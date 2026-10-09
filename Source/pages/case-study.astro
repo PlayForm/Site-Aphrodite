@@ -2,6 +2,7 @@
 import Base from "@Layout/Base.astro";
 
 import Related from "@Component/Related.astro";
+import CodeFence from "@Component/CodeFence.astro";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import PreviewFlow from "../Content/Mermaid/preview-flow.svg?raw";
 
@@ -190,7 +191,7 @@ const Layers = [
 							EXHIBIT A // THE RAW FLOOD (142-LINE BUILD OUTPUT)
 						</div>
 						<div class="border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
-							<div class="text-zinc-dust">$ cargo build --release 2&gt;&amp;1</div>
+							<CodeFence Code="$ cargo build --release 2>&1" />
 							<div class="text-bone-newsprint opacity-90">   Compiling libc v0.2.168</div>
 							<div class="text-bone-newsprint opacity-80">   Compiling tokio v1.47.1</div>
 							<div class="text-bone-newsprint opacity-70">   Compiling serde v1.0.219</div>
@@ -721,10 +722,14 @@ const Layers = [
 							MEDIAN: {Bench.Median} FEWER TOKENS ON TOOL OUTPUT · {Bench.RoundTrips}
 						</div>
 						<div class="font-mono text-base leading-relaxed text-zinc-dust">
-							CACHE AND TOKEN MODES MEASURE IDENTICAL RATIOS · REPRODUCIBLE: CARGO RUN
-							--RELEASE -P APHRODITE --EXAMPLE BENCH_01_CORPUS (BENCH_02_THRESHOLD,
-							BENCH_03_RETRIEVE, BENCH_04_EMA)
+							CACHE AND TOKEN MODES MEASURE IDENTICAL RATIOS · REPRODUCIBLE:
 						</div>
+						<CodeFence
+							Code={`cargo run --release -p aphrodite --example bench_01_corpus
+cargo run --release -p aphrodite --example bench_02_threshold
+cargo run --release -p aphrodite --example bench_03_retrieve
+cargo run --release -p aphrodite --example bench_04_ema`}
+						/>
 					</div>
 					<!-- Per-type bench bars -->
 					<div class="flex flex-col gap-8">

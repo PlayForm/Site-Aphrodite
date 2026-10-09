@@ -3,6 +3,8 @@ import Base from "@Layout/Base.astro";
 
 import Related from "@Component/Related.astro";
 
+import CodeFence from "@Component/CodeFence.astro";
+
 import { ExternalLinks } from "@Library/Links";
 ---
 
@@ -90,11 +92,14 @@ $ hermes`}
 				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					Crates.io install
 				</h2>
-				<div class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
-					<div>$ cargo install aphrodite <span class="opacity-40">// proxy binary</span></div>
-					<div>$ cargo install aphrodite-hermes <span class="opacity-40">// dylib + helper bin</span></div>
-					<div class="text-bone-white">$ aphrodite setup</div>
-					<div class="opacity-70">// runtime home under ~/.hermes/aphrodite + hooks-only loader</div>
+				<CodeFence
+					Class="mb-3 border border-oxblood-dark"
+					Code={`$ cargo install aphrodite // proxy binary
+$ cargo install aphrodite-hermes // dylib + helper bin
+$ aphrodite setup`}
+				/>
+				<div class="mb-3 font-mono text-base leading-relaxed text-zinc-dust">
+					// runtime home under ~/.hermes/aphrodite + hooks-only loader
 				</div>
 			</div>
 		</section>
@@ -112,12 +117,13 @@ $ hermes`}
 				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					Build it yourself
 				</h2>
-				<div class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
-					<div>$ git clone {ExternalLinks.Repository}.git</div>
-					<div>$ cd Aphrodite</div>
-					<div>$ git submodule update --init --recursive</div>
-					<div class="text-bone-white">$ cargo build --release -p aphrodite -p aphrodite-hermes</div>
-				</div>
+				<CodeFence
+					Class="mb-3 border border-oxblood-dark"
+					Code={`$ git clone ${ExternalLinks.Repository}.git
+$ cd Aphrodite
+$ git submodule update --init --recursive
+$ cargo build --release -p aphrodite -p aphrodite-hermes`}
+				/>
 			</div>
 		</section>
 
@@ -134,13 +140,14 @@ $ hermes`}
 				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					Plugin catalog install
 				</h2>
-				<div class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
-					<div class="text-bone-white">$ hermes plugins install aphrodite</div>
-					<div class="opacity-70">$ hermes plugins enable aphrodite <span class="opacity-40">// or answer yes at the Enable now? prompt</span></div>
-					<div>$ cd ~/.hermes/plugins/aphrodite</div>
-					<div class="opacity-70">$ bash download.sh <span class="opacity-40">// or: pwsh ./download.ps1 - still required</span></div>
-					<div class="opacity-70">$ hermes</div>
-				</div>
+				<CodeFence
+					Class="mb-3 border border-oxblood-dark"
+					Code={`$ hermes plugins install aphrodite
+$ hermes plugins enable aphrodite // or answer yes at the Enable now? prompt
+$ cd ~/.hermes/plugins/aphrodite
+$ bash download.sh // or: pwsh ./download.ps1 - still required
+$ hermes`}
+				/>
 				<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
 					<div class="mb-1 text-base font-black uppercase tracking-widest text-stamped-canary">
 						OUTCOME // CATALOG INSTALL:

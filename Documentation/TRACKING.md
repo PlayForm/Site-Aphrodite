@@ -234,8 +234,13 @@ resolve.
 
 ## 6. THE STANDING DECISIONS (the user's)
 
-- The lanes are GLM 5.3 Flash low, launched IDLE, activated 2 at a time;
-  the orchestrator never executes - dispatch + relay + verify only.
+- The lanes are GLM 5.3 Flash low (DeepSeek high only when the user names
+  it), launched IDLE, activated 2 at a time; the orchestrator never executes
+  - dispatch + relay + verify only.
+- THE ARBITER LAW (2026-10-09 user directive): the agents do NOT run
+  `pnpm prepublishOnly` - the USER runs the build themselves (dum
+  prepublishOnly); the agents do development edits only + the fast guards
+  (pnpm run Drift, targeted greps) - never the full build/dev server/tsc.
 - The user commits; the agents never commit.
 - The zine grammar binds (radius 0, the hard shadows, the 16px floor,
   dark-only, the huge-whitespace rhythm, the tree/Current law).

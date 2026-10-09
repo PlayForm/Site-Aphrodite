@@ -14,7 +14,13 @@ interface Props {
 }
 
 const { Code, Lang = "bash", Class = "" } = Astro.props;
-const Html = await codeToHtml(Code, { lang: Lang, theme: "github-dark" });
+// Astro's markdown pipeline renames shiki's `shiki` class to `astro-code` and
+// adds the data-language attribute plus the overflow-x hint; the component
+// applies the same normalization so the markup matches the docs' fences.
+const Html = (await codeToHtml(Code, { lang: Lang, theme: "github-dark" }))
+	.replace('class="shiki ', 'class="astro-code ')
+	.replace('<pre ', `<pre data-language="${Lang}" `)
+	.replace('color:#e1e4e8"', 'color:#e1e4e8;overflow-x:auto"');
 ---
 
 <div class:list={["font-mono text-base leading-relaxed [&>pre]:p-3.5", Class]} set:html={Html} />

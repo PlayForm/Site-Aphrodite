@@ -2,6 +2,7 @@
 import Base from "@Layout/Base.astro";
 
 import Breadcrumbs from "@Component/Breadcrumbs.astro";
+import CodeFence from "@Component/CodeFence.astro";
 import Related from "@Component/Related.astro";
 import { Stamps, Versions } from "@Library/Versions";
 
@@ -71,9 +72,7 @@ const BothCrates =
 					<div class="mb-1 text-base font-black uppercase tracking-widest text-stamped-canary">
 						INSTALL // CARGO:
 					</div>
-					<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base text-bone-white">
-						$ cargo install aphrodite
-					</div>
+					<CodeFence Class="border border-oxblood-dark" Code="$ cargo install aphrodite" />
 					<div class="ccr-marker mt-2 font-mono text-base font-bold text-weathered-teal">
 						{`<<<CCR:crate.aphrodite|${Versions.Binary}|axum-0.8.9+tokio-1.53.1>>>`}
 					</div>
@@ -112,9 +111,7 @@ const BothCrates =
 					<div class="mb-1 text-base font-black uppercase tracking-widest text-stamped-canary">
 						INSTALL // CARGO:
 					</div>
-					<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base text-bone-white">
-						$ cargo install aphrodite-hermes
-					</div>
+					<CodeFence Class="border border-oxblood-dark" Code="$ cargo install aphrodite-hermes" />
 				</div>
 				<p class="mt-4 text-base text-zinc-dust">SRC: crates/aphrodite-hermes/Cargo.toml</p>
 			</div>

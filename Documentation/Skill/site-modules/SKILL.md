@@ -94,3 +94,51 @@ Raw stream panes (ZineStream, the per-page equivalents) take `.ccr-marker` on
 the pane container so every line inherits it; `pre` blocks keep
 `overflow-x: auto` (scroll containment) so intentional code formatting never
 re-wraps. The 16px floor and the mono chip styling are untouched by the wrap.
+
+## 9. The codefence law (the command-block rendering rule)
+
+Every command/terminal-line block a hand-written page renders goes through
+`Source/Component/CodeFence.astro` - the shiki github-dark pipeline the docs
+markdown fences use (astro.config.ts shikiConfig), normalized to the same
+`.astro-code github-dark` / `data-language=bash` markup the docs' ``` fences
+get. NEVER render a command run as plain styled divs: the command names, the
+flags and the paths are tokenized by the grammar, not hand-colored. The law:
+
+1. The code string is BYTE-EXACT - the fence changes the rendering, never the
+   text (the byte-exact facts law above applies to the commands too). A
+   trailing `// note` annotation stays in the string even though the bash
+   grammar renders it as a plain token, not a comment.
+2. Simulated OUTPUT lines inside a terminal pane (the `[INIT] ...` receipts,
+   the compile flood) are NOT commands - they stay as the pane's styled divs
+   next to the fence, preserving the voice-color accents.
+3. The fence's own inline `#24292e` background is the docs-identical look -
+   do not restyle it toward the pane's `bg-soot-black`; the wrapper keeps
+   `font-mono text-base` (the 16px floor) and `[&>pre]:p-3.5`.
+4. Demo data that only SIMULATES a terminal (the workbench compression
+   samples, `$ cargo fmt --check` as tool-output content) is exempt - those
+   strings are Drift-checked showcase content, not install instructions.
+
+## 10. The flow-pane law (the ZineFlow two-view rule)
+
+`ZineFlow.astro` renders each step as two synchronized panes: AGENT-VIEW ·
+CONVERSATION (what the agent sees in its user-facing transcript: the user
+turn, the tool output, the preview line, the marker chip, the
+`aphrodite_retrieve` call and its result) and SYSTEM-PATH · BACKEND (what
+happens behind the conversation: the BLAKE3 store, the inline-then-durable
+lookup, the byte-exact return). Two hard rules:
+
+1. The pane steps stack in ONE grid cell (`grid` wrapper + `col-start-1
+   row-start-1` on every step div, `hidden` for the inactive ones), so the
+   pane AUTO-GROWS with the visible step's content. Never put the step divs
+   in `absolute inset-0` inside a fixed-height wrapper - absolute stacking
+   cannot grow the parent, and long content overflows or clips. The panes
+   are never clipped and never internally scrolled; auto-grow is the
+   decision (no max-height, no overflow-y).
+2. A pane value is a string or a list of mono lines. The per-line tone
+   convention: a line containing `<<<CCR:` renders as the marker chip
+   (`.ccr-marker` + canary bold), `» ` highlights teal, `→ ` dims, `· `
+   fades to opacity-40. Content must be corpus-anchored (hooks.md,
+   retrieve.md, the backends and install docs, the enriched preview catalog
+   at docs/proxy/compression.md:228-241); the marker and preview shapes are
+   the corpus's own examples, never invented formats. Flag any step whose
+   two-view content the sources do not support.

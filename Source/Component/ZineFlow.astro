@@ -20,13 +20,17 @@ interface Props {
 	/** The completion-stamp label shown after the last step. */
 	Complete?: string;
 
-	/** The steps, in order. */
+	/** The steps, in order. Each pane value is either one paragraph or a
+	 *  list of mono lines - the conversation-view excerpt (Agent) or the
+	 *  file-system/backend journey (System). A line containing a CCR
+	 *  marker renders as the marker chip; a "· " line fades, a "→ "
+	 *  line dims, a "» " line highlights teal. */
 	Steps: {
 		Title: string;
 		/** AGENT-VIEW pane text: what the agent sees at this stage. */
-		Agent: string;
+		Agent: string | string[];
 		/** SYSTEM-PATH pane text: what Aphrodite does at this stage. */
-		System: string;
+		System: string | string[];
 		/** Optional per-step detail line, revealed on hover. */
 		Detail?: string;
 		/** Optional SRC anchor route or URL for this step. */
@@ -37,6 +41,21 @@ interface Props {
 }
 
 const { Title, Complete = "FLOW COMPLETE", Steps } = Astro.props;
+
+/** One pane value -> the mono lines it renders as. */
+const PaneLines = (Text: string | string[]) => (Array.isArray(Text) ? Text : [Text]);
+
+/** The per-line treatment: the marker chip, the suppression fades. */
+const PaneLineClass = (Line: string) =>
+	Line.includes("<<<CCR:")
+		? "ccr-marker text-stamped-canary font-bold"
+		: Line.startsWith("» ")
+			? "text-weathered-teal"
+			: Line.startsWith("· ")
+				? "opacity-40"
+				: Line.startsWith("→ ")
+					? "opacity-70"
+					: "";
 ---
 
 <div class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-5 sm:p-8" data-zine-flow>
@@ -63,23 +82,28 @@ const { Title, Complete = "FLOW COMPLETE", Steps } = Astro.props;
 		</span>
 	</div>
 
-	<!-- The synchronized panes: every step rendered, the script shows one -->
+	<!-- The synchronized panes: every step rendered, the script shows one.
+	     The steps stack in one grid cell (col/row 1), so the pane AUTO-GROWS
+	     with the visible step's content - never clipped, never overflowing.
+	     .ccr-marker lets long unbroken marker strings wrap mid-token. -->
 	<div class="mt-4 grid gap-4 lg:grid-cols-2">
 		{
 			["agent", "system"].map((Pane) => (
 				<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
 					<div class={`mb-1 text-base font-black uppercase tracking-widest ${Pane === "agent" ? "text-stamped-canary" : "text-weathered-teal"}`}>
-						{Pane === "agent" ? "AGENT-VIEW" : "SYSTEM-PATH"}
+						{Pane === "agent" ? "AGENT-VIEW · CONVERSATION" : "SYSTEM-PATH · BACKEND"}
 					</div>
-					<div class="relative min-h-[5.5rem]">
+					<div class="grid min-h-[5.5rem]">
 						{Steps.map((Step, I) => (
 							<div
-								class="absolute inset-0 border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold text-bone-white"
+								class="col-start-1 row-start-1 border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold leading-relaxed text-bone-white"
 								data-flow-pane={Pane}
 								data-flow-step={I}
 								hidden={I > 0}
 							>
-								{Pane === "agent" ? Step.Agent : Step.System}
+								{(Pane === "agent" ? PaneLines(Step.Agent) : PaneLines(Step.System)).map((Line) => (
+									<div class={PaneLineClass(Line)}>{Line}</div>
+								))}
 							</div>
 						))}
 					</div>
@@ -142,7 +166,7 @@ const { Title, Complete = "FLOW COMPLETE", Steps } = Astro.props;
 			Root.dataset.flowBound = "1";
 
 			const Data = Root.querySelector('script[type="application/json"][data-flow-steps]');
-			const Steps: { Title: string; Agent: string; System: string; Detail?: string; Anchor?: string; AnchorLabel?: string }[] = Data ? JSON.parse(Data.textContent ?? "[]") : [];
+			const Steps: { Title: string; Agent: string | string[]; System: string | string[]; Detail?: string; Anchor?: string; AnchorLabel?: string }[] = Data ? JSON.parse(Data.textContent ?? "[]") : [];
 			const Total = Steps.length;
 
 			if (Total === 0) {
