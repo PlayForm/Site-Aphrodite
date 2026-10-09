@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -93,7 +93,10 @@ const TokenParts = new RegExp(
 
 /** Wrap one prose file mention or SRC citation: the label stays
  * byte-identical, the anchor composes the tree/Current URL, with the
- * #L<from>[-L<to>] fragment when line references are present. */
+ * #L<from>[-L<to>] fragment when line references are present. A fragment is
+ * emitted only when the referenced lines exist in the local checkout (the
+ * mirror of the Current branch) - a citation whose range runs past the end
+ * of the file degrades to the file anchor instead of a dead line fragment. */
 const WrapProseToken = (Text: string): string => {
 	const Parts = Text.match(TokenParts);
 
@@ -116,8 +119,18 @@ const WrapProseToken = (Text: string): string => {
 	}
 
 	const [, , From, To] = Parts!;
+	const Local = `${Root}/${LocalPath(Entry)}`;
+	const Raw = readFileSync(Local, "utf8").split("\n");
+	const Lines = Raw[Raw.length - 1] === "" ? Raw.length - 1 : Raw.length;
+	const Valid = From !== undefined && To !== undefined
+		? To <= Lines
+		: From === undefined || From <= Lines;
 	const Fragment =
-		From === undefined ? "" : To === undefined ? `#L${From}` : `#L${From}-L${To}`;
+		From === undefined || !Valid
+			? ""
+			: To === undefined
+			? `#L${From}`
+			: `#L${From}-L${To}`;
 	const Url = `${SourceLink(Entry)}${Fragment}`;
 
 	return `<a class="code-link" href="${Url}" title="Source: ${Url}">${Text}</a>`;
