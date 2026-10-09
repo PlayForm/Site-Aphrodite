@@ -3,11 +3,17 @@ import Base from "@Layout/Base.astro";
 
 import Breadcrumbs from "@Component/Breadcrumbs.astro";
 import Related from "@Component/Related.astro";
+import { Stamps, Versions } from "@Library/Versions";
+
+const BothCrates =
+	Versions.Binary === Versions.Hermes
+		? `both v${Versions.Binary}`
+		: `v${Versions.Binary} and v${Versions.Hermes}`;
 ---
 
 <Base
 	Title="CRATES // APHRODITE"
-	Description="The Aphrodite workspace: the aphrodite Chat Completions proxy crate and the aphrodite-hermes integration crate, both v1.6.6, plus the vendored Headroom fork."
+	Description={`The Aphrodite workspace: the aphrodite Chat Completions proxy crate and the aphrodite-hermes integration crate, ${BothCrates}, plus the vendored Headroom fork.`}
 >
 	<main
 		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-32 sm:px-8 lg:gap-40 lg:px-14 lg:py-56"
@@ -49,7 +55,7 @@ import Related from "@Component/Related.astro";
 					<span
 						class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000]"
 					>
-						v1.6.6
+						{Stamps.Binary()}
 					</span>
 				</div>
 				<p class="mb-4 font-body text-sm leading-relaxed text-bone-newsprint">
@@ -66,7 +72,7 @@ import Related from "@Component/Related.astro";
 						$ cargo install aphrodite
 					</div>
 					<div class="mt-2 truncate font-mono text-[11px] font-bold text-weathered-teal">
-						&lt;&lt;&lt;CCR:crate.aphrodite|1.6.6|axum-0.8.9+tokio-1.53.1&gt;&gt;&gt;
+						{`<<<CCR:crate.aphrodite|${Versions.Binary}|axum-0.8.9+tokio-1.53.1>>>`}
 					</div>
 				</div>
 				<p class="mt-4 text-[9px] text-zinc-dust">SRC: crates/aphrodite/Cargo.toml</p>
@@ -90,7 +96,7 @@ import Related from "@Component/Related.astro";
 					<span
 						class="rotate-1 border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-soot-black shadow-[4px_4px_0px_#000]"
 					>
-						v1.6.6
+						{`v${Versions.Hermes}`}
 					</span>
 				</div>
 				<p class="mb-4 font-body text-sm leading-relaxed text-bone-newsprint">
@@ -152,7 +158,7 @@ import Related from "@Component/Related.astro";
 					removed in v1.6.6. Marker grammar:
 					<code class="font-mono text-xs text-weathered-teal">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</code>
 				</p>
-				<p class="mt-2 text-[9px] text-zinc-dust">SRC: aphrodite.toml.example; CHANGELOG.md v1.6.6</p>
+				<p class="mt-2 text-[9px] text-zinc-dust">SRC: aphrodite.toml.example; CHANGELOG.md v{Versions.ChangelogVersion}</p>
 			</div>
 		</section>
 

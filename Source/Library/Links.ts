@@ -42,6 +42,8 @@ export const ExternalLinks = {
 	Crates: "https://crates.io/crates/aphrodite",
 	Repository: "https://github.com/PlayForm/Aphrodite",
 	HermesRepository: "https://github.com/PlayForm/Aphrodite-Hermes",
+	/** The releases listing; the release-note URLs compose with the Aphrodite%2Fv<ver> tag form (Library/Versions.ts). */
+	Releases: "https://github.com/PlayForm/Aphrodite/releases",
 	PlayForm: "https://PlayForm.Cloud",
 } as const;
 

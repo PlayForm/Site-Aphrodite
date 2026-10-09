@@ -1,3 +1,4 @@
+---
 /**
  * ZineDiagramNav - the DeepSeek DiagramNav pattern re-skinned in the zine
  * palette, attached at runtime to every `[data-diagram]` figure on the page.
@@ -16,8 +17,10 @@
  * precedent in hooks/plugin/tools) include this component once to get the
  * interactivity without changing their figure markup.
  */
+---
 
-function NodeKey(Group: Element): string {
+<script>
+	function NodeKey(Group: Element): string {
 	return Group.id.replace(/^flowchart-/, "").replace(/-\d+$/, "");
 }
 
@@ -114,9 +117,8 @@ function BindDiagrams() {
 			}
 		}
 	}
-}
+	}
 
-export default BindDiagrams;
-
-BindDiagrams();
-document.addEventListener("astro:page-load", BindDiagrams);
+	BindDiagrams();
+	document.addEventListener("astro:page-load", BindDiagrams);
+</script>

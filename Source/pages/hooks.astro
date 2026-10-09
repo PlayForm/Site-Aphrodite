@@ -2,6 +2,7 @@
 import Base from "@Layout/Base.astro";
 
 import Related from "@Component/Related.astro";
+import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 ---
 
@@ -275,9 +276,11 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 		<Related
 			Links={[
 				{ Href: "/plugin/", Label: "PLUGIN" },
+				{ Href: "/hermes/", Label: "HERMES" },
 				{ Href: "/tools/", Label: "TOOLS" },
 				{ Href: "/setup/", Label: "SETUP" },
 			]}
 		/>
 	</main>
+	<ZineDiagramNav />
 </Base>

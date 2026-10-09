@@ -24,6 +24,16 @@ export default defineConfig({
 	// TODO Place your site URL here
 	// site: "",
 	compressHTML: true,
+	// The markdown code fences render through shiki (bundled with Astro) with
+	// the dark github-dark theme: the site is dark-only (soot-black panes), so
+	// the pinned dark theme keeps the token colors visible on every code pane.
+	// Highlighting only applies when the fence carries a language tag
+	// (```rust, ```json, ...); untagged fences render as plain text.
+	markdown: {
+		shikiConfig: {
+			theme: "github-dark",
+		},
+	},
 	prefetch: {
 		defaultStrategy: "hover",
 		prefetchAll: true,

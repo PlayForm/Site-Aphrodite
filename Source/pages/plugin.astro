@@ -2,13 +2,15 @@
 import Base from "@Layout/Base.astro";
 
 import Related from "@Component/Related.astro";
+import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import ContextEngine from "../Content/Mermaid/context-engine.svg?raw";
 import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
+import { Stamps, Versions } from "@Library/Versions";
 ---
 
 <Base
 	Title="PLUGIN // APHRODITE"
-	Description="The Aphrodite Hermes plugin, v2.2.6: a thin Python registration shim over a Rust dylib - 6 hooks, 13 tools, an opt-in context engine, and an explicit SHA-256-verified download flow."
+	Description={`The Aphrodite Hermes plugin, v${Versions.Plugin}: a thin Python registration shim over a Rust dylib - 6 hooks, 13 tools, an opt-in context engine, and an explicit SHA-256-verified download flow.`}
 >
 	<main
 		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
@@ -31,13 +33,13 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 				in <code class="font-mono text-xs text-weathered-teal">plugin.yaml</code>, all logic
 				living in <code class="font-mono text-xs text-weathered-teal"
 					>libaphrodite_hermes.dylib</code
-				>. This page documents the v2.2.6 plugin spec.
+				>. This page documents the {`v${Versions.Plugin}`} plugin spec.
 			</p>
 			<div class="mt-16 flex max-w-4xl flex-wrap items-center gap-8">
 				<span
 					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000]"
 				>
-					v2.2.6 STANDALONE
+					{Stamps.Plugin()} STANDALONE
 				</span>
 				<span
 					class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]"
@@ -73,7 +75,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 				<div class="grid grid-cols-1 gap-10 md:grid-cols-2">
 					<div class="space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px]">
 						<div><span class="text-zinc-dust">name:</span> <span class="text-bone-white">aphrodite</span></div>
-						<div><span class="text-zinc-dust">version:</span> <span class="text-bone-white">2.2.6</span></div>
+						<div><span class="text-zinc-dust">version:</span> <span class="text-bone-white">{Versions.Plugin}</span></div>
 						<div><span class="text-zinc-dust">kind:</span> <span class="text-bone-white">standalone</span></div>
 						<div>
 							<span class="text-zinc-dust">requires_hermes:</span>
@@ -298,7 +300,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 						))
 					}
 				</div>
-				<p class="mt-8 font-mono text-[10px] text-zinc-dust">
+				<p class="mt-8 font-mono text-[9px] text-zinc-dust">
 					SRC: docs/plugin/hooks.md:13-20 - every hook is a thin dispatch that forwards to the Rust dylib; the dylib holds all the behavior.
 				</p>
 				<!-- The version-pairing strip -->
@@ -308,10 +310,10 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					</div>
 					<div class="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-3">
 						<div>
-							<div class="font-headline text-2xl font-black text-bone-white">1.6.6 ↔ 2.2.6</div>
+							<div class="font-headline text-2xl font-black text-bone-white">{Stamps.Pairing()}</div>
 							<p class="mt-3 font-body text-xs leading-relaxed text-bone-newsprint">
-								Today's pairing: binary 1.6.6, plugin 2.2.6. Every release moves both:
-								"Binary 1.6.5 → 1.6.6, plugin 2.2.5 → 2.2.6."
+								Today's pairing: binary {Versions.Binary}, plugin {Versions.Plugin}. Every release moves both:
+								"{Versions.ChangelogPairing}."
 							</p>
 						</div>
 						<div>
@@ -334,7 +336,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 							</p>
 						</div>
 					</div>
-					<div class="mt-6 font-mono text-[10px] text-zinc-dust">
+					<div class="mt-6 font-mono text-[9px] text-zinc-dust">
 						SRC: CHANGELOG.md v1.4.6/v1.4.4/v1.6.5/v1.6.6 entries · the Aphrodite/v1.4.6 release note ("released plugin-first ... points at assets that already exist")
 					</div>
 				</div>
@@ -355,7 +357,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 						navigation tool whose feature was unbuildable. The declared surface and the
 						running surface are kept identical on purpose.
 					</p>
-					<div class="mt-4 font-mono text-[10px] text-zinc-dust">SRC: CHANGELOG.md:61-64 (v1.6.5) · CHANGELOG.md:166-173 (v1.6.1) · v1.4.6 release note</div>
+					<div class="mt-4 font-mono text-[9px] text-zinc-dust">SRC: CHANGELOG.md:61-64 (v1.6.5) · CHANGELOG.md:166-173 (v1.6.1) · v1.4.6 release note</div>
 				</div>
 			</div>
 		</section>
@@ -366,8 +368,10 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 				{ Href: "/setup/", Label: "SETUP" },
 				{ Href: "/hermes/", Label: "HERMES" },
 				{ Href: "/hooks/", Label: "HOOKS" },
+				{ Href: "/flavors/", Label: "FLAVORS" },
 				{ Href: "/tools/", Label: "TOOLS" },
 			]}
 		/>
 	</main>
+	<ZineDiagramNav />
 </Base>

@@ -414,7 +414,8 @@ const Samples = [
 					</div>
 					<div class="mt-3 font-mono text-2xl font-black text-bone-white">132× overall</div>
 					<p class="mt-2 font-mono text-[11px] text-zinc-dust">
-						3×–610× per type · 9–40 ms end-to-end · 20/20 retrieve OK · the CHANGELOG
+						3×–610× per type · 9–40 ms end-to-end at v1.3.4 (the README's current
+						latency figure is 8-40 ms) · 20/20 retrieve OK · the CHANGELOG
 						entry prints the unrounded overall at 132.82
 					</p>
 				</div>
@@ -449,8 +450,8 @@ const Samples = [
 					</p>
 				</div>
 			</div>
-			<p class="mt-6 font-mono text-[10px] text-zinc-dust">
-				SRC: CHANGELOG.md:632-635 (the standard corpus entry, unrounded overall 132.82) · CHANGELOG.md:962-973 (the ns/µs table) · CHANGELOG.md:983 (216 KB → 12 markers)
+			<p class="mt-6 font-mono text-[9px] text-zinc-dust">
+				SRC: CHANGELOG.md:632-635 (the standard corpus entry, unrounded overall 132.82) · CHANGELOG.md:962-973 (the ns/µs table) · CHANGELOG.md:983 (216 KB → 12 markers) · README.md:460 (the current 8-40 ms latency figure)
 			</p>
 		</section>
 
@@ -528,6 +529,11 @@ const Samples = [
 		const First = Lines[0] ?? "";
 		const Trimmed = Text.trim();
 
+		// search: search-result JSON (total_count + query). Checked BEFORE the
+		// generic json rule - a search result is itself JSON, so the generic
+		// branch would otherwise claim it first (README.md:169).
+		if (Trimmed.includes("total_count") && Trimmed.includes("query")) return "search";
+
 		// JSON / tool_output: starts with { or [ and parses as JSON.
 		if (Trimmed.startsWith("{") || Trimmed.startsWith("[")) {
 			try {
@@ -538,9 +544,6 @@ const Samples = [
 				// not JSON - fall through
 			}
 		}
-
-		// search: search-result JSON (total_count + query).
-		if (Trimmed.includes("total_count") && Trimmed.includes("query")) return "search";
 
 		// diff headers.
 		if (/^diff --git|^@@ -|^\+\+\+|^--- /m.test(Text)) return "diff";
@@ -689,8 +692,9 @@ const Samples = [
 				try {
 					const Parsed = JSON.parse(Text.trim()) as Record<string, unknown>;
 					const Keys = Object.keys(Parsed);
-					return `[json:${Keys.length} keys 1L | ${Ellipsis(Keys.join(", "))}]`;				} catch {
-					return `[json:5 items 3L]`;
+					return `[${Type}:${Keys.length} keys 1L | ${Ellipsis(Keys.join(", "))}]`;
+				} catch {
+					return `[${Type}:5 items 3L]`;
 				}
 			}
 			case "html":
@@ -805,6 +809,31 @@ const Samples = [
 		SetStat(Key, StatValues[Key]);
 	}
 
+	// ---- CCR chip: click to copy the marker (the "CLICK TO COPY" label).
+	// Clipboard API with the textarea fallback for non-secure contexts. ----
+	Marker.addEventListener("click", async () => {
+		if (!LastMarker) return;
+		let Copied = false;
+		try {
+			await navigator.clipboard.writeText(LastMarker);
+			Copied = true;
+		} catch {
+			const Helper = document.createElement("textarea");
+			Helper.value = LastMarker;
+			Helper.style.position = "fixed";
+			Helper.style.opacity = "0";
+			document.body.appendChild(Helper);
+			Helper.select();
+			Copied = document.execCommand("copy");
+			Helper.remove();
+		}
+		const Label = Marker.textContent ?? "";
+		Marker.textContent = Copied ? "COPIED ✓" : "COPY FAILED";
+		setTimeout(() => {
+			Marker.textContent = Label;
+		}, 1200);
+	});
+
 	// ---- Exec-demo ornament: spin -> result -> reset. ----
 	let ExecBusy = false;
 	ExecButton.addEventListener("click", () => {
@@ -853,10 +882,13 @@ const Samples = [
 		});
 	}
 
-	// ---- POST /reload stamp: re-applies the sliders to their toml values
-	// (the demo's stand-in for the real reload endpoint). ----
+	// ---- POST /reload stamp: restores the sliders to their TOML values
+	// (the demo's stand-in for the real reload endpoint). The initial value
+	// attribute carries the shipped default, so reload resets to it. ----
 	document.querySelector("[data-action='reload']")?.addEventListener("click", () => {
 		for (const Slider of document.querySelectorAll<HTMLInputElement>("[data-knob]")) {
+			const Reset = Slider.getAttribute("value");
+			if (Reset !== null) Slider.value = Reset;
 			Slider.dispatchEvent(new Event("input"));
 		}
 		Run();

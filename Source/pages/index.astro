@@ -4,6 +4,7 @@ import Base from "@Layout/Base.astro";
 import Related from "@Component/Related.astro";
 
 import { ExternalLinks } from "@Library/Links";
+import { Stamps, Versions } from "@Library/Versions";
 ---
 
 <Base
@@ -91,7 +92,7 @@ import { ExternalLinks } from "@Library/Links";
 				<span
 					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-zinc-dust"
 				>
-					v1.6.6
+					{Stamps.Binary()}
 				</span>
 				<a
 					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] uppercase text-bone-newsprint transition-colors hover:bg-blood-crimson"
@@ -112,7 +113,7 @@ import { ExternalLinks } from "@Library/Links";
 				<span
 					class="border border-weathered-teal/40 bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-weathered-teal"
 				>
-					HERMES PLUGIN v2.2.6
+					{Stamps.PluginSpec()}
 				</span>
 				<a
 					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-zinc-dust transition-colors hover:text-bone-white"
@@ -131,6 +132,11 @@ import { ExternalLinks } from "@Library/Links";
 					CC0-1.0
 				</span>
 			</div>
+			<p class="mt-8 text-[9px] text-zinc-dust">
+				SRC: README.md:12 (610&times;/132&times;, ~10&nbsp;ms) &middot; README.md:467-511 (the
+				200-session study) &middot; crates/aphrodite/Cargo.toml ({`v${Versions.Binary}`}) &middot;
+				plugins/aphrodite/plugin.yaml ({`v${Versions.Plugin}`})
+			</p>
 		</header>
 
 		<!-- PROBLEM MODULE -->
@@ -264,7 +270,8 @@ import { ExternalLinks } from "@Library/Links";
 			</div>
 			<p class="mt-10 text-[9px] text-zinc-dust">
 				CLASSIFIER: 16 PIPELINE TYPES IN THE README (README.md:155-176); FULL REGISTRY OF 30
-				TYPES IN THE DOCS (docs/classification/content-types.md:118-151).
+				TYPES IN THE DOCS (docs/classification/content-types.md:118-151). TIMINGS: CLASSIFY
+				40-123 NS, WHOLE COMPRESS STEP SUB-MILLISECOND (README.md:133, 461).
 			</p>
 		</section>
 
@@ -305,7 +312,7 @@ import { ExternalLinks } from "@Library/Links";
 						<div class="mt-1 flex flex-wrap items-center gap-3 text-xs font-bold lg:justify-end">
 							<span class="text-stamped-canary">26.9% TOTAL BUDGET DEFLECTED</span>
 							<span class="text-zinc-dust">&bull;</span>
-							<span class="text-weathered-teal">22,921 MEDIAN PER CALL</span>
+							<span class="text-weathered-teal">22,921 AVG PER CALL</span>
 						</div>
 					</div>
 				</div>
@@ -374,7 +381,7 @@ import { ExternalLinks } from "@Library/Links";
 					MARKERS 424,959,588 / EXPANDED 581,302,405 / SAVED 156,342,817 (26.9%). 183 OF 200
 					SESSIONS SAVED; MEDIAN SESSION RATIO 22.9%; TOOL-HEAVY 20-25%, PURE-TOOL 76-82%.
 					THE EXACT PERCENTAGE IS A BAND: ~24-33% ACROSS A 3.0-4.5 CHARS/TOKEN SENSITIVITY
-					RANGE, CENTERED ~27%.
+					RANGE, CENTERED ~27%. SRC: README.md:467-511.
 				</p>
 			</div>
 		</section>

@@ -2,6 +2,7 @@
 import Base from "@Layout/Base.astro";
 
 import Related from "@Component/Related.astro";
+import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import SessionLifecycle from "../Content/Mermaid/session-lifecycle.svg?raw";
 
 const Previews = [
@@ -123,6 +124,7 @@ const ProxyRows = [
 					THE DUAL PROXIES: TOKEN ON :9798 (SQLITE, PERSISTENT, COMPRESSES ABOVE 1 KB) AND
 					CACHE ON :9797 (IN-MEMORY, COMPRESSES ABOVE 8 KB). NO HOT-RELOAD - RESTART THE
 					SESSION TO PICK UP A NEW BUILD.
+					<span class="mt-1 block text-[9px]">SRC: README.md:298-299; docs/guides/hermes-integration.md:107-108.</span>
 				</p>
 				<figure class="mt-20 border border-oxblood-dark bg-soot-black p-4" data-diagram="session-lifecycle">
 					<div class="overflow-x-auto" set:html={SessionLifecycle} />
@@ -221,4 +223,5 @@ const ProxyRows = [
 			]}
 		/>
 	</main>
+	<ZineDiagramNav />
 </Base>

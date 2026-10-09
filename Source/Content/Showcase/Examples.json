@@ -229,7 +229,7 @@
             "category": "log",
             "corpus": false,
             "raw": "[INFO] server listening on 127.0.0.1:8080\n[DEBUG] connection accepted from 10.0.0.4\n[WARN] slow query: 1240ms /api/report\n[ERROR] upstream timeout after 30s\n[INFO] retry scheduled in 2s",
-            "preview": "[log:5E 1E 1W 5L]",
+            "preview": "[log:1E 1W 5L]",
             "marker": "[INFO] server listening on 127.0.0.1:8080\n[log: entries=5;errors=1;warnings=1]\n<<<CCR:c4f7a0d3e6b9c2f5a8d1e4c7f0a3d6b9e2c5f8a137|log|187>>>",
             "retrieval": {
                 "tool": "aphrodite_retrieve",

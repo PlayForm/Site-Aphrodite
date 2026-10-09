@@ -91,7 +91,7 @@ const Layers = [
 ---
 
 <Base
-	Title="Case Study - Aphrodite"
+	Title="CASE STUDY // APHRODITE"
 	Description="Why Aphrodite is shaped this way: the marker is the contract, the classifier is the gate, the thresholds are the knobs - measured at 156,342,817 context tokens saved across 200 real sessions."
 >
 	<main
@@ -141,6 +141,7 @@ const Layers = [
 						<span class="text-zinc-dust">·</span>
 						<span class="text-zinc-dust">{Study.MedianRatio} MEDIAN SESSION</span>
 					</div>
+					<div class="mt-6 font-mono text-[9px] text-zinc-dust">SRC: README.md:467-511.</div>
 				</div>
 			</div>
 		</header>
@@ -281,7 +282,7 @@ const Layers = [
 											{Tier}
 											<span class="ml-2 text-stamped-canary">{Multiplier}</span>
 										</div>
-										<div class="truncate font-mono text-[10px] text-zinc-dust">{Types}</div>
+										<div class="truncate font-mono text-[9px] text-zinc-dust">{Types}</div>
 									</div>
 									<div
 										class="hidden shrink-0 text-right font-mono text-[10px] text-weathered-teal sm:block"
@@ -295,7 +296,7 @@ const Layers = [
 							HIGHER MULTIPLIER = LONGER THE CONTENT STAYS VISIBLE BEFORE COMPRESSION ·
 							CODE ×3.0 IS THE CONFIG DEFAULT · FOOTNOTE: THE FULL REGISTRY IS{" "}
 							{Classifier.RegistryTypes} TYPES; THE README CATALOG RENDERS{" "}
-							{Classifier.PipelineTypes}.
+							{Classifier.PipelineTypes}. SRC: README.md:187-198.
 						</div>
 					</div>
 				</div>
@@ -522,7 +523,7 @@ const Layers = [
 						}
 						<div class="font-mono text-[10px] leading-relaxed text-zinc-dust">
 							SAVINGS SCALE WITH TOOL-OUTPUT VOLUME AND SESSION LENGTH - THE SAME ENGINE,
-							FOUR DIFFERENT PAYOFFS, ALL FROM THE SAME KNOBS.
+							FOUR DIFFERENT PAYOFFS, ALL FROM THE SAME KNOBS. SRC: README.md:497-503.
 						</div>
 					</div>
 				</div>
@@ -657,6 +658,10 @@ const Layers = [
 						</div>
 					</div>
 				</div>
+				<p class="mt-10 font-mono text-[10px] leading-relaxed text-zinc-dust">
+					SRC: README.md:467-511 (the real-world study table, the per-output compression, and
+					the confidence note).
+				</p>
 			</div>
 		</section>
 
@@ -693,7 +698,7 @@ const Layers = [
 								<div class="font-headline text-4xl font-black tracking-tighter text-bone-white sm:text-5xl">
 									{Bench.Overall}
 								</div>
-								<div class="font-mono text-[10px] text-zinc-dust">{Bench.Corpus}</div>
+								<div class="font-mono text-[9px] text-zinc-dust">{Bench.Corpus}</div>
 							</div>
 							<div class="zine-box-subtle border-[3px] border-oxblood-dark bg-soot-black p-5">
 								<div class="font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-dust">
@@ -742,6 +747,10 @@ const Layers = [
 						}
 					</div>
 				</div>
+				<p class="mt-10 font-mono text-[10px] leading-relaxed text-zinc-dust">
+					SRC: README.md:444-465 (the standard corpus figures, the per-type table, and the
+					reproduce commands).
+				</p>
 			</div>
 		</section>
 
@@ -853,7 +862,7 @@ const Layers = [
 							(<code class="font-mono text-xs">limit: 0</code>) returns the exact
 							original bytes, hashing back to the marker's own hash.
 						</p>
-						<div class="mt-6 font-mono text-[10px] text-zinc-dust">
+						<div class="mt-6 font-mono text-[9px] text-zinc-dust">
 							SRC: CHANGELOG.md:683-706 · docs/api/retrieve.md ("byte-exact by construction")
 						</div>
 					</article>
@@ -893,7 +902,7 @@ const Layers = [
 							release; the packaging guard means this class of regression can never
 							reach crates.io again.
 						</p>
-						<div class="mt-6 font-mono text-[10px] text-zinc-dust">SRC: CHANGELOG.md:408-450</div>
+						<div class="mt-6 font-mono text-[9px] text-zinc-dust">SRC: CHANGELOG.md:408-450</div>
 					</article>
 					<!-- Arc 3: one runtime home -->
 					<article class="border-l-4 border-weathered-teal pl-6 sm:pl-10">
@@ -927,7 +936,7 @@ const Layers = [
 							isolation extends to the whole stack, and the startup log names the
 							decision: <code class="font-mono text-xs">runtime home: &lt;path&gt; (decided by ...)</code>.
 						</p>
-						<div class="mt-6 font-mono text-[10px] text-zinc-dust">SRC: CHANGELOG.md:104-154</div>
+						<div class="mt-6 font-mono text-[9px] text-zinc-dust">SRC: CHANGELOG.md:104-154</div>
 					</article>
 					<!-- Arc 4: the checksum law -->
 					<article class="border-l-4 border-raw-blood pl-6 sm:pl-10">
@@ -960,7 +969,7 @@ const Layers = [
 							ships 12 artifacts - 4 targets x (binary, plugin dylib, SHA256SUMS) - and
 							the dylib arm refuses installs when the in-tree checksums are missing.
 						</p>
-						<div class="mt-6 font-mono text-[10px] text-zinc-dust">SRC: CHANGELOG.md:39-67 · the Aphrodite/v1.6.5 release note</div>
+						<div class="mt-6 font-mono text-[9px] text-zinc-dust">SRC: CHANGELOG.md:39-67 · the Aphrodite/v1.6.5 release note</div>
 					</article>
 					<!-- Arc 5: the path guards -->
 					<article class="border-l-4 border-stamped-canary pl-6 sm:pl-10">
@@ -991,7 +1000,7 @@ const Layers = [
 							as opt-in with a <code class="font-mono text-xs">requires_hermes &gt;= 0.20.2</code>
 							floor.
 						</p>
-						<div class="mt-6 font-mono text-[10px] text-zinc-dust">SRC: CHANGELOG.md:3-37 · the Aphrodite/v1.6.6 release note</div>
+						<div class="mt-6 font-mono text-[9px] text-zinc-dust">SRC: CHANGELOG.md:3-37 · the Aphrodite/v1.6.6 release note</div>
 					</article>
 				</div>
 			</div>

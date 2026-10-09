@@ -196,7 +196,7 @@ const Example = [
 				<figcaption
 					class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust"
 				>
-					CONFIG RESOLUTION - the same order the ladder simulates
+					M7 // CONFIG RESOLUTION
 				</figcaption>
 			</figure>
 		</section>
@@ -469,13 +469,15 @@ const Example = [
 </Base>
 
 <script>
-	// ---- The editor default (captured from the server-rendered textarea on
-	// first init - no duplicated constant, the reset restores it verbatim). ----
-	const Editor = document.querySelector<HTMLTextAreaElement>("[data-editor]");
-	const Status = document.querySelector("[data-editor-status]");
-	const Ladder = document.querySelector("[data-ladder]");
-	const ReloadOut = document.querySelector("[data-reload-out]");
-	const ReloadParent = ReloadOut?.parentElement;
+	// ---- The editor default (captured on first init - the reset restores it
+	// verbatim). The element references are re-queried on every init: the
+	// view-transitions router swaps the page body, so module-load-time
+	// references would point at detached DOM after returning to this page. ----
+	let Editor: HTMLTextAreaElement | null = null;
+	let Status: Element | null = null;
+	let Ladder: Element | null = null;
+	let ReloadOut: Element | null = null;
+	let ReloadParent: Element | null = null;
 
 	let InitialValue = "";
 
@@ -720,6 +722,12 @@ const Example = [
 	}
 
 	function Init(): void {
+		Editor = document.querySelector<HTMLTextAreaElement>("[data-editor]");
+		Status = document.querySelector("[data-editor-status]");
+		Ladder = document.querySelector("[data-ladder]");
+		ReloadOut = document.querySelector("[data-reload-out]");
+		ReloadParent = ReloadOut?.parentElement ?? null;
+
 		if (!Editor || Editor.dataset.editorBound) {
 			return;
 		}
