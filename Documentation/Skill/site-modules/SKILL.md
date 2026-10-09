@@ -79,3 +79,18 @@ the grid never reorders the items. Precedents: `pages/index.astro` (the
 4-stage pipeline grid, `gap-12 sm:gap-14 xl:gap-14`) and
 `pages/case-study.astro` (the layer grid, `gap-16`). When you touch one,
 grep the other and keep the breakpoints identical.
+
+## 8. The marker-render law (the CCR-marker overflow rule)
+
+Every element that renders a CCR marker string (`<<<CCR:hash|type|size>>>`,
+the 40-hex form is ~50+ chars with no break opportunity) carries
+`overflow-wrap: anywhere` - the shared utility class `.ccr-marker` in
+`Source/Stylesheet/Global.css` (or the `.docs-prose :global(code)` /
+`:global(td)` rules for the docs prose, which already carry it). The wrap is
+VISUAL ONLY: the rendered text and every `data-copy` payload stay byte-exact
+(the Drift corpus checks are the arbiter). `truncate` is NOT an acceptable
+substitute on a marker line - it hides the size field instead of wrapping.
+Raw stream panes (ZineStream, the per-page equivalents) take `.ccr-marker` on
+the pane container so every line inherits it; `pre` blocks keep
+`overflow-x: auto` (scroll containment) so intentional code formatting never
+re-wraps. The 16px floor and the mono chip styling are untouched by the wrap.

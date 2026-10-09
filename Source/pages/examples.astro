@@ -195,7 +195,7 @@ const InjectionOrder = [
 							<div class="mt-6 text-bone-newsprint opacity-90">
 								[text:3L 50B | some unrecognizable prose here]
 							</div>
-							<div class="mt-4 text-weathered-teal">&lt;&lt;&lt;CCR:0e3a5c9f...a1e|text|1000&gt;&gt;&gt;</div>
+							<div class="ccr-marker mt-4 text-weathered-teal">&lt;&lt;&lt;CCR:0e3a5c9f...a1e|text|1000&gt;&gt;&gt;</div>
 							<div class="mt-8 border-t border-oxblood-dark pt-4 text-base text-zinc-dust">
 								SAME BYTES ON THE CACHE LANE: NO PREVIEW, NO MARKER, NO STORE ENTRY
 							</div>
@@ -240,7 +240,7 @@ const InjectionOrder = [
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							The lifecycle of one payload: the hook hashes it (BLAKE3), stores the
 							bytes in the session store, and replaces the output with a
-							<code class="font-mono text-base">{"<<<CCR:hash|type|size>>>"}</code> marker
+							<code class="ccr-marker font-mono text-base">{"<<<CCR:hash|type|size>>>"}</code> marker
 							plus a preview. The transcript now carries the marker instead of the
 							content - hash, type, size, ~15 tokens.
 						</p>
@@ -270,7 +270,7 @@ const InjectionOrder = [
 							<div class="mt-6 text-bone-newsprint opacity-90">
 								[git:2M 2A 1D 3?? | src/x.rs src/y.rs +5 more]
 							</div>
-							<div class="mt-4 text-weathered-teal">
+							<div class="ccr-marker mt-4 text-weathered-teal">
 								&lt;&lt;&lt;CCR:d0e3f6a9...d4e7|git|173&gt;&gt;&gt;
 							</div>
 							<div class="mt-8 border-t border-oxblood-dark pt-4 text-base text-stamped-canary">
@@ -307,7 +307,7 @@ const InjectionOrder = [
 						<div class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 							THREE MARKER FACES // HASH EXTRACTION ACCEPTS ALL THREE
 						</div>
-						<div class="border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-loose">
+						<div class="ccr-marker border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-loose">
 							<div class="text-weathered-teal">{"<<<CCR:hash|type|size>>>"}</div>
 							<div class="text-zinc-dust">STANDARD - THE WIRE FORMAT</div>
 							<div class="mt-6 text-weathered-teal">[CCR:hash]</div>
@@ -384,16 +384,16 @@ const InjectionOrder = [
 						<div class="border border-oxblood-dark bg-soot-black p-5 font-mono text-base">
 							<div class="text-zinc-dust">cd project && cargo build --release && cargo test 2&gt;&amp;1</div>
 							<div class="mt-6 text-bone-newsprint opacity-90">[chain:3 | build ...]</div>
-							<div class="mt-4 text-weathered-teal">
+							<div class="ccr-marker mt-4 text-weathered-teal">
 								&lt;&lt;&lt;CCR:e7c0f3a6...c1f4|terminal|398&gt;&gt;&gt;
 							</div>
 							<div class="mt-8 border-t border-oxblood-dark pt-4 text-base text-zinc-dust">
 								PER-SEGMENT MARKERS BEHIND IT - EACH SEGMENT ITS OWN RECEIPT:
 							</div>
-							<div class="mt-4 text-weathered-teal">
+							<div class="ccr-marker mt-4 text-weathered-teal">
 								&lt;&lt;&lt;CCR:f8a1d4c7...b0e3|build_output|210&gt;&gt;&gt;
 							</div>
-							<div class="mt-2 text-weathered-teal">
+							<div class="ccr-marker mt-2 text-weathered-teal">
 								&lt;&lt;&lt;CCR:a9b2c5d8...e1f4|test|188&gt;&gt;&gt;
 							</div>
 						</div>
@@ -730,7 +730,7 @@ const InjectionOrder = [
 							<div class="mt-4 text-bone-newsprint opacity-90">
 								transform_tool_result → BLAKE3 → marker
 							</div>
-							<div class="mt-2 text-weathered-teal">
+							<div class="ccr-marker mt-2 text-weathered-teal">
 								&lt;&lt;&lt;CCR:d7b4f2a8...c6b0|terminal|612&gt;&gt;&gt;
 							</div>
 							<div class="mt-8 border-t border-oxblood-dark pt-4 text-base text-stamped-canary">
@@ -739,7 +739,7 @@ const InjectionOrder = [
 							<div class="mt-4 text-bone-newsprint opacity-90">
 								Chat Completions response → classify → threshold → marker
 							</div>
-							<div class="mt-2 text-weathered-teal">
+							<div class="ccr-marker mt-2 text-weathered-teal">
 								&lt;&lt;&lt;CCR:d7b4f2a8...c6b0|terminal|612&gt;&gt;&gt;
 							</div>
 						</div>

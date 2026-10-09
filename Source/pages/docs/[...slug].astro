@@ -455,13 +455,15 @@ const Purposes = new Map(
 		color: var(--bone-white);
 	}
 
-	/* Inline code: the asphalt chip. */
+	/* Inline code: the asphalt chip. Marker chips (<<<CCR:hash|type|size>>>)
+	   wrap mid-token inside the chip instead of overflowing the column. */
 	.docs-prose :global(code) {
 		padding: 0.1rem 0.4rem;
 		border: 1px solid var(--oxblood-dark);
 		background-color: var(--asphalt-panel);
 		font-family: "JetBrains Mono", monospace;
 		font-size: 1rem;
+		overflow-wrap: anywhere;
 		color: var(--weathered-teal);
 	}
 

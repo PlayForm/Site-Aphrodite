@@ -3,6 +3,8 @@ import Base from "@Layout/Base.astro";
 
 import Related from "@Component/Related.astro";
 
+import CodeFence from "@Component/CodeFence.astro";
+
 import StudyLedger from "@Component/StudyLedger.astro";
 
 import { ExternalLinks } from "@Library/Links";
@@ -259,7 +261,7 @@ import { Stamps, Versions } from "@Library/Versions";
 						</span>
 					</div>
 					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">SQLite</div>
-					<div class="mt-4 border-t border-oxblood-dark pt-3 text-base text-zinc-dust">
+					<div class="ccr-marker mt-4 border-t border-oxblood-dark pt-3 text-base text-zinc-dust">
 						CCR marker: &lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;
 					</div>
 				</div>
@@ -421,12 +423,14 @@ import { Stamps, Versions } from "@Library/Versions";
 					</span>
 				</div>
 				<div class="mb-4 space-y-1 border border-oxblood-dark bg-soot-black p-4 font-mono text-base text-bone-newsprint">
-					<div class="text-zinc-dust">$ git clone {ExternalLinks.HermesRepository}.git</div>
-					<div class="text-zinc-dust">$ cd Aphrodite-Hermes</div>
-					<div class="text-zinc-dust">$ bash download.sh</div>
+					<CodeFence
+						Code={`$ git clone ${ExternalLinks.HermesRepository}.git
+$ cd Aphrodite-Hermes
+$ bash download.sh`}
+					/>
 					<div class="text-stamped-canary">[INIT] binary + dylib fetched from GitHub Releases</div>
 					<div class="text-weathered-teal">[INIT] SHA-256 verified into ~/.hermes/aphrodite/</div>
-					<div class="text-bone-white">$ hermes plugins enable aphrodite</div>
+					<CodeFence Code="$ hermes plugins enable aphrodite" />
 				</div>
 				<div
 					class="flex flex-col items-stretch justify-between gap-3 border-2 border-oxblood-dark bg-asphalt-panel p-4 sm:flex-row sm:items-center"

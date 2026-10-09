@@ -1,0 +1,20 @@
+---
+// CodeFence.astro - the shiki code fence for the hand-written pages: the
+// block renders through the same shiki github-dark pipeline the docs markdown
+// fences use (astro.config.ts shikiConfig), so a command block gets the
+// identical .astro-code markup the docs' ``` fences get - the token spans,
+// the data-language tag, the same theme colors. The code string is rendered
+// byte-exact; only the rendering changes.
+import { codeToHtml } from "shiki";
+
+interface Props {
+	Code: string;
+	Lang?: string;
+	Class?: string;
+}
+
+const { Code, Lang = "bash", Class = "" } = Astro.props;
+const Html = await codeToHtml(Code, { lang: Lang, theme: "github-dark" });
+---
+
+<div class:list={["font-mono text-base leading-relaxed [&>pre]:p-3.5", Class]} set:html={Html} />

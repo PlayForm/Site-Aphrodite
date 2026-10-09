@@ -128,7 +128,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
 						After every tool call: record telemetry, run the skip gates, classify the
 						content type, hash (BLAKE3), store, and replace the output with
-						<span class="font-mono text-base text-weathered-teal">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</span>
+						<span class="ccr-marker font-mono text-base text-weathered-teal">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</span>
 						plus a compact preview. File references are tracked before the gates, so
 						<span class="font-mono text-base text-weathered-teal">aphrodite_files</span> sees
 						every read even when nothing was compressed.

@@ -56,17 +56,16 @@ import { ExternalLinks } from "@Library/Links";
 					</h2>
 					<span class="text-base text-zinc-dust">6 STEPS</span>
 				</div>
-				<div
-					class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust"
-				>
-					<div>$ git clone {ExternalLinks.HermesRepository}.git</div>
-					<div>$ cd Aphrodite-Hermes</div>
-					<div>$ ln -s "$(pwd)" ~/.hermes/plugins/aphrodite</div>
-					<div class="opacity-70">$ bash download.sh <span class="opacity-40">// or: pwsh ./download.ps1 (Windows)</span></div>
-					<div class="opacity-40">$ cd ..</div>
-					<div class="text-bone-white">$ hermes plugins enable aphrodite</div>
-					<div class="opacity-70">$ hermes</div>
-				</div>
+				<CodeFence
+					Class="mb-3 border border-oxblood-dark"
+					Code={`$ git clone ${ExternalLinks.HermesRepository}.git
+$ cd Aphrodite-Hermes
+$ ln -s "$(pwd)" ~/.hermes/plugins/aphrodite
+$ bash download.sh // or: pwsh ./download.ps1 (Windows)
+$ cd ..
+$ hermes plugins enable aphrodite
+$ hermes`}
+				/>
 				<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
 					<div class="mb-1 text-base font-black uppercase tracking-widest text-stamped-canary">
 						OUTCOME // VERIFIED INSTALL:

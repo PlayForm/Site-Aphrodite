@@ -17,6 +17,6 @@ const Tone = {
 };
 ---
 
-<div class="border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
+<div class="ccr-marker border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
 	{Lines.map(({ Text, Tone: LineTone = "plain" }) => <div class={Tone[LineTone]} set:html={Text} />)}
 </div>

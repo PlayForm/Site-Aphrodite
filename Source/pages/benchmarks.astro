@@ -2,6 +2,7 @@
 import Base from "@Layout/Base.astro";
 
 import Breadcrumbs from "@Component/Breadcrumbs.astro";
+import CodeFence from "@Component/CodeFence.astro";
 import Related from "@Component/Related.astro";
 import StudyLedger from "@Component/StudyLedger.astro";
 ---
@@ -208,16 +209,17 @@ import StudyLedger from "@Component/StudyLedger.astro";
 				>
 					REPRODUCE // BENCH HARNESS
 				</div>
-				<div class="mt-2 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
-					<div class="text-bone-newsprint"># requires a source checkout + Rust (see the SETUP page for versions)</div>
-					<div>$ git clone https://github.com/PlayForm/Aphrodite.git && cd Aphrodite</div>
-					<div>$ git submodule update --init --recursive</div>
-					<div>$ cargo run --release -p aphrodite --example bench_01_corpus</div>
-					<div>$ cargo run --release -p aphrodite --example bench_02_threshold</div>
-					<div>$ cargo run --release -p aphrodite --example bench_03_retrieve</div>
-					<div>$ cargo run --release -p aphrodite --example bench_04_ema</div>
-					<div>$ cargo run --release -p aphrodite --example bench_05_type_coverage</div>
-				</div>
+				<CodeFence
+					Class="mt-2 border border-oxblood-dark"
+					Code={`# requires a source checkout + Rust (see the SETUP page for versions)
+$ git clone https://github.com/PlayForm/Aphrodite.git && cd Aphrodite
+$ git submodule update --init --recursive
+$ cargo run --release -p aphrodite --example bench_01_corpus
+$ cargo run --release -p aphrodite --example bench_02_threshold
+$ cargo run --release -p aphrodite --example bench_03_retrieve
+$ cargo run --release -p aphrodite --example bench_04_ema
+$ cargo run --release -p aphrodite --example bench_05_type_coverage`}
+				/>
 				<p class="mt-4 text-base text-zinc-dust">SRC: README.md:463</p>
 			</div>
 		</section>
