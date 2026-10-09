@@ -1,10 +1,24 @@
 {
-	"background_color": "// TODO Set the background color of the app",
-	"categories": [],
-	"display": "minimal-ui",
-	"name": "// TODO Use the same title as in template.html",
-	"orientation": "landscape",
-	"short_name": "// TODO Title but lowercase",
+	"name": "Aphrodite @ PlayForm",
+	"short_name": "Aphrodite",
+	"description": "CCR compression proxy + absorptive preview pipeline for Hermes Agent.",
 	"start_url": "/",
-	"theme_color": "// TODO Use the same theme color from template.html"
+	"display": "standalone",
+	"background_color": "#ffffff",
+	"theme_color": "#ffffff",
+	"lang": "en",
+	"icons": [
+		{
+			"src": "/Brand/aphrodite.png",
+			"sizes": "any",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "/Brand/aphrodite-120.png",
+			"sizes": "120x120",
+			"type": "image/png",
+			"purpose": "any maskable"
+		}
+	]
 }

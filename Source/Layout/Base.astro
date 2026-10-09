@@ -5,7 +5,7 @@ import { Head } from "astro-capo";
 import { ClientRouter } from "astro:transitions";
 
 // TODO Place your title and description here
-const { Title = "", Description = "" } = Astro.props;
+const { Title = "Aphrodite", Description = "" } = Astro.props;
 
 interface Props {
 	Title?: string;
@@ -52,6 +52,8 @@ interface Props {
 		<slot name="Head" />
 
 		<!-- Favicon -->
+		<link rel="icon" href="/Brand/aphrodite-32.png" type="image/png" sizes="32x32" />
+		<link rel="apple-touch-icon" href="/Brand/aphrodite-120.png" />
 		<ClientRouter />
 	</Head>
 	<body>

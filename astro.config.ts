@@ -36,11 +36,20 @@ export default defineConfig({
 	},
 	integrations: [
 		// @ts-ignore
-		import.meta.env.MODE === "production"
+		// The service worker for production builds. Gated on NODE_ENV, not
+		// import.meta.env.MODE: at config-eval time during `astro build` MODE
+		// is still "development" (the build command does not set it), so the
+		// old condition never fired and the worker was never generated.
+		process.env["NODE_ENV"] !== "development"
 			? (await import("astrojs-service-worker")).default()
 			: null,
 		(await import("@astrojs/sitemap")).default(),
-		(await import("@playform/inline")).default({ Logger: 1 }),
+		// Beasties inlines the critical CSS into each HTML page; pruning must
+		// stay off or the shared stylesheet chunk is gutted across pages.
+		(await import("@playform/inline")).default({
+			Logger: 1,
+			Beasties: { pruneSource: false },
+		}),
 		(await import("@playform/compress")).default({ Logger: 1 }),
 	],
 	experimental: {
@@ -52,7 +61,7 @@ export default defineConfig({
 			sourcemap: On,
 			manifest: true,
 			minify: On ? false : "terser",
-			cssMinify: On ? false : "esbuild",
+			cssMinify: On ? false : "lightningcss",
 			terserOptions: On
 				? {
 						compress: false,
