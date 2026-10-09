@@ -7,12 +7,12 @@ import Base from "@Layout/Base.astro";
 	Description="The Aphrodite Hermes plugin, v2.2.6: a thin Python registration shim over a Rust dylib - 6 hooks, 13 tools, an opt-in context engine, and an explicit SHA-256-verified download flow."
 >
 	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-16 sm:px-8 lg:gap-32 lg:px-14 lg:py-28"
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-28 px-5 py-20 sm:px-8 lg:gap-44 lg:px-14 lg:py-32"
 	>
 		<!-- HERO -->
 		<header class="relative flex w-full flex-col items-start">
 			<div
-				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				PLUGIN // THE THIN LOADER
 			</div>
@@ -21,7 +21,7 @@ import Base from "@Layout/Base.astro";
 			>
 				The plugin
 			</h1>
-			<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+			<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
 				Aphrodite ships as a Hermes Agent plugin: a thin Python registration shim over a
 				Rust dylib. Six hooks, thirteen tools, and an opt-in context engine - all declared
 				in <code class="font-mono text-xs text-weathered-teal">plugin.yaml</code>, all logic
@@ -29,7 +29,7 @@ import Base from "@Layout/Base.astro";
 					>libaphrodite_hermes.dylib</code
 				>. This page documents the v2.2.6 plugin spec.
 			</p>
-			<div class="mt-6 flex max-w-4xl flex-wrap items-center gap-3">
+			<div class="mt-8 flex max-w-4xl flex-wrap items-center gap-4">
 				<span
 					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000]"
 				>
@@ -56,18 +56,18 @@ import Base from "@Layout/Base.astro";
 		<!-- PLUGIN.YAML FACTS -->
 		<section class="relative w-full">
 			<div
-				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				plugin.yaml // THE DECLARED SURFACE
 			</div>
 			<div
-				class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+				class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
-				<h2 class="mb-4 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+				<h2 class="mb-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					What the manifest declares
 				</h2>
-				<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-					<div class="space-y-1 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px]">
+				<div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+					<div class="space-y-2 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px]">
 						<div><span class="text-zinc-dust">name:</span> <span class="text-bone-white">aphrodite</span></div>
 						<div><span class="text-zinc-dust">version:</span> <span class="text-bone-white">2.2.6</span></div>
 						<div><span class="text-zinc-dust">kind:</span> <span class="text-bone-white">standalone</span></div>
@@ -84,18 +84,18 @@ import Base from "@Layout/Base.astro";
 							<span class="text-bone-white">true</span>
 						</div>
 					</div>
-					<div class="space-y-1 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px]">
+					<div class="space-y-2 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px]">
 						<div class="text-weathered-teal"># provides_hooks (6)</div>
 						<div class="text-bone-newsprint">on_session_start · pre_tool_call</div>
 						<div class="text-bone-newsprint">transform_tool_result · transform_terminal_output</div>
 						<div class="text-bone-newsprint">pre_llm_call · post_llm_call</div>
-						<div class="pt-2 text-weathered-teal"># provides_tools (13)</div>
+						<div class="pt-3 text-weathered-teal"># provides_tools (13)</div>
 						<div class="text-bone-newsprint">retrieve · compress · stats · rebuild · files · diff</div>
 						<div class="text-bone-newsprint">search · directive · test · catalog</div>
 						<div class="text-bone-newsprint">reclassify · prefetch · prefetch_status</div>
 					</div>
 				</div>
-				<p class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] leading-relaxed text-zinc-dust">
+				<p class="mt-6 border-t border-oxblood-dark pt-4 text-[11px] leading-relaxed text-zinc-dust">
 					ENGINE THRESHOLD SEMANTICS: -1 = ALWAYS COMPRESS · 0 = DISABLED · &gt;0 = FILL
 					PERCENT. SKILLS ARE NOT SHIPPED WITH THE PLUGIN - THEY LIVE DEV-SIDE.
 				</p>
@@ -105,17 +105,17 @@ import Base from "@Layout/Base.astro";
 		<!-- ARCHITECTURE -->
 		<section class="relative w-full lg:w-10/12 lg:self-end">
 			<div
-				class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+				class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div
-					class="absolute -top-3.5 left-6 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+					class="absolute -top-4 left-6 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
 				>
 					ARCHITECTURE // CALL CHAIN
 				</div>
-				<h2 class="mb-4 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+				<h2 class="mb-6 mt-3 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					A thin shim, a Rust brain
 				</h2>
-				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] leading-relaxed">
+				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px] leading-relaxed">
 					<div class="text-bone-white">Hermes Agent (hooks + tool dispatch)</div>
 					<div class="pl-4 text-zinc-dust">│</div>
 					<div class="pl-4 text-bone-newsprint">__init__.py - ctypes FFI, registers hooks/tools/engine · no logic</div>
@@ -126,7 +126,7 @@ import Base from "@Layout/Base.astro";
 					<div class="pl-4 text-zinc-dust">│</div>
 					<div class="pl-4 text-weathered-teal">CCR store - SQLite :9798 / in-memory :9797 / inline</div>
 				</div>
-				<p class="mt-4 font-body text-xs leading-relaxed text-zinc-dust">
+				<p class="mt-6 font-body text-xs leading-relaxed text-zinc-dust">
 					Registration is driven by the dylib: the shim asks the dylib for its hook names
 					and tool schemas and registers one callback per name. No hot-reload - the dylib
 					is resolved once per process; to pick up a new build, restart the Hermes session.
@@ -137,39 +137,39 @@ import Base from "@Layout/Base.astro";
 		<!-- DOWNLOAD FLOW -->
 		<section class="relative w-full">
 			<div
-				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				DOWNLOAD // EXPLICIT STEPS ONLY
 			</div>
 			<div
-				class="zine-box-crimson w-full -rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+				class="zine-box-crimson w-full -rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
-				<h2 class="mb-4 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+				<h2 class="mb-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					register() never downloads
 				</h2>
-				<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+				<div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
 					<div>
-						<p class="mb-3 font-body text-sm leading-relaxed text-bone-newsprint">
+						<p class="mb-4 font-body text-sm leading-relaxed text-bone-newsprint">
 							Binaries are never shipped in the repository. Fetching them is an explicit
 							setup step you run yourself - and the verification is mandatory, not
 							best-effort:
 						</p>
-						<ul class="space-y-2 font-body text-sm text-bone-newsprint">
-							<li class="border-l-4 border-raw-blood pl-3">
+						<ul class="space-y-3 font-body text-sm text-bone-newsprint">
+							<li class="border-l-4 border-raw-blood pl-4">
 								<span class="font-bold text-bone-white">SHA-256 against the in-tree checksum list</span>
 								- <code class="font-mono text-xs text-weathered-teal">SHA256SUMS.txt</code>,
 								generated by CI into the tree; a mismatch is refused outright.
 							</li>
-							<li class="border-l-4 border-raw-blood pl-3">
+							<li class="border-l-4 border-raw-blood pl-4">
 								<span class="font-bold text-bone-white">Magic-byte validation</span> - the
 								downloaded file must be a real ELF / Mach-O / PE image, or it is rejected.
 							</li>
-							<li class="border-l-4 border-raw-blood pl-3">
+							<li class="border-l-4 border-raw-blood pl-4">
 								<span class="font-bold text-bone-white">Backup + restore</span> - an
 								existing install is backed up and restored if any step fails. No
 								release-hosted fallback.
 							</li>
-							<li class="border-l-4 border-raw-blood pl-3">
+							<li class="border-l-4 border-raw-blood pl-4">
 								<span class="font-bold text-bone-white">A missing binary disables, not breaks</span>
 								- the plugin logs the setup command and stays disabled until the binaries
 								are present.
@@ -177,7 +177,7 @@ import Base from "@Layout/Base.astro";
 						</ul>
 					</div>
 					<div>
-						<div class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust">
+						<div class="mb-5 space-y-2 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px] leading-relaxed text-zinc-dust">
 							<div>$ git clone https://github.com/PlayForm/Aphrodite-Hermes.git</div>
 							<div>$ cd Aphrodite-Hermes</div>
 							<div>$ ln -s "$(pwd)" ~/.hermes/plugins/aphrodite</div>
@@ -187,7 +187,7 @@ import Base from "@Layout/Base.astro";
 							<div class="opacity-70">$ hermes</div>
 						</div>
 						<div
-							class="flex items-center justify-between gap-3 border-2 border-oxblood-dark bg-asphalt-panel p-3"
+							class="flex items-center justify-between gap-4 border-2 border-oxblood-dark bg-asphalt-panel p-4"
 						>
 							<span class="text-[10px] font-black uppercase tracking-widest text-stamped-canary">
 								COPY THE FULL SEQUENCE:
@@ -201,7 +201,7 @@ import Base from "@Layout/Base.astro";
 						</div>
 					</div>
 				</div>
-				<p class="mt-4 border-t border-oxblood-dark pt-3 font-body text-xs leading-relaxed text-zinc-dust">
+				<p class="mt-6 border-t border-oxblood-dark pt-4 font-body text-xs leading-relaxed text-zinc-dust">
 					LLM API KEY REQUIRED: the proxy is an OpenAI-compatible forwarder and needs its
 					own credentials - <code class="font-mono text-xs text-weathered-teal">APHRODITE_API_KEY</code>,
 					<code class="font-mono text-xs text-weathered-teal">aphrodite setup</code>, or
@@ -215,17 +215,17 @@ import Base from "@Layout/Base.astro";
 		<!-- FILESYSTEM MAP -->
 		<section class="relative w-full lg:w-9/12 lg:self-start">
 			<div
-				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div
-					class="absolute -top-3.5 right-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					class="absolute -top-4 right-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 				>
 					FILESYSTEM // CANONICAL LAYOUT
 				</div>
-				<h2 class="mb-4 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+				<h2 class="mb-6 mt-3 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					What changes after install
 				</h2>
-				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] leading-relaxed text-bone-newsprint">
+				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px] leading-relaxed text-bone-newsprint">
 					<div>~/.hermes/</div>
 					<div class="pl-4">├── plugins/aphrodite <span class="text-zinc-dust">← manual symlink to the plugin repo</span></div>
 					<div class="pl-4 text-bone-white">└── aphrodite/ <span class="text-zinc-dust">← runtime home</span></div>
@@ -236,7 +236,7 @@ import Base from "@Layout/Base.astro";
 					<div class="pl-10">├── ccr.db <span class="text-zinc-dust">← SQLite CCR store</span></div>
 					<div class="pl-10">└── proxy-stderr.log <span class="text-zinc-dust">← proxy logs (empty = healthy)</span></div>
 				</div>
-				<p class="mt-4 font-body text-xs leading-relaxed text-zinc-dust">
+				<p class="mt-6 font-body text-xs leading-relaxed text-zinc-dust">
 					The runtime home self-heals toward
 					<code class="font-mono text-xs text-weathered-teal">layout_schema.json</code> at
 					startup: misplaced config and binaries are moved to their canonical paths, stale
@@ -249,7 +249,7 @@ import Base from "@Layout/Base.astro";
 
 		<!-- FOOTER -->
 		<footer
-			class="flex flex-col items-center justify-between gap-4 border-t-2 border-oxblood-dark pb-6 pt-12 text-xs text-zinc-dust sm:flex-row"
+			class="flex flex-col items-center justify-between gap-6 border-t-2 border-oxblood-dark pb-6 pt-16 text-xs text-zinc-dust sm:flex-row"
 		>
 			<div class="flex items-center gap-2">
 				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
