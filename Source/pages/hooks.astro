@@ -7,12 +7,12 @@ import Base from "@Layout/Base.astro";
 	Description="The six Aphrodite hooks as a chain: session reset, tool-call pre-flight, dual compression transforms, the pre-LLM context assembler, and post-turn archival - with thresholds, bypass gates, and env-over-TOML precedence."
 >
 	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-16 sm:px-8 lg:gap-32 lg:px-14 lg:py-28"
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-28 px-5 py-20 sm:px-8 lg:gap-44 lg:px-14 lg:py-32"
 	>
 		<!-- HERO -->
 		<header class="relative flex w-full flex-col items-start">
 			<div
-				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				HOOKS // THE CHAIN
 			</div>
@@ -21,7 +21,7 @@ import Base from "@Layout/Base.astro";
 			>
 				Six hooks, one turn
 			</h1>
-			<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+			<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
 				Every hook is a thin dispatch that forwards its arguments to the Rust dylib and
 				hands the JSON reply back to Hermes. On plugin load the shim asks the dylib for
 				its hook names and registers one callback per name - the six below are always
@@ -32,12 +32,12 @@ import Base from "@Layout/Base.astro";
 		<!-- CHAIN SEQUENCE -->
 		<section class="relative w-full">
 			<div
-				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				SEQUENCE // PER TURN
 			</div>
 			<div
-				class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+				class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] leading-relaxed">
 					<div class="text-bone-white">session starts</div>
@@ -62,17 +62,17 @@ import Base from "@Layout/Base.astro";
 		<!-- ONE SECTION PER HOOK -->
 		<section class="relative w-full">
 			<div
-				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				THE SIX // ONE SECTION EACH
 			</div>
-			<div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-8">
+			<div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-2 lg:gap-12">
 				<!-- 1 on_session_start -->
 				<div
-					class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.4deg]"
+					class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.4deg]"
 				>
 					<div
-						class="absolute -top-2.5 left-4 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
+						class="absolute -top-3 left-4 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
 					>
 						01 // on_session_start
 					</div>
@@ -85,10 +85,10 @@ import Base from "@Layout/Base.astro";
 				</div>
 				<!-- 2 pre_tool_call -->
 				<div
-					class="zine-box-canary relative border-[3px] border-stamped-canary/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[1.4deg]"
+					class="zine-box-canary relative border-[3px] border-stamped-canary/40 bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:rotate-[1.4deg]"
 				>
 					<div
-						class="absolute -top-2.5 left-4 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-3 left-4 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
 					>
 						02 // pre_tool_call
 					</div>
@@ -103,10 +103,10 @@ import Base from "@Layout/Base.astro";
 				</div>
 				<!-- 3 transform_tool_result -->
 				<div
-					class="zine-box-crimson relative border-[3px] border-raw-blood bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg]"
+					class="zine-box-crimson relative border-[3px] border-raw-blood bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg]"
 				>
 					<div
-						class="absolute -top-2.5 left-4 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
+						class="absolute -top-3 left-4 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
 					>
 						03 // transform_tool_result
 					</div>
@@ -121,10 +121,10 @@ import Base from "@Layout/Base.astro";
 				</div>
 				<!-- 4 transform_terminal_output -->
 				<div
-					class="zine-box-subtle relative border-[3px] border-zinc-dust/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[2deg]"
+					class="zine-box-subtle relative border-[3px] border-zinc-dust/40 bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:rotate-[2deg]"
 				>
 					<div
-						class="absolute -top-2.5 left-4 border border-black bg-bone-newsprint px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-3 left-4 border border-black bg-bone-newsprint px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
 					>
 						04 // transform_terminal_output
 					</div>
@@ -137,10 +137,10 @@ import Base from "@Layout/Base.astro";
 				</div>
 				<!-- 5 pre_llm_call -->
 				<div
-					class="zine-box-canary relative border-[3px] border-stamped-canary/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.6deg] lg:-translate-y-1"
+					class="zine-box-canary relative border-[3px] border-stamped-canary/40 bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.6deg] lg:-translate-y-1"
 				>
 					<div
-						class="absolute -top-2.5 left-4 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-3 left-4 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
 					>
 						05 // pre_llm_call
 					</div>
@@ -155,10 +155,10 @@ import Base from "@Layout/Base.astro";
 				</div>
 				<!-- 6 post_llm_call -->
 				<div
-					class="zine-box-crimson relative border-[3px] border-raw-blood bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[1.2deg] lg:translate-y-2"
+					class="zine-box-crimson relative border-[3px] border-raw-blood bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:rotate-[1.2deg] lg:translate-y-2"
 				>
 					<div
-						class="absolute -top-2.5 left-4 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
+						class="absolute -top-3 left-4 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
 					>
 						06 // post_llm_call
 					</div>
@@ -176,17 +176,17 @@ import Base from "@Layout/Base.astro";
 		<!-- ESSENTIAL TOOLS / SKIP GATES -->
 		<section class="relative w-full lg:w-10/12 lg:self-end">
 			<div
-				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div
-					class="absolute -top-3.5 left-6 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+					class="absolute -top-4 left-6 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
 				>
 					BYPASS // THE ESSENTIAL-TOOL GATE
 				</div>
-				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+				<h2 class="mb-4 mt-3 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					What never gets compressed
 				</h2>
-				<p class="mb-3 font-body text-sm leading-relaxed text-bone-newsprint">
+				<p class="mb-4 font-body text-sm leading-relaxed text-bone-newsprint">
 					A result is left untouched when it is empty, below threshold, or from the
 					essential set - tools the agent needs raw:
 				</p>
@@ -194,7 +194,7 @@ import Base from "@Layout/Base.astro";
 					skill_view · skills_list · skill_manage · memory · session_search · read_file ·
 					read_terminal
 				</div>
-				<p class="mt-3 font-body text-xs leading-relaxed text-zinc-dust">
+				<p class="mt-4 font-body text-xs leading-relaxed text-zinc-dust">
 					Aphrodite's own tools and headroom helpers are also skipped - compressing
 					<span class="font-mono text-xs text-weathered-teal">aphrodite_retrieve</span>
 					would just replace resolved content with another marker.
@@ -205,52 +205,52 @@ import Base from "@Layout/Base.astro";
 		<!-- THRESHOLDS TABLE -->
 		<section class="relative w-full">
 			<div
-				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				THRESHOLDS // GATES AND BYPASSES
 			</div>
 			<div
-				class="zine-box-crimson w-full -rotate-[1deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+				class="zine-box-crimson w-full -rotate-[1deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse font-mono text-[12px]">
 						<thead>
 							<tr class="border-b-2 border-oxblood-dark text-left">
-								<th class="py-2 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">HOOK</th>
-								<th class="py-2 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">SETTING</th>
-								<th class="py-2 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">DEFAULT</th>
-								<th class="py-2 text-[10px] font-black uppercase tracking-widest text-stamped-canary">BYPASS</th>
+								<th class="py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">HOOK</th>
+								<th class="py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">SETTING</th>
+								<th class="py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">DEFAULT</th>
+								<th class="py-3 text-[10px] font-black uppercase tracking-widest text-stamped-canary">BYPASS</th>
 							</tr>
 						</thead>
 						<tbody class="text-bone-newsprint">
 							<tr class="border-b border-oxblood-dark">
-								<td class="py-2 pr-4">transform_tool_result</td>
-								<td class="py-2 pr-4 text-weathered-teal">tool_threshold_token</td>
-								<td class="py-2 pr-4 text-bone-white">4,096</td>
-								<td class="py-2">empty · essential tools · self tools · <span class="text-stamped-canary">0 = always compress</span></td>
+								<td class="py-3 pr-4">transform_tool_result</td>
+								<td class="py-3 pr-4 text-weathered-teal">tool_threshold_token</td>
+								<td class="py-3 pr-4 text-bone-white">4,096</td>
+								<td class="py-3">empty · essential tools · self tools · <span class="text-stamped-canary">0 = always compress</span></td>
 							</tr>
 							<tr class="border-b border-oxblood-dark">
-								<td class="py-2 pr-4">transform_terminal_output</td>
-								<td class="py-2 pr-4 text-weathered-teal">terminal_threshold</td>
-								<td class="py-2 pr-4 text-bone-white">1,024</td>
-								<td class="py-2">empty · below threshold · <span class="text-stamped-canary">0 = always compress</span></td>
+								<td class="py-3 pr-4">transform_terminal_output</td>
+								<td class="py-3 pr-4 text-weathered-teal">terminal_threshold</td>
+								<td class="py-3 pr-4 text-bone-white">1,024</td>
+								<td class="py-3">empty · below threshold · <span class="text-stamped-canary">0 = always compress</span></td>
 							</tr>
 							<tr class="border-b border-oxblood-dark">
-								<td class="py-2 pr-4">pre_llm_call</td>
-								<td class="py-2 pr-4 text-weathered-teal">flow budget_chars</td>
-								<td class="py-2 pr-4 text-bone-white">4,000</td>
-								<td class="py-2">recall catalog drops first; directives and nudges never drop</td>
+								<td class="py-3 pr-4">pre_llm_call</td>
+								<td class="py-3 pr-4 text-weathered-teal">flow budget_chars</td>
+								<td class="py-3 pr-4 text-bone-white">4,000</td>
+								<td class="py-3">recall catalog drops first; directives and nudges never drop</td>
 							</tr>
 							<tr>
-								<td class="py-2 pr-4">pre_tool_call (chain split)</td>
-								<td class="py-2 pr-4 text-weathered-teal">chain_split_min_segments</td>
-								<td class="py-2 pr-4 text-bone-white">-</td>
-								<td class="py-2">feature off by default (chain_split = false)</td>
+								<td class="py-3 pr-4">pre_tool_call (chain split)</td>
+								<td class="py-3 pr-4 text-weathered-teal">chain_split_min_segments</td>
+								<td class="py-3 pr-4 text-bone-white">-</td>
+								<td class="py-3">feature off by default (chain_split = false)</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
-				<p class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] leading-relaxed text-zinc-dust">
+				<p class="mt-6 border-t border-oxblood-dark pt-4 text-[11px] leading-relaxed text-zinc-dust">
 					PRECEDENCE: ENVIRONMENT &gt; TOML &gt; DEFAULT
 					(APHRODITE_TOOL_THRESHOLD_TOKEN · APHRODITE_TERMINAL_THRESHOLD ·
 					APHRODITE_FLOW_BUDGET_CHARS · APHRODITE_CHAIN_SPLIT).
@@ -260,7 +260,7 @@ import Base from "@Layout/Base.astro";
 
 		<!-- FOOTER -->
 		<footer
-			class="flex flex-col items-center justify-between gap-4 border-t-2 border-oxblood-dark pb-6 pt-12 text-xs text-zinc-dust sm:flex-row"
+			class="flex flex-col items-center justify-between gap-6 border-t-2 border-oxblood-dark pb-6 pt-16 text-xs text-zinc-dust sm:flex-row"
 		>
 			<div class="flex items-center gap-2">
 				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
