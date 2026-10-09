@@ -1,1 +1,0 @@
-import{a as i}from"./index.DlMz3t_Y.js";i();

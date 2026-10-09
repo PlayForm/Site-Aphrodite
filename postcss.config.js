@@ -6,7 +6,7 @@ module.exports = {
 		require("tailwindcss/nesting"),
 		require("tailwindcss")("./tailwind.config.js"),
 		require("postcss-combine-media-query"),
-		require("postcss-combine-duplicated-selectors")({
+		require("postcss-combine-duplicated-selectors").default({
 			removeDuplicatedProperties: true,
 			removeDuplicatedValues: false,
 		}),
