@@ -15,7 +15,7 @@ import { ExternalLinks } from "@Library/Links";
 	>
 		<header class="relative flex w-full flex-col items-start">
 			<div
-				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				SETUP // BINARY ACQUISITION
 			</div>
@@ -24,15 +24,15 @@ import { ExternalLinks } from "@Library/Links";
 			>
 				Setup
 			</h1>
-			<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+			<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Aphrodite ships as a Hermes Agent plugin (recommended) or a standalone Chat
 				Completions proxy. Both install paths land on this page - and the full host map,
 				including the flavors still planned, is laid out on
 				<a class="text-weathered-teal transition-colors hover:text-bone-white" href="/flavors/">FLAVORS</a>. Binaries are never
 				shipped in the repository and
-				<code class="font-mono text-xs text-weathered-teal">register()</code> never downloads -
+				<code class="font-mono text-base text-weathered-teal">register()</code> never downloads -
 				run the explicit setup step to fetch the binary and dylib from GitHub Releases into
-				<code class="font-mono text-xs text-weathered-teal">~/.hermes/aphrodite/</code>, with
+				<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>, with
 				SHA-256 verification.
 			</p>
 		</header>
@@ -43,7 +43,7 @@ import { ExternalLinks } from "@Library/Links";
 				class="zine-box-crimson relative -rotate-[2.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
 			>
 				<div
-					class="absolute -top-3.5 left-6 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+					class="absolute -top-3.5 left-6 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
 				>
 					#A // HERMES PLUGIN (RECOMMENDED)
 				</div>
@@ -51,10 +51,10 @@ import { ExternalLinks } from "@Library/Links";
 					<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 						Clone, link, download, enable
 					</h2>
-					<span class="text-xs text-zinc-dust">6 STEPS</span>
+					<span class="text-base text-zinc-dust">6 STEPS</span>
 				</div>
 				<div
-					class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust"
+					class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust"
 				>
 					<div>$ git clone {ExternalLinks.HermesRepository}.git</div>
 					<div>$ cd Aphrodite-Hermes</div>
@@ -65,10 +65,10 @@ import { ExternalLinks } from "@Library/Links";
 					<div class="opacity-70">$ hermes</div>
 				</div>
 				<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
-					<div class="mb-1 text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+					<div class="mb-1 text-base font-black uppercase tracking-widest text-stamped-canary">
 						OUTCOME // VERIFIED INSTALL:
 					</div>
-					<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-xs font-bold text-bone-white">
+					<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold text-bone-white">
 						Binary + dylib fetched from GitHub Releases, SHA-256 verified, plugin enabled.
 					</div>
 				</div>
@@ -81,14 +81,14 @@ import { ExternalLinks } from "@Library/Links";
 				class="zine-box-crimson relative rotate-[2.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
 			>
 				<div
-					class="absolute -top-3.5 right-6 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					class="absolute -top-3.5 right-6 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 				>
 					#B // CARGO
 				</div>
 				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					Crates.io install
 				</h2>
-				<div class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust">
+				<div class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
 					<div>$ cargo install aphrodite <span class="opacity-40">// proxy binary</span></div>
 					<div>$ cargo install aphrodite-hermes <span class="opacity-40">// dylib + helper bin</span></div>
 					<div class="text-bone-white">$ aphrodite setup</div>
@@ -103,14 +103,14 @@ import { ExternalLinks } from "@Library/Links";
 				class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
 			>
 				<div
-					class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 				>
 					#C // FROM SOURCE
 				</div>
 				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					Build it yourself
 				</h2>
-				<div class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust">
+				<div class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
 					<div>$ git clone {ExternalLinks.Repository}.git</div>
 					<div>$ cd Aphrodite</div>
 					<div>$ git submodule update --init --recursive</div>
@@ -125,14 +125,14 @@ import { ExternalLinks } from "@Library/Links";
 				class="zine-box-crimson relative -rotate-[2.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
 			>
 				<div
-					class="absolute -top-3.5 right-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					class="absolute -top-3.5 right-6 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 				>
 					/CONFIG.TOML
 				</div>
 				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					Configuration
 				</h2>
-				<div class="space-y-1 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] text-bone-newsprint">
+				<div class="space-y-1 border border-oxblood-dark bg-soot-black p-4 font-mono text-base text-bone-newsprint">
 					<div class="text-weathered-teal"># resolution order:</div>
 					<div>./aphrodite.toml <span class="text-zinc-dust">then</span> ~/.hermes/aphrodite/aphrodite.toml</div>
 					<div class="pt-2 text-weathered-teal"># precedence:</div>
@@ -142,11 +142,11 @@ import { ExternalLinks } from "@Library/Links";
 					<div class="pt-2 text-weathered-teal">[flow]</div>
 					<div>budget_chars = <span class="text-stamped-canary">2600</span> <span class="text-zinc-dust"># hard cap per turn</span></div>
 				</div>
-				<div class="mt-4 flex items-center justify-between border-t border-oxblood-dark pt-2 text-[11px] text-zinc-dust">
+				<div class="mt-4 flex items-center justify-between border-t border-oxblood-dark pt-2 text-base text-zinc-dust">
 					<span>TEMPLATE IN THE REPO:</span>
 					<span class="font-bold text-stamped-canary">aphrodite.toml.example</span>
 				</div>
-				<p class="mt-2 font-body text-xs leading-relaxed text-zinc-dust">
+				<p class="mt-2 font-body text-base leading-relaxed text-zinc-dust">
 					Keys not yet wired into the runtime are annotated DOCUMENTED BUT UNWIRED in the
 					example file - the example is the source of truth.
 				</p>

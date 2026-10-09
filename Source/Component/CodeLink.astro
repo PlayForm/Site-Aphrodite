@@ -28,14 +28,14 @@ const Href = Entry ? SourceLink(Entry) : null;
 
 {
 	Href === null ? (
-		<code class="font-mono text-xs">{Name}</code>
+		<code class="font-mono text-base">{Name}</code>
 	) : (
 		<a
-			class="code-link inline-block font-mono text-xs transition-colors focus:outline focus:outline-2 focus:outline-raw-blood focus:outline-offset-2 hover:decoration-stamped-canary hover:underline hover:decoration-2 hover:underline-offset-4"
+			class="code-link inline-block font-mono text-base transition-colors focus:outline focus:outline-2 focus:outline-raw-blood focus:outline-offset-2 hover:decoration-stamped-canary hover:underline hover:decoration-2 hover:underline-offset-4"
 			href={Href}
 			title={`Source: ${Href}`}
 		>
-			<code class="font-mono text-xs">{Name}</code>
+			<code class="font-mono text-base">{Name}</code>
 		</a>
 	)
 }

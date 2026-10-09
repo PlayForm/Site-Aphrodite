@@ -121,7 +121,7 @@ const Tape: TapeStamp[] = [
 		<Breadcrumbs />
 		<header class="relative flex w-full flex-col items-start">
 			<div
-				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				VERSIONS // RELEASE LOG
 			</div>
@@ -130,17 +130,17 @@ const Tape: TapeStamp[] = [
 			>
 				Versions
 			</h1>
-			<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Current release: binary <strong>{Stamps.Binary()}</strong>, plugin <strong>{Stamps.Plugin()}</strong>
 				({`v${Versions.Binary}`}, {Versions.ChangelogDate}). Requires Rust 1.88+. Licensed CC0-1.0.
-				<span class="mt-1 block text-[9px] text-zinc-dust">SRC: README.md:12; CHANGELOG.md v{Versions.ChangelogVersion}</span>
+				<span class="mt-1 block text-base text-zinc-dust">SRC: README.md:12; CHANGELOG.md v{Versions.ChangelogVersion}</span>
 			</p>
 		</header>
 
 		<!-- MONUMENT: CURRENT RELEASE -->
 		<section class="relative w-full rotate-[0.6deg] transition-transform duration-300 hover:rotate-0">
 			<div
-				class="absolute -top-4 right-10 z-20 border border-black bg-stamped-canary px-4 py-1 text-[11px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+				class="absolute -top-4 right-10 z-20 border border-black bg-stamped-canary px-4 py-1 text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
 			>
 				CURRENT // SHIPPED
 			</div>
@@ -149,7 +149,7 @@ const Tape: TapeStamp[] = [
 			>
 				<div class="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
 					<div>
-						<div class="text-[11px] font-black uppercase tracking-widest text-raw-blood">
+						<div class="text-base font-black uppercase tracking-widest text-raw-blood">
 							BINARY RELEASE
 						</div>
 						<div
@@ -159,16 +159,16 @@ const Tape: TapeStamp[] = [
 						</div>
 					</div>
 					<div class="zine-box-subtle w-full border-[3px] border-raw-blood bg-soot-black p-5 lg:w-auto">
-						<div class="text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+						<div class="text-base font-black uppercase tracking-widest text-zinc-dust">
 							HERMES PLUGIN
 						</div>
 						<div class="font-headline text-3xl font-black tracking-tighter text-bone-white sm:text-5xl">
 							{Stamps.Plugin()}
 						</div>
-						<div class="mt-1 text-xs font-bold text-stamped-canary">{Versions.ChangelogDate}</div>
+						<div class="mt-1 text-base font-bold text-stamped-canary">{Versions.ChangelogDate}</div>
 					</div>
 				</div>
-				<div class="mt-8 border-t border-oxblood-dark pt-4 text-[9px] text-zinc-dust">
+				<div class="mt-8 border-t border-oxblood-dark pt-4 text-base text-zinc-dust">
 					SRC: CHANGELOG.md v{Versions.ChangelogVersion} ("{Versions.ChangelogPairing}")
 				</div>
 			</div>
@@ -177,7 +177,7 @@ const Tape: TapeStamp[] = [
 		<!-- CHANGELOG AS TELEMETRY ROWS -->
 		<section class="relative w-full">
 			<div
-				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				{`CHANGELOG // V${Versions.ChangelogVersion}`}
 			</div>
@@ -186,14 +186,14 @@ const Tape: TapeStamp[] = [
 					class="zine-box-subtle relative -rotate-[1.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
 				>
 					<div
-						class="absolute -top-3.5 left-6 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+						class="absolute -top-3.5 left-6 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 					>
 						CATALOG REVIEW
 					</div>
-					<p class="mt-2 font-body text-sm text-bone-newsprint">
+					<p class="mt-2 font-body text-base text-bone-newsprint">
 						Catalog review: prefetch path guard, setup hardening, opt-in context engine.
 					</p>
-					<div class="mt-4 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] text-zinc-dust">
+					<div class="mt-4 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base text-zinc-dust">
 						<div class="text-raw-blood">- fix: aphrodite_prefetch refuses .env, auth.json, ~/.ssh, Hermes home, non-file paths</div>
 						<div class="text-raw-blood">- fix: aphrodite setup treats Hermes-home plugin dir as report-only</div>
 						<div class="text-raw-blood">- fix: dylib arm refuses install when in-tree SHA256SUMS.txt is missing</div>
@@ -203,11 +203,11 @@ const Tape: TapeStamp[] = [
 					class="zine-box-subtle relative rotate-[1.8deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8 lg:-mt-2"
 				>
 					<div
-						class="absolute -top-3.5 right-6 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+						class="absolute -top-3.5 right-6 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
 					>
 						FEATURES
 					</div>
-					<div class="mt-2 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] text-zinc-dust">
+					<div class="mt-2 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base text-zinc-dust">
 						<div class="text-weathered-teal">+ context engine opt-in at registration: APHRODITE_CONTEXT_ENGINE=1 (TOML default true)</div>
 						<div class="text-weathered-teal">+ non-destructive: should_compress always False; transcript unchanged</div>
 						<div class="text-weathered-teal">+ pre_tool_call behavior disclosed: auto-backgrounds long terminal commands</div>
@@ -218,28 +218,28 @@ const Tape: TapeStamp[] = [
 					class="zine-box-subtle relative -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
 				>
 					<div
-						class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+						class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 					>
 						CHORE + DOCS
 					</div>
-					<div class="mt-2 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] text-zinc-dust">
+					<div class="mt-2 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base text-zinc-dust">
 						<div>- config 1:1 audit: dead [templates.*] subtree and compression.prefetch removed</div>
 						<div>- chain_split_min/max_segments and defaults.api_url/model added; unwired keys annotated</div>
 						<div>- 21 doc files fixed; version stamps 1.6.5 → 1.6.6</div>
 					</div>
 				</div>
 			</div>
-			<p class="mt-4 text-[9px] text-zinc-dust">SRC: CHANGELOG.md v{Versions.ChangelogVersion}</p>
+			<p class="mt-4 text-base text-zinc-dust">SRC: CHANGELOG.md v{Versions.ChangelogVersion}</p>
 		</section>
 
 		<!-- THE TIMELINE TAPE: one strip per release stamp -->
 		<section class="relative w-full">
 			<div
-				class="mb-10 -rotate-1 border border-black bg-stamped-canary px-3 py-1 text-[11px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+				class="mb-10 -rotate-1 border border-black bg-stamped-canary px-3 py-1 text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
 			>
 				{`TIMELINE TAPE // v0.7.0 -> v${Versions.Binary}`}
 			</div>
-			<p class="mb-20 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+			<p class="mb-20 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Each strip is one release stamp: the binary and the plugin version it paired,
 				the one-line "what landed", and the release note. The tape runs top to bottom
 				in release order - the enlarged perforations mark the two stamps that changed
@@ -270,7 +270,7 @@ const Tape: TapeStamp[] = [
 							</div>
 							<div class="flex min-w-0 flex-1 flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-8">
 								<div class="shrink-0">
-									<div class="text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+									<div class="text-base font-black uppercase tracking-widest text-zinc-dust">
 										{Date}
 									</div>
 									<div
@@ -285,23 +285,23 @@ const Tape: TapeStamp[] = [
 								</div>
 								<div class="min-w-0 flex-1">
 									<div class="flex flex-wrap items-center gap-3">
-										<span class="border border-black bg-raw-blood px-2 py-0.5 font-mono text-[10px] font-black uppercase tracking-widest text-bone-white">
+										<span class="border border-black bg-raw-blood px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-bone-white">
 											{Pair}
 										</span>
 										<span
-											class={`font-mono text-[10px] font-bold uppercase tracking-widest ${
+											class={`font-mono text-base font-bold uppercase tracking-widest ${
 												Enlarged ? "text-stamped-canary" : "text-weathered-teal"
 											}`}
 										>
 											{Tag}
 										</span>
 									</div>
-									<p class="mt-3 max-w-2xl font-body text-sm leading-relaxed text-bone-newsprint">
+									<p class="mt-3 max-w-2xl font-body text-base leading-relaxed text-bone-newsprint">
 										{Landed}
 									</p>
 								</div>
 								<a
-									class="shrink-0 border border-black bg-soot-black px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-weathered-teal shadow-[3px_3px_0px_#000] transition-colors hover:bg-raw-blood hover:text-bone-white"
+									class="shrink-0 border border-black bg-soot-black px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-weathered-teal shadow-[3px_3px_0px_#000] transition-colors hover:bg-raw-blood hover:text-bone-white"
 									href={NoteFor(Note ?? Ver)}
 								>
 									RELEASE NOTE ↗
@@ -311,7 +311,7 @@ const Tape: TapeStamp[] = [
 					))
 				}
 			</div>
-			<p class="mt-10 text-[9px] text-zinc-dust">
+			<p class="mt-10 text-base text-zinc-dust">
 				SRC: CHANGELOG.md release headers (v0.7.0:1101, v1.2.2:948, v1.3.2:659, v1.3.4:606, v1.5.0:200, v1.5.1:191, v1.6.0:175, v1.6.3:104, v1.6.5:39, v1.6.6:3) + the GitHub release notes (Aphrodite/v*, incl. v1.4.6's chain-split + plugin-first note)
 			</p>
 		</section>
@@ -322,19 +322,19 @@ const Tape: TapeStamp[] = [
 				class="zine-box-crimson relative -rotate-[2.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
 			>
 				<div
-					class="absolute -top-3.5 right-6 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					class="absolute -top-3.5 right-6 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 				>
 					POINTER
 				</div>
 				<h2 class="mt-2 mb-3 font-headline text-lg font-black uppercase text-bone-white">
 					Full numbers
 				</h2>
-				<p class="font-body text-sm text-bone-newsprint">
+				<p class="font-body text-base text-bone-newsprint">
 					The complete telemetry - 610&times;/132&times;, 8-40 ms, the per-type bars, and the
 					200-session study - lives on the benchmarks page.
 				</p>
 				<a
-					class="mt-4 inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-xs font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+					class="mt-4 inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
 					href="/benchmarks/"
 				>
 					OPEN BENCHMARKS

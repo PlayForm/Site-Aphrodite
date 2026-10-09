@@ -6,6 +6,8 @@ import ZineFlow from "@Component/ZineFlow.astro";
 import { Link, OurRepo } from "@Library/Links";
 import ZineToggle from "@Component/ZineToggle.astro";
 import ZineAnatomy from "@Component/ZineAnatomy.astro";
+import Breadcrumbs from "@Component/Breadcrumbs.astro";
+import Related from "@Component/Related.astro";
 import Examples from "../Content/Showcase/Examples.json";
 
 // ---- The bank, typed at the annotation (the Astro compiler's frontmatter
@@ -73,6 +75,7 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 	<main
 		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-28 px-5 py-20 sm:px-8 lg:gap-44 lg:px-14 lg:py-32"
 	>
+		<Breadcrumbs />
 		<!-- HERO -->
 		<header class="relative flex w-full flex-col items-start">
 			<div
@@ -644,6 +647,16 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 				</ul>
 			</div>
 		</section>
+
+		<!-- RELATED: the natural neighbors -->
+		<Related
+			Links={[
+				{ Href: "/examples/", Label: "EXAMPLES" },
+				{ Href: "/workbench/", Label: "WORKBENCH" },
+				{ Href: "/tools/", Label: "TOOLS" },
+				{ Href: "/hooks/", Label: "HOOKS" },
+			]}
+		/>
 	</main>
 </Base>
 

@@ -3,6 +3,8 @@ import Base from "@Layout/Base.astro";
 import ConfigResolution from "../Content/Mermaid/config-resolution.svg?raw";
 import ToolRelay from "../Content/Mermaid/tool-relay.svg?raw";
 import ZineFlow from "@Component/ZineFlow.astro";
+import Breadcrumbs from "@Component/Breadcrumbs.astro";
+import Related from "@Component/Related.astro";
 import { Link, OurRepo } from "@Library/Links";
 
 // Examples page ledger - the worked scenarios' single source of truth (the
@@ -67,6 +69,7 @@ const InjectionOrder = [
 	<main
 		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
 	>
+		<Breadcrumbs />
 		<!-- ============ HERO // THE WORKED SCENARIOS ============ -->
 		<header class="relative flex w-full flex-col items-start pt-12">
 			<div
@@ -898,5 +901,15 @@ const InjectionOrder = [
 				<span class="font-bold text-stamped-canary">CC0-1.0</span>
 			</div>
 		</footer>
+
+		<!-- RELATED: the natural neighbors -->
+		<Related
+			Links={[
+				{ Href: "/showcase/", Label: "SHOWCASE" },
+				{ Href: "/workbench/", Label: "WORKBENCH" },
+				{ Href: "/hooks/", Label: "HOOKS" },
+				{ Href: "/docs/plugin/", Label: "DOCS · PLUGIN" },
+			]}
+		/>
 	</main>
 </Base>

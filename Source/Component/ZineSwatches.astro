@@ -30,7 +30,7 @@ const Tokens: { Name: string; Hex: string; Role: string }[] = [
 ---
 
 <div class="zine-box-subtle border-[3px] border-oxblood-dark bg-carbon-void p-5 sm:p-6">
-	<div class="mb-5 font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+	<div class="mb-5 font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 		{Title}
 	</div>
 	<ul class="grid grid-cols-2 gap-px border border-oxblood-dark bg-oxblood-dark/60 sm:grid-cols-3 lg:grid-cols-4">
@@ -38,9 +38,9 @@ const Tokens: { Name: string; Hex: string; Role: string }[] = [
 			Tokens.map(({ Name, Hex, Role }) => (
 				<li class="bg-carbon-void p-3">
 					<div class="mb-2 h-8 w-full border border-black shadow-[2px_2px_0px_#000]" style={`background: ${Hex};`} />
-					<div class="font-mono text-[11px] font-bold text-bone-white">{Name}</div>
-					<div class="font-mono text-[10px] text-weathered-teal">{Hex}</div>
-					<div class="mt-1 font-body text-[11px] leading-snug text-bone-newsprint">{Role}</div>
+					<div class="font-mono text-base font-bold text-bone-white">{Name}</div>
+					<div class="font-mono text-base text-weathered-teal">{Hex}</div>
+					<div class="mt-1 font-body text-base leading-snug text-bone-newsprint">{Role}</div>
 				</li>
 			))
 		}

@@ -17,7 +17,7 @@ const { Links } = Astro.props;
 	class="relative w-full border-2 border-oxblood-dark bg-asphalt-panel p-5"
 >
 	<div
-		class="mb-3 flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-raw-blood"
+		class="mb-3 flex items-center gap-2 font-mono text-base font-black uppercase tracking-widest text-raw-blood"
 	>
 		<span class="h-2 w-2 bg-raw-blood"></span>
 		RELATED
@@ -26,7 +26,7 @@ const { Links } = Astro.props;
 		{
 			Links.map((Link) => (
 				<a
-					class="font-mono text-xs tracking-widest text-zinc-dust transition-colors hover:text-bone-white"
+					class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white"
 					href={Link.Href}
 				>
 					<span class="text-oxblood-dark" aria-hidden="true">

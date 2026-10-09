@@ -11,7 +11,7 @@ interface Props {
 const { Label, Copy, Href } = Astro.props;
 
 const Base =
-	"inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-xs font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none";
+	"inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none";
 ---
 
 {Href ? <a class={Base} href={Href}>{Label}</a> : <button class={Base} data-copy={Copy} type="button">{Label}</button>}

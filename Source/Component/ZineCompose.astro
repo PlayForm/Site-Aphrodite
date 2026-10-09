@@ -24,18 +24,18 @@ const Parts: { Name: string; Props: string; Encodes: string }[] = [
 ---
 
 <div class="zine-box-subtle border-[3px] border-oxblood-dark bg-carbon-void p-5 sm:p-6">
-	<div class="mb-4 font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+	<div class="mb-4 font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 		{Title}
 	</div>
 	<ul class="divide-y divide-oxblood-dark/60">
 		{
 			Parts.map(({ Name, Props, Encodes }) => (
 				<li class="grid gap-1 py-3 pl-3 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] sm:gap-4">
-					<div class="font-mono text-xs font-bold text-bone-white">
+					<div class="font-mono text-base font-bold text-bone-white">
 						<span class="text-raw-blood">▸</span> {Name}
-						<div class="mt-0.5 font-mono text-[10px] font-normal text-weathered-teal">{Props}</div>
+						<div class="mt-0.5 font-mono text-base font-normal text-weathered-teal">{Props}</div>
 					</div>
-					<p class="font-body text-sm leading-relaxed text-bone-newsprint">{Encodes}</p>
+					<p class="font-body text-base leading-relaxed text-bone-newsprint">{Encodes}</p>
 				</li>
 			))
 		}

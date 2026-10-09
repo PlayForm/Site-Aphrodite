@@ -41,7 +41,7 @@ const ProxyRows = [
 		<!-- HERO -->
 		<header class="relative flex w-full flex-col items-start">
 			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				HERMES // THE INTEGRATION
 			</div>
@@ -50,12 +50,12 @@ const ProxyRows = [
 			>
 				Living inside Hermes
 			</h1>
-			<p class="mt-12 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+			<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a
 				client at. The plugin registers six hooks, thirteen tools, and an optional context
 				engine, then forwards every call into the Rust dylib. Two proxy processes run
 				alongside as subprocesses, and a canonical runtime home under
-				<code class="font-mono text-xs text-weathered-teal">~/.hermes/aphrodite/</code>
+				<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>
 				holds the binaries, config, CCR database, directives, and logs.
 			</p>
 		</header>
@@ -63,7 +63,7 @@ const ProxyRows = [
 		<!-- WHY NOT JUST A PROXY -->
 		<section class="relative w-full">
 			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				COMPARISON // WHY NOT JUST A PROXY
 			</div>
@@ -71,12 +71,12 @@ const ProxyRows = [
 				class="zine-box-crimson w-full -rotate-[1deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div class="overflow-x-auto">
-					<table class="w-full border-collapse font-mono text-[12px]">
+					<table class="w-full border-collapse font-mono text-base">
 						<thead>
 							<tr class="border-b-2 border-oxblood-dark text-left">
-								<th class="py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">CAPABILITY</th>
-								<th class="py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">NATIVE HERMES PLUGIN</th>
-								<th class="py-3 text-[10px] font-black uppercase tracking-widest text-stamped-canary">GENERIC PROXY</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">CAPABILITY</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">NATIVE HERMES PLUGIN</th>
+								<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">GENERIC PROXY</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -90,7 +90,7 @@ const ProxyRows = [
 						</tbody>
 					</table>
 				</div>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 text-[11px] leading-relaxed text-zinc-dust">
+				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
 					THE TRADE-OFF IS REAL AND STATED PLAINLY: THE PLUGIN WORKS WITH HERMES ONLY,
 					WHILE A PROXY WORKS WITH ANY OPENAI-COMPATIBLE CLIENT. THE PROXY PATH STILL
 					EXISTS - POINT base_url AT :9798.
@@ -104,14 +104,14 @@ const ProxyRows = [
 				class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div
-					class="absolute -top-5 left-6 z-10 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+					class="absolute -top-5 left-6 z-10 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
 				>
 					LIFECYCLE // SESSION TO SESSION
 				</div>
 				<h2 class="mb-12 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					What happens when you launch Hermes
 				</h2>
-				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px] leading-relaxed">
+				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
 					<div class="text-bone-white">hermes starts</div>
 					<div class="pl-4 text-bone-newsprint">→ plugin loads · dylib resolved once per process, smoke-tested in a subprocess</div>
 					<div class="pl-4 text-bone-newsprint">→ a faulting image degrades to "plugin disabled" instead of killing the gateway</div>
@@ -120,15 +120,15 @@ const ProxyRows = [
 					<div class="pl-4 text-weathered-teal">→ turn loop: pre_tool_call → transforms → pre_llm_call → post_llm_call</div>
 					<div class="pl-4 text-zinc-dust">→ session ends · markers do not survive a restart - a new session starts a fresh store</div>
 				</div>
-				<p class="mt-12 font-body text-xs leading-relaxed text-zinc-dust">
+				<p class="mt-12 font-body text-base leading-relaxed text-zinc-dust">
 					THE DUAL PROXIES: TOKEN ON :9798 (SQLITE, PERSISTENT, COMPRESSES ABOVE 1 KB) AND
 					CACHE ON :9797 (IN-MEMORY, COMPRESSES ABOVE 8 KB). NO HOT-RELOAD - RESTART THE
 					SESSION TO PICK UP A NEW BUILD.
-					<span class="mt-1 block text-[9px]">SRC: README.md:298-299; docs/guides/hermes-integration.md:107-108.</span>
+					<span class="mt-1 block text-base">SRC: README.md:298-299; docs/guides/hermes-integration.md:107-108.</span>
 				</p>
 				<figure class="mt-20 border border-oxblood-dark bg-soot-black p-4" data-diagram="session-lifecycle">
 					<div class="overflow-x-auto" set:html={SessionLifecycle} />
-					<figcaption class="mt-6 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+					<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 						M8 // SESSION LIFECYCLE
 					</figcaption>
 				</figure>
@@ -138,7 +138,7 @@ const ProxyRows = [
 		<!-- PREVIEW SHOWCASE -->
 		<section class="relative w-full">
 			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				EVIDENCE // WHAT THE AGENT SEES
 			</div>
@@ -148,7 +148,7 @@ const ProxyRows = [
 				<h2 class="mb-12 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					The twelve preview shapes
 				</h2>
-				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px] leading-relaxed">
+				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
 					{Previews.map((Line) => (
 						<div class="text-bone-newsprint">
 							<span class="text-stamped-canary">{Line.slice(0, Line.indexOf(":") + 1)}</span>
@@ -158,25 +158,25 @@ const ProxyRows = [
 				</div>
 				<div class="mt-16 grid grid-cols-1 gap-16 lg:grid-cols-2">
 					<div>
-						<div class="mb-6 text-[10px] font-black uppercase tracking-widest text-raw-blood">
+						<div class="mb-6 text-base font-black uppercase tracking-widest text-raw-blood">
 							WITHOUT APHRODITE:
 						</div>
-						<div class="border border-oxblood-dark bg-asphalt-panel p-4 font-mono text-[12px] text-zinc-dust">
+						<div class="border border-oxblood-dark bg-asphalt-panel p-4 font-mono text-base text-zinc-dust">
 							500 tokens of build output... scrolling... error? no... warning? no... ok it
 							passed. That was 500 tokens I'll never get back.
 						</div>
 					</div>
 					<div>
-						<div class="mb-6 text-[10px] font-black uppercase tracking-widest text-weathered-teal">
+						<div class="mb-6 text-base font-black uppercase tracking-widest text-weathered-teal">
 							WITH NATIVE INTEGRATION:
 						</div>
-						<div class="border border-oxblood-dark bg-asphalt-panel p-4 font-mono text-[12px]">
+						<div class="border border-oxblood-dark bg-asphalt-panel p-4 font-mono text-base">
 							<span class="text-bone-white">[build:0E 0W 1L]</span>
 							<span class="text-zinc-dust"> ← a few tokens. The agent knows: build passed.</span>
 						</div>
 					</div>
 				</div>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 text-[11px] leading-relaxed text-zinc-dust">
+				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
 					SANITIZED, GENERALIZED SHAPES - REPRESENTATIVE PREVIEW FORMS FROM THE PUBLIC
 					DOCS, NOT SESSION CONTENT. THE AGENT RETRIEVES FULL OUTPUT WITH
 					aphrodite_retrieve(hash) ONLY WHEN IT ACTUALLY NEEDS IT.
@@ -190,21 +190,21 @@ const ProxyRows = [
 				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div
-					class="absolute -top-5 right-6 z-10 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					class="absolute -top-5 right-6 z-10 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 				>
 					OPT-IN // CONTEXT ENGINE
 				</div>
 				<h2 class="mb-6 mt-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					The optional third integration point
 				</h2>
-				<p class="mb-8 font-body text-sm leading-relaxed text-bone-newsprint">
-					Enable with <code class="font-mono text-xs text-weathered-teal">APHRODITE_CONTEXT_ENGINE=1</code>.
+				<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
+					Enable with <code class="font-mono text-base text-weathered-teal">APHRODITE_CONTEXT_ENGINE=1</code>.
 					It is non-destructive by design - the engine's
-					<code class="font-mono text-xs text-weathered-teal">should_compress</code> always
+					<code class="font-mono text-base text-weathered-teal">should_compress</code> always
 					returns False, deferring to Hermes' own threshold accounting while the proxy and
 					hooks do the heavy lifting.
 				</p>
-				<div class="space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px] text-bone-newsprint">
+				<div class="space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-base text-bone-newsprint">
 					<div><span class="text-zinc-dust">engine_threshold_pct</span> <span class="text-stamped-canary">45</span> <span class="text-zinc-dust"># compress at % context fill</span></div>
 					<div><span class="text-zinc-dust">engine_protect_first</span> <span class="text-stamped-canary">2</span> <span class="text-zinc-dust"># messages kept at the start</span></div>
 					<div><span class="text-zinc-dust">engine_protect_last</span> <span class="text-stamped-canary">5</span> <span class="text-zinc-dust"># messages kept at the end</span></div>

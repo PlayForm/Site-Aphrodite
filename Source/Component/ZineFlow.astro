@@ -40,7 +40,7 @@ const { Title, Complete = "FLOW COMPLETE", Steps } = Astro.props;
 ---
 
 <div class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-5 sm:p-8" data-zine-flow>
-	<div class="absolute -top-3.5 left-6 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+	<div class="absolute -top-3.5 left-6 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
 		{Title}
 	</div>
 
@@ -58,7 +58,7 @@ const { Title, Complete = "FLOW COMPLETE", Steps } = Astro.props;
 				/>
 			))
 		}
-		<span class="ml-2 font-mono text-[10px] font-bold text-zinc-dust" data-flow-count>
+		<span class="ml-2 font-mono text-base font-bold text-zinc-dust" data-flow-count>
 			01 / {String(Steps.length).padStart(2, "0")}
 		</span>
 	</div>
@@ -68,13 +68,13 @@ const { Title, Complete = "FLOW COMPLETE", Steps } = Astro.props;
 		{
 			["agent", "system"].map((Pane) => (
 				<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
-					<div class={`mb-1 text-[10px] font-black uppercase tracking-widest ${Pane === "agent" ? "text-stamped-canary" : "text-weathered-teal"}`}>
+					<div class={`mb-1 text-base font-black uppercase tracking-widest ${Pane === "agent" ? "text-stamped-canary" : "text-weathered-teal"}`}>
 						{Pane === "agent" ? "AGENT-VIEW" : "SYSTEM-PATH"}
 					</div>
 					<div class="relative min-h-[5.5rem]">
 						{Steps.map((Step, I) => (
 							<div
-								class="absolute inset-0 border border-oxblood-dark bg-soot-black p-2 font-mono text-xs font-bold text-bone-white"
+								class="absolute inset-0 border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold text-bone-white"
 								data-flow-pane={Pane}
 								data-flow-step={I}
 								hidden={I > 0}
@@ -90,13 +90,13 @@ const { Title, Complete = "FLOW COMPLETE", Steps } = Astro.props;
 
 	<!-- The stage title + detail line + anchor chip -->
 	<div class="mt-4 flex flex-wrap items-center gap-3">
-		<span class="font-mono text-sm font-black uppercase tracking-widest text-bone-white" data-flow-title>
+		<span class="font-mono text-base font-black uppercase tracking-widest text-bone-white" data-flow-title>
 			{Steps[0].Title}
 		</span>
 		{
 			Steps[0].Anchor && (
 				<a
-					class="border border-oxblood-dark bg-soot-black px-2 py-0.5 font-mono text-[10px] font-bold text-weathered-teal hover:bg-weathered-teal hover:text-bone-white"
+					class="border border-oxblood-dark bg-soot-black px-2 py-0.5 font-mono text-base font-bold text-weathered-teal hover:bg-weathered-teal hover:text-bone-white"
 					href={Steps[0].Anchor}
 					data-flow-anchor
 					rel={Steps[0].Anchor.startsWith("http") ? "noreferrer" : undefined}
@@ -106,23 +106,23 @@ const { Title, Complete = "FLOW COMPLETE", Steps } = Astro.props;
 			)
 		}
 	</div>
-	<p class="mt-1.5 font-body text-sm leading-relaxed text-bone-newsprint opacity-70 transition-opacity hover:opacity-100" data-flow-detail>
+	<p class="mt-1.5 font-body text-base leading-relaxed text-bone-newsprint opacity-70 transition-opacity hover:opacity-100" data-flow-detail>
 		{Steps[0].Detail}
 	</p>
 
 	<!-- Controls: PREV / PLAY / NEXT; the stamp appears at the end -->
 	<div class="mt-5 flex items-center gap-3">
-		<button class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-[11px] font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson disabled:opacity-40" data-flow-prev type="button">
+		<button class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson disabled:opacity-40" data-flow-prev type="button">
 			◀ PREV
 		</button>
-		<button class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-[11px] font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson" data-flow-play type="button" aria-pressed="false">
+		<button class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson" data-flow-play type="button" aria-pressed="false">
 			▶ PLAY
 		</button>
-		<button class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-[11px] font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson" data-flow-next type="button">
+		<button class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson" data-flow-next type="button">
 			NEXT ▶
 		</button>
 		<span
-			class="hidden -rotate-2 border-2 border-black bg-stamped-canary px-3 py-1 font-mono text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+			class="hidden -rotate-2 border-2 border-black bg-stamped-canary px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
 			data-flow-stamp
 		>
 			{Complete}

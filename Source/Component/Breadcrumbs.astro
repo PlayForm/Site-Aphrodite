@@ -10,7 +10,7 @@ const Active = AllLinks.find((Link) => IsActive(Astro.url.pathname, Link));
 	Active && Active.Href !== "/" && (
 		<nav
 			aria-label="Breadcrumb"
-			class="flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-zinc-dust"
+			class="flex items-center gap-2 font-mono text-base uppercase tracking-widest text-zinc-dust"
 		>
 			<a class="transition-colors hover:text-bone-white" href="/">
 				OVERVIEW

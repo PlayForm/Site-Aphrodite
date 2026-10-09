@@ -33,7 +33,7 @@ const { Left = "BEFORE", Right = "AFTER", LeftPane, RightPane, LeftLabel, RightL
 		aria-label="Toggle the before and after panes"
 	>
 		<button
-			class="grow bg-raw-blood px-3 py-1.5 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white"
+			class="grow bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white"
 			data-toggle-side="left"
 			type="button"
 			aria-pressed="true"
@@ -41,7 +41,7 @@ const { Left = "BEFORE", Right = "AFTER", LeftPane, RightPane, LeftLabel, RightL
 			{Left}
 		</button>
 		<button
-			class="grow px-3 py-1.5 font-mono text-[11px] font-black uppercase tracking-widest text-zinc-dust hover:text-bone-white"
+			class="grow px-3 py-1.5 font-mono text-base font-black uppercase tracking-widest text-zinc-dust hover:text-bone-white"
 			data-toggle-side="right"
 			type="button"
 			aria-pressed="false"
@@ -50,12 +50,12 @@ const { Left = "BEFORE", Right = "AFTER", LeftPane, RightPane, LeftLabel, RightL
 		</button>
 	</div>
 	<div data-toggle-pane="left">
-		{LeftLabel && <div class="mb-1 font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">{LeftLabel}</div>}
-		<div class="border border-oxblood-dark bg-soot-black p-3 font-mono text-xs leading-relaxed text-zinc-dust" set:html={LeftPane} />
+		{LeftLabel && <div class="mb-1 font-mono text-base font-black uppercase tracking-widest text-stamped-canary">{LeftLabel}</div>}
+		<div class="border border-oxblood-dark bg-soot-black p-3 font-mono text-base leading-relaxed text-zinc-dust" set:html={LeftPane} />
 	</div>
 	<div data-toggle-pane="right" hidden>
-		{RightLabel && <div class="mb-1 font-mono text-[10px] font-black uppercase tracking-widest text-weathered-teal">{RightLabel}</div>}
-		<div class="border border-oxblood-dark bg-soot-black p-3 font-mono text-xs font-bold leading-relaxed text-bone-white" set:html={RightPane} />
+		{RightLabel && <div class="mb-1 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">{RightLabel}</div>}
+		<div class="border border-oxblood-dark bg-soot-black p-3 font-mono text-base font-bold leading-relaxed text-bone-white" set:html={RightPane} />
 	</div>
 </div>
 

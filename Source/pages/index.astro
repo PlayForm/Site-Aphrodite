@@ -26,7 +26,7 @@ import { Stamps, Versions } from "@Library/Versions";
 				</div>
 				<div class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-5 sm:p-7">
 					<div
-						class="tape-strip absolute -top-3.5 left-1/2 -translate-x-1/2 -rotate-1 border-b border-t border-bone-newsprint/30 px-6 py-1 text-[9px] font-black uppercase tracking-widest text-bone-newsprint"
+						class="tape-strip absolute -top-3.5 left-1/2 -translate-x-1/2 -rotate-1 border-b border-t border-bone-newsprint/30 px-6 py-1 text-base font-black uppercase tracking-widest text-bone-newsprint"
 					>
 						// REPRO_PROOF #001
 					</div>
@@ -38,7 +38,7 @@ import { Stamps, Versions } from "@Library/Versions";
 						height="160"
 					/>
 					<div
-						class="absolute -bottom-3.5 -right-3 border border-black bg-raw-blood px-2.5 py-0.5 text-[10px] font-black tracking-widest text-bone-white shadow"
+						class="absolute -bottom-3.5 -right-3 border border-black bg-raw-blood px-2.5 py-0.5 text-base font-black tracking-widest text-bone-white shadow"
 					>
 						CCR CORE // STENCIL
 					</div>
@@ -56,33 +56,33 @@ import { Stamps, Versions } from "@Library/Versions";
 				>
 				</div>
 			</div>
-			<p class="max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint sm:text-base">
+			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
 				CCR compression proxy + absorptive preview pipeline for Hermes Agent. Up to 610&times;
 				compression on the standard corpus (132&times; overall), ~10&nbsp;ms end-to-end,
 				type-aware classifier, TOML-driven, opt-in config auto-reload.
 			</p>
-			<p class="mt-8 font-mono text-xs font-bold uppercase tracking-widest text-zinc-dust">
+			<p class="mt-8 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 				One binary. Zero dependencies. Millions of tokens saved.
 			</p>
 			<!-- Rotated stat badges -->
 			<div class="mt-20 flex max-w-4xl flex-wrap items-center justify-center gap-3 sm:gap-4">
 				<span
-					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000] sm:text-sm"
+					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000] sm:text-base"
 				>
 					610&times; COMPRESSION
 				</span>
 				<span
-					class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000] sm:text-sm"
+					class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000] sm:text-base"
 				>
 					132&times; OVERALL
 				</span>
 				<span
-					class="rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000] sm:text-sm"
+					class="rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000] sm:text-base"
 				>
 					~10MS E2E OVERHEAD
 				</span>
 				<span
-					class="-rotate-1 border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-soot-black shadow-[4px_4px_0px_#000] sm:text-sm"
+					class="-rotate-1 border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[4px_4px_0px_#000] sm:text-base"
 				>
 					156M+ TOKENS SAVED
 				</span>
@@ -90,12 +90,12 @@ import { Stamps, Versions } from "@Library/Versions";
 			<!-- Raw technical stamps -->
 			<div class="mt-14 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
 				<span
-					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-zinc-dust"
+					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base uppercase text-zinc-dust"
 				>
 					{Stamps.Binary()}
 				</span>
 				<a
-					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] uppercase text-bone-newsprint transition-colors hover:bg-blood-crimson"
+					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-base uppercase text-bone-newsprint transition-colors hover:bg-blood-crimson"
 					href={ExternalLinks.Crates}
 					target="_blank"
 					rel="noopener"
@@ -103,7 +103,7 @@ import { Stamps, Versions } from "@Library/Versions";
 					CRATES.IO
 				</a>
 				<a
-					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] uppercase text-bone-newsprint transition-colors hover:bg-blood-crimson"
+					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-base uppercase text-bone-newsprint transition-colors hover:bg-blood-crimson"
 					href={ExternalLinks.Repository}
 					target="_blank"
 					rel="noopener"
@@ -111,28 +111,28 @@ import { Stamps, Versions } from "@Library/Versions";
 					GITHUB
 				</a>
 				<span
-					class="border border-weathered-teal/40 bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-weathered-teal"
+					class="border border-weathered-teal/40 bg-asphalt-panel px-3 py-1 font-mono text-base uppercase text-weathered-teal"
 				>
 					{Stamps.PluginSpec()}
 				</span>
 				<a
-					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-zinc-dust transition-colors hover:text-bone-white"
+					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base uppercase text-zinc-dust transition-colors hover:text-bone-white"
 					href="/flavors/"
 				>
 					FLAVORS
 				</a>
 				<span
-					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-zinc-dust"
+					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base uppercase text-zinc-dust"
 				>
 					RUST 1.88+
 				</span>
 				<span
-					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-zinc-dust"
+					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base uppercase text-zinc-dust"
 				>
 					CC0-1.0
 				</span>
 			</div>
-			<p class="mt-8 text-[9px] text-zinc-dust">
+			<p class="mt-8 text-base text-zinc-dust">
 				SRC: README.md:12 (610&times;/132&times;, ~10&nbsp;ms) &middot; README.md:467-511 (the
 				200-session study) &middot; crates/aphrodite/Cargo.toml ({`v${Versions.Binary}`}) &middot;
 				plugins/aphrodite/plugin.yaml ({`v${Versions.Plugin}`})
@@ -142,7 +142,7 @@ import { Stamps, Versions } from "@Library/Versions";
 		<!-- PROBLEM MODULE -->
 		<section class="relative flex w-full flex-col items-center">
 			<div
-				class="mb-8 -rotate-1 relative z-10 w-fit border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-8 -rotate-1 relative z-10 w-fit border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				THE PROBLEM // CONTEXT FLOOD
 			</div>
@@ -152,7 +152,7 @@ import { Stamps, Versions } from "@Library/Versions";
 				<h2 class="mb-4 font-headline text-xl font-black uppercase tracking-tight text-bone-white">
 					The agent spends its budget reading noise
 				</h2>
-				<div class="space-y-3 font-body text-sm leading-relaxed text-bone-newsprint">
+				<div class="space-y-3 font-body text-base leading-relaxed text-bone-newsprint">
 					<p>
 						Every file read, build, code search, or browser open floods the agent's context
 						with raw output - compilation logs, accessibility trees, JSON blobs. The agent
@@ -170,7 +170,7 @@ import { Stamps, Versions } from "@Library/Versions";
 		<!-- PIPELINE // 4-STAGE ABSORPTION -->
 		<section class="relative w-full">
 			<div
-				class="mb-8 -rotate-1 z-10 relative w-fit border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-8 -rotate-1 z-10 relative w-fit border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				PIPELINE // 4-STAGE ABSORPTION
 			</div>
@@ -180,14 +180,14 @@ import { Stamps, Versions } from "@Library/Versions";
 					class="zine-box-subtle isolate relative border-[3px] border-oxblood-dark bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.8deg] lg:-translate-y-2"
 				>
 					<div
-						class="absolute -top-2.5 left-4 z-10 border border-zinc-dust/40 bg-zinc-dust/20 px-2 py-0.5 text-[9px] font-bold uppercase text-bone-newsprint"
+						class="absolute -top-2.5 left-4 z-10 border border-zinc-dust/40 bg-zinc-dust/20 px-2 py-0.5 text-base font-bold uppercase text-bone-newsprint"
 					>
 						STAGE // A
 					</div>
 					<div class="mb-3 mt-1 flex items-center justify-between">
-						<span class="text-xs font-bold tracking-wider text-weathered-teal">01 // CLASSIFY</span>
+						<span class="text-base font-bold tracking-wider text-weathered-teal">01 // CLASSIFY</span>
 						<span
-							class="border border-weathered-teal/30 bg-weathered-teal/10 px-2 py-0.5 text-[10px] font-black text-weathered-teal"
+							class="border border-weathered-teal/30 bg-weathered-teal/10 px-2 py-0.5 text-base font-black text-weathered-teal"
 						>
 							SIMD BYTE
 						</span>
@@ -195,7 +195,7 @@ import { Stamps, Versions } from "@Library/Versions";
 					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">
 						40 - 123 ns
 					</div>
-					<div class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] text-zinc-dust">
+					<div class="mt-4 border-t border-oxblood-dark pt-3 text-base text-zinc-dust">
 						Type-aware classifier names the content.
 					</div>
 				</div>
@@ -204,22 +204,22 @@ import { Stamps, Versions } from "@Library/Versions";
 					class="zine-box-canary isolate relative border-[3px] border-stamped-canary/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[2.2deg] lg:translate-y-4"
 				>
 					<div
-						class="absolute -top-2.5 left-4 z-10 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-2.5 left-4 z-10 border border-black bg-stamped-canary px-2 py-0.5 text-base font-black uppercase text-soot-black"
 					>
 						STAGE // B
 					</div>
 					<div class="mb-3 mt-1 flex items-center justify-between">
-						<span class="text-xs font-bold tracking-wider text-stamped-canary">
+						<span class="text-base font-bold tracking-wider text-stamped-canary">
 							02 // ENRICH &amp; PREVIEW
 						</span>
 						<span
-							class="border border-stamped-canary/30 bg-stamped-canary/10 px-2 py-0.5 text-[10px] font-black text-stamped-canary"
+							class="border border-stamped-canary/30 bg-stamped-canary/10 px-2 py-0.5 text-base font-black text-stamped-canary"
 						>
 							TYPE-AWARE
 						</span>
 					</div>
 					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">~1 ms</div>
-					<div class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] text-stamped-canary">
+					<div class="mt-4 border-t border-oxblood-dark pt-3 text-base text-stamped-canary">
 						Enriched, type-aware preview rendering.
 					</div>
 				</div>
@@ -228,18 +228,18 @@ import { Stamps, Versions } from "@Library/Versions";
 					class="zine-box-crimson isolate relative border-[3px] border-raw-blood bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg]"
 				>
 					<div
-						class="absolute -top-2.5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
+						class="absolute -top-2.5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-base font-black uppercase text-bone-white"
 					>
 						STAGE // C
 					</div>
 					<div class="mb-3 mt-1 flex items-center justify-between">
-						<span class="text-xs font-bold tracking-wider text-raw-blood">03 // BLAKE3 STORE</span>
-						<span class="border border-raw-blood/40 bg-raw-blood/10 px-2 py-0.5 text-[10px] font-black text-raw-blood">
+						<span class="text-base font-bold tracking-wider text-raw-blood">03 // BLAKE3 STORE</span>
+						<span class="border border-raw-blood/40 bg-raw-blood/10 px-2 py-0.5 text-base font-black text-raw-blood">
 							DUAL TIER
 						</span>
 					</div>
 					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">SQLite</div>
-					<div class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] text-zinc-dust">
+					<div class="mt-4 border-t border-oxblood-dark pt-3 text-base text-zinc-dust">
 						CCR marker: &lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;
 					</div>
 				</div>
@@ -248,27 +248,27 @@ import { Stamps, Versions } from "@Library/Versions";
 					class="zine-box-subtle isolate relative border-[3px] border-zinc-dust/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[2.5deg] lg:translate-y-3"
 				>
 					<div
-						class="absolute -top-2.5 left-4 z-10 border border-black bg-bone-newsprint px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-2.5 left-4 z-10 border border-black bg-bone-newsprint px-2 py-0.5 text-base font-black uppercase text-soot-black"
 					>
 						STAGE // D
 					</div>
 					<div class="mb-3 mt-1 flex items-center justify-between">
-						<span class="text-xs font-bold tracking-wider text-bone-newsprint">
+						<span class="text-base font-bold tracking-wider text-bone-newsprint">
 							04 // AGENT DECIDES
 						</span>
-						<span class="border border-bone-newsprint/30 bg-bone-newsprint/10 px-2 py-0.5 text-[10px] font-black text-bone-newsprint">
+						<span class="border border-bone-newsprint/30 bg-bone-newsprint/10 px-2 py-0.5 text-base font-black text-bone-newsprint">
 							ON DEMAND
 						</span>
 					</div>
 					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">
 						aphrodite_retrieve
 					</div>
-					<div class="mt-4 truncate border-t border-oxblood-dark pt-3 text-[11px] text-weathered-teal">
+					<div class="mt-4 truncate border-t border-oxblood-dark pt-3 text-base text-weathered-teal">
 						Full content only when needed.
 					</div>
 				</div>
 			</div>
-			<p class="mt-10 text-[9px] text-zinc-dust">
+			<p class="mt-10 text-base text-zinc-dust">
 				CLASSIFIER: 16 PIPELINE TYPES IN THE README (README.md:155-176); FULL REGISTRY OF 30
 				TYPES IN THE DOCS (docs/classification/content-types.md:118-151). TIMINGS: CLASSIFY
 				40-123 NS, WHOLE COMPRESS STEP SUB-MILLISECOND (README.md:133, 461).
@@ -278,7 +278,7 @@ import { Stamps, Versions } from "@Library/Versions";
 		<!-- TELEMETRY MODULE -->
 		<section class="relative my-6 w-full rotate-[0.6deg] transition-transform duration-300 hover:rotate-0">
 			<div
-				class="absolute -top-4 right-10 z-20 border border-black bg-stamped-canary px-4 py-1 text-[11px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+				class="absolute -top-4 right-10 z-20 border border-black bg-stamped-canary px-4 py-1 text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
 			>
 				TELEMETRY // 200 RUN HARVEST
 			</div>
@@ -289,7 +289,7 @@ import { Stamps, Versions } from "@Library/Versions";
 					class="flex flex-col items-start justify-between gap-6 border-b-2 border-oxblood-dark pb-8 lg:flex-row lg:items-end"
 				>
 					<div>
-						<div class="text-[11px] font-black uppercase tracking-widest text-raw-blood">
+						<div class="text-base font-black uppercase tracking-widest text-raw-blood">
 							EMPIRICAL LEDGER
 						</div>
 						<h2
@@ -301,7 +301,7 @@ import { Stamps, Versions } from "@Library/Versions";
 					<div
 						class="zine-box-subtle w-full border-[3px] border-raw-blood bg-soot-black p-5 text-left sm:p-6 lg:w-auto lg:text-right"
 					>
-						<div class="text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+						<div class="text-base font-black uppercase tracking-widest text-zinc-dust">
 							TOKENS SAVED FROM INGESTION
 						</div>
 						<div
@@ -309,7 +309,7 @@ import { Stamps, Versions } from "@Library/Versions";
 						>
 							156,342,817
 						</div>
-						<div class="mt-1 flex flex-wrap items-center gap-3 text-xs font-bold lg:justify-end">
+						<div class="mt-1 flex flex-wrap items-center gap-3 text-base font-bold lg:justify-end">
 							<span class="text-stamped-canary">26.9% TOTAL BUDGET DEFLECTED</span>
 							<span class="text-zinc-dust">&bull;</span>
 							<span class="text-weathered-teal">22,921 AVG PER CALL</span>
@@ -317,12 +317,12 @@ import { Stamps, Versions } from "@Library/Versions";
 					</div>
 				</div>
 				<div class="mt-8 space-y-4">
-					<div class="mb-2 text-xs font-bold uppercase tracking-wider text-zinc-dust">
+					<div class="mb-2 text-base font-bold uppercase tracking-wider text-zinc-dust">
 						RATIO BY OUTPUT CLASS (PER-TYPE COMPRESSION):
 					</div>
 					<!-- Browser snapshot -->
 					<div>
-						<div class="mb-1 flex justify-between text-xs font-bold">
+						<div class="mb-1 flex justify-between text-base font-bold">
 							<span class="text-bone-newsprint">BROWSER SNAPSHOT</span>
 							<span class="text-weathered-teal">416&times;</span>
 						</div>
@@ -333,7 +333,7 @@ import { Stamps, Versions } from "@Library/Versions";
 					</div>
 					<!-- Build output -->
 					<div>
-						<div class="mb-1 flex justify-between text-xs font-bold">
+						<div class="mb-1 flex justify-between text-base font-bold">
 							<span class="text-bone-newsprint">BUILD OUTPUT</span>
 							<span class="text-raw-blood">140&times;</span>
 						</div>
@@ -344,7 +344,7 @@ import { Stamps, Versions } from "@Library/Versions";
 					</div>
 					<!-- JSON -->
 					<div>
-						<div class="mb-1 flex justify-between text-xs font-bold">
+						<div class="mb-1 flex justify-between text-base font-bold">
 							<span class="text-bone-newsprint">JSON</span>
 							<span class="text-stamped-canary">40&times;</span>
 						</div>
@@ -355,7 +355,7 @@ import { Stamps, Versions } from "@Library/Versions";
 					</div>
 					<!-- Git diff -->
 					<div>
-						<div class="mb-1 flex justify-between text-xs font-bold">
+						<div class="mb-1 flex justify-between text-base font-bold">
 							<span class="text-bone-newsprint">GIT DIFF</span>
 							<span class="text-raw-blood">23&times;</span>
 						</div>
@@ -366,7 +366,7 @@ import { Stamps, Versions } from "@Library/Versions";
 					</div>
 					<!-- Terminal -->
 					<div>
-						<div class="mb-1 flex justify-between text-xs font-bold">
+						<div class="mb-1 flex justify-between text-base font-bold">
 							<span class="text-bone-newsprint">TERMINAL</span>
 							<span class="text-stamped-canary">20&times;</span>
 						</div>
@@ -376,7 +376,7 @@ import { Stamps, Versions } from "@Library/Versions";
 						</div>
 					</div>
 				</div>
-				<p class="mt-8 border-t border-oxblood-dark pt-4 text-[11px] leading-relaxed text-zinc-dust">
+				<p class="mt-8 border-t border-oxblood-dark pt-4 text-base leading-relaxed text-zinc-dust">
 					MEASURED, SEP 2026: 200 HERMES SESSIONS, 6,843 API CALLS (SEP 18-20). TOKENS WITH
 					MARKERS 424,959,588 / EXPANDED 581,302,405 / SAVED 156,342,817 (26.9%). 183 OF 200
 					SESSIONS SAVED; MEDIAN SESSION RATIO 22.9%; TOOL-HEAVY 20-25%, PURE-TOOL 76-82%.
@@ -389,7 +389,7 @@ import { Stamps, Versions } from "@Library/Versions";
 		<!-- INSTALL // RUNTIME HARNESS -->
 		<section class="relative w-full">
 			<div
-				class="mb-8 -rotate-1 relative z-10 w-fit border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-8 -rotate-1 relative z-10 w-fit border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				INSTALL // HERMES PLUGIN
 			</div>
@@ -400,11 +400,11 @@ import { Stamps, Versions } from "@Library/Versions";
 					<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 						Runtime harness
 					</h2>
-					<span class="text-[11px] font-bold text-weathered-teal">
+					<span class="text-base font-bold text-weathered-teal">
 						:9797 [CACHE] &bull; :9798 [TOKEN]
 					</span>
 				</div>
-				<div class="mb-4 space-y-1 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] text-bone-newsprint">
+				<div class="mb-4 space-y-1 border border-oxblood-dark bg-soot-black p-4 font-mono text-base text-bone-newsprint">
 					<div class="text-zinc-dust">$ git clone {ExternalLinks.HermesRepository}.git</div>
 					<div class="text-zinc-dust">$ cd Aphrodite-Hermes</div>
 					<div class="text-zinc-dust">$ bash download.sh</div>
@@ -415,9 +415,9 @@ import { Stamps, Versions } from "@Library/Versions";
 				<div
 					class="flex flex-col items-stretch justify-between gap-3 border-2 border-oxblood-dark bg-asphalt-panel p-4 sm:flex-row sm:items-center"
 				>
-					<div class="text-xs font-bold text-zinc-dust">COPY THE FULL SETUP SEQUENCE:</div>
+					<div class="text-base font-bold text-zinc-dust">COPY THE FULL SETUP SEQUENCE:</div>
 					<button
-						class="border border-black bg-raw-blood px-4 py-2 font-mono text-xs font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+						class="border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
 						type="button"
 						aria-label="Copy the full setup sequence to the clipboard"
 						data-copy={"git clone https://github.com/PlayForm/Aphrodite-Hermes.git\ncd Aphrodite-Hermes\nln -s \"$(pwd)\" ~/.hermes/plugins/aphrodite\nbash download.sh\ncd ..\nhermes plugins enable aphrodite"}
@@ -425,7 +425,7 @@ import { Stamps, Versions } from "@Library/Versions";
 						COPY
 					</button>
 				</div>
-				<div class="mt-4 flex items-center justify-between border-t border-oxblood-dark pt-2 text-[11px] text-zinc-dust">
+				<div class="mt-4 flex items-center justify-between border-t border-oxblood-dark pt-2 text-base text-zinc-dust">
 					<span>FULL INSTRUCTIONS ON THE</span>
 					<a class="font-bold text-stamped-canary" href="/setup/">SETUP PAGE</a>
 				</div>

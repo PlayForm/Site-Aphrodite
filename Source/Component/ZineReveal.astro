@@ -20,16 +20,16 @@ const { Cover, Tag = "SUPPRESSED", Raw } = Astro.props;
 ---
 
 <div class="group relative cursor-crosshair border border-oxblood-dark bg-soot-black" data-zine-reveal tabindex="0" aria-label={`${Tag}: hover or focus to reveal the raw content`}>
-	<div class="flex items-center justify-between gap-3 p-3 font-mono text-[12px] text-zinc-dust transition-opacity duration-150 group-hover:opacity-10 group-focus:opacity-10 group-[.revealed]:opacity-10">
+	<div class="flex items-center justify-between gap-3 p-3 font-mono text-base text-zinc-dust transition-opacity duration-150 group-hover:opacity-10 group-focus:opacity-10 group-[.revealed]:opacity-10">
 		<span class="truncate">{Cover}</span>
-		<span class="shrink-0 border border-oxblood-dark px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-raw-blood">{Tag}</span>
+		<span class="shrink-0 border border-oxblood-dark px-1.5 py-0.5 text-base font-black uppercase tracking-widest text-raw-blood">{Tag}</span>
 	</div>
 	<div
-		class="pointer-events-none absolute inset-0 flex items-center p-3 font-mono text-xs font-bold text-bone-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100 group-[.revealed]:opacity-100"
+		class="pointer-events-none absolute inset-0 flex items-center p-3 font-mono text-base font-bold text-bone-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100 group-[.revealed]:opacity-100"
 	>
 		<div class="w-full" set:html={Raw} />
 	</div>
-	<div class="pointer-events-none absolute bottom-1.5 right-2 font-mono text-[9px] uppercase tracking-widest text-zinc-dust opacity-0 transition-opacity group-hover:opacity-70 group-focus:opacity-70 group-[.revealed]:opacity-70">
+	<div class="pointer-events-none absolute bottom-1.5 right-2 font-mono text-base uppercase tracking-widest text-zinc-dust opacity-0 transition-opacity group-hover:opacity-70 group-focus:opacity-70 group-[.revealed]:opacity-70">
 		REVEALED
 	</div>
 </div>

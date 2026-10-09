@@ -18,7 +18,7 @@ import { Stamps, Versions } from "@Library/Versions";
 		<!-- HERO -->
 		<header class="relative flex w-full flex-col items-start">
 			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				PLUGIN // THE THIN LOADER
 			</div>
@@ -27,32 +27,32 @@ import { Stamps, Versions } from "@Library/Versions";
 			>
 				The plugin
 			</h1>
-			<p class="mt-12 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+			<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Aphrodite ships as a Hermes Agent plugin: a thin Python registration shim over a
 				Rust dylib. Six hooks, thirteen tools, and an opt-in context engine - all declared
-				in <code class="font-mono text-xs text-weathered-teal">plugin.yaml</code>, all logic
-				living in <code class="font-mono text-xs text-weathered-teal"
+				in <code class="font-mono text-base text-weathered-teal">plugin.yaml</code>, all logic
+				living in <code class="font-mono text-base text-weathered-teal"
 					>libaphrodite_hermes.dylib</code
 				>. This page documents the {`v${Versions.Plugin}`} plugin spec.
 			</p>
 			<div class="mt-16 flex max-w-4xl flex-wrap items-center gap-8">
 				<span
-					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000]"
+					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000]"
 				>
 					{Stamps.Plugin()} STANDALONE
 				</span>
 				<span
-					class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]"
+					class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]"
 				>
 					6 HOOKS
 				</span>
 				<span
-					class="-rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]"
+					class="-rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]"
 				>
 					13 TOOLS
 				</span>
 				<span
-					class="rotate-2 border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-soot-black shadow-[4px_4px_0px_#000]"
+					class="rotate-2 border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[4px_4px_0px_#000]"
 				>
 					ZERO LOGIC IN PYTHON
 				</span>
@@ -62,7 +62,7 @@ import { Stamps, Versions } from "@Library/Versions";
 		<!-- PLUGIN.YAML FACTS -->
 		<section class="relative w-full">
 			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				plugin.yaml // THE DECLARED SURFACE
 			</div>
@@ -73,7 +73,7 @@ import { Stamps, Versions } from "@Library/Versions";
 					What the manifest declares
 				</h2>
 				<div class="grid grid-cols-1 gap-10 md:grid-cols-2">
-					<div class="space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px]">
+					<div class="space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-base">
 						<div><span class="text-zinc-dust">name:</span> <span class="text-bone-white">aphrodite</span></div>
 						<div><span class="text-zinc-dust">version:</span> <span class="text-bone-white">{Versions.Plugin}</span></div>
 						<div><span class="text-zinc-dust">kind:</span> <span class="text-bone-white">standalone</span></div>
@@ -90,7 +90,7 @@ import { Stamps, Versions } from "@Library/Versions";
 							<span class="text-bone-white">true</span>
 						</div>
 					</div>
-					<div class="space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px]">
+					<div class="space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-base">
 						<div class="text-weathered-teal"># provides_hooks (6)</div>
 						<div class="text-bone-newsprint">on_session_start · pre_tool_call</div>
 						<div class="text-bone-newsprint">transform_tool_result · transform_terminal_output</div>
@@ -101,7 +101,7 @@ import { Stamps, Versions } from "@Library/Versions";
 						<div class="text-bone-newsprint">reclassify · prefetch · prefetch_status</div>
 					</div>
 				</div>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 text-[11px] leading-relaxed text-zinc-dust">
+				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
 					ENGINE THRESHOLD SEMANTICS: -1 = ALWAYS COMPRESS · 0 = DISABLED · &gt;0 = FILL
 					PERCENT. SKILLS ARE NOT SHIPPED WITH THE PLUGIN - THEY LIVE DEV-SIDE.
 				</p>
@@ -114,14 +114,14 @@ import { Stamps, Versions } from "@Library/Versions";
 				class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div
-					class="absolute -top-5 left-6 z-10 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+					class="absolute -top-5 left-6 z-10 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
 				>
 					ARCHITECTURE // CALL CHAIN
 				</div>
 				<h2 class="mb-12 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					A thin shim, a Rust brain
 				</h2>
-				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px] leading-relaxed">
+				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
 					<div class="text-bone-white">Hermes Agent (hooks + tool dispatch)</div>
 					<div class="pl-4 text-zinc-dust">│</div>
 					<div class="pl-4 text-bone-newsprint">__init__.py - ctypes FFI, registers hooks/tools/engine · no logic</div>
@@ -132,14 +132,14 @@ import { Stamps, Versions } from "@Library/Versions";
 					<div class="pl-4 text-zinc-dust">│</div>
 					<div class="pl-4 text-weathered-teal">CCR store - SQLite :9798 / in-memory :9797 / inline</div>
 				</div>
-				<p class="mt-12 font-body text-xs leading-relaxed text-zinc-dust">
+				<p class="mt-12 font-body text-base leading-relaxed text-zinc-dust">
 					Registration is driven by the dylib: the shim asks the dylib for its hook names
 					and tool schemas and registers one callback per name. No hot-reload - the dylib
 					is resolved once per process; to pick up a new build, restart the Hermes session.
 				</p>
 				<figure class="mt-20 border border-oxblood-dark bg-soot-black p-4" data-diagram="context-engine">
 					<div class="overflow-x-auto" set:html={ContextEngine} />
-					<figcaption class="mt-6 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+					<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 						M9 // CONTEXT ENGINE
 					</figcaption>
 				</figure>
@@ -149,7 +149,7 @@ import { Stamps, Versions } from "@Library/Versions";
 		<!-- DOWNLOAD FLOW -->
 		<section class="relative w-full">
 			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				DOWNLOAD // EXPLICIT STEPS ONLY
 			</div>
@@ -161,15 +161,15 @@ import { Stamps, Versions } from "@Library/Versions";
 				</h2>
 				<div class="grid grid-cols-1 gap-16 lg:grid-cols-2">
 					<div>
-						<p class="mb-8 font-body text-sm leading-relaxed text-bone-newsprint">
+						<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
 							Binaries are never shipped in the repository. Fetching them is an explicit
 							setup step you run yourself - and the verification is mandatory, not
 							best-effort:
 						</p>
-						<ul class="space-y-6 font-body text-sm text-bone-newsprint">
+						<ul class="space-y-6 font-body text-base text-bone-newsprint">
 							<li class="border-l-4 border-raw-blood pl-4">
 								<span class="font-bold text-bone-white">SHA-256 against the in-tree checksum list</span>
-								- <code class="font-mono text-xs text-weathered-teal">SHA256SUMS.txt</code>,
+								- <code class="font-mono text-base text-weathered-teal">SHA256SUMS.txt</code>,
 								generated by CI into the tree; a mismatch is refused outright.
 							</li>
 							<li class="border-l-4 border-raw-blood pl-4">
@@ -189,7 +189,7 @@ import { Stamps, Versions } from "@Library/Versions";
 						</ul>
 					</div>
 					<div>
-						<div class="mb-10 space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px] leading-relaxed text-zinc-dust">
+						<div class="mb-10 space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed text-zinc-dust">
 							<div>$ git clone https://github.com/PlayForm/Aphrodite-Hermes.git</div>
 							<div>$ cd Aphrodite-Hermes</div>
 							<div>$ ln -s "$(pwd)" ~/.hermes/plugins/aphrodite</div>
@@ -201,11 +201,11 @@ import { Stamps, Versions } from "@Library/Versions";
 						<div
 							class="flex items-center justify-between gap-8 border-2 border-oxblood-dark bg-asphalt-panel p-4"
 						>
-							<span class="text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+							<span class="text-base font-black uppercase tracking-widest text-stamped-canary">
 								COPY THE FULL SEQUENCE:
 							</span>
 							<button
-								class="border border-black bg-raw-blood px-4 py-2 font-mono text-xs font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+								class="border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
 								data-copy={"git clone https://github.com/PlayForm/Aphrodite-Hermes.git\ncd Aphrodite-Hermes\nln -s \"$(pwd)\" ~/.hermes/plugins/aphrodite\nbash download.sh\ncd ..\nhermes plugins enable aphrodite\nhermes"}
 							>
 								COPY
@@ -213,11 +213,11 @@ import { Stamps, Versions } from "@Library/Versions";
 						</div>
 					</div>
 				</div>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 font-body text-xs leading-relaxed text-zinc-dust">
+				<p class="mt-12 border-t border-oxblood-dark pt-8 font-body text-base leading-relaxed text-zinc-dust">
 					LLM API KEY REQUIRED: the proxy is an OpenAI-compatible forwarder and needs its
-					own credentials - <code class="font-mono text-xs text-weathered-teal">APHRODITE_API_KEY</code>,
-					<code class="font-mono text-xs text-weathered-teal">aphrodite setup</code>, or
-					<code class="font-mono text-xs text-weathered-teal">api_key</code> in
+					own credentials - <code class="font-mono text-base text-weathered-teal">APHRODITE_API_KEY</code>,
+					<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>, or
+					<code class="font-mono text-base text-weathered-teal">api_key</code> in
 					~/.hermes/aphrodite/aphrodite.toml. Hermes' provider config is NOT reused, and
 					there is no keyless mode: without a key the proxy refuses to start.
 				</p>
@@ -230,14 +230,14 @@ import { Stamps, Versions } from "@Library/Versions";
 				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div
-					class="absolute -top-5 right-6 z-10 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					class="absolute -top-5 right-6 z-10 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 				>
 					FILESYSTEM // CANONICAL LAYOUT
 				</div>
 				<h2 class="mb-12 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					What changes after install
 				</h2>
-				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px] leading-relaxed text-bone-newsprint">
+				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed text-bone-newsprint">
 					<div>~/.hermes/</div>
 					<div class="pl-4">├── plugins/aphrodite <span class="text-zinc-dust">← manual symlink to the plugin repo</span></div>
 					<div class="pl-4 text-bone-white">└── aphrodite/ <span class="text-zinc-dust">← runtime home</span></div>
@@ -248,9 +248,9 @@ import { Stamps, Versions } from "@Library/Versions";
 					<div class="pl-10">├── ccr.db <span class="text-zinc-dust">← SQLite CCR store</span></div>
 					<div class="pl-10">└── proxy-stderr.log <span class="text-zinc-dust">← proxy logs (empty = healthy)</span></div>
 				</div>
-				<p class="mt-12 font-body text-xs leading-relaxed text-zinc-dust">
+				<p class="mt-12 font-body text-base leading-relaxed text-zinc-dust">
 					The runtime home self-heals toward
-					<code class="font-mono text-xs text-weathered-teal">layout_schema.json</code> at
+					<code class="font-mono text-base text-weathered-teal">layout_schema.json</code> at
 					startup: misplaced config and binaries are moved to their canonical paths, stale
 					plugin-source copies are quarantined, and the
 					~/.hermes/plugins/aphrodite install dir is Hermes-owned - the plugin never
@@ -261,7 +261,7 @@ import { Stamps, Versions } from "@Library/Versions";
 					data-diagram="hook-chain-mini"
 				>
 					<div class="overflow-x-auto [&_svg]:h-auto" set:html={HookChain} />
-					<figcaption class="mt-4 font-mono text-[9px] font-black uppercase tracking-widest text-zinc-dust">
+					<figcaption class="mt-4 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 						M3 MINI // HOOK CHAIN
 					</figcaption>
 				</figure>
@@ -274,7 +274,7 @@ import { Stamps, Versions } from "@Library/Versions";
 				class="zine-box-crimson relative -rotate-[0.8deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div
-					class="absolute -top-5 right-6 z-10 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					class="absolute -top-5 right-6 z-10 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 				>
 					EVOLUTION // HOW THE SURFACE GREW
 				</div>
@@ -293,33 +293,33 @@ import { Stamps, Versions } from "@Library/Versions";
 							{ Hook: "post_llm_call", When: "after each LLM response", Does: "archives the turn, advances the counter, expires stale state" },
 						].map(({ Hook, When, Does }) => (
 							<div class="border-2 border-oxblood-dark bg-soot-black p-5">
-								<div class="font-mono text-xs font-black text-bone-white">{Hook}</div>
-								<div class="mt-3 font-mono text-[10px] font-bold uppercase tracking-widest text-stamped-canary">{When}</div>
-								<p class="mt-3 font-body text-xs leading-relaxed text-bone-newsprint">{Does}</p>
+								<div class="font-mono text-base font-black text-bone-white">{Hook}</div>
+								<div class="mt-3 font-mono text-base font-bold uppercase tracking-widest text-stamped-canary">{When}</div>
+								<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">{Does}</p>
 							</div>
 						))
 					}
 				</div>
-				<p class="mt-8 font-mono text-[9px] text-zinc-dust">
+				<p class="mt-8 font-mono text-base text-zinc-dust">
 					SRC: docs/plugin/hooks.md:13-20 - every hook is a thin dispatch that forwards to the Rust dylib; the dylib holds all the behavior.
 				</p>
 				<!-- The version-pairing strip -->
 				<div class="mt-24 border-2 border-raw-blood bg-soot-black p-6">
-					<div class="font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+					<div class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 						THE VERSION PAIRING · BINARY_VERSION MECHANICS
 					</div>
 					<div class="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-3">
 						<div>
 							<div class="font-headline text-2xl font-black text-bone-white">{Stamps.Pairing()}</div>
-							<p class="mt-3 font-body text-xs leading-relaxed text-bone-newsprint">
+							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
 								Today's pairing: binary {Versions.Binary}, plugin {Versions.Plugin}. Every release moves both:
 								"{Versions.ChangelogPairing}."
 							</p>
 						</div>
 						<div>
 							<div class="font-headline text-2xl font-black text-bone-white">BUMPED LAST</div>
-							<p class="mt-3 font-body text-xs leading-relaxed text-bone-newsprint">
-								<code class="font-mono text-xs text-weathered-teal">BINARY_VERSION</code> is
+							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+								<code class="font-mono text-base text-weathered-teal">BINARY_VERSION</code> is
 								pinned to a binary release tag the plugin can download. Since the first
 								plugin-first release (v1.4.6), the plugin is tagged
 								<em>before the parent</em>, so the pinned version points at assets that
@@ -328,36 +328,36 @@ import { Stamps, Versions } from "@Library/Versions";
 						</div>
 						<div>
 							<div class="font-headline text-2xl font-black text-bone-white">OR IT REFUSES</div>
-							<p class="mt-3 font-body text-xs leading-relaxed text-bone-newsprint">
-								The plugin warns before <code class="font-mono text-xs">download.sh</code>
-								when the pinned <code class="font-mono text-xs">BINARY_VERSION</code> points
+							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+								The plugin warns before <code class="font-mono text-base">download.sh</code>
+								when the pinned <code class="font-mono text-base">BINARY_VERSION</code> points
 								at a release with no assets - and since v1.6.5, a checksum mismatch is a
 								hard refusal, not a warning.
 							</p>
 						</div>
 					</div>
-					<div class="mt-6 font-mono text-[9px] text-zinc-dust">
+					<div class="mt-6 font-mono text-base text-zinc-dust">
 						SRC: CHANGELOG.md v1.4.6/v1.4.4/v1.6.5/v1.6.6 entries · the Aphrodite/v1.4.6 release note ("released plugin-first ... points at assets that already exist")
 					</div>
 				</div>
 				<!-- The 14 -> 13 tool-surface callout -->
 				<div class="mt-16 border-l-4 border-stamped-canary bg-soot-black p-6">
-					<div class="font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+					<div class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 						13 TOOLS, NOT 14 · THE CORRECTION IS A BEAT
 					</div>
-					<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 						v1.6.5 corrected the manifest: "14 tools" → "13 tools" - the release dylib
-						registers exactly the 13 declared tools. The 14th, <code class="font-mono text-xs text-weathered-teal">aphrodite_debug</code>,
-						is <code class="font-mono text-xs text-weathered-teal">debug_assertions</code>-gated
-						out of release builds, matching what <code class="font-mono text-xs text-weathered-teal">hermes plugins validate</code>
+						registers exactly the 13 declared tools. The 14th, <code class="font-mono text-base text-weathered-teal">aphrodite_debug</code>,
+						is <code class="font-mono text-base text-weathered-teal">debug_assertions</code>-gated
+						out of release builds, matching what <code class="font-mono text-base text-weathered-teal">hermes plugins validate</code>
 						enforces. Earlier, v1.6.1 had already removed it from
-						<code class="font-mono text-xs text-weathered-teal">provides_tools</code>, closing the
+						<code class="font-mono text-base text-weathered-teal">provides_tools</code>, closing the
 						catalog-review mismatch on the pinned tree - and v1.4.6 had done the same for
-						<code class="font-mono text-xs text-weathered-teal">aphrodite_navigate</code>, the
+						<code class="font-mono text-base text-weathered-teal">aphrodite_navigate</code>, the
 						navigation tool whose feature was unbuildable. The declared surface and the
 						running surface are kept identical on purpose.
 					</p>
-					<div class="mt-4 font-mono text-[9px] text-zinc-dust">SRC: CHANGELOG.md:61-64 (v1.6.5) · CHANGELOG.md:166-173 (v1.6.1) · v1.4.6 release note</div>
+					<div class="mt-4 font-mono text-base text-zinc-dust">SRC: CHANGELOG.md:61-64 (v1.6.5) · CHANGELOG.md:166-173 (v1.6.1) · v1.4.6 release note</div>
 				</div>
 			</div>
 		</section>

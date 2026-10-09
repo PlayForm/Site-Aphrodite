@@ -47,7 +47,7 @@ const Notes: { N: string; Label: string; Text: string }[] = [
 
 <section class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-6 sm:p-10">
 	<div class="mb-8 flex flex-wrap items-center gap-4">
-		<span class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
+		<span class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
 			{Title}
 		</span>
 		<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
@@ -55,22 +55,22 @@ const Notes: { N: string; Label: string; Text: string }[] = [
 
 	<!-- The specimen module: a miniature of the page grammar itself -->
 	<div class="relative border-4 border-blood-crimson bg-carbon-void p-5 shadow-[6px_6px_0px_#000000,10px_10px_0px_#520612] sm:p-8">
-		<div class="absolute -top-3.5 left-6 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+		<div class="absolute -top-3.5 left-6 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
 			SECTION TAPE
 		</div>
 		<div class="grid gap-4 lg:grid-cols-2">
-			<div class="border border-oxblood-dark bg-soot-black p-3 font-mono text-[11px] leading-relaxed text-zinc-dust">
+			<div class="border border-oxblood-dark bg-soot-black p-3 font-mono text-base leading-relaxed text-zinc-dust">
 				<div class="text-bone-white">raw stream line</div>
 				<div class="opacity-70">suppressed at 70% - dim tone</div>
 				<div class="opacity-40">suppressed at 40% - fade tone</div>
 				<div class="opacity-25">suppressed at 25% - mute tone</div>
 			</div>
 			<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3">
-				<div class="mb-1 text-[10px] font-black uppercase tracking-widest text-stamped-canary">PREVIEW</div>
-				<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-xs font-bold text-bone-white">
+				<div class="mb-1 text-base font-black uppercase tracking-widest text-stamped-canary">PREVIEW</div>
+				<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold text-bone-white">
 					one compressed line the LLM reads
 				</div>
-				<div class="mt-2 font-mono text-[11px] font-bold text-weathered-teal">a1b2c3d4... 416x</div>
+				<div class="mt-2 font-mono text-base font-bold text-weathered-teal">a1b2c3d4... 416x</div>
 			</div>
 		</div>
 	</div>
@@ -80,11 +80,11 @@ const Notes: { N: string; Label: string; Text: string }[] = [
 		{
 			Notes.map(({ N, Label, Text }) => (
 				<li class="border-l-2 border-oxblood-dark pl-4">
-					<div class="font-mono text-xs font-bold uppercase tracking-widest text-bone-white">
+					<div class="font-mono text-base font-bold uppercase tracking-widest text-bone-white">
 						<span class="mr-2 inline-block border border-black bg-stamped-canary px-1.5 text-soot-black">{N}</span>
 						{Label}
 					</div>
-					<p class="mt-1.5 font-body text-sm leading-relaxed text-bone-newsprint">{Text}</p>
+					<p class="mt-1.5 font-body text-base leading-relaxed text-bone-newsprint">{Text}</p>
 				</li>
 			))
 		}

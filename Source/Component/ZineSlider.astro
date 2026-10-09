@@ -17,9 +17,9 @@ const { Label, Unit = "", Min = 0, Max = 100, Step = 1, Value = 50 } = Astro.pro
 ---
 
 <label class="zine-box-subtle flex flex-col gap-1.5 border-[3px] border-oxblood-dark bg-carbon-void p-4" data-slider>
-	<span class="flex items-baseline justify-between font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+	<span class="flex items-baseline justify-between font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 		{Label}
-		<span class="text-sm text-stamped-canary" data-slider-value data-slider-unit={Unit}>{String(Value)}{Unit}</span>
+		<span class="text-base text-stamped-canary" data-slider-value data-slider-unit={Unit}>{String(Value)}{Unit}</span>
 	</span>
 	<input
 		class="h-2 w-full appearance-none bg-soot-black accent-raw-blood [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-2 [&::-moz-range-thumb]:border [&::-moz-range-thumb]:border-black [&::-moz-range-thumb]:bg-raw-blood [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-black [&::-webkit-slider-thumb]:bg-raw-blood [&::-webkit-slider-thumb]:shadow-[2px_2px_0px_#000]"

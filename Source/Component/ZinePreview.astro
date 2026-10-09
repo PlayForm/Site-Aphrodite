@@ -23,9 +23,9 @@ const Palette = {
 ---
 
 <div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
-	<div class={`mb-1 text-[10px] font-black uppercase tracking-widest ${Palette}`}>{Label}</div>
-	<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-xs font-bold text-bone-white sm:text-sm">
+	<div class={`mb-1 text-base font-black uppercase tracking-widest ${Palette}`}>{Label}</div>
+	<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold text-bone-white sm:text-base">
 		{Result}
 	</div>
-	{Hash && <div class="mt-2 truncate font-mono text-[11px] font-bold text-weathered-teal" set:html={Hash} />}
+	{Hash && <div class="mt-2 truncate font-mono text-base font-bold text-weathered-teal" set:html={Hash} />}
 </div>

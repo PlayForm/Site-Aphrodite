@@ -90,7 +90,7 @@ const Example = [
 		<!-- Header -->
 		<header class="relative border-l-4 border-blood-crimson bg-carbon-void p-8">
 			<ZineTape Label="aphrodite.toml" Color="raw" Side="left" />
-			<p class="font-mono text-[11px] font-bold uppercase tracking-widest text-stamped-canary">
+			<p class="font-mono text-base font-bold uppercase tracking-widest text-stamped-canary">
 				THE FILE THAT TUNES EVERYTHING
 			</p>
 			<h1 class="mt-3 text-3xl font-bold tracking-tight text-bone-white sm:text-4xl">
@@ -106,10 +106,10 @@ const Example = [
 		<!-- The pick chain -->
 		<section class="relative mt-32" aria-label="The file pick chain">
 			<ZineTape Label="the pick chain" Color="teal" Side="right" />
-			<h2 class="font-mono text-sm font-black uppercase tracking-widest text-bone-white">
+			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 				WHERE THE FILE IS FOUND
 			</h2>
-			<p class="mt-3 max-w-3xl text-sm text-zinc-dust">
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				Three stops, in order - and a hard fall-through when none of them exists
 				(docs/config/aphrodite-toml.md, "File location"):
 			</p>
@@ -129,20 +129,20 @@ const Example = [
 		<section class="relative mt-32" aria-label="The live TOML editor">
 			<ZineTape Label="live editor" Color="canary" Side="left" />
 			<div class="flex flex-wrap items-center justify-between gap-3">
-				<h2 class="font-mono text-sm font-black uppercase tracking-widest text-bone-white">
+				<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 					EDIT THE SHIPPED EXAMPLE
 				</h2>
 				<div class="flex gap-3">
 					<button
 						type="button"
 						data-action="reset"
-						class="inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-xs font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+						class="inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
 					>
 						Reset example
 					</button>
 				</div>
 			</div>
-			<p class="mt-3 max-w-3xl text-sm text-zinc-dust">
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				This is the shipped <code class="text-bone-newsprint">aphrodite.toml.example</code>
 				(sanitized: the api_key sample renders as its env-var name). Edit it - the resolution
 				ladder on the right re-decides every tracked key as you type.
@@ -155,18 +155,18 @@ const Example = [
 						class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3"
 					>
 						<span
-							class="font-mono text-[11px] font-black uppercase tracking-widest text-stamped-canary"
+							class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary"
 						>
 							aphrodite.toml
 						</span>
-						<span class="font-mono text-[11px] text-zinc-dust" data-editor-status aria-live="polite">parsed</span>
+						<span class="font-mono text-base text-zinc-dust" data-editor-status aria-live="polite">parsed</span>
 					</div>
 					<label class="sr-only" for="config-editor">aphrodite.toml contents</label>
 					<textarea
 						id="config-editor"
 						data-editor
 						spellcheck="false"
-						class="h-[36rem] w-full resize-y bg-transparent p-5 font-mono text-xs leading-relaxed text-bone-newsprint"
+						class="h-[36rem] w-full resize-y bg-transparent p-5 font-mono text-base leading-relaxed text-bone-newsprint"
 						placeholder="loading the shipped example..."></textarea>
 				</div>
 
@@ -176,11 +176,11 @@ const Example = [
 						class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3"
 					>
 						<span
-							class="font-mono text-[11px] font-black uppercase tracking-widest text-weathered-teal"
+							class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal"
 						>
 							EFFECTIVE CONFIG - WHO WINS
 						</span>
-						<span class="font-mono text-[11px] text-zinc-dust">env &gt; toml &gt; compiled</span>
+						<span class="font-mono text-base text-zinc-dust">env &gt; toml &gt; compiled</span>
 					</div>
 					<div class="flex-1 space-y-4 p-5" data-ladder aria-live="polite">
 						<!-- rendered client-side -->
@@ -197,7 +197,7 @@ const Example = [
 			>
 				<div class="overflow-x-auto" set:html={ConfigResolution} />
 				<figcaption
-					class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust"
+					class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
 				>
 					M7 // CONFIG RESOLUTION
 				</figcaption>
@@ -207,15 +207,15 @@ const Example = [
 		<!-- Two stacks -->
 		<section class="relative mt-32" aria-label="The two parser stacks">
 			<ZineTape Label="two stacks" Color="raw" Side="right" />
-			<h2 class="font-mono text-sm font-black uppercase tracking-widest text-bone-white">
+			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 				ONE FILE, TWO PARSERS
 			</h2>
 			<div class="mt-8 grid gap-10 lg:grid-cols-2">
 				<ZineBox Tone="crimson">
-					<h3 class="font-mono text-xs font-black uppercase tracking-widest text-stamped-canary">
+					<h3 class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 						THE RUST HTTP PROXY
 					</h3>
-					<p class="mt-3 text-sm text-zinc-dust">
+					<p class="mt-3 text-base text-zinc-dust">
 						<code class="text-bone-newsprint">config/proxy.rs</code>, active whenever an
 						aphrodite.toml is found. It reads <code>[[proxies]]</code>, <code>[defaults]</code>,
 						the four hot-reload thresholds in <code>[compression]</code>, and
@@ -225,10 +225,10 @@ const Example = [
 					</p>
 				</ZineBox>
 				<ZineBox Tone="teal">
-					<h3 class="font-mono text-xs font-black uppercase tracking-widest text-weathered-teal">
+					<h3 class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
 						THE HERMES DYLIB SESSION
 					</h3>
-					<p class="mt-3 text-sm text-zinc-dust">
+					<p class="mt-3 text-base text-zinc-dust">
 						<code class="text-bone-newsprint">config_loader.rs</code>, read once at dylib load:
 						the engine/chain-split/poll keys in <code>[compression]</code>,
 						<code>[defaults] model</code> / <code>api_url</code>,
@@ -245,25 +245,25 @@ const Example = [
 		<!-- The [[proxies]] pair -->
 		<section class="relative mt-32" aria-label="The proxies pair">
 			<ZineTape Label="the pair" Color="bone" Side="left" />
-			<h2 class="font-mono text-sm font-black uppercase tracking-widest text-bone-white">
+			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 				[[PROXIES]] - CACHE :9797 + TOKEN :9798
 			</h2>
 			<div class="mt-8 grid gap-10 md:grid-cols-2">
 				<ZineBox Tone="subtle">
-					<p class="font-mono text-xs font-black uppercase tracking-widest text-bone-newsprint">
+					<p class="font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
 						cache &middot; 127.0.0.1:9797
 					</p>
-					<p class="mt-2 text-sm text-zinc-dust">
+					<p class="mt-2 text-base text-zinc-dust">
 						mode <code class="text-bone-newsprint">"cache"</code> - the in-memory backend,
 						threshold 8192 bytes compiled-in (the example lowers it to 4096).
 						<code>tool_relay = true</code> enables the /tool/relay endpoint.
 					</p>
 				</ZineBox>
 				<ZineBox Tone="subtle">
-					<p class="font-mono text-xs font-black uppercase tracking-widest text-bone-newsprint">
+					<p class="font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
 						token &middot; 127.0.0.1:9798
 					</p>
-					<p class="mt-2 text-sm text-zinc-dust">
+					<p class="mt-2 text-base text-zinc-dust">
 						mode <code class="text-bone-newsprint">"token"</code> - the SQLite-backed durable
 						store, threshold 1024 compiled-in (the example lowers it to 512), TTL from
 						<code>ccr_ttl_seconds</code>.
@@ -271,10 +271,10 @@ const Example = [
 				</ZineBox>
 			</div>
 			<div class="mt-10 border-l-4 border-raw-blood bg-soot-black p-6">
-				<p class="font-mono text-[10px] font-black uppercase tracking-widest text-raw-blood">
+				<p class="font-mono text-base font-black uppercase tracking-widest text-raw-blood">
 					WARNING - THE 0.0.0.0 LINES
 				</p>
-				<p class="mt-2 max-w-3xl text-sm text-zinc-dust">
+				<p class="mt-2 max-w-3xl text-base text-zinc-dust">
 					Listeners bind loopback-only by default, and the router rejects non-loopback peers
 					(and non-loopback Host headers) on every route except /health. Uncommenting
 					<code class="text-bone-newsprint">listen = "0.0.0.0:..."</code> exposes an
@@ -288,20 +288,20 @@ const Example = [
 		<section class="relative mt-32" aria-label="The compression knobs">
 			<ZineTape Label="hot-reload" Color="canary" Side="right" />
 			<div class="flex flex-wrap items-center justify-between gap-3">
-				<h2 class="font-mono text-sm font-black uppercase tracking-widest text-bone-white">
+				<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 					[COMPRESSION] - THE KNOBS
 				</h2>
 				<ZineStamp Label="POST /reload" Color="raw" Rotate="-rotate-1" />
 			</div>
-			<p class="mt-3 max-w-3xl text-sm text-zinc-dust">
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				Edit + save - or <code class="text-bone-newsprint">POST /reload</code>, or the config
 				file watcher - re-applies the four proxy thresholds (and the preview cap) with no
 				restart. Everything else about a proxy is fixed at startup (README.md:389-391).
 			</p>
 			<div class="mt-8 overflow-x-auto border-4 border-blood-crimson bg-carbon-void">
-				<table class="w-full min-w-[42rem] text-left text-sm">
+				<table class="w-full min-w-[42rem] text-left text-base">
 					<thead>
-						<tr class="border-b-2 border-blood-crimson bg-soot-black font-mono text-[10px] uppercase tracking-widest text-zinc-dust">
+						<tr class="border-b-2 border-blood-crimson bg-soot-black font-mono text-base uppercase tracking-widest text-zinc-dust">
 							<th class="px-5 py-3">Key</th>
 							<th class="px-5 py-3">Example</th>
 							<th class="px-5 py-3">Compiled</th>
@@ -321,18 +321,18 @@ const Example = [
 								{ K: "context_engine", E: "true", C: "true", V: "APHRODITE_CONTEXT_ENGINE", N: "opt-in dylib status flag; the HTTP proxy never reads it" },
 							].map((Row) => (
 								<tr class="text-zinc-dust">
-									<td class="px-5 py-3 font-mono text-xs text-bone-newsprint">{Row.K}</td>
-									<td class="px-5 py-3 font-mono text-xs text-stamped-canary">{Row.E}</td>
-									<td class="px-5 py-3 font-mono text-xs">{Row.C}</td>
-									<td class="px-5 py-3 font-mono text-[10px]">{Row.V}</td>
-									<td class="px-5 py-3 text-xs">{Row.N}</td>
+									<td class="px-5 py-3 font-mono text-base text-bone-newsprint">{Row.K}</td>
+									<td class="px-5 py-3 font-mono text-base text-stamped-canary">{Row.E}</td>
+									<td class="px-5 py-3 font-mono text-base">{Row.C}</td>
+									<td class="px-5 py-3 font-mono text-base">{Row.V}</td>
+									<td class="px-5 py-3 text-base">{Row.N}</td>
 								</tr>
 							))
 						}
 					</tbody>
 				</table>
 			</div>
-			<p class="mt-4 max-w-3xl font-mono text-[10px] uppercase tracking-widest text-zinc-dust">
+			<p class="mt-4 max-w-3xl font-mono text-base uppercase tracking-widest text-zinc-dust">
 				Reload reaches the four bolded thresholds + preview_max_chars; the dylib keys ride
 				aphrodite_config_set, and the file watcher applies only the four thresholds.
 			</p>
@@ -341,15 +341,15 @@ const Example = [
 		<!-- flow / directives / previews -->
 		<section class="relative mt-32" aria-label="Flow, directives and previews">
 			<ZineTape Label="per-turn context" Color="teal" Side="left" />
-			<h2 class="font-mono text-sm font-black uppercase tracking-widest text-bone-white">
+			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 				[FLOW] / [DIRECTIVES] / [PREVIEWS]
 			</h2>
 			<div class="mt-8 grid gap-10 lg:grid-cols-3">
 				<ZineBox Tone="teal">
-					<h3 class="font-mono text-xs font-black uppercase tracking-widest text-weathered-teal">
+					<h3 class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
 						[FLOW]
 					</h3>
-					<p class="mt-3 text-sm text-zinc-dust">
+					<p class="mt-3 text-base text-zinc-dust">
 						<code class="text-bone-newsprint">budget_chars = 2600</code> - the hard cap on ALL
 						per-turn injected context (directives + nudges + recall catalog + retrieve hint).
 						Sections drop bottom-up when over budget; directives and nudges never drop. Dylib
@@ -357,10 +357,10 @@ const Example = [
 					</p>
 				</ZineBox>
 				<ZineBox Tone="subtle">
-					<h3 class="font-mono text-xs font-black uppercase tracking-widest text-bone-newsprint">
+					<h3 class="font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
 						[DIRECTIVES]
 					</h3>
-					<p class="mt-3 text-sm text-zinc-dust">
+					<p class="mt-3 text-base text-zinc-dust">
 						<code class="text-bone-newsprint">active = ["focus", "foresight"]</code> - which
 						loaded directives start active; swap mid-conversation via
 						<code>aphrodite_directive</code>. Names not in the loaded set are silently filtered;
@@ -369,10 +369,10 @@ const Example = [
 					</p>
 				</ZineBox>
 				<ZineBox Tone="subtle">
-					<h3 class="font-mono text-xs font-black uppercase tracking-widest text-bone-newsprint">
+					<h3 class="font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
 						[PREVIEWS]
 					</h3>
-					<p class="mt-3 text-sm text-zinc-dust">
+					<p class="mt-3 text-base text-zinc-dust">
 						<code class="text-bone-newsprint">preview_max_chars = 120</code> - caps the whole
 						rendered preview string, not per line; 0 = unlimited. Env
 						<code>APHRODITE_PREVIEW_MAX_CHARS</code> &gt; TOML &gt; unlimited. Re-applied by
@@ -385,10 +385,10 @@ const Example = [
 		<!-- Documented but unwired -->
 		<section class="relative mt-32" aria-label="Documented but unwired keys">
 			<ZineTape Label="honest ledger" Color="bone" Side="right" />
-			<h2 class="font-mono text-sm font-black uppercase tracking-widest text-bone-white">
+			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 				DOCUMENTED BUT UNWIRED
 			</h2>
-			<p class="mt-3 max-w-3xl text-sm text-zinc-dust">
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				These keys parse cleanly but nothing in the current codebase reads them back out -
 				setting one is a silent no-op. They are kept and marked for forward compatibility; the
 				shipped example labels each one in place.
@@ -406,13 +406,13 @@ const Example = [
 						"prompts.ccr_marker_hint",
 						"prompts.catalog_intent_hints",
 					].map((K) => (
-						<span class="border-2 border-stamped-canary bg-soot-black px-3 py-1.5 font-mono text-xs text-stamped-canary">
+						<span class="border-2 border-stamped-canary bg-soot-black px-3 py-1.5 font-mono text-base text-stamped-canary">
 							{K}
 						</span>
 					))
 				}
 			</div>
-			<p class="mt-6 max-w-3xl font-mono text-[10px] uppercase tracking-widest text-zinc-dust">
+			<p class="mt-6 max-w-3xl font-mono text-base uppercase tracking-widest text-zinc-dust">
 				No parser home at all - <code>compression.prefetch</code> and the old
 				<code>[templates.*]</code> sections were removed from the shipped files; marker and
 				preview formats are compiled into the binary.
@@ -423,18 +423,18 @@ const Example = [
 		<section class="relative mt-32" aria-label="The reload simulation">
 			<ZineTape Label="simulation" Color="raw" Side="left" />
 			<div class="flex flex-wrap items-center justify-between gap-3">
-				<h2 class="font-mono text-sm font-black uppercase tracking-widest text-bone-white">
+				<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 					POST /RELOAD - WHAT WOULD APPLY
 				</h2>
 				<button
 					type="button"
 					data-action="reload"
-					class="inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-xs font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+					class="inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
 				>
 					Send /reload
 				</button>
 			</div>
-			<p class="mt-3 max-w-3xl text-sm text-zinc-dust">
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				Simulated from your editor state: /reload answers <code class="text-bone-newsprint">
 					"applied": true </code
 				> with the values that took effect, and a <code>"parsed_only"</code> object for the
@@ -444,7 +444,7 @@ const Example = [
 				<div
 					data-reload-out
 					aria-live="polite"
-					class="border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust"
+					class="border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust"
 				>
 					<div class="opacity-40">// press SEND /RELOAD</div>
 				</div>
@@ -453,17 +453,17 @@ const Example = [
 
 		<!-- Simulation boundary -->
 		<footer class="mt-32 border-l-4 border-weathered-teal bg-carbon-void p-6">
-			<p class="font-mono text-[10px] font-black uppercase tracking-widest text-weathered-teal">
+			<p class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
 				SIMULATION BOUNDARY
 			</p>
-			<p class="mt-2 max-w-3xl text-sm text-zinc-dust">
+			<p class="mt-2 max-w-3xl text-base text-zinc-dust">
 				Real on this page: the pick chain, the precedence rules, the two-stack split, the
 				defaults and the unwired ledger - all quoted from aphrodite.toml.example,
 				README.md:371-442 and docs/config/aphrodite-toml.md. Simulated: the TOML parsing (a
 				browser-side reader, not the Rust or dylib parser), the resolution ladder, and the
 				POST /reload response. No network, no runtime - everything happens in this tab.
 			</p>
-			<p class="mt-3 max-w-3xl text-sm text-zinc-dust">
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				Sanitization: the editor ships the repository's example file - never a user's real
 				toml, never an api_key value; the key field appears only as its env-var name.
 			</p>
@@ -591,14 +591,14 @@ const Example = [
 			live: "border-stamped-canary text-stamped-canary",
 			fallback: "border-weathered-teal text-weathered-teal",
 		}[State];
-		return `<span class="inline-block border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${Style}">${Text}</span>`;
+		return `<span class="inline-block border px-2 py-0.5 font-mono text-base uppercase tracking-widest ${Style}">${Text}</span>`;
 	}
 
 	function Row(Label: string, Chips: string[], Note: string): string {
 		return `<div class="border-l-2 border-oxblood-dark pl-3">
-			<p class="font-mono text-[10px] uppercase tracking-widest text-zinc-dust">${Label}</p>
+			<p class="font-mono text-base uppercase tracking-widest text-zinc-dust">${Label}</p>
 			<div class="mt-1 flex flex-wrap items-center gap-2">${Chips.join('<span class="text-zinc-dust">&rarr;</span>')}</div>
-			<p class="mt-1 font-mono text-[10px] text-zinc-dust">${Note}</p>
+			<p class="mt-1 font-mono text-base text-zinc-dust">${Note}</p>
 		</div>`;
 	}
 

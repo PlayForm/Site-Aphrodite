@@ -28,11 +28,11 @@ const HoverText = {
 ---
 
 <button
-	class={`group inline-flex items-center gap-1.5 border border-oxblood-dark bg-soot-black px-2 py-1 font-mono text-[11px] font-bold transition-colors ${Palette} ${HoverText}`}
+	class={`group inline-flex items-center gap-1.5 border border-oxblood-dark bg-soot-black px-2 py-1 font-mono text-base font-bold transition-colors ${Palette} ${HoverText}`}
 	data-copy={Copy ?? Label}
 	type="button"
 	aria-label={`Copy ${Label} to the clipboard`}
 >
 	<span class="opacity-60 group-hover:opacity-100">{Label}</span>
-	<span aria-hidden="true" class="text-[9px] opacity-40 group-hover:opacity-90">⧉</span>
+	<span aria-hidden="true" class="text-base opacity-40 group-hover:opacity-90">⧉</span>
 </button>

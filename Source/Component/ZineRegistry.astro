@@ -12,17 +12,17 @@ const { Entries, Placeholder = "FILTER..." } = Astro.props;
 
 <div class="zine-box-subtle border-[3px] border-oxblood-dark bg-carbon-void" data-registry>
 	<div class="flex items-center border-b-2 border-blood-crimson bg-soot-black">
-		<span class="border-r border-oxblood-dark bg-raw-blood px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-bone-white">
+		<span class="border-r border-oxblood-dark bg-raw-blood px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-bone-white">
 			REG
 		</span>
 		<input
-			class="w-full bg-transparent px-3 py-2 font-mono text-xs text-bone-white placeholder:text-zinc-dust"
+			class="w-full bg-transparent px-3 py-2 font-mono text-base text-bone-white placeholder:text-zinc-dust"
 			type="search"
 			data-registry-input
 			placeholder={Placeholder}
 			aria-label="Filter the registry"
 		/>
-		<span class="px-3 font-mono text-[10px] font-bold text-zinc-dust" data-registry-count aria-live="polite">
+		<span class="px-3 font-mono text-base font-bold text-zinc-dust" data-registry-count aria-live="polite">
 			{String(Entries.length).padStart(2, "0")}
 		</span>
 	</div>
@@ -30,7 +30,7 @@ const { Entries, Placeholder = "FILTER..." } = Astro.props;
 		{
 			Entries.map((Entry) => (
 				<li data-registry-tags={[Entry.Label, ...(Entry.Tags ?? [])].join(" ").toLowerCase()}>
-					<a class="block px-3 py-2 font-mono text-xs text-bone-newsprint hover:bg-raw-blood/20 hover:text-bone-white" href={Entry.Href}>
+					<a class="block px-3 py-2 font-mono text-base text-bone-newsprint hover:bg-raw-blood/20 hover:text-bone-white" href={Entry.Href}>
 						<span class="font-bold">{Entry.Label}</span>
 						{Entry.Note && <span class="text-zinc-dust"> - {Entry.Note}</span>}
 					</a>
