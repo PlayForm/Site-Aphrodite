@@ -13,7 +13,7 @@ flowchart LR
     E --> H["assemble top-down under state.flow_budget_chars (default 4000)"]
     F --> H
     G --> H
-    H --> I{"joined len > budget?"}
+    H --> I{"joined len &gt; budget?"}
     I -->|yes| J["pop last section (recall block) - directives+nudges survive"]
     I -->|no| K["emit context"]
     J --> I

@@ -3,7 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { HeadroomRepo, HermesRepo } from "./Links";
-import { CodeLinks, ResolveCode, ResolveFile, SourceLink } from "./SourceLinks";
+import { ResolveCode, ResolveFile, SourceLink } from "./SourceLinks";
 
 /**
  * The code-mention pass - the site-side integration. After the build writes
@@ -65,69 +65,37 @@ const Wrap = (Open: string, Inner: string, Tag: string): string => {
 };
 
 /**
- * The plain-prose file token: repository-relative paths first, then the
- * registry's file names (longest first so "aphrodite.toml.example" never
- * matches as "aphrodite.toml"). The lookarounds exclude matches inside a
- * longer word, path or attribute-like context - a token preceded or
- * followed by a word character, dot, slash, dash or @ stays unlinked.
+ * The prose file token (ONE regex, ONE replace per text node): a
+ * repository-relative path, a bare name with a known extension, or the
+ * extensionless BINARY_VERSION marker - optionally followed by line
+ * references ("README.md:444-465", "CHANGELOG.md:613-626", with
+ * comma-separated extra refs). The citation's file and refs are consumed
+ * as a single token, so no second pass can re-match inside the created
+ * anchor (no nested <a>). The lookarounds exclude matches inside a longer
+ * word, path or attribute-like context; a sentence-final period after the
+ * token is allowed, a word character, slash or dash is not.
  */
-const FileToken = new RegExp(
-	`(?<![\\w./@-])(?:${[
-		"(?:crates|docs|tests|Maintain|plugins/aphrodite)/[\\w./-]+\\.\\w{1,4}",
-		...Object.keys(CodeLinks)
-			.filter((Key) => /\.\w{1,4}$/.test(Key) || Key === "BINARY_VERSION")
-			.sort((A, B) => B.length - A.length)
-			.map((Key) => Key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
-	].join("|")})(?![\\w./@-])`,
-	"g",
-);
-
-/** Wrap one plain-prose file mention (the text keeps its exact styling; the
- * a.code-link hover rules supply the only visual addition). */
-const WrapFile = (Text: string): string => {
-	const Entry = ResolveFile(Text);
-
-	switch (Entry !== null && existsSync(`${Root}/${LocalPath(Entry)}`)) {
-		case false:
-			return Text;
-
-		default:
-			break;
-	}
-
-	const Url = SourceLink(Entry);
-
-	return `<a class="code-link" href="${Url}" title="Source: ${Url}">${Text}</a>`;
-};
-
-/**
- * The SRC-citation token: the file part (a repository-relative path or a
- * bare name with a known extension) optionally followed by line references
- * ("README.md:444-465", "CHANGELOG.md:613-626", "plugin.yaml", with
- * comma-separated extra refs). The sentence-final punctuation after the
- * last ref is allowed, but a word character, slash or dash is not, so no
- * token is cut out of a longer word or path.
- */
-const CitationToken = new RegExp(
-	`(?<![\\w./@-])(?:(?:crates|docs|tests|Maintain|plugins/aphrodite)/[\\w./-]+\\.\\w{1,4}|[A-Za-z0-9_][\\w.-]*\\.(?:md|yaml|py|json|sh|txt|toml|ps1|example))(?::\\d+(?:-\\d+)?(?:, ?\\d+(?:-\\d+)?)*(?![\\w/@-]))?`,
+const ProseToken = new RegExp(
+	`(?<![\\w./@-])(?:(?:crates|docs|tests|Maintain|plugins/aphrodite)/[\\w./-]+\\.\\w{1,4}|[A-Za-z0-9_][\\w.-]*\\.(?:md|yaml|py|json|sh|txt|toml|ps1|example|db))(?::\\d+(?:-\\d+)?(?:, ?\\d+(?:-\\d+)?)*)?|(?<![\\w./@-])BINARY_VERSION(?![\\w/@-])`,
 	"g",
 );
 
 /**
- * The citation parts (non-global, anchored): the file, the first line and
- * the first range end. The fragment uses the FIRST reference only - GitHub
+ * The token parts (non-global, anchored): the file, the first line and the
+ * first range end. The fragment uses the FIRST reference only - GitHub
  * resolves one line range per URL, so the extra comma-separated refs stay
  * in the label (byte-identical text) and the anchor opens the citation's
  * primary range.
  */
-const CitationParts = new RegExp(
-	`^((?:crates|docs|tests|Maintain|plugins/aphrodite)/[\\w./-]+\\.\\w{1,4}|[A-Za-z0-9_][\\w.-]*\\.(?:md|yaml|py|json|sh|txt|toml|ps1|example))(?::(\\d+)(?:-(\\d+))?)?`,
+const TokenParts = new RegExp(
+	`^((?:crates|docs|tests|Maintain|plugins/aphrodite)/[\\w./-]+\\.\\w{1,4}|[A-Za-z0-9_][\\w.-]*\\.(?:md|yaml|py|json|sh|txt|toml|ps1|example|db)|BINARY_VERSION)(?::(\\d+)(?:-(\\d+))?)?`,
 );
 
-/** Wrap one SRC citation: the label stays byte-identical, the anchor
- * composes the tree/Current URL with the #L<from>[-L<to>] fragment. */
-const WrapCitation = (Text: string): string => {
-	const Parts = Text.match(CitationParts);
+/** Wrap one prose file mention or SRC citation: the label stays
+ * byte-identical, the anchor composes the tree/Current URL, with the
+ * #L<from>[-L<to>] fragment when line references are present. */
+const WrapProseToken = (Text: string): string => {
+	const Parts = Text.match(TokenParts);
 
 	switch (Parts !== null) {
 		case false:
@@ -139,9 +107,7 @@ const WrapCitation = (Text: string): string => {
 
 	const Entry = ResolveFile(Parts![1]);
 
-	switch (
-		Entry !== null && existsSync(`${Root}/${LocalPath(Entry)}`)
-	) {
+	switch (Entry !== null && existsSync(`${Root}/${LocalPath(Entry)}`)) {
 		case false:
 			return Text;
 
@@ -150,7 +116,8 @@ const WrapCitation = (Text: string): string => {
 	}
 
 	const [, , From, To] = Parts!;
-	const Fragment = From === undefined ? "" : To === undefined ? `#L${From}` : `#L${From}-L${To}`;
+	const Fragment =
+		From === undefined ? "" : To === undefined ? `#L${From}` : `#L${From}-L${To}`;
 	const Url = `${SourceLink(Entry)}${Fragment}`;
 
 	return `<a class="code-link" href="${Url}" title="Source: ${Url}">${Text}</a>`;
@@ -208,12 +175,7 @@ const WrapProse = (Html: string): string => {
 			}
 
 			default:
-				return Depth === 0
-					? Token.replace(CitationToken, WrapCitation).replace(
-							FileToken,
-							WrapFile,
-						)
-					: Token;
+				return Depth === 0 ? Token.replace(ProseToken, WrapProseToken) : Token;
 		}
 	});
 };

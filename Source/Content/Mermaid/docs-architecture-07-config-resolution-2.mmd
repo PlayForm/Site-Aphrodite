@@ -7,7 +7,7 @@ flowchart LR
 		L5["[flow] budget_chars → flow_budget_chars"]
 		L6["[compression] context_engine, tool_threshold_token, terminal_threshold (FFI state)"]
 		L7["[directives] active (seeds active_directives)"]
-		L8["[previews] preview_max_chars → preview cap<br/>(env APHRODITE_PREVIEW_MAX_CHARS > TOML; shipped template default 120, key absent = no cap)"]
+		L8["[previews] preview_max_chars → preview cap<br/>(env APHRODITE_PREVIEW_MAX_CHARS &gt; TOML; shipped template default 120, key absent = no cap)"]
 	end
 	subgraph hot["CONFIG-RELOADABLE (config-file watcher, applies to live atomics)"]
 		H1["the 4 threshold atomics only"]

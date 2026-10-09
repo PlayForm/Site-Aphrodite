@@ -3,7 +3,7 @@ flowchart LR
     B --> C{"hash in visited?"}
     C -->|yes cycle| D["return resolved.get(hash) - cached pre-expansion value"]
     C -->|no| E["visited.push(hash)"]
-    E --> F{"depth >= RECURSIVE_DEPTH (5)?"}
+    E --> F{"depth &gt;= RECURSIVE_DEPTH (5)?"}
     F -->|yes| G["resolve_one(state,hash) - RAW leaf content, no further expand"]
     F -->|no| H{"resolved cache hit?"}
     H -->|yes| I["return cached"]

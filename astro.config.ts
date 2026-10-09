@@ -52,6 +52,12 @@ export default defineConfig({
 		// definition file at tree/Current. Declared first so the compression
 		// integrations below operate on the linked output.
 		(await import("./Source/Library/CodeMentions.ts")).default(),
+		// The docs-diagram pass: the built mermaid code panes become the
+		// rendered [data-diagram] figures (Scripts/Diagrams.ts + Render.mjs
+		// produce the SVGs; the manifest maps each page's fences to them).
+		// Declared with the code-mention pass so the compression integrations
+		// below operate on the figure output.
+		(await import("./Source/Library/DiagramPanels.ts")).default(),
 		// The service worker for production builds. Gated on NODE_ENV, not
 		// import.meta.env.MODE: at config-eval time during `astro build` MODE
 		// is still "development" (the build command does not set it), so the

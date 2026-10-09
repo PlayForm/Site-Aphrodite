@@ -51,6 +51,34 @@ const Id = (Page: string, Index: number): string =>
 const Direction = (Code: string): string =>
 	Code.replace(/^(flowchart|graph)\s+(TD|TB)\b/m, (_Match, Kind: string) => `${Kind} LR`);
 
+// The entity escaping, flowchart/graph blocks only: a raw `<` or `>` inside a
+// quoted node label is dropped or mis-parsed by the renderer at 16px (the
+// `depth >= X` decision lost its `>` entirely), so the label-internal
+// characters escape to the `&lt;` / `&gt;` entities the pipeline already
+// uses. The `&`-prefixed entities the sources already carry and the `<br/>`
+// breaks stay untouched; the transition arrows outside the quotes are never
+// seen.
+const EscapeLabels = (Code: string): string =>
+	Code.replace(/(\[["{]|\{["])([^"}]*)/g, (Match, Head: string, Body: string) => {
+		const Protected = Body.replace(/<br\s*\/?>/g, "\u0001");
+
+		const Escaped = Protected
+			.replace(/(?<!&)</g, "&lt;")
+			.replace(/(?<!&)>/g, "&gt;")
+			.replace(/\u0001/g, "<br/>");
+
+		return Head + Escaped;
+	});
+
+// The sequence statement separator: a `;` inside a message or note text ends
+// the statement for the parser (the plugin-startup sequence broke on
+// "setup);"), so the message text escapes it to the `#59;` entity - the same
+// entity form the pipe `#124;` escape uses elsewhere in the pipeline.
+const EscapeSeparators = (Code: string): string =>
+	Code.replace(/^sequenceDiagram\n([\s\S]*)$/, (_Match, Body: string) =>
+		`sequenceDiagram\n${Body.replace(/;/g, "#59;")}`,
+	);
+
 const Walk = async (Directory: string): Promise<string[]> => {
 	const Entries = await readdir(Directory, { withFileTypes: true });
 
@@ -101,7 +129,11 @@ export default async (): Promise<void> => {
 
 			const Above = Titles.filter(({ Index: At }) => At < Start).pop();
 
-			await writeFile(join(Mermaid, `${DiagramId}.mmd`), `${Direction(Code).trimEnd()}\n`, "utf8");
+			await writeFile(
+				join(Mermaid, `${DiagramId}.mmd`),
+				`${Direction(EscapeLabels(EscapeSeparators(Code))).trimEnd()}\n`,
+				"utf8",
+			);
 
 			Manifest.push({
 				Id: DiagramId,

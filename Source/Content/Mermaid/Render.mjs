@@ -226,15 +226,16 @@ const PageHtml = `<!DOCTYPE html>
 				// The rhythm scale, one consistent proportional raise from the
 				// defaults: nodeSpacing 70 and rankSpacing 84 between the
 				// elements and the layers (defaults 50/50), diagramPadding 24
-				// around the whole graph (default 8), and wrappingWidth 320 so
-				// a single long token (a tool name, an env var) is never split
-				// mid-token by the auto-wrap - 260 fit the 13px floor, but at
-				// 16px the 30-char dispatch_tool name measures over 260 and
-				// word-breaks, so the budget scales with the type size.
+				// around the whole graph (default 8), and wrappingWidth 480 so
+				// a single long token (a tool name, an env var, a symbol
+				// chain) is never split mid-token by the auto-wrap - the
+				// budget scales with the type size (260 fit the 13px floor,
+				// 320 the first 16px pass; the docs diagrams carry tokens up
+				// to ~40 chars, which measure just under 480 at 16px).
 				flowchart: {
 					htmlLabels: false,
 					curve: "basis",
-					wrappingWidth: 320,
+					wrappingWidth: 480,
 					nodeSpacing: 70,
 					rankSpacing: 84,
 					diagramPadding: 24,
