@@ -124,9 +124,8 @@ const Samples = [
 		Label: "JSON BLOB",
 		Text: JSON.stringify(
 			{
-				status: "ok",
-				error: null,
 				cached: true,
+				error: null,
 				hits: 4,
 				query: "build_preview",
 				files: ["src/preview.rs", "src/classify.rs"],
@@ -214,13 +213,22 @@ const Samples = [
 					>
 					<span class="font-mono text-[11px] text-zinc-dust" data-stat="raw-bytes">0 B</span>
 				</div>
-				<label class="sr-only" for="wb-input">Tool output to classify</label>
-				<textarea
-					id="wb-input"
-					data-input
-					spellcheck="false"
-					class="wb-terminal h-72 w-full resize-y bg-transparent p-4 text-bone-newsprint"
-					placeholder="paste any output here - or load a sample"></textarea>
+				<div class="relative flex-1">
+					<label class="sr-only" for="wb-input">Tool output to classify</label>
+					<textarea
+						id="wb-input"
+						data-input
+						spellcheck="false"
+						class="wb-terminal h-72 w-full resize-y bg-transparent p-4 text-bone-newsprint"
+						placeholder="paste any output here - or load a sample"></textarea>
+					<!-- The opacity-fade suppression overlay: the tail of the raw
+					     feed dims toward the bottom of the pane. -->
+					<div
+						aria-hidden="true"
+						class="pointer-events-none absolute inset-x-0 bottom-0 h-16"
+						style="background: linear-gradient(to bottom, transparent, #111014);"
+					></div>
+				</div>
 				<div class="border-t-2 border-blood-crimson/50 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-zinc-dust">
 					suppression: verbose lines fade to opacity - the soot-black feed
 				</div>
@@ -265,6 +273,20 @@ const Samples = [
 						</p>
 						<p class="mt-1 font-mono text-xs text-bone-newsprint" data-decision>
 							preview enough - skip retrieval, keep reasoning
+						</p>
+					</div>
+					<!-- The per-turn injection assembler (docs/plugin/hooks.md:114-136):
+					     the pre_llm_call order under the 4,000-char budget - NOT an
+					     auto-compaction pass (the engine is opt-in, non-destructive). -->
+					<div class="border-l-4 border-oxblood-dark bg-soot-black p-3">
+						<p class="font-mono text-[10px] font-black uppercase tracking-widest text-bone-newsprint">
+							INJECTION ASSEMBLER (PRE_LLM_CALL)
+						</p>
+						<p class="mt-1 font-mono text-xs text-bone-newsprint">
+							<span class="text-stamped-canary">[directives:]</span> →
+							<span class="text-stamped-canary">[nudge:]</span> →
+							<span class="text-weathered-teal">[recall]</span>
+							— assembled per turn, under the 4,000-char budget
 						</p>
 					</div>
 				</div>
@@ -361,6 +383,13 @@ const Samples = [
 				real 40-char digest needs the Rust store), the 40-123 ns timing readout, and
 				aphrodite_retrieve (shown as the decision text, never executed). No network, no
 				runtime - everything happens in this tab.
+			</p>
+			<p class="mt-2 max-w-3xl text-sm text-zinc-dust">
+				Classifier framing: the 16 pipeline types above follow the README catalog
+				(README.md:155-176). The full registry is larger - the 30-type content catalog lives in
+				docs/classification/content-types.md:118-151; this demo simulates the README tier only.
+				Not depicted: context-engine auto-compaction - the engine is opt-in and non-destructive;
+				the per-turn context side is the injection assembler shown under the agent decision.
 			</p>
 		</footer>
 	</main>
@@ -491,11 +520,14 @@ const Samples = [
 			case "build":
 				return `[build:${CountMatches(Text, /error\[E|error:/g)}E ${CountMatches(Text, /warning:/g)}W ${Lines.length}L | ${Ellipsis(FirstError(Text))}]`;
 			case "test": {
-				const Pass = CountMatches(Text, /\.\.\. ok/g) || Number(Text.match(/(\d+) passed/)?.[1] ?? 0);
-				const Fail = Number(Text.match(/(\d+) failed/)?.[1] ?? CountMatches(Text, /\.\.\. FAILED/g));
-				const Ignored = Number(Text.match(/(\d+) ignored/)?.[1] ?? 0);
+				// Prefer the summary line's numbers ("N passed; M failed; K
+				// ignored"), fall back to the per-line "... ok/FAILED" tallies.
+				const Summary = Text.match(/(\d+) passed; (\d+) failed; (\d+) ignored/);
+				const Pass = Number(Summary?.[1] ?? CountMatches(Text, /\. \.\.\. ok/g));
+				const Fail = Number(Summary?.[2] ?? CountMatches(Text, /\. \.\.\. FAILED/g));
+				const Ignored = Number(Summary?.[3] ?? 0);
 				const Secs = Text.match(/finished in ([\d.]+)s/)?.[1] ?? "0.00s";
-				const Body = Fail > 0 ? ` | FAIL ${Ellipsis(Text.match(/failures:.*\n\s*(\S+)/s)?.[1] ?? "")}` : "";
+				const Body = Fail > 0 ? ` | FAIL ${Ellipsis(Text.match(/failures:\s*\n\s*(\S+)/)?.[1] ?? "")}` : "";
 				return `[test:${Pass} pass ${Fail} fail ${Ignored} ignored | ${Secs}${Body}]`;
 			}
 			case "terminal": {
@@ -517,8 +549,14 @@ const Samples = [
 				const Files = new Set(Hits.map((Line) => Line.split(":")[0]));
 				return `[grep:${Hits.length} hits in ${Files.size} files | ${Ellipsis(Hits[0]?.split(":").slice(0, 2).join(":") ?? "")}]`;
 			}
-			case "search":
-				return `[search:${Text.match(/"total_count": (\d+)/)?.[1] ?? 0} hits in ${Text.match(/"query": "([^"]*)"/)?.[1]?.length ?? 0} | first hit]`;
+			case "search": {
+				// Simulated boundary: the file count is derived from the "path"
+				// fields present in the result JSON - a real search_files run
+				// carries them; arbitrary pasted search output cannot.
+				const Hits = Number(Text.match(/"total_count": (\d+)/)?.[1] ?? 0);
+				const Files = new Set((Text.match(/"path": "([^"]+)"/g) ?? []).map((M) => M));
+				return `[search:${Hits} hits in ${Files.size || "?"} files | first hit]`;
+			}
 			case "git": {
 				const Counts: Record<string, number> = { M: 0, A: 0, D: 0, "??": 0 };
 				for (const Line of Lines) {
@@ -547,17 +585,19 @@ const Samples = [
 				return `[diff:${Files}F +${Added}/-${Removed} ${Lines.length}L | ${Ellipsis(Names)}]`;
 			}
 			case "ls": {
-				const Files = Lines.length;
-				return `[ls:${Files} files 0 dirs | first entries]`;
+				// Mode-string entries: leading "d" marks a directory; bare
+				// path tokens count as dirs when they carry no extension.
+				const Dirs = Lines.filter(
+					(Line) => Line.startsWith("d") || !/\.\w+$/.test(Line.trim()),
+				).length;
+				return `[ls:${Lines.length - Dirs} files ${Dirs} dirs | first entries]`;
 			}
 			case "json":
 			case "tool_output": {
 				try {
 					const Parsed = JSON.parse(Text.trim()) as Record<string, unknown>;
 					const Keys = Object.keys(Parsed);
-					if (Keys.length <= 5) return `[json:${Keys.length} keys 1L | ${Ellipsis(Keys.join(", "))}]`;
-					return `[json:${Keys.length} keys 1L | ${Ellipsis(Keys.join(", "))}]`;
-				} catch {
+					return `[json:${Keys.length} keys 1L | ${Ellipsis(Keys.join(", "))}]`;				} catch {
 					return `[json:? | parse failed]`;
 				}
 			}
@@ -612,11 +652,13 @@ const Samples = [
 		const Type = Classify(Text);
 		const ByteLen = new TextEncoder().encode(Text).length;
 		const Ns = (40 + Math.floor(Math.random() * 84)).toString(); // simulated timing readout
-		const Preview = PreviewLine(Type, Text, HintFor(Type));
+		const Preview = PreviewLine(Type, Text, HintFor());
 
 		// Compression decision (README.md:395-420 semantics): the token
-		// threshold governs tool output; code types multiply it; engine pct
-		// is the middle-turn escape hatch.
+		// threshold governs tool output; code types multiply it;
+		// engine_threshold_pct >= 100 is the engine-off escape hatch (the
+		// engine itself is opt-in and non-destructive - no compaction pass
+		// is depicted here).
 		const Tier = TierOf(Type);
 		const TokenLimit = Thresholds.tool_threshold_token * (Type.startsWith("code") ? Thresholds.code_multiplier : Tier > 1 ? Tier : 1);
 		const TokenCompress = ByteLen > TokenLimit;
@@ -649,7 +691,7 @@ const Samples = [
 		document.querySelector<HTMLElement>("[data-stat='raw-bytes']")!.textContent = `${ByteLen.toLocaleString("en-US")} B`;
 	}
 
-	function HintFor(Type: string): number {
+	function HintFor(): number {
 		// The preview hint budget: the inline threshold scales how much of
 		// the first error / first line survives into the preview line.
 		return Math.max(12, Math.min(60, Math.round(Thresholds.inline_threshold / 48)));
@@ -783,10 +825,6 @@ const Samples = [
 		font-size: 12px;
 		line-height: 1.5;
 		outline: none;
-		/* opacity-fade suppression lines: later lines dim toward the tail */
-		background-image: linear-gradient(to bottom, rgba(245, 240, 230, 1) 60%, rgba(245, 240, 230, 0.55));
-		-webkit-background-clip: text;
-		background-clip: text;
 	}
 	.wb-terminal::placeholder {
 		color: #71717a;

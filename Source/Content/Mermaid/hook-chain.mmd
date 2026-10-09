@@ -1,0 +1,17 @@
+flowchart TD
+	H1["H1 on_session_start<br/>resets per-session state<br/>injects nothing"]
+	TURN["user turn"]
+	H2["H2 pre_tool_call<br/>auto-backgrounds long terminal<br/>and process calls<br/>poll-actions never backgrounded<br/>chain split is opt-in"]
+	RUN["the tool or terminal runs"]
+	H3["H3 transform_tool_result<br/>skips: empty, essential tools,<br/>self tools, under 4,096 chars"]
+	H4["H4 transform_terminal_output<br/>under 1,024 passes untouched<br/>chain-split segments unconditional"]
+	H5["H5 pre_llm_call<br/>fixed order under 4,000 chars:<br/>first-turn orientation<br/>directives never dropped<br/>nudges max 2 never dropped<br/>background-task status<br/>recall catalog dropped first"]
+	LLM["the LLM responds"]
+	H6["H6 post_llm_call<br/>archives the last marker<br/>advances the turn<br/>purges expired nudges<br/>expires stale poll tasks"]
+	H1 --> TURN --> H2 --> RUN
+	RUN --> H3
+	RUN --> H4
+	H3 --> H5
+	H4 --> H5
+	H5 --> LLM --> H6
+	H6 -.-> TURN

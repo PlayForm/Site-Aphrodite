@@ -1,0 +1,22 @@
+flowchart TD
+	FILE{"which file"}
+	P1["APHRODITE_CONFIG_PATH"]
+	P2["./aphrodite.toml in the CWD"]
+	P3["the Hermes home copy:<br/>.hermes, aphrodite, aphrodite.toml"]
+	ORD["value precedence on both stacks:<br/>env over TOML over default"]
+	NOTE["mode and listen get no blanket<br/>env override - ports stay per-mode:<br/>APHRODITE_CACHE_PORT and<br/>APHRODITE_TOKEN_PORT"]
+	WATCH["aphrodite.toml Modify event<br/>watcher debounces 500 ms"]
+	RESOLVE["resolve_thresholds"]
+	ATOMICS["only the 4 threshold atomics:<br/>cache, token, inline,<br/>code_multiplier"]
+	RELOAD["POST /reload does<br/>the same on demand"]
+	HOLD["nothing else updates live"]
+	FILE -->|first| P1
+	FILE -->|then| P2
+	FILE -->|last| P3
+	P1 --> ORD
+	P2 --> ORD
+	P3 --> ORD
+	ORD --> NOTE
+	ORD --> WATCH --> RESOLVE --> ATOMICS
+	RELOAD --> ATOMICS
+	ATOMICS --> HOLD

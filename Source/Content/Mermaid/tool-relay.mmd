@@ -1,0 +1,15 @@
+flowchart LR
+	subgraph A["direction A - in-process"]
+		AGENT["agent"] --> SHIM["python shim"]
+		SHIM --> DISPATCH["aphrodite_hermes_dispatch_tool"]
+		DISPATCH --> DYLIB["Rust dylib"]
+	end
+	subgraph B["direction B - HTTP relay on :9798"]
+		CALLER["caller"] -->|POST /tool/relay| RELAY["tool relay"]
+		RELAY -->|no callback| SYNC["synchronous result"]
+		RELAY -->|"https callback_url<br/>async - 5 s, fire and forget"| CB["callback delivery"]
+	end
+	DYLIB --> THIRTEEN["13 tools<br/>one shared session store"]
+	RELAY --> GUARD["accepts only retrieve,<br/>compress and list<br/>retrieve without a hash: 400<br/>callback must be https"]
+	RESTART["markers do not survive<br/>a session restart"]
+	THIRTEEN -.-> RESTART

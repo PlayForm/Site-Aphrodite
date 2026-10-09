@@ -1,0 +1,20 @@
+flowchart LR
+	DYLIB["one Rust dylib<br/>all logic in Rust<br/>python is a thin FFI loader"]
+	subgraph P["in-process lane"]
+		HOOKS["the 6 hooks around every Hermes turn<br/>no API round-trip<br/>context engine opt-in"]
+	end
+	subgraph N["network lane - one binary, two listeners"]
+		CACHE[":9797 cache listener<br/>in-memory DashMap<br/>10K entries - over 8 KB"]
+		TOKEN[":9798 token listener<br/>SQLite store<br/>over 1 KB - plus tool relay"]
+	end
+	MGMT["management loopback<br/>with the mgmt token"]
+	SSE["SSE streams pass through<br/>uncompressed"]
+	DYLIB --> HOOKS
+	DYLIB --> CACHE
+	DYLIB --> TOKEN
+	CACHE --- SHARED["both lanes share the BLAKE3 hash<br/>and the marker wire format"]
+	TOKEN --- SHARED
+	TOKEN --- MGMT
+	TOKEN --- SSE
+	REUSE["startup reuses a healthy running proxy -<br/>never spawns a second"]
+	DYLIB -.-> REUSE

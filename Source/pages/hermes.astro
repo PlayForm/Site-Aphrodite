@@ -1,0 +1,221 @@
+---
+import Base from "@Layout/Base.astro";
+
+const Previews = [
+	"[build:1E 1W 142L | error[E0432]: unresolved import ...]",
+	"[diff:2F +7/-3 12L | src/main.rs Cargo.toml +N more]",
+	"[git:2M 2A 1D 3?? | src/x.rs src/y.rs +5 more]",
+	"[gitlog:2 commits | abc1234 fix... -> def5678 feat...]",
+	"[ls:3 files 2 dirs | .rs x2 .md x1]",
+	"[test:220 pass 0 fail 1 ignored | 0.31s]",
+	"[grep:4 hits in 3 files | src/preview.rs:12 ...]",
+	"[code:3fns 2structs fn main() 414L]",
+	"[search:Nhits ML]",
+	"[json:5 items 3L]",
+	"[terminal:14L exit code: 0]",
+	"[text:3L 50B | some unrecognizable prose here]",
+];
+
+const ProxyRows = [
+	{ F: "Tool output compression", Plugin: "transform_tool_result intercepts", Proxy: "proxy only sees HTTP traffic" },
+	{ F: "Terminal compression", Plugin: "transform_terminal_output", Proxy: "no visibility" },
+	{ F: "Context engine", Plugin: "opt-in; catalog injected via pre_llm_call", Proxy: "unavailable" },
+	{ F: "Auto-launch", Plugin: "proxies spawn at plugin load", Proxy: "manual aphrodite command" },
+	{ F: "aphrodite_* tools", Plugin: "13 tools in agent namespace", Proxy: "agent doesn't know about them" },
+	{ F: "Prompt injection", Plugin: "directives, nudges, catalog", Proxy: "unavailable" },
+	{ F: "CCR storage", Plugin: "token + cache proxy", Proxy: "token + cache proxy" },
+];
+---
+
+<Base
+	Title="HERMES // APHRODITE"
+	Description="How Hermes loads the Aphrodite plugin: the hook chain around a turn, the session lifecycle, the dual proxies on :9797 and :9798, and what the agent actually sees - type-aware previews instead of raw output."
+>
+	<main
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-16 sm:px-8 lg:gap-32 lg:px-14 lg:py-28"
+	>
+		<!-- HERO -->
+		<header class="relative flex w-full flex-col items-start">
+			<div
+				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				HERMES // THE INTEGRATION
+			</div>
+			<h1
+				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
+			>
+				Living inside Hermes
+			</h1>
+			<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+				Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a
+				client at. The plugin registers six hooks, thirteen tools, and an optional context
+				engine, then forwards every call into the Rust dylib. Two proxy processes run
+				alongside as subprocesses, and a canonical runtime home under
+				<code class="font-mono text-xs text-weathered-teal">~/.hermes/aphrodite/</code>
+				holds the binaries, config, CCR database, directives, and logs.
+			</p>
+		</header>
+
+		<!-- WHY NOT JUST A PROXY -->
+		<section class="relative w-full">
+			<div
+				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				COMPARISON // WHY NOT JUST A PROXY
+			</div>
+			<div
+				class="zine-box-crimson w-full -rotate-[1deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div class="overflow-x-auto">
+					<table class="w-full border-collapse font-mono text-[12px]">
+						<thead>
+							<tr class="border-b-2 border-oxblood-dark text-left">
+								<th class="py-2 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">CAPABILITY</th>
+								<th class="py-2 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">NATIVE HERMES PLUGIN</th>
+								<th class="py-2 text-[10px] font-black uppercase tracking-widest text-stamped-canary">GENERIC PROXY</th>
+							</tr>
+						</thead>
+						<tbody>
+							{ProxyRows.map((Row, I) => (
+								<tr class={I < ProxyRows.length - 1 ? "border-b border-oxblood-dark" : ""}>
+									<td class="py-2 pr-4 align-top text-bone-white">{Row.F}</td>
+									<td class="py-2 pr-4 align-top text-weathered-teal">{Row.Plugin}</td>
+									<td class="py-2 align-top text-zinc-dust line-through decoration-raw-blood/60">{Row.Proxy}</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+				<p class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] leading-relaxed text-zinc-dust">
+					THE TRADE-OFF IS REAL AND STATED PLAINLY: THE PLUGIN WORKS WITH HERMES ONLY,
+					WHILE A PROXY WORKS WITH ANY OPENAI-COMPATIBLE CLIENT. THE PROXY PATH STILL
+					EXISTS - POINT base_url AT :9798.
+				</p>
+			</div>
+		</section>
+
+		<!-- SESSION LIFECYCLE -->
+		<section class="relative w-full lg:w-10/12 lg:self-end">
+			<div
+				class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div
+					class="absolute -top-3.5 left-6 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+				>
+					LIFECYCLE // SESSION TO SESSION
+				</div>
+				<h2 class="mb-4 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+					What happens when you launch Hermes
+				</h2>
+				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] leading-relaxed">
+					<div class="text-bone-white">hermes starts</div>
+					<div class="pl-4 text-bone-newsprint">→ plugin loads · dylib resolved once per process, smoke-tested in a subprocess</div>
+					<div class="pl-4 text-bone-newsprint">→ a faulting image degrades to "plugin disabled" instead of killing the gateway</div>
+					<div class="pl-4 text-bone-newsprint">→ two proxies spawn - a healthy pair is reused, never duplicated</div>
+					<div class="pl-4 text-stamped-canary">→ on_session_start resets all per-session state</div>
+					<div class="pl-4 text-weathered-teal">→ turn loop: pre_tool_call → transforms → pre_llm_call → post_llm_call</div>
+					<div class="pl-4 text-zinc-dust">→ session ends · markers do not survive a restart - a new session starts a fresh store</div>
+				</div>
+				<p class="mt-4 font-body text-xs leading-relaxed text-zinc-dust">
+					THE DUAL PROXIES: TOKEN ON :9798 (SQLITE, PERSISTENT, COMPRESSES ABOVE 1 KB) AND
+					CACHE ON :9797 (IN-MEMORY, COMPRESSES ABOVE 8 KB). NO HOT-RELOAD - RESTART THE
+					SESSION TO PICK UP A NEW BUILD.
+				</p>
+			</div>
+		</section>
+
+		<!-- PREVIEW SHOWCASE -->
+		<section class="relative w-full">
+			<div
+				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				EVIDENCE // WHAT THE AGENT SEES
+			</div>
+			<div
+				class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<h2 class="mb-4 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+					The twelve preview shapes
+				</h2>
+				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] leading-relaxed">
+					{Previews.map((Line) => (
+						<div class="text-bone-newsprint">
+							<span class="text-stamped-canary">{Line.slice(0, Line.indexOf(":") + 1)}</span>
+							{Line.slice(Line.indexOf(":") + 1)}
+						</div>
+					))}
+				</div>
+				<div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+					<div>
+						<div class="mb-2 text-[10px] font-black uppercase tracking-widest text-raw-blood">
+							WITHOUT APHRODITE:
+						</div>
+						<div class="border border-oxblood-dark bg-asphalt-panel p-3 font-mono text-[12px] text-zinc-dust">
+							500 tokens of build output... scrolling... error? no... warning? no... ok it
+							passed. That was 500 tokens I'll never get back.
+						</div>
+					</div>
+					<div>
+						<div class="mb-2 text-[10px] font-black uppercase tracking-widest text-weathered-teal">
+							WITH NATIVE INTEGRATION:
+						</div>
+						<div class="border border-oxblood-dark bg-asphalt-panel p-3 font-mono text-[12px]">
+							<span class="text-bone-white">[build:0E 0W 1L]</span>
+							<span class="text-zinc-dust"> ← a few tokens. The agent knows: build passed.</span>
+						</div>
+					</div>
+				</div>
+				<p class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] leading-relaxed text-zinc-dust">
+					SANITIZED, GENERALIZED SHAPES - REPRESENTATIVE PREVIEW FORMS FROM THE PUBLIC
+					DOCS, NOT SESSION CONTENT. THE AGENT RETRIEVES FULL OUTPUT WITH
+					aphrodite_retrieve(hash) ONLY WHEN IT ACTUALLY NEEDS IT.
+				</p>
+			</div>
+		</section>
+
+		<!-- CONTEXT ENGINE -->
+		<section class="relative w-full lg:w-9/12 lg:self-start">
+			<div
+				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div
+					class="absolute -top-3.5 right-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+				>
+					OPT-IN // CONTEXT ENGINE
+				</div>
+				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+					The optional third integration point
+				</h2>
+				<p class="mb-3 font-body text-sm leading-relaxed text-bone-newsprint">
+					Enable with <code class="font-mono text-xs text-weathered-teal">APHRODITE_CONTEXT_ENGINE=1</code>.
+					It is non-destructive by design - the engine's
+					<code class="font-mono text-xs text-weathered-teal">should_compress</code> always
+					returns False, deferring to Hermes' own threshold accounting while the proxy and
+					hooks do the heavy lifting.
+				</p>
+				<div class="space-y-1 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] text-bone-newsprint">
+					<div><span class="text-zinc-dust">engine_threshold_pct</span> <span class="text-stamped-canary">45</span> <span class="text-zinc-dust"># compress at % context fill</span></div>
+					<div><span class="text-zinc-dust">engine_protect_first</span> <span class="text-stamped-canary">2</span> <span class="text-zinc-dust"># messages kept at the start</span></div>
+					<div><span class="text-zinc-dust">engine_protect_last</span> <span class="text-stamped-canary">5</span> <span class="text-zinc-dust"># messages kept at the end</span></div>
+					<div><span class="text-zinc-dust">engine_min_msgs</span> <span class="text-stamped-canary">8</span> <span class="text-zinc-dust"># minimum messages before activating</span></div>
+				</div>
+			</div>
+		</section>
+
+		<!-- FOOTER -->
+		<footer
+			class="flex flex-col items-center justify-between gap-4 border-t-2 border-oxblood-dark pb-6 pt-12 text-xs text-zinc-dust sm:flex-row"
+		>
+			<div class="flex items-center gap-2">
+				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
+				<span class="font-bold tracking-widest text-bone-white uppercase">APHRODITE CCR CORE</span>
+			</div>
+			<div class="flex items-center gap-4">
+				<a class="transition-colors hover:text-bone-white" href="/plugin/">PLUGIN</a>
+				<a class="transition-colors hover:text-bone-white" href="/hooks/">HOOKS</a>
+				<a class="transition-colors hover:text-bone-white" href="/tools/">TOOLS</a>
+				<span class="font-bold text-stamped-canary">CC0-1.0</span>
+			</div>
+		</footer>
+	</main>
+</Base>

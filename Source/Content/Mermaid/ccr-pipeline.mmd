@@ -1,0 +1,26 @@
+flowchart TD
+	ANY["any output enters the pipeline"]
+	CLASS["classify - type-aware<br/>40-123 ns per blob"]
+	THRESH{"over the threshold?"}
+	INLINE["below threshold:<br/>inline cache only - no marker"]
+	RAW["pass-through untouched"]
+	HASH["BLAKE3 hash of the content"]
+	DEDUP{"hash already stored?"}
+	STORE["store on miss:<br/>inline LRU 1,024<br/>DashMap over 8 KB<br/>SQLite over 1 KB<br/>session inline"]
+	MARK["marker + preview replaces the content"]
+	DECIDE{"agent decides"}
+	SKIP["preview is enough -<br/>skip retrieval, keep reasoning"]
+	RET["aphrodite_retrieve"]
+	FULL["normalize the hash<br/>inline first - then backend<br/>404 on a miss<br/>byte-identical content"]
+	BYP["SSE streams bypass -<br/>tool_calls args never targeted"]
+	FAIL["a failed store leaves<br/>the content uncompressed"]
+	ANY --> CLASS --> THRESH
+	THRESH -->|no| INLINE --> RAW
+	THRESH -->|yes| HASH --> DEDUP
+	DEDUP -->|hit| MARK
+	DEDUP -->|miss| STORE --> MARK
+	MARK --> DECIDE
+	DECIDE -->|skip| SKIP
+	DECIDE -->|needs detail| RET --> FULL
+	BYP -.-> CLASS
+	FAIL -.-> STORE

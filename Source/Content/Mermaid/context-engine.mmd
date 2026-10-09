@@ -1,0 +1,14 @@
+flowchart TD
+	OPTIN["activation is opt-in:<br/>APHRODITE_CONTEXT_ENGINE=1<br/>the TOML flag defaults true"]
+	REG["the registered engine is thin<br/>and non-destructive"]
+	REC["update_from_response records<br/>prompt, completion and total usage"]
+	FALSE["should_compress always returns False"]
+	PASS["compress returns the transcript<br/>unchanged - never rewrites messages,<br/>never touches the inline store"]
+	REAL["the real per-turn mechanism:<br/>the pre_llm_call injection assembler -<br/>directives, nudges, background status<br/>and recall under the 4,000-char budget"]
+	NO["no middle-turn compression exists<br/>in the code"]
+	OPTIN --> REG
+	REG --> REC
+	REG --> FALSE
+	REG --> PASS
+	REG --> REAL
+	REAL --> NO

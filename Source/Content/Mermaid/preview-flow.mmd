@@ -1,0 +1,22 @@
+flowchart TD
+	ENTRY["every blob is classified first<br/>16 pipeline types in the README framing<br/>the semantic upgrade layer refines<br/>generic text, terminal and log blobs"]
+	ERROR["error - x8"]
+	CODE["code types - x3.0<br/>the code_multiplier default"]
+	TRACKED["diff, git, text - x2"]
+	DEFAULT["tool_output, json, rest - x1"]
+	NOISY["linter, build_output, log - BASE<br/>pinned, never halved, never tuned"]
+	EMA["EMA auto-tune on top:<br/>ratio over 20 - x2.0<br/>ratio under 3 - x0.5"]
+	BUDGET["budget header scales x0.5 to x1.0"]
+	FOOT["the full registry holds 30 types<br/>see the content-type taxonomy"]
+	ENTRY --> ERROR
+	ENTRY --> CODE
+	ENTRY --> TRACKED
+	ENTRY --> DEFAULT
+	ENTRY --> NOISY
+	ERROR --> EMA
+	CODE --> EMA
+	TRACKED --> EMA
+	DEFAULT --> EMA
+	NOISY -.->|exempt| EMA
+	EMA --> BUDGET
+	ENTRY -.-> FOOT
