@@ -1,1 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" aria-label="Aphrodite kiss mark" viewBox="0 0 232 158"><defs><pattern id="a" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".9" fill="#520612"/><circle cx="3" cy="3" r=".65" fill="#3d040d"/></pattern></defs><g transform="translate(14 16)"><g fill="#3d040d"><path d="M20 74c22-30 58-46 92-22 34-24 70-8 92 22-34-8-66-6-92 4-26-10-58-12-92-4"/><path d="M30 76c28 36 62 50 82 50s54-14 82-50c-36 26-64 10-82 10s-46 16-82-10"/></g><path fill="#09090b" d="M8 62c22-30 58-46 92-22 34-24 70-8 92 22-34-8-66-6-92 4-26-10-58-12-92-4"/><path fill="#09090b" d="M18 64c28 36 62 50 82 50s54-14 82-50c-36 26-64 10-82 10S54 90 18 64"/><path fill="url(#a)" d="M8 62c22-30 58-46 92-22 34-24 70-8 92 22-34-8-66-6-92 4-26-10-58-12-92-4"/><path fill="#ece9e0" d="M42 63c30 6 58 8 116 0-30 3-86 3-116 0" opacity=".9"/><circle cx="30" cy="6" r="5" fill="#20807b"/><circle cx="64" cy="10" r="3.5" fill="#e5a93b"/><circle cx="168" cy="8" r="4.5" fill="#e5a93b"/><circle cx="206" cy="30" r="3.5" fill="#20807b"/><circle cx="190" cy="140" r="3" fill="#dedbd2" opacity=".6"/><circle cx="34" cy="144" r="3" fill="#dedbd2" opacity=".6"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 232 158" role="img" aria-label="Aphrodite kiss mark">
+  <!--
+    aphrodite-mark.svg - the standalone kiss mark: NO background plate. The
+    lips paths, the stipple pattern, the screenprint highlight and the
+    canary/teal specks are reused verbatim from Public/Brand/favicon.svg
+    (which was adapted from Reference/Stitch/code.html's brand card); the
+    0.25-scaled favicon group is here expressed at its native 1x coordinates
+    with the distressed offset shadow at (+12,+12). Carbon-void fill: the
+    mark is intended for dark surfaces (soot/carbon cards); the oxblood
+    shadow and the red stipple carry the contrast.
+  -->
+  <defs>
+    <pattern id="stipple" width="4" height="4" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.9" fill="#520612"/>
+      <circle cx="3" cy="3" r="0.65" fill="#3d040d"/>
+    </pattern>
+  </defs>
+  <g transform="translate(14,16)">
+    <!-- Distressed stencil offset shadow -->
+    <g transform="translate(12,12)">
+      <path d="M 8,62 C 30,32 66,16 100,40 C 134,16 170,32 192,62 C 158,54 126,56 100,66 C 74,56 42,54 8,62 Z" fill="#3d040d"/>
+      <path d="M 18,64 C 46,100 80,114 100,114 C 120,114 154,100 182,64 C 146,90 118,74 100,74 C 82,74 54,90 18,64 Z" fill="#3d040d"/>
+    </g>
+    <!-- The kiss, carbon-void fill -->
+    <path d="M 8,62 C 30,32 66,16 100,40 C 134,16 170,32 192,62 C 158,54 126,56 100,66 C 74,56 42,54 8,62 Z" fill="#09090b"/>
+    <path d="M 18,64 C 46,100 80,114 100,114 C 120,114 154,100 182,64 C 146,90 118,74 100,74 C 82,74 54,90 18,64 Z" fill="#09090b"/>
+    <!-- Risograph stipple over the upper lip -->
+    <path d="M 8,62 C 30,32 66,16 100,40 C 134,16 170,32 192,62 C 158,54 126,56 100,66 C 74,56 42,54 8,62 Z" fill="url(#stipple)"/>
+    <!-- Raw screenprint highlight / tooth gap -->
+    <path d="M 42,63 C 72,69 100,71 158,63 C 128,66 72,66 42,63 Z" fill="#ece9e0" opacity="0.9"/>
+    <!-- Screen ink splatters / halftone specks -->
+    <circle cx="30" cy="6" fill="#20807b" r="5"/>
+    <circle cx="64" cy="10" fill="#e5a93b" r="3.5"/>
+    <circle cx="168" cy="8" fill="#e5a93b" r="4.5"/>
+    <circle cx="206" cy="30" fill="#20807b" r="3.5"/>
+    <circle cx="190" cy="140" fill="#dedbd2" opacity="0.6" r="3"/>
+    <circle cx="34" cy="144" fill="#dedbd2" opacity="0.6" r="3"/>
+  </g>
+</svg>

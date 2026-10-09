@@ -1,1 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><pattern id="a" width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".55" fill="#520612"/><circle cx="2.5" cy="2.5" r=".4" fill="#3d040d"/></pattern></defs><path fill="#7a0a1e" d="M0 0h64v64H0z"/><g fill="#3d040d"><path d="M12 37.5C17.5 30 26.5 26 35 32c8.5-6 17.5-2 23 5.5-8.5-2-16.5-1.5-23 1-6.5-2.5-14.5-3-23-1"/><path d="M14.5 38c7 9 15.5 12.5 20.5 12.5S48.5 47 55.5 38c-9 6.5-16 2.5-20.5 2.5s-11.5 4-20.5-2.5"/></g><path fill="#09090b" d="M9 34.5C14.5 27 23.5 23 32 29c8.5-6 17.5-2 23 5.5-8.5-2-16.5-1.5-23 1-6.5-2.5-14.5-3-23-1"/><path fill="#09090b" d="M11.5 35c7 9 15.5 12.5 20.5 12.5S45.5 44 52.5 35c-9 6.5-16 2.5-20.5 2.5s-11.5 4-20.5-2.5"/><path fill="url(#a)" d="M8 62c22-30 58-46 92-22 34-24 70-8 92 22-34-8-66-6-92 4-26-10-58-12-92-4" transform="matrix(.25 0 0 .25 7 19)"/><path fill="#ece9e0" d="M17.5 34.75c7.5 1.5 14.5 2 29 0-7.5.75-21.5.75-29 0" opacity=".9"/><circle cx="13" cy="14" r="2.6" fill="#20807b"/><circle cx="24" cy="10" r="1.8" fill="#e5a93b"/><circle cx="52" cy="14" r="2.2" fill="#e5a93b"/><circle cx="58" cy="24" r="1.8" fill="#20807b"/><circle cx="54" cy="50" r="1.4" fill="#dedbd2" opacity=".6"/><circle cx="14" cy="52" r="1.4" fill="#dedbd2" opacity=".6"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!--
+    favicon.svg - the zine grammar: the aphrodite mark on the blood-crimson
+    field, the distressed stencil offset shadow, the risograph stipple, the
+    canary/teal specks. Adapted from Reference/Stitch/code.html (brand card).
+  -->
+  <defs>
+    <pattern id="stipple" width="3" height="3" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.55" fill="#520612"/>
+      <circle cx="2.5" cy="2.5" r="0.4" fill="#3d040d"/>
+    </pattern>
+  </defs>
+  <!-- Blood-crimson field -->
+  <rect width="64" height="64" fill="#7a0a1e"/>
+  <!-- Distressed stencil offset shadow -->
+  <g transform="translate(10,22) scale(0.25)">
+    <path d="M 8,62 C 30,32 66,16 100,40 C 134,16 170,32 192,62 C 158,54 126,56 100,66 C 74,56 42,54 8,62 Z" fill="#3d040d"/>
+    <path d="M 18,64 C 46,100 80,114 100,114 C 120,114 154,100 182,64 C 146,90 118,74 100,74 C 82,74 54,90 18,64 Z" fill="#3d040d"/>
+  </g>
+  <!-- The aphrodite mark, carbon-void fill -->
+  <g transform="translate(7,19) scale(0.25)">
+    <path d="M 8,62 C 30,32 66,16 100,40 C 134,16 170,32 192,62 C 158,54 126,56 100,66 C 74,56 42,54 8,62 Z" fill="#09090b"/>
+    <path d="M 18,64 C 46,100 80,114 100,114 C 120,114 154,100 182,64 C 146,90 118,74 100,74 C 82,74 54,90 18,64 Z" fill="#09090b"/>
+    <!-- Risograph stipple over the upper lip -->
+    <path d="M 8,62 C 30,32 66,16 100,40 C 134,16 170,32 192,62 C 158,54 126,56 100,66 C 74,56 42,54 8,62 Z" fill="url(#stipple)"/>
+    <!-- Raw screenprint highlight / tooth gap -->
+    <path d="M 42,63 C 72,69 100,71 158,63 C 128,66 72,66 42,63 Z" fill="#ece9e0" opacity="0.9"/>
+  </g>
+  <!-- Screen ink splatters / halftone specks -->
+  <circle cx="13" cy="14" fill="#20807b" r="2.6"/>
+  <circle cx="24" cy="10" fill="#e5a93b" r="1.8"/>
+  <circle cx="52" cy="14" fill="#e5a93b" r="2.2"/>
+  <circle cx="58" cy="24" fill="#20807b" r="1.8"/>
+  <circle cx="54" cy="50" fill="#dedbd2" opacity="0.6" r="1.4"/>
+  <circle cx="14" cy="52" fill="#dedbd2" opacity="0.6" r="1.4"/>
+</svg>
