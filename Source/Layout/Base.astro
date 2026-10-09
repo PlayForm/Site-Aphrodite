@@ -4,6 +4,8 @@ import "@Stylesheet/Base.css";
 import { Head } from "astro-capo";
 import { ClientRouter } from "astro:transitions";
 
+import { AllLinks, IsActive, MenuLinks, PrimaryLinks } from "@Library/Links";
+
 const { Title = "Aphrodite", Description = "" } = Astro.props;
 
 const DescriptionText =
@@ -16,14 +18,8 @@ interface Props {
 
 // Synthesized site header: the Stitch reference is single-page and headerless;
 // this bar follows the DeepSeek Base header mechanics re-skinned in the zine
-// tokens (soot-black bar, oxblood rule, JBM uppercase links).
-const Links = [
-	{ Href: "/", Label: "OVERVIEW" },
-	{ Href: "/setup/", Label: "SETUP" },
-	{ Href: "/crates/", Label: "CRATES" },
-	{ Href: "/versions/", Label: "VERSIONS" },
-	{ Href: "/benchmarks/", Label: "BENCHMARKS" },
-];
+// tokens (soot-black bar, oxblood rule, JBM uppercase links). Primary entries
+// sit in the bar; the full set lives in the mobile menu.
 ---
 
 <!doctype html>
@@ -133,15 +129,11 @@ const Links = [
 				</a>
 				<div class="hidden items-center gap-4 md:flex">
 					{
-						Links.map(({ Href, Label }) => {
-							const Current = Href === "/" ? "/" : Href;
-							const Active =
-								Current === "/"
-									? Astro.url.pathname === "/"
-									: Astro.url.pathname.startsWith(Current);
+						PrimaryLinks.map((Link) => {
+							const Active = IsActive(Astro.url.pathname, Link);
 							return (
 								<a
-									href={Href}
+									href={Link.Href}
 									aria-current={Active ? "page" : undefined}
 									class={
 										Active
@@ -149,30 +141,41 @@ const Links = [
 											: "px-1 py-1 font-mono text-[11px] tracking-widest text-zinc-dust hover:text-bone-white"
 									}
 								>
-									{Label}
+									{Link.Label}
 								</a>
 							);
 						})
 					}
+					{
+						MenuLinks.map((Link) => (
+							<a
+								href={Link.Href}
+								aria-current={IsActive(Astro.url.pathname, Link) ? "page" : undefined}
+								class="px-1 py-1 font-mono text-[11px] tracking-widest text-zinc-dust hover:text-bone-white"
+							>
+								{Link.Label}
+							</a>
+						))
+					}
 				</div>
 				<button
 					id="nav-toggle"
-					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] font-bold tracking-widest text-bone-newsprint md:hidden"
+					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] font-bold tracking-widest text-bone-newsprint lg:hidden"
 					aria-expanded="false"
 					aria-controls="nav-menu"
 				>
 					MENU
 				</button>
 			</nav>
-			<div id="nav-menu" class="hidden border-t border-oxblood-dark bg-soot-black md:hidden">
+			<div id="nav-menu" class="hidden border-t border-oxblood-dark bg-soot-black lg:hidden">
 				<div class="flex flex-col px-5 py-2">
 					{
-						Links.map(({ Href, Label }) => (
+						AllLinks.map((Link) => (
 							<a
-								href={Href}
+								href={Link.Href}
 								class="border-b border-oxblood-dark/50 py-2 font-mono text-[11px] tracking-widest text-bone-newsprint"
 							>
-								{Label}
+								{Link.Label}
 							</a>
 						))
 					}

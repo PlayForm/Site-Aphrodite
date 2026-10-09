@@ -253,12 +253,16 @@ const PageHtml = `<!DOCTYPE html>
 				// Mermaid's HTML labels emit void \`<br>\` tags, which are invalid
 				// XML (and break strict SVG parsers). Self-close them.
 				let Fixed = Out.replace(/<br\\s*>/g, "<br/>");
-				// THE PIPE SUBSTITUTION. Mermaid escapes a literal pipe inside
-				// a label (it renders as the entity text &amp;#124;), so a
-				// source writes the marker's field separators as tilde and the
-				// renderer rewrites them to pipe here - the .mmd stays plain
-				// ASCII and the label-presence law applies the same rewrite.
-				Fixed = Fixed.replace(/CCR:hash~type~size/g, "CCR:hash|type|size");
+				// THE MARKER SUBSTITUTION. The strict sanitizer displays every
+				// escape form literally (&lt;, &#60;, even a raw &lt; breaks the
+				// flowchart parser), so a source writes the marker's angle
+				// brackets as @@@ - opening before CCR:, closing after - and
+				// the renderer rewrites them to the real brackets here. The
+				// .mmd stays plain ASCII and the label-presence law applies
+				// the same rewrite (see the Marker Substitution below).
+				Fixed = Fixed
+					.replace(/@@@CCR:/g, "&lt;&lt;&lt;CCR:")
+					.replace(/size@@@/g, "size&gt;&gt;&gt;");
 				// Mermaid caps the diagram at its natural pixel size with an
 				// inline \`style="max-width: ...px;"\`. That cap would keep the
 				// rendered diagram from spanning its container's width, so it
@@ -382,13 +386,14 @@ const SvgHasLabels = (Svg, Labels) => {
 	// label whose words got glued together (spaces dropped at the wrap) can
 	// never match here.
 	const Spaced = Normalize(Lines.join(" "));
-	// The pipe substitution, on the comparison side: the source's tilde
-	// separators read as pipes, matching what the renderer wrote (see the
-	// Pipe Substitution in the page).
-	const PipeRewrite = (Text) => Text.replace(/CCR:hash~type~size/g, "CCR:hash|type|size");
+	// The marker substitution, on the comparison side: the source's @@@
+	// brackets read as the real angle brackets, matching what the renderer
+	// wrote (see the Marker Substitution in the page).
+	const MarkerRewrite = (Text) =>
+		Text.replace(/@@@CCR:/g, "<<<CCR:").replace(/size@@@/g, "size>>>");
 	for (const Label of Labels) {
 		for (const Line of Label.split(/<br\s*\/?>/)) {
-			const Want = PipeRewrite(Normalize(Line));
+			const Want = MarkerRewrite(Normalize(Line));
 			if (!Want) continue;
 			if (Spaced.includes(Want)) continue;
 			// Present only in the whitespace-free form? Then the spaces were

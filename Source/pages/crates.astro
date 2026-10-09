@@ -3,98 +3,167 @@ import Base from "@Layout/Base.astro";
 ---
 
 <Base
-	Title="Crates - Aphrodite"
-	Description="The Aphrodite workspace: the aphrodite proxy crate and the aphrodite-hermes integration crate, both v1.6.6."
+	Title="CRATES // APHRODITE"
+	Description="The Aphrodite workspace: the aphrodite Chat Completions proxy crate and the aphrodite-hermes integration crate, both v1.6.6, plus the vendored Headroom fork."
 >
-	<main class="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-6 py-16">
-		<header class="flex flex-col gap-4">
-			<h1 class="text-4xl font-semibold tracking-tight">Crates</h1>
-			<p class="max-w-3xl text-lg text-neutral-600">
+	<main
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-5 py-24 sm:px-8 lg:gap-24 lg:px-14 lg:py-40"
+	>
+		<header class="relative flex w-full flex-col items-start">
+			<div
+				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				CRATES // WORKSPACE MANIFEST
+			</div>
+			<h1
+				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
+			>
+				Crates
+			</h1>
+			<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
 				Two workspace crates plus the vendored Headroom fork that carries the content
 				transforms. Aphrodite adds the preview pipeline, CCR storage, Hermes integration,
 				and dual-proxy architecture on top of Headroom.
+				<span class="mt-1 block text-[9px] text-zinc-dust">SRC: README.md:515-519</span>
 			</p>
 		</header>
 
-		<section class="flex flex-col gap-6">
-			<article class="flex flex-col gap-2 rounded-lg border border-neutral-300 p-6">
-				<h2 class="text-xl font-semibold">
-					aphrodite <span class="text-sm font-normal text-neutral-500">v1.6.6</span>
-				</h2>
-				<p class="text-neutral-600">
-					Chat Completions proxy with CCR, tool relay, and programmatic CCR for Hermes
-					agent integration. Ships the <code class="font-mono text-sm">aphrodite</code>
-					binary and a cdylib/rlib library; built on axum and tokio.
+		<!-- CASE #01: APHRODITE -->
+		<section class="relative w-full lg:w-9/12 lg:self-start">
+			<div
+				class="zine-box-crimson relative -rotate-[2.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div
+					class="absolute -top-3.5 left-6 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+				>
+					#01 // PROXY CRATE
+				</div>
+				<div class="mb-4 mt-2 flex flex-wrap items-center justify-between gap-2">
+					<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+						aphrodite
+					</h2>
+					<span
+						class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000]"
+					>
+						v1.6.6
+					</span>
+				</div>
+				<p class="mb-4 font-body text-sm leading-relaxed text-bone-newsprint">
+					Chat Completions proxy with CCR, tool relay, and programmatic CCR for Hermes agent
+					integration. Ships the
+					<code class="font-mono text-xs text-weathered-teal">aphrodite</code> binary and a
+					cdylib/rlib library; built on axum and tokio.
 				</p>
-			</article>
-			<article class="flex flex-col gap-2 rounded-lg border border-neutral-300 p-6">
-				<h2 class="text-xl font-semibold">
-					aphrodite-hermes <span class="text-sm font-normal text-neutral-500">v1.6.6</span>
-				</h2>
-				<p class="text-neutral-600">
+				<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
+					<div class="mb-1 text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+						INSTALL // CARGO:
+					</div>
+					<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-xs text-bone-white">
+						$ cargo install aphrodite
+					</div>
+					<div class="mt-2 truncate font-mono text-[11px] font-bold text-weathered-teal">
+						&lt;&lt;&lt;CCR:crate.aphrodite|1.6.6|axum-0.8.9+tokio-1.53.1&gt;&gt;&gt;
+					</div>
+				</div>
+				<p class="mt-4 text-[9px] text-zinc-dust">SRC: crates/aphrodite/Cargo.toml</p>
+			</div>
+		</section>
+
+		<!-- CASE #02: APHRODITE-HERMES -->
+		<section class="relative w-full lg:w-7/12 lg:self-end lg:-mt-12">
+			<div
+				class="zine-box-crimson relative rotate-[2.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div
+					class="absolute -top-3.5 right-6 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+				>
+					#02 // INTEGRATION CRATE
+				</div>
+				<div class="mb-4 mt-2 flex flex-wrap items-center justify-between gap-2">
+					<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+						aphrodite-hermes
+					</h2>
+					<span
+						class="rotate-1 border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-soot-black shadow-[4px_4px_0px_#000]"
+					>
+						v1.6.6
+					</span>
+				</div>
+				<p class="mb-4 font-body text-sm leading-relaxed text-bone-newsprint">
 					Hermes Agent-specific integration for the Aphrodite compression engine - tool
 					schemas, hook dispatch, skill registration. Ships the
-					<code class="font-mono text-sm">aphrodite-hermes-setup</code> helper binary and
-					the dylib; watches config with notify.
+					<code class="font-mono text-xs text-weathered-teal">aphrodite-hermes-setup</code>
+					helper binary and the dylib; watches config with notify.
 				</p>
-			</article>
+				<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
+					<div class="mb-1 text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+						INSTALL // CARGO:
+					</div>
+					<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-xs text-bone-white">
+						$ cargo install aphrodite-hermes
+					</div>
+				</div>
+				<p class="mt-4 text-[9px] text-zinc-dust">SRC: crates/aphrodite-hermes/Cargo.toml</p>
+			</div>
 		</section>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">Configuration surface</h2>
-			<p class="max-w-3xl text-neutral-600">
-				From <code class="font-mono text-sm">aphrodite.toml.example</code> - the main
-				sections:
-			</p>
-			<ul class="flex max-w-3xl flex-col gap-3 text-neutral-600">
-				<li>
-					<code class="font-mono text-sm">[[proxies]]</code> - named listeners; the two
-					defaults are <code class="font-mono text-sm">cache</code> on
-					<code class="font-mono text-sm">127.0.0.1:9797</code> (timeout 120) and
-					<code class="font-mono text-sm">token</code> on
-					<code class="font-mono text-sm">127.0.0.1:9798</code> (timeout 300), both with
-					tool relay on.
-				</li>
-				<li>
-					<code class="font-mono text-sm">[defaults]</code> - <code class="font-mono text-sm">api_url</code
-					>, <code class="font-mono text-sm">model</code>,
-					<code class="font-mono text-sm">ccr_ttl_seconds</code> (3600), optional
-					<code class="font-mono text-sm">api_key</code>.
-				</li>
-				<li>
-					<code class="font-mono text-sm">[compression]</code> - the engine thresholds
-					(<code class="font-mono text-sm">engine_threshold_pct</code> 45, protect-first
-					2 / protect-last 5, min 8 messages), the type multipliers (code ×3), the
-					context engine toggle, polling worker, opt-in auto-reload, and chain splitting.
-				</li>
-				<li>
-					<code class="font-mono text-sm">[previews]</code> - preview rendering options;
-					<code class="font-mono text-sm">preview_max_chars</code> 120.
-				</li>
-				<li>
-					<code class="font-mono text-sm">[prompts]</code> - retrieval guidance and the
-					<code class="font-mono text-sm">session_inject</code> CCR notice.
-				</li>
-				<li>
-					<code class="font-mono text-sm">[directives]</code> - the active directive list
-					(seeding <code class="font-mono text-sm">focus</code> and
-					<code class="font-mono text-sm">foresight</code>).
-				</li>
-				<li>
-					<code class="font-mono text-sm">[flow]</code> - <code class="font-mono text-sm"
-						>budget_chars</code
-					>, the hard cap for all per-turn injected context (2600).
-				</li>
-			</ul>
-			<p class="max-w-3xl text-sm text-neutral-600">
-				Keys not yet wired into the runtime are annotated DOCUMENTED BUT UNWIRED in the
-				example; dead sections (<code class="font-mono text-sm">[templates.*]</code>) were
-				removed in v1.6.6.
-			</p>
+		<!-- CONFIG SURFACE -->
+		<section class="relative w-full">
+			<div
+				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				CONFIGURATION SURFACE // APHRODITE.TOML.EXAMPLE
+			</div>
+			<div
+				class="zine-box-crimson relative w-full rotate-[0.6deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-10"
+			>
+				<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+					<div class="border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] text-bone-newsprint">
+						<div class="text-weathered-teal">[[proxies]]</div>
+						<div>cache <span class="text-zinc-dust">→</span> <span class="text-stamped-canary">127.0.0.1:9797</span> timeout <span class="text-stamped-canary">120</span></div>
+						<div>token <span class="text-zinc-dust">→</span> <span class="text-stamped-canary">127.0.0.1:9798</span> timeout <span class="text-stamped-canary">300</span></div>
+						<div>tool_relay = <span class="text-stamped-canary">true</span> <span class="text-zinc-dust">(both)</span></div>
+						<div class="pt-3 text-weathered-teal">[defaults]</div>
+						<div>api_url = <span class="text-stamped-canary">"https://api.openai.com"</span></div>
+						<div>ccr_ttl_seconds = <span class="text-stamped-canary">3600</span></div>
+						<div class="pt-3 text-weathered-teal">[flow]</div>
+						<div>budget_chars = <span class="text-stamped-canary">2600</span></div>
+					</div>
+					<div class="border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] text-bone-newsprint">
+						<div class="text-weathered-teal">[compression]</div>
+						<div>engine_threshold_pct = <span class="text-stamped-canary">45</span></div>
+						<div>tool_threshold_token = <span class="text-stamped-canary">512</span></div>
+						<div>tool_threshold_cache = <span class="text-stamped-canary">4096</span></div>
+						<div>terminal_threshold = <span class="text-stamped-canary">1024</span></div>
+						<div>inline_threshold = <span class="text-stamped-canary">2048</span></div>
+						<div>code_multiplier = <span class="text-stamped-canary">3.0</span></div>
+						<div>auto_reload = <span class="text-stamped-canary">false</span> <span class="text-zinc-dust"># opt-in</span></div>
+						<div class="pt-3 text-weathered-teal">[previews]</div>
+						<div>preview_max_chars = <span class="text-stamped-canary">120</span></div>
+					</div>
+				</div>
+				<p class="mt-6 border-t border-oxblood-dark pt-4 font-body text-xs leading-relaxed text-zinc-dust">
+					Keys not yet wired into the runtime are annotated DOCUMENTED BUT UNWIRED in the
+					example; the dead <code class="font-mono text-xs">[templates.*]</code> subtree was
+					removed in v1.6.6. Marker grammar:
+					<code class="font-mono text-xs text-weathered-teal">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</code>
+				</p>
+				<p class="mt-2 text-[9px] text-zinc-dust">SRC: aphrodite.toml.example; CHANGELOG.md v1.6.6</p>
+			</div>
 		</section>
+
+		<footer
+			class="flex flex-col items-center justify-between gap-4 border-t-2 border-oxblood-dark pb-6 pt-12 text-xs text-zinc-dust sm:flex-row"
+		>
+			<div class="flex items-center gap-2">
+				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
+				<span class="font-bold tracking-widest text-bone-white uppercase">APHRODITE CCR CORE</span>
+			</div>
+			<div class="flex items-center gap-4">
+				<a class="transition-colors hover:text-bone-white" href="/setup/">SETUP</a>
+				<a class="transition-colors hover:text-bone-white" href="/versions/">VERSIONS</a>
+				<span class="font-bold text-stamped-canary">CC0-1.0</span>
+			</div>
+		</footer>
 	</main>
-
-	<footer class="border-t border-neutral-200 px-6 py-8 text-sm text-neutral-500">
-		Aphrodite - CC0-1.0, public domain. Built by PlayForm.
-	</footer>
 </Base>

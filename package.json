@@ -1,67 +1,69 @@
 {
-	"name": "@playform/starter",
-	"version": "0.0.1",
-	"private": true,
-	"description": "Starter 📄",
-	"keywords": [
-		"astro",
-		"starter",
-		"skeleton",
-		"playform"
-	],
-	"homepage": "https://GitHub.Com/PlayForm/Starter#readme",
-	"bugs": {
-		"url": "https://GitHub.Com/PlayForm/Starter/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/PlayForm/Starter.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "Source ✍🏻 Open 👐🏻",
-		"email": "Source/Open@PlayForm.Cloud",
-		"url": "https://PlayForm.Cloud"
-	},
-	"scripts": {
-		"Run": "astro dev --host",
-		"Docs": "node Scripts/Docs.ts",
-		"prepublishOnly": "pnpm Docs && astro build"
-	},
-	"dependencies": {
-		"@astrojs/sitemap": "3.7.4",
-		"@playform/build": "0.3.4",
-		"@playform/compress": "0.2.5",
-		"@playform/inline": "0.1.4",
-		"@tailwindcss/aspect-ratio": "0.4.2",
-		"@tailwindcss/forms": "0.5.11",
-		"@tailwindcss/typography": "0.5.20",
-		"astro": "7.3.8",
-		"astro-capo": "0.0.1",
-		"astrojs-service-worker": "2.0.3",
-		"autoprefixer": "10.6.1",
-		"cssnano": "9.4.0",
-		"cssnano-preset-advanced": "9.3.0",
-		"dotenv": "18.0.6",
-		"firebase": "13.0.0",
-		"mermaid": "11.12.2",
-		"postcss": "8.5.29",
-		"postcss-combine-duplicated-selectors": "11.0.0",
-		"postcss-combine-media-query": "2.1.0",
-		"postcss-import": "17.0.0",
-		"postcss-reporter": "7.1.0",
-		"postcss-url": "10.1.4",
-		"puppeteer": "^25.13.0",
-		"shiki": "4.5.0",
-		"tailwindcss": "3.4.19",
-		"typescript": "7.0.2",
-		"zod": "4.6.5"
-	},
-	"devDependencies": {
-		"@astrojs/ts-plugin": "1.10.12"
-	},
-	"publishConfig": {
-		"access": "restricted",
-		"provenance": true
-	}
+  "name": "@playform/starter",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Starter 📄",
+  "keywords": [
+    "astro",
+    "starter",
+    "skeleton",
+    "playform"
+  ],
+  "homepage": "https://GitHub.Com/PlayForm/Starter#readme",
+  "bugs": {
+    "url": "https://GitHub.Com/PlayForm/Starter/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PlayForm/Starter.git"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "author": {
+    "name": "Source ✍🏻 Open 👐🏻",
+    "email": "Source/Open@PlayForm.Cloud",
+    "url": "https://PlayForm.Cloud"
+  },
+  "scripts": {
+    "Run": "astro dev --host",
+    "Diagrams": "node Source/Content/Mermaid/Render.mjs",
+    "Docs": "node Scripts/Docs.ts",
+    "Drift": "node Scripts/Drift-Guard.mjs",
+    "prepublishOnly": "pnpm Docs && astro build"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "3.7.4",
+    "@playform/build": "0.3.4",
+    "@playform/compress": "0.2.5",
+    "@playform/inline": "0.1.4",
+    "@tailwindcss/aspect-ratio": "0.4.2",
+    "@tailwindcss/forms": "0.5.11",
+    "@tailwindcss/typography": "0.5.20",
+    "astro": "7.3.8",
+    "astro-capo": "0.0.1",
+    "astrojs-service-worker": "2.0.3",
+    "autoprefixer": "10.6.1",
+    "cssnano": "9.4.0",
+    "cssnano-preset-advanced": "9.3.0",
+    "dotenv": "18.0.6",
+    "firebase": "13.0.0",
+    "mermaid": "12.1.0",
+    "postcss": "8.5.29",
+    "postcss-combine-duplicated-selectors": "11.0.0",
+    "postcss-combine-media-query": "2.1.0",
+    "postcss-import": "17.0.0",
+    "postcss-reporter": "7.1.0",
+    "postcss-url": "10.1.4",
+    "puppeteer": "25.13.0",
+    "shiki": "4.5.0",
+    "tailwindcss": "3.4.19",
+    "typescript": "7.0.2",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@astrojs/ts-plugin": "1.10.12"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "provenance": true
+  }
 }

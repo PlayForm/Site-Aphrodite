@@ -3,120 +3,163 @@ import Base from "@Layout/Base.astro";
 ---
 
 <Base
-	Title="Versions & benchmarks - Aphrodite"
-	Description="Aphrodite v1.6.6 / plugin v2.2.6. Compression and latency benchmarks, the real-world study, and reproducible bench commands."
+	Title="VERSIONS // APHRODITE"
+	Description="Aphrodite v1.6.6, plugin v2.2.6 (2026-10-07). The current release, its changelog, and pointers to the full benchmarks."
 >
-	<main class="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-6 py-16">
-		<header class="flex flex-col gap-4">
-			<h1 class="text-4xl font-semibold tracking-tight">Versions &amp; benchmarks</h1>
-			<p class="max-w-3xl text-lg text-neutral-600">
+	<main
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-5 py-24 sm:px-8 lg:gap-24 lg:px-14 lg:py-40"
+	>
+		<header class="relative flex w-full flex-col items-start">
+			<div
+				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				VERSIONS // RELEASE LOG
+			</div>
+			<h1
+				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
+			>
+				Versions
+			</h1>
+			<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
 				Current release: binary <strong>v1.6.6</strong>, plugin <strong>v2.2.6</strong>
 				(v1.6.6, 2026-10-07). Requires Rust 1.88+. Licensed CC0-1.0.
+				<span class="mt-1 block text-[9px] text-zinc-dust">SRC: README.md:12; CHANGELOG.md v1.6.6</span>
 			</p>
 		</header>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">Compression</h2>
-			<p class="max-w-3xl text-neutral-600">
-				Up to <strong>610&times;</strong> compression on the standard corpus,
-				<strong>132&times;</strong> overall (106 KB &rarr; 800 B on the 20-sample standard
-				corpus). Median: 23&times; fewer tokens on tool output.
-			</p>
-			<table class="max-w-2xl text-sm">
-				<thead>
-					<tr class="border-b border-neutral-300 text-left">
-						<th class="py-2 pr-6 font-medium">Content type</th>
-						<th class="py-2 font-medium">Compression</th>
-					</tr>
-				</thead>
-				<tbody class="text-neutral-600">
-					<tr><td class="py-1.5 pr-6">Browser snapshot</td><td class="py-1.5">416&times;</td></tr>
-					<tr><td class="py-1.5 pr-6">Build output</td><td class="py-1.5">140&times;</td></tr>
-					<tr><td class="py-1.5 pr-6">JSON</td><td class="py-1.5">40&times;</td></tr>
-					<tr><td class="py-1.5 pr-6">Git diff</td><td class="py-1.5">23&times;</td></tr>
-					<tr><td class="py-1.5 pr-6">Terminal</td><td class="py-1.5">20&times;</td></tr>
-				</tbody>
-			</table>
+		<!-- MONUMENT: CURRENT RELEASE -->
+		<section class="relative w-full rotate-[0.6deg] transition-transform duration-300 hover:rotate-0">
+			<div
+				class="absolute -top-4 right-10 z-20 border border-black bg-stamped-canary px-4 py-1 text-[11px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+			>
+				CURRENT // SHIPPED
+			</div>
+			<div
+				class="zine-box-crimson relative overflow-hidden border-4 border-blood-crimson bg-carbon-void p-6 sm:p-10"
+			>
+				<div class="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
+					<div>
+						<div class="text-[11px] font-black uppercase tracking-widest text-raw-blood">
+							BINARY RELEASE
+						</div>
+						<div
+							class="font-headline text-5xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-7xl"
+						>
+							v1.6.6
+						</div>
+					</div>
+					<div class="zine-box-subtle w-full border-[3px] border-raw-blood bg-soot-black p-5 lg:w-auto">
+						<div class="text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+							HERMES PLUGIN
+						</div>
+						<div class="font-headline text-3xl font-black tracking-tighter text-bone-white sm:text-5xl">
+							v2.2.6
+						</div>
+						<div class="mt-1 text-xs font-bold text-stamped-canary">2026-10-07</div>
+					</div>
+				</div>
+				<div class="mt-8 border-t border-oxblood-dark pt-4 text-[9px] text-zinc-dust">
+					SRC: CHANGELOG.md v1.6.6 ("Binary 1.6.5 → 1.6.6, plugin 2.2.5 → 2.2.6")
+				</div>
+			</div>
 		</section>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">Latency</h2>
-			<p class="max-w-3xl text-neutral-600">
-				End-to-end preview latency is <strong>8-40 ms</strong> (includes the HTTP
-				round-trip; the headline figure is ~10 ms). Classification alone runs
-				<strong>40-123 ns</strong>, and the compress path itself stays under 1 ms.
-			</p>
+		<!-- CHANGELOG AS TELEMETRY ROWS -->
+		<section class="relative w-full">
+			<div
+				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				CHANGELOG // V1.6.6
+			</div>
+			<div class="flex flex-col gap-6">
+				<div
+					class="zine-box-subtle relative -rotate-[1.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+				>
+					<div
+						class="absolute -top-3.5 left-6 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					>
+						CATALOG REVIEW
+					</div>
+					<p class="mt-2 font-body text-sm text-bone-newsprint">
+						Catalog review: prefetch path guard, setup hardening, opt-in context engine.
+					</p>
+					<div class="mt-4 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] text-zinc-dust">
+						<div class="text-raw-blood">- fix: aphrodite_prefetch refuses .env, auth.json, ~/.ssh, Hermes home, non-file paths</div>
+						<div class="text-raw-blood">- fix: aphrodite setup treats Hermes-home plugin dir as report-only</div>
+						<div class="text-raw-blood">- fix: dylib arm refuses install when in-tree SHA256SUMS.txt is missing</div>
+					</div>
+				</div>
+				<div
+					class="zine-box-subtle relative rotate-[1.8deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8 lg:-mt-2"
+				>
+					<div
+						class="absolute -top-3.5 right-6 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+					>
+						FEATURES
+					</div>
+					<div class="mt-2 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] text-zinc-dust">
+						<div class="text-weathered-teal">+ context engine opt-in at registration: APHRODITE_CONTEXT_ENGINE=1 (TOML default true)</div>
+						<div class="text-weathered-teal">+ non-destructive: should_compress always False; transcript unchanged</div>
+						<div class="text-weathered-teal">+ pre_tool_call behavior disclosed: auto-backgrounds long terminal commands</div>
+						<div class="text-weathered-teal">+ requires_hermes: &gt;=0.20.2</div>
+					</div>
+				</div>
+				<div
+					class="zine-box-subtle relative -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+				>
+					<div
+						class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					>
+						CHORE + DOCS
+					</div>
+					<div class="mt-2 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] text-zinc-dust">
+						<div>- config 1:1 audit: dead [templates.*] subtree and compression.prefetch removed</div>
+						<div>- chain_split_min/max_segments and defaults.api_url/model added; unwired keys annotated</div>
+						<div>- 21 doc files fixed; version stamps 1.6.5 → 1.6.6</div>
+					</div>
+				</div>
+			</div>
+			<p class="mt-4 text-[9px] text-zinc-dust">SRC: CHANGELOG.md v1.6.6</p>
 		</section>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">Real-world study</h2>
-			<p class="max-w-3xl text-sm text-neutral-600">
-				Measured, Sep 2026: 200 Hermes sessions, 6,843 API calls (Sep 18-20). Tokens with
-				markers: 424,959,588; expanded: 581,302,405; saved: 156,342,817 (26.9%). Average
-				22,921 tokens per call; 183 of 200 sessions saved; median session ratio 22.9%.
-				Retrieval tax: 2,275 calls / 2,011,583 tokens. Per-type: terminal 74&times;, table
-				61&times;, source_code 45&times;, ls 37&times;, diff 23&times;, build 23&times;,
-				search 20&times;. Scaling: chat ~0%, light dev ~5%, tool-heavy 20-25%, pure-tool
-				76-82%.
-			</p>
-			<p class="max-w-3xl text-sm text-neutral-500">
-				Caveat, verbatim from the README: &ldquo;the exact percentage is a band &hellip;
-				sensitivity across 3.0-4.5 chars/tok spans ~24-33%, centered ~27%.&rdquo;
-			</p>
+		<!-- BENCHMARKS POINTER -->
+		<section class="relative w-full lg:w-6/12 lg:self-end lg:-mt-4">
+			<div
+				class="zine-box-crimson relative -rotate-[2.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div
+					class="absolute -top-3.5 right-6 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+				>
+					POINTER
+				</div>
+				<h2 class="mt-2 mb-3 font-headline text-lg font-black uppercase text-bone-white">
+					Full numbers
+				</h2>
+				<p class="font-body text-sm text-bone-newsprint">
+					The complete telemetry - 610&times;/132&times;, 8-40 ms, the per-type bars, and the
+					200-session study - lives on the benchmarks page.
+				</p>
+				<a
+					class="mt-4 inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-xs font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+					href="/benchmarks/"
+				>
+					OPEN BENCHMARKS
+				</a>
+			</div>
 		</section>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">v1.6.6 changelog</h2>
-			<ul class="flex max-w-3xl list-disc flex-col gap-2 pl-6 text-neutral-600">
-				<li>Catalog review: prefetch path guard, setup hardening, opt-in context engine.</li>
-				<li>
-					<code class="font-mono text-sm">aphrodite_prefetch</code> refuses
-					<code class="font-mono text-sm">.env</code>,
-					<code class="font-mono text-sm">auth.json</code>,
-					<code class="font-mono text-sm">~/.ssh</code>, Hermes home, and non-file paths.
-				</li>
-				<li>
-					<code class="font-mono text-sm">aphrodite setup</code> treats the Hermes-home
-					plugin dir as report-only - no symlink/write/delete; points at
-					<code class="font-mono text-sm">bash download.sh</code> /
-					<code class="font-mono text-sm">pwsh download.ps1</code>.
-				</li>
-				<li>
-					The dylib arm hard-refuses install when the in-tree
-					<code class="font-mono text-sm">SHA256SUMS.txt</code> is missing or lacks a
-					target entry.
-				</li>
-				<li>
-					Context engine is opt-in at registration
-					(<code class="font-mono text-sm">APHRODITE_CONTEXT_ENGINE=1</code>; TOML default
-					true); <code class="font-mono text-sm">requires_hermes</code> is
-					<code class="font-mono text-sm">&gt;=0.20.2</code>.
-				</li>
-				<li>
-					<code class="font-mono text-sm">pre_tool_call</code> behavior is disclosed:
-					auto-backgrounds long terminal commands.
-				</li>
-				<li>
-					Config 1:1 audit - dead <code class="font-mono text-sm">[templates.*]</code>
-					subtree and <code class="font-mono text-sm">compression.prefetch</code> removed;
-					unwired keys annotated.
-				</li>
-				<li>Binary 1.6.5 &rarr; 1.6.6, plugin 2.2.5 &rarr; 2.2.6.</li>
-			</ul>
-		</section>
-
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">Reproduce</h2>
-			<pre
-				class="max-w-3xl overflow-x-auto rounded-lg border border-neutral-300 bg-neutral-100 p-4 font-mono text-sm"><code>cargo run --release -p aphrodite --example bench_01_corpus
-cargo run --release -p aphrodite --example bench_02_threshold
-cargo run --release -p aphrodite --example bench_03_retrieve
-cargo run --release -p aphrodite --example bench_04_ema
-cargo run --release -p aphrodite --example bench_05_type_coverage</code></pre>
-		</section>
+		<footer
+			class="flex flex-col items-center justify-between gap-4 border-t-2 border-oxblood-dark pb-6 pt-12 text-xs text-zinc-dust sm:flex-row"
+		>
+			<div class="flex items-center gap-2">
+				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
+				<span class="font-bold tracking-widest text-bone-white uppercase">APHRODITE CCR CORE</span>
+			</div>
+			<div class="flex items-center gap-4">
+				<a class="transition-colors hover:text-bone-white" href="/crates/">CRATES</a>
+				<a class="transition-colors hover:text-bone-white" href="/benchmarks/">BENCHMARKS</a>
+				<span class="font-bold text-stamped-canary">CC0-1.0</span>
+			</div>
+		</footer>
 	</main>
-
-	<footer class="border-t border-neutral-200 px-6 py-8 text-sm text-neutral-500">
-		Aphrodite - CC0-1.0, public domain. Built by PlayForm.
-	</footer>
 </Base>
