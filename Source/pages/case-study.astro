@@ -422,7 +422,9 @@ const Layers = [
 					the HTTP round-trip - because the design spends its complexity budget on the
 					decision, not the transform.
 				</p>
-				<div class="mt-16 isolate grid grid-cols-1 items-start gap-16 sm:grid-cols-2 lg:grid-cols-4">
+				<!-- The layer grid: 2x2 until xl - aligned with the index stage grid,
+				     where 4-across between 1024-1279px squished the cards. -->
+				<div class="mt-16 isolate grid grid-cols-1 items-start gap-16 sm:grid-cols-2 xl:grid-cols-4">
 					{
 						Layers.map(({ N, Name, Figure, Note }, Index) => {
 							const Stamp =

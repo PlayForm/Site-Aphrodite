@@ -16,6 +16,8 @@ export const PrimaryLinks: InternalLink[] = [
 	{ Href: "/setup/", Label: "SETUP" },
 	{ Href: "/docs/", Label: "DOCS" },
 	{ Href: "/benchmarks/", Label: "BENCHMARKS" },
+	{ Href: "/case-study/", Label: "CASE STUDY" },
+	{ Href: "/showcase/", Label: "SHOWCASE" },
 ];
 
 /** Secondary header entries - collapsed into the mobile menu, listed after the primary set on wide screens. */
@@ -27,7 +29,6 @@ export const MenuLinks: InternalLink[] = [
 	{ Href: "/hooks/", Label: "HOOKS" },
 	{ Href: "/tools/", Label: "TOOLS" },
 	{ Href: "/flavors/", Label: "FLAVORS" },
-	{ Href: "/case-study/", Label: "CASE STUDY" },
 	{ Href: "/workbench/", Label: "WORKBENCH" },
 	{ Href: "/config/", Label: "CONFIG" },
 	{ Href: "/showcase/", Label: "SHOWCASE" },

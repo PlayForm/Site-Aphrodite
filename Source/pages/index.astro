@@ -46,8 +46,12 @@ import { Stamps, Versions } from "@Library/Versions";
 			</div>
 			<!-- Stamped wordmark -->
 			<div class="relative flex flex-col items-center">
+				<!-- The wordmark clamps at the small breakpoints: at 320px the
+				     fixed 72px measures ~346px wide and clips both edges against
+				     the overflow-x-hidden body; 17.5vw keeps the full name inside
+				     the viewport until the fixed scale resumes above ~412px. -->
 				<h1
-					class="select-none font-headline text-[72px] font-black uppercase leading-[0.85] tracking-tighter text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-[108px] lg:text-[144px]"
+					class="select-none font-headline text-[min(72px,17.5vw)] font-black uppercase leading-[0.85] tracking-tighter text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-[108px] lg:text-[144px]"
 				>
 					Aphrodite
 				</h1>

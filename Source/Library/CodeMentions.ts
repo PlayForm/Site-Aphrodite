@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { HeadroomRepo, HermesRepo } from "./Links";
@@ -221,8 +221,10 @@ const LocalPath = ({ Path, Repo }: { Path: string; Repo: unknown }): string =>
 		: Path;
 
 /**
- * The integration: rewrite every built HTML page through Rewrite(), skipping
- * files that contain no candidates at all.
+ * The integration: rewrite every built HTML page through Rewrite(). The
+ * build manifest drives the first pass, and a filesystem walk of the output
+ * directory covers every HTML file the manifest omits (Astro 7 does not
+ * list the "/" route, so the homepage would otherwise stay unlinked).
  */
 export default () => ({
 	name: "code-mentions",
@@ -233,6 +235,34 @@ export default () => ({
 
 			pages: { pathname?: string; paths?: string[] }[];
 		}) => {
+			const Done = new Set<string>();
+
+			const Visit = async (File: string): Promise<void> => {
+				switch (Done.has(File)) {
+					case true:
+						return;
+
+					default:
+						break;
+				}
+
+				Done.add(File);
+
+				const Html = await readFile(File, "utf8");
+
+				const Linked = Rewrite(Html);
+
+				switch (Linked !== Html) {
+					case true:
+						await writeFile(File, Linked, "utf8");
+
+						return;
+
+					default:
+						return;
+				}
+			};
+
 			for (const Page of pages) {
 				const Files = Array.isArray(Page.paths) && Page.paths.length > 0
 					? Page.paths
@@ -241,21 +271,32 @@ export default () => ({
 					: [];
 
 				for (const File of Files) {
-					const Html = await readFile(File, "utf8");
-
-					const Linked = Rewrite(Html);
-
-					switch (Linked !== Html) {
-						case true:
-							await writeFile(File, Linked, "utf8");
-
-							continue;
-
-						default:
-							continue;
-					}
+					await Visit(File);
 				}
 			}
+
+			const Walk = async (Folder: string): Promise<void> => {
+				for (const Item of await readdir(Folder, { withFileTypes: true })) {
+					const Path = join(Folder, Item.name);
+
+					switch (true) {
+						case Item.isDirectory():
+							await Walk(Path);
+
+							break;
+
+						case Item.name.endsWith(".html"):
+							await Visit(Path);
+
+							break;
+
+						default:
+							break;
+					}
+				}
+			};
+
+			await Walk(dir.pathname);
 		},
 	},
 });

@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -124,7 +124,7 @@ export default () => ({
 
 					switch (Swapped !== Html) {
 						case true:
-							await (await import("node:fs/promises")).writeFile(File, Swapped, "utf8");
+							await writeFile(File, Swapped, "utf8");
 
 							continue;
 
