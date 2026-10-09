@@ -129,7 +129,7 @@ interface Props {
 						>APHRODITE</span
 					>
 				</a>
-				<nav aria-label="Primary" class="hidden items-center gap-3 lg:flex xl:hidden">
+				<nav aria-label="Primary" class="hidden items-center gap-3 lg:flex">
 					{
 						PrimaryLinks.map((Link) => {
 							const Active = IsActive(Astro.url.pathname, Link);
@@ -147,49 +147,18 @@ interface Props {
 								</a>
 							);
 						})
-					}
-				</nav>
-				<nav aria-label="Full" class="hidden items-center gap-3 xl:flex">
-					{
-						PrimaryLinks.map((Link) => {
-							const Active = IsActive(Astro.url.pathname, Link);
-							return (
-								<a
-									href={Link.Href}
-									aria-current={Active ? "page" : undefined}
-									class={
-										Active
-											? "bg-raw-blood px-3 py-1 font-mono text-base font-bold tracking-widest text-bone-white"
-											: "px-1 py-1 font-mono text-base tracking-widest text-zinc-dust hover:text-bone-white"
-									}
-								>
-									{Link.Label}
-								</a>
-							);
-						})
-					}
-					{
-						MenuLinks.map((Link) => (
-							<a
-								href={Link.Href}
-								aria-current={IsActive(Astro.url.pathname, Link) ? "page" : undefined}
-								class="px-1 py-1 font-mono text-base tracking-widest text-zinc-dust hover:text-bone-white"
-							>
-								{Link.Label}
-							</a>
-						))
 					}
 				</nav>
 				<button
 					id="nav-toggle"
-					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-base font-bold tracking-widest text-bone-newsprint xl:hidden"
+					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-base font-bold tracking-widest text-bone-newsprint"
 					aria-expanded="false"
 					aria-controls="nav-menu"
 				>
 					MENU
 				</button>
 			</nav>
-			<div id="nav-menu" class="hidden border-t border-oxblood-dark bg-soot-black xl:hidden">
+			<div id="nav-menu" class="hidden border-t border-oxblood-dark bg-soot-black">
 				<!-- Tree menu: the registry read as two levels - the PRIMARY group
 				     (the bar entries) then MORE (the rest), each as a grid of
 				     cells so the order follows the registry. The group labels
