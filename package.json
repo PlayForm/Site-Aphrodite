@@ -25,7 +25,8 @@
 	},
 	"scripts": {
 		"Run": "astro dev --host",
-		"prepublishOnly": "astro build"
+		"Docs": "node Scripts/Docs.ts",
+		"prepublishOnly": "pnpm Docs && astro build"
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "3.7.4",

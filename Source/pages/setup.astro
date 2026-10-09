@@ -3,75 +3,162 @@ import Base from "@Layout/Base.astro";
 ---
 
 <Base
-	Title="Setup - Aphrodite"
-	Description="Install Aphrodite for Hermes Agent: the plugin flow with bash download.sh, the Cargo flow, or build from source."
+	Title="SETUP // APHRODITE"
+	Description="Install Aphrodite for Hermes Agent: the plugin flow with bash download.sh, the Cargo flow, or build from source. TOML-driven configuration."
 >
-	<main class="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-6 py-16">
-		<header class="flex flex-col gap-4">
-			<h1 class="text-4xl font-semibold tracking-tight">Setup</h1>
-			<p class="max-w-3xl text-lg text-neutral-600">
+	<main
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-16 sm:px-8 lg:gap-32 lg:px-14 lg:py-28"
+	>
+		<header class="relative flex w-full flex-col items-start">
+			<div
+				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				SETUP // BINARY ACQUISITION
+			</div>
+			<h1
+				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
+			>
+				Setup
+			</h1>
+			<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
 				Aphrodite ships as a Hermes Agent plugin (recommended) or a standalone Chat
 				Completions proxy. Binaries are never shipped in the repository and
-				<code class="font-mono text-sm">register()</code> never downloads - run the explicit
-				setup step to fetch the binary and dylib from GitHub Releases into
-				<code class="font-mono text-sm">~/.hermes/aphrodite/</code>, with SHA-256
-				verification.
+				<code class="font-mono text-xs text-weathered-teal">register()</code> never downloads -
+				run the explicit setup step to fetch the binary and dylib from GitHub Releases into
+				<code class="font-mono text-xs text-weathered-teal">~/.hermes/aphrodite/</code>, with
+				SHA-256 verification.
 			</p>
 		</header>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">Option A: Hermes plugin</h2>
-			<pre
-				class="max-w-3xl overflow-x-auto rounded-lg border border-neutral-300 bg-neutral-100 p-4 font-mono text-sm"><code>git clone https://github.com/PlayForm/Aphrodite-Hermes.git
-cd Aphrodite-Hermes
-ln -s "$(pwd)" ~/.hermes/plugins/aphrodite
-bash download.sh
-cd ..
-hermes plugins enable aphrodite
-hermes</code></pre>
-			<p class="max-w-3xl text-sm text-neutral-600">
-				<code class="font-mono text-sm">bash download.sh</code> (or
-				<code class="font-mono text-sm">pwsh ./download.ps1</code> on Windows) fetches the
-				binary and dylib from GitHub Releases and verifies them against SHA-256 checksums.
-			</p>
+		<!-- OPTION A: HERMES PLUGIN -->
+		<section class="relative w-full lg:w-9/12 lg:self-start">
+			<div
+				class="zine-box-crimson relative -rotate-[2.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div
+					class="absolute -top-3.5 left-6 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+				>
+					#A // HERMES PLUGIN (RECOMMENDED)
+				</div>
+				<div class="mb-3 mt-2 flex flex-wrap items-center justify-between gap-2">
+					<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+						Clone, link, download, enable
+					</h2>
+					<span class="text-xs text-zinc-dust">6 STEPS</span>
+				</div>
+				<div
+					class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust"
+				>
+					<div>$ git clone https://github.com/PlayForm/Aphrodite-Hermes.git</div>
+					<div>$ cd Aphrodite-Hermes</div>
+					<div>$ ln -s "$(pwd)" ~/.hermes/plugins/aphrodite</div>
+					<div class="opacity-70">$ bash download.sh <span class="opacity-40">// or: pwsh ./download.ps1 (Windows)</span></div>
+					<div class="opacity-40">$ cd ..</div>
+					<div class="text-bone-white">$ hermes plugins enable aphrodite</div>
+					<div class="opacity-70">$ hermes</div>
+				</div>
+				<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
+					<div class="mb-1 text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+						OUTCOME // VERIFIED INSTALL:
+					</div>
+					<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-xs font-bold text-bone-white">
+						Binary + dylib fetched from GitHub Releases, SHA-256 verified, plugin enabled.
+					</div>
+				</div>
+			</div>
 		</section>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">Option B: Cargo</h2>
-			<pre
-				class="max-w-3xl overflow-x-auto rounded-lg border border-neutral-300 bg-neutral-100 p-4 font-mono text-sm"><code>cargo install aphrodite        # proxy binary
-cargo install aphrodite-hermes # dylib + helper bin
-aphrodite setup                # runtime home under ~/.hermes/aphrodite + hooks-only loader</code></pre>
+		<!-- OPTION B: CARGO -->
+		<section class="relative w-full lg:w-7/12 lg:self-end lg:-mt-12">
+			<div
+				class="zine-box-crimson relative rotate-[2.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div
+					class="absolute -top-3.5 right-6 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+				>
+					#B // CARGO
+				</div>
+				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+					Crates.io install
+				</h2>
+				<div class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust">
+					<div>$ cargo install aphrodite <span class="opacity-40">// proxy binary</span></div>
+					<div>$ cargo install aphrodite-hermes <span class="opacity-40">// dylib + helper bin</span></div>
+					<div class="text-bone-white">$ aphrodite setup</div>
+					<div class="opacity-70">// runtime home under ~/.hermes/aphrodite + hooks-only loader</div>
+				</div>
+			</div>
 		</section>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">Option C: from source</h2>
-			<pre
-				class="max-w-3xl overflow-x-auto rounded-lg border border-neutral-300 bg-neutral-100 p-4 font-mono text-sm"><code>git clone https://github.com/PlayForm/Aphrodite.git
-cd Aphrodite
-git submodule update --init --recursive
-cargo build --release -p aphrodite -p aphrodite-hermes</code></pre>
+		<!-- OPTION C: FROM SOURCE -->
+		<section class="relative w-full lg:w-8/12 lg:self-start">
+			<div
+				class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div
+					class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+				>
+					#C // FROM SOURCE
+				</div>
+				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+					Build it yourself
+				</h2>
+				<div class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust">
+					<div>$ git clone https://github.com/PlayForm/Aphrodite.git</div>
+					<div>$ cd Aphrodite</div>
+					<div>$ git submodule update --init --recursive</div>
+					<div class="text-bone-white">$ cargo build --release -p aphrodite -p aphrodite-hermes</div>
+				</div>
+			</div>
 		</section>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">Configuration</h2>
-			<p class="max-w-3xl text-neutral-600">
-				Aphrodite is TOML-driven. It reads <code class="font-mono text-sm">./aphrodite.toml</code>
-				first, then <code class="font-mono text-sm">~/.hermes/aphrodite/aphrodite.toml</code>;
-	environment variables override TOML, TOML overrides defaults. Auto-reload is opt-in
-	(<code class="font-mono text-sm">compression.auto_reload</code>). The template lives at
-				<code class="font-mono text-sm">aphrodite.toml.example</code> in the repository.
-			</p>
-			<p class="max-w-3xl text-sm text-neutral-600">
-				Injected context is hard-capped per turn (<code class="font-mono text-sm"
-					>flow.budget_chars</code
-				>, default 2600). Keys not yet wired into the runtime are annotated
-				DOCUMENTED BUT UNWIRED in the example file - the example is the source of truth.
-			</p>
+		<!-- CONFIG TOML MODULE -->
+		<section class="relative w-full lg:w-6/12 lg:self-end lg:-mt-10">
+			<div
+				class="zine-box-crimson relative -rotate-[2.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div
+					class="absolute -top-3.5 right-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+				>
+					/CONFIG.TOML
+				</div>
+				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+					Configuration
+				</h2>
+				<div class="space-y-1 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] text-bone-newsprint">
+					<div class="text-weathered-teal"># resolution order:</div>
+					<div>./aphrodite.toml <span class="text-zinc-dust">then</span> ~/.hermes/aphrodite/aphrodite.toml</div>
+					<div class="pt-2 text-weathered-teal"># precedence:</div>
+					<div>env var <span class="text-zinc-dust">&gt;</span> TOML <span class="text-zinc-dust">&gt;</span> default</div>
+					<div class="pt-2 text-weathered-teal">[compression]</div>
+					<div>auto_reload = <span class="text-stamped-canary">false</span> <span class="text-zinc-dust"># opt-in</span></div>
+					<div class="pt-2 text-weathered-teal">[flow]</div>
+					<div>budget_chars = <span class="text-stamped-canary">2600</span> <span class="text-zinc-dust"># hard cap per turn</span></div>
+				</div>
+				<div class="mt-4 flex items-center justify-between border-t border-oxblood-dark pt-2 text-[11px] text-zinc-dust">
+					<span>TEMPLATE IN THE REPO:</span>
+					<span class="font-bold text-stamped-canary">aphrodite.toml.example</span>
+				</div>
+				<p class="mt-2 font-body text-xs leading-relaxed text-zinc-dust">
+					Keys not yet wired into the runtime are annotated DOCUMENTED BUT UNWIRED in the
+					example file - the example is the source of truth.
+				</p>
+			</div>
 		</section>
+
+		<!-- FOOTER -->
+		<footer
+			class="flex flex-col items-center justify-between gap-4 border-t-2 border-oxblood-dark pb-6 pt-12 text-xs text-zinc-dust sm:flex-row"
+		>
+			<div class="flex items-center gap-2">
+				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
+				<span class="font-bold tracking-widest text-bone-white uppercase">APHRODITE CCR CORE</span>
+			</div>
+			<div class="flex items-center gap-4">
+				<a class="transition-colors hover:text-bone-white" href="/">OVERVIEW</a>
+				<a class="transition-colors hover:text-bone-white" href="/crates/">CRATES</a>
+				<span class="font-bold text-stamped-canary">CC0-1.0</span>
+			</div>
+		</footer>
 	</main>
-
-	<footer class="border-t border-neutral-200 px-6 py-8 text-sm text-neutral-500">
-		Aphrodite - CC0-1.0, public domain. Built by PlayForm.
-	</footer>
 </Base>

@@ -1,0 +1,85 @@
+---
+import Base from "@Layout/Base.astro";
+
+import { getCollection, render } from "astro:content";
+
+// One page per generated docs entry; the root entry (id "index") builds /docs/.
+export async function getStaticPaths() {
+	const Docs = await getCollection("Docs");
+
+	return Docs.map((Doc) => ({
+		params: { slug: Doc.id === "index" ? undefined : Doc.id },
+		props: { Doc },
+	}));
+}
+
+const { Doc } = Astro.props;
+
+const { Content } = await render(Doc);
+
+const Sections = [
+	...(
+		await getCollection("Docs")
+	)
+		.sort((A, B) => A.id.localeCompare(B.id))
+		.reduce((Groups, Page) => {
+			Groups.set(
+				Page.data.section,
+				[
+					...(Groups.get(Page.data.section) ?? []),
+					{ Id: Page.id, Title: Page.data.title },
+				],
+			);
+
+			return Groups;
+		}, new Map<string, { Id: string; Title: string }[]>() as Map<string, { Id: string; Title: string }[]>)
+		.entries(),
+]
+	.sort(([A], [B]) =>
+		A === "Overview" ? -1 : B === "Overview" ? 1 : A.localeCompare(B),
+	)
+	.map(([Name, Entries]) => ({ Entries, Name }));
+---
+
+<Base
+	Title={`${Doc.data.title} - Aphrodite`}
+	Description={`Aphrodite documentation - ${Doc.data.section}.`}
+>
+	<main class="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-6 py-16">
+		<p class="text-sm text-neutral-500">
+			<a class="underline" href="/docs/">Docs</a>
+			<span> / </span>
+			{Doc.data.section}
+		</p>
+
+		<nav
+			aria-label="Documentation"
+			class="grid w-full gap-x-8 gap-y-6 text-sm sm:grid-cols-2 lg:grid-cols-4"
+		>
+			{
+				Sections.map(({ Name, Entries }) => (
+					<div class="flex flex-col gap-1">
+						<p class="font-semibold text-neutral-900">{Name}</p>
+						{Entries.map((Entry) => (
+							<a
+								class={
+									Entry.Id === Doc.id
+										? "text-neutral-900 underline"
+										: "text-neutral-600 hover:text-neutral-900"
+								}
+								href={Entry.Id === "index" ? "/docs/" : `/docs/${Entry.Id}/`}
+								aria-current={Entry.Id === Doc.id ? "page" : undefined}
+							>
+								{Entry.Title}
+							</a>
+						))}
+					</div>
+				))
+			}
+		</nav>
+
+		<article class="prose prose-neutral max-w-3xl">
+			<Content />
+		</article>
+	</main>
+</Base>

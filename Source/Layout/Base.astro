@@ -4,17 +4,30 @@ import "@Stylesheet/Base.css";
 import { Head } from "astro-capo";
 import { ClientRouter } from "astro:transitions";
 
-// TODO Place your title and description here
 const { Title = "Aphrodite", Description = "" } = Astro.props;
+
+const DescriptionText =
+	Description || "CCR compression proxy + absorptive preview pipeline for Hermes Agent.";
 
 interface Props {
 	Title?: string;
 	Description?: string;
 }
+
+// Synthesized site header: the Stitch reference is single-page and headerless;
+// this bar follows the DeepSeek Base header mechanics re-skinned in the zine
+// tokens (soot-black bar, oxblood rule, JBM uppercase links).
+const Links = [
+	{ Href: "/", Label: "OVERVIEW" },
+	{ Href: "/setup/", Label: "SETUP" },
+	{ Href: "/crates/", Label: "CRATES" },
+	{ Href: "/versions/", Label: "VERSIONS" },
+	{ Href: "/benchmarks/", Label: "BENCHMARKS" },
+];
 ---
 
 <!doctype html>
-<html lang="en" class="no-js" dir="ltr">
+<html lang="en" class="no-js dark" dir="ltr">
 	<Head>
 		<script>
 			document.documentElement.classList.remove("no-js");
@@ -25,25 +38,49 @@ interface Props {
 		<title>{Title}</title>
 		<meta charset="utf-8" />
 
-		<meta name="description" content={Description} />
+		<meta name="description" content={DescriptionText} />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<!-- TODO Define your color theme in hex here -->
-		<meta name="theme-color" content="" />
+		<meta name="theme-color" content="#09090b" />
 		<meta name="format-detection" content="telephone=no" />
 		<meta name="twitter:dnt" content="on" />
 
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={Title} />
+		<meta property="og:description" content={DescriptionText} />
+		<meta property="og:image" content="/Brand/OG.png" />
+
+		<!-- Structured data -->
+		<script is:inline type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "SoftwareApplication",
+				"name": "Aphrodite",
+				"applicationCategory": "DeveloperApplication",
+				"operatingSystem": "Linux, macOS, Windows",
+				"offers": { "@type": "Offer", "price": "0" },
+				"license": "https://spdx.org/licenses/CC0-1.0.html",
+				"description": "CCR compression proxy + absorptive preview pipeline for Hermes Agent."
+			}
+		</script>
+
 		<!-- Links -->
 		<link
-			rel="preconnect"
-			href="https://fonts.googleapis.com"
+			rel="preload"
+			href="/Font/space-grotesk-latin.woff2"
+			as="font"
+			type="font/woff2"
 			crossorigin
 		/>
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
-			rel="manifest"
-			href="/Manifest.json"
-			crossorigin="use-credentials"
+			rel="preload"
+			href="/Font/jetbrains-mono-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
 		/>
+		<link rel="preload" href="/Font/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="manifest" href="/Manifest.json" crossorigin="use-credentials" />
 
 		<style is:global>
 			@import "@Stylesheet/Global.css";
@@ -56,12 +93,137 @@ interface Props {
 		<link rel="apple-touch-icon" href="/Brand/aphrodite-120.png" />
 		<ClientRouter />
 	</Head>
-	<body>
-		<div class="grow">
+	<body class="relative min-h-screen overflow-x-hidden">
+		<!-- SVG grunge noise filter (texture layer 3) -->
+		<svg aria-hidden="true" class="hidden">
+			<defs>
+				<filter height="100%" id="grunge-noise" width="100%" x="0%" y="0%">
+					<feTurbulence
+						baseFrequency="0.82"
+						numOctaves="4"
+						result="noise"
+						stitchTiles="stitch"
+						type="fractalNoise"></feTurbulence>
+					<feColorMatrix
+						result="coloredNoise"
+						type="matrix"
+						values="0 0 0 0 0.1   0 0 0 0 0.1   0 0 0 0 0.1   0 0 0 0.18 0"></feColorMatrix>
+					<feBlend in="SourceGraphic" in2="coloredNoise" mode="multiply"></feBlend>
+				</filter>
+			</defs>
+		</svg>
+
+		<!-- Ambient photocopy screen, halftone screen and grunge overlays -->
+		<div class="photocopy-grit pointer-events-none fixed inset-0 z-0 opacity-40"></div>
+		<div class="halftone-screen pointer-events-none fixed inset-0 z-0 opacity-30"></div>
+		<div
+			class="pointer-events-none fixed inset-0 z-0 opacity-60 mix-blend-overlay"
+			style="filter: url(#grunge-noise);"
+		>
+		</div>
+
+		<!-- Site header (synthesized, zine skin) -->
+		<header class="sticky top-0 z-40 w-full border-b-2 border-oxblood-dark bg-soot-black/95">
+			<nav class="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-3 sm:px-8">
+				<a class="flex items-center gap-2" href="/">
+					<img class="h-5 w-5" src="/Brand/aphrodite-32.png" alt="" width="20" height="20" />
+					<span class="font-mono text-[11px] font-bold tracking-widest text-bone-white"
+						>APHRODITE</span
+					>
+				</a>
+				<div class="hidden items-center gap-4 md:flex">
+					{
+						Links.map(({ Href, Label }) => {
+							const Current = Href === "/" ? "/" : Href;
+							const Active =
+								Current === "/"
+									? Astro.url.pathname === "/"
+									: Astro.url.pathname.startsWith(Current);
+							return (
+								<a
+									href={Href}
+									aria-current={Active ? "page" : undefined}
+									class={
+										Active
+											? "bg-raw-blood px-3 py-1 font-mono text-[11px] font-bold tracking-widest text-bone-white"
+											: "px-1 py-1 font-mono text-[11px] tracking-widest text-zinc-dust hover:text-bone-white"
+									}
+								>
+									{Label}
+								</a>
+							);
+						})
+					}
+				</div>
+				<button
+					id="nav-toggle"
+					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] font-bold tracking-widest text-bone-newsprint md:hidden"
+					aria-expanded="false"
+					aria-controls="nav-menu"
+				>
+					MENU
+				</button>
+			</nav>
+			<div id="nav-menu" class="hidden border-t border-oxblood-dark bg-soot-black md:hidden">
+				<div class="flex flex-col px-5 py-2">
+					{
+						Links.map(({ Href, Label }) => (
+							<a
+								href={Href}
+								class="border-b border-oxblood-dark/50 py-2 font-mono text-[11px] tracking-widest text-bone-newsprint"
+							>
+								{Label}
+							</a>
+						))
+					}
+				</div>
+			</div>
+		</header>
+
+		<div class="relative z-10 flex grow flex-col">
 			<slot />
 		</div>
+
+		<!-- Copy runtime: any [data-copy] element copies its value and shows the toast stamp -->
+		<div
+			id="copy-toast"
+			class="pointer-events-none fixed bottom-4 right-4 z-50 hidden border-2 border-black bg-raw-blood px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+		>
+			COPIED TO SPOOL
+		</div>
 		<script>
-			import "@Script/Firebase";
+			function BindCopy() {
+				for (const Element of document.querySelectorAll("[data-copy]")) {
+					if (Element.dataset.copyBound) {
+						continue;
+					}
+
+					Element.dataset.copyBound = "1";
+					Element.addEventListener("click", async () => {
+						await navigator.clipboard.writeText(Element.dataset["copy"] ?? "");
+
+						const Toast = document.getElementById("copy-toast");
+
+						if (Toast) {
+							Toast.classList.remove("hidden");
+							setTimeout(() => Toast.classList.add("hidden"), 1500);
+						}
+					});
+				}
+			}
+
+			BindCopy();
+			document.addEventListener("astro:page-load", BindCopy);
+
+			const Toggle = document.getElementById("nav-toggle");
+			const Menu = document.getElementById("nav-menu");
+
+			Toggle?.addEventListener("click", () => {
+				const Open = !Menu?.classList.contains("hidden");
+
+				Menu?.classList.toggle("hidden");
+				Toggle.setAttribute("aria-expanded", String(!Open));
+			});
 		</script>
 	</body>
 </html>

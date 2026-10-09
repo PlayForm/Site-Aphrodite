@@ -7,36 +7,38 @@ export default {
 		"./Source/**/*.{astro,js,jsx,ts,tsx,vue,svelte}",
 	],
 
-	darkMode: "media",
+	darkMode: "class",
 
 	theme: {
 		container: {
 			center: true,
 		},
 		extend: {
-			transitionTimingFunction: {
-				apple: "cubic-bezier(0.21, 0.1, 0.21, 1)",
+			colors: {
+				// Zine workbench tokens, single source: Source/Stylesheet/Global.css
+				// :root custom properties (dark-only design).
+				"soot-black": "var(--soot-black)",
+				"carbon-void": "var(--carbon-void)",
+				"asphalt-panel": "var(--asphalt-panel)",
+				"asphalt-panel-dark": "var(--asphalt-panel-dark)",
+				"oxblood-dark": "var(--oxblood-dark)",
+				"blood-crimson": "var(--blood-crimson)",
+				"raw-blood": "var(--raw-blood)",
+				"bone-newsprint": "var(--bone-newsprint)",
+				"bone-white": "var(--bone-white)",
+				"stamped-canary": "var(--stamped-canary)",
+				"weathered-teal": "var(--weathered-teal)",
+				"zinc-dust": "var(--zinc-dust)",
+				"outline-oxblood": "var(--outline-oxblood)",
 			},
 			fontFamily: {
-				sans: ["Albert Sans", ...fontFamily.sans],
-			},
-			typography: {
-				DEFAULT: {
-					css: {
-						a: {
-							"font-weight": "400",
-						},
-					},
-				},
-			},
-			colors: {
-				backgroundLight: "var(--background-light)",
-				backgroundDark: "var(--background-dark)",
+				headline: ["Space Grotesk", "sans-serif"],
+				mono: ["JetBrains Mono", "monospace"],
+				body: ["DM Sans", "sans-serif"],
+				sans: ["DM Sans", ...fontFamily.sans],
 			},
 		},
 	},
-
-	variants: {},
 
 	plugins: [
 		require("@tailwindcss/forms"),

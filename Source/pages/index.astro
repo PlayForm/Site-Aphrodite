@@ -3,119 +3,426 @@ import Base from "@Layout/Base.astro";
 ---
 
 <Base
-	Title="Aphrodite - CCR compression proxy for Hermes Agent"
+	Title="APHRODITE // CCR COMPRESSION ENGINE"
 	Description="CCR compression proxy + absorptive preview pipeline for Hermes Agent. Up to 610x compression on the standard corpus (132x overall), ~10 ms end-to-end. One binary. Zero dependencies."
 >
-	<main class="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-16 px-6 py-16">
-		<section class="flex flex-col gap-6">
-			<h1 class="text-4xl font-semibold tracking-tight sm:text-6xl">Aphrodite</h1>
-			<p class="max-w-3xl text-lg text-neutral-600">
-				CCR compression proxy + absorptive preview pipeline for Hermes Agent.
-				Up to 610&times; compression on the standard corpus (132&times; overall),
-				~10&nbsp;ms end-to-end, type-aware classifier, TOML-driven, opt-in config
-				auto-reload.
+	<main
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-28 px-5 py-16 sm:px-8 lg:gap-40 lg:px-14 lg:py-28"
+	>
+		<!-- HERO SLAB -->
+		<header class="relative flex w-full flex-col items-center justify-center pt-4 text-center">
+			<!-- Brand card: aphrodite.png in the crimson module, oxblood offset underlay -->
+			<div
+				class="group relative mb-8 -rotate-[2.5deg] cursor-pointer transition-transform duration-300 hover:rotate-0"
+			>
+				<div
+					class="pointer-events-none absolute -inset-2 translate-x-3 translate-y-3 border border-black bg-oxblood-dark opacity-80"
+				>
+				</div>
+				<div class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-5 sm:p-7">
+					<div
+						class="tape-strip absolute -top-3.5 left-1/2 -translate-x-1/2 -rotate-1 border-b border-t border-bone-newsprint/30 px-6 py-1 text-[9px] font-black uppercase tracking-widest text-bone-newsprint"
+					>
+						// REPRO_PROOF #001
+					</div>
+					<img
+						class="h-32 w-auto sm:h-44"
+						src="/Brand/aphrodite.png"
+						alt="Aphrodite brand mark"
+						width="160"
+						height="160"
+					/>
+					<div
+						class="absolute -bottom-3.5 -right-3 border border-black bg-raw-blood px-2.5 py-0.5 text-[10px] font-black tracking-widest text-bone-white shadow"
+					>
+						CCR CORE // STENCIL
+					</div>
+				</div>
+			</div>
+			<!-- Stamped wordmark -->
+			<div class="relative flex flex-col items-center">
+				<h1
+					class="select-none font-headline text-[72px] font-black uppercase leading-[0.85] tracking-tighter text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-[108px] lg:text-[144px]"
+				>
+					Aphrodite
+				</h1>
+				<div
+					class="mb-5 mt-2 h-2 w-full max-w-xl -rotate-1 border border-black bg-raw-blood shadow-[3px_3px_0px_#000]"
+				>
+				</div>
+			</div>
+			<p class="max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint sm:text-base">
+				CCR compression proxy + absorptive preview pipeline for Hermes Agent. Up to 610&times;
+				compression on the standard corpus (132&times; overall), ~10&nbsp;ms end-to-end,
+				type-aware classifier, TOML-driven, opt-in config auto-reload.
 			</p>
-			<p class="text-lg font-medium">One binary. Zero dependencies. Millions of tokens saved.</p>
-			<nav class="flex flex-wrap gap-3 text-sm">
-				<a class="rounded-lg border border-neutral-300 bg-neutral-100 px-4 py-2" href="/setup/"
-					>Setup</a
+			<p class="mt-2 font-mono text-xs font-bold uppercase tracking-widest text-zinc-dust">
+				One binary. Zero dependencies. Millions of tokens saved.
+			</p>
+			<!-- Rotated stat badges -->
+			<div class="mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-3 sm:gap-4">
+				<span
+					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000] sm:text-sm"
 				>
-				<a class="rounded-lg border border-neutral-300 bg-neutral-100 px-4 py-2" href="/crates/"
-					>Crates</a
+					610&times; COMPRESSION
+				</span>
+				<span
+					class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000] sm:text-sm"
 				>
+					132&times; OVERALL
+				</span>
+				<span
+					class="rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000] sm:text-sm"
+				>
+					~10MS E2E OVERHEAD
+				</span>
+				<span
+					class="-rotate-1 border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-soot-black shadow-[4px_4px_0px_#000] sm:text-sm"
+				>
+					156M+ TOKENS SAVED
+				</span>
+			</div>
+			<!-- Raw technical stamps -->
+			<div class="mt-6 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+				<span
+					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-zinc-dust"
+				>
+					v1.6.6
+				</span>
 				<a
-					class="rounded-lg border border-neutral-300 bg-neutral-100 px-4 py-2"
-					href="/versions/"
-					>Versions</a
+					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] uppercase text-bone-newsprint transition-colors hover:bg-blood-crimson"
+					href="https://crates.io/crates/aphrodite"
+					target="_blank"
+					rel="noopener"
 				>
-			</nav>
+					CRATES.IO
+				</a>
+				<a
+					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] uppercase text-bone-newsprint transition-colors hover:bg-blood-crimson"
+					href="https://github.com/PlayForm/Aphrodite"
+					target="_blank"
+					rel="noopener"
+				>
+					GITHUB
+				</a>
+				<span
+					class="border border-weathered-teal/40 bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-weathered-teal"
+				>
+					HERMES PLUGIN v2.2.6
+				</span>
+				<span
+					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-zinc-dust"
+				>
+					RUST 1.88+
+				</span>
+				<span
+					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-zinc-dust"
+				>
+					CC0-1.0
+				</span>
+			</div>
+		</header>
+
+		<!-- PROBLEM MODULE -->
+		<section class="relative flex w-full flex-col items-center">
+			<div
+				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				THE PROBLEM // CONTEXT FLOOD
+			</div>
+			<div
+				class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<h2 class="mb-4 font-headline text-xl font-black uppercase tracking-tight text-bone-white">
+					The agent spends its budget reading noise
+				</h2>
+				<div class="space-y-3 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p>
+						Every file read, build, code search, or browser open floods the agent's context
+						with raw output - compilation logs, accessibility trees, JSON blobs. The agent
+						spends its budget reading noise instead of reasoning.
+					</p>
+					<p>
+						Aphrodite intercepts output before it reaches the LLM and replaces it with a
+						compact, structured preview. The agent sees ~15 tokens of metadata instead of
+						hundreds - and retrieves the full content only when it actually needs it.
+					</p>
+				</div>
+			</div>
 		</section>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">The problem</h2>
-			<p class="max-w-3xl text-neutral-600">
-				Every file read, build, code search, or browser open floods the agent's context with
-				raw output - compilation logs, accessibility trees, JSON blobs. The agent spends its
-				budget reading noise instead of reasoning.
-			</p>
-			<p class="max-w-3xl text-neutral-600">
-				Aphrodite intercepts output before it reaches the LLM and replaces it with a compact,
-				structured preview. The agent sees ~15 tokens of metadata instead of hundreds - and
-				retrieves the full content only when it actually needs it.
-			</p>
+		<!-- PIPELINE // 4-STAGE ABSORPTION -->
+		<section class="relative w-full">
+			<div
+				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				PIPELINE // 4-STAGE ABSORPTION
+			</div>
+			<div class="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+				<!-- Stage 01 -->
+				<div
+					class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.8deg] lg:-translate-y-2"
+				>
+					<div
+						class="absolute -top-2.5 left-4 border border-zinc-dust/40 bg-zinc-dust/20 px-2 py-0.5 text-[9px] font-bold uppercase text-bone-newsprint"
+					>
+						STAGE // A
+					</div>
+					<div class="mb-3 mt-1 flex items-center justify-between">
+						<span class="text-xs font-bold tracking-wider text-weathered-teal">01 // CLASSIFY</span>
+						<span
+							class="border border-weathered-teal/30 bg-weathered-teal/10 px-2 py-0.5 text-[10px] font-black text-weathered-teal"
+						>
+							SIMD BYTE
+						</span>
+					</div>
+					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">
+						40 - 123 ns
+					</div>
+					<div class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] text-zinc-dust">
+						Type-aware classifier names the content.
+					</div>
+				</div>
+				<!-- Stage 02 -->
+				<div
+					class="zine-box-canary relative border-[3px] border-stamped-canary/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[2.2deg] lg:translate-y-4"
+				>
+					<div
+						class="absolute -top-2.5 left-4 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+					>
+						STAGE // B
+					</div>
+					<div class="mb-3 mt-1 flex items-center justify-between">
+						<span class="text-xs font-bold tracking-wider text-stamped-canary">
+							02 // ENRICH &amp; PREVIEW
+						</span>
+						<span
+							class="border border-stamped-canary/30 bg-stamped-canary/10 px-2 py-0.5 text-[10px] font-black text-stamped-canary"
+						>
+							TYPE-AWARE
+						</span>
+					</div>
+					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">~1 ms</div>
+					<div class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] text-stamped-canary">
+						Enriched, type-aware preview rendering.
+					</div>
+				</div>
+				<!-- Stage 03 -->
+				<div
+					class="zine-box-crimson relative border-[3px] border-raw-blood bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg]"
+				>
+					<div
+						class="absolute -top-2.5 left-4 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
+					>
+						STAGE // C
+					</div>
+					<div class="mb-3 mt-1 flex items-center justify-between">
+						<span class="text-xs font-bold tracking-wider text-raw-blood">03 // BLAKE3 STORE</span>
+						<span class="border border-raw-blood/40 bg-raw-blood/10 px-2 py-0.5 text-[10px] font-black text-raw-blood">
+							DUAL TIER
+						</span>
+					</div>
+					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">SQLite</div>
+					<div class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] text-zinc-dust">
+						CCR marker: &lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;
+					</div>
+				</div>
+				<!-- Stage 04 -->
+				<div
+					class="zine-box-subtle relative border-[3px] border-zinc-dust/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[2.5deg] lg:translate-y-3"
+				>
+					<div
+						class="absolute -top-2.5 left-4 border border-black bg-bone-newsprint px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+					>
+						STAGE // D
+					</div>
+					<div class="mb-3 mt-1 flex items-center justify-between">
+						<span class="text-xs font-bold tracking-wider text-bone-newsprint">
+							04 // AGENT DECIDES
+						</span>
+						<span class="border border-bone-newsprint/30 bg-bone-newsprint/10 px-2 py-0.5 text-[10px] font-black text-bone-newsprint">
+							ON DEMAND
+						</span>
+					</div>
+					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">
+						aphrodite_retrieve
+					</div>
+					<div class="mt-4 truncate border-t border-oxblood-dark pt-3 text-[11px] text-weathered-teal">
+						Full content only when needed.
+					</div>
+				</div>
+			</div>
 		</section>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">The pipeline</h2>
-			<ol class="flex max-w-3xl flex-col gap-3 text-neutral-600">
-				<li>
-					<strong>1. Classify.</strong> A type-aware classifier names the content (build
-					output, diff, JSON, browser snapshot...). Classification alone takes 40-123&nbsp;ns.
-				</li>
-				<li><strong>2. Preview.</strong> An enriched, type-aware preview is rendered.</li>
-				<li>
-					<strong>3. Store.</strong> Full content lands in CCR storage (BLAKE3, SQLite or
-					in-memory) behind a
-					<code class="font-mono text-sm">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</code> marker.
-				</li>
-				<li>
-					<strong>4. Decide.</strong> The agent retrieves only when needed, via
-					<code class="font-mono text-sm">aphrodite_retrieve(hash)</code>.
-				</li>
-			</ol>
-			<p class="max-w-3xl text-neutral-600">
-				Aphrodite reaches the agent two ways: as a native Hermes plugin with hook-level
-				interception (no API round-trip), or as a reverse proxy for any OpenAI-compatible
-				client, compressing Chat Completions responses through CCR with a tool relay.
-			</p>
+		<!-- TELEMETRY MODULE -->
+		<section class="relative my-6 w-full rotate-[0.6deg] transition-transform duration-300 hover:rotate-0">
+			<div
+				class="absolute -top-4 right-10 z-20 border border-black bg-stamped-canary px-4 py-1 text-[11px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+			>
+				TELEMETRY // 200 RUN HARVEST
+			</div>
+			<div
+				class="zine-box-crimson relative overflow-hidden border-4 border-blood-crimson bg-carbon-void p-6 sm:p-10 lg:p-12"
+			>
+				<div
+					class="flex flex-col items-start justify-between gap-6 border-b-2 border-oxblood-dark pb-8 lg:flex-row lg:items-end"
+				>
+					<div>
+						<div class="text-[11px] font-black uppercase tracking-widest text-raw-blood">
+							EMPIRICAL LEDGER
+						</div>
+						<h2
+							class="mt-1 font-headline text-3xl font-black uppercase tracking-tight text-bone-white sm:text-4xl lg:text-5xl"
+						>
+							Aggregate deflection
+						</h2>
+					</div>
+					<div
+						class="zine-box-subtle w-full border-[3px] border-raw-blood bg-soot-black p-5 text-left sm:p-6 lg:w-auto lg:text-right"
+					>
+						<div class="text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+							TOKENS SAVED FROM INGESTION
+						</div>
+						<div
+							class="font-headline text-4xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-6xl lg:text-7xl"
+						>
+							156,342,817
+						</div>
+						<div class="mt-1 flex flex-wrap items-center gap-3 text-xs font-bold lg:justify-end">
+							<span class="text-stamped-canary">26.9% TOTAL BUDGET DEFLECTED</span>
+							<span class="text-zinc-dust">&bull;</span>
+							<span class="text-weathered-teal">22,921 MEDIAN PER CALL</span>
+						</div>
+					</div>
+				</div>
+				<div class="mt-8 space-y-4">
+					<div class="mb-2 text-xs font-bold uppercase tracking-wider text-zinc-dust">
+						RATIO BY OUTPUT CLASS (PER-TYPE COMPRESSION):
+					</div>
+					<!-- Browser snapshot -->
+					<div>
+						<div class="mb-1 flex justify-between text-xs font-bold">
+							<span class="text-bone-newsprint">BROWSER SNAPSHOT</span>
+							<span class="text-weathered-teal">416&times;</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-weathered-teal" style="width: 98%;"></div>
+							<div class="h-full bg-raw-blood" style="width: 2%;"></div>
+						</div>
+					</div>
+					<!-- Build output -->
+					<div>
+						<div class="mb-1 flex justify-between text-xs font-bold">
+							<span class="text-bone-newsprint">BUILD OUTPUT</span>
+							<span class="text-raw-blood">140&times;</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-raw-blood" style="width: 93%;"></div>
+							<div class="h-full bg-stamped-canary" style="width: 7%;"></div>
+						</div>
+					</div>
+					<!-- JSON -->
+					<div>
+						<div class="mb-1 flex justify-between text-xs font-bold">
+							<span class="text-bone-newsprint">JSON</span>
+							<span class="text-stamped-canary">40&times;</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-stamped-canary" style="width: 86%;"></div>
+							<div class="h-full bg-asphalt-panel" style="width: 14%;"></div>
+						</div>
+					</div>
+					<!-- Git diff -->
+					<div>
+						<div class="mb-1 flex justify-between text-xs font-bold">
+							<span class="text-bone-newsprint">GIT DIFF</span>
+							<span class="text-raw-blood">23&times;</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-raw-blood" style="width: 58%;"></div>
+							<div class="h-full bg-asphalt-panel" style="width: 42%;"></div>
+						</div>
+					</div>
+					<!-- Terminal -->
+					<div>
+						<div class="mb-1 flex justify-between text-xs font-bold">
+							<span class="text-bone-newsprint">TERMINAL</span>
+							<span class="text-stamped-canary">20&times;</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-stamped-canary" style="width: 55%;"></div>
+							<div class="h-full bg-asphalt-panel" style="width: 45%;"></div>
+						</div>
+					</div>
+				</div>
+				<p class="mt-8 border-t border-oxblood-dark pt-4 text-[11px] leading-relaxed text-zinc-dust">
+					MEASURED, SEP 2026: 200 HERMES SESSIONS, 6,843 API CALLS (SEP 18-20). TOKENS WITH
+					MARKERS 424,959,588 / EXPANDED 581,302,405 / SAVED 156,342,817 (26.9%). 183 OF 200
+					SESSIONS SAVED; MEDIAN SESSION RATIO 22.9%; TOOL-HEAVY 20-25%, PURE-TOOL 76-82%.
+					THE EXACT PERCENTAGE IS A BAND: ~24-33% ACROSS A 3.0-4.5 CHARS/TOKEN SENSITIVITY
+					RANGE, CENTERED ~27%.
+				</p>
+			</div>
 		</section>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">The numbers</h2>
-			<table class="max-w-2xl text-sm">
-				<thead>
-					<tr class="border-b border-neutral-300 text-left">
-						<th class="py-2 pr-6 font-medium">Content type</th>
-						<th class="py-2 font-medium">Compression</th>
-					</tr>
-				</thead>
-				<tbody class="text-neutral-600">
-					<tr><td class="py-1.5 pr-6">Browser snapshot</td><td class="py-1.5">416&times;</td></tr>
-					<tr><td class="py-1.5 pr-6">Build output</td><td class="py-1.5">140&times;</td></tr>
-					<tr><td class="py-1.5 pr-6">JSON</td><td class="py-1.5">40&times;</td></tr>
-					<tr><td class="py-1.5 pr-6">Git diff</td><td class="py-1.5">23&times;</td></tr>
-					<tr><td class="py-1.5 pr-6">Terminal</td><td class="py-1.5">20&times;</td></tr>
-					<tr class="border-t border-neutral-300">
-						<td class="py-1.5 pr-6 font-medium text-neutral-900">Median</td>
-						<td class="py-1.5 font-medium text-neutral-900">23&times; fewer tokens on tool output</td>
-					</tr>
-				</tbody>
-			</table>
-			<p class="max-w-3xl text-sm text-neutral-600">
-				Measured in the real world across 200 Hermes sessions (6,843 API calls,
-				Sep&nbsp;18-20, 2026): 156,342,817 tokens saved of 581,302,405 expanded - 26.9%
-				(the exact percentage is a band: ~24-33% across a 3.0-4.5 chars/token sensitivity
-				range, centered ~27%). 183 of 200 sessions saved; tool-heavy workloads scale to
-				20-25%, pure-tool to 76-82%.
-			</p>
+		<!-- INSTALL // RUNTIME HARNESS -->
+		<section class="relative w-full">
+			<div
+				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				INSTALL // HERMES PLUGIN
+			</div>
+			<div
+				class="zine-box-crimson w-full -rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+					<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+						Runtime harness
+					</h2>
+					<span class="text-[11px] font-bold text-weathered-teal">
+						:9797 [CACHE] &bull; :9798 [TOKEN]
+					</span>
+				</div>
+				<div class="mb-4 space-y-1 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] text-bone-newsprint">
+					<div class="text-zinc-dust">$ git clone https://github.com/PlayForm/Aphrodite-Hermes.git</div>
+					<div class="text-zinc-dust">$ cd Aphrodite-Hermes</div>
+					<div class="text-zinc-dust">$ bash download.sh</div>
+					<div class="text-stamped-canary">[INIT] binary + dylib fetched from GitHub Releases</div>
+					<div class="text-weathered-teal">[INIT] SHA-256 verified into ~/.hermes/aphrodite/</div>
+					<div class="text-bone-white">$ hermes plugins enable aphrodite</div>
+				</div>
+				<div
+					class="flex flex-col items-stretch justify-between gap-3 border-2 border-oxblood-dark bg-asphalt-panel p-4 sm:flex-row sm:items-center"
+				>
+					<div class="text-xs font-bold text-zinc-dust">COPY THE FULL SETUP SEQUENCE:</div>
+					<button
+						class="border border-black bg-raw-blood px-4 py-2 font-mono text-xs font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+						data-copy={"git clone https://github.com/PlayForm/Aphrodite-Hermes.git\ncd Aphrodite-Hermes\nln -s \"$(pwd)\" ~/.hermes/plugins/aphrodite\nbash download.sh\ncd ..\nhermes plugins enable aphrodite"}
+					>
+						COPY
+					</button>
+				</div>
+				<div class="mt-4 flex items-center justify-between border-t border-oxblood-dark pt-2 text-[11px] text-zinc-dust">
+					<span>FULL INSTRUCTIONS ON THE</span>
+					<a class="font-bold text-stamped-canary" href="/setup/">SETUP PAGE</a>
+				</div>
+			</div>
 		</section>
 
-		<section class="flex flex-col gap-4">
-			<h2 class="text-2xl font-semibold tracking-tight">Install</h2>
-			<p class="max-w-3xl text-neutral-600">
-				The recommended path is the Hermes plugin; the proxy binary also installs
-				standalone via Cargo. Full instructions on the
-				<a class="underline" href="/setup/">setup page</a>.
-			</p>
-			<pre
-				class="max-w-3xl overflow-x-auto rounded-lg border border-neutral-300 bg-neutral-100 p-4 font-mono text-sm"><code>git clone https://github.com/PlayForm/Aphrodite-Hermes.git
-cd Aphrodite-Hermes
-bash download.sh
-hermes plugins enable aphrodite</code></pre>
-		</section>
+		<!-- FOOTER -->
+		<footer
+			class="flex flex-col items-center justify-between gap-4 border-t-2 border-oxblood-dark pb-6 pt-12 text-xs text-zinc-dust sm:flex-row"
+		>
+			<div class="flex items-center gap-2">
+				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
+				<span class="font-bold tracking-widest text-bone-white uppercase">APHRODITE CCR CORE</span>
+			</div>
+			<div class="flex items-center gap-4">
+				<a class="transition-colors hover:text-bone-white" href="/setup/">SETUP</a>
+				<a class="transition-colors hover:text-bone-white" href="/crates/">CRATES</a>
+				<a class="transition-colors hover:text-bone-white" href="/versions/">VERSIONS</a>
+				<span class="font-bold text-stamped-canary">CC0-1.0</span>
+			</div>
+		</footer>
 	</main>
-
-	<footer class="border-t border-neutral-200 px-6 py-8 text-sm text-neutral-500">
-		Aphrodite - CC0-1.0, public domain. Built by PlayForm.
-	</footer>
 </Base>
