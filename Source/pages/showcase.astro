@@ -2,6 +2,9 @@
 import Base from "@Layout/Base.astro";
 import ZineTape from "@Component/ZineTape.astro";
 import ZinePreview from "@Component/ZinePreview.astro";
+import ZineFlow from "@Component/ZineFlow.astro";
+import ZineToggle from "@Component/ZineToggle.astro";
+import ZineAnatomy from "@Component/ZineAnatomy.astro";
 import Examples from "../Content/Showcase/Examples.json";
 
 // ---- The bank, typed at the annotation (the Astro compiler's frontmatter
@@ -269,6 +272,337 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 					</article>
 				);
 			})}
+		</section>
+
+		<!-- THE TRAVERSALS: the interactive flows, agent view vs system path -->
+		<section class="relative flex w-full flex-col gap-28 lg:gap-36">
+			<div class="w-full">
+				<div
+					class="mb-6 -rotate-1 border border-black bg-stamped-canary px-3 py-1 text-[11px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+				>
+					THE TRAVERSALS // AGENT-VIEW vs SYSTEM-PATH, STEP BY STEP
+				</div>
+				<p class="max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+					The five pipelines above are worked examples; these are the pipes they run
+					through. Each traversal steps through its hook or endpoint with two
+					synchronized panes - what the agent sees, what the system does - and every
+					step carries its source anchor. Press PLAY to watch one run.
+				</p>
+			</div>
+
+			<!-- Traversal A: tool-output compression -->
+			<div class="w-full lg:w-11/12 lg:self-start">
+				<ZineFlow
+					Title="TRAVERSAL A // TRANSFORM_TOOL_RESULT"
+					Complete="COMPRESSED · RETRIEVABLE"
+					Steps={[
+						{
+							Title: "THE RESULT ARRIVES",
+							Agent: "the full tool output, still raw, on its way into the transcript",
+							System: "telemetry first: status, error type/message, arguments and duration recorded into the tool-event ring (feeds the error-loop and phase detectors). Empty results are skipped here.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:69-75",
+						},
+						{
+							Title: "FILE REFERENCES TRACKED",
+							Agent: "nothing changes yet - the output is untouched",
+							System: "read_file and search_files results are recorded for aphrodite_files and the recall catalog BEFORE the skip gates, so they feed the catalog even when never compressed.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:92-94",
+						},
+						{
+							Title: "THE SKIP GATES",
+							Agent: "essential tools stay raw: skill_view, skills_list, skill_manage, memory, session_search, read_file, read_terminal",
+							System: "gates in order: empty result; essential set; Aphrodite's own tools and headroom helpers (compressing aphrodite_retrieve would replace resolved content with another marker); below the tool threshold (default 4,096 chars, 0 disables the gate). Raw stays raw when it matters.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:76-84",
+						},
+						{
+							Title: "CLASSIFY",
+							Agent: "the output now has a name - and the name decides everything downstream",
+							System: "the content-type detector assigns a type; generic text/log/plain results get a semantic upgrade (git status, ls, test, grep) so the preview carries high-signal shape.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:85-88",
+						},
+						{
+							Title: "THRESHOLD + EMA",
+							Agent: "invisible - the agent never tunes this by hand",
+							System: "the per-type threshold (EMA auto-tuned by what past turns saved) decides compress vs. pass-through; env overrides TOML overrides the default.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:139-146",
+						},
+						{
+							Title: "STORE",
+							Agent: "still just the output - but the receipt is being written",
+							System: "the content is hashed (BLAKE3) and stored in the inline store; the marker's hash is the address of the original bytes, taken over the ORIGINAL, never a wrapper's extracted view (the v1.3.2 losslessness law).",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/CHANGELOG.md",
+							AnchorLabel: "CHANGELOG v1.3.2",
+						},
+						{
+							Title: "THE SWAP",
+							Agent: "the tool output is now a preview line plus a marker - roughly fifteen tokens",
+							System: "Hermes swaps the tool output for the marker; the transcript carries hash, type, size instead of the bytes.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:89-91",
+						},
+						{
+							Title: "DECIDE / RETRIEVE",
+							Agent: "the agent - not the engine - spends the budget: call aphrodite_retrieve only if the preview did not answer the question",
+							System: "retrieval returns the exact original bytes, byte-exact by construction; the loop closes with nothing lost.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/api/retrieve.md",
+							AnchorLabel: "retrieve.md",
+						},
+					]}
+				/>
+			</div>
+
+			<!-- Traversal B: terminal transform -->
+			<div class="w-full lg:w-10/12 lg:self-end">
+				<ZineFlow
+					Title="TRAVERSAL B // TRANSFORM_TERMINAL_OUTPUT"
+					Complete="TERMINAL HANDLED"
+					Steps={[
+						{
+							Title: "THE OUTPUT ARRIVES",
+							Agent: "the terminal's stdout and its exit code, as one blob",
+							System: "telemetry: the command and return code are recorded; a non-zero exit code marks the event as a failure and feeds the error-loop detector.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:98-101",
+						},
+						{
+							Title: "CHAIN SPLIT FIRST",
+							Agent: "if pre_tool_call marked the segments, each one is about to get its own receipt",
+							System: "when chain splitting is enabled and the output carries the segment markers, each segment is compressed into its own marker - unconditional, BEFORE the threshold gate, so marked output never leaks raw. Per-segment error hints merge into previews.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:102-106",
+						},
+						{
+							Title: "THE THRESHOLD GATE",
+							Agent: "short output stays exactly as it was",
+							System: "unmarked output below the terminal threshold (default 1,024 characters; 0 disables the gate) passes through untouched.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:107-108",
+						},
+						{
+							Title: "CLASSIFY",
+							Agent: "a failed run is named terminal - the type keeps errors visible longest",
+							System: "output containing 'exit code:' or 'Error:' is typed terminal; other output gets the normal content-type detection with the same semantic upgrade as tool results.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:109-111",
+						},
+						{
+							Title: "STORE + THE NUDGE LOOP",
+							Agent: "next turn opens with a nudge, not a surprise",
+							System: "above-threshold content is hashed, stored, and replaced by a marker; the failure recorded in step 1 surfaces as a poll-worker status nudge at the next pre_llm_call.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:111-112,114-121",
+						},
+					]}
+				/>
+			</div>
+
+			<!-- Traversal C: retrieval round-trip -->
+			<div class="w-full lg:w-10/12 lg:self-start">
+				<ZineFlow
+					Title="TRAVERSAL C // THE RETRIEVAL ROUND-TRIP"
+					Complete="BYTE-EXACT"
+					Steps={[
+						{
+							Title: "THE CALL",
+							Agent: "the agent hands back the marker it kept - or just the hash",
+							System: "the hash argument is normalized before lookup: a type/size marker-body suffix and surrounding whitespace are stripped, so a hash echoed back in full marker form still resolves.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/api/retrieve.md",
+							AnchorLabel: "retrieve.md:41-43",
+						},
+						{
+							Title: "LOOKUP",
+							Agent: "one answer either way: found or not",
+							System: "the inline store is checked first, then the CCR backend; the success path always reports source 'ccr' regardless of which store served the content. No zstd decompression happens on this path - content is stored and returned verbatim as UTF-8 strings.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/api/retrieve.md",
+							AnchorLabel: "retrieve.md:196-212",
+						},
+						{
+							Title: "PAGINATION",
+							Agent: "a window, or the whole thing",
+							System: "limit 0 requests the FULL document with no cap - the round-trip contract; any explicit limit, including one above 10,000, is clamped to a 10,000-line server cap. A windowed result carries a lines a-b/total header and truncated: true, so a caller can tell truncated from genuinely short.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/api/retrieve.md",
+							AnchorLabel: "retrieve.md:184-192",
+						},
+						{
+							Title: "BYTE-EXACT",
+							Agent: "the original bytes return unchanged - a trailing newline included",
+							System: "a full-document retrieval returns the exact original bytes: the lossy lines/join round-trip is skipped entirely, and the body hashes back to the marker's own hash. The losslessness law, verified per call.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/api/retrieve.md",
+							AnchorLabel: "retrieve.md:184-188",
+						},
+					]}
+				/>
+			</div>
+
+			<!-- Traversal G: the proxy lane -->
+			<div class="w-full lg:w-11/12 lg:self-end">
+				<ZineFlow
+					Title="TRAVERSAL G // THE PROXY LANE"
+					Complete="COMPRESSED OR PASSED THROUGH"
+					Steps={[
+						{
+							Title: "POST /V1/CHAT/COMPLETIONS",
+							Agent: "an ordinary OpenAI-compatible client - no Aphrodite plugin required",
+							System: "the request cache is checked first (cache_key_from_body; skipped when stream is true) - a hit returns early with X-Aphrodite-Cache: HIT.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/architecture/02-chat-compression.md",
+							AnchorLabel: "02-chat-compression.md",
+						},
+						{
+							Title: "UPSTREAM",
+							Agent: "the request is forwarded unchanged",
+							System: "forwarded with at most 3 connection retries; the response comes back with headers and body.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/architecture/02-chat-compression.md",
+							AnchorLabel: "02-chat-compression.md",
+						},
+						{
+							Title: "SSE BYPASS",
+							Agent: "a streaming answer streams, untouched",
+							System: "a text/event-stream content-type passes through as a raw stream - NO compression on the SSE path. Long-running streams are never killed mid-answer by the compressor.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/architecture/02-chat-compression.md",
+							AnchorLabel: "02-chat-compression.md",
+						},
+						{
+							Title: "COMPRESS EACH MESSAGE.CONTENT",
+							Agent: "large assistant/tool text comes back as preview + marker",
+							System: "each choice.message.content (string) is classified, its threshold is threshold_for(type).max(base) scaled by the x-headroom-budget multiplier (clamped 0.50..1.0); over-threshold content is BLAKE3-hashed, deduped via ccr_get, stored, and swapped for the marker; the ratio feeds the EMA.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/architecture/02-chat-compression.md",
+							AnchorLabel: "02-chat-compression.md",
+						},
+						{
+							Title: "TOOL_CALLS NEVER",
+							Agent: "the client's tool calls keep working - always",
+							System: "the loop reads message.content only: tool_calls[].function.arguments is client-executable JSON, not model-facing prose, and is never compressed. The v1.3.2 fix - before it, every OpenAI-tools client broke through the proxy.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/CHANGELOG.md",
+							AnchorLabel: "CHANGELOG v1.3.2",
+						},
+						{
+							Title: "TWO PIPELINES, SHARED WIRES",
+							Agent: "same marker format, whichever lane compressed it",
+							System: "the proxy path never calls the staged transform pipeline (transforms::detect, stage2, struct_extract) - those run only on the Hermes hook path. The two pipelines share the BLAKE3 compute_key and the marker wire format, but nothing else.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/architecture/02-chat-compression.md",
+							AnchorLabel: "02-chat-compression.md",
+						},
+					]}
+				/>
+			</div>
+
+			<!-- Traversal H: chain split -->
+			<div class="w-full lg:w-10/12 lg:self-start">
+				<ZineFlow
+					Title="TRAVERSAL H // THE CHAIN SPLIT"
+					Complete="SEGMENTED"
+					Steps={[
+						{
+							Title: "THE PENDING CALL",
+							Agent: "the agent asks for one compound command: cd x && cargo build && cargo test",
+							System: "pre_tool_call fires before the tool executes and may rewrite the pending call.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:59-65",
+						},
+						{
+							Title: "FEATURE CHECK",
+							Agent: "off by default - opt-in only",
+							System: "chain splitting is enabled by APHRODITE_CHAIN_SPLIT=1 or chain_split = true (default off), and only when the command has at least chain_split_min_segments segments.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:63-65",
+						},
+						{
+							Title: "THE REWRITE",
+							Agent: "the command looks the same - the markers are invisible",
+							System: "pre_tool_call rewrites the chained command with invisible segment markers; the rewrite is what lets the output be split later.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:63-64",
+						},
+						{
+							Title: "PER-SEGMENT MARKERS",
+							Agent: "several compact previews instead of one large blob",
+							System: "transform_terminal_output compresses each segment into its own CCR marker, unconditionally and before the threshold gate; per-segment error hints merge into the previews.",
+							Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+							AnchorLabel: "hooks.md:102-106",
+						},
+					]}
+				/>
+			</div>
+
+			<!-- The truthful context engine pane -->
+			<div class="w-full lg:w-10/12 lg:self-end">
+				<div
+					class="zine-box-crimson relative -rotate-[0.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-10"
+				>
+					<div
+						class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					>
+						THE CONTEXT ENGINE // WHAT IT DOES NOT DO
+					</div>
+					<h3 class="mt-4 font-headline text-xl font-black uppercase text-bone-white sm:text-2xl">
+						Compress returns the transcript unchanged
+					</h3>
+					<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+						The registered engine is opt-in (<code class="font-mono text-xs text-weathered-teal">APHRODITE_CONTEXT_ENGINE=1</code>;
+						the TOML key defaults true) and requires Hermes &gt;= 0.20.2 - the first
+						release with <code class="font-mono text-xs text-weathered-teal">pre_tool_call</code> modify.
+						What it does: records token usage from each response. What it never does:
+						<code class="font-mono text-xs text-weathered-teal">should_compress</code> always
+						returns false (it defers to Hermes' own accounting), and
+						<code class="font-mono text-xs text-weathered-teal">compress</code> returns the
+						transcript unchanged - non-destructive, because the transform hooks already
+						shrank the tool output. It never forces a compaction, never rewrites
+						messages, and never touches the inline store.
+					</p>
+					<div class="mt-6 font-mono text-[10px] text-zinc-dust">
+						SRC: docs/plugin/context-engine.md:38-48
+					</div>
+				</div>
+			</div>
+
+			<!-- The prefetch refusal hero -->
+			<div class="w-full lg:w-10/12 lg:self-start">
+				<div
+					class="zine-box-crimson relative rotate-[0.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-10"
+				>
+					<div
+						class="absolute -top-3.5 right-6 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					>
+						THE PREFETCH REFUSAL // v1.6.6
+					</div>
+					<h3 class="mt-4 font-headline text-xl font-black uppercase text-bone-white sm:text-2xl">
+						Some paths are never read
+					</h3>
+					<p class="mt-6 font-body text-sm leading-relaxed text-bone-newsprint">
+						<code class="font-mono text-xs text-weathered-teal">aphrodite_prefetch</code>
+						would happily warm the store from any path - so the guard names the paths
+						that must never be read and refuses them outright:
+					</p>
+					<div class="mt-8 max-w-2xl">
+						<ZineToggle
+							Left="THE REQUEST"
+							Right="THE ANSWER"
+							LeftLabel="WHAT THE AGENT ASKS FOR"
+							RightLabel="WHAT THE SYSTEM RETURNS"
+							LeftPane={".env<br />auth.json<br />~/.ssh<br />the Hermes home<br />any non-file path"}
+							RightPane={"ReadOutcome::Refused<br />refuse_reason: &quot;...&quot;<br /><br />the file is not opened, not hashed,<br />not stored - the prefetch returns<br />a refusal instead of the content"}
+						/>
+					</div>
+					<p class="mt-8 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+						The same release hardened setup the same way: the Hermes-home plugin
+						directory is report-only - no symlink removal, no writes, no deletes - and
+						the dylib arm refuses installs when the in-tree checksums are missing.
+					</p>
+					<div class="mt-6 font-mono text-[10px] text-zinc-dust">
+						SRC: CHANGELOG.md:3-37 (v1.6.6) · the Aphrodite/v1.6.6 release note
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- HOW THIS PAGE IS BUILT -->
+		<section class="relative w-full">
+			<ZineAnatomy />
 		</section>
 
 		<!-- CROSS-LINKS -->

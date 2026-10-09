@@ -85,8 +85,9 @@ interface Props {
 		<slot name="Head" />
 
 		<!-- Favicon -->
+		<link rel="icon" href="/Brand/favicon.svg" type="image/svg+xml" sizes="any" />
 		<link rel="icon" href="/Brand/aphrodite-32.png" type="image/png" sizes="32x32" />
-		<link rel="apple-touch-icon" href="/Brand/aphrodite-120.png" />
+		<link rel="apple-touch-icon" href="/Brand/aphrodite-180.png" />
 		<ClientRouter />
 	</Head>
 	<body class="relative min-h-screen overflow-x-hidden">
@@ -120,14 +121,14 @@ interface Props {
 
 		<!-- Site header (synthesized, zine skin) -->
 		<header class="sticky top-0 z-40 w-full border-b-2 border-oxblood-dark bg-soot-black/95">
-			<nav class="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-3 sm:px-8">
+			<nav aria-label="Site" class="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-3 sm:px-8">
 				<a class="flex items-center gap-2" href="/">
 					<img class="h-5 w-5" src="/Brand/aphrodite-32.png" alt="" width="20" height="20" />
 					<span class="font-mono text-[11px] font-bold tracking-widest text-bone-white"
 						>APHRODITE</span
 					>
 				</a>
-				<div class="hidden items-center gap-3 lg:flex xl:hidden">
+				<nav aria-label="Primary" class="hidden items-center gap-3 lg:flex xl:hidden">
 					{
 						PrimaryLinks.map((Link) => {
 							const Active = IsActive(Astro.url.pathname, Link);
@@ -146,8 +147,8 @@ interface Props {
 							);
 						})
 					}
-				</div>
-				<div class="hidden items-center gap-3 xl:flex">
+				</nav>
+				<nav aria-label="Full" class="hidden items-center gap-3 xl:flex">
 					{
 						PrimaryLinks.map((Link) => {
 							const Active = IsActive(Astro.url.pathname, Link);
@@ -177,7 +178,7 @@ interface Props {
 							</a>
 						))
 					}
-				</div>
+				</nav>
 				<button
 					id="nav-toggle"
 					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] font-bold tracking-widest text-bone-newsprint xl:hidden"
@@ -193,6 +194,7 @@ interface Props {
 						AllLinks.map((Link) => (
 							<a
 								href={Link.Href}
+								aria-current={IsActive(Astro.url.pathname, Link) ? "page" : undefined}
 								class="border-b border-oxblood-dark/50 py-2 font-mono text-[11px] tracking-widest text-bone-newsprint"
 							>
 								{Link.Label}
@@ -247,6 +249,8 @@ interface Props {
 		<!-- Copy runtime: any [data-copy] element copies its value and shows the toast stamp -->
 		<div
 			id="copy-toast"
+			role="status"
+			aria-live="polite"
 			class="pointer-events-none fixed bottom-4 right-4 z-50 hidden border-2 border-black bg-raw-blood px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 		>
 			COPIED TO SPOOL
@@ -275,15 +279,38 @@ interface Props {
 			BindCopy();
 			document.addEventListener("astro:page-load", BindCopy);
 
-			const Toggle = document.getElementById("nav-toggle");
-			const Menu = document.getElementById("nav-menu");
+			// The hamburger: same rebind pattern as the copy runtime - the
+			// view-transitions router swaps the body, so the binding re-runs on
+			// each astro:page-load under a bound guard. Escape closes the menu
+			// (and hands focus back to the toggle) when it is open.
+			function BindToggle() {
+				const Toggle = document.getElementById("nav-toggle") as HTMLButtonElement | null;
+				const Menu = document.getElementById("nav-menu");
 
-			Toggle?.addEventListener("click", () => {
-				const Open = !Menu?.classList.contains("hidden");
+				if (!Toggle || !Menu || Toggle.dataset.toggleBound) {
+					return;
+				}
 
-				Menu?.classList.toggle("hidden");
-				Toggle.setAttribute("aria-expanded", String(!Open));
-			});
+				Toggle.dataset.toggleBound = "1";
+
+				Toggle.addEventListener("click", () => {
+					const Open = Menu.classList.contains("hidden");
+
+					Menu.classList.toggle("hidden");
+					Toggle.setAttribute("aria-expanded", String(Open));
+				});
+
+				document.addEventListener("keydown", (Event) => {
+					if (Event.key === "Escape" && !Menu.classList.contains("hidden")) {
+						Menu.classList.add("hidden");
+						Toggle.setAttribute("aria-expanded", "false");
+						Toggle.focus();
+					}
+				});
+			}
+
+			BindToggle();
+			document.addEventListener("astro:page-load", BindToggle);
 		</script>
 	</body>
 </html>

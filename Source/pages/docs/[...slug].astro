@@ -310,7 +310,13 @@ const Purposes = new Map(
 	</div>
 
 	<!-- Mobile drawer: the sidebar in a fixed overlay above everything -->
-	<div id="docs-drawer" class="fixed inset-0 z-50 hidden lg:hidden" role="dialog" aria-modal="true">
+	<div
+		id="docs-drawer"
+		class="fixed inset-0 z-50 hidden lg:hidden"
+		role="dialog"
+		aria-modal="true"
+		aria-label="Documentation index"
+	>
 		<div class="absolute inset-0 bg-soot-black/90" data-drawer-close></div>
 		<div
 			class="absolute inset-y-0 left-0 w-80 max-w-[85vw] overflow-y-auto border-r-4 border-blood-crimson bg-carbon-void p-6"
@@ -535,13 +541,23 @@ const Purposes = new Map(
 			return;
 		}
 
-		Toggle.dataset.drawerBound = "1";
+	// Focus management: opening moves focus into the drawer (the CLOSE button),
+	// closing hands it back to the toggle that opened it.
+	Toggle.dataset.drawerBound = "1";
 
-		const Set = (Open) => {
-			Drawer.classList.toggle("hidden", !Open);
-			Toggle.setAttribute("aria-expanded", String(Open));
-			document.documentElement.classList.toggle("overflow-hidden", Open);
-		};
+	const Closer = Drawer.querySelector<HTMLButtonElement>("button[data-drawer-close]");
+
+	const Set = (Open: boolean) => {
+		Drawer.classList.toggle("hidden", !Open);
+		Toggle.setAttribute("aria-expanded", String(Open));
+		document.documentElement.classList.toggle("overflow-hidden", Open);
+
+		if (Open) {
+			Closer?.focus();
+		} else {
+			Toggle.focus();
+		}
+	};
 
 		Toggle.addEventListener("click", () => Set(Drawer.classList.contains("hidden")));
 
@@ -550,7 +566,7 @@ const Purposes = new Map(
 		}
 
 		document.addEventListener("keydown", (Event) => {
-			if (Event.key === "Escape") {
+			if (Event.key === "Escape" && !Drawer.classList.contains("hidden")) {
 				Set(false);
 			}
 		});

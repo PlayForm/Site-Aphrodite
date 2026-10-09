@@ -1,0 +1,43 @@
+---
+/**
+ * ZineCompose - the component-composition guide: how the Zine* primitives
+ * stack into a page module. Each row is one component, its Props surface,
+ * and what it encodes in the grammar. Pages embed this next to ZineAnatomy
+ * when they want the reader to see the machinery.
+ */
+interface Props {
+	Title?: string;
+}
+
+const { Title = "THE COMPOSITION // FROM PRIMITIVES TO A MODULE" } = Astro.props;
+
+const Parts: { Name: string; Props: string; Encodes: string }[] = [
+	{ Name: "ZineBox", Props: "Tone: crimson/subtle/canary/teal - Rotate", Encodes: "the module plate: 4px border + hard offset shadow; the Tone sets the misregistration color" },
+	{ Name: "ZineTape", Props: "Label - Color: raw/canary/teal/bone - Side", Encodes: "the section label pasted across the top edge; Color sets the voice (raw = section, canary = highlight, teal = mechanical)" },
+	{ Name: "ZineStream", Props: "Lines[] with Tone: plain/dim/fade/mute/result/canary/teal", Encodes: "the raw terminal flow; the suppression opacities are the product's core idea, rendered literally" },
+	{ Name: "ZinePreview", Props: "Label - Result - Hash - Color", Encodes: "the absorptive pane: what the LLM sees after compression; Hash carries the CCR anchor" },
+	{ Name: "ZineStatBar", Props: "Label - Ratio - Percent - Color - Fill: static/scroll", Encodes: "the monument: a ratio as a filled bar; Fill=scroll snaps it in hard steps on viewport entry" },
+	{ Name: "ZineButton", Props: "Label - Copy - Href", Encodes: "the only primary action: raw-blood block, press collapses the shadow" },
+	{ Name: "ZineStamp", Props: "Label - Color: raw/canary/bone - Rotate", Encodes: "the verdict, stamped; use sparingly - one stamp per argument" },
+	{ Name: "ZineTape + ZineBox + ZineStream + ZinePreview", Props: "composed", Encodes: "the standard page module: tape names it, the stream shows the raw, the preview shows the compressed result - see ZineExample for the pre-assembled form" },
+];
+---
+
+<div class="zine-box-subtle border-[3px] border-oxblood-dark bg-carbon-void p-5 sm:p-6">
+	<div class="mb-4 font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+		{Title}
+	</div>
+	<ul class="divide-y divide-oxblood-dark/60">
+		{
+			Parts.map(({ Name, Props, Encodes }) => (
+				<li class="grid gap-1 py-3 pl-3 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] sm:gap-4">
+					<div class="font-mono text-xs font-bold text-bone-white">
+						<span class="text-raw-blood">▸</span> {Name}
+						<div class="mt-0.5 font-mono text-[10px] font-normal text-weathered-teal">{Props}</div>
+					</div>
+					<p class="font-body text-sm leading-relaxed text-bone-newsprint">{Encodes}</p>
+				</li>
+			))
+		}
+	</ul>
+</div>

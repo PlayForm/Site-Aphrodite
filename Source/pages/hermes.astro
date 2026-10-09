@@ -1,5 +1,7 @@
 ---
 import Base from "@Layout/Base.astro";
+
+import Related from "@Component/Related.astro";
 import SessionLifecycle from "../Content/Mermaid/session-lifecycle.svg?raw";
 
 const Previews = [
@@ -209,21 +211,14 @@ const ProxyRows = [
 			</div>
 		</section>
 
-		<!-- FOOTER -->
-		<footer
-			class="flex flex-col items-center justify-between gap-12 border-t-2 border-oxblood-dark pb-12 pt-32 text-xs text-zinc-dust sm:flex-row"
-		>
-			<div class="flex items-center gap-4">
-				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
-				<span class="font-bold tracking-widest text-bone-white uppercase">APHRODITE CCR CORE</span>
-			</div>
-			<div class="flex items-center gap-8">
-				<a class="transition-colors hover:text-bone-white" href="/plugin/">PLUGIN</a>
-				<a class="transition-colors hover:text-bone-white" href="/hooks/">HOOKS</a>
-				<a class="transition-colors hover:text-bone-white" href="/tools/">TOOLS</a>
-				<a class="transition-colors hover:text-bone-white" href="/flavors/">FLAVORS</a>
-				<span class="font-bold text-stamped-canary">CC0-1.0</span>
-			</div>
-		</footer>
+		<!-- RELATED: the natural neighbors -->
+		<Related
+			Links={[
+				{ Href: "/plugin/", Label: "PLUGIN" },
+				{ Href: "/hooks/", Label: "HOOKS" },
+				{ Href: "/flavors/", Label: "FLAVORS" },
+				{ Href: "/setup/", Label: "SETUP" },
+			]}
+		/>
 	</main>
 </Base>

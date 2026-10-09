@@ -1,4 +1,4 @@
-import { readFile, rm } from "node:fs/promises";
+import { readFile, rm, stat } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -11,13 +11,27 @@ import Write from "./Write.ts";
 // The site root (two levels up from Scripts/Docs/).
 const Root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
-// The documentation source in the Aphrodite repository, next to the Site.
-const Source = resolve(Root, "..", "docs");
+// The documentation source in the Aphrodite repository, next to the Site,
+// overridable for testing the hermetic fallback.
+const Source = process.env.DOCS_SOURCE
+	? resolve(process.env.DOCS_SOURCE)
+	: resolve(Root, "..", "docs");
 
 // The generated content collection the /docs routes build from.
 const Target = resolve(Root, "Source", "Content", "Docs");
 
 export default async (): Promise<void> => {
+	// Hermetic fallback: when the root docs source is absent (e.g. the
+	// deployed Site repository), the committed generated content in
+	// Source/Content/Docs/ is used as-is.
+	try {
+		await stat(Source);
+	} catch {
+		console.log("Docs: source not found, using committed Source/Content/Docs");
+
+		return;
+	}
+
 	await rm(Target, { force: true, recursive: true });
 
 	const Files = await Collect(Source);

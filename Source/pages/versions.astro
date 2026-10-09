@@ -3,6 +3,95 @@ import Base from "@Layout/Base.astro";
 
 import Breadcrumbs from "@Component/Breadcrumbs.astro";
 import Related from "@Component/Related.astro";
+
+// THE TIMELINE TAPE - one tape strip per release stamp, from the first public
+// architecture (v0.7.0) to the current pairing (v1.6.6 <-> v2.2.6). Every
+// "what landed" line traces to CHANGELOG.md's release header; every release
+// link is the GitHub release note. The 1.2.2 (first crates.io publish) and
+// 1.4.6 (chain-split CCR + the first plugin-first release) stamps get the
+// enlarged perforation treatment.
+const Tape = [
+	{
+		Ver: "v0.7.0",
+		Date: "2026-06-17",
+		Pair: "PLUGIN: PYTHON ERA (PRE-2.0)",
+		Landed: "Atomization + live containers: the Python plugin split into 29 nested modules; terminal output streams instead of blocking.",
+		Tag: "THE FIRST ARCHITECTURE",
+		Enlarged: false,
+	},
+	{
+		Ver: "v1.2.2",
+		Date: "2026-07-13",
+		Pair: "PLUGIN v2.0.6",
+		Landed: "First crates.io publish: aphrodite-headroom-core 0.1.1 -> aphrodite 1.2.2 -> aphrodite-hermes 1.2.2; classification re-measured at 40-123 ns.",
+		Tag: "FIRST CRATES.IO",
+		Enlarged: true,
+	},
+	{
+		Ver: "v1.3.2 -> v1.3.4",
+		Date: "2026-07-14",
+		Pair: "PLUGIN v2.0.x",
+		Landed: "Rust maturity: the losslessness sweep (hash the ORIGINAL, never the wrapper) and the lossy-arguments fix; then high-intelligibility previews at 132× overall.",
+		Tag: "RUST MATURITY",
+		Enlarged: false,
+	},
+	{
+		Ver: "v1.4.6",
+		Date: "2026-09-19",
+		Pair: "PLUGIN v2.1.4",
+		Landed: "Chain-split CCR + the first plugin-first release: the plugin tagged before the parent, so BINARY_VERSION 1.4.6 points at assets that already exist.",
+		Tag: "CHAIN-SPLIT + PLUGIN-FIRST",
+		Enlarged: true,
+	},
+	{
+		Ver: "v1.5.0",
+		Date: "2026-09-20",
+		Pair: "PLUGIN v2.2.0",
+		Landed: "Edition-2024 + atomization: the flat src/*.rs promoted into per-item module trees; the aphrodite_debug tool lands.",
+		Tag: "EDITION-2024",
+		Enlarged: false,
+	},
+	{
+		Ver: "v1.5.1",
+		Date: "2026-09-21",
+		Pair: "PLUGIN v2.1.5",
+		Landed: "Headroom fork publication 0.1.3: the fork's accumulated changes finally reach crates.io, replacing the stale July 0.1.2.",
+		Tag: "FORK PUBLISHED",
+		Enlarged: false,
+	},
+	{
+		Ver: "v1.6.0",
+		Date: "2026-09-24",
+		Pair: "PLUGIN v2.2.0",
+		Landed: "Config diagnostics + opt-in auto-reload (issue #38): a broken aphrodite.toml can no longer fail silently to defaults.",
+		Tag: "DIAGNOSTICS",
+		Enlarged: false,
+	},
+	{
+		Ver: "v1.6.3",
+		Date: "2026-09-25",
+		Pair: "PLUGIN v2.2.3",
+		Landed: "One runtime home (issue #40): the shim and the Rust half resolve one shared home instead of $HERMES_HOME vs $HOME.",
+		Tag: "ONE HOME",
+		Enlarged: false,
+	},
+	{
+		Ver: "v1.6.5",
+		Date: "2026-10-05",
+		Pair: "PLUGIN v2.2.5",
+		Landed: "Checksum law: the in-tree SHA256SUMS.txt is the only checksum source of truth; a missing file, version mismatch, or missing asset entry is a hard refusal.",
+		Tag: "CHECKSUM LAW",
+		Enlarged: false,
+	},
+	{
+		Ver: "v1.6.6",
+		Date: "2026-10-07",
+		Pair: "PLUGIN v2.2.6",
+		Landed: "Path guards: aphrodite_prefetch refuses .env, auth.json, ~/.ssh, the Hermes home, and non-file paths outright; the context engine is re-described as opt-in.",
+		Tag: "CURRENT PAIRING",
+		Enlarged: false,
+	},
+] as const;
 ---
 
 <Base
@@ -124,6 +213,90 @@ import Related from "@Component/Related.astro";
 				</div>
 			</div>
 			<p class="mt-4 text-[9px] text-zinc-dust">SRC: CHANGELOG.md v1.6.6</p>
+		</section>
+
+		<!-- THE TIMELINE TAPE: one strip per release stamp -->
+		<section class="relative w-full">
+			<div
+				class="mb-10 -rotate-1 border border-black bg-stamped-canary px-3 py-1 text-[11px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+			>
+				TIMELINE TAPE // v0.7.0 -> v1.6.6
+			</div>
+			<p class="mb-20 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+				Each strip is one release stamp: the binary and the plugin version it paired,
+				the one-line "what landed", and the release note. The tape runs top to bottom
+				in release order - the enlarged perforations mark the two stamps that changed
+				the project's shape (the first crates.io publish, the chain-split CCR).
+			</p>
+			<div class="flex flex-col gap-16">
+				{
+					Tape.map(({ Ver, Date, Pair, Landed, Tag, Enlarged }) => (
+						<article
+							class={`relative flex items-stretch gap-6 ${
+								Enlarged
+									? "border-4 border-stamped-canary bg-carbon-void p-8 shadow-[6px_6px_0px_#000]"
+									: "border-2 border-oxblood-dark bg-carbon-void p-6 shadow-[4px_4px_0px_#000]"
+							} transition-transform duration-300 hover:rotate-0 ${
+								Enlarged ? "-rotate-[0.6deg]" : "rotate-[0.3deg]"
+							}`}
+						>
+							{/* Perforation spine */}
+							<div
+								aria-hidden="true"
+								class={`flex w-10 shrink-0 flex-col items-center justify-center gap-3 border-r-2 border-dashed border-oxblood-dark pr-4 ${
+									Enlarged ? "text-stamped-canary" : "text-zinc-dust"
+								}`}
+							>
+								<span class={`h-2.5 w-2.5 rounded-full bg-current ${Enlarged ? "" : "opacity-60"}`} />
+								<span class={`h-2.5 w-2.5 rounded-full bg-current ${Enlarged ? "" : "opacity-60"}`} />
+								<span class={`h-2.5 w-2.5 rounded-full bg-current ${Enlarged ? "" : "opacity-60"}`} />
+							</div>
+							<div class="flex min-w-0 flex-1 flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-8">
+								<div class="shrink-0">
+									<div class="text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+										{Date}
+									</div>
+									<div
+										class={`font-headline font-black tracking-tighter text-bone-white ${
+											Enlarged
+												? "text-4xl sm:text-5xl"
+												: "text-2xl sm:text-3xl"
+										}`}
+									>
+										{Ver}
+									</div>
+								</div>
+								<div class="min-w-0 flex-1">
+									<div class="flex flex-wrap items-center gap-3">
+										<span class="border border-black bg-raw-blood px-2 py-0.5 font-mono text-[10px] font-black uppercase tracking-widest text-bone-white">
+											{Pair}
+										</span>
+										<span
+											class={`font-mono text-[10px] font-bold uppercase tracking-widest ${
+												Enlarged ? "text-stamped-canary" : "text-weathered-teal"
+											}`}
+										>
+											{Tag}
+										</span>
+									</div>
+									<p class="mt-3 max-w-2xl font-body text-sm leading-relaxed text-bone-newsprint">
+										{Landed}
+									</p>
+								</div>
+								<a
+									class="shrink-0 border border-black bg-soot-black px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-weathered-teal shadow-[3px_3px_0px_#000] transition-colors hover:bg-raw-blood hover:text-bone-white"
+									href={`https://github.com/PlayForm/Aphrodite/releases/tag/Aphrodite%2F${Ver}`}
+								>
+									RELEASE NOTE ↗
+								</a>
+							</div>
+						</article>
+					))
+				}
+			</div>
+			<p class="mt-10 text-[9px] text-zinc-dust">
+				SRC: CHANGELOG.md release headers (v0.7.0:1101, v1.2.2:948, v1.3.2:659, v1.3.4:606, v1.5.0:200, v1.5.1:191, v1.6.0:175, v1.6.3:104, v1.6.5:39, v1.6.6:3) + the GitHub release notes (Aphrodite/v*, incl. v1.4.6's chain-split + plugin-first note)
+			</p>
 		</section>
 
 		<!-- BENCHMARKS POINTER -->

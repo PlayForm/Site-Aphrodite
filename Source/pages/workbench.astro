@@ -1,5 +1,7 @@
 ---
 import Base from "@Layout/Base.astro";
+
+import Related from "@Component/Related.astro";
 import DualListener from "../Content/Mermaid/dual-listener.svg?raw";
 import ConfigResolution from "../Content/Mermaid/config-resolution.svg?raw";
 
@@ -395,6 +397,63 @@ const Samples = [
 			</figure>
 		</section>
 
+		<!-- SIM NOTES: the benchmark arc numbers behind the sim -->
+		<section class="wb-skew border-l-4 border-stamped-canary bg-carbon-void p-8" aria-label="Benchmark notes">
+			<p class="font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+				SIM NOTES · THE MEASURED ARC
+			</p>
+			<p class="mt-4 max-w-3xl text-sm text-zinc-dust">
+				The numbers this sim gestures at are real, and they arrived in stages: the
+				benchmarks below were printed in the CHANGELOG at each release, and the sim's
+				simulation boundary is that it re-runs them in your browser.
+			</p>
+			<div class="mt-8 grid gap-6 md:grid-cols-2">
+				<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
+					<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+						v1.3.4 · STANDARD CORPUS (20 SAMPLES, 106 KB)
+					</div>
+					<div class="mt-3 font-mono text-2xl font-black text-bone-white">132× overall</div>
+					<p class="mt-2 font-mono text-[11px] text-zinc-dust">
+						3×–610× per type · 9–40 ms end-to-end · 20/20 retrieve OK · the CHANGELOG
+						entry prints the unrounded overall at 132.82
+					</p>
+				</div>
+				<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
+					<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+						v1.2.2 · REAL-WORLD EXAMPLE
+					</div>
+					<div class="mt-3 font-mono text-2xl font-black text-bone-white">216 KB → 12 markers</div>
+					<p class="mt-2 font-mono text-[11px] text-zinc-dust">
+						54K → 240 tokens · the CHANGELOG entry prints the ratio as 225
+					</p>
+				</div>
+				<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
+					<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+						v1.2.2 · CLASSIFICATION &amp; CCR STORE (APPLE M2 MAX)
+					</div>
+					<div class="mt-3 font-mono text-sm font-black text-bone-white">
+						classify 40–123 ns · put 453 ns · get 119.4 ns
+					</div>
+					<p class="mt-2 font-mono text-[11px] text-zinc-dust">
+						CCR mixed MT, 8 threads: DashMap 229 µs vs Mutex 1.15 ms
+					</p>
+				</div>
+				<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
+					<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+						WHY THE STORE LOOKS LIKE IT DOES
+					</div>
+					<div class="mt-3 font-mono text-sm font-black text-weathered-teal">5× at 8 threads</div>
+					<p class="mt-2 font-mono text-[11px] text-zinc-dust">
+						The DashMap-over-Mutex result is why the in-memory CCR backend is a sharded
+						map, not one guarded table.
+					</p>
+				</div>
+			</div>
+			<p class="mt-6 font-mono text-[10px] text-zinc-dust">
+				SRC: CHANGELOG.md:632-635 (the standard corpus entry, unrounded overall 132.82) · CHANGELOG.md:962-973 (the ns/µs table) · CHANGELOG.md:983 (216 KB → 12 markers)
+			</p>
+		</section>
+
 		<!-- Simulated-vs-real boundary note -->
 		<footer class="wb-skew border-l-4 border-weathered-teal bg-carbon-void p-6">
 			<p class="font-mono text-[10px] font-black uppercase tracking-widest text-weathered-teal">
@@ -416,6 +475,15 @@ const Samples = [
 				the per-turn context side is the injection assembler shown under the agent decision.
 			</p>
 		</footer>
+
+		<!-- RELATED: the natural neighbors -->
+		<Related
+			Links={[
+				{ Href: "/tools/", Label: "TOOLS" },
+				{ Href: "/case-study/", Label: "CASE STUDY" },
+				{ Href: "/setup/", Label: "SETUP" },
+			]}
+		/>
 	</main>
 </Base>
 

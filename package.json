@@ -26,7 +26,7 @@
   "scripts": {
     "Run": "astro dev --host",
     "Diagrams": "node Source/Content/Mermaid/Render.mjs",
-    "Docs": "node Scripts/Docs.ts",
+    "Docs": "node --experimental-strip-types Scripts/Docs.ts",
     "Drift": "node Scripts/Drift-Guard.mjs",
     "prepublishOnly": "pnpm Docs && astro build"
   },

@@ -156,7 +156,7 @@ const Example = [
 						>
 							aphrodite.toml
 						</span>
-						<span class="font-mono text-[11px] text-zinc-dust" data-editor-status>parsed</span>
+						<span class="font-mono text-[11px] text-zinc-dust" data-editor-status aria-live="polite">parsed</span>
 					</div>
 					<label class="sr-only" for="config-editor">aphrodite.toml contents</label>
 					<textarea
@@ -179,7 +179,7 @@ const Example = [
 						</span>
 						<span class="font-mono text-[11px] text-zinc-dust">env &gt; toml &gt; compiled</span>
 					</div>
-					<div class="flex-1 space-y-4 p-5" data-ladder>
+					<div class="flex-1 space-y-4 p-5" data-ladder aria-live="polite">
 						<!-- rendered client-side -->
 					</div>
 				</div>
@@ -440,6 +440,7 @@ const Example = [
 			<div class="mt-8">
 				<div
 					data-reload-out
+					aria-live="polite"
 					class="border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust"
 				>
 					<div class="opacity-40">// press SEND /RELOAD</div>
@@ -719,7 +720,14 @@ const Example = [
 	}
 
 	function Init(): void {
-		if (!Editor) return;
+		if (!Editor || Editor.dataset.editorBound) {
+			return;
+		}
+
+		// The bound guard keeps the listeners single under the astro:page-load
+		// rebinding (the view-transitions router swaps the page body).
+		Editor.dataset.editorBound = "1";
+
 		if (!InitialValue) {
 			InitialValue = Example;
 			Editor.value = Example;
@@ -738,4 +746,5 @@ const Example = [
 	}
 
 	Init();
+	document.addEventListener("astro:page-load", Init);
 </script>

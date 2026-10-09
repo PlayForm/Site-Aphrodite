@@ -1,0 +1,55 @@
+---
+/**
+ * ZineReveal - the hover-to-reveal layer: the "suppressed" surface shows a
+ * redacted/muted cover line; hovering (or focusing) lifts it to expose the
+ * raw content underneath. Mobile has no hover, so the reveal is tap-to-flip
+ * there (click toggles the class) - the same hard-offset grammar, no easing.
+ */
+interface Props {
+	/** The cover line shown while suppressed (mono, muted). */
+	Cover: string;
+
+	/** Optional small label on the cover, e.g. "SUPPRESSED". */
+	Tag?: string;
+
+	/** The raw content revealed underneath (rich). */
+	Raw: string;
+}
+
+const { Cover, Tag = "SUPPRESSED", Raw } = Astro.props;
+---
+
+<div class="group relative cursor-crosshair border border-oxblood-dark bg-soot-black" data-zine-reveal tabindex="0" aria-label={`${Tag}: hover or focus to reveal the raw content`}>
+	<div class="flex items-center justify-between gap-3 p-3 font-mono text-[12px] text-zinc-dust transition-opacity duration-150 group-hover:opacity-10 group-focus:opacity-10 group-[.revealed]:opacity-10">
+		<span class="truncate">{Cover}</span>
+		<span class="shrink-0 border border-oxblood-dark px-1.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-raw-blood">{Tag}</span>
+	</div>
+	<div
+		class="pointer-events-none absolute inset-0 flex items-center p-3 font-mono text-xs font-bold text-bone-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100 group-[.revealed]:opacity-100"
+	>
+		<div class="w-full" set:html={Raw} />
+	</div>
+	<div class="pointer-events-none absolute bottom-1.5 right-2 font-mono text-[9px] uppercase tracking-widest text-zinc-dust opacity-0 transition-opacity group-hover:opacity-70 group-focus:opacity-70 group-[.revealed]:opacity-70">
+		REVEALED
+	</div>
+</div>
+
+<script>
+	// Mobile flattens: no hover exists there, so tap flips the reveal.
+	function BindReveals() {
+		for (const Root of document.querySelectorAll("[data-zine-reveal]")) {
+			if (Root.dataset.revealBound) {
+				continue;
+			}
+
+			Root.dataset.revealBound = "1";
+
+			Root.addEventListener("click", () => {
+				Root.classList.toggle("revealed");
+			});
+		}
+	}
+
+	BindReveals();
+	document.addEventListener("astro:page-load", BindReveals);
+</script>

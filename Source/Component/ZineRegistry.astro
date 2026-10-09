@@ -16,13 +16,13 @@ const { Entries, Placeholder = "FILTER..." } = Astro.props;
 			REG
 		</span>
 		<input
-			class="w-full bg-transparent px-3 py-2 font-mono text-xs text-bone-white placeholder:text-zinc-dust focus:outline-none"
+			class="w-full bg-transparent px-3 py-2 font-mono text-xs text-bone-white placeholder:text-zinc-dust"
 			type="search"
 			data-registry-input
 			placeholder={Placeholder}
 			aria-label="Filter the registry"
 		/>
-		<span class="px-3 font-mono text-[10px] font-bold text-zinc-dust" data-registry-count>
+		<span class="px-3 font-mono text-[10px] font-bold text-zinc-dust" data-registry-count aria-live="polite">
 			{String(Entries.length).padStart(2, "0")}
 		</span>
 	</div>

@@ -1,5 +1,7 @@
 ---
 import Base from "@Layout/Base.astro";
+
+import Related from "@Component/Related.astro";
 import PreviewFlow from "../Content/Mermaid/preview-flow.svg?raw";
 
 // Case-study content ledger - the page's single source of truth (the borrowed
@@ -802,22 +804,206 @@ const Layers = [
 			</div>
 		</section>
 
-		<!-- FOOTER -->
-		<footer
-			class="flex flex-col items-center justify-between gap-12 border-t-2 border-oxblood-dark pb-12 pt-32 text-xs text-zinc-dust sm:flex-row"
-		>
-			<div class="flex items-center gap-6">
-				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
-				<span class="font-bold uppercase tracking-widest text-bone-white">
-					APHRODITE CASE FILE · CLOSED SEP 2026
-				</span>
+		<!-- ============ IX. THE HISTORY SPINE ============ -->
+		<section class="relative w-full">
+			<div
+				class="relative z-10 -mb-7 ml-6 inline-block -rotate-1 border border-black bg-raw-blood px-4 py-1.5 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				IX // THE HISTORY SPINE
 			</div>
-			<div class="flex items-center gap-12">
-				<a class="transition-colors hover:text-bone-white" href="/">OVERVIEW</a>
-				<a class="transition-colors hover:text-bone-white" href="/benchmarks/">BENCHMARKS</a>
-				<a class="transition-colors hover:text-bone-white" href="/setup/">SETUP</a>
-				<span class="font-bold text-stamped-canary">CC0-1.0</span>
+			<div
+				class="zine-box-crimson w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.3deg] sm:p-12"
+			>
+				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
+					Five incidents that set the laws
+				</h2>
+				<p class="mt-8 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+					Every rule on this page was paid for once. Each arc below runs the same
+					three beats: the incident, the fix, and the mechanic that still stands today.
+					All of it is public record - the CHANGELOG entries and the release notes.
+				</p>
+				<div class="mt-24 flex flex-col gap-32">
+					<!-- Arc 1: the losslessness law -->
+					<article class="border-l-4 border-raw-blood pl-6 sm:pl-10">
+						<div class="font-mono text-[11px] font-black uppercase tracking-widest text-stamped-canary">
+							ARC 1 · v1.3.0 -> v1.3.2 · THE LOSSLESSNESS LAW
+						</div>
+						<h3 class="mt-6 font-headline text-xl font-black uppercase tracking-tight text-bone-white sm:text-2xl">
+							Hash the ORIGINAL, never the wrapper
+						</h3>
+						<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">The incident.</strong> Compressing a
+							Hermes wrapper stored the <em>extracted</em> content under
+							<code class="font-mono text-xs">hash(extracted)</code> and discarded the
+							original. A failed command's <code class="font-mono text-xs">exit_code</code>
+							and <code class="font-mono text-xs">error</code> fields were unrecoverable
+							after compression, and caller JSON that merely matched a wrapper shape -
+							e.g. <code class="font-mono text-xs">{'{"content":"hi","id":42}'}</code> - got
+							permanently collapsed to one field.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">The fix.</strong> Both the hook and the
+							tool paths now hash and store the ORIGINAL content always; the unwrapped
+							view is used only for classification and preview.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">Mechanics today.</strong> Retrieval is
+							byte-exact by construction - backends store and return content verbatim
+							as UTF-8 strings, no zstd on the path - and a full-document retrieval
+							(<code class="font-mono text-xs">limit: 0</code>) returns the exact
+							original bytes, hashing back to the marker's own hash.
+						</p>
+						<div class="mt-6 font-mono text-[10px] text-zinc-dust">
+							SRC: CHANGELOG.md:683-706 · docs/api/retrieve.md ("byte-exact by construction")
+						</div>
+					</article>
+					<!-- Arc 2: the publishing incident -->
+					<article class="border-l-4 border-stamped-canary pl-6 sm:pl-10">
+						<div class="font-mono text-[11px] font-black uppercase tracking-widest text-stamped-canary">
+							ARC 2 · v1.3.8 -> v1.3.9 · THE PUBLISHING INCIDENT
+						</div>
+						<h3 class="mt-6 font-headline text-xl font-black uppercase tracking-tight text-bone-white sm:text-2xl">
+							The tarball that compiled locally and failed everywhere else
+						</h3>
+						<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">The incident.</strong> v1.3.8 published to
+							crates.io but was <em>uninstallable</em>: <code class="font-mono text-xs">Cargo.toml</code>
+							had <code class="font-mono text-xs">exclude = [..., "*.md", ...]</code>, and
+							cargo applies <code class="font-mono text-xs">exclude</code> at publish time -
+							recursively. The six <code class="font-mono text-xs">builtin_directives/*.md</code>
+							files embedded via <code class="font-mono text-xs">include_str!</code> were
+							stripped from the tarball, so the local checkout built fine and CI's Test
+							job passed - but <code class="font-mono text-xs">cargo install aphrodite</code>
+							failed at compile time.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">The fix.</strong> Drop the recursive
+							<code class="font-mono text-xs">*.md</code> exclusion (and never combine
+							<code class="font-mono text-xs">include</code> with
+							<code class="font-mono text-xs">exclude</code> - cargo would ignore
+							<code class="font-mono text-xs">exclude</code> and drop the targets), add a
+							<code class="font-mono text-xs">cargo package --list</code> packaging guard
+							to CI, and a durable in-crate regression test that fails when
+							<code class="font-mono text-xs">*.md</code> returns to
+							<code class="font-mono text-xs">exclude</code>.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">Mechanics today.</strong> crates.io versions
+							are immutable - v1.3.8 stays broken forever, superseded as the working
+							release; the packaging guard means this class of regression can never
+							reach crates.io again.
+						</p>
+						<div class="mt-6 font-mono text-[10px] text-zinc-dust">SRC: CHANGELOG.md:408-450</div>
+					</article>
+					<!-- Arc 3: one runtime home -->
+					<article class="border-l-4 border-weathered-teal pl-6 sm:pl-10">
+						<div class="font-mono text-[11px] font-black uppercase tracking-widest text-weathered-teal">
+							ARC 3 · v1.6.3 · ONE RUNTIME HOME
+						</div>
+						<h3 class="mt-6 font-headline text-xl font-black uppercase tracking-tight text-bone-white sm:text-2xl">
+							One decision, made once, by both halves
+						</h3>
+						<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">The incident.</strong> Issue #40: the
+							plugin's Python shim resolved the runtime home from
+							<code class="font-mono text-xs">$HERMES_HOME</code> while the Rust half
+							resolved it from <code class="font-mono text-xs">$HOME</code>. Whenever
+							they diverged - the shipped Docker image, profile gateways - the shim
+							looked for binaries in a directory that never existed, disabled the
+							plugin, and orphaned the previous runtime home, config and provider API
+							key included.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">The fix.</strong> The shim resolves the
+							runtime home once (<code class="font-mono text-xs">$APHRODITE_HOME</code>
+							override, then <code class="font-mono text-xs">&lt;hermes-home&gt;/aphrodite</code>,
+							then <code class="font-mono text-xs">~/.hermes/aphrodite</code>) and exports
+							it to the Rust half through <code class="font-mono text-xs">APHRODITE_HOME</code>,
+							so the dylib and the spawned proxy agree by construction. Legacy installs
+							are adopted with a one-line warning, never migrated.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">Mechanics today.</strong> Per-Hermes-home
+							isolation extends to the whole stack, and the startup log names the
+							decision: <code class="font-mono text-xs">runtime home: &lt;path&gt; (decided by ...)</code>.
+						</p>
+						<div class="mt-6 font-mono text-[10px] text-zinc-dust">SRC: CHANGELOG.md:104-154</div>
+					</article>
+					<!-- Arc 4: the checksum law -->
+					<article class="border-l-4 border-raw-blood pl-6 sm:pl-10">
+						<div class="font-mono text-[11px] font-black uppercase tracking-widest text-raw-blood">
+							ARC 4 · v1.6.5 · THE CHECKSUM LAW
+						</div>
+						<h3 class="mt-6 font-headline text-xl font-black uppercase tracking-tight text-bone-white sm:text-2xl">
+							In-tree SHA256SUMS.txt is the only truth
+						</h3>
+						<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">The incident.</strong> The download scripts
+							used to fetch the release-hosted per-target checksums and had
+							warn-and-skip paths - a missing checksum file or tool degraded to a
+							warning instead of a refusal. A plugin-hardening catalog review called it
+							out.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">The fix.</strong> The pinned tree's
+							<code class="font-mono text-xs">SHA256SUMS.txt</code> became the only
+							checksum source of truth: a missing file, a
+							<code class="font-mono text-xs">BINARY_VERSION</code> mismatch, a missing
+							target block, or a missing asset entry is a hard refusal (exit 1), and a
+							missing <code class="font-mono text-xs">shasum</code>/<code class="font-mono text-xs">sha256sum</code>
+							tool is a hard refusal rather than a skipped check. The legacy
+							<code class="font-mono text-xs">~/.hermes/aphrodite</code> home adoption in
+							the runtime lookup is also gone.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">Mechanics today.</strong> Every release
+							ships 12 artifacts - 4 targets x (binary, plugin dylib, SHA256SUMS) - and
+							the dylib arm refuses installs when the in-tree checksums are missing.
+						</p>
+						<div class="mt-6 font-mono text-[10px] text-zinc-dust">SRC: CHANGELOG.md:39-67 · the Aphrodite/v1.6.5 release note</div>
+					</article>
+					<!-- Arc 5: the path guards -->
+					<article class="border-l-4 border-stamped-canary pl-6 sm:pl-10">
+						<div class="font-mono text-[11px] font-black uppercase tracking-widest text-stamped-canary">
+							ARC 5 · v1.6.6 · THE PATH GUARDS
+						</div>
+						<h3 class="mt-6 font-headline text-xl font-black uppercase tracking-tight text-bone-white sm:text-2xl">
+							Some paths are never read
+						</h3>
+						<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">The incident.</strong> Nothing stopped the
+							prefetch path from reading the files most likely to contain secrets -
+							environment files, auth tokens, SSH keys, or the Hermes home itself.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">The fix.</strong>
+							<code class="font-mono text-xs">aphrodite_prefetch</code> refuses
+							<code class="font-mono text-xs">.env</code>, <code class="font-mono text-xs">auth.json</code>,
+							<code class="font-mono text-xs">~/.ssh</code>, the Hermes home, and non-file
+							paths outright, answering with <code class="font-mono text-xs">ReadOutcome::Refused</code>
+							plus a <code class="font-mono text-xs">refuse_reason</code> instead of
+							reading them.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+							<strong class="text-bone-white">Mechanics today.</strong> Setup is hardened
+							the same way: the Hermes-home plugin directory is report-only - no
+							writes, no deletes - and the same release re-described the context engine
+							as opt-in with a <code class="font-mono text-xs">requires_hermes &gt;= 0.20.2</code>
+							floor.
+						</p>
+						<div class="mt-6 font-mono text-[10px] text-zinc-dust">SRC: CHANGELOG.md:3-37 · the Aphrodite/v1.6.6 release note</div>
+					</article>
+				</div>
 			</div>
-		</footer>
+		</section>
+
+		<!-- RELATED: the natural neighbors -->
+		<Related
+			Links={[
+				{ Href: "/benchmarks/", Label: "BENCHMARKS" },
+				{ Href: "/workbench/", Label: "WORKBENCH" },
+				{ Href: "/setup/", Label: "SETUP" },
+			]}
+		/>
 	</main>
 </Base>

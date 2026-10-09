@@ -1,0 +1,48 @@
+---
+/**
+ * ZineSwatches - the token-swatch strip: the 13 design tokens with their
+ * roles, straight from the :root table in Stylesheet/Global.css. The swatch
+ * chip renders the actual color; the role line explains where the token is
+ * allowed to appear.
+ */
+interface Props {
+	/** Optional heading over the strip. */
+	Title?: string;
+}
+
+const { Title = "THE TOKENS // THIRTEEN COLORS, THIRTEEN JOBS" } = Astro.props;
+
+const Tokens: { Name: string; Hex: string; Role: string }[] = [
+	{ Name: "soot-black", Hex: "#09090b", Role: "body background, terminal panels" },
+	{ Name: "carbon-void", Hex: "#111014", Role: "workbench module background" },
+	{ Name: "asphalt-panel", Hex: "#16151a", Role: "sub-panel background" },
+	{ Name: "asphalt-panel-dark", Hex: "#0d0c10", Role: "inner panel background" },
+	{ Name: "oxblood-dark", Hex: "#520612", Role: "borders, shadow planes" },
+	{ Name: "blood-crimson", Hex: "#7a0a1e", Role: "4px module borders, hover fills" },
+	{ Name: "raw-blood", Hex: "#931128", Role: "stamps, primary buttons, badges, focus rings" },
+	{ Name: "outline-oxblood", Hex: "#3d040d", Role: "inner borders, shadow color" },
+	{ Name: "bone-newsprint", Hex: "#dedbd2", Role: "body text" },
+	{ Name: "bone-white", Hex: "#ece9e0", Role: "headings" },
+	{ Name: "zinc-dust", Hex: "#82808a", Role: "muted text" },
+	{ Name: "stamped-canary", Hex: "#e5a93b", Role: "highlights, deltas" },
+	{ Name: "weathered-teal", Hex: "#20807b", Role: "hashes, retrieval, mechanics" },
+];
+---
+
+<div class="zine-box-subtle border-[3px] border-oxblood-dark bg-carbon-void p-5 sm:p-6">
+	<div class="mb-5 font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+		{Title}
+	</div>
+	<ul class="grid grid-cols-2 gap-px border border-oxblood-dark bg-oxblood-dark/60 sm:grid-cols-3 lg:grid-cols-4">
+		{
+			Tokens.map(({ Name, Hex, Role }) => (
+				<li class="bg-carbon-void p-3">
+					<div class="mb-2 h-8 w-full border border-black shadow-[2px_2px_0px_#000]" style={`background: ${Hex};`} />
+					<div class="font-mono text-[11px] font-bold text-bone-white">{Name}</div>
+					<div class="font-mono text-[10px] text-weathered-teal">{Hex}</div>
+					<div class="mt-1 font-body text-[11px] leading-snug text-bone-newsprint">{Role}</div>
+				</li>
+			))
+		}
+	</ul>
+</div>

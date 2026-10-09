@@ -17,7 +17,9 @@
 	/* Text */
 	--bone-newsprint: #dedbd2; /* body text */
 	--bone-white: #ece9e0; /* headings */
-	--zinc-dust: #73717b; /* muted */
+	--zinc-dust: #82808a; /* muted - lifted from #73717b: 4.15:1 on soot failed
+	                         WCAG AA for body text; #82808a is 5.12:1 on soot,
+	                         4.88:1 on carbon-void, 4.67:1 on asphalt-panel */
 
 	/* Accents */
 	--stamped-canary: #e5a93b;
@@ -130,16 +132,17 @@ img {
 
 /* ---- ADVANCED-STYLES additions (appended; the tokens above are untouched) ---- */
 
-/* Focus-visible in the zine palette: the canary stamp outline, hard edge, no blur. */
+/* Focus-visible in the zine palette: the raw-blood stamp outline, hard edge,
+   no blur (the A11Y-PERF spec: 2px raw-blood ring, 2px offset). */
 :focus-visible {
-	outline: 2px solid var(--stamped-canary);
+	outline: 2px solid var(--raw-blood);
 	outline-offset: 2px;
 }
 
 button:focus-visible,
 a:focus-visible,
 [tabindex]:focus-visible {
-	background-color: rgba(229, 169, 59, 0.08);
+	background-color: rgba(147, 17, 40, 0.12);
 }
 
 /* MANIFESTO drop cap: the first letter set as a stamped block, print misregistration shadow. */
@@ -198,4 +201,30 @@ a:focus-visible,
 .zine-diagram-linkable:hover circle,
 .zine-diagram-linkable:hover polygon {
 	stroke: var(--stamped-canary) !important;
+}
+
+/* ---- A11Y-PERF additions (appended; the tokens above are untouched) ---- */
+
+/* prefers-reduced-motion: the zine motion (the exec spin, the hover
+   un-rotate/translate, the MONUMENT scroll-fill) collapses to its end state. */
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+
+	.zine-exec-spin {
+		animation: none;
+	}
+
+	.zine-stat-fill {
+		transition: none;
+	}
 }

@@ -1,0 +1,29 @@
+---
+title: "Architecture"
+section: "Architecture"
+---
+
+# Architecture
+
+Flow traces of every runtime path in Aphrodite (v1.6.5): the CCR compression proxy with its dual loopback listeners, the Hermes plugin (Python shim → C-ABI dylib → shared core crate), the CI/release pipeline, and the data model underneath. Two runtime worlds run in separate processes with separate state: the **proxy binary** (HTTP response compression) and the **Hermes plugin** (hook-level interception). The plugin is a pure loader - directives are embedded in the binary and materialized into `~/.hermes/aphrodite/directives/` at startup, and the dylib/binary live in the canonical runtime home `~/.hermes/aphrodite/binaries/` with layout self-heal.
+
+| #   | File                                               | What it traces                                                                                                                                                                                                                                   |
+| --- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 01  | [01-startup.md](/docs/architecture/01-startup/)                     | Process startup: config resolution, bind-before-spawn of the `:9797` cache / `:9798` token listeners, CCR store init, config reload watcher, and plugin `register()` (dylib probe/load, layout self-heal, directives materialize, proxy launch). |
+| 02  | [02-chat-compression.md](/docs/architecture/02-chat-compression/)   | Core value path: chat response → classify → EMA-tuned threshold → BLAKE3 → store → `<<<CCR:…>>>` marker + preview; the `tool_calls`-not-compressed branch; proxy vs FFI pipeline separation.                                                     |
+| 03  | [03-retrieve.md](/docs/architecture/03-retrieve/)                   | `/retrieve` (inline → backend, filter, pagination, byte-exact round-trip) plus the recursive resolver `resolve::expand` (nested markers, depth limit, cycle-safe, no write-back).                                                                |
+| 04  | [04-hook-ffi.md](/docs/architecture/04-hook-ffi/)                   | Hermes → Python ctypes → C-ABI → core hooks; FFI declarations via the generated `_bindings.py`; the `pre_llm_call` → `flow::build_turn_context` choke point.                                                                                     |
+| 05  | [05-ccr-lifecycle.md](/docs/architecture/05-ccr-lifecycle/)         | State machine of a CCR entry (created → stored → previewed → {retrieved / decayed / evicted / expired} → GC) plus the EMA threshold state.                                                                                                       |
+| 06  | [06-sse-streaming.md](/docs/architecture/06-sse-streaming/)         | `text/event-stream` detection → timeout-free client → chunk passthrough (no compression, no cache) → mid-stream byte/error accounting.                                                                                                           |
+| 07  | [07-config-resolution.md](/docs/architecture/07-config-resolution/) | env > TOML > default precedence across the proxy and FFI config loaders; live vs inert/reserved keys; config reload scope.                                                                                                                       |
+| 08  | [08-dylib-loading.md](/docs/architecture/08-dylib-loading/)         | Load-once-per-process contract: candidate resolution → presence-only `_ensure_binaries` (no downloads) → subprocess probe → direct `CDLL`; restart to pick up a new build.                                                                       |
+| 09  | [09-release-ci.md](/docs/architecture/09-release-ci/)               | Tag push → `Build.yml` (release-once → 4-target matrix → Finalize) + `Publish.yml` (Test + packaging guard → crates.io chain; `aphrodite`/`aphrodite-hermes` publish on tag, `headroom-core` dispatch-only).                                     |
+| 10  | [10-component.md](/docs/architecture/10-component/)                 | Top-level component diagram: crates + Python shim + proxies + store backends + Hermes host + canonical runtime home, with the C-ABI and HTTP boundaries labeled.                                                                                 |
+| 11  | [11-data-model.md](/docs/architecture/11-data-model/)               | Class diagram: `AphroditeState`, `AppState`, `MarkerEntry`, `ToolEvent`, `SplitEvent`, `CcrStore` trait + backends, directives.                                                                                                                  |
+
+## Cross-cutting notes
+
+- The **HTTP proxy path and the Hermes FFI path are two separate compression pipelines**. The proxy classifies via `proxy_detect_content_type` and builds previews via `proxy_build_preview`; the staged transform pipeline (`transforms::detect`, `stage2`, `struct_extract`) runs only on the hook path. They share the BLAKE3 `compute_key` and the marker wire format, but nothing else.
+- **Two marker layouts** exist for the same `<<<CCR:hash|type|size>>>` token: the FFI path renders the marker line first, the proxy path renders it last.
+- `flow::build_turn_context` is the single directive choke point that all `pre_llm_call` entry points converge on, so directive injection cannot fork between paths.
+- The proxy and the plugin run in separate processes: each carries its own `AppState` / `AphroditeState`, its own inline store, and its own CCR backend - the dylib is loaded once per process, so a session restart starts a fresh plugin-side store.
