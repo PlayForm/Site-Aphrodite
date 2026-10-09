@@ -1,4 +1,4 @@
-flowchart TD
+flowchart LR
 	START["the session starts:<br/>on_session_start resets<br/>the dylib is loaded once per process"]
 	TURNS["turns run through the 6-hook chain:<br/>large outputs become markers<br/>retrieve only when detail is needed"]
 	FILL["the context fills:<br/>the engine records usage<br/>via update_from_response"]

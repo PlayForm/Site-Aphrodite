@@ -1,0 +1,36 @@
+sequenceDiagram
+    autonumber
+    participant C as caller (Hermes / curl)
+    participant HR as handle_retrieve
+    participant N as marker::normalize_hash
+    participant IL as inline_ccr LRU (proxy AppState)
+    participant CCR as CcrStore (sqlite/in-memory)
+    participant F as filter_content
+    participant P as paginate
+
+    C->>HR: POST /retrieve {hash, query?, offset?, limit?}
+    HR->>N: normalize_hash(hash)  (strip |type|size suffix, trim)
+    alt hash missing
+        HR-->>C: 400 {found:false, error:"`hash` required"}
+    end
+    HR->>IL: inline_ccr.get(hash)
+    alt inline HIT
+        IL-->>HR: content  (inline_ccr_hits++, ccr_hits++)
+    else inline miss
+        HR->>CCR: ccr_get(hash).await  (inline_ccr_misses++)
+        alt backend HIT
+            CCR-->>HR: content (ccr_hits++)
+        else miss / no backend
+            HR-->>C: 404 {found:false, error:"CCR entry not found"}
+        end
+    end
+    HR->>F: filter_content(content, query)  (case-insensitive, query capped 512 chars)
+    HR->>P: paginate(content, offset, limit)
+    alt offset >= total (non-empty doc)
+        P-->>HR: Err → 400 "[offset N out of range]"
+    else full-document window
+        P-->>HR: (content verbatim, truncated=false)  ← byte-exact, keeps trailing \n
+    else partial window
+        P-->>HR: ("[lines a-b/total]\n…", truncated=true)
+    end
+    HR-->>C: 200 {found:true, content, source:"ccr", truncated}

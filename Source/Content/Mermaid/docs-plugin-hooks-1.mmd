@@ -1,0 +1,10 @@
+flowchart LR
+    S["Session starts"] --> H1["on_session_start - reset per-session state"]
+    H1 --> T["User turn"]
+    T --> P1["pre_tool_call - auto-background, chain split"]
+    P1 --> X["Tool or terminal runs"]
+    X --> T1["transform_tool_result or transform_terminal_output - compress to marker"]
+    T1 --> P2["pre_llm_call - inject directives and catalog"]
+    P2 --> L["LLM responds"]
+    L --> P3["post_llm_call - archive turn, advance counter"]
+    P3 --> T

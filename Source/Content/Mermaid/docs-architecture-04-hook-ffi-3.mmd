@@ -1,0 +1,26 @@
+flowchart LR
+    subgraph py["Python shim"]
+      T["_make_handler → dispatch_tool"]
+      HK["_hook_dispatch → call_hook"]
+      FFI["_configure_ffi: generated _bindings.py<br/>bind_to(dylib) → manual fallback →<br/>_REQUIRED_VOID_P assertion"]
+    end
+    subgraph bridge["aphrodite-hermes (process-global state)"]
+      DT["aphrodite_hermes_dispatch_tool"]
+      CH2["aphrodite_hermes_call_hook"]
+      SG["aphrodite_hermes_get_schemas / get_hooks<br/>schemas + hook list"]
+    end
+    subgraph core["aphrodite core (handle-based ABI)"]
+      DP["aphrodite_dispatch"]
+      IH["hooks::{transform_*, pre_llm_call, post_llm_call}"]
+    end
+    T --> DT
+    HK --> CH2
+    DT --> R["tools::dispatch registry"]
+    CH2 --> IH
+    DP --> IH
+    R --> SH["with_shared → AphroditeState (OnceLock)"]
+    IH --> SH
+    FFI -.->|restype/argtypes replayed| DT
+    FFI -.->|restype/argtypes replayed| CH2
+    Note1["pre_llm_call: bridge + core + context_engine_pre_llm<br/>ALL call flow::build_turn_context - single assembler"]
+    style Note1 fill:#eef

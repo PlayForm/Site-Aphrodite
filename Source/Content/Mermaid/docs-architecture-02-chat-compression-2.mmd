@@ -1,0 +1,21 @@
+flowchart LR
+    A["threshold_for(ct)"] --> B{"ct in linter/build_output/log?"}
+    B -->|yes| Z["return base (no tune, no mult)"]
+    B -->|no| C["ratio = compression_ratio_ema/100"]
+    C --> D{"ratio"}
+    D -->|">20"| E["tune = 2.0 (compressing well → raise bar)"]
+    D -->|"0<ratio<3"| F["tune = 0.5 (weak → lower bar)"]
+    D -->|else| G["tune = 1.0"]
+    E --> H["base' = base*tune"]
+    F --> H
+    G --> H
+    H --> I{"fixed per-type multiplier"}
+    I -->|error| J["base'*8"]
+    I -->|"code_*"| K["base' * code_multiplier (default 3.0)"]
+    I -->|diff/git/text| L["base'*2"]
+    I -->|tool_output/json| M["base'"]
+
+    subgraph EMA["update_compression_ratio"]
+      N["ratio = orig/comp * 100"] --> O["new = 0.2*ratio + 0.8*old  (α=0.2)"]
+      O --> P["fill_pct = clamp(100 - ema/20, 1..99)*100"]
+    end

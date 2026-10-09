@@ -1,0 +1,15 @@
+flowchart LR
+	A["any tool/hook call → _load_dylib()"] --> B["pick first existing candidate:<br/>APHRODITE_HERMES_DYLIB_PATH → shipped plugin-dir binaries/<br/>(immutable release assets) → canonical runtime home<br/>($HERMES_HOME/aphrodite/binaries) → legacy plugin-dir copy<br/>→ monorepo target/release"]
+	B --> B1["_ensure_binaries(): presence-only check - NEVER downloads.<br/>Missing binaries → log the explicit setup step<br/>(bash download.sh / aphrodite setup); register() has no download path.<br/>APHRODITE_AUTO_DOWNLOAD=1 restores the legacy fetch for dev loops"]
+	B1 --> C{"_state.dylib already set?"}
+	C -->|yes| E["return cached handle - load-once-per-process<br/>(a rebuilt dylib is picked up only after a restart)"]
+	C -->|no| H["first load"]
+	H --> P["_probe_dylib(path) - smoke-test in a SUBPROCESS<br/>(once per unique path; a ctypes SIGSEGV cannot be caught by<br/>try/except and would kill the whole Hermes gateway)"]
+	P -->|fail| PF["RuntimeError - plugin disabled, graceful log, never SIGSEGV"]
+	P -->|ok| K["ctypes.CDLL(resolved_path) - direct load, no copies"]
+	K --> L["_configure_ffi: generated _bindings.py bind_to(dylib) →<br/>manual fallback → _REQUIRED_VOID_P assertion (7 exports)<br/>(restype=c_void_p - prevents 64-bit pointer truncation)"]
+	L --> N{"AttributeError (missing symbol)?"}
+	N -->|yes| O["RuntimeError naming path+symbol - stale/mismatched dylib"]
+	N -->|no| P2["_state.dylib set; return"]
+
+	E --> Q["_call_json → FFI"]

@@ -1,0 +1,18 @@
+flowchart LR
+    A["ProxyConfig (from aphrodite.toml)"] --> B["MultiConfig::resolve"]
+    B --> C{"cfg.listen set?"}
+    C -->|Some s| D["s.parse::&lt;SocketAddr&gt; (fail→error)"]
+    C -->|None| E["default 127.0.0.1:9797"]
+    D --> F{"mode / name"}
+    E --> F
+    F -->|cache| G["apply_port_override(listen, APHRODITE_CACHE_PORT)"]
+    F -->|token| H["apply_port_override(listen, APHRODITE_TOKEN_PORT)"]
+    F -->|other| I["listen unchanged"]
+    G --> J{"env var parses as u16?"}
+    H --> J
+    J -->|Ok port| K["addr.set_port(port) · info! log"]
+    J -->|present, malformed| L["warn! · keep listen"]
+    J -->|absent| I
+    K --> M["Cli.listen"]
+    L --> M
+    I --> M

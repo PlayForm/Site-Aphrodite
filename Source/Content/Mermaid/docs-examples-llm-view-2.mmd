@@ -1,0 +1,11 @@
+graph LR
+    A["Turn 1: ls listing 5889 bytes crosses the terminal threshold"] --> B["Proxy stores it under a BLAKE3 hash"]
+    B --> C["Model sees marker plus ls preview line"]
+    C --> D["Turn 2: model calls aphrodite_retrieve with the hash"]
+    D --> E["Full listing restored into context"]
+    E --> F["Turn 3: the same command runs again"]
+    F --> G["Same bytes produce the same hash, no duplicate storage"]
+    G --> H["With auto_expand true the marker expands inline"]
+
+    style C fill:#e1f5fe
+    style E fill:#c8e6c9

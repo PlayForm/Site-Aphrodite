@@ -1,0 +1,164 @@
+[
+	{
+		"Id": "docs-api-retrieve-1",
+		"File": "api/retrieve",
+		"Index": 1,
+		"Label": "RETRIEVE FLOW"
+	},
+	{
+		"Id": "docs-architecture-01-startup-1",
+		"File": "architecture/01-startup",
+		"Index": 1,
+		"Label": "STARTUP SEQUENCE"
+	},
+	{
+		"Id": "docs-architecture-01-startup-2",
+		"File": "architecture/01-startup",
+		"Index": 2,
+		"Label": "PORT OVERRIDE (ENV PIERCES TOML PER MODE)"
+	},
+	{
+		"Id": "docs-architecture-01-startup-3",
+		"File": "architecture/01-startup",
+		"Index": 3,
+		"Label": "PLUGIN STARTUP (REGISTER() - THE HERMES-SIDE HALF)"
+	},
+	{
+		"Id": "docs-architecture-02-chat-compression-1",
+		"File": "architecture/02-chat-compression",
+		"Index": 1,
+		"Label": "RESPONSE COMPRESSION SEQUENCE"
+	},
+	{
+		"Id": "docs-architecture-02-chat-compression-2",
+		"File": "architecture/02-chat-compression",
+		"Index": 2,
+		"Label": "PER-TYPE THRESHOLD (EMA AUTO-TUNE → FIXED MULTIPLIER)"
+	},
+	{
+		"Id": "docs-architecture-03-retrieve-1",
+		"File": "architecture/03-retrieve",
+		"Index": 1,
+		"Label": "/RETRIEVE HTTP PATH"
+	},
+	{
+		"Id": "docs-architecture-03-retrieve-2",
+		"File": "architecture/03-retrieve",
+		"Index": 2,
+		"Label": "RECURSIVE RESOLUTION (RESOLVE::EXPAND)"
+	},
+	{
+		"Id": "docs-architecture-04-hook-ffi-1",
+		"File": "architecture/04-hook-ffi",
+		"Index": 1,
+		"Label": "TOOL-RESULT / TERMINAL-OUTPUT TRANSFORM (BRIDGE PATH)"
+	},
+	{
+		"Id": "docs-architecture-04-hook-ffi-2",
+		"File": "architecture/04-hook-ffi",
+		"Index": 2,
+		"Label": "PRE_LLM_CALL - THE DIRECTIVE-INJECTION CHOKE POINT"
+	},
+	{
+		"Id": "docs-architecture-04-hook-ffi-3",
+		"File": "architecture/04-hook-ffi",
+		"Index": 3,
+		"Label": "PARITY: BRIDGE PATH VS CORE (HANDLE-BASED) PATH"
+	},
+	{
+		"Id": "docs-architecture-05-ccr-lifecycle-1",
+		"File": "architecture/05-ccr-lifecycle",
+		"Index": 1,
+		"Label": "CCR ENTRY LIFECYCLE"
+	},
+	{
+		"Id": "docs-architecture-05-ccr-lifecycle-2",
+		"File": "architecture/05-ccr-lifecycle",
+		"Index": 2,
+		"Label": "EMA COMPRESSION-RATIO THRESHOLD STATE"
+	},
+	{
+		"Id": "docs-architecture-06-sse-streaming-1",
+		"File": "architecture/06-sse-streaming",
+		"Index": 1,
+		"Label": "SSE DETECTION & PASSTHROUGH"
+	},
+	{
+		"Id": "docs-architecture-06-sse-streaming-2",
+		"File": "architecture/06-sse-streaming",
+		"Index": 2,
+		"Label": "WHY COMPRESSION IS SKIPPED FOR SSE"
+	},
+	{
+		"Id": "docs-architecture-07-config-resolution-1",
+		"File": "architecture/07-config-resolution",
+		"Index": 1,
+		"Label": "PRECEDENCE FLOWCHART"
+	},
+	{
+		"Id": "docs-architecture-07-config-resolution-2",
+		"File": "architecture/07-config-resolution",
+		"Index": 2,
+		"Label": "LIVE VS INERT KEYS"
+	},
+	{
+		"Id": "docs-architecture-08-dylib-loading-1",
+		"File": "architecture/08-dylib-loading",
+		"Index": 1,
+		"Label": "LOAD FLOW"
+	},
+	{
+		"Id": "docs-architecture-08-dylib-loading-2",
+		"File": "architecture/08-dylib-loading",
+		"Index": 2,
+		"Label": "STATE HANDLING ACROSS PROCESSES"
+	},
+	{
+		"Id": "docs-architecture-09-release-ci-1",
+		"File": "architecture/09-release-ci",
+		"Index": 1,
+		"Label": "BUILD.YML - TAG PUSH → RELEASE + 4-TARGET MATRIX"
+	},
+	{
+		"Id": "docs-architecture-09-release-ci-2",
+		"File": "architecture/09-release-ci",
+		"Index": 2,
+		"Label": "PUBLISH.YML - TEST + PACKAGING GUARD → CRATES.IO CHAIN"
+	},
+	{
+		"Id": "docs-architecture-10-component-1",
+		"File": "architecture/10-component",
+		"Index": 1,
+		"Label": "COMPONENT ARCHITECTURE"
+	},
+	{
+		"Id": "docs-architecture-11-data-model-1",
+		"File": "architecture/11-data-model",
+		"Index": 1,
+		"Label": "CORE DATA MODEL"
+	},
+	{
+		"Id": "docs-examples-llm-view-1",
+		"File": "examples/llm-view",
+		"Index": 1,
+		"Label": "CONVERSATION FLOW"
+	},
+	{
+		"Id": "docs-examples-llm-view-2",
+		"File": "examples/llm-view",
+		"Index": 2,
+		"Label": "SCENARIO 4: MULTI-TURN MEMORY FLOW"
+	},
+	{
+		"Id": "docs-guides-hermes-integration-1",
+		"File": "guides/hermes-integration",
+		"Index": 1,
+		"Label": "HERMES INTEGRATION"
+	},
+	{
+		"Id": "docs-plugin-hooks-1",
+		"File": "plugin/hooks",
+		"Index": 1,
+		"Label": "PLUGIN HOOKS"
+	}
+]

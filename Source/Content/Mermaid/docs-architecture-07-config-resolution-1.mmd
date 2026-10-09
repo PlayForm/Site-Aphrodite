@@ -1,0 +1,24 @@
+flowchart LR
+	subgraph proxy["Proxy path - MultiConfig::resolve"]
+		P0["aphrodite.toml [[proxies]] + [defaults] + [compression]"] --> P1
+		P1{"per key"} --> P2["env APHRODITE_* (env_parse_warn / env var)"]
+		P2 -->|set| PV["value"]
+		P2 -->|unset| P3["proxy TOML field"]
+		P3 -->|set| PV
+		P3 -->|unset| P4["[defaults] field"]
+		P4 -->|set| PV
+		P4 -->|unset| P5["hardcoded default"]
+		P5 --> PV
+	end
+
+	subgraph ffi["FFI/Hermes path - Config loader"]
+		F0["./aphrodite.toml → ~/.hermes/aphrodite/aphrodite.toml"] --> F1
+		F1{"get_bool/u64/usize/string"} --> F2["1. runtime override (set_override)"]
+		F2 -->|hit| FV["value"]
+		F2 -->|miss| F3["2. env var (APHRODITE_*)"]
+		F3 -->|hit| FV
+		F3 -->|miss| F4["3. toml[section][key]"]
+		F4 -->|hit| FV
+		F4 -->|miss| F5["4. default arg"]
+		F5 --> FV
+	end

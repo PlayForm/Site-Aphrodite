@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph entries["Three entry points converge"]
+      A["bridge: call_hook('pre_llm_call')"]
+      B["core FFI: aphrodite_dispatch('pre_llm_call') → hooks::pre_llm_call"]
+      C["context_engine_pre_llm tool"]
+    end
+    A --> D["flow::build_turn_context(state, est_bytes)"]
+    B --> D
+    C --> D
+    D --> E["directives = build_directive_context - NEVER dropped"]
+    D --> F["nudges = render_nudges - ≤2 inline [nudge:…], never dropped"]
+    D --> G["recall = session::catalog_summary - droppable FIRST"]
+    E --> H["assemble top-down under state.flow_budget_chars (default 4000)"]
+    F --> H
+    G --> H
+    H --> I{"joined len > budget?"}
+    I -->|yes| J["pop last section (recall block) - directives+nudges survive"]
+    I -->|no| K["emit context"]
+    J --> I
+    K --> L["injected into model turn:<br/>[directives]…<br/>[nudge:…]<br/>[recall]…<br/>retrieve hint"]

@@ -182,11 +182,14 @@ const PageHtml = `<!DOCTYPE html>
 				theme: "base",
 				themeVariables: {
 					fontFamily: "JetBrains Mono, ui-monospace, monospace",
-					// 13px is the renderer floor: at 16px the htmlLabels:false
-					// flowchart word-breaks and drops spaces, failing the
-					// MISSING TEXT integrity check below. FLAG: the only
-					// sub-16px text on the site lives in these generated SVGs.
-					fontSize: "13px",
+					// 16px: the site's typography floor (the CONSIST-DESIGN
+					// alignment). At 16px the htmlLabels:false flowchart word-
+					// wraps more aggressively; the wrap-line comparison below
+					// joins the wrapped lines with single spaces, so the
+					// labels survive with their separators as long as Mermaid
+					// breaks at word boundaries (the sources' wrap budget
+					// keeps each token short enough to fit a line).
+					fontSize: "16px",
 					// The zine tokens: near-black panels on transparent, bone
 					// ink, oxblood borders and veins.
 					primaryColor: "#111014",
@@ -223,13 +226,15 @@ const PageHtml = `<!DOCTYPE html>
 				// The rhythm scale, one consistent proportional raise from the
 				// defaults: nodeSpacing 70 and rankSpacing 84 between the
 				// elements and the layers (defaults 50/50), diagramPadding 24
-				// around the whole graph (default 8), and wrappingWidth 260 so
+				// around the whole graph (default 8), and wrappingWidth 320 so
 				// a single long token (a tool name, an env var) is never split
-				// mid-token by the auto-wrap.
+				// mid-token by the auto-wrap - 260 fit the 13px floor, but at
+				// 16px the 30-char dispatch_tool name measures over 260 and
+				// word-breaks, so the budget scales with the type size.
 				flowchart: {
 					htmlLabels: false,
 					curve: "basis",
-					wrappingWidth: 260,
+					wrappingWidth: 320,
 					nodeSpacing: 70,
 					rankSpacing: 84,
 					diagramPadding: 24,

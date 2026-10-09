@@ -1,0 +1,21 @@
+flowchart LR
+	subgraph live["LIVE - actually consumed"]
+		L1["tool_threshold_cache/token → cache/token_compress_threshold (atomics)"]
+		L2["inline_threshold → inline_ccr_threshold (atomic)"]
+		L3["code_multiplier → code_multiplier_x100 (atomic)"]
+		L4["defaults.api_url/model, ccr_ttl_seconds, timeout"]
+		L5["[flow] budget_chars → flow_budget_chars"]
+		L6["[compression] context_engine, tool_threshold_token, terminal_threshold (FFI state)"]
+		L7["[directives] active (seeds active_directives)"]
+		L8["[previews] preview_max_chars → preview cap<br/>(env APHRODITE_PREVIEW_MAX_CHARS > TOML; shipped template default 120, key absent = no cap)"]
+	end
+	subgraph hot["CONFIG-RELOADABLE (config-file watcher, applies to live atomics)"]
+		H1["the 4 threshold atomics only"]
+	end
+	subgraph inert["INERT / RESERVED (write-only, never read by the proxy)"]
+		I1["engine_min_msgs, engine_protect_first/last (write-only, never read)"]
+		I2["catalog_mode (RESERVED)"]
+		I3["previews.* remaining inert (model_family / code_structure_map / rust_preview_lines) · prompts.* (never read by the proxy)"]
+		I4["auto_expand / auto_expand_limit / classifier_poll (CompressionConfig fields, unused)"]
+		I5["mode/listen: not env-overridable in resolve (would break dual-proxy)"]
+	end

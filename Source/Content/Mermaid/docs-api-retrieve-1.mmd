@@ -1,0 +1,34 @@
+sequenceDiagram
+    autonumber
+    participant C as caller (Hermes / curl)
+    participant R as handle_retrieve
+    participant IL as inline_ccr LRU
+    participant S as CcrStore (sqlite/in-memory)
+    participant P as paginate
+
+    C->>R: POST /retrieve with hash, query?, offset?, limit?
+    R->>R: normalize_hash - strip |type|size suffix, trim
+    alt hash missing
+        R-->>C: 400 - hash required
+    end
+    R->>IL: inline_ccr.get(hash)
+    alt inline hit
+        IL-->>R: content (inline_ccr_hits++, ccr_hits++)
+    else inline miss
+        R->>S: ccr_get(hash)
+        alt backend hit
+            S-->>R: content (ccr_hits++)
+        else miss or no backend
+            R-->>C: 404 - CCR entry not found
+        end
+    end
+    R->>R: filter_content(query) - case-insensitive, capped at 512 chars
+    R->>P: paginate(offset, limit)
+    alt offset at or past end, non-empty document
+        P-->>R: out of range - 400
+    else full-document window
+        P-->>R: original bytes verbatim, truncated=false
+    else partial window
+        P-->>R: [lines a-b/total] header, truncated=true
+    end
+    R-->>C: 200 - found:true, content, source:ccr, truncated

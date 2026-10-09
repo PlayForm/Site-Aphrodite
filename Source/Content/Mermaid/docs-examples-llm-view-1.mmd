@@ -1,0 +1,14 @@
+sequenceDiagram
+    actor LLM
+    participant Agent as Hermes Agent
+    participant Proxy as Aphrodite Proxy
+    participant Store as CCR Store
+
+    Note over LLM,Store: Tool output crosses a compression threshold
+    LLM->>Agent: read a file or run a command
+    Agent->>Proxy: Tool result intercepted by hook
+    Proxy->>Proxy: detect content type (source_code, ls, diff, json, build_error)
+    Proxy->>Proxy: size above threshold, so compress
+    Proxy->>Store: store bytes keyed by BLAKE3 hash
+    Proxy-->>Agent: marker plus preview line
+    Agent-->>LLM: two-line relayed result

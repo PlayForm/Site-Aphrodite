@@ -1,0 +1,7 @@
+flowchart LR
+    A["SSE response detected"] --> B["compression SKIPPED"]
+    A --> C["response_cache SKIPPED"]
+    B --> D["chunks are partial JSON deltas - not whole message.content;<br/>can't classify/hash/marker a fragment"]
+    C --> E["cache_key_from_body already returns None when request stream:true"]
+    A --> F["timeout-free stream_client - a slow-but-valid stream<br/>must not be killed mid-answer"]
+    A --> G["mid-stream errors counted separately from<br/>upstream_connect_errors/upstream_timeouts (pre-header only)"]

@@ -1,0 +1,24 @@
+flowchart LR
+	TT["push tag Aphrodite/v* OR workflow_dispatch"] --> TEST["Test job"]
+	TEST --> T1["cargo test -p aphrodite -p aphrodite-hermes --release"]
+	T1 --> T2["packaging guard: cargo package --list must contain<br/>all 6 builtin_directives/*.md<br/>- a recursive *.md exclude once stripped them"]
+
+	TEST --> PHC["Publish-Headroom-Core (needs: Test)"]
+	PHC --> C0{"version already on crates.io? (check runs on tag AND dispatch)"}
+	C0 -->|published| SKIP1["skip - crates.io versions immutable"]
+	C0 -->|not published| C1{"workflow_dispatch && publish_crates?"}
+	C1 -->|no| SKIP2["skip - headroom-core is DISPATCH-ONLY"]
+	C1 -->|yes| PUB1["cargo publish -p aphrodite-headroom-core --no-verify"]
+
+	PUB1 --> PA["Publish-Aphrodite (needs: Test + Headroom-Core)"]
+	SKIP2 --> PA
+	SKIP1 --> PA
+	PA --> C2{"tag push OR (dispatch && publish_crates)?"}
+	C2 -->|yes| PUB2["cargo publish -p aphrodite --no-verify"]
+	C2 -->|no| SKIP3["build only"]
+
+	PUB2 --> PHh["Publish-Hermes (needs: Publish-Aphrodite)"]
+	SKIP3 --> PHh
+	PHh --> C3{"tag push OR (dispatch && publish_crates)?"}
+	C3 -->|yes| PUB3["cargo publish -p aphrodite-hermes --no-verify"]
+	C3 -->|no| SKIP4["build only"]

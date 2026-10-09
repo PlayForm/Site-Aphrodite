@@ -102,7 +102,15 @@ export const CodeLinks: Record<string, Entry> = {
 	// under Site/, which is gitignored, so tree/Current anchors to them
 	// would 404 on GitHub.
 	"aphrodite.toml": Ours("aphrodite.toml.example"),
+	"aphrodite.toml.example": Ours("aphrodite.toml.example"),
 	"ccr.db": Ours("crates/aphrodite/src/config/proxy.rs"),
+
+	// ── The repository root files (Aphrodite repository). FLAG: "Cargo.toml"
+	// is ambiguous - the workspace root file is the canonical mention; the
+	// per-crate manifests are linked through their crates/... path form.
+	"Cargo.toml": Ours("Cargo.toml"),
+	"CHANGELOG.md": Ours("CHANGELOG.md"),
+	"README.md": Ours("README.md"),
 
 	// ── The environment variables (crates/aphrodite/src/config_loader.rs).
 	APHRODITE_API_KEY: Ours("crates/aphrodite/src/config/proxy.rs"),
@@ -197,4 +205,38 @@ export function ResolveCode(Text: string): Entry | null {
 /** Compose the anchor URL for an entry. */
 export function SourceLink({ Path, Repo }: Entry): string {
 	return `${Repo.Base}/${Repo.Branch}/${Path}`;
+}
+
+/**
+ * The file-name index for the plain-prose pass: every registry key that is a
+ * file name (a dotted name, or the extensionless BINARY_VERSION marker),
+ * indexed case-insensitively so the prose forms ("Cargo.toml" vs
+ * "cargo.toml") resolve without new mappings. Identifiers without a file
+ * name shape (the tools, hooks, env vars, config keys) are excluded - the
+ * prose pass never links them.
+ */
+const FileIndex: Record<string, Entry> = Object.fromEntries(
+	Object.entries(CodeLinks)
+		.filter(([Key]) => /\.\w{1,4}$/.test(Key) || Key === "BINARY_VERSION")
+		.map(([Key, Entry]) => [Key.toLowerCase(), Entry]),
+);
+
+/**
+ * Resolve a plain-prose text to its source entry: the exact and
+ * repo-relative forms resolve through ResolveCode(); otherwise a
+ * case-insensitive lookup in the file-name index. Non-file text returns
+ * null and stays unlinked.
+ */
+export function ResolveFile(Text: string): Entry | null {
+	const Direct = ResolveCode(Text);
+
+	switch (Direct !== null) {
+		case true:
+			return Direct;
+
+		default:
+			break;
+	}
+
+	return FileIndex[Text.toLowerCase()] ?? null;
 }

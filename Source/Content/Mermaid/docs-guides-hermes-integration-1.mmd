@@ -1,0 +1,12 @@
+flowchart LR
+    A["Hermes Agent"]
+    B["aphrodite plugin - pure loader"]
+    C["libaphrodite_hermes.dylib"]
+    D["proxy subprocesses on :9797 and :9798"]
+    E["~/.hermes/aphrodite runtime home"]
+
+    A -->|"loads the plugin at gateway start"| B
+    B -->|"six hooks, thirteen tools"| C
+    B -->|"spawns on plugin load"| D
+    C -->|"CCR markers, directives, catalog"| A
+    C -->|"CCR store"| E

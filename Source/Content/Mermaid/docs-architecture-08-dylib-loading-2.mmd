@@ -1,0 +1,12 @@
+stateDiagram-v2
+	[*] --> ImageA: CDLL load (startup, gen 0)
+	ImageA --> ImageA: calls mutate AphroditeState<br/>(bridge OnceLock / core HANDLES)
+	ImageA --> [*]: process exits
+	[*] --> ImageB: next Hermes session loads the new dylib
+	note right of ImageB
+		ImageB starts with DEFAULT state
+		(re-reads aphrodite.toml at dylib init).
+		ImageA's inline_store + markers are GONE:
+		old markers unresolvable against the new image.
+	end note
+	ImageB --> [*]

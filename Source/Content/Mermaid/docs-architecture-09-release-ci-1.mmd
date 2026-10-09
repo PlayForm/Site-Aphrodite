@@ -1,0 +1,24 @@
+flowchart LR
+	T["push tag Aphrodite/v* OR workflow_dispatch"] --> R["Release job (environment: Release)"]
+	R --> R1["softprops/action-gh-release - create release ONCE (before any attach)"]
+	R1 --> M{"Build matrix (needs: Release; fail-fast: false)"}
+	M --> B1["x86_64-unknown-linux-gnu (ubuntu)"]
+	M --> B2["aarch64-apple-darwin (macos)"]
+	M --> B3["x86_64-apple-darwin (macos, cross from arm64)"]
+	M --> B4["x86_64-pc-windows-msvc (windows - LONG POLE)"]
+
+	B1 --> S["cargo build --release -p aphrodite -p aphrodite-hermes --target T"]
+	B2 --> S
+	B3 --> S
+	B4 --> S
+	S --> ST["stage artifacts: aphrodite-T(.exe) + libaphrodite_hermes-T(.dylib/.so/.dll)"]
+	ST --> CK{"checksums"}
+	CK -->|windows| CW["pwsh Get-FileHash (bash findstr mangles /v flag)"]
+	CK -->|unix| CU["shasum -a 256"]
+	CW --> UP["upload-artifact + action-gh-release attach (fail_on_unmatched_files: true)"]
+	CU --> UP
+
+	UP --> F["Finalize job (needs: Build, tags only)"]
+	F --> FV["gh release view - assert all 4 targets × 3 files = 12 assets"]
+	FV -->|missing| FX["::error:: exit 1 - do NOT publish notes for incomplete matrix"]
+	FV -->|complete| FOK["All 4 platforms present (Windows included)"]

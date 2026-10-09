@@ -1,0 +1,28 @@
+stateDiagram-v2
+    [*] --> Classified: content over threshold<br/>(compress_chat_completion / transform_*_inner)
+    Classified --> Hashed: compute_key(bytes) → BLAKE3 40-hex
+
+    Hashed --> Stored_inline: len < inline byte budget<br/>(inline_ccr LRU 1024 / AphroditeState inline_store)
+    Hashed --> Stored_sqlite: Token mode → SqliteCcrStore.put (TTL rows)
+    Hashed --> Stored_lru: Cache mode → InMemoryCcrStore.put (cap 10k + TTL)
+
+    state Stored <<join>>
+    Stored_inline --> Stored
+    Stored_sqlite --> Stored
+    Stored_lru --> Stored
+
+    Stored --> Previewed: marker emitted<br/>preview + &lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;
+    Previewed --> Recalled: catalog_summary emits DELTA previews<br/>(+N new compressions this turn - pre_llm_call context)
+
+    Previewed --> Retrieved: /retrieve or aphrodite_retrieve(hash)<br/>byte-exact round-trip
+    Retrieved --> Previewed: entry stays stored
+
+    Previewed --> Decayed: turn-age - conv_index keeps last 50 turns<br/>recent_markers keeps last 200
+    Previewed --> Evicted: LRU / byte-budget pressure<br/>(inline_store_bytes > 256MB default)
+    Previewed --> Expired: TTL elapsed (ccr_ttl_seconds, default 3600s)
+
+    Decayed --> GC: dropped from index/marker ring
+    Evicted --> GC: pop_back oldest (inline) / LRU tail
+    Expired --> GC: backend TTL sweep on get/len
+    Retrieved --> [*]: process restart wipes all in-process state<br/>(new process = fresh state)
+    GC --> [*]

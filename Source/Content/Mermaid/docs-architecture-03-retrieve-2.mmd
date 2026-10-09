@@ -1,0 +1,27 @@
+flowchart LR
+    A["expand(state, hash)"] --> B["resolve_recursive(depth=0)"]
+    B --> C{"hash in visited?"}
+    C -->|yes cycle| D["return resolved.get(hash) - cached pre-expansion value"]
+    C -->|no| E["visited.push(hash)"]
+    E --> F{"depth >= RECURSIVE_DEPTH (5)?"}
+    F -->|yes| G["resolve_one(state,hash) - RAW leaf content, no further expand"]
+    F -->|no| H{"resolved cache hit?"}
+    H -->|yes| I["return cached"]
+    H -->|no| J["content = resolve_one(hash)?  (None → propagate)"]
+    J --> K["resolved.insert(hash, content)"]
+    K --> L["find_markers(content) - scan &lt;&lt;&lt;CCR:…&gt;&gt;&gt;"]
+    L --> M{"nested markers?"}
+    M -->|none| N["return content"]
+    M -->|yes| O["for each nested: recurse(depth+1) or reuse cache"]
+    O --> P["replace marker text with resolved value"]
+    P --> Q{"nested unresolved?"}
+    Q -->|yes| R["LEAVE original marker text intact - may heal later"]
+    Q -->|no| S["substitute"]
+    S --> T["return result - NOT written back over hash (content-address invariant)"]
+    R --> T
+
+    subgraph resolve_one["resolve_one"]
+      RA["normalize_hash"] --> RB{"i: prefix?"}
+      RB -->|yes| RC["inline_store_get (inline-only)"]
+      RB -->|no| RD["inline_store_get(hash)"]
+    end

@@ -1,0 +1,60 @@
+sequenceDiagram
+    autonumber
+    actor OS as OS / shell
+    participant main as main()
+    participant rt as tokio runtime
+    participant run as run()
+    participant cfg as MultiConfig
+    participant bind as bind loop
+    participant bs as proxy::build_state
+    participant ccr as CcrStore backend
+    participant watch as config watcher task
+    participant single as run_single
+
+    OS->>main: exec `aphrodite [args]`
+    main->>main: --version / --help early-exit checks
+    main->>main: `aphrodite setup` subcommand handled before the runtime
+    main->>main: worker_threads = env APHRODITE_WORKER_THREADS<br/>or (cpus*4).max(32)
+    main->>rt: Builder::new_multi_thread().worker_threads(n).enable_all()
+    rt->>run: block_on(run())
+
+    run->>run: resolve config_path:<br/>APHRODITE_CONFIG_PATH → ./aphrodite.toml → ~/.hermes/aphrodite/aphrodite.toml
+    alt config file exists (multi-proxy)
+        run->>cfg: MultiConfig::load(path)
+        cfg-->>run: proxies[], [compression], [defaults]
+        run->>cfg: for each proxy: config.resolve(p) → Cli
+        Note over cfg: env > TOML(proxy>defaults) > default<br/>API-key chain, per-mode port override,<br/>timeout clamp ≤600s, max_output<max_context
+    else no config (CLI fallback)
+        run->>cfg: Cli::parse() (requires --api-key)
+    end
+    run->>run: init tracing subscriber
+
+    loop each (name, cli) in proxies
+        bind->>bind: resolve relative ccr_db_path vs exe dir · mkdir -p parent
+        bind->>bind: TcpListener::bind(cli.listen) - a bind failure aborts startup
+        bind->>bs: build_state(&cli, compression)
+        bs->>bs: resolve_thresholds(compression)
+        alt mode == Token && !no_ccr_marker
+            bs->>ccr: SqliteCcrStore::open(db_path, ccr_ttl_seconds)
+        else mode == Cache
+            bs->>ccr: InMemoryCcrStore::with_capacity_and_ttl(10_000, ttl)
+        else Token && no_ccr_marker
+            bs->>ccr: None (no CCR backend)
+        end
+        bs-->>bind: Arc<AppState> (atomics seeded: ema=200, fill=9000, thresholds)
+        bind->>bind: bound.push((name, cli, listener, state))
+    end
+
+    run->>watch: spawn notify watcher on aphrodite.toml dir
+    Note over watch: on Modify(aphrodite.toml): debounce 500ms →<br/>MultiConfig::load → resolve_thresholds →<br/>store into every live AppState's 4 atomics
+
+    loop each bound listener
+        run->>single: spawn run_single(name, cli, listener, state, shutdown_rx)
+        single->>single: warn if APHRODITE_MGMT_TOKEN unset
+        single->>single: build restricted Router (/stats,/retrieve,/ccr/*,/reload,...)<br/>+ catch_all /{*path} → proxy_handler<br/>+ /health (public)
+        single->>single: axum::serve(...).with_graceful_shutdown(shutdown_rx.changed())
+    end
+
+    OS-->>main: SIGINT / SIGTERM
+    main->>single: shutdown_tx.send(true) → all listeners drain
+    main->>main: select: drain done | 5s timeout | 2nd Ctrl+C → abort remaining

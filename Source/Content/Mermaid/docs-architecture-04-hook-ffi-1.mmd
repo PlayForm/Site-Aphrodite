@@ -1,0 +1,37 @@
+sequenceDiagram
+    autonumber
+    participant H as Hermes host
+    participant PY as __init__.py _hook_dispatch
+    participant DL as _load_dylib (probe + load-once-per-process)
+    participant CJ as _call_json (forced restype + same-handle free)
+    participant CH as aphrodite_hermes_call_hook
+    participant UW as tools::unwrap_hermes_result
+    participant TI as hooks::transform_tool_result_with_meta
+    participant IN as transform_tool_result_inner
+    participant ST as inline_store + recent_markers (AphroditeState)
+    participant RF as replacement_from
+
+    H->>PY: transform_tool_result(tool_name, result, status, error_*, duration_ms)
+    PY->>DL: _load_dylib()  (probe + load-once-per-process)
+    DL->>DL: _probe_dylib in subprocess once per unique path -<br/>SIGSEGV stays in the child, never the gateway
+    PY->>CJ: aphrodite_hermes_call_hook("transform_tool_result", args_json)
+    CJ->>CJ: fn.restype = c_void_p (forced - default c_int truncates 64-bit ptr)
+    CJ->>CH: extern "C" (guarded - panic → {"error":...})
+    CH->>UW: unwrap_hermes_result(tool_content) → (classify_content, type)
+    Note over UW: unwraps {output,exit_code}/{diff}/{error}/{matches}/{content}<br/>original content still hashed verbatim - only type/preview affected
+    CH->>TI: transform_tool_result_with_meta(state, content, tool, classify, meta)
+    TI->>IN: inner pipeline
+    IN->>ST: record_tool_event_from_meta (always - telemetry)
+    IN->>IN: gates: empty / essential-tool / self-tool / below tool_threshold
+    alt over threshold, compressible
+        IN->>ST: inline_store_put(hash, content) · record_marker
+        IN-->>CH: {compressed:true, hash, type, size, preview, marker}
+    else skipped
+        IN-->>CH: {compressed:false, reason}
+    end
+    CH->>RF: replacement_from(result)
+    RF-->>CJ: marker string  (or Value::Null if not compressed)
+    CJ->>CJ: _read_str(ptr) - NULL guarded BEFORE the cast
+    CJ->>CJ: aphrodite_hermes_free_string(ptr) - through the SAME dylib<br/>handle that produced the pointer (never a reloaded image)
+    CJ-->>PY: json
+    PY-->>H: string → Hermes swaps tool output for marker (or leaves it on null)
