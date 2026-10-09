@@ -1,6 +1,7 @@
 ---
 import Base from "@Layout/Base.astro";
 import DocsSidebar from "../../Component/DocsSidebar.astro";
+import ZineDiagramNav from "../../Component/ZineDiagramNav.astro";
 
 import CcrPipeline from "../../Content/Mermaid/ccr-pipeline.svg?raw";
 import ConfigResolution from "../../Content/Mermaid/config-resolution.svg?raw";
@@ -60,16 +61,21 @@ const Href = (Id: string) => (Id === "index" ? "/docs/" : `/docs/${Id}/`);
 // The pre-rendered Mermaid SVGs, embedded per the placement map. The markdown
 // sources keep their ```mermaid blocks (they render as plain stream panes);
 // the rendered diagram rides above the prose in a [data-diagram] figure.
-const Diagrams: Record<string, { Label: string; Svg: string }> = {
-	"architecture/01-startup": { Label: "M1 // CCR PIPELINE", Svg: CcrPipeline },
-	"ccr/lifecycle": { Label: "M1 // CCR PIPELINE", Svg: CcrPipeline },
-	"ccr/marker-format": { Label: "M6 // MARKER FORMAT", Svg: MarkerFormat },
+const Diagrams: Record<string, { Id: string; Label: string; Svg: string }> = {
+	"architecture/01-startup": { Id: "ccr-pipeline", Label: "M1 // CCR PIPELINE", Svg: CcrPipeline },
+	"ccr/lifecycle": { Id: "ccr-pipeline", Label: "M1 // CCR PIPELINE", Svg: CcrPipeline },
+	"ccr/marker-format": { Id: "marker-format", Label: "M6 // MARKER FORMAT", Svg: MarkerFormat },
 	"architecture/07-config-resolution": {
+		Id: "config-resolution",
 		Label: "M7 // CONFIG RESOLUTION",
 		Svg: ConfigResolution,
 	},
-	"architecture/05-ccr-lifecycle": { Label: "M8 // SESSION LIFECYCLE", Svg: SessionLifecycle },
-	"proxy/architecture": { Label: "M5 // DUAL LISTENER", Svg: DualListener },
+	"architecture/05-ccr-lifecycle": {
+		Id: "session-lifecycle",
+		Label: "M8 // SESSION LIFECYCLE",
+		Svg: SessionLifecycle,
+	},
+	"proxy/architecture": { Id: "dual-listener", Label: "M5 // DUAL LISTENER", Svg: DualListener },
 };
 
 const Diagram = Diagrams[Doc.id];
@@ -194,7 +200,7 @@ const Purposes = new Map(
 					Diagram && (
 						<figure
 							class="relative z-10 mt-16 border border-oxblood-dark bg-soot-black p-4"
-							data-diagram={Diagram.Label.toLowerCase().replaceAll(" ", "-")}
+							data-diagram={Diagram.Id}
 						>
 							<div class="overflow-x-auto [&_svg]:h-auto [&_svg]:max-w-full" set:html={Diagram.Svg} />
 							<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
@@ -330,6 +336,7 @@ const Purposes = new Map(
 			<DocsSidebar Sections={Sections} CurrentId={Doc.id} />
 		</div>
 	</div>
+	<ZineDiagramNav />
 </Base>
 
 <style>
@@ -392,6 +399,30 @@ const Purposes = new Map(
 	.docs-prose :global(a:hover) {
 		background-color: var(--raw-blood);
 		color: var(--bone-white);
+	}
+
+	/* The code-mention links: the chip wrapped in a source anchor - the canary
+	   underline on hover, the raw-blood focus ring. */
+	.docs-prose :global(a.code-link) {
+		text-decoration: none;
+		transition: background-color 0.15s ease, color 0.15s ease;
+	}
+
+	.docs-prose :global(a.code-link:hover) {
+		background-color: var(--raw-blood);
+	}
+
+	.docs-prose :global(a.code-link:hover code) {
+		color: var(--stamped-canary);
+		text-decoration: underline;
+		text-decoration-color: var(--stamped-canary);
+		text-decoration-thickness: 2px;
+		text-underline-offset: 4px;
+	}
+
+	.docs-prose :global(a.code-link:focus-visible) {
+		outline: 2px solid var(--raw-blood);
+		outline-offset: 2px;
 	}
 
 	.docs-prose :global(strong) {

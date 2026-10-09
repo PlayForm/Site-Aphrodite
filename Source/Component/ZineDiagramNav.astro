@@ -20,6 +20,12 @@
 ---
 
 <script>
+	// The ClientRouter-friendly navigation: `navigate` from astro:transitions
+	// performs the same client-side swap the site's header links get (no full
+	// reload), and still falls back to a real navigation when the router is
+	// absent (view transitions disabled).
+	import { navigate } from "astro:transitions/client";
+
 	function NodeKey(Group: Element): string {
 	return Group.id.replace(/^flowchart-/, "").replace(/-\d+$/, "");
 }
@@ -107,11 +113,11 @@ function BindDiagrams() {
 
 			if (Links[Key]) {
 				Group.addEventListener("click", () => {
-					window.location.assign(Links[Key]);
+					navigate(Links[Key]);
 				});
 				Group.addEventListener("keydown", (Event) => {
 					if ((Event as KeyboardEvent).key === "Enter") {
-						window.location.assign(Links[Key]);
+						navigate(Links[Key]);
 					}
 				});
 			}

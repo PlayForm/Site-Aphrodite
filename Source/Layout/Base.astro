@@ -125,7 +125,7 @@ interface Props {
 			<nav aria-label="Site" class="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-3 sm:px-8">
 				<a class="flex items-center gap-2" href="/">
 					<img class="h-5 w-5" src="/Brand/aphrodite-32.png" alt="" width="20" height="20" />
-					<span class="font-mono text-[11px] font-bold tracking-widest text-bone-white"
+					<span class="font-mono text-base font-bold tracking-widest text-bone-white"
 						>APHRODITE</span
 					>
 				</a>
@@ -139,8 +139,8 @@ interface Props {
 									aria-current={Active ? "page" : undefined}
 									class={
 										Active
-											? "bg-raw-blood px-3 py-1 font-mono text-[11px] font-bold tracking-widest text-bone-white"
-											: "px-1 py-1 font-mono text-[11px] tracking-widest text-zinc-dust hover:text-bone-white"
+											? "bg-raw-blood px-3 py-1 font-mono text-base font-bold tracking-widest text-bone-white"
+											: "px-1 py-1 font-mono text-base tracking-widest text-zinc-dust hover:text-bone-white"
 									}
 								>
 									{Link.Label}
@@ -159,8 +159,8 @@ interface Props {
 									aria-current={Active ? "page" : undefined}
 									class={
 										Active
-											? "bg-raw-blood px-3 py-1 font-mono text-[11px] font-bold tracking-widest text-bone-white"
-											: "px-1 py-1 font-mono text-[11px] tracking-widest text-zinc-dust hover:text-bone-white"
+											? "bg-raw-blood px-3 py-1 font-mono text-base font-bold tracking-widest text-bone-white"
+											: "px-1 py-1 font-mono text-base tracking-widest text-zinc-dust hover:text-bone-white"
 									}
 								>
 									{Link.Label}
@@ -173,7 +173,7 @@ interface Props {
 							<a
 								href={Link.Href}
 								aria-current={IsActive(Astro.url.pathname, Link) ? "page" : undefined}
-								class="px-1 py-1 font-mono text-[11px] tracking-widest text-zinc-dust hover:text-bone-white"
+								class="px-1 py-1 font-mono text-base tracking-widest text-zinc-dust hover:text-bone-white"
 							>
 								{Link.Label}
 							</a>
@@ -182,7 +182,7 @@ interface Props {
 				</nav>
 				<button
 					id="nav-toggle"
-					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] font-bold tracking-widest text-bone-newsprint xl:hidden"
+					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-base font-bold tracking-widest text-bone-newsprint xl:hidden"
 					aria-expanded="false"
 					aria-controls="nav-menu"
 				>
@@ -190,18 +190,65 @@ interface Props {
 				</button>
 			</nav>
 			<div id="nav-menu" class="hidden border-t border-oxblood-dark bg-soot-black xl:hidden">
-				<div class="flex flex-col px-5 py-2">
-					{
-						AllLinks.map((Link) => (
-							<a
-								href={Link.Href}
-								aria-current={IsActive(Astro.url.pathname, Link) ? "page" : undefined}
-								class="border-b border-oxblood-dark/50 py-2 font-mono text-[11px] tracking-widest text-bone-newsprint"
-							>
-								{Link.Label}
-							</a>
-						))
-					}
+				<!-- Tree menu: the registry read as two levels - the PRIMARY group
+				     (the bar entries) then MORE (the rest), each as a grid of
+				     cells so the order follows the registry. The group labels
+				     carry the tape-stamp skin. -->
+				<div class="flex flex-col gap-6 px-5 py-4">
+					<nav aria-label="Primary" class="flex flex-col gap-2">
+						<p
+							class="w-fit -rotate-1 border border-black bg-raw-blood px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+						>
+							PRIMARY
+						</p>
+						<div class="grid grid-cols-2 gap-x-4">
+							{
+								PrimaryLinks.map((Link) => {
+									const Active = IsActive(Astro.url.pathname, Link);
+									return (
+										<a
+											href={Link.Href}
+											aria-current={Active ? "page" : undefined}
+											class={
+												Active
+													? "border-b border-oxblood-dark/50 bg-raw-blood px-2 py-2 font-mono text-base font-bold tracking-widest text-bone-white"
+													: "border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"
+											}
+										>
+											{Link.Label}
+										</a>
+									);
+								})
+							}
+						</div>
+					</nav>
+					<nav aria-label="More" class="flex flex-col gap-2">
+						<p
+							class="w-fit rotate-1 border border-black bg-stamped-canary px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+						>
+							MORE
+						</p>
+						<div class="grid grid-cols-2 gap-x-4">
+							{
+								MenuLinks.map((Link) => {
+									const Active = IsActive(Astro.url.pathname, Link);
+									return (
+										<a
+											href={Link.Href}
+											aria-current={Active ? "page" : undefined}
+											class={
+												Active
+													? "border-b border-oxblood-dark/50 bg-raw-blood px-2 py-2 font-mono text-base font-bold tracking-widest text-bone-white"
+													: "border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"
+											}
+										>
+											{Link.Label}
+										</a>
+									);
+								})
+							}
+						</div>
+					</nav>
 				</div>
 			</div>
 		</header>
@@ -220,12 +267,12 @@ interface Props {
 					<div class="flex items-center gap-2">
 						<span class="h-2.5 w-2.5 bg-raw-blood"></span>
 						<span
-							class="font-mono text-xs font-bold uppercase tracking-widest text-bone-white"
+							class="font-mono text-base font-bold uppercase tracking-widest text-bone-white"
 							>APHRODITE CCR CORE</span
 						>
 					</div>
 					<div
-						class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 font-mono text-xs text-zinc-dust"
+						class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 font-mono text-base text-zinc-dust"
 					>
 						{
 							AllLinks.map((Link) => (
@@ -253,7 +300,7 @@ interface Props {
 			id="copy-toast"
 			role="status"
 			aria-live="polite"
-			class="pointer-events-none fixed bottom-4 right-4 z-50 hidden border-2 border-black bg-raw-blood px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			class="pointer-events-none fixed bottom-4 right-4 z-50 hidden border-2 border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 		>
 			COPIED TO SPOOL
 		</div>

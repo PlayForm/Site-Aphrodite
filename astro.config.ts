@@ -46,6 +46,12 @@ export default defineConfig({
 	},
 	integrations: [
 		// @ts-ignore
+		// The code-mention pass: after the build writes each page, every inline
+		// code element that resolves through Source/Library/SourceLinks.ts (or
+		// an existing repo-relative path) is wrapped in an anchor to its
+		// definition file at tree/Current. Declared first so the compression
+		// integrations below operate on the linked output.
+		(await import("./Source/Library/CodeMentions.ts")).default(),
 		// The service worker for production builds. Gated on NODE_ENV, not
 		// import.meta.env.MODE: at config-eval time during `astro build` MODE
 		// is still "development" (the build command does not set it), so the

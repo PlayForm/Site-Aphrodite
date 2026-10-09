@@ -5,6 +5,8 @@ import ZineBox from "../Component/ZineBox.astro";
 import ZineStamp from "../Component/ZineStamp.astro";
 import ZineStream from "../Component/ZineStream.astro";
 import ZineTape from "../Component/ZineTape.astro";
+import Breadcrumbs from "@Component/Breadcrumbs.astro";
+import Related from "@Component/Related.astro";
 
 // The CONFIG PLAYGROUND: the aphrodite.toml surface made explorable, as a
 // CLIENT-SIDE SIMULATION (no runtime, no network). Every fact below traces to
@@ -84,6 +86,7 @@ const Example = [
 	<main
 		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col px-5 pt-16 sm:px-8 lg:px-14"
 	>
+		<Breadcrumbs />
 		<!-- Header -->
 		<header class="relative border-l-4 border-blood-crimson bg-carbon-void p-8">
 			<ZineTape Label="aphrodite.toml" Color="raw" Side="left" />
@@ -465,6 +468,15 @@ const Example = [
 				toml, never an api_key value; the key field appears only as its env-var name.
 			</p>
 		</footer>
+
+		<!-- RELATED: the natural neighbors -->
+		<Related
+			Links={[
+				{ Href: "/setup/", Label: "SETUP" },
+				{ Href: "/workbench/", Label: "WORKBENCH" },
+				{ Href: "/docs/config/", Label: "DOCS · CONFIG" },
+			]}
+		/>
 	</main>
 </Base>
 

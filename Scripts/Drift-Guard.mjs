@@ -123,8 +123,12 @@ const MarkerDoc = await Read(join(Docs, "ccr/marker-format.md"));
 Check("marker-format doc carries the marker constant", true, MarkerDoc.includes(MarkerConstant));
 
 // --- 4. The headline figures ---
-// Every Nx token a page carries must appear in the root README: an invented
-// or drifted figure fails, and a figure the README drops fails too.
+// Every Nx token a page carries must appear in the root README or, as the
+// secondary figure-primary, the root CHANGELOG.md: an invented or drifted
+// figure fails, and a figure both sources drop fails too. The CHANGELOG is the
+// primary for figures a page cites directly from it (the history content cites
+// CHANGELOG.md anchors, so the unrounded values like 132.82× verify against
+// the CHANGELOG itself - the page value must match the cited source).
 const PageDir = join(SiteRoot, "Source/pages");
 const Walk = async (Base, Out = []) => {
 	for (const Entry of await readdir(Base, { withFileTypes: true })) {
@@ -141,7 +145,11 @@ for (const Page of Pages) {
 	const Label = relative(PageDir, Page);
 	const Figures = new Set(Text.match(FigurePattern) ?? []);
 	for (const Figure of Figures) {
-		Check(`page figure ${Label}: "${Figure}" appears in the README`, true, Readme.includes(Figure));
+		Check(
+			`page figure ${Label}: "${Figure}" appears in the README or the CHANGELOG`,
+			true,
+			Readme.includes(Figure) || Changelog.includes(Figure),
+		);
 	}
 }
 

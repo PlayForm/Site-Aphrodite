@@ -28,7 +28,7 @@
     "Diagrams": "node Source/Content/Mermaid/Render.mjs",
     "Docs": "node --experimental-strip-types Scripts/Docs.ts",
     "Drift": "node Scripts/Drift-Guard.mjs",
-    "prepublishOnly": "pnpm Docs && astro build"
+    "prepublishOnly": "pnpm Docs && node Scripts/Drift-Guard.mjs && astro build"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.4",

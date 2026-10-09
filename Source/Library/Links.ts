@@ -79,6 +79,18 @@ export const OurRepo: Repo = {
 };
 
 /**
+ * The Aphrodite-Hermes repository - the canonical home of the CCR plugin
+ * (plugin.yaml, the loader, the installer, the layout check), linked at the
+ * same canonical Current branch. The root repository vendors the same plugin
+ * content under plugins/aphrodite, but the plugin's own repository is the
+ * single home every plugin-context link composes against.
+ */
+export const HermesRepo: Repo = {
+	Base: "https://github.com/PlayForm/Aphrodite-Hermes",
+	Branch: BranchCurrent,
+};
+
+/**
  * Compose a repository URL: Link(OurRepo, "docs/proxy/handlers.md")
  * -> "https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/handlers.md".
  * The one function every composed repository URL flows through - a future

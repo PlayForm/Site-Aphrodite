@@ -1,0 +1,41 @@
+---
+import { Link, OurRepo, type Repo } from "@Library/Links";
+import { ResolveCode, SourceLink } from "@Library/SourceLinks";
+
+interface Props {
+	/** The identifier text, exactly as it appears in the registry (or a repo-relative path). */
+	Name: string;
+
+	/** The target path; unset resolves through the SourceLinks registry. */
+	Path?: string;
+
+	/** The repository for an explicit Path; defaults to the Aphrodite repository. */
+	Repo?: Repo;
+}
+
+/**
+ * The code-mention link: the mono code chip that links to the identifier's
+ * definition file in the repository, always in the tree/<branch> form. The
+ * visual follows the docs-prose chip (the asphalt border) with the canary
+ * underline on hover and the raw-blood focus ring, matching the site's link
+ * grammar.
+ */
+const { Name, Path, Repo = OurRepo } = Astro.props;
+
+const Entry = Path === undefined ? ResolveCode(Name) : { Path, Repo };
+const Href = Entry ? SourceLink(Entry) : null;
+---
+
+{
+	Href === null ? (
+		<code class="font-mono text-xs">{Name}</code>
+	) : (
+		<a
+			class="code-link inline-block font-mono text-xs transition-colors focus:outline focus:outline-2 focus:outline-raw-blood focus:outline-offset-2 hover:decoration-stamped-canary hover:underline hover:decoration-2 hover:underline-offset-4"
+			href={Href}
+			title={`Source: ${Href}`}
+		>
+			<code class="font-mono text-xs">{Name}</code>
+		</a>
+	)
+}

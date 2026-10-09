@@ -3,14 +3,30 @@ import Base from "@Layout/Base.astro";
 
 import Breadcrumbs from "@Component/Breadcrumbs.astro";
 import Related from "@Component/Related.astro";
+import { ReleaseNote, Stamps, Versions } from "@Library/Versions";
+
+/** The release-note URL for a tape stamp ("v1.6.6" -> the Aphrodite/v1.6.6 tag). */
+const NoteFor = (Ver: string): string =>
+	ReleaseNote(Ver.startsWith("v") ? Ver.slice(1) : Ver);
 
 // THE TIMELINE TAPE - one tape strip per release stamp, from the first public
-// architecture (v0.7.0) to the current pairing (v1.6.6 <-> v2.2.6). Every
+// architecture (v0.7.0) to the current pairing (read from the monorepo
+// primaries at build time by Library/Versions.ts). Every
 // "what landed" line traces to CHANGELOG.md's release header; every release
 // link is the GitHub release note. The 1.2.2 (first crates.io publish) and
 // 1.4.6 (chain-split CCR + the first plugin-first release) stamps get the
 // enlarged perforation treatment.
-const Tape = [
+interface TapeStamp {
+	Ver: string;
+	Date: string;
+	Pair: string;
+	Landed: string;
+	Tag: string;
+	Enlarged: boolean;
+	/** The release-note tag when the stamp's Ver is a range (the note links at one tag). */
+	Note?: string;
+}
+const Tape: TapeStamp[] = [
 	{
 		Ver: "v0.7.0",
 		Date: "2026-06-17",
@@ -29,6 +45,7 @@ const Tape = [
 	},
 	{
 		Ver: "v1.3.2 -> v1.3.4",
+		Note: "v1.3.4",
 		Date: "2026-07-14",
 		Pair: "PLUGIN v2.0.x",
 		Landed: "Rust maturity: the losslessness sweep (hash the ORIGINAL, never the wrapper) and the lossy-arguments fix; then high-intelligibility previews at 132× overall.",
@@ -84,19 +101,19 @@ const Tape = [
 		Enlarged: false,
 	},
 	{
-		Ver: "v1.6.6",
-		Date: "2026-10-07",
-		Pair: "PLUGIN v2.2.6",
+		Ver: `v${Versions.Binary}`,
+		Date: Versions.ChangelogDate,
+		Pair: `PLUGIN v${Versions.Plugin}`,
 		Landed: "Path guards: aphrodite_prefetch refuses .env, auth.json, ~/.ssh, the Hermes home, and non-file paths outright; the context engine is re-described as opt-in.",
 		Tag: "CURRENT PAIRING",
 		Enlarged: false,
 	},
-] as const;
+];
 ---
 
 <Base
 	Title="VERSIONS // APHRODITE"
-	Description="Aphrodite v1.6.6, plugin v2.2.6 (2026-10-07). The current release, its changelog, and pointers to the full benchmarks."
+	Description={`Aphrodite v${Versions.Binary}, plugin v${Versions.Plugin} (${Versions.ChangelogDate}). The current release, its changelog, and pointers to the full benchmarks.`}
 >
 	<main
 		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-32 sm:px-8 lg:gap-40 lg:px-14 lg:py-56"
@@ -114,9 +131,9 @@ const Tape = [
 				Versions
 			</h1>
 			<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
-				Current release: binary <strong>v1.6.6</strong>, plugin <strong>v2.2.6</strong>
-				(v1.6.6, 2026-10-07). Requires Rust 1.88+. Licensed CC0-1.0.
-				<span class="mt-1 block text-[9px] text-zinc-dust">SRC: README.md:12; CHANGELOG.md v1.6.6</span>
+				Current release: binary <strong>{Stamps.Binary()}</strong>, plugin <strong>{Stamps.Plugin()}</strong>
+				({`v${Versions.Binary}`}, {Versions.ChangelogDate}). Requires Rust 1.88+. Licensed CC0-1.0.
+				<span class="mt-1 block text-[9px] text-zinc-dust">SRC: README.md:12; CHANGELOG.md v{Versions.ChangelogVersion}</span>
 			</p>
 		</header>
 
@@ -138,7 +155,7 @@ const Tape = [
 						<div
 							class="font-headline text-5xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-7xl"
 						>
-							v1.6.6
+							{Stamps.Binary()}
 						</div>
 					</div>
 					<div class="zine-box-subtle w-full border-[3px] border-raw-blood bg-soot-black p-5 lg:w-auto">
@@ -146,13 +163,13 @@ const Tape = [
 							HERMES PLUGIN
 						</div>
 						<div class="font-headline text-3xl font-black tracking-tighter text-bone-white sm:text-5xl">
-							v2.2.6
+							{Stamps.Plugin()}
 						</div>
-						<div class="mt-1 text-xs font-bold text-stamped-canary">2026-10-07</div>
+						<div class="mt-1 text-xs font-bold text-stamped-canary">{Versions.ChangelogDate}</div>
 					</div>
 				</div>
 				<div class="mt-8 border-t border-oxblood-dark pt-4 text-[9px] text-zinc-dust">
-					SRC: CHANGELOG.md v1.6.6 ("Binary 1.6.5 → 1.6.6, plugin 2.2.5 → 2.2.6")
+					SRC: CHANGELOG.md v{Versions.ChangelogVersion} ("{Versions.ChangelogPairing}")
 				</div>
 			</div>
 		</section>
@@ -162,7 +179,7 @@ const Tape = [
 			<div
 				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
-				CHANGELOG // V1.6.6
+				{`CHANGELOG // V${Versions.ChangelogVersion}`}
 			</div>
 			<div class="flex flex-col gap-6">
 				<div
@@ -212,7 +229,7 @@ const Tape = [
 					</div>
 				</div>
 			</div>
-			<p class="mt-4 text-[9px] text-zinc-dust">SRC: CHANGELOG.md v1.6.6</p>
+			<p class="mt-4 text-[9px] text-zinc-dust">SRC: CHANGELOG.md v{Versions.ChangelogVersion}</p>
 		</section>
 
 		<!-- THE TIMELINE TAPE: one strip per release stamp -->
@@ -220,7 +237,7 @@ const Tape = [
 			<div
 				class="mb-10 -rotate-1 border border-black bg-stamped-canary px-3 py-1 text-[11px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
 			>
-				TIMELINE TAPE // v0.7.0 -> v1.6.6
+				{`TIMELINE TAPE // v0.7.0 -> v${Versions.Binary}`}
 			</div>
 			<p class="mb-20 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
 				Each strip is one release stamp: the binary and the plugin version it paired,
@@ -230,7 +247,7 @@ const Tape = [
 			</p>
 			<div class="flex flex-col gap-16">
 				{
-					Tape.map(({ Ver, Date, Pair, Landed, Tag, Enlarged }) => (
+					Tape.map(({ Ver, Date, Pair, Landed, Tag, Enlarged, Note }) => (
 						<article
 							class={`relative flex items-stretch gap-6 ${
 								Enlarged
@@ -285,7 +302,7 @@ const Tape = [
 								</div>
 								<a
 									class="shrink-0 border border-black bg-soot-black px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-weathered-teal shadow-[3px_3px_0px_#000] transition-colors hover:bg-raw-blood hover:text-bone-white"
-									href={`https://github.com/PlayForm/Aphrodite/releases/tag/Aphrodite%2F${Ver}`}
+									href={NoteFor(Note ?? Ver)}
 								>
 									RELEASE NOTE ↗
 								</a>
