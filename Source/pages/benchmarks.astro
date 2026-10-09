@@ -17,7 +17,7 @@ import Related from "@Component/Related.astro";
 			<div
 				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
-				BENCHMARKS // MEASURED TELEMETRY
+				BENCHMARKS // MEASURED FIGURES
 			</div>
 			<h1
 				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
@@ -25,9 +25,9 @@ import Related from "@Component/Related.astro";
 				Benchmarks
 			</h1>
 			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Every figure below is quoted from the repository's own measurements - the standard
-				corpus, the threshold benches, and the 200-session real-world study. Nothing on this
-				page is extrapolated.
+				These figures come from the project's own benchmarks and from a study of the
+				author's real Hermes sessions. Benchmark ratios are measured; session savings
+				are estimated, and the uncertainty band is shown below.
 			</p>
 		</header>
 
@@ -49,7 +49,8 @@ import Related from "@Component/Related.astro";
 					610&times;
 				</div>
 				<p class="mt-4 border-t border-oxblood-dark pt-3 text-base text-zinc-dust">
-					Standard corpus. <span class="text-weathered-teal">132&times; overall, 106 KB &rarr; 800 B.</span>
+					Best case on large low-entropy prose. <span class="text-weathered-teal">132&times; overall on the same corpus, 106 KB &rarr; 800 B.</span>
+					<span class="mt-1 block text-base text-zinc-dust">The best case is not part of the per-type chart below - that chart peaks at 416&times;.</span>
 					<span class="mt-1 block text-base text-zinc-dust">SRC: README.md:12, 446</span>
 				</p>
 			</div>
@@ -103,8 +104,8 @@ import Related from "@Component/Related.astro";
 					23&times;
 				</div>
 				<p class="mt-4 border-t border-oxblood-dark pt-3 text-base text-zinc-dust">
-					Fewer tokens on tool output.
-					<span class="mt-1 block text-base text-zinc-dust">SRC: README.md:458</span>
+					Fewer tokens on tool output - the median the README reports for its per-type table.
+					<span class="mt-1 block text-base text-zinc-dust">SRC: README.md:459</span>
 				</p>
 			</div>
 		</section>
@@ -114,13 +115,13 @@ import Related from "@Component/Related.astro";
 			<div
 				class="absolute -top-4 right-10 z-20 border border-black bg-stamped-canary px-4 py-1 text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
 			>
-				TELEMETRY // PER-TYPE COMPRESSION
+				MEASURED // PER-TYPE COMPRESSION
 			</div>
 			<div
 				class="zine-box-crimson relative overflow-hidden border-4 border-blood-crimson bg-carbon-void p-6 sm:p-10"
 			>
 				<div class="mb-8 text-base font-bold uppercase tracking-wider text-zinc-dust">
-					RATIO BY OUTPUT CLASS (README STANDARD CORPUS):
+					RATIO BY OUTPUT CLASS (README STANDARD CORPUS, LOG SCALE):
 				</div>
 				<div class="space-y-5">
 					<div>
@@ -129,8 +130,8 @@ import Related from "@Component/Related.astro";
 							<span class="text-weathered-teal">416&times;</span>
 						</div>
 						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-weathered-teal" style="width: 98%;"></div>
-							<div class="h-full bg-raw-blood" style="width: 2%;"></div>
+							<div class="h-full bg-weathered-teal" style="width: 100%;"></div>
+							<div class="h-full bg-raw-blood" style="width: 0%;"></div>
 						</div>
 					</div>
 					<div>
@@ -139,8 +140,8 @@ import Related from "@Component/Related.astro";
 							<span class="text-raw-blood">140&times;</span>
 						</div>
 						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-raw-blood" style="width: 93%;"></div>
-							<div class="h-full bg-stamped-canary" style="width: 7%;"></div>
+							<div class="h-full bg-raw-blood" style="width: 82%;"></div>
+							<div class="h-full bg-stamped-canary" style="width: 18%;"></div>
 						</div>
 					</div>
 					<div>
@@ -149,8 +150,8 @@ import Related from "@Component/Related.astro";
 							<span class="text-stamped-canary">40&times;</span>
 						</div>
 						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-stamped-canary" style="width: 86%;"></div>
-							<div class="h-full bg-asphalt-panel" style="width: 14%;"></div>
+							<div class="h-full bg-stamped-canary" style="width: 61%;"></div>
+							<div class="h-full bg-asphalt-panel" style="width: 39%;"></div>
 						</div>
 					</div>
 					<div>
@@ -159,8 +160,8 @@ import Related from "@Component/Related.astro";
 							<span class="text-raw-blood">23&times;</span>
 						</div>
 						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-raw-blood" style="width: 58%;"></div>
-							<div class="h-full bg-asphalt-panel" style="width: 42%;"></div>
+							<div class="h-full bg-raw-blood" style="width: 52%;"></div>
+							<div class="h-full bg-asphalt-panel" style="width: 48%;"></div>
 						</div>
 					</div>
 					<div>
@@ -169,8 +170,8 @@ import Related from "@Component/Related.astro";
 							<span class="text-stamped-canary">20&times;</span>
 						</div>
 						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-stamped-canary" style="width: 55%;"></div>
-							<div class="h-full bg-asphalt-panel" style="width: 45%;"></div>
+							<div class="h-full bg-stamped-canary" style="width: 50%;"></div>
+							<div class="h-full bg-asphalt-panel" style="width: 50%;"></div>
 						</div>
 					</div>
 				</div>
@@ -216,6 +217,24 @@ import Related from "@Component/Related.astro";
 				<div class="mt-8 space-y-5">
 					<div>
 						<div class="mb-1 flex justify-between text-base font-bold">
+							<span class="text-bone-newsprint">CHAT-ONLY SESSIONS</span>
+							<span class="text-weathered-teal">~0%</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-zinc-dust" style="width: 0%;"></div>
+						</div>
+					</div>
+					<div>
+						<div class="mb-1 flex justify-between text-base font-bold">
+							<span class="text-bone-newsprint">LIGHT DEVELOPER SESSIONS</span>
+							<span class="text-weathered-teal">~5%</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-weathered-teal" style="width: 5%;"></div>
+						</div>
+					</div>
+					<div>
+						<div class="mb-1 flex justify-between text-base font-bold">
 							<span class="text-bone-newsprint">TOOL-HEAVY SESSIONS</span>
 							<span class="text-weathered-teal">20-25%</span>
 						</div>
@@ -225,18 +244,26 @@ import Related from "@Component/Related.astro";
 					</div>
 					<div>
 						<div class="mb-1 flex justify-between text-base font-bold">
-							<span class="text-bone-newsprint">PURE-TOOL SESSIONS</span>
+							<span class="text-bone-newsprint">SIMULATED PURE-TOOL LOOP</span>
 							<span class="text-raw-blood">76-82%</span>
 						</div>
 						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
 							<div class="h-full bg-raw-blood" style="width: 79%;"></div>
 						</div>
+						<div class="mt-1 text-base text-zinc-dust">
+							A simulated diff+ls+build+search workload - a stress test, not real usage.
+						</div>
 					</div>
 				</div>
 				<p class="mt-6 border-t border-oxblood-dark pt-4 font-body text-base leading-relaxed text-zinc-dust">
-					The exact percentage is a band: sensitivity across 3.0-4.5 chars/token spans
-					~24-33%, centered ~27%. Retrieval tax: 2,275 calls / 2,011,583 tokens.
-					<span class="mt-1 block text-base text-zinc-dust">SRC: README.md:467-503</span>
+					The study is the author's own work: 200 real Hermes sessions, Sep 18-20, 2026 -
+					multi-agent atomization fan-outs, merge/PR work, plugin integration -
+					reconstructed payload-by-payload from the session transcripts. The exact
+					percentage is a band: sensitivity across 3.0-4.5 chars/token spans ~24-33%,
+					centered ~27%.
+					<span class="mt-1 block text-base text-zinc-dust">Retrieval cost: 2,275 calls /
+					2,011,583 tokens - the re-entry toll, roughly 1.3% of the tokens saved. SRC:
+					README.md:467-503</span>
 				</p>
 			</div>
 		</section>
@@ -252,6 +279,9 @@ import Related from "@Component/Related.astro";
 					REPRODUCE // BENCH HARNESS
 				</div>
 				<div class="mt-2 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
+					<div class="text-bone-newsprint"># requires a source checkout + Rust (see the SETUP page for versions)</div>
+					<div>$ git clone https://github.com/PlayForm/Aphrodite.git && cd Aphrodite</div>
+					<div>$ git submodule update --init --recursive</div>
 					<div>$ cargo run --release -p aphrodite --example bench_01_corpus</div>
 					<div>$ cargo run --release -p aphrodite --example bench_02_threshold</div>
 					<div>$ cargo run --release -p aphrodite --example bench_03_retrieve</div>

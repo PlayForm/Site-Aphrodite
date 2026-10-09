@@ -24,10 +24,12 @@ import Related from "@Component/Related.astro";
 				One engine, many hosts
 			</h1>
 			<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Aphrodite's compression engine does not belong to one agent. The native Hermes
-				plugin is the flagship flavor today - the deepest integration, the most
-				capabilities - but the same CCR core runs standalone for any OpenAI-compatible
-				client, and the engine's core is an embedded fork built to stay portable.
+				Aphrodite's compression engine does not belong to one agent.
+				<span class="mt-1 block text-base">It is the reason the same CCR core ships in
+				more than one shape: the native Hermes plugin is the flagship flavor today - the
+				deepest integration, the most capabilities - while a standalone listener serves
+				any OpenAI-compatible client, and the engine's core is an embedded fork built to
+				stay portable.</span>
 			</p>
 			<div class="mt-8 flex max-w-4xl flex-wrap items-center gap-8">
 				<span
@@ -120,9 +122,10 @@ import Related from "@Component/Related.astro";
 				<p class="font-body text-base leading-relaxed text-bone-newsprint">
 					Aphrodite embeds Headroom - a custom fork, tracked as a git submodule - as its
 					content-transform core: the classifier, the smart crusher, the tokenizer. The
-					Hermes-specific layer is a thin bridge on top. That separation is what makes
-					new host flavors possible: the engine already speaks in content types and
-					previews, not in agent APIs.
+					Hermes-specific layer is a thin bridge on top.
+					<span class="mt-1 block text-base">It is the reason new host flavors are
+					possible: the engine already speaks in content types and previews, not in
+					agent APIs.</span>
 				</p>
 			</div>
 		</section>

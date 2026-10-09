@@ -27,9 +27,10 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 			</h1>
 			<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Every hook is a thin dispatch that forwards its arguments to the Rust dylib and
-				hands the JSON reply back to Hermes. On plugin load the shim asks the dylib for
-				its hook names and registers one callback per name - the six below are always
-				registered together.
+				hands the JSON reply back to Hermes.
+				<span class="mt-1 block text-base">It is the reason the shim registers one callback
+				per name: on plugin load it asks the dylib for its hook names, and the six below
+				are always registered together.</span>
 			</p>
 		</header>
 

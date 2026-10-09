@@ -8,7 +8,7 @@ import { ExternalLinks } from "@Library/Links";
 
 <Base
 	Title="SETUP // APHRODITE"
-	Description="Install Aphrodite for Hermes Agent: the plugin flow with bash download.sh, the Cargo flow, or build from source. TOML-driven configuration."
+	Description="Install Aphrodite for Hermes Agent: the plugin flow with bash download.sh, the plugin catalog (store) install, the Cargo flow, or build from source. TOML-driven configuration."
 >
 	<main
 		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-32 sm:px-8 lg:gap-40 lg:px-14 lg:py-56"
@@ -26,14 +26,17 @@ import { ExternalLinks } from "@Library/Links";
 			</h1>
 			<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Aphrodite ships as a Hermes Agent plugin (recommended) or a standalone Chat
-				Completions proxy. Both install paths land on this page - and the full host map,
-				including the flavors still planned, is laid out on
-				<a class="text-weathered-teal transition-colors hover:text-bone-white" href="/flavors/">FLAVORS</a>. Binaries are never
-				shipped in the repository and
-				<code class="font-mono text-base text-weathered-teal">register()</code> never downloads -
-				run the explicit setup step to fetch the binary and dylib from GitHub Releases into
-				<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>, with
-				SHA-256 verification.
+				Completions proxy.
+				<span class="mt-1 block text-base">It is the reason both install paths land on this
+				page: the binaries are never shipped in the repository, and
+				<code class="font-mono text-base text-weathered-teal">register()</code> never
+				downloads - run the explicit setup step to fetch the binary and dylib from GitHub
+				Releases into
+				<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>,
+				with SHA-256 verification.</span>
+				<span class="mt-1 block text-base">The full host map, including the flavors still
+				planned, is laid out on
+				<a class="text-weathered-teal transition-colors hover:text-bone-white" href="/flavors/">FLAVORS</a>.</span>
 			</p>
 		</header>
 
@@ -115,6 +118,43 @@ import { ExternalLinks } from "@Library/Links";
 					<div>$ cd Aphrodite</div>
 					<div>$ git submodule update --init --recursive</div>
 					<div class="text-bone-white">$ cargo build --release -p aphrodite -p aphrodite-hermes</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- OPTION D: HERMES STORE -->
+		<section class="relative w-full lg:w-7/12 lg:self-end lg:-mt-12">
+			<div
+				class="zine-box-crimson relative -rotate-[1.8deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div
+					class="absolute -top-3.5 right-6 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+				>
+					#D // HERMES STORE
+				</div>
+				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+					Plugin catalog install
+				</h2>
+				<div class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
+					<div class="text-bone-white">$ hermes plugins install aphrodite</div>
+					<div class="opacity-70">$ hermes plugins enable aphrodite <span class="opacity-40">// or answer yes at the Enable now? prompt</span></div>
+					<div>$ cd ~/.hermes/plugins/aphrodite</div>
+					<div class="opacity-70">$ bash download.sh <span class="opacity-40">// or: pwsh ./download.ps1 - still required</span></div>
+					<div class="opacity-70">$ hermes</div>
+				</div>
+				<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
+					<div class="mb-1 text-base font-black uppercase tracking-widest text-stamped-canary">
+						OUTCOME // CATALOG INSTALL:
+					</div>
+					<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold text-bone-white">
+						Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256 verified, plugin enabled.
+					</div>
+					<p class="mt-2 font-body text-base leading-relaxed text-zinc-dust">
+						The catalog entry is reviewed and pinned - <code class="font-mono text-base text-weathered-teal">hermes plugins install</code> checks out exactly that commit, never a branch tip. Do NOT run <code class="font-mono text-base text-weathered-teal">aphrodite setup</code> against the catalog-managed directory; fetch the binaries from the installed plugin directory with <code class="font-mono text-base text-weathered-teal">download.sh</code>/<code class="font-mono text-base text-weathered-teal">download.ps1</code>.
+					</p>
+					<div class="mt-2 font-mono text-base text-zinc-dust">
+						SRC: <a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={ExternalLinks.HermesGuide}>the Hermes plugin guide</a> - Installing from the catalog.
+					</div>
 				</div>
 			</div>
 		</section>

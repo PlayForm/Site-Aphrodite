@@ -52,11 +52,15 @@ const ProxyRows = [
 			</h1>
 			<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a
-				client at. The plugin registers six hooks, thirteen tools, and an optional context
-				engine, then forwards every call into the Rust dylib. Two proxy processes run
-				alongside as subprocesses, and a canonical runtime home under
+				client at.
+				<span class="mt-1 block text-base">It is the reason the interception lives inside
+				the turn: tool output never hits a wire, so only hook-level registration can catch
+				it before it becomes message history - six hooks, thirteen tools, and an optional
+				context engine, every call forwarded into the Rust dylib.</span>
+				<span class="mt-1 block text-base">Two proxy processes still run alongside as
+				subprocesses, and a canonical runtime home under
 				<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>
-				holds the binaries, config, CCR database, directives, and logs.
+				holds the binaries, config, CCR database, directives, and logs.</span>
 			</p>
 		</header>
 

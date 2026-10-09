@@ -6,6 +6,7 @@ import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import ContextEngine from "../Content/Mermaid/context-engine.svg?raw";
 import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 import { Stamps, Versions } from "@Library/Versions";
+import { ExternalLinks } from "@Library/Links";
 ---
 
 <Base
@@ -134,8 +135,10 @@ import { Stamps, Versions } from "@Library/Versions";
 				</div>
 				<p class="mt-12 font-body text-base leading-relaxed text-zinc-dust">
 					Registration is driven by the dylib: the shim asks the dylib for its hook names
-					and tool schemas and registers one callback per name. No hot-reload - the dylib
-					is resolved once per process; to pick up a new build, restart the Hermes session.
+					and tool schemas and registers one callback per name.
+					<span class="mt-1 block text-base">It is the reason there is no hot-reload: the
+					dylib is resolved once per process, so to pick up a new build you restart the
+					Hermes session.</span>
 				</p>
 				<figure class="mt-20 border border-oxblood-dark bg-soot-black p-4" data-diagram="context-engine">
 					<div class="overflow-x-auto" set:html={ContextEngine} />
@@ -213,6 +216,16 @@ import { Stamps, Versions } from "@Library/Versions";
 						</div>
 					</div>
 				</div>
+				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
+					ALSO ON THE STORE: the plugin is in the Hermes plugin catalog - the reviewed,
+					pinned alternative to the manual clone above. <code class="font-mono text-base text-weathered-teal">hermes plugins install aphrodite</code>
+					checks out the catalog entry's exact commit, then <code class="font-mono text-base text-weathered-teal">bash download.sh</code>
+					from <code class="font-mono text-base text-weathered-teal">~/.hermes/plugins/aphrodite</code>
+					still fetches the binaries (never <code class="font-mono text-base text-weathered-teal">aphrodite setup</code>
+					against the catalog-managed directory). The full flow is on
+					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/setup/">SETUP</a>;
+					the mechanics are in <a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={ExternalLinks.HermesGuide}>the Hermes plugin guide</a>.
+				</p>
 				<p class="mt-12 border-t border-oxblood-dark pt-8 font-body text-base leading-relaxed text-zinc-dust">
 					LLM API KEY REQUIRED: the proxy is an OpenAI-compatible forwarder and needs its
 					own credentials - <code class="font-mono text-base text-weathered-teal">APHRODITE_API_KEY</code>,
@@ -251,10 +264,12 @@ import { Stamps, Versions } from "@Library/Versions";
 				<p class="mt-12 font-body text-base leading-relaxed text-zinc-dust">
 					The runtime home self-heals toward
 					<code class="font-mono text-base text-weathered-teal">layout_schema.json</code> at
-					startup: misplaced config and binaries are moved to their canonical paths, stale
-					plugin-source copies are quarantined, and the
-					~/.hermes/plugins/aphrodite install dir is Hermes-owned - the plugin never
-					creates, converts, or modifies it.
+					startup: misplaced config and binaries are moved to their canonical paths, and
+					stale plugin-source copies are quarantined.
+					<span class="mt-1 block text-base">It is the reason the self-healing stops at the
+					Hermes-owned boundary: the
+					~/.hermes/plugins/aphrodite install dir is Hermes' territory, and the plugin
+					never creates, converts, or modifies it.</span>
 				</p>
 				<figure
 					class="mx-auto mt-20 max-w-md border border-oxblood-dark bg-soot-black p-3"

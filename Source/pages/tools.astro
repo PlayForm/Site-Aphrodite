@@ -46,12 +46,13 @@ const Tools = [
 				Every tool is a thin relay into the Rust dylib: the plugin registers each tool from
 				the dylib's schema list, and every call dispatches through
 				<code class="font-mono text-base text-weathered-teal">aphrodite_hermes_dispatch_tool</code>,
-				returning the JSON result verbatim. All handlers share one session store - content
-				compressed by a hook or by
-				<code class="font-mono text-base text-weathered-teal">aphrodite_compress</code> stays
-				resolvable by
-				<code class="font-mono text-base text-weathered-teal">aphrodite_retrieve</code> for
-				the life of the session.
+				returning the JSON result verbatim.
+				<span class="mt-1 block text-base">It is the reason all handlers share one session
+				store: content compressed by a hook or by
+				<code class="font-mono text-base text-weathered-teal">aphrodite_compress</code>
+				stays resolvable by
+				<code class="font-mono text-base text-weathered-teal">aphrodite_retrieve</code>
+				for the life of the session.</span>
 			</p>
 			<div class="mt-16 flex max-w-4xl flex-wrap items-center gap-8">
 				<span

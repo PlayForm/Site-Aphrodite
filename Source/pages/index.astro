@@ -9,7 +9,7 @@ import { Stamps, Versions } from "@Library/Versions";
 
 <Base
 	Title="APHRODITE // CCR COMPRESSION ENGINE"
-	Description="CCR compression proxy + absorptive preview pipeline for Hermes Agent. Up to 610x compression on the standard corpus (132x overall), ~10 ms end-to-end. One binary. Zero dependencies."
+	Description="Context management for tool-using AI agents. Aphrodite turns verbose tool output - logs, diffs, files, searches, JSON, and browser snapshots - into compact, retrievable previews. Up to 610x compression on the standard corpus (132x overall), ~10 ms end-to-end."
 >
 	<main
 		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 pb-32 pt-16 sm:px-8 lg:gap-40 lg:pb-56 lg:px-14 lg:pt-24"
@@ -26,16 +26,16 @@ import { Stamps, Versions } from "@Library/Versions";
 				</div>
 				<div class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-5 sm:p-7">
 					<div
-						class="tape-strip absolute -top-3.5 left-1/2 -translate-x-1/2 -rotate-1 border-b border-t border-bone-newsprint/30 px-6 py-1 text-base font-black uppercase tracking-widest text-bone-newsprint"
+						class="tape-strip absolute -top-3.5 left-1/2 -translate-x-1/2 -rotate-1 border-b border-t border-bone-newsprint/30 px-6 py-1 text-xs font-black uppercase tracking-widest text-bone-newsprint"
 					>
 						// REPRO_PROOF #001
 					</div>
 					<img
-						class="h-32 w-auto sm:h-44"
-						src="/Brand/aphrodite-256.png"
+						class="h-44 w-auto sm:h-60"
+						src="/Brand/aphrodite-mark.svg"
 						alt="Aphrodite brand mark"
-						width="160"
-						height="160"
+						width="232"
+						height="158"
 					/>
 					<div
 						class="absolute -bottom-3.5 -right-3 border border-black bg-raw-blood px-2.5 py-0.5 text-base font-black tracking-widest text-bone-white shadow"
@@ -60,10 +60,18 @@ import { Stamps, Versions } from "@Library/Versions";
 				>
 				</div>
 			</div>
+			<div
+				class="mb-8 inline-block -rotate-1 border border-black bg-carbon-void px-3 py-1 text-base font-black uppercase tracking-widest text-weathered-teal shadow-[3px_3px_0px_#000]"
+			>
+				CONTEXT MANAGEMENT FOR TOOL-USING AI AGENTS
+			</div>
 			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
-				CCR compression proxy + absorptive preview pipeline for Hermes Agent. Up to 610&times;
-				compression on the standard corpus (132&times; overall), ~10&nbsp;ms end-to-end,
-				type-aware classifier, TOML-driven, opt-in config auto-reload.
+				Aphrodite keeps noisy tool output out of your agent's context - logs, diffs,
+				files, searches, JSON, and browser snapshots become compact previews the agent
+				can act on, with the original always one retrieval away.
+				<span class="mt-1 block text-base">It is the reason tool-heavy agents keep
+				working: the context window stops paying for noise before the reasoning
+				starts.</span>
 			</p>
 			<p class="mt-8 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 				One binary. Zero dependencies. Millions of tokens saved.
@@ -164,8 +172,10 @@ import { Stamps, Versions } from "@Library/Versions";
 					</p>
 					<p>
 						Aphrodite intercepts output before it reaches the LLM and replaces it with a
-						compact, structured preview. The agent sees ~15 tokens of metadata instead of
-						hundreds - and retrieves the full content only when it actually needs it.
+						compact, structured preview - because the agent's reasoning budget is the
+						context budget, and raw noise spends both. The agent sees ~15 tokens of
+						metadata instead of hundreds - and retrieves the full content only when it
+						actually needs it.
 					</p>
 				</div>
 			</div>
@@ -326,7 +336,7 @@ import { Stamps, Versions } from "@Library/Versions";
 				</div>
 				<div class="mt-8 space-y-4">
 					<div class="mb-2 text-base font-bold uppercase tracking-wider text-zinc-dust">
-						RATIO BY OUTPUT CLASS (PER-TYPE COMPRESSION):
+						RATIO BY OUTPUT CLASS (PER-TYPE COMPRESSION, LOG SCALE):
 					</div>
 					<!-- Browser snapshot -->
 					<div>
@@ -335,8 +345,8 @@ import { Stamps, Versions } from "@Library/Versions";
 							<span class="text-weathered-teal">416&times;</span>
 						</div>
 						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-weathered-teal" style="width: 98%;"></div>
-							<div class="h-full bg-raw-blood" style="width: 2%;"></div>
+							<div class="h-full bg-weathered-teal" style="width: 100%;"></div>
+							<div class="h-full bg-raw-blood" style="width: 0%;"></div>
 						</div>
 					</div>
 					<!-- Build output -->
@@ -346,8 +356,8 @@ import { Stamps, Versions } from "@Library/Versions";
 							<span class="text-raw-blood">140&times;</span>
 						</div>
 						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-raw-blood" style="width: 93%;"></div>
-							<div class="h-full bg-stamped-canary" style="width: 7%;"></div>
+							<div class="h-full bg-raw-blood" style="width: 82%;"></div>
+							<div class="h-full bg-stamped-canary" style="width: 18%;"></div>
 						</div>
 					</div>
 					<!-- JSON -->
@@ -357,8 +367,8 @@ import { Stamps, Versions } from "@Library/Versions";
 							<span class="text-stamped-canary">40&times;</span>
 						</div>
 						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-stamped-canary" style="width: 86%;"></div>
-							<div class="h-full bg-asphalt-panel" style="width: 14%;"></div>
+							<div class="h-full bg-stamped-canary" style="width: 61%;"></div>
+							<div class="h-full bg-asphalt-panel" style="width: 39%;"></div>
 						</div>
 					</div>
 					<!-- Git diff -->
@@ -368,8 +378,8 @@ import { Stamps, Versions } from "@Library/Versions";
 							<span class="text-raw-blood">23&times;</span>
 						</div>
 						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-raw-blood" style="width: 58%;"></div>
-							<div class="h-full bg-asphalt-panel" style="width: 42%;"></div>
+							<div class="h-full bg-raw-blood" style="width: 52%;"></div>
+							<div class="h-full bg-asphalt-panel" style="width: 48%;"></div>
 						</div>
 					</div>
 					<!-- Terminal -->
@@ -379,8 +389,8 @@ import { Stamps, Versions } from "@Library/Versions";
 							<span class="text-stamped-canary">20&times;</span>
 						</div>
 						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-stamped-canary" style="width: 55%;"></div>
-							<div class="h-full bg-asphalt-panel" style="width: 45%;"></div>
+							<div class="h-full bg-stamped-canary" style="width: 50%;"></div>
+							<div class="h-full bg-asphalt-panel" style="width: 50%;"></div>
 						</div>
 					</div>
 				</div>

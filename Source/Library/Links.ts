@@ -31,7 +31,6 @@ export const MenuLinks: InternalLink[] = [
 	{ Href: "/flavors/", Label: "FLAVORS" },
 	{ Href: "/workbench/", Label: "WORKBENCH" },
 	{ Href: "/config/", Label: "CONFIG" },
-	{ Href: "/showcase/", Label: "SHOWCASE" },
 	{ Href: "/examples/", Label: "EXAMPLES" },
 ];
 
@@ -43,6 +42,8 @@ export const ExternalLinks = {
 	Crates: "https://crates.io/crates/aphrodite",
 	Repository: "https://github.com/PlayForm/Aphrodite",
 	HermesRepository: "https://github.com/PlayForm/Aphrodite-Hermes",
+	/** The Hermes plugin guide - the plugin system plus the plugin catalog (the store) install flow. */
+	HermesGuide: "https://hermes-agent.nousresearch.com/docs/user-guide/features/plugins/",
 	/** The releases listing; the release-note URLs compose with the Aphrodite%2Fv<ver> tag form (Library/Versions.ts). */
 	Releases: "https://github.com/PlayForm/Aphrodite/releases",
 	PlayForm: "https://PlayForm.Cloud",
