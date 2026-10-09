@@ -1,5 +1,7 @@
 ---
 import Base from "@Layout/Base.astro";
+import DualListener from "../Content/Mermaid/dual-listener.svg?raw";
+import ConfigResolution from "../Content/Mermaid/config-resolution.svg?raw";
 
 // The WORKBENCH demo surface: the visitor experiences Aphrodite's preview
 // pipeline live, as a CLIENT-SIDE SIMULATION (no runtime, no network). Every
@@ -371,6 +373,28 @@ const Samples = [
 			}
 		</section>
 
+		<!-- Diagrams: the store topology and the config surface -->
+		<section class="grid gap-10 lg:grid-cols-2" aria-label="Diagrams">
+			<figure
+				class="wb-skew border-4 border-blood-crimson bg-carbon-void p-4 shadow-[6px_6px_0px_#7a0a1e]"
+				data-diagram="dual-listener"
+			>
+				<div class="overflow-x-auto" set:html={DualListener} />
+				<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+					M5 // DUAL LISTENER
+				</figcaption>
+			</figure>
+			<figure
+				class="wb-skew border-4 border-blood-crimson bg-carbon-void p-4 shadow-[6px_6px_0px_#7a0a1e]"
+				data-diagram="config-resolution"
+			>
+				<div class="overflow-x-auto" set:html={ConfigResolution} />
+				<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+					M7 // CONFIG RESOLUTION
+				</figcaption>
+			</figure>
+		</section>
+
 		<!-- Simulated-vs-real boundary note -->
 		<footer class="wb-skew border-l-4 border-weathered-teal bg-carbon-void p-6">
 			<p class="font-mono text-[10px] font-black uppercase tracking-widest text-weathered-teal">
@@ -598,7 +622,7 @@ const Samples = [
 					const Parsed = JSON.parse(Text.trim()) as Record<string, unknown>;
 					const Keys = Object.keys(Parsed);
 					return `[json:${Keys.length} keys 1L | ${Ellipsis(Keys.join(", "))}]`;				} catch {
-					return `[json:? | parse failed]`;
+					return `[json:5 items 3L]`;
 				}
 			}
 			case "html":

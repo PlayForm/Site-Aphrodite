@@ -1,11 +1,12 @@
 ---
 import Base from "@Layout/Base.astro";
+import SessionLifecycle from "../Content/Mermaid/session-lifecycle.svg?raw";
 
 const Previews = [
 	"[build:1E 1W 142L | error[E0432]: unresolved import ...]",
 	"[diff:2F +7/-3 12L | src/main.rs Cargo.toml +N more]",
 	"[git:2M 2A 1D 3?? | src/x.rs src/y.rs +5 more]",
-	"[gitlog:2 commits | abc1234 fix... -> def5678 feat...]",
+	"[gitlog:2 commits | abc1234 fix... → def5678 feat...]",
 	"[ls:3 files 2 dirs | .rs x2 .md x1]",
 	"[test:220 pass 0 fail 1 ignored | 0.31s]",
 	"[grep:4 hits in 3 files | src/preview.rs:12 ...]",
@@ -121,6 +122,12 @@ const ProxyRows = [
 					CACHE ON :9797 (IN-MEMORY, COMPRESSES ABOVE 8 KB). NO HOT-RELOAD - RESTART THE
 					SESSION TO PICK UP A NEW BUILD.
 				</p>
+				<figure class="mt-10 border border-oxblood-dark bg-soot-black p-4" data-diagram="session-lifecycle">
+					<div class="overflow-x-auto" set:html={SessionLifecycle} />
+					<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+						M8 // SESSION LIFECYCLE
+					</figcaption>
+				</figure>
 			</div>
 		</section>
 

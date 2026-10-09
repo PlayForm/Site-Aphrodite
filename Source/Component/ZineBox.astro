@@ -1,0 +1,22 @@
+---
+interface Props {
+	/** Shadow tone: the zine-box class from Global.css. */
+	Tone?: "crimson" | "subtle" | "canary" | "teal";
+
+	/** Rotation applied from the sm breakpoint up; mobile is always flat. */
+	Rotate?: string;
+}
+
+const { Tone = "crimson", Rotate = "" } = Astro.props;
+
+const Shadow = {
+	crimson: "zine-box-crimson",
+	subtle: "zine-box-subtle",
+	canary: "zine-box-canary",
+	teal: "zine-box-teal",
+}[Tone];
+---
+
+<div class={`relative border-4 border-blood-crimson bg-carbon-void p-6 sm:p-8 ${Shadow} ${Rotate} transition-transform duration-300 hover:rotate-0`}>
+	<slot />
+</div>

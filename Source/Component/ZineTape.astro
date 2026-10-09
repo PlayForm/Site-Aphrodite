@@ -1,0 +1,32 @@
+---
+interface Props {
+	Label: string;
+
+	/** Stamp color: raw-blood (default), stamped-canary, weathered-teal, bone-newsprint. */
+	Color?: "raw" | "canary" | "teal" | "bone";
+
+	/** Side of the module the tape sits on. */
+	Side?: "left" | "right" | "center";
+}
+
+const { Label, Color = "raw", Side = "left" } = Astro.props;
+
+const Palette = {
+	raw: "bg-raw-blood text-bone-white",
+	canary: "bg-stamped-canary text-soot-black",
+	teal: "bg-weathered-teal text-bone-white",
+	bone: "bg-bone-newsprint text-soot-black",
+}[Color];
+
+const Position = {
+	left: "left-6",
+	right: "right-6",
+	center: "left-1/2 -translate-x-1/2",
+}[Side];
+---
+
+<div
+	class={`absolute -top-3.5 ${Position} -rotate-1 border border-black px-3 py-0.5 text-[10px] font-black uppercase tracking-widest shadow-[2px_2px_0px_#000] ${Palette}`}
+>
+	{Label}
+</div>

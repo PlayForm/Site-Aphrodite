@@ -1,0 +1,31 @@
+---
+interface Props {
+	/** The micro-label above the result (canary by default). */
+	Label: string;
+
+	/** The compressed result line shown to the LLM. */
+	Result: string;
+
+	/** The CCR hash line (teal). */
+	Hash?: string;
+
+	/** Label color: canary (default), teal, raw. */
+	Color?: "canary" | "teal" | "raw";
+}
+
+const { Label, Result, Hash, Color = "canary" } = Astro.props;
+
+const Palette = {
+	canary: "text-stamped-canary",
+	teal: "text-weathered-teal",
+	raw: "text-raw-blood",
+}[Color];
+---
+
+<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
+	<div class={`mb-1 text-[10px] font-black uppercase tracking-widest ${Palette}`}>{Label}</div>
+	<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-xs font-bold text-bone-white sm:text-sm">
+		{Result}
+	</div>
+	{Hash && <div class="mt-2 truncate font-mono text-[11px] font-bold text-weathered-teal" set:html={Hash} />}
+</div>

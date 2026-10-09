@@ -1,5 +1,6 @@
 ---
 import Base from "@Layout/Base.astro";
+import PreviewFlow from "../Content/Mermaid/preview-flow.svg?raw";
 
 // Case-study content ledger - the page's single source of truth (the borrowed
 // Content.ts pattern, scoped to this page): every dynamic figure the narrative
@@ -212,7 +213,7 @@ const Layers = [
 								THE PREVIEW INSTEAD
 							</div>
 							<div class="mt-3 border border-oxblood-dark bg-soot-black px-4 py-3 text-bone-white">
-								[build:1E 1W 142L | warning: unused import: `HashMap`]
+								[build:1E 1W 142L | error[E0432]: unresolved import ...]
 							</div>
 							<div class="mt-3 text-weathered-teal">
 								&lt;&lt;&lt;CCR:0e3a5c9f...a1e|build|1420&gt;&gt;&gt;
@@ -297,6 +298,12 @@ const Layers = [
 					</div>
 				</div>
 			</div>
+				<figure class="mt-12 border border-oxblood-dark bg-asphalt-panel p-4" data-diagram="preview-flow">
+					<div class="overflow-x-auto" set:html={PreviewFlow} />
+					<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+						M2 // PREVIEW FLOW
+					</figcaption>
+				</figure>
 		</section>
 
 		<!-- ============ III. THE CONTRACT // THE MARKER ============ -->

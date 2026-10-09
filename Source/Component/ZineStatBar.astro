@@ -1,0 +1,38 @@
+---
+interface Props {
+	Label: string;
+
+	/** The ratio text on the right, e.g. "416×". */
+	Ratio: string;
+
+	/** Width of the primary fill, 0-100. */
+	Percent: number;
+
+	/** Fill color: teal (default), raw, canary. */
+	Color?: "teal" | "raw" | "canary";
+}
+
+const { Label, Ratio, Percent, Color = "teal" } = Astro.props;
+
+const Palette = {
+	teal: "bg-weathered-teal",
+	raw: "bg-raw-blood",
+	canary: "bg-stamped-canary",
+}[Color];
+
+const Text = {
+	teal: "text-weathered-teal",
+	raw: "text-raw-blood",
+	canary: "text-stamped-canary",
+}[Color];
+---
+
+<div>
+	<div class="mb-1 flex justify-between text-xs font-bold">
+		<span class="text-bone-newsprint">{Label}</span>
+		<span class={Text}>{Ratio}</span>
+	</div>
+	<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+		<div class={`h-full ${Palette}`} style={`width: ${Percent}%;`}></div>
+	</div>
+</div>

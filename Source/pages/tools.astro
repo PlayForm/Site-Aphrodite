@@ -1,5 +1,7 @@
 ---
 import Base from "@Layout/Base.astro";
+import ToolRelay from "../Content/Mermaid/tool-relay.svg?raw";
+import MarkerFormat from "../Content/Mermaid/marker-format.svg?raw";
 
 const Tools = [
 	{ N: "01", Name: "aphrodite_retrieve", What: "Expand a CCR marker, or read a file, to full content" },
@@ -90,6 +92,15 @@ const Tools = [
 					ENGINE'S OWN PRE-LLM HOOK, NOT A TOOL AN AGENT CALLS DIRECTLY.
 				</p>
 			</div>
+			<figure
+				class="mt-10 border border-oxblood-dark bg-soot-black p-4"
+				data-diagram="tool-relay"
+			>
+				<div class="overflow-x-auto" set:html={ToolRelay} />
+				<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+					M4 // TOOL RELAY
+				</figcaption>
+			</figure>
 		</section>
 
 		<!-- MARKER CONTRACT -->
@@ -107,7 +118,7 @@ const Tools = [
 				</h2>
 				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px] leading-relaxed">
 					<div class="text-bone-newsprint">&lt;&lt;&lt;<span class="text-stamped-canary">CCR:</span><span class="text-weathered-teal">a1b2c3d4...</span>|<span class="text-bone-white">build</span>|<span class="text-bone-white">12,408</span>&gt;&gt;&gt;</div>
-					<div class="pl-4 text-zinc-dust">[build:0E 0W 1L | exit code: 0]</div>
+					<div class="pl-4 text-zinc-dust">[terminal:14L exit code: 0]</div>
 				</div>
 				<ul class="mt-6 space-y-3 font-body text-sm text-bone-newsprint">
 					<li class="border-l-4 border-raw-blood pl-4">
@@ -184,6 +195,12 @@ const Tools = [
 					Give hash or path - if both are present, path wins. The query parameter is the
 					cheap way to poke at a large entry without pulling all of it into context.
 				</p>
+				<figure class="mt-10 border border-oxblood-dark bg-soot-black p-4" data-diagram="marker-format">
+					<div class="overflow-x-auto" set:html={MarkerFormat} />
+					<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+						M6 // MARKER FORMAT
+					</figcaption>
+				</figure>
 			</div>
 		</section>
 

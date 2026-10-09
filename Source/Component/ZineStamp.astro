@@ -1,0 +1,25 @@
+---
+interface Props {
+	Label: string;
+
+	/** Stamp color: raw-blood (default), stamped-canary, bone. */
+	Color?: "raw" | "canary" | "bone";
+
+	/** Rotation in degrees, applied from the sm breakpoint up. */
+	Rotate?: string;
+}
+
+const { Label, Color = "raw", Rotate = "" } = Astro.props;
+
+const Palette = {
+	raw: "bg-raw-blood text-bone-white",
+	canary: "bg-stamped-canary text-soot-black",
+	bone: "bg-bone-newsprint text-soot-black",
+}[Color];
+---
+
+<span
+	class={`inline-block border-2 border-black px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest shadow-[4px_4px_0px_#000] sm:text-sm ${Palette} ${Rotate}`}
+>
+	{Label}
+</span>

@@ -1,0 +1,22 @@
+---
+interface Props {
+	/** Terminal lines; Tone maps to the suppression opacities or a highlight. */
+	Lines: { Text: string; Tone?: "plain" | "dim" | "fade" | "mute" | "result" | "canary" | "teal" }[];
+}
+
+const { Lines } = Astro.props;
+
+const Tone = {
+	plain: "",
+	dim: "opacity-70",
+	fade: "opacity-40",
+	mute: "opacity-25",
+	result: "text-bone-white",
+	canary: "text-stamped-canary",
+	teal: "text-weathered-teal",
+};
+---
+
+<div class="border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust">
+	{Lines.map(({ Text, Tone: LineTone = "plain" }) => <div class={Tone[LineTone]} set:html={Text} />)}
+</div>
