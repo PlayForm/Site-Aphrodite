@@ -1,6 +1,8 @@
 ---
 import Base from "@Layout/Base.astro";
 
+import Related from "@Component/Related.astro";
+
 import { ExternalLinks } from "@Library/Links";
 ---
 
@@ -24,7 +26,10 @@ import { ExternalLinks } from "@Library/Links";
 			</h1>
 			<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
 				Aphrodite ships as a Hermes Agent plugin (recommended) or a standalone Chat
-				Completions proxy. Binaries are never shipped in the repository and
+				Completions proxy. Both install paths land on this page - and the full host map,
+				including the flavors still planned, is laid out on
+				<a class="text-weathered-teal transition-colors hover:text-bone-white" href="/flavors/">FLAVORS</a>. Binaries are never
+				shipped in the repository and
 				<code class="font-mono text-xs text-weathered-teal">register()</code> never downloads -
 				run the explicit setup step to fetch the binary and dylib from GitHub Releases into
 				<code class="font-mono text-xs text-weathered-teal">~/.hermes/aphrodite/</code>, with
@@ -148,19 +153,15 @@ import { ExternalLinks } from "@Library/Links";
 			</div>
 		</section>
 
-		<!-- FOOTER -->
-		<footer
-			class="flex flex-col items-center justify-between gap-4 border-t-2 border-oxblood-dark pb-6 pt-12 text-xs text-zinc-dust sm:flex-row"
-		>
-			<div class="flex items-center gap-2">
-				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
-				<span class="font-bold tracking-widest text-bone-white uppercase">APHRODITE CCR CORE</span>
-			</div>
-			<div class="flex items-center gap-4">
-				<a class="transition-colors hover:text-bone-white" href="/">OVERVIEW</a>
-				<a class="transition-colors hover:text-bone-white" href="/crates/">CRATES</a>
-				<span class="font-bold text-stamped-canary">CC0-1.0</span>
-			</div>
-		</footer>
+		<!-- RELATED: the natural neighbors -->
+		<Related
+			Links={[
+				{ Href: "/plugin/", Label: "PLUGIN" },
+				{ Href: "/hermes/", Label: "HERMES" },
+				{ Href: "/hooks/", Label: "HOOKS" },
+				{ Href: "/flavors/", Label: "FLAVORS" },
+				{ Href: "/docs/", Label: "DOCS" },
+			]}
+		/>
 	</main>
 </Base>

@@ -1,0 +1,778 @@
+---
+import Base from "@Layout/Base.astro";
+import ConfigResolution from "../Content/Mermaid/config-resolution.svg?raw";
+import ToolRelay from "../Content/Mermaid/tool-relay.svg?raw";
+
+// Examples page ledger - the worked scenarios' single source of truth (the
+// borrowed Content.ts pattern, scoped to this page): every dynamic figure the
+// narrative renders comes from this block, exactly as printed in the repo's
+// README, docs and CHANGELOG, never reworded or rounded. Anchors cite the
+// source lines each fact came from. Mechanics-first histories - the
+// behavior-first examples live in Content/Showcase/Examples.json (/showcase).
+
+// The four live-reload thresholds (README.md:403-407, the four the config
+// resolver stores into every live AppState: docs/architecture/07-config-resolution.md:71).
+const Thresholds = [
+	{ Key: "tool_threshold_token", Default: "512", Gate: "TOKEN PROXY", Effect: "tool results above 512 bytes compress" },
+	{ Key: "tool_threshold_cache", Default: "4096", Gate: "CACHE PROXY", Effect: "tool results above 4096 bytes compress" },
+	{ Key: "inline_threshold", Default: "2048", Gate: "STORAGE CUTOFF", Effect: "above this, store instead of inline zlib" },
+	{ Key: "code_multiplier", Default: "3.0", Gate: "CODE TIER", Effect: "code_* types get base threshold x 3" },
+] as const;
+
+// The same output at different settings: one 1,000-byte text blob, four doors
+// (the token proxy 512 lets it through, the cache proxy 4096 does not, source
+// code earns 512 x 3.0 = 1536 of headroom, the storage cutoff at 2048 decides
+// inline zlib vs the durable CCR store).
+const Doors = [
+	{ Surface: "TOKEN PROXY (512)", Verdict: "MARKER", Why: "1000 > 512 - compressed, preview + marker" },
+	{ Surface: "CACHE PROXY (4096)", Verdict: "RAW", Why: "1000 < 4096 - passes through untouched" },
+	{ Surface: "AS SOURCE CODE (1536)", Verdict: "RAW", Why: "512 x 3.0 = 1536 headroom; 1000 < 1536" },
+	{ Surface: "STORAGE CUTOFF (2048)", Verdict: "INLINE", Why: "had it compressed: below 2048 stays inline zlib" },
+] as const;
+
+// The annotated artifacts of one worked session (CHANGELOG.md:613-616).
+const Artifacts = [
+	{ Line: "git status", Shape: "[git:2M 2A 1D 3?? | src/x.rs src/y.rs +5 more]", Reads: "2 modified, 2 added, 1 deleted, 3 untracked; first files named" },
+	{ Line: "test run", Shape: "[test:220 pass 0 fail 1 ignored | 0.31s]", Reads: "all green - the one ignored test is visible, nothing to retrieve" },
+	{ Line: "grep", Shape: "[grep:4 hits in 3 files | src/preview.rs:12 ...]", Reads: "hit count, distinct files, first location - retrieve or narrow the search" },
+] as const;
+
+// The seven built-in directives, baked into the binary (docs/plugin/directives.md:34-42).
+const Builtins = [
+	{ Name: "focus", Role: "one primary action per turn, marker-aware retrieval" },
+	{ Name: "foresight", Role: "prefetch what the next turn will need, never wait on I/O" },
+	{ Name: "ccr-handling", Role: "how to read the marker and when to retrieve vs. skip" },
+	{ Name: "cleanup", Role: "catalog sweep, summarize, verify nothing left unresolved" },
+	{ Name: "explore", Role: "broad context, aggressive prefetch, resolve what matters" },
+	{ Name: "lazy", Role: "only what this turn strictly requires; defer the rest" },
+	{ Name: "lazy-eval", Role: "markers accumulate across turns; you decide when to resolve" },
+] as const;
+
+// The injection order of pre_llm_call, top to bottom (docs/plugin/hooks.md:123-128).
+const InjectionOrder = [
+	{ N: "01", Section: "FIRST-TURN ORIENTATION", Rule: "turn 0 only, from [prompts] session_inject" },
+	{ N: "02", Section: "DIRECTIVES", Rule: "never dropped" },
+	{ N: "03", Section: "NUDGES", Rule: "one-shots, at most two - never dropped" },
+	{ N: "04", Section: "BACKGROUND STATUS", Rule: "yields under pressure" },
+	{ N: "05", Section: "RECALL CATALOG", Rule: "the first section dropped under budget" },
+] as const;
+---
+
+<Base
+	Title="Examples - Aphrodite"
+	Description="The worked scenarios: threshold tuning in action, the retrieval round-trip, the chain split, the directives block, the tool-relay callback, the skip gate, and the dual-listener parallel - real mechanics, every claim anchored."
+>
+	<main
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
+	>
+		<!-- ============ HERO // THE WORKED SCENARIOS ============ -->
+		<header class="relative flex w-full flex-col items-start pt-12">
+			<div
+				class="tape-strip absolute -top-6 left-0 z-10 -rotate-1 border-b border-t border-bone-newsprint/30 px-4 py-1 text-[9px] font-black uppercase tracking-widest text-bone-newsprint"
+			>
+				EXAMPLES // MECHANICS-FIRST · THE OTHER SHELF IS /SHOWCASE
+			</div>
+			<div
+				class="zine-box-teal relative w-full border-4 border-blood-crimson bg-carbon-void p-8 sm:p-12 lg:p-16"
+			>
+				<p class="font-mono text-[11px] font-bold uppercase tracking-widest text-weathered-teal">
+					THE WORKED SCENARIOS // HOW IT ACTUALLY MOVES
+				</p>
+				<h1
+					class="mt-8 font-headline text-5xl font-black uppercase leading-[0.9] tracking-tighter text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-7xl lg:text-8xl"
+				>
+					Seven scenarios,<br />one <span class="text-stamped-canary">lifecycle</span>
+				</h1>
+				<p class="mt-16 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint sm:text-base">
+					Not what the output looks like - what happens to it, step by step. A
+					threshold edit propagates through a running proxy. A marker travels from
+					compression to byte-exact retrieval. A compound command splits into
+					segments. Directives assemble under a budget. A relay call fires a callback.
+					Essential tools refuse the machine. And the same payload crosses two
+					listeners without changing shape.
+				</p>
+				<div class="mt-24 flex flex-wrap gap-12 font-mono text-[11px] font-bold uppercase tracking-widest">
+					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-stamped-canary transition-colors hover:text-bone-white" href="/workbench/">TRY THE SIMULATOR</a>
+					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-zinc-dust transition-colors hover:text-bone-white" href="/tools/">THE TOOLS</a>
+					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-zinc-dust transition-colors hover:text-bone-white" href="/docs/">THE DOCS</a>
+				</div>
+			</div>
+		</header>
+
+		<!-- ============ I // THRESHOLD TUNING WALKTHROUGH ============ -->
+		<section class="relative w-full">
+			<div
+				class="relative z-10 -mb-7 ml-6 inline-block -rotate-1 border border-black bg-raw-blood px-4 py-1.5 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				I // THE THRESHOLD TUNING WALKTHROUGH
+			</div>
+			<div
+				class="zine-box-crimson w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.6deg] sm:p-12"
+			>
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
+					<div class="flex flex-col gap-12">
+						<h2
+							class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+						>
+							Four knobs, hot
+						</h2>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							The four hot-reload thresholds are the only compression values the
+							running proxy re-reads: <code class="font-mono text-xs">tool_threshold_token</code>,
+							<code class="font-mono text-xs">tool_threshold_cache</code>,
+							<code class="font-mono text-xs">inline_threshold</code> and
+							<code class="font-mono text-xs">code_multiplier</code>. Edit + save, or
+							<code class="font-mono text-xs">POST /reload</code> - the new values apply
+							immediately, with no restart (README.md:389-391). Everything else about a
+							proxy is fixed at startup.
+						</p>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							The mechanics of the hot path: the config-file watcher reacts to
+							<code class="font-mono text-xs">Modify</code> events on
+							<code class="font-mono text-xs">aphrodite.toml</code> with a 500 ms
+							debounce, reloads the file, and stores the four resolved thresholds into
+							every live <code class="font-mono text-xs">AppState</code>'s atomics -
+							nothing else is updated live (docs/architecture/07-config-resolution.md:71).
+							The dylib session is a different story: it re-applies config fields on
+							change only when <code class="font-mono text-xs">auto_reload = true</code>
+							(README.md:390-391).
+						</p>
+					</div>
+					<div class="flex flex-col gap-8">
+						<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+							THE FOUR LIVE THRESHOLDS // SHIPPED DEFAULTS
+						</div>
+						{
+							Thresholds.map(({ Key, Default, Gate, Effect }) => (
+								<div class="border border-oxblood-dark bg-asphalt-panel px-4 py-3">
+									<div class="flex items-baseline justify-between gap-4">
+										<code class="font-mono text-[11px] font-black text-bone-white">{Key}</code>
+										<span class="font-mono text-sm font-black text-stamped-canary">{Default}</span>
+									</div>
+									<div class="mt-2 flex justify-between font-mono text-[10px] text-zinc-dust">
+										<span>{Gate}</span>
+										<span>{Effect}</span>
+									</div>
+								</div>
+							))
+						}
+					</div>
+				</div>
+				<!-- The same output at different settings -->
+				<div class="mt-24 grid grid-cols-1 gap-32 lg:grid-cols-2">
+					<div class="flex flex-col gap-8">
+						<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+							THE WALKTHROUGH // ONE 1,000-BYTE TEXT BLOB, FOUR DOORS
+						</div>
+						{
+							Doors.map(({ Surface, Verdict, Why }) => (
+								<div class="flex items-center justify-between gap-8 border border-oxblood-dark bg-soot-black px-4 py-3">
+									<div class="min-w-0">
+										<div class="font-mono text-[11px] font-black uppercase tracking-widest text-bone-white">{Surface}</div>
+										<div class="font-mono text-[10px] text-zinc-dust">{Why}</div>
+									</div>
+									<span
+										class={`shrink-0 border px-2 py-0.5 font-mono text-[10px] font-black ${Verdict === "MARKER" ? "border-raw-blood text-raw-blood" : Verdict === "RAW" ? "border-weathered-teal text-weathered-teal" : "border-stamped-canary text-stamped-canary"}`}
+									>
+										{Verdict}
+									</span>
+								</div>
+							))
+						}
+					</div>
+					<div class="flex flex-col gap-8">
+						<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+							THE STREAM // TOKEN-PROXY LANE
+						</div>
+						<div class="border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px]">
+							<div class="text-zinc-dust">&lt; 1,000 bytes of prose, above the token gate &gt;</div>
+							<div class="mt-6 text-bone-newsprint opacity-90">
+								[text:3L 50B | some unrecognizable prose here]
+							</div>
+							<div class="mt-4 text-weathered-teal">&lt;&lt;&lt;CCR:0e3a5c9f...a1e|text|1000&gt;&gt;&gt;</div>
+							<div class="mt-8 border-t border-oxblood-dark pt-4 text-[10px] text-zinc-dust">
+								SAME BYTES ON THE CACHE LANE: NO PREVIEW, NO MARKER, NO STORE ENTRY
+							</div>
+						</div>
+						<a
+							class="border border-raw-blood bg-soot-black px-4 py-2 text-center font-mono text-[11px] font-black uppercase tracking-widest text-stamped-canary transition-colors hover:text-bone-white"
+							href="/workbench/"
+						>
+							TRY IT // TURN THE KNOBS IN THE WORKBENCH
+						</a>
+					</div>
+				</div>
+				<figure class="mt-24 border border-oxblood-dark bg-asphalt-panel p-4" data-diagram="config-resolution">
+					<div class="overflow-x-auto" set:html={ConfigResolution} />
+					<figcaption class="mt-6 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+						THE HOT PATH // EDIT-SAVE - 500 MS DEBOUNCE - FOUR ATOMICS
+					</figcaption>
+				</figure>
+				<div class="mt-16 font-mono text-[9px] leading-relaxed text-zinc-dust">
+					SRC: README.md:389-407 · docs/architecture/07-config-resolution.md:66-71 · docs/config/aphrodite-toml.md:204
+				</div>
+			</div>
+		</section>
+
+		<!-- ============ II // THE RETRIEVAL ROUND-TRIP ============ -->
+		<section class="relative w-full">
+			<div
+				class="relative z-10 -mb-7 ml-6 inline-block rotate-1 border border-black bg-stamped-canary px-4 py-1.5 font-mono text-[11px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+			>
+				II // THE RETRIEVAL ROUND-TRIP
+			</div>
+			<div
+				class="zine-box-canary w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:rotate-[0.5deg] sm:p-12"
+			>
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
+					<div class="flex flex-col gap-12">
+						<h2
+							class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+						>
+							Compress, marker, retrieve, byte-exact
+						</h2>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							The lifecycle of one payload: the hook hashes it (BLAKE3), stores the
+							bytes in the session store, and replaces the output with a
+							<code class="font-mono text-xs">{"<<<CCR:hash|type|size>>>"}</code> marker
+							plus a preview. The transcript now carries the marker instead of the
+							content - hash, type, size, ~33 tokens.
+						</p>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							When the next action needs the substance, the agent calls
+							<code class="font-mono text-xs">aphrodite_retrieve</code> with the hash -
+							or pastes the marker body directly; every retrieval entry point accepts
+							it, suffix or no suffix. What comes back is the original content
+							byte-for-byte, nested markers resolved recursively (docs/ccr/marker-format.md).
+						</p>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							The caveat, printed on the tool's own contract: markers stay resolvable
+							for the life of the session but <strong class="text-bone-white"
+								>do not survive a session restart</strong
+							> - the dylib is loaded once per process, so a new session starts a fresh
+							store (docs/tool-relay/tools.md:36-39). The proxy's token listener backs
+							its store with SQLite, which is the durability escape from that rule.
+						</p>
+					</div>
+					<!-- The round-trip panes -->
+					<div class="flex flex-col gap-8">
+						<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+							THE TRANSCRIPT // WHAT THE MODEL HOLDS
+						</div>
+						<div class="border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px]">
+							<div class="text-zinc-dust">turn 7, tool result</div>
+							<div class="mt-6 text-bone-newsprint opacity-90">
+								[git:2M 2A 1D 3?? | src/x.rs src/y.rs +5 more]
+							</div>
+							<div class="mt-4 text-weathered-teal">
+								&lt;&lt;&lt;CCR:d0e3f6a9...d4e7|git|173&gt;&gt;&gt;
+							</div>
+							<div class="mt-8 border-t border-oxblood-dark pt-4 text-[10px] text-stamped-canary">
+								↓ APHRODITE_RETRIEVE(HASH) - THE AGENT DECIDES, NOT THE ENGINE ↓
+							</div>
+							<div class="mt-6 text-bone-newsprint opacity-90">
+								173 bytes return unchanged · nested markers resolved
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- The annotated artifacts -->
+				<div class="mt-24">
+					<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+						THE ANNOTATED ARTIFACTS // PREVIEWS THAT MADE RETRIEVAL UNNECESSARY
+					</div>
+					<div class="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-3">
+						{
+							Artifacts.map(({ Line, Shape, Reads }) => (
+								<div class="zine-box-subtle border-[3px] border-oxblood-dark bg-soot-black p-5">
+									<div class="font-mono text-[9px] font-black uppercase tracking-widest text-raw-blood">{Line}</div>
+									<div class="mt-4 font-mono text-[12px] text-bone-white">{Shape}</div>
+									<div class="mt-4 border-t border-oxblood-dark pt-4 font-mono text-[10px] leading-relaxed text-zinc-dust">
+										{Reads}
+									</div>
+								</div>
+							))
+						}
+					</div>
+				</div>
+				<!-- Three marker faces -->
+				<div class="mt-24 grid grid-cols-1 gap-32 lg:grid-cols-2">
+					<div class="flex flex-col gap-8">
+						<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+							THREE MARKER FACES // HASH EXTRACTION ACCEPTS ALL THREE
+						</div>
+						<div class="border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px] leading-loose">
+							<div class="text-weathered-teal">{"<<<CCR:hash|type|size>>>"}</div>
+							<div class="text-zinc-dust">STANDARD - THE WIRE FORMAT</div>
+							<div class="mt-6 text-weathered-teal">[CCR:hash]</div>
+							<div class="text-zinc-dust">BRACKET</div>
+							<div class="mt-6 text-weathered-teal">⧗CCR:hash⧘</div>
+							<div class="text-zinc-dust">UNICODE - U+2AF7 / U+2AF8</div>
+						</div>
+					</div>
+					<div class="flex flex-col gap-8">
+						<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+							THE REGRESSION HISTORY // PREVIEW DOUBLING, v1.3.4
+						</div>
+						<div class="border border-oxblood-dark bg-asphalt-panel p-5 font-mono text-[12px]">
+							<div class="text-zinc-dust">THE BUG, BEFORE THE FIX</div>
+							<div class="mt-6 text-raw-blood">
+								[text:[text:53L 1913B]]
+							</div>
+							<div class="mt-6 font-mono text-[10px] leading-relaxed text-zinc-dust">
+								AN ALREADY-SELF-DESCRIBING PREVIEW RE-WRAPPED IN RENDER_MARKER - NOW
+								EMITTED EXACTLY ONCE, REGRESSION-TESTED.
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="mt-16 font-mono text-[9px] leading-relaxed text-zinc-dust">
+					SRC: docs/tool-relay/tools.md:36-39 · docs/ccr/marker-format.md:76-86 · CHANGELOG.md:613-626 · README.md:298-299,506
+				</div>
+			</div>
+		</section>
+
+		<!-- ============ III // THE CHAIN-SPLIT ============ -->
+		<section class="relative w-full">
+			<div
+				class="relative z-10 -mb-7 ml-6 inline-block -rotate-1 border border-black bg-weathered-teal px-4 py-1.5 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				III // THE CHAIN-SPLIT
+			</div>
+			<div
+				class="zine-box-teal w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.4deg] sm:p-12"
+			>
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
+					<div class="flex flex-col gap-12">
+						<h2
+							class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+						>
+							One command, many markers
+						</h2>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							Chain-split is a Hermes plugin-side feature, not a proxy one: with it
+							enabled, <code class="font-mono text-xs">pre_tool_call</code> rewrites a
+							chained shell command by echoing segment markers, and
+							<code class="font-mono text-xs">transform_terminal_output</code> splits
+							the produced output into per-segment pieces - each segment compressed
+							into its own marker, so the model sees several compact previews instead
+							of one large blob (docs/proxy/compression.md:366-379).
+						</p>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							It is opt-in: <code class="font-mono text-xs">chain_split = false</code> by
+							default, because invisible segment markers pollute redirected stdout.
+							The split floor and cap are
+							<code class="font-mono text-xs">chain_split_min_segments = 2</code> and
+							<code class="font-mono text-xs">chain_split_max_segments = 6</code>. The
+							split is unconditional once marked - segment compression happens before
+							the threshold gate, so marked output never leaks raw. And it is
+							careful: constructs that would corrupt control flow (heredocs, loops
+							spanning segments) are left untouched. The proxy never performs chain
+							splitting - it only sees Chat Completions responses.
+						</p>
+					</div>
+					<div class="flex flex-col gap-8">
+						<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+							THE STREAM // CHAIN_SPLIT = TRUE
+						</div>
+						<div class="border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px]">
+							<div class="text-zinc-dust">cd project && cargo build --release && cargo test 2&gt;&amp;1</div>
+							<div class="mt-6 text-bone-newsprint opacity-90">[chain:3 | build ...]</div>
+							<div class="mt-4 text-weathered-teal">
+								&lt;&lt;&lt;CCR:e7c0f3a6...c1f4|terminal|398&gt;&gt;&gt;
+							</div>
+							<div class="mt-8 border-t border-oxblood-dark pt-4 text-[10px] text-zinc-dust">
+								PER-SEGMENT MARKERS BEHIND IT - EACH SEGMENT ITS OWN RECEIPT:
+							</div>
+							<div class="mt-4 text-weathered-teal">
+								&lt;&lt;&lt;CCR:f8a1d4c7...b0e3|build_output|210&gt;&gt;&gt;
+							</div>
+							<div class="mt-2 text-weathered-teal">
+								&lt;&lt;&lt;CCR:a9b2c5d8...e1f4|test|188&gt;&gt;&gt;
+							</div>
+						</div>
+						<div class="border border-oxblood-dark bg-asphalt-panel p-5 font-body text-[13px] leading-relaxed text-bone-newsprint">
+							<span class="font-mono text-[10px] font-bold uppercase tracking-widest text-raw-blood">OFF BY DEFAULT · </span>
+							Without the split, the same compound command is one terminal blob with
+							one marker; the build preview and the test preview never separate.
+						</div>
+					</div>
+				</div>
+				<div class="mt-16 font-mono text-[9px] leading-relaxed text-zinc-dust">
+					SRC: docs/proxy/compression.md:366-379 · docs/plugin/hooks.md:59-65,102-106 · README.md:411-413
+				</div>
+			</div>
+		</section>
+
+		<!-- ============ IV // THE DIRECTIVES IN ACTION ============ -->
+		<section class="relative w-full">
+			<div
+				class="relative z-10 -mb-7 ml-6 inline-block rotate-1 border border-black bg-raw-blood px-4 py-1.5 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				IV // THE DIRECTIVES IN ACTION
+			</div>
+			<div
+				class="zine-box-crimson w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:rotate-[0.5deg] sm:p-12"
+			>
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
+					<div class="flex flex-col gap-12">
+						<h2
+							class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+						>
+							Seven built-ins, one budget
+						</h2>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							Short behavioral <code class="font-mono text-xs">.md</code> files,
+							baked into the binary and materialized on plugin registration, injected
+							verbatim every <code class="font-mono text-xs">pre_llm_call</code> - they
+							teach retrieval vocabulary, never the compression mechanism. The
+							discovery order is strictly first-wins, never merged:
+							<code class="font-mono text-xs">APHRODITE_DIRECTIVES_DIR</code> →
+							<code class="font-mono text-xs">./directives/</code> →
+							<code class="font-mono text-xs">~/.hermes/aphrodite/directives/</code> →
+							binary-relative. Any <code class="font-mono text-xs">.md</code> file in a
+							discovered directory becomes a directive named after its stem - the
+							built-ins are not special-cased (docs/plugin/directives.md:51-58).
+						</p>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							The budget math: 2,000 characters per directive body, 4,000 characters
+							across all active directives combined - and the whole per-turn injection
+							(directives + nudges + recall catalog + retrieve hint) lives under one
+							hard cap, <code class="font-mono text-xs">flow_budget_chars</code>,
+							default 4,000 (shipped example: 2,600). Sections drop from the bottom
+							when over budget; directives and nudges never drop.
+						</p>
+						<div class="border border-oxblood-dark bg-asphalt-panel p-5 font-mono text-[11px] leading-relaxed text-bone-newsprint">
+							aphrodite_directive("swap", "explore") - no config edit, takes effect on
+							the very next turn. The active set is per-process state: it persists
+							across a session reset.
+						</div>
+					</div>
+					<div class="flex flex-col gap-8">
+						<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+							THE BUILT-IN SET // SEVEN, BAKED IN
+						</div>
+						{
+							Builtins.map(({ Name, Role }) => (
+								<div class="flex items-baseline justify-between gap-8 border border-oxblood-dark bg-asphalt-panel px-4 py-3">
+									<span class="font-mono text-[11px] font-black text-stamped-canary">{Name}</span>
+									<span class="text-right font-mono text-[10px] text-zinc-dust">{Role}</span>
+								</div>
+							))
+						}
+					</div>
+				</div>
+				<!-- Injection order -->
+				<div class="mt-24">
+					<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+						THE INJECTION ORDER // PRE_LLM_CALL, TOP TO BOTTOM, DROPS FROM THE BOTTOM
+					</div>
+					<div class="mt-8 isolate grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-5">
+						{
+							InjectionOrder.map(({ N, Section, Rule }, Index) => {
+								const Stamp =
+									Index % 3 === 0
+										? "bg-raw-blood text-bone-white"
+										: Index % 3 === 1
+											? "bg-stamped-canary text-soot-black"
+											: "bg-weathered-teal text-bone-white";
+								return (
+									<div class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-5 pt-8 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg] sm:hover:rotate-0">
+										<div class={`absolute -top-4 left-3 z-10 border border-black px-2 py-0.5 text-[9px] font-black uppercase ${Stamp}`}>
+											{`ORDER // ${N}`}
+										</div>
+										<div class="font-mono text-[11px] font-black uppercase tracking-widest text-bone-white">
+											{Section}
+										</div>
+										<div class="mt-6 border-t border-oxblood-dark pt-4 font-mono text-[10px] leading-relaxed text-zinc-dust">
+											{Rule}
+										</div>
+									</div>
+								);
+							})
+						}
+					</div>
+				</div>
+				<!-- The assembled block -->
+				<div class="mt-24 grid grid-cols-1 gap-32 lg:grid-cols-2">
+					<div class="border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px]">
+						<div class="text-zinc-dust">THE ASSEMBLED TURN // pre_llm_call</div>
+						<div class="mt-6 text-bone-newsprint opacity-90">[directives: name1, name2]</div>
+						<div class="mt-2 text-bone-newsprint opacity-80">focus: targeted execution, marker-aware retrieval</div>
+						<div class="mt-4 text-bone-newsprint opacity-90">[nudge: ...]</div>
+						<div class="mt-4 text-bone-newsprint opacity-80">[recall] catalog summary</div>
+					</div>
+					<div class="flex flex-col justify-center border border-oxblood-dark bg-asphalt-panel p-5 font-body text-[13px] leading-relaxed text-bone-newsprint">
+						<span class="font-mono text-[10px] font-bold uppercase tracking-widest text-stamped-canary">THE PRIORITY LADDER · </span>
+						Under budget pressure the recall catalog goes first, then background
+						status. Directives and nudges are never dropped - nudges are capped at
+						two one-shots, so the floor is always the directive block plus up to two
+						nudges (docs/plugin/hooks.md:123-137).
+					</div>
+				</div>
+				<div class="mt-16 font-mono text-[9px] leading-relaxed text-zinc-dust">
+					SRC: docs/plugin/directives.md:34-97 · docs/plugin/hooks.md:114-137,146-153 · README.md:415-440 · docs/config/env-vars.md:78
+				</div>
+			</div>
+		</section>
+
+		<!-- ============ V // THE TOOL-RELAY CALLBACK ============ -->
+		<section class="relative w-full">
+			<div
+				class="relative z-10 -mb-7 ml-6 inline-block -rotate-1 border border-black bg-stamped-canary px-4 py-1.5 font-mono text-[11px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+			>
+				V // THE TOOL-RELAY CALLBACK
+			</div>
+			<div
+				class="zine-box-canary w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.5deg] sm:p-12"
+			>
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
+					<div class="flex flex-col gap-12">
+						<h2
+							class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+						>
+							Synchronous, unless you say otherwise
+						</h2>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							<code class="font-mono text-xs">POST /tool/relay</code> runs the tool
+							synchronously unless the request carries a
+							<code class="font-mono text-xs">callback_url</code> - then the call
+							becomes asynchronous: the proxy answers immediately with
+							<code class="font-mono text-xs">{"{success: true, async_call: true}"}</code>,
+							executes the tool, and POSTs the real result to the callback URL later
+							(docs/tool-relay/callbacks.md:29-48).
+						</p>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							The guardrails are strict. The callback URL must be
+							<strong class="text-bone-white">https-only</strong> - http, including
+							loopback, and any other scheme are rejected with HTTP 400 before
+							anything executes (SSRF protection). The delivery is a
+							<strong class="text-bone-white">5-second, fire-and-forget POST</strong>:
+							no auth header, no retries, the outcome untracked (only relay calls
+							themselves are counted in
+							<code class="font-mono text-xs">/stats</code>). Only
+							<code class="font-mono text-xs">aphrodite_retrieve</code>,
+							<code class="font-mono text-xs">aphrodite_compress</code> and
+							<code class="font-mono text-xs">aphrodite_list</code> are relayable;
+							anything else is an error. On graceful shutdown the task tracker waits
+							for in-flight deliveries, so none are lost mid-flight.
+						</p>
+					</div>
+					<div class="flex flex-col gap-8">
+						<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+							THE TWO LANES OF ONE RELAY CALL
+						</div>
+						<div class="border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px]">
+							<div class="text-zinc-dust">SYNCHRONOUS // NO CALLBACK_URL</div>
+							<div class="mt-4 text-bone-newsprint opacity-90">POST /tool/relay - tool runs - full result inline</div>
+							<div class="mt-8 border-t border-oxblood-dark pt-4 text-[10px] text-stamped-canary">
+								ASYNC // WITH CALLBACK_URL
+							</div>
+							<div class="mt-4 text-bone-newsprint opacity-90">
+								{"{ \"success\": true, \"result\": null, \"async_call\": true }"}
+							</div>
+							<div class="mt-2 text-zinc-dust">... later, 5s timeout, no auth, no retries ...</div>
+							<div class="mt-2 text-bone-newsprint opacity-90">POST callback_url - the real result</div>
+						</div>
+						<div class="border border-oxblood-dark bg-asphalt-panel p-5 font-body text-[13px] leading-relaxed text-bone-newsprint">
+							<span class="font-mono text-[10px] font-bold uppercase tracking-widest text-raw-blood">THE RESULT ITSELF · </span>
+							is compact metadata (hash, type, size, marker) - so it stays raw through
+							the hook pipeline: compressing an
+							<code class="font-mono text-xs">aphrodite_retrieve</code> result would
+							replace resolved content with another marker.
+						</div>
+					</div>
+				</div>
+				<figure class="mt-24 border border-oxblood-dark bg-asphalt-panel p-4" data-diagram="tool-relay">
+					<div class="overflow-x-auto" set:html={ToolRelay} />
+					<figcaption class="mt-6 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+						THE RELAY // VALIDATE HTTPS - EXECUTE - SPAWN THE 5S CALLBACK
+					</figcaption>
+				</figure>
+				<div class="mt-16 font-mono text-[9px] leading-relaxed text-zinc-dust">
+					SRC: docs/tool-relay/callbacks.md:27-111,139-144 · docs/plugin/hooks.md:76-83
+				</div>
+			</div>
+		</section>
+
+		<!-- ============ VI // THE ESSENTIAL-TOOL SKIP GATE ============ -->
+		<section class="relative w-full">
+			<div
+				class="relative z-10 -mb-7 ml-6 inline-block rotate-1 border border-black bg-weathered-teal px-4 py-1.5 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				VI // THE ESSENTIAL-TOOL SKIP GATE
+			</div>
+			<div
+				class="zine-box-teal w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.4deg] sm:p-12"
+			>
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
+					<div class="flex flex-col gap-12">
+						<h2
+							class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+						>
+							What stays raw, and why
+						</h2>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							Before any classification or storage, <code class="font-mono text-xs"
+								>transform_tool_result</code
+							> runs its skip gates: a result is left untouched when it is empty;
+							when the tool is in the <strong class="text-bone-white">essential set</strong> -
+							<code class="font-mono text-xs">skill_view</code>,
+							<code class="font-mono text-xs">skills_list</code>,
+							<code class="font-mono text-xs">skill_manage</code>,
+							<code class="font-mono text-xs">memory</code>,
+							<code class="font-mono text-xs">session_search</code>,
+							<code class="font-mono text-xs">read_file</code>,
+							<code class="font-mono text-xs">read_terminal</code>; when it is one of
+							Aphrodite's own tools or a headroom helper; or when it sits below the
+							tool threshold (docs/plugin/hooks.md:76-83).
+						</p>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							The logic is not protectionism - it is information theory per surface.
+							The essential tools return compact, self-describing metadata the agent
+							needs raw: a skill's instructions, a memory entry, a file's content.
+							Compressing them would trade precision for nothing. The self-tools are
+							already the compressed form: their output is a marker or a catalog, and
+							marking a marker is the preview-doubling bug in slow motion. And the
+							size gate is the quiet one - most tool output is simply small, and
+							passes through without a store entry ever existing.
+						</p>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							One subtlety: file references are tracked <em>before</em> the skip gates,
+							so <code class="font-mono text-xs">read_file</code> and
+							<code class="font-mono text-xs">search_files</code> results feed the
+							recall catalog even when they are never compressed (docs/plugin/hooks.md:92-94).
+						</p>
+					</div>
+					<div class="flex flex-col gap-8">
+						<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+							THE GATES // IN ORDER
+						</div>
+						<div class="border border-oxblood-dark bg-asphalt-panel px-4 py-3 font-mono text-[11px]">
+							<span class="font-black text-bone-white">01 EMPTY</span>
+							<span class="ml-4 text-zinc-dust">nothing to compress</span>
+						</div>
+						<div class="border border-oxblood-dark bg-asphalt-panel px-4 py-3 font-mono text-[11px]">
+							<span class="font-black text-bone-white">02 ESSENTIAL SET</span>
+							<span class="ml-4 text-zinc-dust">the agent needs raw output</span>
+						</div>
+						<div class="border border-oxblood-dark bg-asphalt-panel px-4 py-3 font-mono text-[11px]">
+							<span class="font-black text-bone-white">03 SELF TOOLS</span>
+							<span class="ml-4 text-zinc-dust">already compact metadata</span>
+						</div>
+						<div class="border border-oxblood-dark bg-asphalt-panel px-4 py-3 font-mono text-[11px]">
+							<span class="font-black text-bone-white">04 SIZE GATE</span>
+							<span class="ml-4 text-zinc-dust">4,096 chars default; 0 disables the gate</span>
+						</div>
+						<a
+							class="border border-raw-blood bg-soot-black px-4 py-2 text-center font-mono text-[11px] font-black uppercase tracking-widest text-stamped-canary transition-colors hover:text-bone-white"
+							href="/workbench/"
+						>
+							TRY IT // THE CLASSIFIER DEMO, SAME GATES
+						</a>
+					</div>
+				</div>
+				<div class="mt-16 font-mono text-[9px] leading-relaxed text-zinc-dust">
+					SRC: docs/plugin/hooks.md:69-94,146-153
+				</div>
+			</div>
+		</section>
+
+		<!-- ============ VII // THE DUAL-LISTENER PARALLEL ============ -->
+		<section class="relative w-full">
+			<div
+				class="relative z-10 -mb-7 ml-6 inline-block -rotate-1 border border-black bg-raw-blood px-4 py-1.5 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				VII // THE DUAL-LISTENER PARALLEL
+			</div>
+			<div
+				class="zine-box-crimson w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:rotate-[0.5deg] sm:p-12"
+			>
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
+					<div class="flex flex-col gap-12">
+						<h2
+							class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+						>
+							Same output, two lanes, one marker
+						</h2>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							A single binary can run two listeners with different roles - the cache
+							proxy on <code class="font-mono text-xs">:9797</code> (in-memory
+							DashMap, 10,000 entries, 8192-byte threshold) and the token proxy on
+							<code class="font-mono text-xs">:9798</code> (SQLite at
+							<code class="font-mono text-xs">ccr.db</code>, 1024-byte threshold,
+							persistent, tool-relay-capable). Each has its own
+							<code class="font-mono text-xs">AppState</code> and CCR backend; both
+							bind to loopback by default (docs/proxy/architecture.md:9-35).
+						</p>
+						<p class="font-body text-sm leading-relaxed text-bone-newsprint">
+							The parallel that matters: the same payload crosses the plugin-hook lane
+							(intercepted directly at the tool boundary, no API round-trip) and the
+							proxy lane (Chat Completions responses compressed in flight) - and the
+							marker it becomes is byte-identical across the two paths, as are the
+							enriched previews (CHANGELOG.md:616-617). The preview-doubling
+							regression of v1.3.4 was caught precisely because the two paths were
+							held to that standard.
+						</p>
+					</div>
+					<div class="flex flex-col gap-8">
+						<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+							ONE PAYLOAD, TWO LANES
+						</div>
+						<div class="border border-oxblood-dark bg-soot-black p-5 font-mono text-[12px]">
+							<div class="text-zinc-dust">LANE A // PLUGIN HOOKS</div>
+							<div class="mt-4 text-bone-newsprint opacity-90">
+								transform_tool_result → BLAKE3 → marker
+							</div>
+							<div class="mt-2 text-weathered-teal">
+								&lt;&lt;&lt;CCR:d7b4f2a8...c6b0|terminal|612&gt;&gt;&gt;
+							</div>
+							<div class="mt-8 border-t border-oxblood-dark pt-4 text-[10px] text-stamped-canary">
+								LANE B // PROXY
+							</div>
+							<div class="mt-4 text-bone-newsprint opacity-90">
+								Chat Completions response → classify → threshold → marker
+							</div>
+							<div class="mt-2 text-weathered-teal">
+								&lt;&lt;&lt;CCR:d7b4f2a8...c6b0|terminal|612&gt;&gt;&gt;
+							</div>
+						</div>
+						<div class="grid grid-cols-2 gap-12">
+							<div class="zine-box-subtle border-[3px] border-oxblood-dark bg-soot-black p-5">
+								<div class="font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-dust">CACHE :9797</div>
+								<div class="mt-4 font-mono text-[11px] font-black text-bone-white">DASHMAP · 10,000</div>
+								<div class="mt-2 font-mono text-[10px] text-zinc-dust">8192-BYTE THRESHOLD · TRANSIENT</div>
+							</div>
+							<div class="zine-box-subtle border-[3px] border-raw-blood bg-soot-black p-5">
+								<div class="font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-dust">TOKEN :9798</div>
+								<div class="mt-4 font-mono text-[11px] font-black text-bone-white">SQLITE · ccr.db</div>
+								<div class="mt-2 font-mono text-[10px] text-zinc-dust">1024-BYTE THRESHOLD · PERSISTENT</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="mt-16 font-mono text-[9px] leading-relaxed text-zinc-dust">
+					SRC: docs/proxy/architecture.md:9-35 · README.md:287-299 · CHANGELOG.md:616-617
+				</div>
+			</div>
+		</section>
+
+		<!-- FOOTER -->
+		<footer
+			class="flex flex-col items-center justify-between gap-12 border-t-2 border-oxblood-dark pb-12 pt-32 text-xs text-zinc-dust sm:flex-row"
+		>
+			<div class="flex items-center gap-6">
+				<span class="h-2.5 w-2.5 bg-weathered-teal"></span>
+				<span class="font-bold uppercase tracking-widest text-bone-white">
+					APHRODITE EXAMPLES · MECHANICS-FIRST · ALL CLAIMS ANCHORED
+				</span>
+			</div>
+			<div class="flex items-center gap-12">
+				<a class="transition-colors hover:text-bone-white" href="/workbench/">WORKBENCH</a>
+				<a class="transition-colors hover:text-bone-white" href="/tools/">TOOLS</a>
+				<a class="transition-colors hover:text-bone-white" href="/docs/">DOCS</a>
+				<span class="font-bold text-stamped-canary">CC0-1.0</span>
+			</div>
+		</footer>
+	</main>
+</Base>

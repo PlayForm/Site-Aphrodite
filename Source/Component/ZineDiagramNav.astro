@@ -1,0 +1,122 @@
+/**
+ * ZineDiagramNav - the DeepSeek DiagramNav pattern re-skinned in the zine
+ * palette, attached at runtime to every `[data-diagram]` figure on the page.
+ *
+ * The Mermaid SVGs are embedded via `?raw` + `set:html`, so the binding happens
+ * after mount (and again on each astro:page-load). From the SVG itself:
+ * - node groups carry ids like `flowchart-H1-0`  -> the key is `H1`
+ * - edge paths carry ids like `L_H1_TURN_0`      -> the edge is H1 -> TURN
+ *
+ * Hovering a node dims everything not adjacent to it (`.zine-diagram-dim`)
+ * and lights its adjacent edges raw-blood (`.zine-diagram-hot`). When the
+ * figure declares `data-diagram-links` (a JSON map of node key -> route),
+ * linkable nodes get the canary hover chrome and clicking navigates.
+ *
+ * Pages that hand-roll their `<figure data-diagram="...">` (the DRIFT-ALIGN
+ * precedent in hooks/plugin/tools) include this component once to get the
+ * interactivity without changing their figure markup.
+ */
+
+function NodeKey(Group: Element): string {
+	return Group.id.replace(/^flowchart-/, "").replace(/-\d+$/, "");
+}
+
+function BindDiagrams() {
+	for (const Figure of document.querySelectorAll<HTMLElement>("[data-diagram]")) {
+		if (Figure.dataset.diagramBound) {
+			continue;
+		}
+
+		Figure.dataset.diagramBound = "1";
+
+		const Svg = Figure.querySelector("svg");
+
+		if (!Svg) {
+			continue;
+		}
+
+		const Nodes = new Map<string, Element>();
+
+		for (const Group of Svg.querySelectorAll('g[id^="flowchart-"]')) {
+			Nodes.set(NodeKey(Group), Group);
+			Group.classList.add("zine-diagram-node");
+		}
+
+		const Edges = new Map<Element, [string, string]>();
+
+		for (const Path of Svg.querySelectorAll('path[id^="L_"]')) {
+			const Parts = Path.id.slice(2).replace(/_\d+$/, "").split("_");
+			if (Parts.length === 2 && Nodes.has(Parts[0]) && Nodes.has(Parts[1])) {
+				Edges.set(Path, [Parts[0], Parts[1]]);
+			}
+		}
+
+		// The registry: node key -> route, read from the figure attribute.
+		let Links: Record<string, string> = {};
+
+		try {
+			Links = JSON.parse(Figure.dataset["diagramLinks"] ?? "{}") as Record<string, string>;
+		} catch {
+			Links = {};
+		}
+
+		for (const [Key, Group] of Nodes) {
+			if (Links[Key]) {
+				Group.classList.add("zine-diagram-linkable");
+				Group.setAttribute("role", "link");
+				Group.setAttribute("tabindex", "0");
+				Group.setAttribute("aria-label", `Open ${Key}`);
+			}
+
+			const Enter = () => {
+				const Near = new Set([Key]);
+
+				for (const [From, To] of Edges.values()) {
+					if (From === Key) Near.add(To);
+					if (To === Key) Near.add(From);
+				}
+
+				for (const [NodeKey, Node] of Nodes) {
+					Node.classList.toggle("zine-diagram-dim", !Near.has(NodeKey));
+				}
+
+				for (const [Path, [From, To]] of Edges) {
+					const Hot = From === Key || To === Key;
+					Path.classList.toggle("zine-diagram-hot", Hot);
+					Path.classList.toggle("zine-diagram-dim", !Hot);
+				}
+			};
+
+			const Leave = () => {
+				for (const Node of Nodes.values()) {
+					Node.classList.remove("zine-diagram-dim");
+				}
+
+				for (const Path of Edges.keys()) {
+					Path.classList.remove("zine-diagram-hot", "zine-diagram-dim");
+				}
+			};
+
+			Group.addEventListener("mouseenter", Enter);
+			Group.addEventListener("mouseleave", Leave);
+			Group.addEventListener("focus", Enter);
+			Group.addEventListener("blur", Leave);
+
+			if (Links[Key]) {
+				Group.addEventListener("click", () => {
+					window.location.assign(Links[Key]);
+				});
+				Group.addEventListener("keydown", (Event) => {
+					if ((Event as KeyboardEvent).key === "Enter") {
+						window.location.assign(Links[Key]);
+					}
+				});
+			}
+		}
+	}
+}
+
+export default BindDiagrams;
+
+BindDiagrams();
+document.addEventListener("astro:page-load", BindDiagrams);

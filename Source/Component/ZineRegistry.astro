@@ -1,0 +1,72 @@
+---
+interface Props {
+	/** The registry entries; filtered client-side against the Label and the Tags. */
+	Entries: { Label: string; Href: string; Tags?: string[]; Note?: string }[];
+
+	/** The placeholder text in the filter input. */
+	Placeholder?: string;
+}
+
+const { Entries, Placeholder = "FILTER..." } = Astro.props;
+---
+
+<div class="zine-box-subtle border-[3px] border-oxblood-dark bg-carbon-void" data-registry>
+	<div class="flex items-center border-b-2 border-blood-crimson bg-soot-black">
+		<span class="border-r border-oxblood-dark bg-raw-blood px-3 py-2 font-mono text-[10px] font-black uppercase tracking-widest text-bone-white">
+			REG
+		</span>
+		<input
+			class="w-full bg-transparent px-3 py-2 font-mono text-xs text-bone-white placeholder:text-zinc-dust focus:outline-none"
+			type="search"
+			data-registry-input
+			placeholder={Placeholder}
+			aria-label="Filter the registry"
+		/>
+		<span class="px-3 font-mono text-[10px] font-bold text-zinc-dust" data-registry-count>
+			{String(Entries.length).padStart(2, "0")}
+		</span>
+	</div>
+	<ul class="max-h-80 divide-y divide-oxblood-dark/60 overflow-y-auto">
+		{
+			Entries.map((Entry) => (
+				<li data-registry-tags={[Entry.Label, ...(Entry.Tags ?? [])].join(" ").toLowerCase()}>
+					<a class="block px-3 py-2 font-mono text-xs text-bone-newsprint hover:bg-raw-blood/20 hover:text-bone-white" href={Entry.Href}>
+						<span class="font-bold">{Entry.Label}</span>
+						{Entry.Note && <span class="text-zinc-dust"> - {Entry.Note}</span>}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</div>
+
+<script>
+	function BindRegistries() {
+		for (const Root of document.querySelectorAll("[data-registry]")) {
+			if (Root.dataset.registryBound) {
+				continue;
+			}
+
+			Root.dataset.registryBound = "1";
+
+			const Input = Root.querySelector<HTMLInputElement>("[data-registry-input]");
+			const Count = Root.querySelector<HTMLElement>("[data-registry-count]");
+
+			Input?.addEventListener("input", () => {
+				const Needle = Input.value.trim().toLowerCase();
+				let Visible = 0;
+
+				for (const Item of Root.querySelectorAll<HTMLElement>("[data-registry-tags]")) {
+					const Show = !Needle || (Item.dataset["registryTags"] ?? "").includes(Needle);
+					Item.classList.toggle("hidden", !Show);
+					if (Show) Visible += 1;
+				}
+
+				if (Count) Count.textContent = String(Visible).padStart(2, "0");
+			});
+		}
+	}
+
+	BindRegistries();
+	document.addEventListener("astro:page-load", BindRegistries);
+</script>

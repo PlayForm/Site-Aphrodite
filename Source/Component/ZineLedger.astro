@@ -1,0 +1,50 @@
+---
+interface Props {
+	/** Table rows; Delta highlights a cell in the canary/teal accent. */
+	Rows: {
+		Cells: {
+			Text: string;
+			/** "up" renders canary, "down" renders teal; unset renders plain. */
+			Delta?: "up" | "down";
+			/** Align this cell right (numeric columns). */
+			Align?: "right";
+		}[];
+	}[];
+
+	/** Optional header row; rendered as the ruled column captions. */
+	Headers?: string[];
+}
+
+const { Rows, Headers } = Astro.props;
+
+const Delta = {
+	up: "text-stamped-canary",
+	down: "text-weathered-teal",
+};
+---
+
+<div class="zine-box-subtle border-[3px] border-oxblood-dark bg-carbon-void">
+	<table class="w-full border-collapse font-mono text-xs">
+		{Headers && (
+			<thead>
+				<tr class="border-b-2 border-blood-crimson">
+					{Headers.map((Header) => <th class="px-3 py-2 text-left text-[10px] font-black uppercase tracking-widest text-zinc-dust">{Header}</th>)}
+				</tr>
+			</thead>
+		)}
+		<tbody>
+			{Rows.map(
+				(Row) => (
+					<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
+						{Row.Cells.map((Cell) => (
+							<td class={`px-3 py-2 ${Cell.Delta ? Delta[Cell.Delta] : "text-bone-newsprint"} ${Cell.Align === "right" ? "text-right" : "text-left"}`}>
+								{Cell.Delta && <span class="mr-1 font-black">{Cell.Delta === "up" ? "▲" : "▼"}</span>}
+								{Cell.Text}
+							</td>
+						))}
+					</tr>
+				)
+			)}
+		</tbody>
+	</table>
+</div>

@@ -10,9 +10,14 @@ interface Props {
 
 	/** Fill color: teal (default), raw, canary. */
 	Color?: "teal" | "raw" | "canary";
+
+	/** "scroll" = the MONUMENT treatment: width 0 until the bar enters the
+	 *  viewport, then snaps to Percent in hard steps (.zine-stat-fill).
+	 *  Default "static" renders the width immediately (the existing form). */
+	Fill?: "static" | "scroll";
 }
 
-const { Label, Ratio, Percent, Color = "teal" } = Astro.props;
+const { Label, Ratio, Percent, Color = "teal", Fill = "static" } = Astro.props;
 
 const Palette = {
 	teal: "bg-weathered-teal",
@@ -33,6 +38,54 @@ const Text = {
 		<span class={Text}>{Ratio}</span>
 	</div>
 	<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-		<div class={`h-full ${Palette}`} style={`width: ${Percent}%;`}></div>
+		{
+			Fill === "scroll" ? (
+				<div
+					class="zine-stat-fill h-full"
+					style="width: 0%;"
+					data-stat-fill={Percent}
+					aria-hidden="true"
+				/>
+			) : (
+				<div class={`h-full ${Palette}`} style={`width: ${Percent}%;`} />
+			)
+		}
 	</div>
 </div>
+
+<script>
+	function BindStatFills() {
+		for (const Bar of document.querySelectorAll<HTMLElement>("[data-stat-fill]")) {
+			if (Bar.dataset.statFillBound) {
+				continue;
+			}
+
+			Bar.dataset.statFillBound = "1";
+
+			// The MONUMENT scroll-fill: the color plane and the target width are
+			// applied only when the bar first enters the viewport (hard offsets:
+			// width goes 0% -> target in steps, never eased).
+			const Fill = () => {
+				Bar.style.width = `${Bar.dataset["statFill"] ?? "0"}%`;
+				Bar.classList.add({ teal: "bg-weathered-teal", raw: "bg-raw-blood", canary: "bg-stamped-canary" }[Color]);
+			};
+
+			const Observer = new IntersectionObserver(
+				(Entries) => {
+					for (const Entry of Entries) {
+						if (Entry.isIntersecting) {
+							Fill();
+							Observer.disconnect();
+						}
+					}
+				},
+				{ threshold: 0.4 }
+			);
+
+			Observer.observe(Bar);
+		}
+	}
+
+	BindStatFills();
+	document.addEventListener("astro:page-load", BindStatFills);
+</script>

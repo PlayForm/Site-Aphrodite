@@ -1,0 +1,40 @@
+---
+import type { InternalLink } from "@Library/Links";
+
+interface Props {
+	/** The natural neighbors of the page - truthful links only, never forced. */
+	Links: InternalLink[];
+}
+
+const { Links } = Astro.props;
+---
+
+<!-- RELATED module: the cross-link web node. Rendered at the foot of each
+     page's content; the links are the page's natural neighbors, curated
+     per page from the registry. -->
+<nav
+	aria-label="Related pages"
+	class="relative w-full border-2 border-oxblood-dark bg-asphalt-panel p-5"
+>
+	<div
+		class="mb-3 flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-raw-blood"
+	>
+		<span class="h-2 w-2 bg-raw-blood"></span>
+		RELATED
+	</div>
+	<div class="flex flex-wrap gap-x-6 gap-y-2">
+		{
+			Links.map((Link) => (
+				<a
+					class="font-mono text-xs tracking-widest text-zinc-dust transition-colors hover:text-bone-white"
+					href={Link.Href}
+				>
+					<span class="text-oxblood-dark" aria-hidden="true">
+						■
+					</span>
+					{Link.Label}
+				</a>
+			))
+		}
+	</div>
+</nav>

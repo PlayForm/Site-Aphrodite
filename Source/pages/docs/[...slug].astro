@@ -1,5 +1,12 @@
 ---
 import Base from "@Layout/Base.astro";
+import DocsSidebar from "../../Component/DocsSidebar.astro";
+
+import CcrPipeline from "../../Content/Mermaid/ccr-pipeline.svg?raw";
+import ConfigResolution from "../../Content/Mermaid/config-resolution.svg?raw";
+import DualListener from "../../Content/Mermaid/dual-listener.svg?raw";
+import MarkerFormat from "../../Content/Mermaid/marker-format.svg?raw";
+import SessionLifecycle from "../../Content/Mermaid/session-lifecycle.svg?raw";
 
 import { getCollection, render } from "astro:content";
 
@@ -39,47 +46,516 @@ const Sections = [
 		A === "Overview" ? -1 : B === "Overview" ? 1 : A.localeCompare(B),
 	)
 	.map(([Name, Entries]) => ({ Entries, Name }));
+
+// Reading order for the prev/next navigation: the flattened section tree.
+const Sequence = Sections.flatMap(({ Entries }) => Entries);
+
+const Position = Sequence.findIndex((Entry) => Entry.Id === Doc.id);
+
+const Previous = Position > 0 ? Sequence[Position - 1] : undefined;
+const Next = Position > -1 && Position < Sequence.length - 1 ? Sequence[Position + 1] : undefined;
+
+const Href = (Id: string) => (Id === "index" ? "/docs/" : `/docs/${Id}/`);
+
+// The pre-rendered Mermaid SVGs, embedded per the placement map. The markdown
+// sources keep their ```mermaid blocks (they render as plain stream panes);
+// the rendered diagram rides above the prose in a [data-diagram] figure.
+const Diagrams: Record<string, { Label: string; Svg: string }> = {
+	"architecture/01-startup": { Label: "M1 // CCR PIPELINE", Svg: CcrPipeline },
+	"ccr/lifecycle": { Label: "M1 // CCR PIPELINE", Svg: CcrPipeline },
+	"ccr/marker-format": { Label: "M6 // MARKER FORMAT", Svg: MarkerFormat },
+	"architecture/07-config-resolution": {
+		Label: "M7 // CONFIG RESOLUTION",
+		Svg: ConfigResolution,
+	},
+	"architecture/05-ccr-lifecycle": { Label: "M8 // SESSION LIFECYCLE", Svg: SessionLifecycle },
+	"proxy/architecture": { Label: "M5 // DUAL LISTENER", Svg: DualListener },
+};
+
+const Diagram = Diagrams[Doc.id];
+
+// A section index page is a README-derived entry whose id matches its section
+// folder ("architecture", "guides", ...); the root entry is id "index".
+const IsSectionIndex =
+	Doc.id !== "index" && Doc.id.toLowerCase() === Doc.data.section.toLowerCase();
+
+const IsIndex = Doc.id === "index" || IsSectionIndex;
+
+const IndexEntries = IsSectionIndex
+	? [
+			{
+				Name: Doc.data.section,
+				// The card grid always consumes { Name, Entries } groups; on the
+				// section-index routes the group is this section's own page list.
+				Entries: (Sections.find(
+					({ Name }) => Name.toLowerCase() === Doc.data.section.toLowerCase(),
+				)?.Entries ?? []).filter((Entry) => Entry.Id !== Doc.id),
+			},
+		]
+	: Sections.filter(({ Name }) => Name !== "Overview");
+
+// One-line purpose pulled from the page body: the first prose sentence, with
+// the markdown syntax stripped. The generated content itself is untouched.
+const Purpose = (Body?: string) => {
+	for (const Line of (Body ?? "").split("\n")) {
+		const Trimmed = Line.trim();
+
+		if (
+			!Trimmed ||
+			Trimmed.startsWith("#") ||
+			Trimmed.startsWith("|") ||
+			Trimmed.startsWith("<") ||
+			Trimmed.startsWith("```") ||
+			Trimmed.startsWith(">")
+		) {
+			continue;
+		}
+
+		const Text = Trimmed
+			.replace(/[*`_[\]()]/g, "")
+			.replace(/\s+/g, " ")
+			.trim();
+		const Cut = Text.indexOf(". ");
+
+		return (Cut > 0 ? Text.slice(0, Cut + 1) : Text).slice(0, 220);
+	}
+
+	return "";
+};
+
+const Purposes = new Map(
+	(
+		await getCollection("Docs")
+	).map((Page) => [Page.id, Purpose(Page.body)]),
+);
 ---
 
 <Base
 	Title={`${Doc.data.title} - Aphrodite`}
 	Description={`Aphrodite documentation - ${Doc.data.section}.`}
 >
-	<main class="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-6 py-16">
-		<p class="text-sm text-neutral-500">
-			<a class="underline" href="/docs/">Docs</a>
-			<span> / </span>
-			{Doc.data.section}
-		</p>
-
-		<nav
-			aria-label="Documentation"
-			class="grid w-full gap-x-8 gap-y-6 text-sm sm:grid-cols-2 lg:grid-cols-4"
+	<div class="relative z-10 mx-auto w-full max-w-[1440px] px-5 py-16 sm:px-8 lg:py-24">
+		<!-- Mobile: the docs index opens as a full-screen drawer -->
+		<button
+			id="docs-nav-toggle"
+			class="mb-8 flex w-full items-center justify-between border-4 border-blood-crimson bg-carbon-void px-4 py-2.5 font-mono text-[11px] font-black uppercase tracking-widest text-bone-newsprint shadow-[4px_4px_0px_#000] lg:hidden"
+			aria-expanded="false"
+			aria-controls="docs-drawer"
 		>
+			DOCUMENTATION INDEX
+			<span aria-hidden="true">+</span>
+		</button>
+
+		<nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-2 font-mono text-xs">
+			<a
+				class="text-stamped-canary underline decoration-2 underline-offset-4 hover:text-bone-white"
+				href="/docs/"
+			>
+				DOCS
+			</a>
+			<span class="text-zinc-dust" aria-hidden="true">/</span>
+			<span class="uppercase tracking-widest text-zinc-dust">{Doc.data.section}</span>
 			{
-				Sections.map(({ Name, Entries }) => (
-					<div class="flex flex-col gap-1">
-						<p class="font-semibold text-neutral-900">{Name}</p>
-						{Entries.map((Entry) => (
-							<a
-								class={
-									Entry.Id === Doc.id
-										? "text-neutral-900 underline"
-										: "text-neutral-600 hover:text-neutral-900"
-								}
-								href={Entry.Id === "index" ? "/docs/" : `/docs/${Entry.Id}/`}
-								aria-current={Entry.Id === Doc.id ? "page" : undefined}
-							>
-								{Entry.Title}
-							</a>
-						))}
-					</div>
-				))
+				!IsIndex && (
+					<>
+						<span class="text-zinc-dust" aria-hidden="true">
+							/
+						</span>
+						<span class="uppercase tracking-widest text-bone-white">{Doc.data.title}</span>
+					</>
+				)
 			}
 		</nav>
 
-		<article class="prose prose-neutral max-w-3xl">
-			<Content />
-		</article>
-	</main>
+		<div class="mt-10 flex flex-col gap-16 lg:grid lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-x-20">
+			<!-- Desktop: sticky sidebar -->
+			<aside class="hidden lg:block">
+				<div class="sticky top-24">
+					<DocsSidebar Sections={Sections} CurrentId={Doc.id} />
+				</div>
+			</aside>
+
+			<div class="min-w-0">
+				<!-- Page header: the tape-stamp section tag above the crimson rule -->
+				<header class="relative">
+					<span
+						class="absolute -top-7 left-0 z-20 -rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+					>
+						{Doc.data.section}
+					</span>
+					<h1
+						class="border-b-4 border-blood-crimson pb-6 font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-4xl"
+					>
+						{Doc.data.title}
+					</h1>
+				</header>
+
+				{
+					Diagram && (
+						<figure
+							class="relative z-10 mt-16 border border-oxblood-dark bg-soot-black p-4"
+							data-diagram={Diagram.Label.toLowerCase().replaceAll(" ", "-")}
+						>
+							<div class="overflow-x-auto [&_svg]:h-auto [&_svg]:max-w-full" set:html={Diagram.Svg} />
+							<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+								{Diagram.Label}
+							</figcaption>
+						</figure>
+					)
+				}
+
+				<!-- Index pages: the zine index cards with one-line purposes -->
+				{
+					IsIndex && (
+						<section aria-label="Section index" class="relative mt-16">
+							<h2 class="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-dust">
+								{IsSectionIndex ? "IN THIS SECTION" : "THE SECTIONS"}
+							</h2>
+							<div class="mt-8 grid gap-16 sm:grid-cols-2 sm:gap-x-8">
+								{IndexEntries.map(({ Name, Entries }, GridIndex) => (
+									<div
+										class={`relative border-4 border-blood-crimson bg-carbon-void p-6 ${
+											GridIndex % 2 === 0 ? "zine-box-subtle" : "zine-box-crimson"
+										}`}
+									>
+										<span
+											class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+										>
+											{Name}
+										</span>
+										<ul class="mt-2 flex flex-col gap-4">
+											{Entries.filter((Entry) => Entry.Id !== Doc.id).map((Entry) => (
+												<li class="flex flex-col gap-1">
+													<a
+														href={Href(Entry.Id)}
+														aria-current={Entry.Id === Doc.id ? "page" : undefined}
+														class={`font-mono text-xs font-bold tracking-wide ${
+															Entry.Id === Doc.id
+																? "text-stamped-canary underline decoration-2 underline-offset-4"
+																: "text-bone-white hover:text-stamped-canary"
+														}`}
+													>
+														{Entry.Title}
+													</a>
+													{Purposes.get(Entry.Id) && (
+														<p class="font-body text-xs leading-relaxed text-zinc-dust">
+															{Purposes.get(Entry.Id)}
+														</p>
+													)}
+												</li>
+											))}
+										</ul>
+									</div>
+								))}
+							</div>
+						</section>
+					)
+				}
+
+				<!-- The reading column -->
+				<article class="docs-prose mt-16 min-w-0">
+					<Content />
+				</article>
+
+				<!-- Prev / next: the zine cards at the bottom of the reading column -->
+				{
+					(Previous || Next) && (
+						<nav
+							aria-label="Pagination"
+							class="mt-32 grid gap-16 border-t-4 border-dashed border-oxblood-dark pt-16 sm:grid-cols-2 sm:gap-8"
+						>
+							{Previous ? (
+								<a
+									href={Href(Previous.Id)}
+									rel="prev"
+									class="group relative border-4 border-blood-crimson bg-carbon-void p-6 zine-box-subtle transition-transform hover:-translate-y-1"
+								>
+									<span class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+										PREV
+									</span>
+									<span class="mt-2 block font-mono text-xs font-bold text-bone-white group-hover:text-stamped-canary">
+										{Previous.Title}
+									</span>
+									<span class="mt-1 block font-mono text-[10px] uppercase tracking-widest text-zinc-dust">
+										{`/docs/${Previous.Id}/`}
+									</span>
+								</a>
+							) : (
+								<span aria-hidden="true" />
+							)}
+							{Next ? (
+								<a
+									href={Href(Next.Id)}
+									rel="next"
+									class="group relative border-4 border-blood-crimson bg-carbon-void p-6 text-right zine-box-subtle transition-transform hover:-translate-y-1"
+								>
+									<span class="absolute -top-3.5 right-4 z-20 rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]">
+										NEXT
+									</span>
+									<span class="mt-2 block font-mono text-xs font-bold text-bone-white group-hover:text-stamped-canary">
+										{Next.Title}
+									</span>
+									<span class="mt-1 block font-mono text-[10px] uppercase tracking-widest text-zinc-dust">
+										{`/docs/${Next.Id}/`}
+									</span>
+								</a>
+							) : (
+								<span aria-hidden="true" />
+							)}
+						</nav>
+					)
+				}
+			</div>
+		</div>
+	</div>
+
+	<!-- Mobile drawer: the sidebar in a fixed overlay above everything -->
+	<div id="docs-drawer" class="fixed inset-0 z-50 hidden lg:hidden" role="dialog" aria-modal="true">
+		<div class="absolute inset-0 bg-soot-black/90" data-drawer-close></div>
+		<div
+			class="absolute inset-y-0 left-0 w-80 max-w-[85vw] overflow-y-auto border-r-4 border-blood-crimson bg-carbon-void p-6"
+		>
+			<button
+				data-drawer-close
+				class="mb-8 border-2 border-black bg-raw-blood px-3 py-1.5 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				CLOSE
+			</button>
+			<DocsSidebar Sections={Sections} CurrentId={Doc.id} />
+		</div>
+	</div>
 </Base>
+
+<style>
+	/* The markdown presentation layer, scoped to the reading column. The
+	   rendered <Content /> tree is generated, so the element selectors are
+	   global under the hashed .docs-prose wrapper. */
+	.docs-prose :global(h1:first-child) {
+		display: none; /* the page title already lives in the header */
+	}
+
+	.docs-prose :global(h2) {
+		margin-top: 7rem;
+		margin-bottom: 2rem;
+		padding-bottom: 0.75rem;
+		border-bottom: 2px solid var(--blood-crimson);
+		font-family: "Space Grotesk", sans-serif;
+		font-size: 1.5rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+		color: var(--bone-white);
+	}
+
+	.docs-prose :global(h3) {
+		margin-top: 4.5rem;
+		margin-bottom: 1.5rem;
+		font-family: "Space Grotesk", sans-serif;
+		font-size: 1.15rem;
+		font-weight: 700;
+		color: var(--bone-white);
+	}
+
+	.docs-prose :global(h4),
+	.docs-prose :global(h5),
+	.docs-prose :global(h6) {
+		margin-top: 3rem;
+		margin-bottom: 1rem;
+		font-family: "Space Grotesk", sans-serif;
+		font-size: 1rem;
+		font-weight: 700;
+		color: var(--bone-white);
+	}
+
+	.docs-prose :global(p) {
+		margin: 1.5rem 0;
+		font-family: "DM Sans", sans-serif;
+		font-size: 0.95rem;
+		line-height: 1.8;
+		color: var(--bone-newsprint);
+	}
+
+	.docs-prose :global(a) {
+		color: var(--bone-white);
+		text-decoration: underline;
+		text-decoration-color: var(--stamped-canary);
+		text-decoration-thickness: 2px;
+		text-underline-offset: 4px;
+	}
+
+	.docs-prose :global(a:hover) {
+		background-color: var(--raw-blood);
+		color: var(--bone-white);
+	}
+
+	.docs-prose :global(strong) {
+		color: var(--bone-white);
+	}
+
+	/* Inline code: the asphalt chip. */
+	.docs-prose :global(code) {
+		padding: 0.1rem 0.4rem;
+		border: 1px solid var(--oxblood-dark);
+		background-color: var(--asphalt-panel);
+		font-family: "JetBrains Mono", monospace;
+		font-size: 0.8rem;
+		color: var(--weathered-teal);
+	}
+
+	/* Pre blocks: the raw stream panes - JBM 12px on soot-black. */
+	.docs-prose :global(pre) {
+		margin: 2rem 0;
+		padding: 1rem;
+		border: 1px solid var(--oxblood-dark);
+		background-color: var(--soot-black);
+		overflow-x: auto;
+	}
+
+	.docs-prose :global(pre code) {
+		padding: 0;
+		border: none;
+		background: none;
+		font-size: 12px;
+		line-height: 1.7;
+		color: var(--zinc-dust);
+	}
+
+	/* Tables: the ledger rows. */
+	.docs-prose :global(table) {
+		margin: 2.5rem 0;
+		width: 100%;
+		border: 1px solid var(--oxblood-dark);
+		border-collapse: collapse;
+		display: block;
+		overflow-x: auto;
+	}
+
+	.docs-prose :global(th) {
+		padding: 0.6rem 1rem;
+		border-bottom: 2px solid var(--blood-crimson);
+		background-color: var(--carbon-void);
+		font-family: "JetBrains Mono", monospace;
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		text-align: left;
+		color: var(--stamped-canary);
+	}
+
+	.docs-prose :global(td) {
+		padding: 0.6rem 1rem;
+		border-top: 1px solid var(--oxblood-dark);
+		font-family: "DM Sans", sans-serif;
+		font-size: 0.85rem;
+		color: var(--bone-newsprint);
+	}
+
+	.docs-prose :global(tr:nth-child(even) td) {
+		background-color: color-mix(in srgb, var(--asphalt-panel) 55%, transparent);
+	}
+
+	.docs-prose :global(blockquote) {
+		margin: 2.5rem 0;
+		padding: 1rem 1.5rem;
+		border-left: 4px solid var(--stamped-canary);
+		background-color: var(--asphalt-panel);
+		color: var(--zinc-dust);
+	}
+
+	.docs-prose :global(blockquote p) {
+		margin: 0.5rem 0;
+	}
+
+	.docs-prose :global(ul),
+	.docs-prose :global(ol) {
+		margin: 1.5rem 0;
+		padding-left: 1.5rem;
+		font-family: "DM Sans", sans-serif;
+		font-size: 0.95rem;
+		line-height: 1.8;
+		color: var(--bone-newsprint);
+	}
+
+	.docs-prose :global(ul) {
+		list-style: square;
+	}
+
+	.docs-prose :global(ol) {
+		list-style: decimal;
+	}
+
+	.docs-prose :global(li)::marker {
+		color: var(--blood-crimson);
+	}
+
+	.docs-prose :global(li > ul),
+	.docs-prose :global(li > ol) {
+		margin: 0.5rem 0;
+	}
+
+	.docs-prose :global(hr) {
+		margin: 7rem 0;
+		border: none;
+		border-top: 2px dashed var(--oxblood-dark);
+	}
+
+	.docs-prose :global(img) {
+		border: 4px solid var(--blood-crimson);
+	}
+
+	.docs-prose :global(section.footnotes) {
+		margin-top: 4rem;
+		padding-top: 1rem;
+		border-top: 2px dashed var(--oxblood-dark);
+		font-size: 0.8rem;
+		color: var(--zinc-dust);
+	}
+
+	.docs-prose :global(.footnotes-backref) {
+		text-decoration: none;
+	}
+
+	.docs-prose :global(kbd) {
+		padding: 0.1rem 0.4rem;
+		border: 1px solid var(--zinc-dust);
+		border-bottom-width: 3px;
+		font-family: "JetBrains Mono", monospace;
+		font-size: 0.75rem;
+		color: var(--bone-white);
+	}
+</style>
+
+<script>
+	function BindDocsDrawer() {
+		const Toggle = document.getElementById("docs-nav-toggle");
+		const Drawer = document.getElementById("docs-drawer");
+
+		if (!Toggle || !Drawer || Toggle.dataset.drawerBound) {
+			return;
+		}
+
+		Toggle.dataset.drawerBound = "1";
+
+		const Set = (Open) => {
+			Drawer.classList.toggle("hidden", !Open);
+			Toggle.setAttribute("aria-expanded", String(Open));
+			document.documentElement.classList.toggle("overflow-hidden", Open);
+		};
+
+		Toggle.addEventListener("click", () => Set(Drawer.classList.contains("hidden")));
+
+		for (const Closer of Drawer.querySelectorAll("[data-drawer-close]")) {
+			Closer.addEventListener("click", () => Set(false));
+		}
+
+		document.addEventListener("keydown", (Event) => {
+			if (Event.key === "Escape") {
+				Set(false);
+			}
+		});
+	}
+
+	BindDocsDrawer();
+	document.addEventListener("astro:page-load", BindDocsDrawer);
+</script>

@@ -29,6 +29,9 @@ export const MenuLinks: InternalLink[] = [
 	{ Href: "/flavors/", Label: "FLAVORS" },
 	{ Href: "/case-study/", Label: "CASE STUDY" },
 	{ Href: "/workbench/", Label: "WORKBENCH" },
+	{ Href: "/config/", Label: "CONFIG" },
+	{ Href: "/showcase/", Label: "SHOWCASE" },
+	{ Href: "/examples/", Label: "EXAMPLES" },
 ];
 
 /** Every internal route the header knows about. */

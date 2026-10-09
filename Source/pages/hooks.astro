@@ -8,12 +8,12 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 	Description="The six Aphrodite hooks as a chain: session reset, tool-call pre-flight, dual compression transforms, the pre-LLM context assembler, and post-turn archival - with thresholds, bypass gates, and env-over-TOML precedence."
 >
 	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-28 px-5 py-20 sm:px-8 lg:gap-44 lg:px-14 lg:py-32"
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
 	>
 		<!-- HERO -->
 		<header class="relative flex w-full flex-col items-start">
 			<div
-				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				HOOKS // THE CHAIN
 			</div>
@@ -22,7 +22,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 			>
 				Six hooks, one turn
 			</h1>
-			<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+			<p class="mt-12 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
 				Every hook is a thin dispatch that forwards its arguments to the Rust dylib and
 				hands the JSON reply back to Hermes. On plugin load the shim asks the dylib for
 				its hook names and registers one callback per name - the six below are always
@@ -33,7 +33,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 		<!-- CHAIN SEQUENCE -->
 		<section class="relative w-full">
 			<div
-				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				SEQUENCE // PER TURN
 			</div>
@@ -65,7 +65,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 			data-diagram="hook-chain"
 		>
 			<div class="overflow-x-auto" set:html={HookChain} />
-			<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+			<figcaption class="mt-6 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
 				M3 // HOOK CHAIN
 			</figcaption>
 		</figure>
@@ -73,21 +73,21 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 		<!-- ONE SECTION PER HOOK -->
 		<section class="relative w-full">
 			<div
-				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				THE SIX // ONE SECTION EACH
 			</div>
-			<div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-2 lg:gap-12">
+			<div class="isolate grid grid-cols-1 items-start gap-16 lg:grid-cols-2 lg:gap-24">
 				<!-- 1 on_session_start -->
 				<div
 					class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.4deg]"
 				>
 					<div
-						class="absolute -top-3 left-4 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
+						class="absolute -top-5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
 					>
 						01 // on_session_start
 					</div>
-					<p class="mt-2 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 font-body text-sm leading-relaxed text-bone-newsprint">
 						Resets every piece of per-session state to a clean baseline: turn counter,
 						conversation index, recent markers, referenced files, tool-event telemetry,
 						ephemeral directives. Injects nothing - the one-shot first-turn orientation
@@ -99,11 +99,11 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					class="zine-box-canary relative border-[3px] border-stamped-canary/40 bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:rotate-[1.4deg]"
 				>
 					<div
-						class="absolute -top-3 left-4 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-5 left-4 z-10 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
 					>
 						02 // pre_tool_call
 					</div>
-					<p class="mt-2 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 font-body text-sm leading-relaxed text-bone-newsprint">
 						Two interventions before a tool executes. <span class="font-bold text-bone-white">Auto-backgrounding</span>:
 						long-running terminal/process calls are rewritten to run in the background
 						(poll worker, default on). <span class="font-bold text-bone-white">Chain splitting</span>
@@ -117,11 +117,11 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					class="zine-box-crimson relative border-[3px] border-raw-blood bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg]"
 				>
 					<div
-						class="absolute -top-3 left-4 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
+						class="absolute -top-5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
 					>
 						03 // transform_tool_result
 					</div>
-					<p class="mt-2 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 font-body text-sm leading-relaxed text-bone-newsprint">
 						After every tool call: record telemetry, run the skip gates, classify the
 						content type, hash (BLAKE3), store, and replace the output with
 						<span class="font-mono text-xs text-weathered-teal">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</span>
@@ -135,11 +135,11 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					class="zine-box-subtle relative border-[3px] border-zinc-dust/40 bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:rotate-[2deg]"
 				>
 					<div
-						class="absolute -top-3 left-4 border border-black bg-bone-newsprint px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-5 left-4 z-10 border border-black bg-bone-newsprint px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
 					>
 						04 // transform_terminal_output
 					</div>
-					<p class="mt-2 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 font-body text-sm leading-relaxed text-bone-newsprint">
 						Same pipeline for shell stdout/stderr. Non-zero exit codes are recorded as
 						failures for the error-loop detector; chain-split segments compress
 						unconditionally, before the threshold gate, so marked output never leaks raw;
@@ -151,11 +151,11 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					class="zine-box-canary relative border-[3px] border-stamped-canary/40 bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.6deg] lg:-translate-y-1"
 				>
 					<div
-						class="absolute -top-3 left-4 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-5 left-4 z-10 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
 					>
 						05 // pre_llm_call
 					</div>
-					<p class="mt-2 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 font-body text-sm leading-relaxed text-bone-newsprint">
 						Runs the poll-worker checkpoint, then the context assembler: first-turn
 						orientation (turn 0 only), <span class="font-mono text-xs text-weathered-teal">[directives:]</span>
 						(never dropped), <span class="font-mono text-xs text-weathered-teal">[nudge:]</span>
@@ -169,11 +169,11 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					class="zine-box-crimson relative border-[3px] border-raw-blood bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:rotate-[1.2deg] lg:translate-y-2"
 				>
 					<div
-						class="absolute -top-3 left-4 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
+						class="absolute -top-5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
 					>
 						06 // post_llm_call
 					</div>
-					<p class="mt-2 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 font-body text-sm leading-relaxed text-bone-newsprint">
 						Archives the last marker of the turn into the conversation index (so
 						<span class="font-mono text-xs text-weathered-teal">aphrodite_diff</span> can
 						report per-turn compressions), advances the turn counter, purges expired
@@ -190,14 +190,14 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div
-					class="absolute -top-4 left-6 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+					class="absolute -top-5 left-6 z-10 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
 				>
 					BYPASS // THE ESSENTIAL-TOOL GATE
 				</div>
-				<h2 class="mb-4 mt-3 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+				<h2 class="mb-8 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					What never gets compressed
 				</h2>
-				<p class="mb-4 font-body text-sm leading-relaxed text-bone-newsprint">
+				<p class="mb-8 font-body text-sm leading-relaxed text-bone-newsprint">
 					A result is left untouched when it is empty, below threshold, or from the
 					essential set - tools the agent needs raw:
 				</p>
@@ -205,7 +205,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					skill_view · skills_list · skill_manage · memory · session_search · read_file ·
 					read_terminal
 				</div>
-				<p class="mt-4 font-body text-xs leading-relaxed text-zinc-dust">
+				<p class="mt-8 font-body text-xs leading-relaxed text-zinc-dust">
 					Aphrodite's own tools and headroom helpers are also skipped - compressing
 					<span class="font-mono text-xs text-weathered-teal">aphrodite_retrieve</span>
 					would just replace resolved content with another marker.
@@ -216,7 +216,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 		<!-- THRESHOLDS TABLE -->
 		<section class="relative w-full">
 			<div
-				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				THRESHOLDS // GATES AND BYPASSES
 			</div>
@@ -261,7 +261,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 						</tbody>
 					</table>
 				</div>
-				<p class="mt-6 border-t border-oxblood-dark pt-4 text-[11px] leading-relaxed text-zinc-dust">
+				<p class="mt-12 border-t border-oxblood-dark pt-8 text-[11px] leading-relaxed text-zinc-dust">
 					PRECEDENCE: ENVIRONMENT &gt; TOML &gt; DEFAULT
 					(APHRODITE_TOOL_THRESHOLD_TOKEN · APHRODITE_TERMINAL_THRESHOLD ·
 					APHRODITE_FLOW_BUDGET_CHARS · APHRODITE_CHAIN_SPLIT).
@@ -271,13 +271,13 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 
 		<!-- FOOTER -->
 		<footer
-			class="flex flex-col items-center justify-between gap-6 border-t-2 border-oxblood-dark pb-6 pt-16 text-xs text-zinc-dust sm:flex-row"
+			class="flex flex-col items-center justify-between gap-12 border-t-2 border-oxblood-dark pb-12 pt-32 text-xs text-zinc-dust sm:flex-row"
 		>
-			<div class="flex items-center gap-2">
+			<div class="flex items-center gap-4">
 				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
 				<span class="font-bold tracking-widest text-bone-white uppercase">APHRODITE CCR CORE</span>
 			</div>
-			<div class="flex items-center gap-4">
+			<div class="flex items-center gap-8">
 				<a class="transition-colors hover:text-bone-white" href="/plugin/">PLUGIN</a>
 				<a class="transition-colors hover:text-bone-white" href="/tools/">TOOLS</a>
 				<a class="transition-colors hover:text-bone-white" href="/hermes/">HERMES</a>

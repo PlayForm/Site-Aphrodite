@@ -1,0 +1,46 @@
+---
+import ZinePreview from "./ZinePreview.astro";
+import ZineStream from "./ZineStream.astro";
+import ZineTape from "./ZineTape.astro";
+
+interface Props {
+	/** The example title, rendered on the tape across the top. */
+	Title: string;
+
+	/** The raw input lines shown in the terminal panel (the ZineStream tones). */
+	Lines: { Text: string; Tone?: "plain" | "dim" | "fade" | "mute" | "result" | "canary" | "teal" }[];
+
+	/** The absorptive preview shown to the LLM. */
+	Preview: string;
+
+	/** The optional CCR hash line (teal). */
+	Hash?: string;
+
+	/** Optional retrieval note under the pair, e.g. the tool + args that got it back. */
+	Retrieval?: string;
+
+	/** Rotation applied from the sm breakpoint up; mobile is always flat. */
+	Rotate?: string;
+}
+
+const { Title, Lines, Preview, Hash, Retrieval, Rotate = "" } = Astro.props;
+---
+
+<div class={`relative ${Rotate} transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.8deg]`}>
+	<ZineTape Label={Title} Color="raw" Side="center" />
+	<div class="zine-box-subtle border-[3px] border-oxblood-dark bg-carbon-void p-4 pt-7 sm:p-6 sm:pt-8">
+		<ZineStream Lines={Lines} />
+		<div class="my-4 flex items-center gap-3" aria-hidden="true">
+			<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
+			<span class="font-mono text-[9px] font-black uppercase tracking-widest text-zinc-dust">absorbed</span>
+			<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
+		</div>
+		<ZinePreview Label="PREVIEW // WHAT THE LLM SEES" Result={Preview} Hash={Hash} Color="canary" />
+		{Retrieval && (
+			<div class="mt-3 border border-oxblood-dark bg-asphalt-panel-dark px-3 py-2 font-mono text-[11px] leading-relaxed text-weathered-teal">
+				<span class="mr-1 font-black text-stamped-canary">RETRIEVAL</span>
+				{Retrieval}
+			</div>
+		)}
+	</div>
+</div>

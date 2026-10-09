@@ -93,7 +93,7 @@ const Layers = [
 	Description="Why Aphrodite is shaped this way: the marker is the contract, the classifier is the gate, the thresholds are the knobs - measured at 156,342,817 context tokens saved across 200 real sessions."
 >
 	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-80 px-5 py-24 sm:px-8 lg:gap-124 lg:px-14 lg:py-40"
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
 	>
 		<!-- ============ HERO // THE MANIFESTO OPEN ============ -->
 		<header class="relative flex w-full flex-col items-start pt-12">
@@ -109,11 +109,11 @@ const Layers = [
 					THE CASE STUDY // WHY, NOT HOW
 				</p>
 				<h1
-					class="mt-4 font-headline text-5xl font-black uppercase leading-[0.9] tracking-tighter text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-7xl lg:text-8xl"
+					class="mt-8 font-headline text-5xl font-black uppercase leading-[0.9] tracking-tighter text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-7xl lg:text-8xl"
 				>
 					Why Aphrodite<br />is shaped <span class="text-stamped-canary">this way</span>
 				</h1>
-				<p class="mt-8 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint sm:text-base">
+				<p class="mt-16 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint sm:text-base">
 					Not a tour of the code - an argument about the shape. An agent's context is a
 					budget, and every tool call spends it on raw output before the agent can decide
 					whether any of it mattered. Aphrodite's answer is structural: show the shape of
@@ -122,17 +122,17 @@ const Layers = [
 				</p>
 				<!-- Monument stat -->
 				<div
-					class="zine-box-subtle mt-12 w-full max-w-2xl border-[3px] border-raw-blood bg-soot-black p-8 sm:p-10"
+					class="zine-box-subtle mt-24 w-full max-w-2xl border-[3px] border-raw-blood bg-soot-black p-8 sm:p-10"
 				>
 					<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
 						CONTEXT TOKENS SAVED · 200 REAL SESSIONS
 					</div>
 					<div
-						class="mt-3 font-headline text-5xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-7xl"
+						class="mt-6 font-headline text-5xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-7xl"
 					>
 						{Study.Saved}
 					</div>
-					<div class="mt-3 flex flex-wrap items-center gap-8 font-mono text-xs font-bold">
+					<div class="mt-6 flex flex-wrap items-center gap-8 font-mono text-xs font-bold">
 						<span class="text-stamped-canary">{Study.SavedPct} OF THE TOTAL BUDGET</span>
 						<span class="text-zinc-dust">·</span>
 						<span class="text-weathered-teal">{Study.AvgPerCall} TOK AVG / CALL</span>
@@ -153,7 +153,7 @@ const Layers = [
 			<div
 				class="zine-box-crimson w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.6deg] sm:p-12"
 			>
-				<div class="grid grid-cols-1 gap-62 lg:grid-cols-2">
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
 					<div class="flex flex-col gap-12">
 						<h2
 							class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
@@ -202,7 +202,7 @@ const Layers = [
 								Finished `release` [optimized] in 41.7s
 							</div>
 							<div
-								class="mt-4 border-t border-oxblood-dark pt-4 text-[10px] font-bold text-raw-blood"
+								class="mt-8 border-t border-oxblood-dark pt-8 text-[10px] font-bold text-raw-blood"
 							>
 								≈ 1,400 TOKENS · MOSTLY NOISE · ONE LINE MATTERED
 							</div>
@@ -212,10 +212,10 @@ const Layers = [
 							<div class="text-[9px] font-bold uppercase tracking-widest text-zinc-dust">
 								THE PREVIEW INSTEAD
 							</div>
-							<div class="mt-3 border border-oxblood-dark bg-soot-black px-4 py-3 text-bone-white">
+							<div class="mt-6 border border-oxblood-dark bg-soot-black px-4 py-3 text-bone-white">
 								[build:1E 1W 142L | error[E0432]: unresolved import ...]
 							</div>
-							<div class="mt-3 text-weathered-teal">
+							<div class="mt-6 text-weathered-teal">
 								&lt;&lt;&lt;CCR:0e3a5c9f...a1e|build|1420&gt;&gt;&gt;
 							</div>
 						</div>
@@ -234,7 +234,7 @@ const Layers = [
 			<div
 				class="zine-box-canary w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:rotate-[0.5deg] sm:p-12"
 			>
-				<div class="grid grid-cols-1 gap-62 lg:grid-cols-2">
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
 					<div class="flex flex-col gap-12">
 						<h2
 							class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
@@ -298,9 +298,9 @@ const Layers = [
 					</div>
 				</div>
 			</div>
-				<figure class="mt-12 border border-oxblood-dark bg-asphalt-panel p-4" data-diagram="preview-flow">
+				<figure class="mt-24 border border-oxblood-dark bg-asphalt-panel p-4" data-diagram="preview-flow">
 					<div class="overflow-x-auto" set:html={PreviewFlow} />
-					<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+					<figcaption class="mt-6 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
 						M2 // PREVIEW FLOW
 					</figcaption>
 				</figure>
@@ -316,7 +316,7 @@ const Layers = [
 			<div
 				class="zine-box-teal w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.4deg] sm:p-12"
 			>
-				<div class="grid grid-cols-1 gap-62 lg:grid-cols-2">
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
 					<div class="flex flex-col gap-12">
 						<h2
 							class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
@@ -364,13 +364,13 @@ const Layers = [
 							<div class="text-[9px] font-bold uppercase tracking-widest text-zinc-dust">
 								WHAT THE AGENT SEES
 							</div>
-							<div class="mt-3 text-bone-newsprint opacity-90">
+							<div class="mt-6 text-bone-newsprint opacity-90">
 								[build:1E 1W 142L | error[E0432]: unresolved import ...]
 							</div>
-							<div class="mt-2 text-weathered-teal">
+							<div class="mt-4 text-weathered-teal">
 								&lt;&lt;&lt;CCR:0e3a5c9f...|build|1420&gt;&gt;&gt;
 							</div>
-							<div class="mt-4 border-t border-oxblood-dark pt-2 text-[10px] text-zinc-dust">
+							<div class="mt-8 border-t border-oxblood-dark pt-4 text-[10px] text-zinc-dust">
 								≈ 15 TOKENS
 							</div>
 						</div>
@@ -384,11 +384,11 @@ const Layers = [
 								WHAT RETRIEVAL RETURNS
 							</div>
 							<div
-								class="mt-3 border border-oxblood-dark bg-soot-black px-4 py-3 text-bone-newsprint opacity-90"
+								class="mt-6 border border-oxblood-dark bg-soot-black px-4 py-3 text-bone-newsprint opacity-90"
 							>
 								1,420 BYTES OF ORIGINAL OUTPUT · UNCHANGED
 							</div>
-							<div class="mt-3 text-[10px] text-zinc-dust">
+							<div class="mt-6 text-[10px] text-zinc-dust">
 								RECURSIVE RESOLUTION · NESTED MARKERS HANDLED
 							</div>
 						</div>
@@ -412,13 +412,13 @@ const Layers = [
 				>
 					Four layers, one decision
 				</h2>
-				<p class="mt-4 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+				<p class="mt-8 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
 					The pipeline is short on purpose: classify, preview, store, decide. The whole
 					compress step is sub-millisecond - end-to-end latency is {Bench.Latency} including
 					the HTTP round-trip - because the design spends its complexity budget on the
 					decision, not the transform.
 				</p>
-				<div class="mt-8 isolate grid grid-cols-1 items-start gap-16 sm:grid-cols-2 lg:grid-cols-4">
+				<div class="mt-16 isolate grid grid-cols-1 items-start gap-16 sm:grid-cols-2 lg:grid-cols-4">
 					{
 						Layers.map(({ N, Name, Figure, Note }, Index) => {
 							const Stamp =
@@ -440,7 +440,7 @@ const Layers = [
 									<div class="font-mono text-[11px] font-bold uppercase tracking-widest text-stamped-canary">
 										{Name}
 									</div>
-									<div class="mt-4 border-t border-oxblood-dark pt-4 text-[11px] leading-relaxed text-zinc-dust">
+									<div class="mt-8 border-t border-oxblood-dark pt-8 text-[11px] leading-relaxed text-zinc-dust">
 										{Note}
 									</div>
 								</div>
@@ -448,7 +448,7 @@ const Layers = [
 						})
 					}
 				</div>
-				<div class="mt-8 border border-oxblood-dark bg-asphalt-panel p-5 font-body text-sm leading-relaxed text-bone-newsprint">
+				<div class="mt-16 border border-oxblood-dark bg-asphalt-panel p-5 font-body text-sm leading-relaxed text-bone-newsprint">
 					And the engine stays polite about it: compression is opt-in and non-destructive -
 					everything the agent ever saw stays retrievable unchanged. What the <code
 						class="font-mono text-xs">pre_llm_call</code
@@ -474,7 +474,7 @@ const Layers = [
 			<div
 				class="zine-box-canary w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.5deg] sm:p-12"
 			>
-				<div class="grid grid-cols-1 gap-62 lg:grid-cols-2">
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
 					<div class="flex flex-col gap-12">
 						<h2
 							class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
@@ -508,7 +508,7 @@ const Layers = [
 						{
 							Bands.map(({ Label, Range, Width, Bar }) => (
 								<div>
-									<div class="mb-2 flex justify-between font-mono text-[11px] font-bold uppercase">
+									<div class="mb-4 flex justify-between font-mono text-[11px] font-bold uppercase">
 										<span class="text-bone-newsprint">{Label}</span>
 										<span class="text-weathered-teal">{Range}</span>
 									</div>
@@ -538,14 +538,14 @@ const Layers = [
 				class="zine-box-crimson w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:rotate-[0.5deg] sm:p-12"
 			>
 				<div
-					class="flex flex-col items-start justify-between gap-16 border-b-2 border-oxblood-dark pb-10 lg:flex-row lg:items-end"
+					class="flex flex-col items-start justify-between gap-16 border-b-2 border-oxblood-dark pb-20 lg:flex-row lg:items-end"
 				>
 					<div>
 						<div class="font-mono text-[11px] font-black uppercase tracking-widest text-raw-blood">
 							MEASURED · SEP 2026 · RETROACTIVE, RECONSTRUCTED PAYLOAD-BY-PAYLOAD
 						</div>
 						<h2
-							class="mt-2 font-headline text-3xl font-black uppercase tracking-tight text-bone-white sm:text-5xl"
+							class="mt-4 font-headline text-3xl font-black uppercase tracking-tight text-bone-white sm:text-5xl"
 						>
 							{Study.Sessions} sessions, {Study.Calls} calls
 						</h2>
@@ -557,13 +557,13 @@ const Layers = [
 					</div>
 				</div>
 				<!-- Monument ledger -->
-				<div class="mt-8 grid grid-cols-1 gap-16 sm:grid-cols-3">
+				<div class="mt-16 grid grid-cols-1 gap-16 sm:grid-cols-3">
 					<div class="zine-box-subtle border-[3px] border-oxblood-dark bg-soot-black p-6">
 						<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
 							WITH MARKERS (WHAT THE MODEL SAW)
 						</div>
 						<div
-							class="mt-3 font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl"
+							class="mt-6 font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl"
 						>
 							{Study.WithMarkers}
 						</div>
@@ -573,7 +573,7 @@ const Layers = [
 							EXPANDED (STOCK, NO CCR)
 						</div>
 						<div
-							class="mt-3 font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl"
+							class="mt-6 font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl"
 						>
 							{Study.Expanded}
 						</div>
@@ -583,7 +583,7 @@ const Layers = [
 							SAVED
 						</div>
 						<div
-							class="mt-3 font-headline text-2xl font-black tracking-tight text-bone-white drop-shadow-[2px_2px_0px_#520612] sm:text-3xl"
+							class="mt-6 font-headline text-2xl font-black tracking-tight text-bone-white drop-shadow-[2px_2px_0px_#520612] sm:text-3xl"
 						>
 							{Study.Saved}
 							<span class="text-stamped-canary"> ({Study.SavedPct})</span>
@@ -591,7 +591,7 @@ const Layers = [
 					</div>
 				</div>
 				<!-- Secondary metrics + retrieval tax -->
-				<div class="mt-8 grid grid-cols-2 gap-12 sm:grid-cols-4">
+				<div class="mt-16 grid grid-cols-2 gap-12 sm:grid-cols-4">
 					{[
 						{ Label: "AVG SAVED / CALL", Value: Study.AvgPerCall, Accent: "text-weathered-teal" },
 						{ Label: "SESSIONS THAT SAVED", Value: Study.SessionsSaved, Accent: "text-bone-white" },
@@ -606,14 +606,14 @@ const Layers = [
 							<div class="font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-dust">
 								{Label}
 							</div>
-							<div class={`mt-2 font-mono text-lg font-black ${Accent}`}>{Value}</div>
+							<div class={`mt-4 font-mono text-lg font-black ${Accent}`}>{Value}</div>
 						</div>
 					))}
 				</div>
 				<!-- Per-type real-world compression -->
-				<div class="mt-8 grid grid-cols-1 gap-24 lg:grid-cols-2">
+				<div class="mt-16 grid grid-cols-1 gap-24 lg:grid-cols-2">
 					<div>
-						<div class="mb-4 font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+						<div class="mb-8 font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
 							REAL-WORLD PER-OUTPUT COMPRESSION (ORIG → ~33-TOK MARKER)
 						</div>
 						<div class="flex flex-col gap-6">
@@ -668,7 +668,7 @@ const Layers = [
 			<div
 				class="zine-box-teal w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.4deg] sm:p-12"
 			>
-				<div class="grid grid-cols-1 gap-62 lg:grid-cols-2">
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
 					<div class="flex flex-col gap-10">
 						<h2
 							class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
@@ -723,7 +723,7 @@ const Layers = [
 							BenchTypes.map(({ Type, Without, With, Savings, Width }) => (
 								<div>
 									<div
-										class="mb-2 flex flex-wrap justify-between gap-x-4 font-mono text-[11px] font-bold uppercase"
+										class="mb-4 flex flex-wrap justify-between gap-x-4 font-mono text-[11px] font-bold uppercase"
 									>
 										<span class="text-bone-newsprint">{Type}</span>
 										<span class="text-zinc-dust">
@@ -785,7 +785,7 @@ const Layers = [
 									{Verb}
 								</div>
 								<div
-									class="mt-4 border-t border-oxblood-dark pt-4 font-body text-[13px] leading-relaxed text-bone-newsprint"
+									class="mt-8 border-t border-oxblood-dark pt-8 font-body text-[13px] leading-relaxed text-bone-newsprint"
 								>
 									{Body}
 								</div>
@@ -804,7 +804,7 @@ const Layers = [
 
 		<!-- FOOTER -->
 		<footer
-			class="flex flex-col items-center justify-between gap-12 border-t-2 border-oxblood-dark pb-6 pt-16 text-xs text-zinc-dust sm:flex-row"
+			class="flex flex-col items-center justify-between gap-12 border-t-2 border-oxblood-dark pb-12 pt-32 text-xs text-zinc-dust sm:flex-row"
 		>
 			<div class="flex items-center gap-6">
 				<span class="h-2.5 w-2.5 bg-raw-blood"></span>

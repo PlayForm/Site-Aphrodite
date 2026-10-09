@@ -149,9 +149,9 @@ const Samples = [
 	Title="Workbench - Aphrodite"
 	Description="The interactive preview workbench: paste any tool output and watch the Aphrodite preview line, the CCR marker and the threshold knobs work - live, client-side."
 >
-	<main class="mx-auto w-full max-w-[1440px] flex-1 flex-col gap-14 px-5 py-16 sm:px-8">
+	<main class="mx-auto w-full max-w-[1440px] flex-1 flex-col gap-28 px-5 py-32 sm:px-8">
 		<!-- Stamps row -->
-		<div class="flex flex-wrap items-center gap-4">
+		<div class="flex flex-wrap items-center gap-8">
 			<span
 				class="border-2 border-black bg-stamped-canary px-3 py-1 font-mono text-[11px] font-black uppercase tracking-widest text-black shadow-[3px_3px_0px_#000]"
 				>SIMULATION - CLIENT-SIDE, NO RUNTIME</span
@@ -171,10 +171,10 @@ const Samples = [
 			<p class="font-mono text-[11px] font-bold uppercase tracking-widest text-stamped-canary">
 				THE UNEXPLAINABLE BECOMES EFFORTLESS
 			</p>
-			<h1 class="mt-3 text-3xl font-bold tracking-tight text-bone-white sm:text-4xl">
+			<h1 class="mt-6 text-3xl font-bold tracking-tight text-bone-white sm:text-4xl">
 				Preview Workbench
 			</h1>
-			<p class="mt-4 max-w-3xl text-base text-zinc-dust">
+			<p class="mt-8 max-w-3xl text-base text-zinc-dust">
 				Paste any tool output - a build log, a test run, a grep result - and this page shows
 				the enriched preview line Aphrodite would hand the agent, plus the CCR marker it would
 				store. The four live-reloadable thresholds and the engine knob are yours to turn. The
@@ -183,7 +183,7 @@ const Samples = [
 		</header>
 
 		<!-- Sample switchboard -->
-		<section class="wb-skew flex flex-wrap items-center gap-3" aria-label="Sample outputs">
+		<section class="wb-skew flex flex-wrap items-center gap-6" aria-label="Sample outputs">
 			<span class="font-mono text-[11px] font-bold uppercase tracking-widest text-zinc-dust"
 				>LOAD SAMPLE:</span
 			>
@@ -206,7 +206,7 @@ const Samples = [
 		</section>
 
 		<!-- The stream + preview panes -->
-		<section class="grid gap-10 lg:grid-cols-2" aria-label="Raw stream and enriched preview">
+		<section class="grid gap-20 lg:grid-cols-2" aria-label="Raw stream and enriched preview">
 			<!-- Raw stream pane -->
 			<div class="wb-skew flex flex-col border-4 border-blood-crimson bg-carbon-void shadow-[6px_6px_0px_#7a0a1e]">
 				<div class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3">
@@ -244,13 +244,13 @@ const Samples = [
 					>
 					<span class="font-mono text-[11px] text-zinc-dust" data-stat="classify-ns">- ns</span>
 				</div>
-				<div class="flex grow flex-col gap-5 p-6">
+				<div class="flex grow flex-col gap-10 p-6">
 					<!-- The preview line, inset bone-white result -->
 					<div class="bg-bone-white p-4 shadow-[inset_3px_3px_0px_rgba(0,0,0,0.35)]">
 						<p class="font-mono text-[10px] font-black uppercase tracking-widest text-black/60">
 							PREVIEW LINE
 						</p>
-						<p class="wb-preview mt-2 break-all font-mono text-sm text-black" data-preview>
+						<p class="wb-preview mt-4 break-all font-mono text-sm text-black" data-preview>
 							[press RUN PIPELINE]
 						</p>
 					</div>
@@ -261,7 +261,7 @@ const Samples = [
 						</p>
 						<button
 							type="button"
-							class="wb-chip mt-2 w-full border-2 border-weathered-teal bg-soot-black p-2 text-left font-mono text-xs text-weathered-teal"
+							class="wb-chip mt-4 w-full border-2 border-weathered-teal bg-soot-black p-2 text-left font-mono text-xs text-weathered-teal"
 							data-copy=""
 							data-marker
 						>
@@ -273,7 +273,7 @@ const Samples = [
 						<p class="font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
 							AGENT DECISION
 						</p>
-						<p class="mt-2 font-mono text-xs text-bone-newsprint" data-decision>
+						<p class="mt-4 font-mono text-xs text-bone-newsprint" data-decision>
 							preview enough - skip retrieval, keep reasoning
 						</p>
 					</div>
@@ -284,7 +284,7 @@ const Samples = [
 						<p class="font-mono text-[10px] font-black uppercase tracking-widest text-bone-newsprint">
 							INJECTION ASSEMBLER (PRE_LLM_CALL)
 						</p>
-						<p class="mt-2 font-mono text-xs text-bone-newsprint">
+						<p class="mt-4 font-mono text-xs text-bone-newsprint">
 							<span class="text-stamped-canary">[directives:]</span> →
 							<span class="text-stamped-canary">[nudge:]</span> →
 							<span class="text-weathered-teal">[recall]</span>
@@ -297,17 +297,17 @@ const Samples = [
 
 		<!-- Threshold knobs -->
 		<section class="wb-skew border-4 border-blood-crimson bg-carbon-void p-8 shadow-[6px_6px_0px_#7a0a1e]" aria-label="Threshold knobs">
-			<div class="flex flex-wrap items-center justify-between gap-3">
+			<div class="flex flex-wrap items-center justify-between gap-6">
 				<h2 class="font-mono text-sm font-black uppercase tracking-widest text-bone-white">
 					THRESHOLD KNOBS
 				</h2>
 				<button type="button" class="wb-pill" data-action="reload">POST /RELOAD</button>
 			</div>
-			<p class="mt-3 font-mono text-[11px] text-zinc-dust">
+			<p class="mt-6 font-mono text-[11px] text-zinc-dust">
 				aphrodite.toml [compression] - the four proxy thresholds are live-reloadable; edit +
 				save (or POST /reload) re-applies them immediately (README.md:389).
 			</p>
-			<div class="mt-6 grid gap-8 md:grid-cols-2">
+			<div class="mt-12 grid gap-16 md:grid-cols-2">
 				{
 					[
 						{ Key: "tool_threshold_token", Label: "tool_threshold_token", Min: 64, Max: 4096, Step: 64, Default: 512, Unit: "B", Note: "token proxy threshold (bytes)" },
@@ -334,26 +334,26 @@ const Samples = [
 								max={Knob.Max}
 								step={Knob.Step}
 								value={Knob.Default}
-								class="wb-slider mt-4 w-full"
+								class="wb-slider mt-8 w-full"
 							/>
-							<p class="mt-2 font-mono text-[10px] uppercase tracking-widest text-zinc-dust">{Knob.Note}</p>
+							<p class="mt-4 font-mono text-[10px] uppercase tracking-widest text-zinc-dust">{Knob.Note}</p>
 						</div>
 					))
 				}
 			</div>
 			<!-- The verdict strip -->
-			<div class="mt-8 border-2 border-raw-blood bg-soot-black p-4">
+			<div class="mt-16 border-2 border-raw-blood bg-soot-black p-4">
 				<p class="font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
 					COMPRESSION DECISION
 				</p>
-				<p class="mt-2 font-mono text-xs text-bone-newsprint" data-verdict>
+				<p class="mt-4 font-mono text-xs text-bone-newsprint" data-verdict>
 					turn the knobs, then RUN PIPELINE
 				</p>
 			</div>
 		</section>
 
 		<!-- Stat bars -->
-		<section class="grid gap-10 md:grid-cols-3" aria-label="Session stats">
+		<section class="grid gap-20 md:grid-cols-3" aria-label="Session stats">
 			{
 				[
 					{ Key: "ratio", Label: "COMPRESSION RATIO", Value: 0, Cap: 100, Suffix: "%" },
@@ -362,10 +362,10 @@ const Samples = [
 				].map((Stat) => (
 					<div class="wb-skew border-4 border-blood-crimson bg-carbon-void p-6 shadow-[6px_6px_0px_#7a0a1e]">
 						<p class="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">{Stat.Label}</p>
-						<p class="mt-2 font-mono text-2xl font-black text-bone-white" data-stat-value={Stat.Key}>
+						<p class="mt-4 font-mono text-2xl font-black text-bone-white" data-stat-value={Stat.Key}>
 							0{Stat.Suffix}
 						</p>
-						<div class="mt-3 h-3 border-2 border-black bg-soot-black">
+						<div class="mt-6 h-3 border-2 border-black bg-soot-black">
 							<div class="h-full bg-raw-blood transition-all" data-stat-bar={Stat.Key} style="width:0%"></div>
 						</div>
 					</div>
@@ -374,13 +374,13 @@ const Samples = [
 		</section>
 
 		<!-- Diagrams: the store topology and the config surface -->
-		<section class="grid gap-10 lg:grid-cols-2" aria-label="Diagrams">
+		<section class="grid gap-20 lg:grid-cols-2" aria-label="Diagrams">
 			<figure
 				class="wb-skew border-4 border-blood-crimson bg-carbon-void p-4 shadow-[6px_6px_0px_#7a0a1e]"
 				data-diagram="dual-listener"
 			>
 				<div class="overflow-x-auto" set:html={DualListener} />
-				<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+				<figcaption class="mt-6 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
 					M5 // DUAL LISTENER
 				</figcaption>
 			</figure>
@@ -389,7 +389,7 @@ const Samples = [
 				data-diagram="config-resolution"
 			>
 				<div class="overflow-x-auto" set:html={ConfigResolution} />
-				<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+				<figcaption class="mt-6 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
 					M7 // CONFIG RESOLUTION
 				</figcaption>
 			</figure>
@@ -400,7 +400,7 @@ const Samples = [
 			<p class="font-mono text-[10px] font-black uppercase tracking-widest text-weathered-teal">
 				SIMULATION BOUNDARY
 			</p>
-			<p class="mt-2 max-w-3xl text-sm text-zinc-dust">
+			<p class="mt-4 max-w-3xl text-sm text-zinc-dust">
 				Real on this page: the classifier rules (first match wins, per README.md:153-176), the
 				preview line shapes (README.md:108-133), the threshold semantics and defaults
 				(README.md:395-420). Simulated: the BLAKE3 digest (a deterministic stand-in hash - the
@@ -408,7 +408,7 @@ const Samples = [
 				aphrodite_retrieve (shown as the decision text, never executed). No network, no
 				runtime - everything happens in this tab.
 			</p>
-			<p class="mt-3 max-w-3xl text-sm text-zinc-dust">
+			<p class="mt-6 max-w-3xl text-sm text-zinc-dust">
 				Classifier framing: the 16 pipeline types above follow the README catalog
 				(README.md:155-176). The full registry is larger - the 30-type content catalog lives in
 				docs/classification/content-types.md:118-151; this demo simulates the README tier only.

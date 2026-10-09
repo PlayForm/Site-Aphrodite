@@ -1,0 +1,34 @@
+---
+interface Props {
+	/** The quote text; the first letter is rendered as the drop cap. */
+	Text: string;
+
+	/** Optional attribution line, set in canary under the quote. */
+	Attribution?: string;
+
+	/** Shadow tone of the enclosing rule block: crimson (default), subtle, canary, teal. */
+	Tone?: "crimson" | "subtle" | "canary" | "teal";
+
+	/** Rotation applied from the sm breakpoint up; mobile is always flat. */
+	Rotate?: string;
+}
+
+const { Text, Attribution, Tone = "crimson", Rotate = "" } = Astro.props;
+
+const Shadow = {
+	crimson: "zine-box-crimson",
+	subtle: "zine-box-subtle",
+	canary: "zine-box-canary",
+	teal: "zine-box-teal",
+}[Tone];
+---
+
+<figure class={`relative border-4 border-blood-crimson bg-carbon-void p-8 sm:p-12 ${Shadow} ${Rotate} transition-transform duration-300 hover:rotate-0`}>
+	<div class="pointer-events-none absolute right-4 top-4 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+		MANIFESTO
+	</div>
+	<blockquote class="zine-drop-cap font-body text-xl font-medium leading-relaxed text-bone-white sm:text-2xl">
+		{Text}
+	</blockquote>
+	{Attribution && <figcaption class="mt-6 font-mono text-[11px] font-bold uppercase tracking-widest text-stamped-canary">- {Attribution}</figcaption>}
+</figure>

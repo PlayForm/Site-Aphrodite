@@ -1,0 +1,27 @@
+---
+interface Props {
+	/** The lesson headline, stamped. */
+	Label: string;
+
+	/** The lesson text. */
+	Text: string;
+
+	/** Stamp color of the headline: canary (default), raw, teal. */
+	Color?: "canary" | "raw" | "teal";
+}
+
+const { Label, Text, Color = "canary" } = Astro.props;
+
+const Palette = {
+	canary: "bg-stamped-canary text-soot-black",
+	raw: "bg-raw-blood text-bone-white",
+	teal: "bg-weathered-teal text-bone-white",
+}[Color];
+---
+
+<aside class="flex flex-col gap-3 border-l-4 border-blood-crimson bg-asphalt-panel p-4 sm:flex-row sm:items-start sm:gap-5">
+	<span class={`shrink-0 -rotate-1 self-start border-2 border-black px-3 py-1 font-mono text-[10px] font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] sm:-rotate-2 ${Palette}`}>
+		{Label}
+	</span>
+	<p class="font-body text-sm leading-relaxed text-bone-newsprint">{Text}</p>
+</aside>

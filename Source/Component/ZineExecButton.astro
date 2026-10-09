@@ -1,0 +1,63 @@
+---
+interface Props {
+	/** The idle label, e.g. "RUN PIPELINE". */
+	Label: string;
+
+	/** The label shown while the demo spins, e.g. "CLASSIFYING...". */
+	Busy?: string;
+
+	/** How long the spin lasts before reset, in ms (default 420, the
+	 *  workbench rhythm). */
+	Delay?: number;
+}
+
+const { Label, Busy = "RUNNING...", Delay = 420 } = Astro.props;
+---
+
+<button
+	class="inline-flex items-center gap-2 border border-black bg-raw-blood px-4 py-2 font-mono text-xs font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson disabled:cursor-wait disabled:opacity-80"
+	type="button"
+	data-exec
+	data-exec-busy={Busy}
+	data-exec-delay={Delay}
+	aria-pressed="false"
+>
+	{Label}
+</button>
+
+<script>
+	function BindExecButtons() {
+		for (const Button of document.querySelectorAll<HTMLButtonElement>("[data-exec]")) {
+			if (Button.dataset.execBound) {
+				continue;
+			}
+
+			Button.dataset.execBound = "1";
+
+			Button.addEventListener("click", () => {
+				if (Button.getAttribute("aria-pressed") === "true") {
+					return;
+				}
+
+				const Idle = Button.textContent;
+
+				Button.setAttribute("aria-pressed", "true");
+				Button.disabled = true;
+				Button.classList.add("zine-exec-spin");
+				Button.textContent = Button.dataset["execBusy"] ?? "RUNNING...";
+				Button.dispatchEvent(new CustomEvent("zine:exec", { bubbles: true }));
+
+				setTimeout(() => {
+					Button.classList.remove("zine-exec-spin");
+					Button.textContent = Idle;
+					Button.setAttribute("aria-pressed", "false");
+					Button.disabled = false;
+					Button.dispatchEvent(new CustomEvent("zine:exec-done", { bubbles: true }));
+				}, Number(Button.dataset["execDelay"] ?? 420));
+			});
+		}
+	}
+
+	BindExecButtons();
+	document.addEventListener("astro:page-load", BindExecButtons);
+</script>

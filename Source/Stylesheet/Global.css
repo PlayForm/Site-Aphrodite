@@ -127,3 +127,75 @@ body {
 img {
 	@apply inline-block select-none align-top outline-none;
 }
+
+/* ---- ADVANCED-STYLES additions (appended; the tokens above are untouched) ---- */
+
+/* Focus-visible in the zine palette: the canary stamp outline, hard edge, no blur. */
+:focus-visible {
+	outline: 2px solid var(--stamped-canary);
+	outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+	background-color: rgba(229, 169, 59, 0.08);
+}
+
+/* MANIFESTO drop cap: the first letter set as a stamped block, print misregistration shadow. */
+.zine-drop-cap::first-letter {
+	float: left;
+	font-family: "Space Grotesk", sans-serif;
+	font-size: 3.4em;
+	line-height: 0.82;
+	font-weight: 700;
+	color: var(--raw-blood);
+	background: var(--carbon-void);
+	border: 2px solid var(--oxblood-dark);
+	box-shadow: 4px 4px 0px var(--outline-oxblood);
+	padding: 0.08em 0.18em 0.02em;
+	margin: 0.06em 0.5em 0 0;
+}
+
+/* Exec-demo spin: hard stepped rotation, no easing curve (the grammar: hard offsets only). */
+.zine-exec-spin {
+	animation: zine-exec-spin 0.42s steps(6) infinite;
+}
+
+@keyframes zine-exec-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* MONUMENT scroll-fill: the bar width snaps in hard steps when it enters the viewport. */
+.zine-stat-fill {
+	transition: width 0.8s steps(8);
+}
+
+/* DiagramNav (the Mermaid hover-highlight, re-skinned in the blood family):
+   JS toggles these on the embedded SVG's node/edge groups. */
+.zine-diagram-node {
+	cursor: pointer;
+	transition: opacity 0.15s steps(2);
+}
+
+.zine-diagram-dim {
+	opacity: 0.22;
+}
+
+.zine-diagram-hot {
+	cursor: pointer;
+}
+
+.zine-diagram-hot path,
+.zine-diagram-hot circle,
+.zine-diagram-hot polygon {
+	stroke: var(--raw-blood) !important;
+}
+
+.zine-diagram-linkable:hover rect,
+.zine-diagram-linkable:hover circle,
+.zine-diagram-linkable:hover polygon {
+	stroke: var(--stamped-canary) !important;
+}

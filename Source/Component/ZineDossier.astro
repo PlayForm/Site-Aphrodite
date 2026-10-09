@@ -1,0 +1,58 @@
+---
+interface Props {
+	/** The heading over the whole dossier. */
+	Title: string;
+
+	/** Left evidence column. */
+	Left: { Label: string; Text: string }[];
+
+	/** Right evidence column. */
+	Right: { Label: string; Text: string }[];
+
+	/** Shadow tone of the enclosing block: subtle (default), crimson, canary, teal. */
+	Tone?: "crimson" | "subtle" | "canary" | "teal";
+
+	/** Rotation applied from the sm breakpoint up; mobile is always flat. */
+	Rotate?: string;
+}
+
+const { Title, Left, Right, Tone = "subtle", Rotate = "" } = Astro.props;
+
+const Shadow = {
+	crimson: "zine-box-crimson",
+	subtle: "zine-box-subtle",
+	canary: "zine-box-canary",
+	teal: "zine-box-teal",
+}[Tone];
+---
+
+<section class={`relative border-4 border-blood-crimson bg-carbon-void p-6 sm:p-10 ${Shadow} ${Rotate} transition-transform duration-300 hover:rotate-0`}>
+	<div class="mb-8 flex items-center gap-4">
+		<span class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
+			{Title}
+		</span>
+		<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
+	</div>
+	<div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
+		{
+			[
+				{ Caption: "EVIDENCE // A", Items: Left },
+				{ Caption: "EVIDENCE // B", Items: Right },
+			].map((Column) => (
+				<div>
+					<div class="mb-4 border-b border-oxblood-dark pb-1 font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+						{Column.Caption}
+					</div>
+					<dl class="space-y-6">
+						{Column.Items.map((Item) => (
+							<div class="border-l-2 border-oxblood-dark pl-4">
+								<dt class="font-mono text-xs font-bold uppercase tracking-widest text-bone-white">{Item.Label}</dt>
+								<dd class="mt-1 font-body text-sm leading-relaxed text-bone-newsprint">{Item.Text}</dd>
+							</div>
+						))}
+					</dl>
+				</div>
+			))
+		}
+	</div>
+</section>

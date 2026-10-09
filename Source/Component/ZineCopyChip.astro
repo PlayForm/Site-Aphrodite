@@ -1,0 +1,38 @@
+---
+interface Props {
+	/** The chip text; clicking copies this exact string (defaults to Label). */
+	Label: string;
+
+	/** The payload handed to the clipboard; unset copies the Label. */
+	Copy?: string;
+
+	/** Chip color: teal (default), canary, raw, bone. */
+	Color?: "teal" | "canary" | "raw" | "bone";
+}
+
+const { Label, Copy, Color = "teal" } = Astro.props;
+
+const Palette = {
+	teal: "text-weathered-teal hover:bg-weathered-teal",
+	canary: "text-stamped-canary hover:bg-stamped-canary",
+	raw: "text-raw-blood hover:bg-raw-blood",
+	bone: "text-bone-newsprint hover:bg-bone-newsprint",
+}[Color];
+
+const HoverText = {
+	teal: "hover:text-bone-white",
+	canary: "hover:text-soot-black",
+	raw: "hover:text-bone-white",
+	bone: "hover:text-soot-black",
+}[Color];
+---
+
+<button
+	class={`group inline-flex items-center gap-1.5 border border-oxblood-dark bg-soot-black px-2 py-1 font-mono text-[11px] font-bold transition-colors ${Palette} ${HoverText}`}
+	data-copy={Copy ?? Label}
+	type="button"
+	aria-label={`Copy ${Label} to the clipboard`}
+>
+	<span class="opacity-60 group-hover:opacity-100">{Label}</span>
+	<span aria-hidden="true" class="text-[9px] opacity-40 group-hover:opacity-90">⧉</span>
+</button>

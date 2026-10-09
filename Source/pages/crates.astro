@@ -1,5 +1,8 @@
 ---
 import Base from "@Layout/Base.astro";
+
+import Breadcrumbs from "@Component/Breadcrumbs.astro";
+import Related from "@Component/Related.astro";
 ---
 
 <Base
@@ -9,6 +12,7 @@ import Base from "@Layout/Base.astro";
 	<main
 		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-32 sm:px-8 lg:gap-40 lg:px-14 lg:py-56"
 	>
+		<Breadcrumbs />
 		<header class="relative flex w-full flex-col items-start">
 			<div
 				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
@@ -152,18 +156,13 @@ import Base from "@Layout/Base.astro";
 			</div>
 		</section>
 
-		<footer
-			class="flex flex-col items-center justify-between gap-4 border-t-2 border-oxblood-dark pb-6 pt-12 text-xs text-zinc-dust sm:flex-row"
-		>
-			<div class="flex items-center gap-2">
-				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
-				<span class="font-bold tracking-widest text-bone-white uppercase">APHRODITE CCR CORE</span>
-			</div>
-			<div class="flex items-center gap-4">
-				<a class="transition-colors hover:text-bone-white" href="/setup/">SETUP</a>
-				<a class="transition-colors hover:text-bone-white" href="/versions/">VERSIONS</a>
-				<span class="font-bold text-stamped-canary">CC0-1.0</span>
-			</div>
-		</footer>
+		<!-- RELATED: the natural neighbors -->
+		<Related
+			Links={[
+				{ Href: "/versions/", Label: "VERSIONS" },
+				{ Href: "/benchmarks/", Label: "BENCHMARKS" },
+				{ Href: "/setup/", Label: "SETUP" },
+			]}
+		/>
 	</main>
 </Base>
