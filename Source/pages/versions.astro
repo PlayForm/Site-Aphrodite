@@ -1,0 +1,122 @@
+---
+import Base from "@Layout/Base.astro";
+---
+
+<Base
+	Title="Versions & benchmarks - Aphrodite"
+	Description="Aphrodite v1.6.6 / plugin v2.2.6. Compression and latency benchmarks, the real-world study, and reproducible bench commands."
+>
+	<main class="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-6 py-16">
+		<header class="flex flex-col gap-4">
+			<h1 class="text-4xl font-semibold tracking-tight">Versions &amp; benchmarks</h1>
+			<p class="max-w-3xl text-lg text-neutral-600">
+				Current release: binary <strong>v1.6.6</strong>, plugin <strong>v2.2.6</strong>
+				(v1.6.6, 2026-10-07). Requires Rust 1.88+. Licensed CC0-1.0.
+			</p>
+		</header>
+
+		<section class="flex flex-col gap-4">
+			<h2 class="text-2xl font-semibold tracking-tight">Compression</h2>
+			<p class="max-w-3xl text-neutral-600">
+				Up to <strong>610&times;</strong> compression on the standard corpus,
+				<strong>132&times;</strong> overall (106 KB &rarr; 800 B on the 20-sample standard
+				corpus). Median: 23&times; fewer tokens on tool output.
+			</p>
+			<table class="max-w-2xl text-sm">
+				<thead>
+					<tr class="border-b border-neutral-300 text-left">
+						<th class="py-2 pr-6 font-medium">Content type</th>
+						<th class="py-2 font-medium">Compression</th>
+					</tr>
+				</thead>
+				<tbody class="text-neutral-600">
+					<tr><td class="py-1.5 pr-6">Browser snapshot</td><td class="py-1.5">416&times;</td></tr>
+					<tr><td class="py-1.5 pr-6">Build output</td><td class="py-1.5">140&times;</td></tr>
+					<tr><td class="py-1.5 pr-6">JSON</td><td class="py-1.5">40&times;</td></tr>
+					<tr><td class="py-1.5 pr-6">Git diff</td><td class="py-1.5">23&times;</td></tr>
+					<tr><td class="py-1.5 pr-6">Terminal</td><td class="py-1.5">20&times;</td></tr>
+				</tbody>
+			</table>
+		</section>
+
+		<section class="flex flex-col gap-4">
+			<h2 class="text-2xl font-semibold tracking-tight">Latency</h2>
+			<p class="max-w-3xl text-neutral-600">
+				End-to-end preview latency is <strong>8-40 ms</strong> (includes the HTTP
+				round-trip; the headline figure is ~10 ms). Classification alone runs
+				<strong>40-123 ns</strong>, and the compress path itself stays under 1 ms.
+			</p>
+		</section>
+
+		<section class="flex flex-col gap-4">
+			<h2 class="text-2xl font-semibold tracking-tight">Real-world study</h2>
+			<p class="max-w-3xl text-sm text-neutral-600">
+				Measured, Sep 2026: 200 Hermes sessions, 6,843 API calls (Sep 18-20). Tokens with
+				markers: 424,959,588; expanded: 581,302,405; saved: 156,342,817 (26.9%). Average
+				22,921 tokens per call; 183 of 200 sessions saved; median session ratio 22.9%.
+				Retrieval tax: 2,275 calls / 2,011,583 tokens. Per-type: terminal 74&times;, table
+				61&times;, source_code 45&times;, ls 37&times;, diff 23&times;, build 23&times;,
+				search 20&times;. Scaling: chat ~0%, light dev ~5%, tool-heavy 20-25%, pure-tool
+				76-82%.
+			</p>
+			<p class="max-w-3xl text-sm text-neutral-500">
+				Caveat, verbatim from the README: &ldquo;the exact percentage is a band &hellip;
+				sensitivity across 3.0-4.5 chars/tok spans ~24-33%, centered ~27%.&rdquo;
+			</p>
+		</section>
+
+		<section class="flex flex-col gap-4">
+			<h2 class="text-2xl font-semibold tracking-tight">v1.6.6 changelog</h2>
+			<ul class="flex max-w-3xl list-disc flex-col gap-2 pl-6 text-neutral-600">
+				<li>Catalog review: prefetch path guard, setup hardening, opt-in context engine.</li>
+				<li>
+					<code class="font-mono text-sm">aphrodite_prefetch</code> refuses
+					<code class="font-mono text-sm">.env</code>,
+					<code class="font-mono text-sm">auth.json</code>,
+					<code class="font-mono text-sm">~/.ssh</code>, Hermes home, and non-file paths.
+				</li>
+				<li>
+					<code class="font-mono text-sm">aphrodite setup</code> treats the Hermes-home
+					plugin dir as report-only - no symlink/write/delete; points at
+					<code class="font-mono text-sm">bash download.sh</code> /
+					<code class="font-mono text-sm">pwsh download.ps1</code>.
+				</li>
+				<li>
+					The dylib arm hard-refuses install when the in-tree
+					<code class="font-mono text-sm">SHA256SUMS.txt</code> is missing or lacks a
+					target entry.
+				</li>
+				<li>
+					Context engine is opt-in at registration
+					(<code class="font-mono text-sm">APHRODITE_CONTEXT_ENGINE=1</code>; TOML default
+					true); <code class="font-mono text-sm">requires_hermes</code> is
+					<code class="font-mono text-sm">&gt;=0.20.2</code>.
+				</li>
+				<li>
+					<code class="font-mono text-sm">pre_tool_call</code> behavior is disclosed:
+					auto-backgrounds long terminal commands.
+				</li>
+				<li>
+					Config 1:1 audit - dead <code class="font-mono text-sm">[templates.*]</code>
+					subtree and <code class="font-mono text-sm">compression.prefetch</code> removed;
+					unwired keys annotated.
+				</li>
+				<li>Binary 1.6.5 &rarr; 1.6.6, plugin 2.2.5 &rarr; 2.2.6.</li>
+			</ul>
+		</section>
+
+		<section class="flex flex-col gap-4">
+			<h2 class="text-2xl font-semibold tracking-tight">Reproduce</h2>
+			<pre
+				class="max-w-3xl overflow-x-auto rounded-lg border border-neutral-300 bg-neutral-100 p-4 font-mono text-sm"><code>cargo run --release -p aphrodite --example bench_01_corpus
+cargo run --release -p aphrodite --example bench_02_threshold
+cargo run --release -p aphrodite --example bench_03_retrieve
+cargo run --release -p aphrodite --example bench_04_ema
+cargo run --release -p aphrodite --example bench_05_type_coverage</code></pre>
+		</section>
+	</main>
+
+	<footer class="border-t border-neutral-200 px-6 py-8 text-sm text-neutral-500">
+		Aphrodite - CC0-1.0, public domain. Built by PlayForm.
+	</footer>
+</Base>

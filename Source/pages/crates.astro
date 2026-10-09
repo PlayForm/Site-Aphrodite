@@ -1,0 +1,100 @@
+---
+import Base from "@Layout/Base.astro";
+---
+
+<Base
+	Title="Crates - Aphrodite"
+	Description="The Aphrodite workspace: the aphrodite proxy crate and the aphrodite-hermes integration crate, both v1.6.6."
+>
+	<main class="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-6 py-16">
+		<header class="flex flex-col gap-4">
+			<h1 class="text-4xl font-semibold tracking-tight">Crates</h1>
+			<p class="max-w-3xl text-lg text-neutral-600">
+				Two workspace crates plus the vendored Headroom fork that carries the content
+				transforms. Aphrodite adds the preview pipeline, CCR storage, Hermes integration,
+				and dual-proxy architecture on top of Headroom.
+			</p>
+		</header>
+
+		<section class="flex flex-col gap-6">
+			<article class="flex flex-col gap-2 rounded-lg border border-neutral-300 p-6">
+				<h2 class="text-xl font-semibold">
+					aphrodite <span class="text-sm font-normal text-neutral-500">v1.6.6</span>
+				</h2>
+				<p class="text-neutral-600">
+					Chat Completions proxy with CCR, tool relay, and programmatic CCR for Hermes
+					agent integration. Ships the <code class="font-mono text-sm">aphrodite</code>
+					binary and a cdylib/rlib library; built on axum and tokio.
+				</p>
+			</article>
+			<article class="flex flex-col gap-2 rounded-lg border border-neutral-300 p-6">
+				<h2 class="text-xl font-semibold">
+					aphrodite-hermes <span class="text-sm font-normal text-neutral-500">v1.6.6</span>
+				</h2>
+				<p class="text-neutral-600">
+					Hermes Agent-specific integration for the Aphrodite compression engine - tool
+					schemas, hook dispatch, skill registration. Ships the
+					<code class="font-mono text-sm">aphrodite-hermes-setup</code> helper binary and
+					the dylib; watches config with notify.
+				</p>
+			</article>
+		</section>
+
+		<section class="flex flex-col gap-4">
+			<h2 class="text-2xl font-semibold tracking-tight">Configuration surface</h2>
+			<p class="max-w-3xl text-neutral-600">
+				From <code class="font-mono text-sm">aphrodite.toml.example</code> - the main
+				sections:
+			</p>
+			<ul class="flex max-w-3xl flex-col gap-3 text-neutral-600">
+				<li>
+					<code class="font-mono text-sm">[[proxies]]</code> - named listeners; the two
+					defaults are <code class="font-mono text-sm">cache</code> on
+					<code class="font-mono text-sm">127.0.0.1:9797</code> (timeout 120) and
+					<code class="font-mono text-sm">token</code> on
+					<code class="font-mono text-sm">127.0.0.1:9798</code> (timeout 300), both with
+					tool relay on.
+				</li>
+				<li>
+					<code class="font-mono text-sm">[defaults]</code> - <code class="font-mono text-sm">api_url</code
+					>, <code class="font-mono text-sm">model</code>,
+					<code class="font-mono text-sm">ccr_ttl_seconds</code> (3600), optional
+					<code class="font-mono text-sm">api_key</code>.
+				</li>
+				<li>
+					<code class="font-mono text-sm">[compression]</code> - the engine thresholds
+					(<code class="font-mono text-sm">engine_threshold_pct</code> 45, protect-first
+					2 / protect-last 5, min 8 messages), the type multipliers (code ×3), the
+					context engine toggle, polling worker, opt-in auto-reload, and chain splitting.
+				</li>
+				<li>
+					<code class="font-mono text-sm">[previews]</code> - preview rendering options;
+					<code class="font-mono text-sm">preview_max_chars</code> 120.
+				</li>
+				<li>
+					<code class="font-mono text-sm">[prompts]</code> - retrieval guidance and the
+					<code class="font-mono text-sm">session_inject</code> CCR notice.
+				</li>
+				<li>
+					<code class="font-mono text-sm">[directives]</code> - the active directive list
+					(seeding <code class="font-mono text-sm">focus</code> and
+					<code class="font-mono text-sm">foresight</code>).
+				</li>
+				<li>
+					<code class="font-mono text-sm">[flow]</code> - <code class="font-mono text-sm"
+						>budget_chars</code
+					>, the hard cap for all per-turn injected context (2600).
+				</li>
+			</ul>
+			<p class="max-w-3xl text-sm text-neutral-600">
+				Keys not yet wired into the runtime are annotated DOCUMENTED BUT UNWIRED in the
+				example; dead sections (<code class="font-mono text-sm">[templates.*]</code>) were
+				removed in v1.6.6.
+			</p>
+		</section>
+	</main>
+
+	<footer class="border-t border-neutral-200 px-6 py-8 text-sm text-neutral-500">
+		Aphrodite - CC0-1.0, public domain. Built by PlayForm.
+	</footer>
+</Base>

@@ -1,0 +1,77 @@
+---
+import Base from "@Layout/Base.astro";
+---
+
+<Base
+	Title="Setup - Aphrodite"
+	Description="Install Aphrodite for Hermes Agent: the plugin flow with bash download.sh, the Cargo flow, or build from source."
+>
+	<main class="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-6 py-16">
+		<header class="flex flex-col gap-4">
+			<h1 class="text-4xl font-semibold tracking-tight">Setup</h1>
+			<p class="max-w-3xl text-lg text-neutral-600">
+				Aphrodite ships as a Hermes Agent plugin (recommended) or a standalone Chat
+				Completions proxy. Binaries are never shipped in the repository and
+				<code class="font-mono text-sm">register()</code> never downloads - run the explicit
+				setup step to fetch the binary and dylib from GitHub Releases into
+				<code class="font-mono text-sm">~/.hermes/aphrodite/</code>, with SHA-256
+				verification.
+			</p>
+		</header>
+
+		<section class="flex flex-col gap-4">
+			<h2 class="text-2xl font-semibold tracking-tight">Option A: Hermes plugin</h2>
+			<pre
+				class="max-w-3xl overflow-x-auto rounded-lg border border-neutral-300 bg-neutral-100 p-4 font-mono text-sm"><code>git clone https://github.com/PlayForm/Aphrodite-Hermes.git
+cd Aphrodite-Hermes
+ln -s "$(pwd)" ~/.hermes/plugins/aphrodite
+bash download.sh
+cd ..
+hermes plugins enable aphrodite
+hermes</code></pre>
+			<p class="max-w-3xl text-sm text-neutral-600">
+				<code class="font-mono text-sm">bash download.sh</code> (or
+				<code class="font-mono text-sm">pwsh ./download.ps1</code> on Windows) fetches the
+				binary and dylib from GitHub Releases and verifies them against SHA-256 checksums.
+			</p>
+		</section>
+
+		<section class="flex flex-col gap-4">
+			<h2 class="text-2xl font-semibold tracking-tight">Option B: Cargo</h2>
+			<pre
+				class="max-w-3xl overflow-x-auto rounded-lg border border-neutral-300 bg-neutral-100 p-4 font-mono text-sm"><code>cargo install aphrodite        # proxy binary
+cargo install aphrodite-hermes # dylib + helper bin
+aphrodite setup                # runtime home under ~/.hermes/aphrodite + hooks-only loader</code></pre>
+		</section>
+
+		<section class="flex flex-col gap-4">
+			<h2 class="text-2xl font-semibold tracking-tight">Option C: from source</h2>
+			<pre
+				class="max-w-3xl overflow-x-auto rounded-lg border border-neutral-300 bg-neutral-100 p-4 font-mono text-sm"><code>git clone https://github.com/PlayForm/Aphrodite.git
+cd Aphrodite
+git submodule update --init --recursive
+cargo build --release -p aphrodite -p aphrodite-hermes</code></pre>
+		</section>
+
+		<section class="flex flex-col gap-4">
+			<h2 class="text-2xl font-semibold tracking-tight">Configuration</h2>
+			<p class="max-w-3xl text-neutral-600">
+				Aphrodite is TOML-driven. It reads <code class="font-mono text-sm">./aphrodite.toml</code>
+				first, then <code class="font-mono text-sm">~/.hermes/aphrodite/aphrodite.toml</code>;
+	environment variables override TOML, TOML overrides defaults. Auto-reload is opt-in
+	(<code class="font-mono text-sm">compression.auto_reload</code>). The template lives at
+				<code class="font-mono text-sm">aphrodite.toml.example</code> in the repository.
+			</p>
+			<p class="max-w-3xl text-sm text-neutral-600">
+				Injected context is hard-capped per turn (<code class="font-mono text-sm"
+					>flow.budget_chars</code
+				>, default 2600). Keys not yet wired into the runtime are annotated
+				DOCUMENTED BUT UNWIRED in the example file - the example is the source of truth.
+			</p>
+		</section>
+	</main>
+
+	<footer class="border-t border-neutral-200 px-6 py-8 text-sm text-neutral-500">
+		Aphrodite - CC0-1.0, public domain. Built by PlayForm.
+	</footer>
+</Base>
