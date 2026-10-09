@@ -168,9 +168,22 @@ const PageHtml = `<!DOCTYPE html>
 					loopTextColor: "#dedbd2",
 				},
 				// Zero-radius, 2px strokes on every node shape - the zine law.
-				themeCSS: "&anchor--marker--end{fill:#dedbd2;} .node rect,.node polygon,.node circle,.node path { stroke-width: 2px; rx: 0; ry: 0; } svg { background-color: transparent; } .edgeLabel rect { fill: #111014; stroke: none; }",
+				themeCSS: ".node rect,.node polygon,.node circle,.node path { stroke-width: 2px; rx: 0; ry: 0; } svg { background-color: transparent; } .edgeLabel rect { fill: #111014; stroke: none; } .arrowheadPath { fill: #dedbd2; }",
 				// (kept false in sync with the top-level flag - see above)
-				flowchart: { htmlLabels: false, curve: "basis" },
+				// The rhythm scale, one consistent proportional raise from the
+				// defaults: nodeSpacing 70 and rankSpacing 84 between the
+				// elements and the layers (defaults 50/50), diagramPadding 24
+				// around the whole graph (default 8), and wrappingWidth 260 so
+				// a single long token (a tool name, an env var) is never split
+				// mid-token by the auto-wrap.
+				flowchart: {
+					htmlLabels: false,
+					curve: "basis",
+					wrappingWidth: 260,
+					nodeSpacing: 70,
+					rankSpacing: 84,
+					diagramPadding: 24,
+				},
 			});
 			window.__render = async (Id, Text) => {
 				const Stage = document.getElementById("stage");
@@ -197,9 +210,11 @@ const PageHtml = `<!DOCTYPE html>
 				// The layout reserves the measured label widths, so with the
 				// space law in place every label fits inside the viewBox. If a
 				// label still pokes out (measurement drift), grow the viewBox
-				// to cover every label plus a small margin - a label's first
-				// or last character must never be cropped by the viewport.
-				const Pad = 2;
+				// to cover every label plus the internal padding margin - a
+				// label's first or last character must never be cropped by the
+				// viewport. The pad is part of the rhythm scale: 16 units of
+				// breathing room inside the viewBox on every side.
+				const Pad = 16;
 				const MinX = Math.min(View.x, ...Boxes.map((B) => B.x));
 				const MinY = Math.min(View.y, ...Boxes.map((B) => B.y));
 				const MaxX = Math.max(View.x + View.width, ...Boxes.map((B) => B.x + B.width));
@@ -237,7 +252,13 @@ const PageHtml = `<!DOCTYPE html>
 				Stage.innerHTML = "";
 				// Mermaid's HTML labels emit void \`<br>\` tags, which are invalid
 				// XML (and break strict SVG parsers). Self-close them.
-				const Fixed = Out.replace(/<br\\s*>/g, "<br/>");
+				let Fixed = Out.replace(/<br\\s*>/g, "<br/>");
+				// THE PIPE SUBSTITUTION. Mermaid escapes a literal pipe inside
+				// a label (it renders as the entity text &amp;#124;), so a
+				// source writes the marker's field separators as tilde and the
+				// renderer rewrites them to pipe here - the .mmd stays plain
+				// ASCII and the label-presence law applies the same rewrite.
+				Fixed = Fixed.replace(/CCR:hash~type~size/g, "CCR:hash|type|size");
 				// Mermaid caps the diagram at its natural pixel size with an
 				// inline \`style="max-width: ...px;"\`. That cap would keep the
 				// rendered diagram from spanning its container's width, so it
@@ -282,7 +303,7 @@ if (Filter && Selected.length === 0) {
 // text or spaces must fail, never ship.
 const Unescape = (Text) =>
 	Text.replace(
-		/&gt;|&lt;|&amp;|&quot;|&apos;|&#39;|&nbsp;|&#160;/g,
+		/&gt;|&lt;|&amp;|&quot;|&apos;|&#39;|&nbsp;|&#160;|#124;/g,
 		(Entity) =>
 			({
 				"&gt;": ">",
@@ -291,6 +312,9 @@ const Unescape = (Text) =>
 				"&quot;": '"',
 				"&apos;": "'",
 				"&#39;": "'",
+				// The Mermaid pipe entity (#124;) decodes to a literal pipe in
+				// the rendered label - the marker format needs it.
+				"#124;": "|",
 			})[Entity] ?? " ",
 	);
 // The comparison form: entities decoded, no-break spaces read as spaces,
@@ -358,9 +382,13 @@ const SvgHasLabels = (Svg, Labels) => {
 	// label whose words got glued together (spaces dropped at the wrap) can
 	// never match here.
 	const Spaced = Normalize(Lines.join(" "));
+	// The pipe substitution, on the comparison side: the source's tilde
+	// separators read as pipes, matching what the renderer wrote (see the
+	// Pipe Substitution in the page).
+	const PipeRewrite = (Text) => Text.replace(/CCR:hash~type~size/g, "CCR:hash|type|size");
 	for (const Label of Labels) {
 		for (const Line of Label.split(/<br\s*\/?>/)) {
-			const Want = Normalize(Line);
+			const Want = PipeRewrite(Normalize(Line));
 			if (!Want) continue;
 			if (Spaced.includes(Want)) continue;
 			// Present only in the whitespace-free form? Then the spaces were

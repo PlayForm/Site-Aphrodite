@@ -1,0 +1,272 @@
+---
+import Base from "@Layout/Base.astro";
+---
+
+<Base
+	Title="BENCHMARKS // APHRODITE"
+	Description="Aphrodite benchmarks: up to 610x compression on the standard corpus (132x overall, 106 KB to 800 B), 8-40 ms end-to-end, 40-123 ns classification, and the 200-session real-world study."
+>
+	<main
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-5 py-24 sm:px-8 lg:gap-24 lg:px-14 lg:py-40"
+	>
+		<header class="relative flex w-full flex-col items-start">
+			<div
+				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				BENCHMARKS // MEASURED TELEMETRY
+			</div>
+			<h1
+				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
+			>
+				Benchmarks
+			</h1>
+			<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+				Every figure below is quoted from the repository's own measurements - the standard
+				corpus, the threshold benches, and the 200-session real-world study. Nothing on this
+				page is extrapolated.
+			</p>
+		</header>
+
+		<!-- HEADLINE NUMBERS: MONUMENT ROW -->
+		<section class="relative grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+			<div
+				class="zine-box-crimson relative -rotate-[1.8deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0"
+			>
+				<div
+					class="absolute -top-3.5 left-6 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+				>
+					MAX COMPRESSION
+				</div>
+				<div
+					class="font-headline text-4xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-5xl"
+				>
+					610&times;
+				</div>
+				<p class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] text-zinc-dust">
+					Standard corpus. <span class="text-weathered-teal">132&times; overall, 106 KB &rarr; 800 B.</span>
+					<span class="mt-1 block text-[9px] text-zinc-dust">SRC: README.md:12, 446</span>
+				</p>
+			</div>
+			<div
+				class="zine-box-canary relative rotate-[2.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 lg:translate-y-3"
+			>
+				<div
+					class="absolute -top-3.5 left-6 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+				>
+					END-TO-END
+				</div>
+				<div
+					class="font-headline text-4xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-5xl"
+				>
+					8-40 ms
+				</div>
+				<p class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] text-zinc-dust">
+					Including the HTTP round-trip; the headline figure is ~10 ms.
+					<span class="mt-1 block text-[9px] text-zinc-dust">SRC: README.md:460, 12</span>
+				</p>
+			</div>
+			<div
+				class="zine-box-subtle relative -rotate-[1deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0"
+			>
+				<div
+					class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+				>
+					CLASSIFICATION
+				</div>
+				<div
+					class="font-headline text-4xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-5xl"
+				>
+					40-123 ns
+				</div>
+				<p class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] text-zinc-dust">
+					The compress path itself stays under 1 ms.
+					<span class="mt-1 block text-[9px] text-zinc-dust">SRC: README.md:461, 133; docs/README.md:7</span>
+				</p>
+			</div>
+			<div
+				class="zine-box-subtle relative rotate-[2.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 lg:translate-y-3"
+			>
+				<div
+					class="absolute -top-3.5 left-6 border border-black bg-bone-newsprint px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+				>
+					MEDIAN
+				</div>
+				<div
+					class="font-headline text-4xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-5xl"
+				>
+					23&times;
+				</div>
+				<p class="mt-4 border-t border-oxblood-dark pt-3 text-[11px] text-zinc-dust">
+					Fewer tokens on tool output.
+					<span class="mt-1 block text-[9px] text-zinc-dust">SRC: README.md:458</span>
+				</p>
+			</div>
+		</section>
+
+		<!-- PER-TYPE STAT BARS -->
+		<section class="relative w-full rotate-[0.6deg] transition-transform duration-300 hover:rotate-0">
+			<div
+				class="absolute -top-4 right-10 z-20 border border-black bg-stamped-canary px-4 py-1 text-[11px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+			>
+				TELEMETRY // PER-TYPE COMPRESSION
+			</div>
+			<div
+				class="zine-box-crimson relative overflow-hidden border-4 border-blood-crimson bg-carbon-void p-6 sm:p-10"
+			>
+				<div class="mb-8 text-xs font-bold uppercase tracking-wider text-zinc-dust">
+					RATIO BY OUTPUT CLASS (README STANDARD CORPUS):
+				</div>
+				<div class="space-y-5">
+					<div>
+						<div class="mb-1 flex justify-between text-xs font-bold">
+							<span class="text-bone-newsprint">BROWSER SNAPSHOT</span>
+							<span class="text-weathered-teal">416&times;</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-weathered-teal" style="width: 98%;"></div>
+							<div class="h-full bg-raw-blood" style="width: 2%;"></div>
+						</div>
+					</div>
+					<div>
+						<div class="mb-1 flex justify-between text-xs font-bold">
+							<span class="text-bone-newsprint">BUILD OUTPUT</span>
+							<span class="text-raw-blood">140&times;</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-raw-blood" style="width: 93%;"></div>
+							<div class="h-full bg-stamped-canary" style="width: 7%;"></div>
+						</div>
+					</div>
+					<div>
+						<div class="mb-1 flex justify-between text-xs font-bold">
+							<span class="text-bone-newsprint">JSON</span>
+							<span class="text-stamped-canary">40&times;</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-stamped-canary" style="width: 86%;"></div>
+							<div class="h-full bg-asphalt-panel" style="width: 14%;"></div>
+						</div>
+					</div>
+					<div>
+						<div class="mb-1 flex justify-between text-xs font-bold">
+							<span class="text-bone-newsprint">GIT DIFF</span>
+							<span class="text-raw-blood">23&times;</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-raw-blood" style="width: 58%;"></div>
+							<div class="h-full bg-asphalt-panel" style="width: 42%;"></div>
+						</div>
+					</div>
+					<div>
+						<div class="mb-1 flex justify-between text-xs font-bold">
+							<span class="text-bone-newsprint">TERMINAL</span>
+							<span class="text-stamped-canary">20&times;</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-stamped-canary" style="width: 55%;"></div>
+							<div class="h-full bg-asphalt-panel" style="width: 45%;"></div>
+						</div>
+					</div>
+				</div>
+				<p class="mt-6 text-[9px] text-zinc-dust">SRC: README.md:451-457</p>
+			</div>
+		</section>
+
+		<!-- REAL-WORLD STUDY -->
+		<section class="relative w-full">
+			<div
+				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				REAL-WORLD STUDY // 200 SESSIONS
+			</div>
+			<div
+				class="zine-box-crimson relative w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-10"
+			>
+				<div class="grid grid-cols-1 gap-8 sm:grid-cols-3">
+					<div>
+						<div class="text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+							TOKENS SAVED
+						</div>
+						<div class="font-headline text-3xl font-black tracking-tighter text-bone-white sm:text-4xl">
+							156,342,817
+						</div>
+						<div class="mt-1 text-xs font-bold text-stamped-canary">26.9% OF EXPANDED</div>
+					</div>
+					<div>
+						<div class="text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+							WITH MARKERS / EXPANDED
+						</div>
+						<div class="font-mono text-sm text-bone-newsprint">424,959,588 / 581,302,405</div>
+						<div class="mt-1 text-xs font-bold text-weathered-teal">6,843 API CALLS</div>
+					</div>
+					<div>
+						<div class="text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+							SESSIONS SAVED
+						</div>
+						<div class="font-mono text-sm text-bone-newsprint">183 / 200</div>
+						<div class="mt-1 text-xs font-bold text-stamped-canary">MEDIAN RATIO 22.9%</div>
+					</div>
+				</div>
+				<div class="mt-8 space-y-5">
+					<div>
+						<div class="mb-1 flex justify-between text-xs font-bold">
+							<span class="text-bone-newsprint">TOOL-HEAVY SESSIONS</span>
+							<span class="text-weathered-teal">20-25%</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-weathered-teal" style="width: 23%;"></div>
+						</div>
+					</div>
+					<div>
+						<div class="mb-1 flex justify-between text-xs font-bold">
+							<span class="text-bone-newsprint">PURE-TOOL SESSIONS</span>
+							<span class="text-raw-blood">76-82%</span>
+						</div>
+						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+							<div class="h-full bg-raw-blood" style="width: 79%;"></div>
+						</div>
+					</div>
+				</div>
+				<p class="mt-6 border-t border-oxblood-dark pt-4 font-body text-xs leading-relaxed text-zinc-dust">
+					The exact percentage is a band: sensitivity across 3.0-4.5 chars/token spans
+					~24-33%, centered ~27%. Retrieval tax: 2,275 calls / 2,011,583 tokens.
+					<span class="mt-1 block text-[9px] text-zinc-dust">SRC: README.md:467-503</span>
+				</p>
+			</div>
+		</section>
+
+		<!-- REPRODUCE -->
+		<section class="relative w-full lg:w-8/12 lg:self-start">
+			<div
+				class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div
+					class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+				>
+					REPRODUCE // BENCH HARNESS
+				</div>
+				<div class="mt-2 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust">
+					<div>$ cargo run --release -p aphrodite --example bench_01_corpus</div>
+					<div>$ cargo run --release -p aphrodite --example bench_02_threshold</div>
+					<div>$ cargo run --release -p aphrodite --example bench_03_retrieve</div>
+					<div>$ cargo run --release -p aphrodite --example bench_04_ema</div>
+					<div>$ cargo run --release -p aphrodite --example bench_05_type_coverage</div>
+				</div>
+				<p class="mt-4 text-[9px] text-zinc-dust">SRC: README.md:463</p>
+			</div>
+		</section>
+
+		<footer
+			class="flex flex-col items-center justify-between gap-4 border-t-2 border-oxblood-dark pb-6 pt-12 text-xs text-zinc-dust sm:flex-row"
+		>
+			<div class="flex items-center gap-2">
+				<span class="h-2.5 w-2.5 bg-raw-blood"></span>
+				<span class="font-bold tracking-widest text-bone-white uppercase">APHRODITE CCR CORE</span>
+			</div>
+			<div class="flex items-center gap-4">
+				<a class="transition-colors hover:text-bone-white" href="/versions/">VERSIONS</a>
+				<span class="font-bold text-stamped-canary">CC0-1.0</span>
+			</div>
+		</footer>
+	</main>
+</Base>
