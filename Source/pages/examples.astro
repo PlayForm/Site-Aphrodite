@@ -3,6 +3,7 @@ import Base from "@Layout/Base.astro";
 import ConfigResolution from "../Content/Mermaid/config-resolution.svg?raw";
 import ToolRelay from "../Content/Mermaid/tool-relay.svg?raw";
 import ZineFlow from "@Component/ZineFlow.astro";
+import { Link, OurRepo } from "@Library/Links";
 
 // Examples page ledger - the worked scenarios' single source of truth (the
 // borrowed Content.ts pattern, scoped to this page): every dynamic figure the
@@ -778,42 +779,42 @@ const InjectionOrder = [
 						Title: "SESSION START",
 						Agent: "a clean slate - nothing injected yet",
 						System: "on_session_start resets every piece of per-session state: turn counter, conversation index, recent markers, referenced files, tool-event telemetry, ephemeral directives. It injects nothing; the orientation renders on the first pre_llm_call.",
-						Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+						Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
 						AnchorLabel: "hooks.md:22-27",
 					},
 					{
 						Title: "BEFORE THE TOOL",
 						Agent: "the call may be rewritten before it runs",
 						System: "pre_tool_call can auto-background long-running terminal/process calls (poll worker, default on) and split chained commands (chain split, off by default). If neither applies, the call passes through unchanged.",
-						Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+						Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
 						AnchorLabel: "hooks.md:29-42",
 					},
 					{
 						Title: "AFTER THE TOOL",
 						Agent: "a large result comes back as a preview and a marker",
 						System: "transform_tool_result runs telemetry, file-reference tracking, the skip gates, classification, the EMA-tuned threshold, then the BLAKE3 store and the swap.",
-						Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+						Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
 						AnchorLabel: "hooks.md:44-56",
 					},
 					{
 						Title: "AFTER THE TERMINAL",
 						Agent: "same treatment for command output - chain split first",
 						System: "transform_terminal_output mirrors the tool pipeline: telemetry, per-segment chain split before the threshold gate, the 1,024-character gate, classify, store, swap.",
-						Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+						Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
 						AnchorLabel: "hooks.md:58-66",
 					},
 					{
 						Title: "BEFORE THE LLM",
 						Agent: "the turn opens with directives, nudges, and the recall catalog",
 						System: "pre_llm_call runs the poll-worker checkpoint, then the assembler composes the injection under one 4,000-character budget, dropping sections from the bottom - recall first to go; directives and nudges never drop.",
-						Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+						Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
 						AnchorLabel: "hooks.md:68-79",
 					},
 					{
 						Title: "AFTER THE LLM",
 						Agent: "the answer arrives - the machinery tidies up",
 						System: "post_llm_call archives the last marker into the conversation index, advances the turn counter, purges expired nudges (after the counter advances, so a one-shot renders exactly once), and expires stale poll-worker tasks. Then the next turn begins.",
-						Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/docs/plugin/hooks.md",
+						Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
 						AnchorLabel: "hooks.md:81-86",
 					},
 				]}
@@ -842,35 +843,35 @@ const InjectionOrder = [
 						Title: "EXPLICIT OVERRIDE",
 						Agent: "you set APHRODITE_HOME - the whole stack obeys",
 						System: "the shim resolves the runtime home once at register() and exports it to the Rust half through APHRODITE_HOME + APHRODITE_DIRECTIVES_DIR, so the dylib and the spawned proxy binary agree by construction.",
-						Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/CHANGELOG.md",
+						Anchor: Link(OurRepo, "CHANGELOG.md"),
 						AnchorLabel: "CHANGELOG v1.6.3",
 					},
 					{
 						Title: "THE HERMES HOME",
 						Agent: "per-Hermes-home isolation, extended to the Rust half",
 						System: "no override: the home derives from the Hermes home (HERMES_HOME), honored with the same precedence on the Rust side through the shared home module.",
-						Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/CHANGELOG.md",
+						Anchor: Link(OurRepo, "CHANGELOG.md"),
 						AnchorLabel: "CHANGELOG v1.6.3",
 					},
 					{
 						Title: "THE LEGACY ADOPTION",
 						Agent: "upgrades keep working - with a warning, never a migration",
 						System: "when the Hermes-home-derived home holds no install but the pre-2.2 ~/.hermes/aphrodite does, the legacy home is adopted with a one-line warning. Adoption never fires for throwaway homes (probe scratch, temp homes), preserving the catalog probe's isolation.",
-						Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/CHANGELOG.md",
+						Anchor: Link(OurRepo, "CHANGELOG.md"),
 						AnchorLabel: "CHANGELOG v1.6.3",
 					},
 					{
 						Title: "THE DECISION IS NAMED",
 						Agent: "the startup log tells you which home was chosen and why",
 						System: "the startup log prints: runtime home: path (decided by ...). Before v1.6.3, the shim read HERMES_HOME while the Rust half read HOME - the divergence that orphaned configs and disabled plugins whenever the two differed. Fixed as one decision, shared.",
-						Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/CHANGELOG.md",
+						Anchor: Link(OurRepo, "CHANGELOG.md"),
 						AnchorLabel: "CHANGELOG v1.6.3",
 					},
 					{
 						Title: "AND SINCE 1.6.5, NO QUIET SHARING",
 						Agent: "a non-default HERMES_HOME with no install reports 'not installed'",
 						System: "the catalog review dropped the legacy ~/.hermes/aphrodite adoption from _runtime_home(): a non-default HERMES_HOME with no install no longer quietly shares one runtime home across profiles.",
-						Anchor: "https://github.com/PlayForm/Aphrodite/blob/Development/CHANGELOG.md",
+						Anchor: Link(OurRepo, "CHANGELOG.md"),
 						AnchorLabel: "CHANGELOG v1.6.5",
 					},
 				]}
