@@ -101,3 +101,11 @@ READY-TO-COMMIT), write files only through the tool API (raw-write/edit for
 unicode glyphs; read-before-edit always), respect the zine grammar and the
 sanitization law, run the arbiter (`cd Site && pnpm prepublishOnly` +
 `pnpm run Drift`) and trust the printed tails.
+
+## 7. THE MODEL POINTER (2026-10-10)
+
+Read the orchestrator-batch skill's THE FORMALIZED MODEL section FIRST (the
+2-active law, the pair queue, the ACK-trap, the re-pause, the no-build law,
+the deploy alignment, the tracking) + the current queue + the feedback
+ledger at Site/Documentation/TRACKING.md - the ledger is the session's
+memory; the active pair is tracked only, everything else is PAUSED.

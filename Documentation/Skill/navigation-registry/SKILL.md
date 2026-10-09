@@ -15,23 +15,21 @@ whenToUse: Mandatory before adding, removing, moving, or reordering any entry in
 Every nav surface renders from `Source/Library/Links.ts` - never from inline
 HTML:
 
-- `PrimaryLinks` - the always-visible set: the lg bar, the xl bar's head, and
+- `PrimaryLinks` - the always-visible set: the desktop bar (lg and up) and
   the mobile tree's PRIMARY group.
-- `MenuLinks` - the collapsed set: the mobile tree's MORE group and the tail
-  of the xl bar.
+- `MenuLinks` - the collapsed set: the mobile tree's MORE group only (no
+  desktop tail - the essentials law, section 4).
 - `AllLinks` - `[...PrimaryLinks, ...MenuLinks]`: the footer only.
 
 `Base.astro` maps these arrays verbatim; nav markup edits happen ONLY when a
 new surface kind is added. A route appears in EXACTLY ONE of PrimaryLinks or
-MenuLinks - never both (the xl bar concatenates them, so a duplicate renders
-twice and the footer inherits it too). This bit for real: SHOWCASE was
-momentarily present in both arrays and rendered duplicated in the xl bar.
+MenuLinks - never both (the footer concatenates them, so a duplicate renders
+twice). This bit for real: SHOWCASE was momentarily present in both arrays.
 
 ## 2. The always-visible promotion rule
 
 The user's "X needs to be on the menu" for a specific route means X is
-PROMOTED into `PrimaryLinks` (the lg bar, the xl bar head, the mobile PRIMARY
-group) - not merely kept somewhere. Promotion is a MOVE, in two edits:
+PROMOTED into `PrimaryLinks` (the desktop bar and the mobile PRIMARY group) - not merely kept somewhere. Promotion is a MOVE, in two edits:
 
 1. Add `{ Href, Label }` to `PrimaryLinks` at the intended position
    (append, or the slot the ordering implies).
@@ -53,7 +51,23 @@ pushes the estimate near the viewport, the order of remedies is: reduce the
 gap (`gap-3` to `gap-2`), then shorten a label - and state the decision in
 the report.
 
-## 4. The aria-current behavior
+## 4. THE ESSENTIALS LAW (user-mandated 2026-10: the desktop reduction)
+
+The desktop bar shows ONLY THE ESSENTIALS at every width - lg AND xl. There
+is no "full row": the xl bar does NOT get the MenuLinks tail. The essentials
+are the PrimaryLinks set the user explicitly promoted (OVERVIEW / SETUP /
+DOCS / BENCHMARKS / CASE STUDY / SHOWCASE); deeper tooling pages (CRATES,
+VERSIONS, PLUGIN, HERMES, HOOKS, TOOLS, FLAVORS, WORKBENCH, CONFIG, EXAMPLES)
+stay OUT of the desktop bar. Implementation: Base.astro has ONE desktop nav
+(the PrimaryLinks map, `hidden lg:flex` - no `xl:hidden`), the Full nav is
+DELETED, and the MENU toggle + the nav-menu container carry NO `xl:hidden`
+(the hamburger is available at all widths so the MORE group stays reachable
+on desktop). The non-essential routes must remain reachable without the bar:
+the mobile tree's MORE group, the footer (AllLinks), the RELATED modules, and
+the cross-links. Verify no orphaned route: every route in MenuLinks must
+appear in the footer at minimum.
+
+## 5. The aria-current behavior
 
 `IsActive(path, link)` (Links.ts) decides `aria-current="page"`: the root
 matches only itself; every other route matches by prefix. All surfaces use
@@ -61,8 +75,10 @@ it - do not hand-roll active states. After any registry change, check the
 promoted route's built page: the link must carry `aria-current` when that
 page is served.
 
-## 5. The arbiter after every change
+## 6. The arbiter after every change
 
-`cd Site && pnpm prepublishOnly` (63 pages) then `pnpm run Drift` (the count
-is dynamic; all PASS). Verify the built HTML, not the source, before
-reporting done - the nav surfaces are only observable there.
+The FULL build (`pnpm prepublishOnly`) is for structural changes; for
+markup-only nav changes the fast guard is `pnpm run Drift` (the count is
+dynamic; all PASS - 97 checks at the essentials reduction). Verify the
+markup with greps of the SOURCE when no build ran, and note that the built
+HTML under Target/ is stale until the next full build.

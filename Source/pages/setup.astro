@@ -10,7 +10,7 @@ import { ExternalLinks } from "@Library/Links";
 
 <Base
 	Title="SETUP // APHRODITE"
-	Description="Install Aphrodite for Hermes Agent: the plugin flow with bash download.sh, the plugin catalog (store) install, the Cargo flow, or build from source. TOML-driven configuration."
+	Description="Install Aphrodite for Hermes Agent. Pick the plugin catalog, a git clone, cargo, or a source build. Includes Windows steps and how to confirm it works."
 >
 	<main
 		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-32 sm:px-8 lg:gap-40 lg:px-14 lg:py-56"
@@ -19,47 +19,117 @@ import { ExternalLinks } from "@Library/Links";
 			<div
 				class="mb-5 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
-				SETUP // BINARY ACQUISITION
+				SETUP
 			</div>
 			<h1
 				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
 			>
-				Setup
+				Install Aphrodite
 			</h1>
 			<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Aphrodite ships as a Hermes Agent plugin (recommended) or a standalone Chat
-				Completions proxy.
-				<span class="mt-1 block text-base">It is the reason both install paths land on this
-				page: the binaries are never shipped in the repository, and
-				<code class="font-mono text-base text-weathered-teal">register()</code> never
-				downloads - run the explicit setup step to fetch the binary and dylib from GitHub
-				Releases into
-				<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>,
-				with SHA-256 verification.</span>
+				Aphrodite is installed as a Hermes Agent plugin (recommended) or run as a
+				standalone proxy for OpenAI-compatible APIs.
+				<span class="mt-1 block text-base">Two things to know first: the plugin never
+				downloads anything on its own - you run one setup command, and it fetches the
+				Aphrodite binary and library from GitHub Releases, verifies them with SHA-256,
+				and stores them in
+				<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>.
+				And you do not need Rust unless you build from source.</span>
+				<span class="mt-1 block text-base">Not sure which to choose? Use the plugin
+				catalog (Option 1).</span>
 				<span class="mt-1 block text-base">The full host map, including the flavors still
 				planned, is laid out on
 				<a class="text-weathered-teal transition-colors hover:text-bone-white" href="/flavors/">FLAVORS</a>.</span>
 			</p>
+			<p class="mt-4 font-body text-base leading-relaxed text-zinc-dust">
+				WINDOWS: use PowerShell and run <code class="font-mono text-base text-weathered-teal">pwsh ./download.ps1</code>
+				instead of <code class="font-mono text-base text-weathered-teal">bash download.sh</code> -
+				the full Windows walkthrough is on
+				<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/docs/install/windows/">/docs/install/windows/</a>.
+			</p>
 		</header>
 
-		<!-- OPTION A: HERMES PLUGIN -->
-		<section class="relative w-full lg:w-9/12 lg:self-start">
+		<!-- OPTION 1: PLUGIN CATALOG -->
+		<section class="relative w-full lg:w-5/6 lg:self-start">
 			<div
-				class="zine-box-crimson relative -rotate-[2.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+				class="zine-box-crimson relative -rotate-[1.8deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
 			>
 				<div
 					class="absolute -top-3.5 left-6 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
 				>
-					#A // HERMES PLUGIN (RECOMMENDED)
+					#1 // PLUGIN CATALOG (RECOMMENDED)
+				</div>
+				<div class="mb-3 mt-2 flex flex-wrap items-center justify-between gap-2">
+					<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+						Plugin catalog install
+					</h2>
+					<span class="text-base text-zinc-dust">5 STEPS</span>
+				</div>
+				<CodeFence
+					Class="mb-3 border border-oxblood-dark [&>pre]:overflow-x-hidden [&>pre]:[overflow-wrap:anywhere]"
+					Code={`$ hermes plugins install aphrodite
+$ hermes plugins enable aphrodite // or answer yes at the Enable now? prompt
+$ cd ~/.hermes/plugins/aphrodite
+$ bash download.sh // or: pwsh ./download.ps1 - still required
+$ hermes`}
+				/>
+				<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
+					<div class="mb-1 text-base font-black uppercase tracking-widest text-stamped-canary">
+						OUTCOME // CATALOG INSTALL:
+					</div>
+					<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold text-bone-white">
+						Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256 verified, plugin enabled.
+					</div>
+					<div class="mt-3 border-l-4 border-stamped-canary bg-soot-black p-4">
+						<div class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+							THE CATALOG RULE
+						</div>
+						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+							The catalog entry is reviewed and pinned -
+							<code class="font-mono text-base text-weathered-teal">hermes plugins install</code>
+							checks out exactly that commit, never a branch tip. Do NOT run
+							<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>
+							in a catalog-managed directory - still run
+							<code class="font-mono text-base text-weathered-teal">download.sh</code>
+							(or <code class="font-mono text-base text-weathered-teal">download.ps1</code>
+							on Windows) from the installed plugin folder.
+						</p>
+					</div>
+					<div class="mt-3 border-t border-oxblood-dark pt-3">
+						<div class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
+							VERIFY IT WORKS
+						</div>
+						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+							Start <code class="font-mono text-base text-weathered-teal">hermes</code>.
+							The plugin should log that Aphrodite is enabled. If the binaries are
+							missing, it logs the setup command and stays disabled until you run it.
+						</p>
+					</div>
+					<div class="mt-2 font-mono text-base text-zinc-dust">
+						SRC: <a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={ExternalLinks.HermesGuide}>the Hermes plugin guide</a> - Installing from the catalog.
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- OPTION 2: GIT CLONE -->
+		<section class="relative w-full lg:w-5/6 lg:self-end lg:-mt-12">
+			<div
+				class="zine-box-crimson relative -rotate-[2.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+			>
+				<div
+					class="absolute -top-3.5 right-6 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+				>
+					#2 // GIT CLONE (RECOMMENDED)
 				</div>
 				<div class="mb-3 mt-2 flex flex-wrap items-center justify-between gap-2">
 					<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 						Clone, link, download, enable
 					</h2>
-					<span class="text-base text-zinc-dust">6 STEPS</span>
+					<span class="text-base text-zinc-dust">7 STEPS</span>
 				</div>
 				<CodeFence
-					Class="mb-3 border border-oxblood-dark"
+					Class="mb-3 border border-oxblood-dark [&>pre]:overflow-x-hidden [&>pre]:[overflow-wrap:anywhere]"
 					Code={`$ git clone ${ExternalLinks.HermesRepository}.git
 $ cd Aphrodite-Hermes
 $ ln -s "$(pwd)" ~/.hermes/plugins/aphrodite
@@ -75,98 +145,134 @@ $ hermes`}
 					<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold text-bone-white">
 						Binary + dylib fetched from GitHub Releases, SHA-256 verified, plugin enabled.
 					</div>
+					<div class="mt-3 border-t border-oxblood-dark pt-3">
+						<div class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
+							VERIFY IT WORKS
+						</div>
+						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+							Start <code class="font-mono text-base text-weathered-teal">hermes</code>.
+							The plugin should log that Aphrodite is enabled. If the binaries are
+							missing, it logs the setup command and stays disabled until you run it.
+						</p>
+					</div>
 				</div>
 			</div>
 		</section>
 
-		<!-- OPTION B: CARGO -->
-		<section class="relative w-full lg:w-7/12 lg:self-end lg:-mt-12">
+		<!-- OPTION 3: CARGO -->
+		<section class="relative w-full lg:w-5/6 lg:self-start">
 			<div
 				class="zine-box-crimson relative rotate-[2.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
 			>
 				<div
-					class="absolute -top-3.5 right-6 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					class="absolute -top-3.5 left-6 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 				>
-					#B // CARGO
+					#3 // CARGO
 				</div>
 				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					Crates.io install
 				</h2>
 				<CodeFence
-					Class="mb-3 border border-oxblood-dark"
+					Class="mb-3 border border-oxblood-dark [&>pre]:overflow-x-hidden [&>pre]:[overflow-wrap:anywhere]"
 					Code={`$ cargo install aphrodite // proxy binary
 $ cargo install aphrodite-hermes // dylib + helper bin
 $ aphrodite setup`}
 				/>
 				<div class="mb-3 font-mono text-base leading-relaxed text-zinc-dust">
-					// runtime home under ~/.hermes/aphrodite + hooks-only loader
+					// cargo installs the binaries only - aphrodite setup then writes a minimal
+					// loader into ~/.hermes/plugins/aphrodite. For the full plugin, use Option 1
+					// or 2. Needs Rust 1.88+ (the repo toolchain pins nightly).
+				</div>
+				<div class="border-t border-oxblood-dark pt-3">
+					<div class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
+						VERIFY IT WORKS
+					</div>
+					<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+						Option 3 does not install the plugin by itself - after
+						<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>
+						writes the loader, start <code class="font-mono text-base text-weathered-teal">hermes</code>.
+						The plugin should log that Aphrodite is enabled; if the binaries are missing,
+						it logs the setup command and stays disabled until you run it.
+					</p>
 				</div>
 			</div>
 		</section>
 
-		<!-- OPTION C: FROM SOURCE -->
-		<section class="relative w-full lg:w-8/12 lg:self-start">
+		<!-- OPTION 4: FROM SOURCE -->
+		<section class="relative w-full lg:w-5/6 lg:self-end lg:-mt-12">
 			<div
 				class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
 			>
 				<div
-					class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+					class="absolute -top-3.5 right-6 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 				>
-					#C // FROM SOURCE
+					#4 // FROM SOURCE
 				</div>
 				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					Build it yourself
 				</h2>
 				<CodeFence
-					Class="mb-3 border border-oxblood-dark"
+					Class="mb-3 border border-oxblood-dark [&>pre]:overflow-x-hidden [&>pre]:[overflow-wrap:anywhere]"
 					Code={`$ git clone ${ExternalLinks.Repository}.git
 $ cd Aphrodite
 $ git submodule update --init --recursive
 $ cargo build --release -p aphrodite -p aphrodite-hermes`}
 				/>
+				<div class="mb-3 font-mono text-base leading-relaxed text-zinc-dust">
+					// needs Rust 1.88+ (the repo toolchain pins nightly). The build outputs land
+					// in target/release/ - point APHRODITE_BINARY_PATH / APHRODITE_HERMES_DYLIB_PATH
+					// at them, or copy them into ~/.hermes/aphrodite/binaries/.
+				</div>
+				<div class="border-t border-oxblood-dark pt-3">
+					<div class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
+						VERIFY IT WORKS
+					</div>
+					<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+						Start <code class="font-mono text-base text-weathered-teal">hermes</code>.
+						The plugin should log that Aphrodite is enabled. If the binaries are
+						missing, it logs the setup command and stays disabled until you run it.
+					</p>
+				</div>
 			</div>
 		</section>
 
-		<!-- OPTION D: HERMES STORE -->
-		<section class="relative w-full lg:w-7/12 lg:self-end lg:-mt-12">
+		<!-- PROXY // THE STANDALONE LANE -->
+		<section class="relative w-full lg:w-3/4 lg:self-start">
 			<div
-				class="zine-box-crimson relative -rotate-[1.8deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
+				class="zine-box-crimson relative rotate-[1.6deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
 			>
 				<div
-					class="absolute -top-3.5 right-6 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+					class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 				>
-					#D // HERMES STORE
+					PROXY // THE STANDALONE LANE
 				</div>
 				<h2 class="mb-3 mt-2 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-					Plugin catalog install
+					Run it without Hermes
 				</h2>
-				<CodeFence
-					Class="mb-3 border border-oxblood-dark"
-					Code={`$ hermes plugins install aphrodite
-$ hermes plugins enable aphrodite // or answer yes at the Enable now? prompt
-$ cd ~/.hermes/plugins/aphrodite
-$ bash download.sh // or: pwsh ./download.ps1 - still required
-$ hermes`}
-				/>
-				<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
-					<div class="mb-1 text-base font-black uppercase tracking-widest text-stamped-canary">
-						OUTCOME // CATALOG INSTALL:
-					</div>
-					<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold text-bone-white">
-						Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256 verified, plugin enabled.
-					</div>
-					<p class="mt-2 font-body text-base leading-relaxed text-zinc-dust">
-						The catalog entry is reviewed and pinned - <code class="font-mono text-base text-weathered-teal">hermes plugins install</code> checks out exactly that commit, never a branch tip. Do NOT run <code class="font-mono text-base text-weathered-teal">aphrodite setup</code> against the catalog-managed directory; fetch the binaries from the installed plugin directory with <code class="font-mono text-base text-weathered-teal">download.sh</code>/<code class="font-mono text-base text-weathered-teal">download.ps1</code>.
-					</p>
-					<div class="mt-2 font-mono text-base text-zinc-dust">
-						SRC: <a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={ExternalLinks.HermesGuide}>the Hermes plugin guide</a> - Installing from the catalog.
-					</div>
-				</div>
+				<p class="font-body text-base leading-relaxed text-bone-newsprint">
+					The same compression engine runs as a standalone proxy: point any
+					OpenAI-compatible client's
+					<code class="font-mono text-base text-weathered-teal">base_url</code> at
+					<code class="font-mono text-base text-weathered-teal">http://localhost:9798</code>
+					(token) or <code class="font-mono text-base text-weathered-teal">:9797</code>
+					(cache), and responses compress over plain HTTP. Invoked without an
+					<code class="font-mono text-base text-weathered-teal">aphrodite.toml</code>,
+					the binary needs
+					<code class="font-mono text-base text-weathered-teal">--api-key</code> or
+					<code class="font-mono text-base text-weathered-teal">APHRODITE_API_KEY</code>.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					The full surface is documented on the proxy pages:
+					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/docs/proxy/architecture/">architecture</a>,
+					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/docs/proxy/compression/">compression</a>,
+					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/docs/proxy/handlers/">handlers</a>,
+					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/docs/proxy/retry/">retry</a>.
+				</p>
 			</div>
 		</section>
 
 		<!-- CONFIG TOML MODULE -->
-		<section class="relative w-full lg:w-6/12 lg:self-end lg:-mt-10">
+		<section class="relative w-full lg:w-3/4 lg:self-end lg:-mt-10">
 			<div
 				class="zine-box-crimson relative -rotate-[2.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
 			>
@@ -189,12 +295,14 @@ $ hermes`}
 					<div>budget_chars = <span class="text-stamped-canary">2600</span> <span class="text-zinc-dust"># hard cap per turn</span></div>
 				</div>
 				<div class="mt-4 flex items-center justify-between border-t border-oxblood-dark pt-2 text-base text-zinc-dust">
-					<span>TEMPLATE IN THE REPO:</span>
-					<span class="font-bold text-stamped-canary">aphrodite.toml.example</span>
+					<span>TEMPLATES IN THE REPO:</span>
+					<span class="font-bold text-stamped-canary">aphrodite.toml.example + the embedded template</span>
 				</div>
 				<p class="mt-2 font-body text-base leading-relaxed text-zinc-dust">
-					Keys not yet wired into the runtime are annotated DOCUMENTED BUT UNWIRED in the
-					example file - the example is the source of truth.
+					Two shipped files stay in sync: aphrodite.toml.example (the annotated reference)
+					and the embedded template the binary ships with. Keys not yet wired into the
+					runtime are annotated DOCUMENTED BUT UNWIRED in the example - it is the source
+					of truth for the documented surface.
 				</p>
 			</div>
 		</section>

@@ -95,3 +95,41 @@ the count is dynamic). The routing law: every lane is GLM 5.3 flash low
 5. THE SKILL TREE IS LOADED FIRST: every lane loads the project's own
    skills from `Site/Documentation/Skill/` before working; the
    ~/.dsh/ skills are the fallback.
+
+## THE FORMALIZED MODEL (user-mandated 2026-10-10 - save this behavior)
+
+1. TWO ACTIVE, ALWAYS: the orchestrator keeps EXACTLY 2 lanes active at any
+   moment; all others are PAUSED (retained specs, no work); only the pair's
+   work is tracked. A flood (more than 2 working at once) multiplies the GLM
+   flash API-limit errors - the 2-at-a-time IS the throttle.
+2. THE PAIR QUEUE: lanes launch IDLE with the comprehensive retained spec
+   (confirm "<NAME> SPEC RETAINED - IDLE"); activate via ACTIVATE + the
+   CURRENT STATE block; when the active pair is COMPLETELY done (the reports
+   delivered), release the next pair - never before.
+3. THE ACK-TRAP: an amendment acknowledgment ("<NAME> SPEC AMENDED - ACK")
+   is NOT work - the lane must then DO the mandate; a lane whose turn ends
+   after the ACK gets a "CONTINUE + deliver the report" nudge; the urgent
+   form: "do not acknowledge without the work".
+4. THE RE-PAUSE: the message "RE-PAUSE - the batch runs 2 at a time only.
+   STOP all work NOW" - the lane acknowledges "<NAME> PAUSED - IDLE"; the
+   partial state persists in the session for the resume with the fresh state.
+5. THE NO-BUILD LAW: the agents NEVER run prepublishOnly - the USER's own
+   build is the arbiter; the fast guards only: `pnpm run Drift` + the
+   targeted greps; never the dev server, never tsc.
+6. THE DEPLOY ALIGNMENT (the DeepSeek-exact form): prepublishOnly =
+   "astro build" only; the Docs/Diagrams/Drift scripts are the LOCAL manual
+   commands (run before committing to keep the committed deploy sources
+   fresh); the deploy builds purely from the committed state.
+7. THE TRACKING: Site/Documentation/TRACKING.md carries EVERY user
+   requirement + feedback item (each its own line), the agent roster, the
+   queue - the orchestrator updates it.
+8. THE SELF-REVIEW + SKILL-UPDATE clause per lane: at the end, the lane
+   reviews its own work for gaps + fixes them + updates the relevant
+   SKILL.md under Site/Documentation/Skill ONLY (read-before-edit; the tree
+   exists) - the user's skill-updates directive.
+9. THE RELAY + NON-EXECUTION: the user's feedback relays VERBATIM; the
+   orchestrator never executes (no builds, no site edits, no research) -
+   dispatch + relay + verify only (the read-only spot-checks of the reported
+   claims).
+10. THE ROUTING: GLM 5.3 flash low always (cloudflare-workers-ai); the
+    DeepSeek-high coder route only when the user names it explicitly.
