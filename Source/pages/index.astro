@@ -9,13 +9,13 @@ import { ExternalLinks } from "@Library/Links";
 	Description="CCR compression proxy + absorptive preview pipeline for Hermes Agent. Up to 610x compression on the standard corpus (132x overall), ~10 ms end-to-end. One binary. Zero dependencies."
 >
 	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-5 py-24 sm:px-8 lg:gap-24 lg:px-14 lg:py-40"
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-32 sm:px-8 lg:gap-40 lg:px-14 lg:py-56"
 	>
 		<!-- HERO SLAB -->
 		<header class="relative flex w-full flex-col items-center justify-center pt-4 text-center">
 			<!-- Brand card: aphrodite.png in the crimson module, oxblood offset underlay -->
 			<div
-				class="group relative mb-8 -rotate-[2.5deg] cursor-pointer transition-transform duration-300 hover:rotate-0"
+				class="group relative mb-16 -rotate-[2.5deg] cursor-pointer transition-transform duration-300 hover:rotate-0"
 			>
 				<div
 					class="pointer-events-none absolute -inset-2 translate-x-3 translate-y-3 border border-black bg-oxblood-dark opacity-80"
@@ -49,7 +49,7 @@ import { ExternalLinks } from "@Library/Links";
 					Aphrodite
 				</h1>
 				<div
-					class="mb-5 mt-2 h-2 w-full max-w-xl -rotate-1 border border-black bg-raw-blood shadow-[3px_3px_0px_#000]"
+					class="mb-10 mt-2 h-2 w-full max-w-xl -rotate-1 border border-black bg-raw-blood shadow-[3px_3px_0px_#000]"
 				>
 				</div>
 			</div>
@@ -58,11 +58,11 @@ import { ExternalLinks } from "@Library/Links";
 				compression on the standard corpus (132&times; overall), ~10&nbsp;ms end-to-end,
 				type-aware classifier, TOML-driven, opt-in config auto-reload.
 			</p>
-			<p class="mt-2 font-mono text-xs font-bold uppercase tracking-widest text-zinc-dust">
+			<p class="mt-8 font-mono text-xs font-bold uppercase tracking-widest text-zinc-dust">
 				One binary. Zero dependencies. Millions of tokens saved.
 			</p>
 			<!-- Rotated stat badges -->
-			<div class="mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-3 sm:gap-4">
+			<div class="mt-20 flex max-w-4xl flex-wrap items-center justify-center gap-3 sm:gap-4">
 				<span
 					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000] sm:text-sm"
 				>
@@ -85,7 +85,7 @@ import { ExternalLinks } from "@Library/Links";
 				</span>
 			</div>
 			<!-- Raw technical stamps -->
-			<div class="mt-6 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+			<div class="mt-14 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
 				<span
 					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-[11px] uppercase text-zinc-dust"
 				>
@@ -125,10 +125,24 @@ import { ExternalLinks } from "@Library/Links";
 			</div>
 		</header>
 
+		<!-- DIAGRAM: CCR PIPELINE (M1) -->
+		<section class="relative w-full" data-diagram="ccr-pipeline">
+			<div
+				class="mb-8 -rotate-1 relative z-10 w-fit border border-black bg-weathered-teal px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				DIAGRAM // CCR PIPELINE
+			</div>
+			<div
+				class="zine-box-subtle w-full rotate-[0.4deg] border-4 border-blood-crimson bg-carbon-void p-4 transition-transform duration-300 hover:rotate-0 sm:p-6"
+			>
+				<img class="mx-auto w-full max-w-4xl" src="/Diagrams/ccr-pipeline.svg" alt="The CCR pipeline: classify, preview, store, decide" />
+			</div>
+		</section>
+
 		<!-- PROBLEM MODULE -->
 		<section class="relative flex w-full flex-col items-center">
 			<div
-				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-8 -rotate-1 relative z-10 w-fit border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				THE PROBLEM // CONTEXT FLOOD
 			</div>
@@ -156,17 +170,17 @@ import { ExternalLinks } from "@Library/Links";
 		<!-- PIPELINE // 4-STAGE ABSORPTION -->
 		<section class="relative w-full">
 			<div
-				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-8 -rotate-1 z-10 relative w-fit border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				PIPELINE // 4-STAGE ABSORPTION
 			</div>
-			<div class="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+			<div class="grid grid-cols-1 items-start gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-14">
 				<!-- Stage 01 -->
 				<div
-					class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.8deg] lg:-translate-y-2"
+					class="zine-box-subtle isolate relative border-[3px] border-oxblood-dark bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.8deg] lg:-translate-y-2"
 				>
 					<div
-						class="absolute -top-2.5 left-4 border border-zinc-dust/40 bg-zinc-dust/20 px-2 py-0.5 text-[9px] font-bold uppercase text-bone-newsprint"
+						class="absolute -top-2.5 left-4 z-10 border border-zinc-dust/40 bg-zinc-dust/20 px-2 py-0.5 text-[9px] font-bold uppercase text-bone-newsprint"
 					>
 						STAGE // A
 					</div>
@@ -187,10 +201,10 @@ import { ExternalLinks } from "@Library/Links";
 				</div>
 				<!-- Stage 02 -->
 				<div
-					class="zine-box-canary relative border-[3px] border-stamped-canary/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[2.2deg] lg:translate-y-4"
+					class="zine-box-canary isolate relative border-[3px] border-stamped-canary/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[2.2deg] lg:translate-y-4"
 				>
 					<div
-						class="absolute -top-2.5 left-4 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-2.5 left-4 z-10 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
 					>
 						STAGE // B
 					</div>
@@ -211,10 +225,10 @@ import { ExternalLinks } from "@Library/Links";
 				</div>
 				<!-- Stage 03 -->
 				<div
-					class="zine-box-crimson relative border-[3px] border-raw-blood bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg]"
+					class="zine-box-crimson isolate relative border-[3px] border-raw-blood bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg]"
 				>
 					<div
-						class="absolute -top-2.5 left-4 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
+						class="absolute -top-2.5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
 					>
 						STAGE // C
 					</div>
@@ -231,10 +245,10 @@ import { ExternalLinks } from "@Library/Links";
 				</div>
 				<!-- Stage 04 -->
 				<div
-					class="zine-box-subtle relative border-[3px] border-zinc-dust/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[2.5deg] lg:translate-y-3"
+					class="zine-box-subtle isolate relative border-[3px] border-zinc-dust/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[2.5deg] lg:translate-y-3"
 				>
 					<div
-						class="absolute -top-2.5 left-4 border border-black bg-bone-newsprint px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-2.5 left-4 z-10 border border-black bg-bone-newsprint px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
 					>
 						STAGE // D
 					</div>
@@ -254,7 +268,7 @@ import { ExternalLinks } from "@Library/Links";
 					</div>
 				</div>
 			</div>
-			<p class="text-[9px] text-zinc-dust">
+			<p class="mt-10 text-[9px] text-zinc-dust">
 				CLASSIFIER: 16 PIPELINE TYPES IN THE README (README.md:155-176); FULL REGISTRY OF 30
 				TYPES IN THE DOCS (docs/classification/content-types.md:118-151).
 			</p>
@@ -374,7 +388,7 @@ import { ExternalLinks } from "@Library/Links";
 		<!-- INSTALL // RUNTIME HARNESS -->
 		<section class="relative w-full">
 			<div
-				class="mb-4 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-8 -rotate-1 relative z-10 w-fit border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				INSTALL // HERMES PLUGIN
 			</div>

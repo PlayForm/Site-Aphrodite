@@ -26,6 +26,7 @@ export const MenuLinks: InternalLink[] = [
 	{ Href: "/hermes/", Label: "HERMES" },
 	{ Href: "/hooks/", Label: "HOOKS" },
 	{ Href: "/tools/", Label: "TOOLS" },
+	{ Href: "/flavors/", Label: "FLAVORS" },
 	{ Href: "/case-study/", Label: "CASE STUDY" },
 	{ Href: "/workbench/", Label: "WORKBENCH" },
 ];
@@ -49,4 +50,35 @@ export function IsActive(Path: string, Link: InternalLink): boolean {
 	return Link.Href === "/"
 		? Path === "/"
 		: Path.startsWith(Link.Href);
+}
+
+/** A repository entry: the bare clone URL plus the branch segment links compose with. */
+export interface Repo {
+	/** The repository's base URL (no branch, no trailing slash). */
+	Base: string;
+
+	/** The branch segment, always in the tree/<branch> form. */
+	Branch: string;
+}
+
+/** The branch segments - the two forms the docs carried before consolidation. */
+export const BranchDevelopment = "tree/Development";
+
+/** The canonical branch: every repository deep-link composes with it. */
+export const BranchCurrent = "tree/Current";
+
+/** The Aphrodite repository, linked at the canonical Current branch. */
+export const OurRepo: Repo = {
+	Base: "https://github.com/PlayForm/Aphrodite",
+	Branch: BranchCurrent,
+};
+
+/**
+ * Compose a repository URL: Link(OurRepo, "docs/proxy/handlers.md")
+ * -> "https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/handlers.md".
+ * The one function every composed repository URL flows through - a future
+ * branch rename or scheme change edits this file alone.
+ */
+export function Link(Repo: Repo, Path: string): string {
+	return `${Repo.Base}/${Repo.Branch}/${Path}`;
 }

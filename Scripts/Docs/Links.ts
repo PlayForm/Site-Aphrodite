@@ -1,9 +1,16 @@
 import { join } from "node:path";
 import { normalize } from "node:path/posix";
 
+import { Link as Compose, OurRepo } from "../../Source/Library/Links.ts";
+
 // Rewrites relative markdown links between docs files into site routes.
 // Absolute, protocol, and pure-anchor links pass through. Every relative link
 // that does not resolve to a docs file is reported and left as-is.
+//
+// BRANCH FORM LAW: every repository deep-link (an absolute
+// github.com/PlayForm/Aphrodite/tree/<branch>/... URL) is recomposed through
+// the registry's Link() at the canonical Current branch, so the branch pin
+// lives in Source/Library/Links.ts alone - never in the docs markdown.
 export default (
 	Content: string,
 	Folder: string,
@@ -14,8 +21,18 @@ export default (
 		/\]\(([^()\s]+)\)/g,
 		(Link: string, Target: string): string => {
 			switch (true) {
-				case /^(https?:|mailto:|#|\/)/.test(Target):
-					return Link;
+				case /^(https?:|mailto:|#|\/)/.test(Target): {
+					const Repo = Target.match(
+						/^https:\/\/github\.com\/PlayForm\/Aphrodite\/tree\/[^/]+\/(.+)$/,
+					);
+
+					switch (Repo !== null) {
+						case true:
+							return `](${Compose(OurRepo, Repo![1])})`;
+						default:
+							return Link;
+					}
+				}
 				case /\.md([#)]|$)/.test(Target) || Target.endsWith("/"): {
 					const [File, Anchor = ""] = Target.split("#");
 

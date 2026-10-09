@@ -127,7 +127,27 @@ interface Props {
 						>APHRODITE</span
 					>
 				</a>
-				<div class="hidden items-center gap-3 xl:gap-4 xl:flex">
+				<div class="hidden items-center gap-3 lg:flex xl:hidden">
+					{
+						PrimaryLinks.map((Link) => {
+							const Active = IsActive(Astro.url.pathname, Link);
+							return (
+								<a
+									href={Link.Href}
+									aria-current={Active ? "page" : undefined}
+									class={
+										Active
+											? "bg-raw-blood px-3 py-1 font-mono text-[11px] font-bold tracking-widest text-bone-white"
+											: "px-1 py-1 font-mono text-[11px] tracking-widest text-zinc-dust hover:text-bone-white"
+									}
+								>
+									{Link.Label}
+								</a>
+							);
+						})
+					}
+				</div>
+				<div class="hidden items-center gap-3 xl:flex">
 					{
 						PrimaryLinks.map((Link) => {
 							const Active = IsActive(Astro.url.pathname, Link);
