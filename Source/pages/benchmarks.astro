@@ -31,8 +31,10 @@ import Related from "@Component/Related.astro";
 			</p>
 		</header>
 
-		<!-- HEADLINE NUMBERS: MONUMENT ROW -->
-		<section class="relative grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+		<!-- HEADLINE NUMBERS: MONUMENT ROW. 2x2 through the tablet/wide
+		     range; the four monument cards only go 4-across at xl, where
+		     each card keeps room for the enlarged headline numbers. -->
+		<section class="relative grid w-full grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 xl:grid-cols-4 xl:gap-6">
 			<div
 				class="zine-box-crimson relative -rotate-[1.8deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0"
 			>

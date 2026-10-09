@@ -52,6 +52,22 @@ const YamlList = (Text, Key) => {
 };
 
 // --- The primaries ---
+// Hermetic guard: the standalone deploy repo (PlayForm/Site-Aphrodite) does
+// not carry the monorepo primaries (its own README.md exists, so the guard
+// keys on a monorepo-only marker) - the guard runs where they exist and
+// passes trivially otherwise, so prepublishOnly never fails the deploy.
+const HasPrimaries = await stat(join(Root, "plugins/aphrodite/plugin.yaml")).then(
+	() => true,
+	() => false,
+);
+
+switch (HasPrimaries) {
+	case false:
+		console.log("Drift: monorepo primaries absent (standalone deploy) - skipped");
+
+		process.exit(0);
+}
+
 const Readme = await Read(join(Root, "README.md"));
 const PluginYaml = await Read(join(Root, "plugins/aphrodite/plugin.yaml"));
 const Cargo = await Read(join(Root, "crates/aphrodite/Cargo.toml"));

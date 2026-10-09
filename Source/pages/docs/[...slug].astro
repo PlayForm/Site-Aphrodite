@@ -182,10 +182,13 @@ const Purposes = new Map(
 			</aside>
 
 			<div class="min-w-0">
-				<!-- Page header: the tape-stamp section tag above the crimson rule -->
-				<header class="relative">
+				<!-- Page header: the tape-stamp section tag above the crimson rule.
+			     pt-12 pushes the whole block clear of the breadcrumb row above -
+			     the section stamp's -top-7 rise previously reached the
+			     breadcrumb text at the mt-10 gap. -->
+				<header class="relative pt-12">
 					<span
-						class="absolute -top-7 left-0 z-20 -rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+						class="absolute left-0 top-0 z-20 -rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
 					>
 						{Doc.data.section}
 					</span>
@@ -457,14 +460,18 @@ const Purposes = new Map(
 		color: var(--zinc-dust);
 	}
 
-	/* Tables: the ledger rows. */
+	/* Tables: the ledger rows. display:table (not block) + table-layout:
+	   fixed - the block form spanned the container but left the inner table
+	   box content-width, so the rows never reached the borders. The fixed
+	   layout distributes the columns across the full width and can never
+	   overflow horizontally; cells wrap their content instead. */
 	.docs-prose :global(table) {
 		margin: 2.5rem 0;
 		width: 100%;
 		border: 1px solid var(--oxblood-dark);
 		border-collapse: collapse;
-		display: block;
-		overflow-x: auto;
+		display: table;
+		table-layout: fixed;
 	}
 
 	.docs-prose :global(th) {
@@ -477,6 +484,7 @@ const Purposes = new Map(
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
 		text-align: left;
+		overflow-wrap: anywhere;
 		color: var(--stamped-canary);
 	}
 
@@ -485,6 +493,7 @@ const Purposes = new Map(
 		border-top: 1px solid var(--oxblood-dark);
 		font-family: "DM Sans", sans-serif;
 		font-size: 1rem;
+		overflow-wrap: anywhere;
 		color: var(--bone-newsprint);
 	}
 

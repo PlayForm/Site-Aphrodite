@@ -1,0 +1,1 @@
+import{t as r}from"./prefetch.DM3ztRUV.js";r();

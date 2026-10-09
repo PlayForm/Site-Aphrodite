@@ -162,7 +162,7 @@ const PageHtml = `<!DOCTYPE html>
 						this.namespaceURI === "http://www.w3.org/2000/svg" &&
 						this.localName === "text"
 					) {
-						Value = Value.replace(/(<tspan\b[^>]*>) /g, `$1${NoBreakSpace}`);
+						Value = Value.replace(/(<tspan\b[^>]*>) /g, "$1" + NoBreakSpace);
 					}
 					InnerHtml.set.call(this, Value);
 				},
@@ -394,7 +394,10 @@ const SvgLines = (Svg) => {
 			Tokens.push({ At: Match.index, Outer: false, Text: Match[1] });
 		}
 		for (const Match of TextMatch[1].matchAll(
-			/<tspan[^>]*class="text-outer-tspan"[^>]*>([^<]*)/g,
+			// The class may carry extra tokens (mermaid emits
+			// "text-outer-tspan row"), so the match stops at the closing
+			// quote, not at the class value's end.
+			/<tspan[^>]*class="text-outer-tspan[^"]*"[^>]*>([^<]*)/g,
 		)) {
 			// Direct text after an outer opener only exists on plain
 			// (non-nested) labels; nested labels capture an empty string

@@ -281,8 +281,10 @@ import { Stamps, Versions } from "@Library/Versions";
 				<h2 class="mb-12 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					The six hooks, the version pairing, and the 14-to-13 correction
 				</h2>
-				<!-- The six-lane hook grid -->
-				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+				<!-- The six-lane hook grid: 2x2 through the tablet/wide range;
+				     the three-lane form only at xl, where the enlarged hook
+				     names ("on_session_start") keep room beside the WHEN chips. -->
+				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 xl:grid-cols-3 xl:gap-6">
 					{
 						[
 							{ Hook: "on_session_start", When: "session starts", Does: "resets all per-session state to a clean baseline - injects nothing" },

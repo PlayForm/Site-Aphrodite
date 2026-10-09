@@ -174,7 +174,11 @@ import { Stamps, Versions } from "@Library/Versions";
 			>
 				PIPELINE // 4-STAGE ABSORPTION
 			</div>
-			<div class="grid grid-cols-1 items-start gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-14">
+			<!-- The stage grid: 2x2 through the tablet/wide range - at 4-across
+			     the enlarged stage labels ("STAGE // B 02 // ENRICH") squished
+			     against the stamp chips between 1024-1279px. 4-across returns
+			     only at xl, where each card gets ~330px+. -->
+			<div class="grid grid-cols-1 items-start gap-12 sm:grid-cols-2 sm:gap-14 xl:grid-cols-4 xl:gap-14">
 				<!-- Stage 01 -->
 				<div
 					class="zine-box-subtle isolate relative border-[3px] border-oxblood-dark bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.8deg] lg:-translate-y-2"

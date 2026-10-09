@@ -145,6 +145,24 @@ a:focus-visible,
 	background-color: rgba(147, 17, 40, 0.12);
 }
 
+/* The code-mention links (the CodeMentions pass wraps identifier chips in
+   source anchors): the canary underline on hover, matching the docs-prose
+   link grammar. The focus ring comes from the :focus-visible rules above. */
+a.code-link {
+	text-decoration: none;
+}
+
+a.code-link:hover {
+	text-decoration: underline;
+	text-decoration-color: var(--stamped-canary);
+	text-decoration-thickness: 2px;
+	text-underline-offset: 4px;
+}
+
+a.code-link:hover code {
+	color: var(--stamped-canary);
+}
+
 /* MANIFESTO drop cap: the first letter set as a stamped block, print misregistration shadow. */
 .zine-drop-cap::first-letter {
 	float: left;

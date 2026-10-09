@@ -594,8 +594,10 @@ const Layers = [
 						</div>
 					</div>
 				</div>
-				<!-- Secondary metrics + retrieval tax -->
-				<div class="mt-16 grid grid-cols-2 gap-12 sm:grid-cols-4">
+				<!-- Secondary metrics + retrieval tax: 2x2 through the
+				     tablet/wide range; 4-across only at xl so the enlarged
+				     metric labels never squish. -->
+				<div class="mt-16 grid grid-cols-2 gap-12 sm:gap-16 xl:grid-cols-4 xl:gap-8">
 					{[
 						{ Label: "AVG SAVED / CALL", Value: Study.AvgPerCall, Accent: "text-weathered-teal" },
 						{ Label: "SESSIONS THAT SAVED", Value: Study.SessionsSaved, Accent: "text-bone-white" },
