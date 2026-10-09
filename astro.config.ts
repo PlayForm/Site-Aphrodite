@@ -1,6 +1,21 @@
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
+
 import { defineConfig } from "astro/config";
 
 export const On = process.env["NODE_ENV"] === "development";
+
+export const Here = dirname(fileURLToPath(import.meta.url));
+
+// Alias table mirroring the `@playform/build` tsconfig paths convention, so
+// that Vite resolves the same `@Stylesheet/`, `@Script/`, ... imports that
+// TypeScript resolves via tsconfig `paths`.
+export const Aliases = Object.fromEntries(
+	["Layout", "Page", "Script", "Stylesheet", "Target"].map((Folder) => [
+		`@${Folder}`,
+		resolve(Here, "Source", Folder === "Page" ? "pages" : Folder),
+	]),
+);
 
 export default defineConfig({
 	srcDir: "./Source",
@@ -79,6 +94,7 @@ export default defineConfig({
 		},
 		resolve: {
 			preserveSymlinks: false,
+			alias: Aliases,
 		},
 		css: {
 			devSourcemap: true,
