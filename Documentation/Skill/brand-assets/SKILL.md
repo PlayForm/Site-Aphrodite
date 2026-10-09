@@ -27,6 +27,16 @@ whenToUse: Mandatory before adding, editing, or placing any file under Site/Publ
    RULE: the mark reads only on dark surfaces (soot/carbon cards). Do not
    place the raw mark on light paper; if a light mount is wanted, it is a
    card-level decision, never a fill change baked into the asset.
+5. THE HERO USES THE ORIGINAL IMAGE (user-mandated): the homepage hero brand
+   card renders `/Brand/aphrodite.png` - the original brand image,
+   byte-identical to the repo's `assets/aphrodite.png` (MD5
+   f81f3cff0964e54384da4ced0f6d2d37) - at the pre-swap sizing
+   (`h-32 w-auto sm:h-44`). The SVG mark treatment was REJECTED by user
+   feedback ("restore the image - the svg icon and logo are still not worked
+   out well enough, use the original image from Aphrodite");
+   `Public/Brand/aphrodite-mark.svg` is kept as an unused asset until the
+   SVG treatment is worked out. Do not swap the hero to the SVG mark again
+   without a new explicit user instruction.
 
 ## 3. The decorative-stamp typography exception
 
