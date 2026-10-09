@@ -27,16 +27,21 @@ whenToUse: Mandatory before adding, editing, or placing any file under Site/Publ
    RULE: the mark reads only on dark surfaces (soot/carbon cards). Do not
    place the raw mark on light paper; if a light mount is wanted, it is a
    card-level decision, never a fill change baked into the asset.
-5. THE HERO USES THE ORIGINAL IMAGE (user-mandated): the homepage hero brand
-   card renders `/Brand/aphrodite.png` - the original brand image,
-   byte-identical to the repo's `assets/aphrodite.png` (MD5
-   f81f3cff0964e54384da4ced0f6d2d37) - at the pre-swap sizing
-   (`h-32 w-auto sm:h-44`). The SVG mark treatment was REJECTED by user
-   feedback ("restore the image - the svg icon and logo are still not worked
-   out well enough, use the original image from Aphrodite");
-   `Public/Brand/aphrodite-mark.svg` is kept as an unused asset until the
-   SVG treatment is worked out. Do not swap the hero to the SVG mark again
-   without a new explicit user instruction.
+5. THE HERO USES THE RED MARK (user-mandated 2026-10-10, supersedes the
+   earlier PNG rule): the homepage hero brand card renders
+   `/Brand/aphrodite.svg` at the same sizing (`h-32 w-auto sm:h-44`).
+   History: the first SVG treatment was rejected ("restore the image") and
+   `Public/Brand/aphrodite.png` was restored; the later user instruction
+   "we've also saved an aphrodite.svg in brand, turn that red and use it
+   everywhere on the website" supersedes it. `Public/Brand/aphrodite.png`
+   remains a raster fallback asset.
+6. THE FAVICON IS THE RED MARK (user-mandated 2026-10-10): the SVG icon
+   link in `Source/Layout/Base.astro` points at `/Brand/aphrodite.svg`
+   (the recolored raw-blood `#931128` mark); the 32px/180px PNGs remain
+   the raster fallbacks. `Public/Brand/favicon.svg` (the lips mark) is the
+   unused prior variant. Residual: if the 1800pt full-detail mark muddies
+   at 16px in real browsers, generate a favicon-size variant from the red
+   mark.
 
 ## 3. The decorative-stamp typography exception
 
@@ -46,9 +51,33 @@ whenToUse: Mandatory before adding, editing, or placing any file under Site/Publ
    lower a stamp's size on your own initiative; state the before -> after
    size and the trade-off in the report whenever the exception is applied.
 
-## 4. Verification
+## 4. The README header banner (user-mandated 2026-10-10)
 
-6. After any brand-asset or mark-placement change, the arbiters are
-   `cd Site && pnpm prepublishOnly` (63 pages) and `pnpm run Drift` (all
-   PASS), plus a check that the built `Target/**/index.html` carries the
-   intended asset path and classes.
+7. `Public/Brand/aphrodite-header.svg` is the dark-patterned full README
+   header: the soot-black `#09090b` field + the zine texture layers from
+   `Source/Stylesheet/Global.css` inlined as SVG patterns (photocopy-grit
+   dots `#dedbd2` @0.08 on an 8px grid, halftone-screen dots `#931128`
+   @0.28 on a 13px grid, the `feTurbulence` grunge-noise filter from
+   `Source/Layout/Base.astro`), the oxblood misregistration frame, the
+   red kiss mark (the paths verbatim, filled raw-blood `#931128`), and
+   the APHRODITE wordmark + "CCR COMPRESSION PROXY FOR HERMES AGENT"
+   subtitle in the Space Grotesk stack. Wide 3:1 banner (1800x600).
+8. The banner is SELF-CONTAINED: patterns, filter, mark and wordmark are
+   all inline - no external references. A root copy lives at
+   `assets/aphrodite-header.svg` and the two copies stay byte-identical
+   (`cmp` them after any change); the root `README.md` header `<img>`
+   points at the root copy. Only the root README carries the brand
+   header image (verified by grep); vendor READMEs are off-limits.
+9. WORDMARK SIZING LAW: SVG renderers do not reliably honor
+   `textLength`/`lengthAdjust` (rsvg 2.63 ignores it), so size the
+   `<text>` elements so their natural fallback-font width fits inside
+   the frame edge - verify with a real render (`rsvg-convert -w 900`,
+   or equivalent) before reporting done, never from geometry alone.
+
+## 5. Verification
+
+10. After any brand-asset or mark-placement change, the arbiters are the
+    fast guards ONLY (no full build): `cd Site && pnpm run Drift` (97
+    checks - the count is dynamic; all PASS), the greps over the touched
+    assets/READMEs (the fill values, the pattern ids, the image refs),
+    and for banner/wordmark work an actual raster render of the SVG.
