@@ -59,7 +59,7 @@ const Escape = (Text: string): string =>
 const Figure = (Id: string, Label: string): string =>
 	`<figure class="relative z-10 mt-16 border border-oxblood-dark bg-soot-black p-4" data-diagram="${Escape(Id)}">` +
 	`<div class="overflow-x-auto [&_svg]:h-auto [&_svg]:max-w-full">${Svg.get(Id)}</div>` +
-	`<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">${Escape(Label)}</figcaption>` +
+	`<figcaption class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">${Escape(Label)}</figcaption>` +
 	`</figure>`;
 
 const Rewrite = (Html: string, File: string): string => {
