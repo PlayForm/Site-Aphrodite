@@ -33,6 +33,7 @@
 //   no-break spaces at render time (the .mmd sources stay plain ASCII);
 // - the containment law - every label must sit fully inside the viewBox.
 
+import { existsSync } from "node:fs";
 import { readdir, readFile, writeFile, unlink, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
