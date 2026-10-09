@@ -44,7 +44,7 @@
 		"cssnano-preset-advanced": "9.3.0",
 		"dotenv": "18.0.6",
 		"firebase": "13.0.0",
-		"mermaid": "11.12.2",
+		"mermaid": "11.16.1",
 		"postcss": "8.5.29",
 		"postcss-combine-duplicated-selectors": "11.0.0",
 		"postcss-combine-media-query": "2.1.0",
