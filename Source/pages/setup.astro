@@ -1,5 +1,7 @@
 ---
 import Base from "@Layout/Base.astro";
+
+import { ExternalLinks } from "@Library/Links";
 ---
 
 <Base
@@ -49,7 +51,7 @@ import Base from "@Layout/Base.astro";
 				<div
 					class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust"
 				>
-					<div>$ git clone https://github.com/PlayForm/Aphrodite-Hermes.git</div>
+					<div>$ git clone {ExternalLinks.HermesRepository}.git</div>
 					<div>$ cd Aphrodite-Hermes</div>
 					<div>$ ln -s "$(pwd)" ~/.hermes/plugins/aphrodite</div>
 					<div class="opacity-70">$ bash download.sh <span class="opacity-40">// or: pwsh ./download.ps1 (Windows)</span></div>
@@ -104,7 +106,7 @@ import Base from "@Layout/Base.astro";
 					Build it yourself
 				</h2>
 				<div class="mb-3 space-y-1 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed text-zinc-dust">
-					<div>$ git clone https://github.com/PlayForm/Aphrodite.git</div>
+					<div>$ git clone {ExternalLinks.Repository}.git</div>
 					<div>$ cd Aphrodite</div>
 					<div>$ git submodule update --init --recursive</div>
 					<div class="text-bone-white">$ cargo build --release -p aphrodite -p aphrodite-hermes</div>

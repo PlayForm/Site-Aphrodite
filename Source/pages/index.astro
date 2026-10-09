@@ -1,5 +1,7 @@
 ---
 import Base from "@Layout/Base.astro";
+
+import { ExternalLinks } from "@Library/Links";
 ---
 
 <Base
@@ -91,7 +93,7 @@ import Base from "@Layout/Base.astro";
 				</span>
 				<a
 					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] uppercase text-bone-newsprint transition-colors hover:bg-blood-crimson"
-					href="https://crates.io/crates/aphrodite"
+					href={ExternalLinks.Crates}
 					target="_blank"
 					rel="noopener"
 				>
@@ -99,7 +101,7 @@ import Base from "@Layout/Base.astro";
 				</a>
 				<a
 					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] uppercase text-bone-newsprint transition-colors hover:bg-blood-crimson"
-					href="https://github.com/PlayForm/Aphrodite"
+					href={ExternalLinks.Repository}
 					target="_blank"
 					rel="noopener"
 				>
@@ -388,7 +390,7 @@ import Base from "@Layout/Base.astro";
 					</span>
 				</div>
 				<div class="mb-4 space-y-1 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] text-bone-newsprint">
-					<div class="text-zinc-dust">$ git clone https://github.com/PlayForm/Aphrodite-Hermes.git</div>
+					<div class="text-zinc-dust">$ git clone {ExternalLinks.HermesRepository}.git</div>
 					<div class="text-zinc-dust">$ cd Aphrodite-Hermes</div>
 					<div class="text-zinc-dust">$ bash download.sh</div>
 					<div class="text-stamped-canary">[INIT] binary + dylib fetched from GitHub Releases</div>

@@ -127,7 +127,7 @@ interface Props {
 						>APHRODITE</span
 					>
 				</a>
-				<div class="hidden items-center gap-4 md:flex">
+				<div class="hidden items-center gap-3 xl:gap-4 xl:flex">
 					{
 						PrimaryLinks.map((Link) => {
 							const Active = IsActive(Astro.url.pathname, Link);
@@ -160,14 +160,14 @@ interface Props {
 				</div>
 				<button
 					id="nav-toggle"
-					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] font-bold tracking-widest text-bone-newsprint lg:hidden"
+					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] font-bold tracking-widest text-bone-newsprint xl:hidden"
 					aria-expanded="false"
 					aria-controls="nav-menu"
 				>
 					MENU
 				</button>
 			</nav>
-			<div id="nav-menu" class="hidden border-t border-oxblood-dark bg-soot-black lg:hidden">
+			<div id="nav-menu" class="hidden border-t border-oxblood-dark bg-soot-black xl:hidden">
 				<div class="flex flex-col px-5 py-2">
 					{
 						AllLinks.map((Link) => (
