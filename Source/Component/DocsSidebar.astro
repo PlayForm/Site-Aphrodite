@@ -3,6 +3,9 @@ interface Entry {
 	Id: string;
 
 	Title: string;
+
+	/** Roadmap / partly unimplemented docs carry the WIP mark. */
+	Wip?: boolean;
 }
 
 interface Props {
@@ -54,6 +57,16 @@ const Href = (Id: string) => (Id === "index" ? "/docs/" : `/docs/${Id}/`);
 											}`}
 										>
 											{Entry.Title}
+											{
+												Entry.Wip && (
+													<span
+														class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black"
+														title="Roadmap: partly unimplemented"
+													>
+														WIP
+													</span>
+												)
+											}
 										</a>
 									</li>
 								);

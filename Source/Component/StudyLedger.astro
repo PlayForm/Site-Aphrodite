@@ -1,0 +1,166 @@
+---
+/**
+ * StudyLedger - the canonical real-world study block. One structured form
+ * for every occurrence of the Sep 2026 measured study (the index telemetry
+ * module, the /benchmarks study module, the case-study evidence section):
+ * a header row (the period + the scope), key-value ledger rows with the
+ * grammar's voice colors (canary = the saved figure, teal = the ratio,
+ * raw-blood = the band), optional session-shape stat bars, the caveat as
+ * its own bordered note, and the SRC citation.
+ *
+ * The facts are the Drift-checked primaries - every number stays
+ * byte-exact, never reworded or rounded. The SRC citation is written as a
+ * plain prose token ("README.md:467-511") and the CodeMentions pass wraps
+ * it at build time into the real tree/Current link with the #L467-L511
+ * fragment (the registry composes SourceLinks -> OurRepo; the fragment is
+ * emitted only when the range exists in the local checkout), so no anchor
+ * is hand-built here.
+ */
+
+interface Props {
+	/** "full" = the /benchmarks primary (larger numerals); "compact" = the
+	 *  index telemetry footnote and the case-study variants. */
+	Scale?: "compact" | "full";
+
+	/** Show the session-shape stat bars (the ratio presentation). */
+	ShowBars?: boolean;
+}
+
+const { Scale = "compact", ShowBars = false } = Astro.props;
+
+const ValueSize =
+	Scale === "full"
+		? "text-2xl sm:text-3xl"
+		: "text-xl sm:text-2xl";
+
+// The session-shape bands (README.md:497-499): savings track the session
+// shape, from the chat-only floor to the pure-tool stress test. Bar widths
+// sit at the band centers; the range is the label.
+const Bands = [
+	{ Label: "CHAT-ONLY SESSIONS", Range: "~0%", Percent: 0, Color: "zinc" as const, Note: "" },
+	{
+		Label: "LIGHT DEVELOPER SESSIONS",
+		Range: "~5%",
+		Percent: 5,
+		Color: "teal" as const,
+		Note: "",
+	},
+	{
+		Label: "TOOL-HEAVY SESSIONS",
+		Range: "20-25%",
+		Percent: 23,
+		Color: "teal" as const,
+		Note: "",
+	},
+	{
+		Label: "SIMULATED PURE-TOOL LOOP",
+		Range: "76-82%",
+		Percent: 79,
+		Color: "raw" as const,
+		Note: "a simulated diff+ls+build+search workload - a stress test, not real usage",
+	},
+];
+
+const BarColor = {
+	zinc: "bg-zinc-dust",
+	teal: "bg-weathered-teal",
+	raw: "bg-raw-blood",
+};
+
+const BarText = {
+	zinc: "text-zinc-dust",
+	teal: "text-weathered-teal",
+	raw: "text-raw-blood",
+};
+
+const Rows = [
+	{
+		Label: "TOKENS SAVED",
+		Value: "156,342,817",
+		Accent: "text-stamped-canary",
+		Note: "26.9% of the expanded context budget deflected",
+	},
+	{
+		Label: "WITH MARKERS / EXPANDED",
+		Value: "424,959,588 / 581,302,405",
+		Accent: "text-bone-newsprint",
+		Note: "tokens as stored vs the same payload with every marker expanded (stock Hermes)",
+	},
+	{
+		Label: "SESSIONS SAVED",
+		Value: "183 / 200",
+		Accent: "text-weathered-teal",
+		Note: "median session ratio 22.9%; avg 22,921 saved per call",
+	},
+	{
+		Label: "SESSION-SHAPE BAND",
+		Value: "20-25% tool-heavy · 76-82% pure-tool",
+		Accent: "text-raw-blood",
+		Note: "the same engine, four payoffs - savings track tool-output volume",
+	},
+	{
+		Label: "RETRIEVAL TAX",
+		Value: "2,275 calls / 2,011,583 tokens",
+		Accent: "text-raw-blood",
+		Note: "the re-entry toll, roughly 1.3% of the tokens saved",
+	},
+];
+---
+
+<div class="border-t-2 border-oxblood-dark pt-6">
+		<!-- HEADER row: the period + the scope -->
+		<div class="flex flex-wrap items-baseline justify-between gap-2">
+			<div class="font-mono text-base font-black uppercase tracking-widest text-raw-blood">
+				MEASURED, SEP 2026
+			</div>
+			<div class="font-mono text-base font-bold uppercase tracking-wider text-zinc-dust">
+				200 HERMES SESSIONS &bull; 6,843 API CALLS &bull; SEP 18-20
+			</div>
+		</div>
+		<!-- KEY-VALUE ledger rows -->
+		<div class="mt-4 divide-y divide-oxblood-dark/60 border border-oxblood-dark bg-soot-black">
+			{
+				Rows.map(({ Label, Value, Accent, Note }) => (
+					<div class="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+						<div class="shrink-0 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust sm:w-64">
+							{Label}
+						</div>
+						<div class={`font-mono font-black ${ValueSize} ${Accent}`}>{Value}</div>
+						<div class="font-body text-base text-zinc-dust sm:flex-1 sm:text-right">{Note}</div>
+					</div>
+				))
+			}
+		</div>
+		<!-- Provenance: the study is the author's own work -->
+		<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+			The study is the author's own work - multi-agent atomization fan-outs, merge/PR
+			work, plugin integration - reconstructed payload-by-payload from the session
+			transcripts.
+		</p>
+		{
+			ShowBars && (
+				<div class="mt-4 space-y-3">
+					{Bands.map(({ Label, Range, Percent, Color, Note }) => (
+						<div>
+							<div class="mb-1 flex justify-between text-base font-bold">
+								<span class="text-bone-newsprint">{Label}</span>
+								<span class={BarText[Color]}>{Range}</span>
+							</div>
+							<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+								<div class={`h-full ${BarColor[Color]}`} style={`width: ${Percent}%;`} />
+							</div>
+							{Note && <div class="mt-1 font-body text-base text-zinc-dust">{Note}</div>}
+						</div>
+					))}
+				</div>
+			)
+		}
+		<!-- CAVEAT: its own bordered note, visually distinct -->
+		<div class="mt-4 border-l-4 border-stamped-canary bg-asphalt-panel p-4 font-mono text-base leading-relaxed text-bone-newsprint">
+			<span class="font-black uppercase tracking-widest text-stamped-canary">CAVEAT &bull; </span>
+			THE EXACT PERCENTAGE IS A BAND: ~24-33% ACROSS A 3.0-4.5 CHARS/TOKEN SENSITIVITY
+			RANGE, CENTERED ~27%.
+		</div>
+		<!-- SRC: the plain citation token the CodeMentions pass links at build time -->
+		<div class="mt-3 font-mono text-base text-zinc-dust">SRC: README.md:467-511.</div>
+	</div>

@@ -178,6 +178,16 @@ a.code-link:hover code {
 	margin: 0.06em 0.5em 0 0;
 }
 
+/* CCR marker lines: the 40-hex + pipes is ~50+ chars with no break
+   opportunity, so marker-bearing elements overflow their containers on
+   narrow viewports. .ccr-marker lets the string wrap mid-token - visual
+   only: the text payload (and every data-copy payload) stays byte-exact.
+   For very long hash chips where `anywhere` still leaves a wide first
+   segment, use Tailwind's break-all instead. */
+.ccr-marker {
+	overflow-wrap: anywhere;
+}
+
 /* Exec-demo spin: hard stepped rotation, no easing curve (the grammar: hard offsets only). */
 .zine-exec-spin {
 	animation: zine-exec-spin 0.42s steps(6) infinite;

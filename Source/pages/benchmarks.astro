@@ -3,6 +3,7 @@ import Base from "@Layout/Base.astro";
 
 import Breadcrumbs from "@Component/Breadcrumbs.astro";
 import Related from "@Component/Related.astro";
+import StudyLedger from "@Component/StudyLedger.astro";
 ---
 
 <Base
@@ -189,82 +190,11 @@ import Related from "@Component/Related.astro";
 			<div
 				class="zine-box-crimson relative w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-10"
 			>
-				<div class="grid grid-cols-1 gap-8 sm:grid-cols-3">
-					<div>
-						<div class="text-base font-black uppercase tracking-widest text-zinc-dust">
-							TOKENS SAVED
-						</div>
-						<div class="font-headline text-3xl font-black tracking-tighter text-bone-white sm:text-4xl">
-							156,342,817
-						</div>
-						<div class="mt-1 text-base font-bold text-stamped-canary">26.9% OF EXPANDED</div>
-					</div>
-					<div>
-						<div class="text-base font-black uppercase tracking-widest text-zinc-dust">
-							WITH MARKERS / EXPANDED
-						</div>
-						<div class="font-mono text-base text-bone-newsprint">424,959,588 / 581,302,405</div>
-						<div class="mt-1 text-base font-bold text-weathered-teal">6,843 API CALLS</div>
-					</div>
-					<div>
-						<div class="text-base font-black uppercase tracking-widest text-zinc-dust">
-							SESSIONS SAVED
-						</div>
-						<div class="font-mono text-base text-bone-newsprint">183 / 200</div>
-						<div class="mt-1 text-base font-bold text-stamped-canary">MEDIAN RATIO 22.9%</div>
-					</div>
-				</div>
-				<div class="mt-8 space-y-5">
-					<div>
-						<div class="mb-1 flex justify-between text-base font-bold">
-							<span class="text-bone-newsprint">CHAT-ONLY SESSIONS</span>
-							<span class="text-weathered-teal">~0%</span>
-						</div>
-						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-zinc-dust" style="width: 0%;"></div>
-						</div>
-					</div>
-					<div>
-						<div class="mb-1 flex justify-between text-base font-bold">
-							<span class="text-bone-newsprint">LIGHT DEVELOPER SESSIONS</span>
-							<span class="text-weathered-teal">~5%</span>
-						</div>
-						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-weathered-teal" style="width: 5%;"></div>
-						</div>
-					</div>
-					<div>
-						<div class="mb-1 flex justify-between text-base font-bold">
-							<span class="text-bone-newsprint">TOOL-HEAVY SESSIONS</span>
-							<span class="text-weathered-teal">20-25%</span>
-						</div>
-						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-weathered-teal" style="width: 23%;"></div>
-						</div>
-					</div>
-					<div>
-						<div class="mb-1 flex justify-between text-base font-bold">
-							<span class="text-bone-newsprint">SIMULATED PURE-TOOL LOOP</span>
-							<span class="text-raw-blood">76-82%</span>
-						</div>
-						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-raw-blood" style="width: 79%;"></div>
-						</div>
-						<div class="mt-1 text-base text-zinc-dust">
-							A simulated diff+ls+build+search workload - a stress test, not real usage.
-						</div>
-					</div>
-				</div>
-				<p class="mt-6 border-t border-oxblood-dark pt-4 font-body text-base leading-relaxed text-zinc-dust">
-					The study is the author's own work: 200 real Hermes sessions, Sep 18-20, 2026 -
-					multi-agent atomization fan-outs, merge/PR work, plugin integration -
-					reconstructed payload-by-payload from the session transcripts. The exact
-					percentage is a band: sensitivity across 3.0-4.5 chars/token spans ~24-33%,
-					centered ~27%.
-					<span class="mt-1 block text-base text-zinc-dust">Retrieval cost: 2,275 calls /
-					2,011,583 tokens - the re-entry toll, roughly 1.3% of the tokens saved. SRC:
-					README.md:467-503</span>
-				</p>
+				<!-- The canonical structured study module (Component/StudyLedger):
+				     header row, key-value ledger with the voice colors, the
+				     session-shape ratio bars, the caveat note and the linked SRC
+				     citation - one form shared with the index telemetry module. -->
+				<StudyLedger Scale="full" ShowBars />
 			</div>
 		</section>
 

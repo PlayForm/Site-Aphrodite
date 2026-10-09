@@ -25,6 +25,11 @@ const { Doc } = Astro.props;
 
 const { Content } = await render(Doc);
 
+// The WIP docs: pages that document partly unimplemented or roadmap-only
+// functionality (Centers: v1 shipped, v2-v4 are design sketches). They carry
+// the WIP badge in the sidebar, the section cards, and the page header.
+const WipDocs = new Set(["centers"]);
+
 const Sections = [
 	...(
 		await getCollection("Docs")
@@ -35,7 +40,7 @@ const Sections = [
 				Page.data.section,
 				[
 					...(Groups.get(Page.data.section) ?? []),
-					{ Id: Page.id, Title: Page.data.title },
+				{ Id: Page.id, Title: Page.data.title, Wip: WipDocs.has(Page.id) },
 				],
 			);
 
@@ -192,6 +197,16 @@ const Purposes = new Map(
 					>
 						{Doc.data.section}
 					</span>
+					{
+						WipDocs.has(Doc.id) && (
+							<span
+								class="absolute right-0 top-0 z-20 rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+								title="Roadmap: partly unimplemented"
+							>
+								WIP
+							</span>
+						)
+					}
 					<h1
 						class="border-b-4 border-blood-crimson pb-6 font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-4xl"
 					>
@@ -245,6 +260,14 @@ const Purposes = new Map(
 														}`}
 													>
 														{Entry.Title}
+															{Entry.Wip && (
+																<span
+																	class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black"
+																	title="Roadmap: partly unimplemented"
+																>
+																	WIP
+																</span>
+															)}
 													</a>
 													{Purposes.get(Entry.Id) && (
 														<p class="font-body text-base leading-relaxed text-zinc-dust">
