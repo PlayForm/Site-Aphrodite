@@ -144,7 +144,7 @@ const Purposes = new Map(
 		<!-- Mobile: the docs index opens as a full-screen drawer -->
 		<button
 			id="docs-nav-toggle"
-			class="mb-8 flex w-full items-center justify-between border-4 border-blood-crimson bg-carbon-void px-4 py-2.5 font-mono text-[11px] font-black uppercase tracking-widest text-bone-newsprint shadow-[4px_4px_0px_#000] lg:hidden"
+			class="mb-8 flex w-full items-center justify-between border-4 border-blood-crimson bg-carbon-void px-4 py-2.5 font-mono text-base font-black uppercase tracking-widest text-bone-newsprint shadow-[4px_4px_0px_#000] lg:hidden"
 			aria-expanded="false"
 			aria-controls="docs-drawer"
 		>
@@ -152,7 +152,7 @@ const Purposes = new Map(
 			<span aria-hidden="true">+</span>
 		</button>
 
-		<nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-2 font-mono text-xs">
+		<nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-2 font-mono text-base">
 			<a
 				class="text-stamped-canary underline decoration-2 underline-offset-4 hover:text-bone-white"
 				href="/docs/"
@@ -185,7 +185,7 @@ const Purposes = new Map(
 				<!-- Page header: the tape-stamp section tag above the crimson rule -->
 				<header class="relative">
 					<span
-						class="absolute -top-7 left-0 z-20 -rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+						class="absolute -top-7 left-0 z-20 -rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
 					>
 						{Doc.data.section}
 					</span>
@@ -203,7 +203,7 @@ const Purposes = new Map(
 							data-diagram={Diagram.Id}
 						>
 							<div class="overflow-x-auto [&_svg]:h-auto [&_svg]:max-w-full" set:html={Diagram.Svg} />
-							<figcaption class="mt-3 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+							<figcaption class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 								{Diagram.Label}
 							</figcaption>
 						</figure>
@@ -214,7 +214,7 @@ const Purposes = new Map(
 				{
 					IsIndex && (
 						<section aria-label="Section index" class="relative mt-16">
-							<h2 class="font-mono text-[11px] font-black uppercase tracking-widest text-zinc-dust">
+							<h2 class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 								{IsSectionIndex ? "IN THIS SECTION" : "THE SECTIONS"}
 							</h2>
 							<div class="mt-8 grid gap-16 sm:grid-cols-2 sm:gap-x-8">
@@ -225,7 +225,7 @@ const Purposes = new Map(
 										}`}
 									>
 										<span
-											class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+											class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 										>
 											{Name}
 										</span>
@@ -235,7 +235,7 @@ const Purposes = new Map(
 													<a
 														href={Href(Entry.Id)}
 														aria-current={Entry.Id === Doc.id ? "page" : undefined}
-														class={`font-mono text-xs font-bold tracking-wide ${
+														class={`font-mono text-base font-bold tracking-wide ${
 															Entry.Id === Doc.id
 																? "text-stamped-canary underline decoration-2 underline-offset-4"
 																: "text-bone-white hover:text-stamped-canary"
@@ -244,7 +244,7 @@ const Purposes = new Map(
 														{Entry.Title}
 													</a>
 													{Purposes.get(Entry.Id) && (
-														<p class="font-body text-xs leading-relaxed text-zinc-dust">
+														<p class="font-body text-base leading-relaxed text-zinc-dust">
 															{Purposes.get(Entry.Id)}
 														</p>
 													)}
@@ -276,13 +276,13 @@ const Purposes = new Map(
 									rel="prev"
 									class="group relative border-4 border-blood-crimson bg-carbon-void p-6 zine-box-subtle transition-transform hover:-translate-y-1"
 								>
-									<span class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+									<span class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
 										PREV
 									</span>
-									<span class="mt-2 block font-mono text-xs font-bold text-bone-white group-hover:text-stamped-canary">
+									<span class="mt-2 block font-mono text-base font-bold text-bone-white group-hover:text-stamped-canary">
 										{Previous.Title}
 									</span>
-									<span class="mt-1 block font-mono text-[10px] uppercase tracking-widest text-zinc-dust">
+									<span class="mt-1 block font-mono text-base uppercase tracking-widest text-zinc-dust">
 										{`/docs/${Previous.Id}/`}
 									</span>
 								</a>
@@ -295,13 +295,13 @@ const Purposes = new Map(
 									rel="next"
 									class="group relative border-4 border-blood-crimson bg-carbon-void p-6 text-right zine-box-subtle transition-transform hover:-translate-y-1"
 								>
-									<span class="absolute -top-3.5 right-4 z-20 rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]">
+									<span class="absolute -top-3.5 right-4 z-20 rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]">
 										NEXT
 									</span>
-									<span class="mt-2 block font-mono text-xs font-bold text-bone-white group-hover:text-stamped-canary">
+									<span class="mt-2 block font-mono text-base font-bold text-bone-white group-hover:text-stamped-canary">
 										{Next.Title}
 									</span>
-									<span class="mt-1 block font-mono text-[10px] uppercase tracking-widest text-zinc-dust">
+									<span class="mt-1 block font-mono text-base uppercase tracking-widest text-zinc-dust">
 										{`/docs/${Next.Id}/`}
 									</span>
 								</a>
@@ -329,7 +329,7 @@ const Purposes = new Map(
 		>
 			<button
 				data-drawer-close
-				class="mb-8 border-2 border-black bg-raw-blood px-3 py-1.5 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-8 border-2 border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				CLOSE
 			</button>
@@ -383,7 +383,7 @@ const Purposes = new Map(
 	.docs-prose :global(p) {
 		margin: 1.5rem 0;
 		font-family: "DM Sans", sans-serif;
-		font-size: 0.95rem;
+		font-size: 1rem;
 		line-height: 1.8;
 		color: var(--bone-newsprint);
 	}
@@ -435,7 +435,7 @@ const Purposes = new Map(
 		border: 1px solid var(--oxblood-dark);
 		background-color: var(--asphalt-panel);
 		font-family: "JetBrains Mono", monospace;
-		font-size: 0.8rem;
+		font-size: 1rem;
 		color: var(--weathered-teal);
 	}
 
@@ -452,7 +452,7 @@ const Purposes = new Map(
 		padding: 0;
 		border: none;
 		background: none;
-		font-size: 12px;
+		font-size: 16px;
 		line-height: 1.7;
 		color: var(--zinc-dust);
 	}
@@ -472,7 +472,7 @@ const Purposes = new Map(
 		border-bottom: 2px solid var(--blood-crimson);
 		background-color: var(--carbon-void);
 		font-family: "JetBrains Mono", monospace;
-		font-size: 10px;
+		font-size: 16px;
 		font-weight: 700;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
@@ -484,7 +484,7 @@ const Purposes = new Map(
 		padding: 0.6rem 1rem;
 		border-top: 1px solid var(--oxblood-dark);
 		font-family: "DM Sans", sans-serif;
-		font-size: 0.85rem;
+		font-size: 1rem;
 		color: var(--bone-newsprint);
 	}
 
@@ -509,7 +509,7 @@ const Purposes = new Map(
 		margin: 1.5rem 0;
 		padding-left: 1.5rem;
 		font-family: "DM Sans", sans-serif;
-		font-size: 0.95rem;
+		font-size: 1rem;
 		line-height: 1.8;
 		color: var(--bone-newsprint);
 	}
@@ -545,7 +545,7 @@ const Purposes = new Map(
 		margin-top: 4rem;
 		padding-top: 1rem;
 		border-top: 2px dashed var(--oxblood-dark);
-		font-size: 0.8rem;
+		font-size: 1rem;
 		color: var(--zinc-dust);
 	}
 
@@ -558,7 +558,7 @@ const Purposes = new Map(
 		border: 1px solid var(--zinc-dust);
 		border-bottom-width: 3px;
 		font-family: "JetBrains Mono", monospace;
-		font-size: 0.75rem;
+		font-size: 1rem;
 		color: var(--bone-white);
 	}
 </style>

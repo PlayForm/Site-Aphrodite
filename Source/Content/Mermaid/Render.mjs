@@ -122,6 +122,52 @@ const PageHtml = `<!DOCTYPE html>
 				},
 			});
 
+			// The same law for the appendChild path: this Mermaid version
+			// builds label text as Text nodes (createTextNode) and appends
+			// them into the tspans, never touching tspan.textContent - so
+			// the setter above never fires. Intercept the insertion: a Text
+			// child whose data starts with a space, appended into an SVG
+			// tspan, gets the same NBSP rewrite.
+			const AppendChild = Node.prototype.appendChild;
+			Node.prototype.appendChild = function (Child) {
+				if (
+					Child instanceof Text &&
+					typeof Child.data === "string" &&
+					Child.data.startsWith(" ") &&
+					this.namespaceURI === "http://www.w3.org/2000/svg" &&
+					this.localName === "tspan"
+				) {
+					Child.data = NoBreakSpace + Child.data.slice(1);
+				}
+				return AppendChild.call(this, Child);
+			};
+
+			// The same law for the innerHTML path: if Mermaid writes the
+			// tspan markup wholesale (innerHTML on the <text> element), the
+			// parsed tspans never pass through either hook above. Intercept
+			// the markup: a chunk-opening space right after a tspan start tag
+			// becomes the NBSP before the parser ever sees it.
+			const InnerHtml = Object.getOwnPropertyDescriptor(
+				Element.prototype,
+				"innerHTML",
+			);
+			Object.defineProperty(Element.prototype, "innerHTML", {
+				configurable: true,
+				get() {
+					return InnerHtml.get.call(this);
+				},
+				set(Value) {
+					if (
+						typeof Value === "string" &&
+						this.namespaceURI === "http://www.w3.org/2000/svg" &&
+						this.localName === "text"
+					) {
+						Value = Value.replace(/(<tspan\b[^>]*>) /g, `$1${NoBreakSpace}`);
+					}
+					InnerHtml.set.call(this, Value);
+				},
+			});
+
 			mermaid.initialize({
 				startOnLoad: false,
 				securityLevel: "strict",
@@ -136,6 +182,10 @@ const PageHtml = `<!DOCTYPE html>
 				theme: "base",
 				themeVariables: {
 					fontFamily: "JetBrains Mono, ui-monospace, monospace",
+					// 13px is the renderer floor: at 16px the htmlLabels:false
+					// flowchart word-breaks and drops spaces, failing the
+					// MISSING TEXT integrity check below. FLAG: the only
+					// sub-16px text on the site lives in these generated SVGs.
 					fontSize: "13px",
 					// The zine tokens: near-black panels on transparent, bone
 					// ink, oxblood borders and veins.

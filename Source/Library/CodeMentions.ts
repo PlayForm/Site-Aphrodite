@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { HermesRepo } from "./Links";
+import { HeadroomRepo, HermesRepo } from "./Links";
 import { ResolveCode, SourceLink } from "./SourceLinks";
 
 /**
@@ -33,6 +33,9 @@ const Decode = (Text: string): string =>
 /** Split out the <pre> blocks so fenced code is never transformed. */
 const PreSplit = /(<pre[^>]*>[\s\S]*?<\/pre>)/g;
 
+/** Split out existing anchors so a code span inside link text is never wrapped (no nested <a>). */
+const AnchorSplit = /(<a\b[^>]*>[\s\S]*?<\/a>)/g;
+
 /** One inline code element (with or without attributes), element-only text. */
 const CodeElement = /<code([^>]*)>((?:[^<>]|&(?:amp|lt|gt|quot|#39);)*)<\/code>/g;
 
@@ -59,11 +62,15 @@ const Rewrite = (Html: string): string =>
 	Html.split(PreSplit).map((Segment) =>
 		Segment.startsWith("<pre")
 			? Segment
-			: Segment
-				.replace(CodeElement, (Element, Attrs: string, Inner: string) =>
-					Wrap(`<code${Attrs}>`, Inner, "code"))
-				.replace(MonoSpan, (Element, Attrs: string, Inner: string) =>
-					Wrap(`<span${Attrs}>`, Inner, "span")),
+			: Segment.split(AnchorSplit).map((Inner) =>
+					Inner.startsWith("<a")
+						? Inner
+						: Inner
+							.replace(CodeElement, (Element, Attrs: string, Text: string) =>
+								Wrap(`<code${Attrs}>`, Text, "code"))
+							.replace(MonoSpan, (Element, Attrs: string, Text: string) =>
+								Wrap(`<span${Attrs}>`, Text, "span")),
+				).join(""),
 	).join("");
 
 // The root of the Aphrodite checkout - the existence oracle for the
@@ -72,13 +79,18 @@ const Root = new URL("../../../", import.meta.url).pathname;
 
 /**
  * The local path an entry is verified against: the root checkout for the
- * Aphrodite repository, and the vendored plugins/aphrodite clone (the local
- * checkout of the Aphrodite-Hermes repository) for its entries - the check
+ * Aphrodite repository, the vendored plugins/aphrodite clone (the local
+ * checkout of the Aphrodite-Hermes repository) for its entries, and the
+ * vendor/headroom submodule checkout for Headroom entries - the check
  * mirrors the repo the anchor composes against, so a mapped path can never
  * 404 on GitHub.
  */
 const LocalPath = ({ Path, Repo }: { Path: string; Repo: unknown }): string =>
-	Repo === HermesRepo ? `plugins/aphrodite/${Path}` : Path;
+	Repo === HermesRepo
+		? `plugins/aphrodite/${Path}`
+		: Repo === HeadroomRepo
+		? `vendor/headroom/${Path}`
+		: Path;
 
 /**
  * The integration: rewrite every built HTML page through Rewrite(), skipping

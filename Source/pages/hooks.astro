@@ -16,7 +16,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 		<!-- HERO -->
 		<header class="relative flex w-full flex-col items-start">
 			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				HOOKS // THE CHAIN
 			</div>
@@ -25,7 +25,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 			>
 				Six hooks, one turn
 			</h1>
-			<p class="mt-12 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+			<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Every hook is a thin dispatch that forwards its arguments to the Rust dylib and
 				hands the JSON reply back to Hermes. On plugin load the shim asks the dylib for
 				its hook names and registers one callback per name - the six below are always
@@ -36,14 +36,14 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 		<!-- CHAIN SEQUENCE -->
 		<section class="relative w-full">
 			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				SEQUENCE // PER TURN
 			</div>
 			<div
 				class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
-				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] leading-relaxed">
+				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-4 font-mono text-base leading-relaxed">
 					<div class="text-bone-white">session starts</div>
 					<div class="pl-4 text-stamped-canary">→ on_session_start · reset per-session state</div>
 					<div class="pl-4 text-zinc-dust">↓</div>
@@ -68,7 +68,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 			data-diagram="hook-chain"
 		>
 			<div class="overflow-x-auto" set:html={HookChain} />
-			<figcaption class="mt-6 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+			<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 				M3 // HOOK CHAIN
 			</figcaption>
 		</figure>
@@ -76,7 +76,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 		<!-- ONE SECTION PER HOOK -->
 		<section class="relative w-full">
 			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				THE SIX // ONE SECTION EACH
 			</div>
@@ -86,15 +86,15 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.4deg]"
 				>
 					<div
-						class="absolute -top-5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
+						class="absolute -top-5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-base font-black uppercase text-bone-white"
 					>
 						01 // on_session_start
 					</div>
-					<p class="mt-4 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
 						Resets every piece of per-session state to a clean baseline: turn counter,
 						conversation index, recent markers, referenced files, tool-event telemetry,
 						ephemeral directives. Injects nothing - the one-shot first-turn orientation
-						renders later, on the first <span class="font-mono text-xs text-weathered-teal">pre_llm_call</span>.
+						renders later, on the first <span class="font-mono text-base text-weathered-teal">pre_llm_call</span>.
 					</p>
 				</div>
 				<!-- 2 pre_tool_call -->
@@ -102,11 +102,11 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					class="zine-box-canary relative border-[3px] border-stamped-canary/40 bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:rotate-[1.4deg]"
 				>
 					<div
-						class="absolute -top-5 left-4 z-10 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-5 left-4 z-10 border border-black bg-stamped-canary px-2 py-0.5 text-base font-black uppercase text-soot-black"
 					>
 						02 // pre_tool_call
 					</div>
-					<p class="mt-4 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
 						Two interventions before a tool executes. <span class="font-bold text-bone-white">Auto-backgrounding</span>:
 						long-running terminal/process calls are rewritten to run in the background
 						(poll worker, default on). <span class="font-bold text-bone-white">Chain splitting</span>
@@ -120,16 +120,16 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					class="zine-box-crimson relative border-[3px] border-raw-blood bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg]"
 				>
 					<div
-						class="absolute -top-5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
+						class="absolute -top-5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-base font-black uppercase text-bone-white"
 					>
 						03 // transform_tool_result
 					</div>
-					<p class="mt-4 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
 						After every tool call: record telemetry, run the skip gates, classify the
 						content type, hash (BLAKE3), store, and replace the output with
-						<span class="font-mono text-xs text-weathered-teal">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</span>
+						<span class="font-mono text-base text-weathered-teal">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</span>
 						plus a compact preview. File references are tracked before the gates, so
-						<span class="font-mono text-xs text-weathered-teal">aphrodite_files</span> sees
+						<span class="font-mono text-base text-weathered-teal">aphrodite_files</span> sees
 						every read even when nothing was compressed.
 					</p>
 				</div>
@@ -138,11 +138,11 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					class="zine-box-subtle relative border-[3px] border-zinc-dust/40 bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:rotate-[2deg]"
 				>
 					<div
-						class="absolute -top-5 left-4 z-10 border border-black bg-bone-newsprint px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-5 left-4 z-10 border border-black bg-bone-newsprint px-2 py-0.5 text-base font-black uppercase text-soot-black"
 					>
 						04 // transform_terminal_output
 					</div>
-					<p class="mt-4 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
 						Same pipeline for shell stdout/stderr. Non-zero exit codes are recorded as
 						failures for the error-loop detector; chain-split segments compress
 						unconditionally, before the threshold gate, so marked output never leaks raw;
@@ -154,16 +154,16 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					class="zine-box-canary relative border-[3px] border-stamped-canary/40 bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.6deg] lg:-translate-y-1"
 				>
 					<div
-						class="absolute -top-5 left-4 z-10 border border-black bg-stamped-canary px-2 py-0.5 text-[9px] font-black uppercase text-soot-black"
+						class="absolute -top-5 left-4 z-10 border border-black bg-stamped-canary px-2 py-0.5 text-base font-black uppercase text-soot-black"
 					>
 						05 // pre_llm_call
 					</div>
-					<p class="mt-4 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
 						Runs the poll-worker checkpoint, then the context assembler: first-turn
-						orientation (turn 0 only), <span class="font-mono text-xs text-weathered-teal">[directives:]</span>
-						(never dropped), <span class="font-mono text-xs text-weathered-teal">[nudge:]</span>
+						orientation (turn 0 only), <span class="font-mono text-base text-weathered-teal">[directives:]</span>
+						(never dropped), <span class="font-mono text-base text-weathered-teal">[nudge:]</span>
 						one-shots at most two (never dropped), background-task status, and the
-						<span class="font-mono text-xs text-weathered-teal">[recall]</span> catalog -
+						<span class="font-mono text-base text-weathered-teal">[recall]</span> catalog -
 						the first section dropped under pressure. One hard budget: 4,000 chars.
 					</p>
 				</div>
@@ -172,13 +172,13 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					class="zine-box-crimson relative border-[3px] border-raw-blood bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:rotate-[1.2deg] lg:translate-y-2"
 				>
 					<div
-						class="absolute -top-5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-[9px] font-black uppercase text-bone-white"
+						class="absolute -top-5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-base font-black uppercase text-bone-white"
 					>
 						06 // post_llm_call
 					</div>
-					<p class="mt-4 font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
 						Archives the last marker of the turn into the conversation index (so
-						<span class="font-mono text-xs text-weathered-teal">aphrodite_diff</span> can
+						<span class="font-mono text-base text-weathered-teal">aphrodite_diff</span> can
 						report per-turn compressions), advances the turn counter, purges expired
 						nudges after the counter advances - a one-shot nudge renders exactly once -
 						and expires stale poll-worker tasks.
@@ -193,24 +193,24 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div
-					class="absolute -top-5 left-6 z-10 border border-black bg-stamped-canary px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+					class="absolute -top-5 left-6 z-10 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
 				>
 					BYPASS // THE ESSENTIAL-TOOL GATE
 				</div>
 				<h2 class="mb-8 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					What never gets compressed
 				</h2>
-				<p class="mb-8 font-body text-sm leading-relaxed text-bone-newsprint">
+				<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
 					A result is left untouched when it is empty, below threshold, or from the
 					essential set - tools the agent needs raw:
 				</p>
-				<div class="border border-oxblood-dark bg-soot-black p-4 font-mono text-[12px] text-bone-newsprint">
+				<div class="border border-oxblood-dark bg-soot-black p-4 font-mono text-base text-bone-newsprint">
 					skill_view · skills_list · skill_manage · memory · session_search · read_file ·
 					read_terminal
 				</div>
-				<p class="mt-8 font-body text-xs leading-relaxed text-zinc-dust">
+				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
 					Aphrodite's own tools and headroom helpers are also skipped - compressing
-					<span class="font-mono text-xs text-weathered-teal">aphrodite_retrieve</span>
+					<span class="font-mono text-base text-weathered-teal">aphrodite_retrieve</span>
 					would just replace resolved content with another marker.
 				</p>
 			</div>
@@ -219,7 +219,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 		<!-- THRESHOLDS TABLE -->
 		<section class="relative w-full">
 			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				THRESHOLDS // GATES AND BYPASSES
 			</div>
@@ -227,13 +227,13 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 				class="zine-box-crimson w-full -rotate-[1deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
 				<div class="overflow-x-auto">
-					<table class="w-full border-collapse font-mono text-[12px]">
+					<table class="w-full border-collapse font-mono text-base">
 						<thead>
 							<tr class="border-b-2 border-oxblood-dark text-left">
-								<th class="py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">HOOK</th>
-								<th class="py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">SETTING</th>
-								<th class="py-3 pr-4 text-[10px] font-black uppercase tracking-widest text-stamped-canary">DEFAULT</th>
-								<th class="py-3 text-[10px] font-black uppercase tracking-widest text-stamped-canary">BYPASS</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">HOOK</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">SETTING</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">DEFAULT</th>
+								<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">BYPASS</th>
 							</tr>
 						</thead>
 						<tbody class="text-bone-newsprint">
@@ -264,7 +264,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 						</tbody>
 					</table>
 				</div>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 text-[11px] leading-relaxed text-zinc-dust">
+				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
 					PRECEDENCE: ENVIRONMENT &gt; TOML &gt; DEFAULT
 					(APHRODITE_TOOL_THRESHOLD_TOKEN · APHRODITE_TERMINAL_THRESHOLD ·
 					APHRODITE_FLOW_BUDGET_CHARS · APHRODITE_CHAIN_SPLIT).

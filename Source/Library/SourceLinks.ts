@@ -1,12 +1,12 @@
-import { HermesRepo, OurRepo, type Repo } from "./Links";
+import { HeadroomRepo, HermesRepo, OurRepo, type Repo } from "./Links";
 
 /**
  * The code-mention registry: every code identifier the site and the docs
- * prose mention maps to the exact source file it is defined in. The docs
- * markdown renders through the LinkCode rehype plugin (Site-side wrapping,
- * the generated markdown sources stay untouched) and the hand-written pages
- * render through Component/CodeLink.astro; both resolve through this module,
- * so the mapping lives here alone.
+ * prose mention maps to the exact source file it is defined in. The built
+ * pages render through the CodeMentions integration (Site-side wrapping at
+ * build time, the sources stay untouched) and the hand-written pages can
+ * use Component/CodeLink.astro; both resolve through this module, so the
+ * mapping lives here alone.
  *
  * REPO CHOICE: the proxy / crates / docs / setup context maps to OurRepo
  * (PlayForm/Aphrodite); the plugin loader / plugin.yaml / installer context
@@ -36,6 +36,9 @@ const Hermes = (Path: string): Entry => ({ Repo: HermesRepo, Path });
 
 /** The Aphrodite repository paths, verified against the local checkout. */
 const Ours = (Path: string): Entry => ({ Repo: OurRepo, Path });
+
+/** The Headroom submodule paths (vendor/headroom = PlayForm/Headroom). */
+const Headroom = (Path: string): Entry => ({ Repo: HeadroomRepo, Path });
 
 /** The exact-match registry. Keys are the literal code-span texts. */
 export const CodeLinks: Record<string, Entry> = {
@@ -95,10 +98,11 @@ export const CodeLinks: Record<string, Entry> = {
 	"layout_check.py": Hermes("layout_check.py"),
 
 	// ── The site and configuration files (Aphrodite repository).
+	// FLAG: "Render.mjs" and "Drift-Guard.mjs" are NOT mapped - they live
+	// under Site/, which is gitignored, so tree/Current anchors to them
+	// would 404 on GitHub.
 	"aphrodite.toml": Ours("aphrodite.toml.example"),
 	"ccr.db": Ours("crates/aphrodite/src/config/proxy.rs"),
-	"Render.mjs": Ours("Site/Source/Content/Mermaid/Render.mjs"),
-	"Drift-Guard.mjs": Ours("Site/Scripts/Drift-Guard.mjs"),
 
 	// ── The environment variables (crates/aphrodite/src/config_loader.rs).
 	APHRODITE_API_KEY: Ours("crates/aphrodite/src/config/proxy.rs"),
@@ -148,7 +152,7 @@ export const CodeLinks: Record<string, Entry> = {
 	// ── The crates and the CLI surfaces.
 	aphrodite: Ours("crates/aphrodite/Cargo.toml"),
 	"aphrodite-hermes": Ours("crates/aphrodite-hermes/Cargo.toml"),
-	"aphrodite-headroom-core": Ours("vendor/headroom/crates/headroom-core/Cargo.toml"),
+	"aphrodite-headroom-core": Headroom("crates/headroom-core/Cargo.toml"),
 	"aphrodite setup": Ours("crates/aphrodite/src/setup/run.rs"),
 	"aphrodite.exe": Ours("crates/aphrodite/Cargo.toml"),
 
@@ -159,10 +163,12 @@ export const CodeLinks: Record<string, Entry> = {
 /**
  * Resolve a code-span text to its source entry. Exact matches come from the
  * registry; repository-relative paths (`crates/...`, `docs/...`,
- * `plugins/aphrodite/...`, `Site/...`) resolve against OurRepo when the file
- * exists in the local checkout (the caller verifies with Exists below, so a
- * missing path degrades to plain text instead of a 404 anchor). Anything
- * else returns null and stays unlinked.
+ * `tests/...`, `Maintain/...`) resolve against OurRepo when the file exists
+ * in the local checkout; `plugins/aphrodite/...` resolves against HermesRepo
+ * (the submodule's own repository). The Site/ and bare vendor/ prefixes are
+ * excluded because Site/ is gitignored and vendor/ holds submodules, so
+ * anchors to them would 404 on GitHub (the caller verifies existence too).
+ * Anything else returns null and stays unlinked.
  */
 export function ResolveCode(Text: string): Entry | null {
 	const Exact = CodeLinks[Text];
@@ -174,9 +180,15 @@ export function ResolveCode(Text: string): Entry | null {
 			break;
 	}
 
-	switch (/^(crates|docs|plugins|Site|tests|Maintain|vendor)\/[\w./-]+\.\w{1,4}$/.test(Text)) {
-		case true:
+	switch (true) {
+		// plugins/aphrodite is the submodule checkout of Aphrodite-Hermes, so
+		// its paths must anchor against the submodule's own repository.
+		case /^plugins\/aphrodite\/[\w./-]+\.\w{1,4}$/.test(Text):
+			return Hermes(Text.slice("plugins/aphrodite/".length));
+
+		case /^(crates|docs|tests|Maintain)\/[\w./-]+\.\w{1,4}$/.test(Text):
 			return Ours(Text);
+
 		default:
 			return null;
 	}

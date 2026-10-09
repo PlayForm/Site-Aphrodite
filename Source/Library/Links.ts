@@ -91,6 +91,17 @@ export const HermesRepo: Repo = {
 };
 
 /**
+ * The Headroom repository - the git submodule checked out at
+ * vendor/headroom (PlayForm/Headroom, branch Current), the home of the
+ * aphrodite-headroom-core crate. Links to files inside a submodule must
+ * compose against the submodule's own repository or they 404.
+ */
+export const HeadroomRepo: Repo = {
+	Base: "https://github.com/PlayForm/Headroom",
+	Branch: BranchCurrent,
+};
+
+/**
  * Compose a repository URL: Link(OurRepo, "docs/proxy/handlers.md")
  * -> "https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/handlers.md".
  * The one function every composed repository URL flows through - a future

@@ -156,22 +156,22 @@ const Samples = [
 		<!-- Stamps row -->
 		<div class="flex flex-wrap items-center gap-8">
 			<span
-				class="border-2 border-black bg-stamped-canary px-3 py-1 font-mono text-[11px] font-black uppercase tracking-widest text-black shadow-[3px_3px_0px_#000]"
+				class="border-2 border-black bg-stamped-canary px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-black shadow-[3px_3px_0px_#000]"
 				>SIMULATION - CLIENT-SIDE, NO RUNTIME</span
 			>
 			<span
-				class="bg-raw-blood px-3 py-1 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 				>PREVIEW DEMO</span
 			>
 			<span
-				class="border-2 border-raw-blood bg-carbon-void px-3 py-1 font-mono text-[11px] font-black uppercase tracking-widest text-bone-newsprint shadow-[3px_3px_0px_#000]"
+				class="border-2 border-raw-blood bg-carbon-void px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-newsprint shadow-[3px_3px_0px_#000]"
 				>CLASSIFIER 40-123 NS</span
 			>
 		</div>
 
 		<!-- Tape-stamp header -->
 		<header class="wb-skew border-l-4 border-blood-crimson bg-carbon-void p-8 shadow-[6px_6px_0px_#7a0a1e]">
-			<p class="font-mono text-[11px] font-bold uppercase tracking-widest text-stamped-canary">
+			<p class="font-mono text-base font-bold uppercase tracking-widest text-stamped-canary">
 				THE UNEXPLAINABLE BECOMES EFFORTLESS
 			</p>
 			<h1 class="mt-6 text-3xl font-bold tracking-tight text-bone-white sm:text-4xl">
@@ -187,7 +187,7 @@ const Samples = [
 
 		<!-- Sample switchboard -->
 		<section class="wb-skew flex flex-wrap items-center gap-6" aria-label="Sample outputs">
-			<span class="font-mono text-[11px] font-bold uppercase tracking-widest text-zinc-dust"
+			<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust"
 				>LOAD SAMPLE:</span
 			>
 			{
@@ -213,10 +213,10 @@ const Samples = [
 			<!-- Raw stream pane -->
 			<div class="wb-skew flex flex-col border-4 border-blood-crimson bg-carbon-void shadow-[6px_6px_0px_#7a0a1e]">
 				<div class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3">
-					<span class="font-mono text-[11px] font-black uppercase tracking-widest text-stamped-canary"
+					<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary"
 						>RAW STREAM</span
 					>
-					<span class="font-mono text-[11px] text-zinc-dust" data-stat="raw-bytes">0 B</span>
+					<span class="font-mono text-base text-zinc-dust" data-stat="raw-bytes">0 B</span>
 				</div>
 				<div class="relative flex-1">
 					<label class="sr-only" for="wb-input">Tool output to classify</label>
@@ -234,7 +234,7 @@ const Samples = [
 						style="background: linear-gradient(to bottom, transparent, #111014);"
 					></div>
 				</div>
-				<div class="border-t-2 border-blood-crimson/50 px-5 py-3 font-mono text-[10px] uppercase tracking-widest text-zinc-dust">
+				<div class="border-t-2 border-blood-crimson/50 px-5 py-3 font-mono text-base uppercase tracking-widest text-zinc-dust">
 					suppression: verbose lines fade to opacity - the soot-black feed
 				</div>
 			</div>
@@ -242,29 +242,29 @@ const Samples = [
 			<!-- Enriched preview pane -->
 			<div class="wb-skew flex flex-col border-4 border-blood-crimson bg-carbon-void shadow-[6px_6px_0px_#7a0a1e]">
 				<div class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3">
-					<span class="font-mono text-[11px] font-black uppercase tracking-widest text-weathered-teal"
+					<span class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal"
 						>ENRICHED PREVIEW</span
 					>
-					<span class="font-mono text-[11px] text-zinc-dust" data-stat="classify-ns">- ns</span>
+					<span class="font-mono text-base text-zinc-dust" data-stat="classify-ns">- ns</span>
 				</div>
 				<div class="flex grow flex-col gap-10 p-6">
 					<!-- The preview line, inset bone-white result -->
 					<div class="bg-bone-white p-4 shadow-[inset_3px_3px_0px_rgba(0,0,0,0.35)]">
-						<p class="font-mono text-[10px] font-black uppercase tracking-widest text-black/60">
+						<p class="font-mono text-base font-black uppercase tracking-widest text-black/60">
 							PREVIEW LINE
 						</p>
-						<p class="wb-preview mt-4 break-all font-mono text-sm text-black" data-preview>
+						<p class="wb-preview mt-4 break-all font-mono text-base text-black" data-preview>
 							[press RUN PIPELINE]
 						</p>
 					</div>
 					<!-- The CCR marker chip -->
 					<div>
-						<p class="font-mono text-[10px] font-black uppercase tracking-widest text-weathered-teal">
+						<p class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
 							MARKER (CLICK TO COPY)
 						</p>
 						<button
 							type="button"
-							class="wb-chip mt-4 w-full border-2 border-weathered-teal bg-soot-black p-2 text-left font-mono text-xs text-weathered-teal"
+							class="wb-chip mt-4 w-full border-2 border-weathered-teal bg-soot-black p-2 text-left font-mono text-base text-weathered-teal"
 							data-copy=""
 							data-marker
 						>
@@ -273,10 +273,10 @@ const Samples = [
 					</div>
 					<!-- The decision -->
 					<div class="border-l-4 border-stamped-canary bg-soot-black p-4">
-						<p class="font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+						<p class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 							AGENT DECISION
 						</p>
-						<p class="mt-4 font-mono text-xs text-bone-newsprint" data-decision>
+						<p class="mt-4 font-mono text-base text-bone-newsprint" data-decision>
 							preview enough - skip retrieval, keep reasoning
 						</p>
 					</div>
@@ -284,10 +284,10 @@ const Samples = [
 					     the pre_llm_call order under the 4,000-char budget - NOT an
 					     auto-compaction pass (the engine is opt-in, non-destructive). -->
 					<div class="border-l-4 border-oxblood-dark bg-soot-black p-4">
-						<p class="font-mono text-[10px] font-black uppercase tracking-widest text-bone-newsprint">
+						<p class="font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
 							INJECTION ASSEMBLER (PRE_LLM_CALL)
 						</p>
-						<p class="mt-4 font-mono text-xs text-bone-newsprint">
+						<p class="mt-4 font-mono text-base text-bone-newsprint">
 							<span class="text-stamped-canary">[directives:]</span> →
 							<span class="text-stamped-canary">[nudge:]</span> →
 							<span class="text-weathered-teal">[recall]</span>
@@ -301,12 +301,12 @@ const Samples = [
 		<!-- Threshold knobs -->
 		<section class="wb-skew border-4 border-blood-crimson bg-carbon-void p-8 shadow-[6px_6px_0px_#7a0a1e]" aria-label="Threshold knobs">
 			<div class="flex flex-wrap items-center justify-between gap-6">
-				<h2 class="font-mono text-sm font-black uppercase tracking-widest text-bone-white">
+				<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 					THRESHOLD KNOBS
 				</h2>
 				<button type="button" class="wb-pill" data-action="reload">POST /RELOAD</button>
 			</div>
-			<p class="mt-6 font-mono text-[11px] text-zinc-dust">
+			<p class="mt-6 font-mono text-base text-zinc-dust">
 				aphrodite.toml [compression] - the four proxy thresholds are live-reloadable; edit +
 				save (or POST /reload) re-applies them immediately (README.md:389).
 			</p>
@@ -321,10 +321,10 @@ const Samples = [
 					].map((Knob) => (
 						<div class="border-2 border-blood-crimson/60 bg-soot-black p-6">
 							<div class="flex items-baseline justify-between">
-								<label class="font-mono text-xs font-bold text-bone-newsprint" for={`wb-knob-${Knob.Key}`}>
+								<label class="font-mono text-base font-bold text-bone-newsprint" for={`wb-knob-${Knob.Key}`}>
 									{Knob.Label}
 								</label>
-								<output class="font-mono text-sm font-black text-stamped-canary" data-knob-value={Knob.Key} for={`wb-knob-${Knob.Key}`}>
+								<output class="font-mono text-base font-black text-stamped-canary" data-knob-value={Knob.Key} for={`wb-knob-${Knob.Key}`}>
 									{Knob.Default}
 									{Knob.Unit}
 								</output>
@@ -339,17 +339,17 @@ const Samples = [
 								value={Knob.Default}
 								class="wb-slider mt-8 w-full"
 							/>
-							<p class="mt-4 font-mono text-[10px] uppercase tracking-widest text-zinc-dust">{Knob.Note}</p>
+							<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">{Knob.Note}</p>
 						</div>
 					))
 				}
 			</div>
 			<!-- The verdict strip -->
 			<div class="mt-16 border-2 border-raw-blood bg-soot-black p-4">
-				<p class="font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+				<p class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 					COMPRESSION DECISION
 				</p>
-				<p class="mt-4 font-mono text-xs text-bone-newsprint" data-verdict>
+				<p class="mt-4 font-mono text-base text-bone-newsprint" data-verdict>
 					turn the knobs, then RUN PIPELINE
 				</p>
 			</div>
@@ -364,7 +364,7 @@ const Samples = [
 					{ Key: "saved", Label: "CONTEXT SAVED", Value: 0, Cap: 100, Suffix: " KB" },
 				].map((Stat) => (
 					<div class="wb-skew border-4 border-blood-crimson bg-carbon-void p-6 shadow-[6px_6px_0px_#7a0a1e]">
-						<p class="font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">{Stat.Label}</p>
+						<p class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">{Stat.Label}</p>
 						<p class="mt-4 font-mono text-2xl font-black text-bone-white" data-stat-value={Stat.Key}>
 							0{Stat.Suffix}
 						</p>
@@ -383,7 +383,7 @@ const Samples = [
 				data-diagram="dual-listener"
 			>
 				<div class="overflow-x-auto" set:html={DualListener} />
-				<figcaption class="mt-6 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+				<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 					M5 // DUAL LISTENER
 				</figcaption>
 			</figure>
@@ -392,7 +392,7 @@ const Samples = [
 				data-diagram="config-resolution"
 			>
 				<div class="overflow-x-auto" set:html={ConfigResolution} />
-				<figcaption class="mt-6 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+				<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 					M7 // CONFIG RESOLUTION
 				</figcaption>
 			</figure>
@@ -400,68 +400,68 @@ const Samples = [
 
 		<!-- SIM NOTES: the benchmark arc numbers behind the sim -->
 		<section class="wb-skew border-l-4 border-stamped-canary bg-carbon-void p-8" aria-label="Benchmark notes">
-			<p class="font-mono text-[10px] font-black uppercase tracking-widest text-stamped-canary">
+			<p class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 				SIM NOTES · THE MEASURED ARC
 			</p>
-			<p class="mt-4 max-w-3xl text-sm text-zinc-dust">
+			<p class="mt-4 max-w-3xl text-base text-zinc-dust">
 				The numbers this sim gestures at are real, and they arrived in stages: the
 				benchmarks below were printed in the CHANGELOG at each release, and the sim's
 				simulation boundary is that it re-runs them in your browser.
 			</p>
 			<div class="mt-8 grid gap-6 md:grid-cols-2">
 				<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
-					<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+					<div class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 						v1.3.4 · STANDARD CORPUS (20 SAMPLES, 106 KB)
 					</div>
 					<div class="mt-3 font-mono text-2xl font-black text-bone-white">132.82× overall</div>
-					<p class="mt-2 font-mono text-[11px] text-zinc-dust">
+					<p class="mt-2 font-mono text-base text-zinc-dust">
 						3×–610× per type · 9–40 ms end-to-end at v1.3.4 (the README's current
 						latency figure is 8-40 ms) · 20/20 retrieve OK · the CHANGELOG
 						entry prints the unrounded overall at 132.82
 					</p>
 				</div>
 				<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
-					<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+					<div class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 						v1.2.2 · REAL-WORLD EXAMPLE
 					</div>
 					<div class="mt-3 font-mono text-2xl font-black text-bone-white">216 KB → 12 markers</div>
-					<p class="mt-2 font-mono text-[11px] text-zinc-dust">
+					<p class="mt-2 font-mono text-base text-zinc-dust">
 						54K → 240 tokens · the CHANGELOG entry prints the ratio as 225×
 					</p>
 				</div>
 				<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
-					<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+					<div class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 						v1.2.2 · CLASSIFICATION &amp; CCR STORE (APPLE M2 MAX)
 					</div>
-					<div class="mt-3 font-mono text-sm font-black text-bone-white">
+					<div class="mt-3 font-mono text-base font-black text-bone-white">
 						classify 40–123 ns · put 453 ns · get 119.4 ns
 					</div>
-					<p class="mt-2 font-mono text-[11px] text-zinc-dust">
+					<p class="mt-2 font-mono text-base text-zinc-dust">
 						CCR mixed MT, 8 threads: DashMap 229 µs vs Mutex 1.15 ms
 					</p>
 				</div>
 				<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
-					<div class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-dust">
+					<div class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 						WHY THE STORE LOOKS LIKE IT DOES
 					</div>
-					<div class="mt-3 font-mono text-sm font-black text-weathered-teal">5× at 8 threads</div>
-					<p class="mt-2 font-mono text-[11px] text-zinc-dust">
+					<div class="mt-3 font-mono text-base font-black text-weathered-teal">5× at 8 threads</div>
+					<p class="mt-2 font-mono text-base text-zinc-dust">
 						The DashMap-over-Mutex result is why the in-memory CCR backend is a sharded
 						map, not one guarded table.
 					</p>
 				</div>
 			</div>
-			<p class="mt-6 font-mono text-[9px] text-zinc-dust">
+			<p class="mt-6 font-mono text-base text-zinc-dust">
 				SRC: CHANGELOG.md:632-635 (the standard corpus entry, unrounded overall 132.82) · CHANGELOG.md:962-973 (the ns/µs table) · CHANGELOG.md:983 (216 KB → 12 markers) · README.md:460 (the current 8-40 ms latency figure)
 			</p>
 		</section>
 
 		<!-- Simulated-vs-real boundary note -->
 		<footer class="wb-skew border-l-4 border-weathered-teal bg-carbon-void p-6">
-			<p class="font-mono text-[10px] font-black uppercase tracking-widest text-weathered-teal">
+			<p class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
 				SIMULATION BOUNDARY
 			</p>
-			<p class="mt-4 max-w-3xl text-sm text-zinc-dust">
+			<p class="mt-4 max-w-3xl text-base text-zinc-dust">
 				Real on this page: the classifier rules (first match wins, per README.md:153-176), the
 				preview line shapes (README.md:108-133), the threshold semantics and defaults
 				(README.md:395-420). Simulated: the BLAKE3 digest (a deterministic stand-in hash - the
@@ -469,7 +469,7 @@ const Samples = [
 				aphrodite_retrieve (shown as the decision text, never executed). No network, no
 				runtime - everything happens in this tab.
 			</p>
-			<p class="mt-6 max-w-3xl text-sm text-zinc-dust">
+			<p class="mt-6 max-w-3xl text-base text-zinc-dust">
 				Classifier framing: the 16 pipeline types above follow the README catalog
 				(README.md:155-176). The full registry is larger - the 30-type content catalog lives in
 				docs/classification/content-types.md:118-151; this demo simulates the README tier only.
@@ -921,17 +921,17 @@ const Samples = [
 		background: #111014;
 		padding: 0.5rem 0.9rem;
 		font-family: var(--font-mono, "JetBrains Mono", monospace);
-		font-size: 11px;
+		font-size: 16px;
 		font-weight: 700;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
-		color: #d6d3d1;
+		color: #dedbd2;
 		box-shadow: 3px 3px 0px #000;
 	}
 	.wb-pill:hover,
 	.wb-pill[data-active] {
 		background: #931128;
-		color: #f5f0e6;
+		color: #ece9e0;
 	}
 	.wb-exec.wb-exec-spin {
 		background: #e5a93b;
@@ -948,12 +948,12 @@ const Samples = [
 	}
 	.wb-terminal {
 		font-family: var(--font-mono, "JetBrains Mono", monospace);
-		font-size: 12px;
+		font-size: 16px;
 		line-height: 1.5;
 		outline: none;
 	}
 	.wb-terminal::placeholder {
-		color: #71717a;
+		color: #82808a;
 	}
 	.wb-chip:hover {
 		background: #20807b;

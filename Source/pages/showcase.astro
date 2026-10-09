@@ -79,7 +79,7 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 		<!-- HERO -->
 		<header class="relative flex w-full flex-col items-start">
 			<div
-				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				SHOWCASE // THE PLUGIN IN ACTION
 			</div>
@@ -88,7 +88,7 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 			>
 				The plugin, worked
 			</h1>
-			<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Every example below is a real behavior of the pipeline dressed in generic
 				content: what the agent sends (the raw stream), what it sees back (the enriched
 				preview), how the bytes come home (the retrieval round-trip), and why the
@@ -98,12 +98,12 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 			</p>
 			<div class="mt-8 flex max-w-4xl flex-wrap items-center gap-4">
 				<span
-					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-xs font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000]"
+					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000]"
 				>
 					{Bank.examples.length} WORKED EXAMPLES
 				</span>
 				<span
-					class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]"
+					class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]"
 				>
 					{Categories.length} CATEGORIES
 				</span>
@@ -113,14 +113,14 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 		<!-- THE DEFAULTS IN PLAY -->
 		<section class="relative w-full">
 			<div
-				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				THE DEFAULTS // APHRODITE.TOML
 			</div>
 			<div
 				class="zine-box-crimson w-full rotate-[0.8deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
-				<p class="font-mono text-[11px] leading-loose text-bone-newsprint">
+				<p class="font-mono text-base leading-loose text-bone-newsprint">
 					{Object.entries(Bank.defaults).map(([Key, Value]) => (
 						<span class="mr-6 inline-block whitespace-nowrap">
 							<span class="text-zinc-dust">{Key}</span>
@@ -128,11 +128,11 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 						</span>
 					))}
 				</p>
-				<p class="mt-6 border-t border-oxblood-dark pt-4 font-body text-sm leading-relaxed text-bone-newsprint">
+				<p class="mt-6 border-t border-oxblood-dark pt-4 font-body text-base leading-relaxed text-bone-newsprint">
 					These seven numbers decide every example below. Compression is never a judgment
 					call - it is a byte count against the surface's threshold, and the essential
 					tools plus the
-					<code class="font-mono text-xs text-weathered-teal">aphrodite_*</code>
+					<code class="font-mono text-base text-weathered-teal">aphrodite_*</code>
 					tools themselves are always raw regardless of size.
 				</p>
 			</div>
@@ -141,7 +141,7 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 		<!-- FILTER BAR -->
 		<section class="relative w-full" data-registry>
 			<div
-				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-6 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				THE REGISTRY // FILTER BY CATEGORY, SEARCH BY KEYWORD
 			</div>
@@ -152,7 +152,7 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 					<button
 						type="button"
 						data-filter="*"
-						class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+						class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 					>
 						ALL · {Bank.examples.length}
 					</button>
@@ -160,7 +160,7 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 						<button
 							type="button"
 							data-filter={Category}
-							class="border-2 border-black bg-soot-black px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-widest text-zinc-dust shadow-[2px_2px_0px_#000] transition-colors hover:text-bone-white"
+							class="border-2 border-black bg-soot-black px-3 py-1 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust shadow-[2px_2px_0px_#000] transition-colors hover:text-bone-white"
 						>
 							{Category}
 						</button>
@@ -171,9 +171,9 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 					placeholder="SEARCH THE EXAMPLES…"
 					aria-label="Search the examples"
 					data-search
-					class="mt-5 w-full border-2 border-oxblood-dark bg-soot-black px-4 py-2 font-mono text-xs tracking-widest text-bone-white placeholder:text-zinc-dust focus:border-weathered-teal focus:outline-none"
+					class="mt-5 w-full border-2 border-oxblood-dark bg-soot-black px-4 py-2 font-mono text-base tracking-widest text-bone-white placeholder:text-zinc-dust focus:border-weathered-teal focus:outline-none"
 				/>
-				<p class="mt-4 font-mono text-[11px] tracking-widest text-zinc-dust" data-count>
+				<p class="mt-4 font-mono text-base tracking-widest text-zinc-dust" data-count>
 					SHOWING {Bank.examples.length} OF {Bank.examples.length}
 				</p>
 			</div>
@@ -207,7 +207,7 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 									{Example.title}
 								</h2>
 								<span
-									class={`border border-oxblood-dark px-2 py-0.5 font-mono text-[10px] font-black uppercase tracking-widest ${Example.corpus ? "text-weathered-teal" : "text-stamped-canary"}`}
+									class={`border border-oxblood-dark px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest ${Example.corpus ? "text-weathered-teal" : "text-stamped-canary"}`}
 								>
 									{Example.corpus ? "CORPUS-EXACT PREVIEW" : "GENERIC FRAGMENT"}
 								</span>
@@ -215,10 +215,10 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 
 							<!-- RAW STREAM: the generic input, with the suppression fade -->
 							<div class="mt-8">
-								<div class="mb-2 font-mono text-[10px] font-black uppercase tracking-widest text-zinc-dust">
+								<div class="mb-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 									RAW STREAM // WHAT THE AGENT SENT
 								</div>
-								<div class="border border-oxblood-dark bg-soot-black p-3.5 font-mono text-[12px] leading-relaxed">
+								<div class="border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed">
 									{Lines.length === 0 ? (
 										<div class="opacity-70">(no raw stream - the block is generated, not captured)</div>
 									) : (
@@ -242,10 +242,10 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 							<!-- RETRIEVAL: the byte-exact round-trip -->
 							{Example.retrieval && (
 								<div class="mt-5 border border-oxblood-dark bg-asphalt-panel p-3.5">
-									<div class="mb-2 font-mono text-[10px] font-black uppercase tracking-widest text-weathered-teal">
+									<div class="mb-2 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
 										RETRIEVAL // THE BYTE-EXACT ROUND-TRIP
 									</div>
-									<div class="font-mono text-[11px] leading-relaxed text-bone-newsprint">
+									<div class="font-mono text-base leading-relaxed text-bone-newsprint">
 										<div>
 											<span class="text-weathered-teal">{Example.retrieval.tool}</span>
 											<span class="text-zinc-dust">(hash: "</span>
@@ -265,10 +265,10 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 
 							<!-- BEHAVIOR LESSON: the threshold decision -->
 							<div class="mt-6 border-l-4 border-raw-blood pl-4">
-								<div class="font-mono text-[10px] font-black uppercase tracking-widest text-raw-blood">
+								<div class="font-mono text-base font-black uppercase tracking-widest text-raw-blood">
 									BEHAVIOR LESSON // THE THRESHOLD DECISION
 								</div>
-								<p class="mt-2 font-body text-sm leading-relaxed text-bone-newsprint">
+								<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
 									{Example.note}
 								</p>
 							</div>
@@ -282,11 +282,11 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 		<section class="relative flex w-full flex-col gap-28 lg:gap-36">
 			<div class="w-full">
 				<div
-					class="mb-6 -rotate-1 border border-black bg-stamped-canary px-3 py-1 text-[11px] font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+					class="mb-6 -rotate-1 border border-black bg-stamped-canary px-3 py-1 text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
 				>
 					THE TRAVERSALS // AGENT-VIEW vs SYSTEM-PATH, STEP BY STEP
 				</div>
-				<p class="max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+				<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The five pipelines above are worked examples; these are the pipes they run
 					through. Each traversal steps through its hook or endpoint with two
 					synchronized panes - what the agent sees, what the system does - and every
@@ -539,26 +539,26 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 					class="zine-box-crimson relative -rotate-[0.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-10"
 				>
 					<div
-						class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+						class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 					>
 						THE CONTEXT ENGINE // WHAT IT DOES NOT DO
 					</div>
 					<h3 class="mt-4 font-headline text-xl font-black uppercase text-bone-white sm:text-2xl">
 						Compress returns the transcript unchanged
 					</h3>
-					<p class="mt-6 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
-						The registered engine is opt-in (<code class="font-mono text-xs text-weathered-teal">APHRODITE_CONTEXT_ENGINE=1</code>;
+					<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+						The registered engine is opt-in (<code class="font-mono text-base text-weathered-teal">APHRODITE_CONTEXT_ENGINE=1</code>;
 						the TOML key defaults true) and requires Hermes &gt;= 0.20.2 - the first
-						release with <code class="font-mono text-xs text-weathered-teal">pre_tool_call</code> modify.
+						release with <code class="font-mono text-base text-weathered-teal">pre_tool_call</code> modify.
 						What it does: records token usage from each response. What it never does:
-						<code class="font-mono text-xs text-weathered-teal">should_compress</code> always
+						<code class="font-mono text-base text-weathered-teal">should_compress</code> always
 						returns false (it defers to Hermes' own accounting), and
-						<code class="font-mono text-xs text-weathered-teal">compress</code> returns the
+						<code class="font-mono text-base text-weathered-teal">compress</code> returns the
 						transcript unchanged - non-destructive, because the transform hooks already
 						shrank the tool output. It never forces a compaction, never rewrites
 						messages, and never touches the inline store.
 					</p>
-					<div class="mt-6 font-mono text-[9px] text-zinc-dust">
+					<div class="mt-6 font-mono text-base text-zinc-dust">
 						SRC: docs/plugin/context-engine.md:38-48
 					</div>
 				</div>
@@ -570,15 +570,15 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 					class="zine-box-crimson relative rotate-[0.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-10"
 				>
 					<div
-						class="absolute -top-3.5 right-6 border border-black bg-raw-blood px-3 py-0.5 text-[10px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+						class="absolute -top-3.5 right-6 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
 					>
 						THE PREFETCH REFUSAL // v1.6.6
 					</div>
 					<h3 class="mt-4 font-headline text-xl font-black uppercase text-bone-white sm:text-2xl">
 						Some paths are never read
 					</h3>
-					<p class="mt-6 font-body text-sm leading-relaxed text-bone-newsprint">
-						<code class="font-mono text-xs text-weathered-teal">aphrodite_prefetch</code>
+					<p class="mt-6 font-body text-base leading-relaxed text-bone-newsprint">
+						<code class="font-mono text-base text-weathered-teal">aphrodite_prefetch</code>
 						would happily warm the store from any path - so the guard names the paths
 						that must never be read and refuses them outright:
 					</p>
@@ -592,12 +592,12 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 							RightPane={"ReadOutcome::Refused<br />refuse_reason: &quot;...&quot;<br /><br />the file is not opened, not hashed,<br />not stored - the prefetch returns<br />a refusal instead of the content"}
 						/>
 					</div>
-					<p class="mt-8 max-w-3xl font-body text-sm leading-relaxed text-bone-newsprint">
+					<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 						The same release hardened setup the same way: the Hermes-home plugin
 						directory is report-only - no symlink removal, no writes, no deletes - and
 						the dylib arm refuses installs when the in-tree checksums are missing.
 					</p>
-					<div class="mt-6 font-mono text-[9px] text-zinc-dust">
+					<div class="mt-6 font-mono text-base text-zinc-dust">
 						SRC: CHANGELOG.md:3-37 (v1.6.6) · the Aphrodite/v1.6.6 release note
 					</div>
 				</div>
@@ -612,14 +612,14 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 		<!-- CROSS-LINKS -->
 		<section class="relative w-full">
 			<div
-				class="mb-6 rotate-1 border border-black bg-raw-blood px-3 py-1 text-[11px] font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+				class="mb-6 rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				GO DEEPER // THE SURFACES THESE EXAMPLES EXERCISE
 			</div>
 			<div
 				class="zine-box-crimson w-full rotate-[-0.8deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
-				<ul class="grid gap-5 font-body text-sm text-bone-newsprint sm:grid-cols-2">
+				<ul class="grid gap-5 font-body text-base text-bone-newsprint sm:grid-cols-2">
 					<li class="border-l-4 border-weathered-teal pl-4">
 						<a class="font-bold text-bone-white underline decoration-raw-blood" href="/tools/"
 							>THE THIRTEEN TOOLS</a
