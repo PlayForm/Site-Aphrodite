@@ -93,6 +93,15 @@ whenToUse: Mandatory before adding, editing, or placing any file under Site/Publ
    render (`rsvg-convert -w 900`, or equivalent) before reporting done,
    never from geometry alone.
 
+## 6. The raster sanitization note (DEEP-SANITIZE 2026-10-10)
+
+14. Four PNGs (`aphrodite.png`, `aphrodite-32/64/120.png`) carry an opaque
+    `Signature: SDYA...` XMP `iTXt` chunk (an AI-generation watermark, no
+    usernames/paths). FLAGGED to the orchestrator, not stripped: binary
+    rewrites bypass the edit-tool law and the signature is not a personal
+    identifier. Any future generator run should state whether the source
+    SVG regenerates clean rasters (the current SVG has no XMP).
+
 ## 5. Verification
 
 10. After any brand-asset or mark-placement change, the arbiters are the

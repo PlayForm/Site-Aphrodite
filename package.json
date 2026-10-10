@@ -28,6 +28,7 @@
     "Diagrams": "node --experimental-strip-types Scripts/Diagrams.ts && node Source/Content/Mermaid/Render.mjs",
     "Docs": "node --experimental-strip-types Scripts/Docs.ts",
     "Drift": "node Scripts/Drift-Guard.mjs",
+    "Redirects": "node Scripts/GenerateRedirects.mjs",
     "prepublishOnly": "astro build"
   },
   "dependencies": {
@@ -42,8 +43,8 @@
     "astro-capo": "0.0.1",
     "astrojs-service-worker": "2.0.3",
     "autoprefixer": "10.6.1",
-    "cssnano": "9.4.0",
-    "cssnano-preset-advanced": "9.3.0",
+    "cssnano": "9.5.0",
+    "cssnano-preset-advanced": "9.4.0",
     "dotenv": "18.0.7",
     "firebase": "13.0.0",
     "mermaid": "12.1.0",

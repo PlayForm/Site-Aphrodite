@@ -145,3 +145,79 @@ tags itself. The contract every page inherits:
 7. Arbiters: `pnpm run Drift` (all PASS) + the quote-agnostic greps
    over `Target/` (the production build strips attribute quotes, so
    greps must match both `name="x"` and `name=x`).
+
+## THE PAYLOAD BASELINE (the DEEP-PERF sweep, measured 2026-10 over the built Target/)
+
+The numbers every perf conversation starts from (the current build may
+shift hashes, not magnitudes):
+
+- 64 HTML pages, ~6.1 MB raw / ~1.08 MB gzipped total; the median page
+  gzips to ~10-15 KB, the heaviest (docs/architecture/01-startup) to
+  ~44 KB. Per-page HTML carries ~40 KB of inlined critical CSS
+  (Beasties, `pruneSource: false` by design) plus the diagram SVGs.
+- The assets: one shared CSS chunk (~52 KB / ~10.5 KB gz), a JS graph
+  of page → prefetch (~1.4 KB gz) on every routed page,
+  ZineDiagramNav → the client router chunk (~4.4 KB gz) on diagram
+  pages, and page-specific scripts (workbench ~3.6 KB gz,
+  config ~2.4 KB gz). The whole JS is under 17 KB gz.
+- The fonts: three variable latin-subset woff2 (Space Grotesk 22 KB,
+  JetBrains Mono 31 KB, DM Sans 37 KB), `font-display: swap`, all
+  three preloaded in every page head (Base.astro).
+- The service worker precaches ALL 64 HTML pages + the fonts + every
+  Brand asset (~7 MB raw on first visit), with no runtime caching.
+
+The perf laws learned from that sweep:
+
+1. The inline diagram SVGs are the page-weight driver: the
+   architecture pages carry 70-194 KB of inline SVG each (they gzip
+   well, so the transfer is fine - the parse cost is not). New
+   diagrams should stay under ~40 KB of inline SVG; bigger ones go
+   through a redesign flag, not a silent squeeze.
+2. `/Font/*` must keep its `Cache-Control: public, max-age=31536000,
+   immutable` rule in `Public/_headers` (added by the DEEP-PERF
+   sweep) - the fonts are content-stable and preloaded, so they cache
+   like the build assets.
+3. The 193 KB traced `Brand/aphrodite.svg` is the favicon on every
+   page; treat any Brand-svg growth as a red flag - it is fetched by
+   every browser and precached by the SW.
+4. The head contract above still binds: the font preloads and the
+   stylesheet links are layout-owned; a page never adds its own.
+
+## THE _REDIRECTS MECHANISM (the CodeEditorLand borrow, user-mandated 2026-10-10)
+
+`Public/_redirects` and `Target/_redirects` are GENERATED - never
+hand-edited. The generator is `Scripts/GenerateRedirects.mjs`, the full
+borrow of CodeEditorLand/WebSite's `Maintain/Script/GenerateRedirects.mjs`
+(the same rule forms, the same file layout), adapted:
+
+1. The canonical paths are this site's pages: the 14 top-level lowercase
+   routes plus every `/docs` slug derived from `Source/Content/Docs`
+   (the reference derives its slugs from its build-time RouteMap; here
+   the script scans the docs tree directly).
+2. The variant rewrites (200): case permutations, plurals, flat
+   kebab/joined forms → canonical, from the reference's generators
+   verbatim. They make `/Benchmarks`, `/Case-Study`, `/DOCS/...` resolve
+   instead of 404-ing.
+3. The asset pass-throughs (200): `/_astro/*`, `/Brand/*`, `/Font/*`
+   and the single files (`/404.html`, `/Manifest.json`, `/robots.txt`,
+   the sitemaps). `/Brand/*` is the rule that keeps `OG.png` and the
+   favicons reachable at their `/Brand/` URLs.
+4. NO catch-all: the reference rewrites `/*` → `/Visit/` (its app
+   shell page). This site has no shell page; a catch-all here would
+   shadow the automatic `404.html` serving for every unknown path.
+5. Wiring: `pnpm run Redirects` (the package.json script). The
+   reference also wires its redirects into the build chain
+   (`Source/Function/Route/Integration.ts`); that integration-layer
+   borrow is NOT ported - run the script after changing routes or docs.
+6. Regenerate whenever a page or docs slug is added: the file must
+   cover every canonical or the path 404s on the deploy.
+
+## THE DEPLOY ASSET CHECK (the /Brand/ reachability)
+
+`https://aphrodite.playform.cloud/Brand/OG.png` must resolve (200,
+image/png) - it is the `og:image` on every page. The chain: the asset
+lives in `Public/Brand/` → copied to `Target/Brand/` by the build →
+served by Cloudflare Pages, guaranteed by the `/Brand/*` 200 rule in
+`_redirects` and the cache rule in `Public/_headers`. A broken `/Brand/`
+URL means either the asset left `Public/Brand/` or `_redirects` lost its
+pass-through - check both, never guess.
