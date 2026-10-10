@@ -139,13 +139,19 @@ const Purposes = new Map(
 		await getCollection("Docs")
 	).map((Page) => [Page.id, Purpose(Page.body)]),
 );
+
+// This page's own one-line purpose - the unique per-page meta description.
+// The section template stays as the fallback for entries without prose.
+const SelfPurpose = Purposes.get(Doc.id) ?? "";
 ---
 
 <Base
 	Title={`${Doc.data.title} - Aphrodite`}
-	Description={`Aphrodite documentation - ${Doc.data.section}.`}
+	Description={
+		SelfPurpose || `Aphrodite documentation - ${Doc.data.section}.`
+	}
 >
-	<div class="relative z-10 mx-auto w-full max-w-[1440px] px-5 py-16 sm:px-8 lg:py-24">
+	<main class="relative z-10 mx-auto w-full max-w-[1440px] px-5 py-16 sm:px-8 lg:py-24">
 		<!-- Mobile: the docs index opens as a full-screen drawer -->
 		<button
 			id="docs-nav-toggle"
@@ -339,7 +345,7 @@ const Purposes = new Map(
 				}
 			</div>
 		</div>
-	</div>
+	</main>
 
 	<!-- Mobile drawer: the sidebar in a fixed overlay above everything -->
 	<div

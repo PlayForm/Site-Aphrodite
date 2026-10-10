@@ -9,6 +9,11 @@
 /Brand/*
 	Cache-Control: public, max-age=31536000, immutable
 
+# The three latin-subset woff2 files are content-stable (the preloaded
+# page fonts); cache them like the build assets.
+/Font/*
+	Cache-Control: public, max-age=31536000, immutable
+
 # Security and correctness basics for every route.
 /*
 	X-Content-Type-Options: nosniff

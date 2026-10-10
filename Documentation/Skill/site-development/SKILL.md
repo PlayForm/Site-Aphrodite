@@ -91,3 +91,57 @@ short-line structure:
 6. The arbiters: `pnpm run Drift` (all PASS) after every file; the
    whitespace check is zero space-indented lines (tabs only, tabWidth 4)
    and balanced `<p>` tags. NO `prepublishOnly` as the routine guard.
+
+## THE RELEASE-CLAIM DISCIPLINE (user-mandated 2026-10-07)
+
+Every release-derived value on the site (version pairings, timeline dates,
+release-note statements, artifact counts, tool counts, `requires_hermes`
+floors) must trace to a live fetched source before it ships:
+
+1. The pairing authority is the GitHub release note's own title line
+   ("Aphrodite v1.2.2 💋 Plugin v2.0.5"), fetched from
+   `https://github.com/PlayForm/Aphrodite/releases.atom` (or the releases
+   API per tag). The CHANGELOG header is the secondary source - when the
+   two disagree (live case: CHANGELOG:981 says "badges synced to v1.2.2 /
+   v2.0.6" while the note says the tag pairs v2.0.5 and explains the
+   v2.0.6 sync landed after tagging), the note wins for the TAG pairing.
+2. The date authority is the releases API `published_at` (UTC); the
+   CHANGELOG header date is the site's cited source - when they differ by
+   a day (timezone edge, live case: v1.5.1 = CHANGELOG 2026-09-21 vs
+   published_at 2026-09-20T21:53:38Z), FLAG in the report, never silently
+   pick one.
+3. Counts the notes don't state ("six builtin_directives/*.md files",
+   "29 nested modules", "13 tools") trace to the CHANGELOG anchor the
+   page's SRC line cites - verify that anchor exists before trusting it.
+4. The verification pass quotes the fetched line for every claim in the
+   report; a claim without a fetched quote is unverified, not verified.
+
+## THE HEAD CONTRACT (user-mandated 2026-10-10, the DEEP-HTML sweep)
+
+`Source/Layout/Base.astro` owns the shared head; a page never writes meta
+tags itself. The contract every page inherits:
+
+1. `<title>` + `<meta name="description">` come from the page's `Base`
+   props - both required, unique per page, description mirrors og/twitter.
+2. `charset`, `viewport`, `theme-color` (#09090b), `format-detection`,
+   the OG block (type/title/description/image), and the Twitter block
+   (card/title/description/image) are layout-fixed - never duplicated
+   per page.
+3. `og:image` / `twitter:image` are `/Brand/OG.png` (relative) and the
+   canonical link + `og:url` are ABSENT because the site URL is unset
+   (`astro.config.ts` line 25 placeholder). When the user sets the URL,
+   add the conditional canonical + absolute image/og:url in
+   `Base.astro` - the one-line decision is theirs, never improvised.
+4. The JSON-LD SoftwareApplication block is layout-level (renders on
+   every routed page; the static 404 correctly omits it).
+5. Every page's slot content is wrapped in `<main>` BY THE PAGE (the
+   docs route does it too); `Base` supplies the `<header>` + `<footer>`
+   around the slot. A page that forgets `<main>` is a bug - the
+   DEEP-HTML sweep checks it.
+6. The 404 is a static `Public/404.html`: self-contained (inline CSS
+   only), `noindex`, own `description` + `theme-color`, `<nav
+   aria-label="Primary">` with links that resolve against the built
+   tree. Edit it directly; it never passes through Base.
+7. Arbiters: `pnpm run Drift` (all PASS) + the quote-agnostic greps
+   over `Target/` (the production build strips attribute quotes, so
+   greps must match both `name="x"` and `name=x`).
