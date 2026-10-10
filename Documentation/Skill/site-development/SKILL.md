@@ -225,3 +225,24 @@ served by Cloudflare Pages, guaranteed by the `/Brand/*` 200 rule in
 `_redirects` and the cache rule in `Public/_headers`. A broken `/Brand/`
 URL means either the asset left `Public/Brand/` or `_redirects` lost its
 pass-through - check both, never guess.
+
+## THE AA-LIFT CONTRACT (the FINAL-A11Y recommendations, user-approved)
+
+Three accessibility laws that sit on top of the five grammar laws:
+
+1. **THE 13px TAPE FLOOR** - the sub-13px tape strips (the decorative
+   stamps and chips ONLY, never the content text, which keeps the 16px
+   floor) render at `text-[13px]` at minimum. The tape identity is
+   preserved; nothing goes below 13px. Guard: no `text-xs` on any
+   `.astro` tape or chip.
+2. **THE TEAL TOKEN** - `--weathered-teal` is `#2a938d` (lifted from the
+   prior `#20807b`: same hue family, passes 4.5:1 on all surfaces). The
+   swatch table (`ZineSwatches`) and any inline CSS hex must mirror the
+   token - no raw old hex anywhere in `Source/`.
+3. **THE RAW-BLOOD TEXT LAW** - raw-blood is CHROME: fills
+   (`bg-raw-blood`), borders, chips, marker prefixes, and the deliberate
+   per-variant color identities (the palette maps in `StudyLedger`,
+   `ZinePreview`, `ZineCopyChip`, `ZineStatBar`; the verdict chips on
+   `examples`). INFORMATIVE raw-blood text - labels, stat values, lead-in
+   accents, the `▸` glyph - reads in `text-zinc-dust` instead. Guard:
+   grep `text-raw-blood` and classify every hit as chrome or resolve it.

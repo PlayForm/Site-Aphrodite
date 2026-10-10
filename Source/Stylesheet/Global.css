@@ -23,7 +23,7 @@
 
 	/* Accents */
 	--stamped-canary: #e5a93b;
-	--weathered-teal: #20807b;
+	--weathered-teal: #2a938d; /* lifted from the prior weathered teal: passes 4.5:1 on all surfaces */
 }
 
 /* Self-hosted variable fonts (latin subset, OFL - see Public/Font/LICENSE.md) */
