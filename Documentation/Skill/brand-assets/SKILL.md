@@ -41,10 +41,33 @@ whenToUse: Mandatory before adding, editing, or placing any file under Site/Publ
    remains a raster fallback asset.
 6. THE FAVICON IS THE RED MARK (user-mandated 2026-10-10): the SVG icon
    link in `Source/Layout/Base.astro` points at `/Brand/aphrodite.svg`
-   (the recolored raw-blood `#931128` mark); the 32px/180px PNGs remain
-   the raster fallbacks. Residual: if the 1800pt full-detail mark muddies
-   at 16px in real browsers, generate a favicon-size variant from the red
-   mark.
+   (the recolored raw-blood `#931128` mark); the raster fallbacks are
+   GENERATED from the red mark (see §6) - at 32/64 the lips silhouette is
+   scaled to fill the full plate so the red shape reads while the code-text
+   grain drops out (the favicon-size treatment, verified by render).
+
+## 6. The raster variant generation law
+
+11. All sized PNG variants and the OG cards are generated FROM THE RED MARK
+    `Public/Brand/aphrodite.svg` - never from the old raster
+    `Public/Brand/aphrodite.png` (that file remains only as a historical
+    fallback asset, byte-identical to root `assets/aphrodite.png`). The
+    generators, run from the Site directory:
+    - `python3 Scripts/Brand-Variants.py` → the icon set
+      `aphrodite-32/64/120/192/512.png` (32/64 lips-fill treatment; 120/192/
+      512 padded on a carbon-void `#09090b` plate via rsvg-convert + PIL).
+    - `python3 Scripts/Media-Social.py` → `OG.png` (1200x630),
+      `OG-square.png` (600x600), `aphrodite-180.png` (the apple-touch icon
+      with the oxblood frame). Tool deps: `rsvg-convert` (brew) and Space
+      Grotesk (fetched to `/tmp/SpaceGrotesk.ttf` from Google Fonts; pass
+      `FONT=` to override).
+12. The generators are the assets' source of truth: change the SVG, then
+    re-run both scripts; never hand-edit the PNG outputs. Verify every
+    generated raster visually (read the image) and size it via
+    `PIL Image.open(...).size` before reporting done.
+13. The Manifest icons point at the generated set (`aphrodite-192.png`,
+    `aphrodite-512.png`, plus the 120x120 maskable entry) - never at the
+    full-detail fallback raster with `sizes: "any"`.
 
 ## 3. The decorative-stamp typography exception
 
