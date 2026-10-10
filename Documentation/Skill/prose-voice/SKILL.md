@@ -65,6 +65,12 @@ lines, `<<<CCR:...>>>` marker literals, SRC citation lines, links and table
 data cells are NEVER reworded. A voice fix changes verb forms and actors in
 prose only; it never reflows the paragraph.
 
+The line-breaking half of this (the DeepSeek double-newline treatment: each
+sentence or sentence group its own block, no multi-sentence run in one
+paragraph) lives in site-development SKILL.md ("THE PROSE BREAKDOWN") - a
+voice edit and a breakdown edit must never fight over the same paragraph:
+apply the voice first, then the line breaking, both byte-preserving.
+
 ## 4. The actors (use the named one)
 
 The active subject is the component the sources name: `the hook` for the

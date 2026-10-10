@@ -63,7 +63,9 @@ def brand_mark(height):
         check=True,
     )
     mark = Image.open(raw).convert("RGBA")
-    return mark.crop(mark.getchannel("A").getbbox())
+    mark = mark.crop(mark.getchannel("A").getbbox())
+    scale = height / mark.height
+    return mark.resize((int(mark.width * scale), height), Image.LANCZOS)
 
 
 def landscape_card():

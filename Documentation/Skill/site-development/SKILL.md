@@ -60,3 +60,34 @@ The five laws, verbatim:
   manual spacing patches.
 - The grammar reference: the DESIGN-ADOPTION SPEC (Reference/Stitch) and the
   token table in Source/Stylesheet/Global.css.
+
+## THE PROSE BREAKDOWN (the double-newline treatment)
+
+The DeepSeek-site convention, user-mandated 2026-10: no large multi-sentence
+paragraph ships as one flowing block. Every prose paragraph follows the
+short-line structure:
+
+1. Each sentence (or tight sentence group) is its own block - the topic
+   sentence on its own, then the next thought, separated by the blank-line
+   rhythm (`mt-3` between sibling `<p>` blocks; the panel containers keep
+   one bordered box with the split `<p>`s inside).
+2. Within a block, source lines break at clause boundaries (~100 chars) -
+   the reference's soft-wrap discipline; the words stay byte-identical,
+   ONLY the line breaking changes.
+3. Lead-in labels stay inline: the mono uppercase keyword label
+   (`font-mono text-base font-bold uppercase tracking-widest` in
+   raw-blood / stamped-canary / weathered-teal) opens the paragraph, then
+   the prose. Section-level keyword stamps use `ZineStamp` (the black chip:
+   raw-blood fill, bone-white mono text, hard 4px offset shadow).
+4. What is NEVER rewrapped: quoted strings (tool `description` JSON lines,
+   transcript/data-array strings, ledger quotes), `<code>` contents, SRC
+   citation lines, table rows, mermaid diagram lines - byte-exact, FLAG
+   instead.
+5. The docs mirror: edit `../docs/*.md` in the SOURCE tree (hard-wrap the
+   long prose lines, sentence per line, blank lines only between
+   paragraphs), then `pnpm run Docs` to regenerate `Source/Content/Docs/`.
+   A Markdown blank line splits a paragraph - do not add one inside a
+   sentence group.
+6. The arbiters: `pnpm run Drift` (all PASS) after every file; the
+   whitespace check is zero space-indented lines (tabs only, tabWidth 4)
+   and balanced `<p>` tags. NO `prepublishOnly` as the routine guard.
