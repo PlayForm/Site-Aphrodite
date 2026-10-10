@@ -82,3 +82,30 @@ markup-only nav changes the fast guard is `pnpm run Drift` (the count is
 dynamic; all PASS - 97 checks at the essentials reduction). Verify the
 markup with greps of the SOURCE when no build ran, and note that the built
 HTML under Target/ is stale until the next full build.
+
+## 7. The RELATED + BREADCRUMB laws (born from the RESID-RELATED closeout)
+
+The two cross-link components complete the web the bar cannot hold:
+
+- `Source/Component/Related.astro` - rendered at the foot of a page's
+  content, before `</main>`. Its markup is CANONICAL: never restyled, never
+  forked per page. A page adds `<Related Links={[{ Href, Label }, ...]} />`
+  plus the `import Related from "@Component/Related.astro";` line.
+- `Source/Component/Breadcrumbs.astro` - rendered as the FIRST element
+  inside `<main>` on the deep pages. Same registry rule: it resolves the
+  active page through `AllLinks` + `IsActive`; a page with no registry entry
+  renders nothing, which is correct.
+
+The truthful-target law (this bit for real): every `Href` in a Related list
+MUST resolve to a built route - check `Target/<route>/index.html` exists
+before choosing it. The docs section indexes are NOT auto-generated: a docs
+section folder with no `index.md` (config, plugin, ... - only their leaf
+.md files exist) has no `/docs/<section>/` route, so link the LEAF page
+instead (`/docs/config/aphrodite-toml/`, `/docs/plugin/hooks/`) or `/docs/`.
+A dead Related link is a silent 404 the build does not catch - grep the
+target tree, never assume the route exists.
+
+Neighbors are curated, not exhaustive: three to four links that name the
+page's actual companions (the flow the reader came from / goes to), using
+the registry's label vocabulary. Docs links carry the `DOCS · X` label form
+when they name a specific doc page.

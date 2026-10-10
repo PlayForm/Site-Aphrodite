@@ -178,10 +178,15 @@ const Samples = [
 				Preview Workbench
 			</h1>
 			<p class="mt-8 max-w-3xl text-base text-zinc-dust">
-				Paste any tool output - a build log, a test run, a grep result - and this page shows
-				the enriched preview line Aphrodite would hand the agent, plus the CCR marker it would
-				store. The four live-reloadable thresholds and the engine knob are yours to turn. The
-				rules below are the real rules, simulated in your browser.
+				Paste any tool output - a build log, a test run, a grep result - and this page
+				shows the enriched preview line Aphrodite would hand the agent, plus the CCR
+				marker it would store.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The four live-reloadable thresholds and the engine knob are yours to turn.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The rules below are the real rules, simulated in your browser.
 			</p>
 		</header>
 
@@ -462,19 +467,31 @@ const Samples = [
 				SIMULATION BOUNDARY
 			</p>
 			<p class="mt-4 max-w-3xl text-base text-zinc-dust">
-				Real on this page: the classifier rules (first match wins, per README.md:153-176), the
-				preview line shapes (README.md:108-133), the threshold semantics and defaults
-				(README.md:395-420). Simulated: the BLAKE3 digest (a deterministic stand-in hash - the
-				real 40-char digest needs the Rust store), the 40-123 ns timing readout, and
-				aphrodite_retrieve (shown as the decision text, never executed). No network, no
-				runtime - everything happens in this tab.
+				Real on this page: the classifier rules (first match wins, per README.md:153-176),
+				the preview line shapes (README.md:108-133), the threshold semantics and defaults
+				(README.md:395-420).
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Simulated: the BLAKE3 digest (a deterministic stand-in hash - the real 40-char
+				digest needs the Rust store), the 40-123 ns timing readout, and aphrodite_retrieve
+				(shown as the decision text, never executed).
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				No network, no runtime - everything happens in this tab.
 			</p>
 			<p class="mt-6 max-w-3xl text-base text-zinc-dust">
 				Classifier framing: the 16 pipeline types above follow the README catalog
-				(README.md:155-176). The full registry is larger - the 30-type content catalog lives in
-				docs/classification/content-types.md:118-151; this demo simulates the README tier only.
-				Not depicted: context-engine auto-compaction - the engine is opt-in and non-destructive;
-				the per-turn context side is the injection assembler shown under the agent decision.
+				(README.md:155-176).
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The full registry is larger - the 30-type content catalog lives in
+				docs/classification/content-types.md:118-151; this demo simulates the README tier
+				only.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Not depicted: context-engine auto-compaction - the engine is opt-in and
+				non-destructive; the per-turn context side is the injection assembler shown under
+				the agent decision.
 			</p>
 		</footer>
 

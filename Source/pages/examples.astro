@@ -90,12 +90,28 @@ const InjectionOrder = [
 					Seven scenarios,<br />one <span class="text-stamped-canary">lifecycle</span>
 				</h1>
 				<p class="mt-16 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
-					Not what the output looks like - what happens to it, step by step. A
-					threshold edit propagates through a running proxy. A marker travels from
-					compression to byte-exact retrieval. A compound command splits into
-					segments. Directives assemble under a budget. A relay call fires a callback.
-					Essential tools refuse the machine. And the same payload crosses two
-					listeners without changing shape.
+					Not what the output looks like - what happens to it, step by step.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
+					A threshold edit propagates through a running proxy.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
+					A marker travels from compression to byte-exact retrieval.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
+					A compound command splits into segments.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
+					Directives assemble under a budget.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
+					A relay call fires a callback.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
+					Essential tools refuse the machine.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
+					And the same payload crosses two listeners without changing shape.
 				</p>
 				<div class="mt-24 flex flex-wrap gap-12 font-mono text-base font-bold uppercase tracking-widest">
 					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-stamped-canary transition-colors hover:text-bone-white" href="/workbench/">TRY THE SIMULATOR</a>
@@ -123,14 +139,18 @@ const InjectionOrder = [
 							Four knobs, hot
 						</h2>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							The four hot-reload thresholds are the only compression values the
-							running proxy re-reads: <code class="font-mono text-base">tool_threshold_token</code>,
+							The four hot-reload thresholds are the only compression values the running
+							proxy re-reads: <code class="font-mono text-base">tool_threshold_token</code>,
 							<code class="font-mono text-base">tool_threshold_cache</code>,
 							<code class="font-mono text-base">inline_threshold</code> and
-							<code class="font-mono text-base">code_multiplier</code>. Edit + save, or
-							<code class="font-mono text-base">POST /reload</code> - the new values apply
-							immediately, with no restart (README.md:389-391). Everything else about a
-							proxy is fixed at startup.
+							<code class="font-mono text-base">code_multiplier</code>.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Edit + save, or <code class="font-mono text-base">POST /reload</code> - the
+							new values apply immediately, with no restart (README.md:389-391).
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Everything else about a proxy is fixed at startup.
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							The mechanics of the hot path: the config-file watcher reacts to
@@ -238,26 +258,35 @@ const InjectionOrder = [
 							Compress, marker, retrieve, byte-exact
 						</h2>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							The lifecycle of one payload: the hook hashed it (BLAKE3), stored the
-							bytes in the session store, and replaced the output with a
+							The lifecycle of one payload: the hook hashed it (BLAKE3), stored the bytes
+							in the session store, and replaced the output with a
 							<code class="ccr-marker font-mono text-base">{"<<<CCR:hash|type|size>>>"}</code> marker
-							plus a preview. The transcript then carried the marker instead of the
-							content - hash, type, size, ~15 tokens.
+							plus a preview.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The transcript then carried the marker instead of the content - hash, type,
+							size, ~15 tokens.
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							When the next action needs the substance, the agent calls
 							<code class="font-mono text-base">aphrodite_retrieve</code> with the hash -
-							or pastes the marker body directly; every retrieval entry point accepts
-							it, suffix or no suffix. What comes back is the original content
-							byte-for-byte, nested markers resolved recursively (docs/ccr/marker-format.md).
+							or pastes the marker body directly; every retrieval entry point accepts it,
+							suffix or no suffix.
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							The caveat, printed on the tool's own contract: markers stay resolvable
-							for the life of the session but <strong class="text-bone-white"
-								>do not survive a session restart</strong
-							> - the dylib is loaded once per process, so a new session starts a fresh
-							store (docs/tool-relay/tools.md:36-39). The proxy's token listener backs
-							its store with SQLite, which is the durability escape from that rule.
+							What comes back is the original content byte-for-byte, nested markers
+							resolved recursively (docs/ccr/marker-format.md).
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The caveat, printed on the tool's own contract: markers stay resolvable for
+							the life of the session but{" "}
+							<strong class="text-bone-white">do not survive a session restart</strong> -
+							the dylib is loaded once per process, so a new session starts a fresh store
+							(docs/tool-relay/tools.md:36-39).
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The proxy's token listener backs its store with SQLite, which is the
+							durability escape from that rule.
 						</p>
 					</div>
 					<!-- The round-trip panes -->
@@ -367,14 +396,23 @@ const InjectionOrder = [
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							It is opt-in: <code class="font-mono text-base">chain_split = false</code> by
 							default, because invisible segment markers pollute redirected stdout.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							The split floor and cap are
 							<code class="font-mono text-base">chain_split_min_segments = 2</code> and
-							<code class="font-mono text-base">chain_split_max_segments = 6</code>. The
-							split is unconditional once marked - segment compression happens before
-							the threshold gate, so marked output never leaks raw. And it is
-							careful: constructs that would corrupt control flow (heredocs, loops
-							spanning segments) are left untouched. The proxy never performs chain
-							splitting - it only sees Chat Completions responses.
+							<code class="font-mono text-base">chain_split_max_segments = 6</code>.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The split is unconditional once marked - segment compression happens before
+							the threshold gate, so marked output never leaks raw.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							And it is careful: constructs that would corrupt control flow (heredocs,
+							loops spanning segments) are left untouched.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The proxy never performs chain splitting - it only sees Chat Completions
+							responses.
 						</p>
 					</div>
 					<div class="flex flex-col gap-8">
@@ -428,30 +466,42 @@ const InjectionOrder = [
 							Seven built-ins, one budget
 						</h2>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							Short behavioral <code class="font-mono text-base">.md</code> files,
-							baked into the binary and materialized on plugin registration, injected
-							verbatim every <code class="font-mono text-base">pre_llm_call</code> - they
-							teach retrieval vocabulary, never the compression mechanism. The
-							discovery order is strictly first-wins, never merged:
+							Short behavioral <code class="font-mono text-base">.md</code> files, baked
+							into the binary and materialized on plugin registration, injected verbatim
+							every <code class="font-mono text-base">pre_llm_call</code> - they teach
+							retrieval vocabulary, never the compression mechanism.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The discovery order is strictly first-wins, never merged:
 							<code class="font-mono text-base">APHRODITE_DIRECTIVES_DIR</code> →
 							<code class="font-mono text-base">./directives/</code> →
 							<code class="font-mono text-base">~/.hermes/aphrodite/directives/</code> →
-							binary-relative. Any <code class="font-mono text-base">.md</code> file in a
-							discovered directory becomes a directive named after its stem - the
-							built-ins are not special-cased (docs/plugin/directives.md:51-58).
+							binary-relative.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Any <code class="font-mono text-base">.md</code> file in a discovered
+							directory becomes a directive named after its stem - the built-ins are not
+							special-cased (docs/plugin/directives.md:51-58).
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							The budget math: 2,000 characters per directive body, 4,000 characters
 							across all active directives combined - and the whole per-turn injection
-							(directives + nudges + recall catalog + retrieve hint) lives under one
-							hard cap, <code class="font-mono text-base">flow_budget_chars</code>,
-							default 4,000 (shipped example: 2,600). Sections drop from the bottom
-							when over budget; directives and nudges never drop.
+							(directives + nudges + recall catalog + retrieve hint) lives under one hard
+							cap, <code class="font-mono text-base">flow_budget_chars</code>, default
+							4,000 (shipped example: 2,600).
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Sections drop from the bottom when over budget; directives and nudges never
+							drop.
 						</p>
 						<div class="border border-oxblood-dark bg-asphalt-panel p-5 font-mono text-base leading-relaxed text-bone-newsprint">
-							aphrodite_directive("swap", "explore") - no config edit, takes effect on
-							the very next turn. The active set is per-process state: it persists
-							across a session reset.
+							<p>
+								aphrodite_directive("swap", "explore") - no config edit, takes effect on
+								the very next turn.
+							</p>
+							<p class="mt-3">
+								The active set is per-process state: it persists across a session reset.
+							</p>
 						</div>
 					</div>
 					<div class="flex flex-col gap-8">
@@ -509,11 +559,16 @@ const InjectionOrder = [
 						<div class="mt-4 text-bone-newsprint opacity-80">[recall] catalog summary</div>
 					</div>
 					<div class="flex flex-col justify-center border border-oxblood-dark bg-asphalt-panel p-5 font-body text-base leading-relaxed text-bone-newsprint">
-						<span class="font-mono text-base font-bold uppercase tracking-widest text-stamped-canary">THE PRIORITY LADDER · </span>
-						Under budget pressure the recall catalog goes first, then background
-						status. Directives and nudges are never dropped - nudges are capped at
-						two one-shots, so the floor is always the directive block plus up to two
-						nudges (docs/plugin/hooks.md:123-137).
+						<p>
+							<span class="font-mono text-base font-bold uppercase tracking-widest text-stamped-canary">THE PRIORITY LADDER · </span>
+							Under budget pressure the recall catalog goes first, then background
+							status.
+						</p>
+						<p class="mt-3">
+							Directives and nudges are never dropped - nudges are capped at two
+							one-shots, so the floor is always the directive block plus up to two nudges
+							(docs/plugin/hooks.md:123-137).
+						</p>
 					</div>
 				</div>
 				<div class="mt-16 font-mono text-base leading-relaxed text-zinc-dust">
@@ -549,19 +604,29 @@ const InjectionOrder = [
 							(docs/tool-relay/callbacks.md:29-48).
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							The guardrails are strict. The callback URL must be
+							The guardrails are strict.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The callback URL must be
 							<strong class="text-bone-white">https-only</strong> - http, including
-							loopback, and any other scheme are rejected with HTTP 400 before
-							anything executes (SSRF protection). The delivery is a
-							<strong class="text-bone-white">5-second, fire-and-forget POST</strong>:
-							no auth header, no retries, the outcome untracked (only relay calls
-							themselves are counted in
-							<code class="font-mono text-base">/stats</code>). Only
-							<code class="font-mono text-base">aphrodite_retrieve</code>,
+							loopback, and any other scheme are rejected with HTTP 400 before anything
+							executes (SSRF protection).
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The delivery is a
+							<strong class="text-bone-white">5-second, fire-and-forget POST</strong>: no
+							auth header, no retries, the outcome untracked (only relay calls themselves
+							are counted in <code class="font-mono text-base">/stats</code>).
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Only <code class="font-mono text-base">aphrodite_retrieve</code>,
 							<code class="font-mono text-base">aphrodite_compress</code> and
 							<code class="font-mono text-base">aphrodite_list</code> are relayable;
-							anything else is an error. On graceful shutdown the task tracker waits
-							for in-flight deliveries, so none are lost mid-flight.
+							anything else is an error.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							On graceful shutdown the task tracker waits for in-flight deliveries, so
+							none are lost mid-flight.
 						</p>
 					</div>
 					<div class="flex flex-col gap-8">
@@ -635,12 +700,20 @@ const InjectionOrder = [
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							The logic is not protectionism - it is information theory per surface.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							The essential tools return compact, self-describing metadata the agent
 							needs raw: a skill's instructions, a memory entry, a file's content.
-							Compressing them would trade precision for nothing. The self-tools are
-							already the compressed form: their output is a marker or a catalog, and
-							marking a marker is the preview-doubling bug in slow motion. And the
-							size gate is the quiet one - most tool output is simply small, and
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Compressing them would trade precision for nothing.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The self-tools are already the compressed form: their output is a marker or
+							a catalog, and marking a marker is the preview-doubling bug in slow motion.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							And the size gate is the quiet one - most tool output is simply small, and
 							passes through without a store entry ever existing.
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
@@ -703,22 +776,26 @@ const InjectionOrder = [
 						</h2>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							A single binary can run two listeners with different roles - the cache
-							proxy on <code class="font-mono text-base">:9797</code> (in-memory
-							DashMap, 10,000 entries, 8192-byte threshold) and the token proxy on
+							proxy on <code class="font-mono text-base">:9797</code> (in-memory DashMap,
+							10,000 entries, 8192-byte threshold) and the token proxy on
 							<code class="font-mono text-base">:9798</code> (SQLite at
 							<code class="font-mono text-base">ccr.db</code>, 1024-byte threshold,
-							persistent, tool-relay-capable). Each has its own
-							<code class="font-mono text-base">AppState</code> and CCR backend; both
-							bind to loopback by default (docs/proxy/architecture.md:9-35).
+							persistent, tool-relay-capable).
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Each has its own <code class="font-mono text-base">AppState</code> and CCR
+							backend; both bind to loopback by default (docs/proxy/architecture.md:9-35).
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							The parallel that matters: the same payload crosses the plugin-hook lane
 							(the hook intercepts it at the tool boundary, no API round-trip) and the
-							proxy lane (the proxy compresses Chat Completions responses in flight) - and the
-							marker it becomes is byte-identical across the two paths, as are the
-							enriched previews (CHANGELOG.md:616-617). The preview-doubling
-							regression of v1.3.4 was caught precisely because the two paths were
-							held to that standard.
+							proxy lane (the proxy compresses Chat Completions responses in flight) -
+							and the marker it becomes is byte-identical across the two paths, as are
+							the enriched previews (CHANGELOG.md:616-617).
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The preview-doubling regression of v1.3.4 was caught precisely because the
+							two paths were held to that standard.
 						</p>
 					</div>
 					<div class="flex flex-col gap-8">
@@ -771,9 +848,11 @@ const InjectionOrder = [
 				VIII // THE TURN CYCLE, INTERACTIVE
 			</div>
 			<p class="mb-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The scenarios above each zoom into one mechanism. This is the loop that holds
-				them: the six hooks, in firing order, with what the agent sees and what the
-				system does at each step.
+				The scenarios above each zoom into one mechanism.
+			</p>
+			<p class="mb-8 mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				This is the loop that holds them: the six hooks, in firing order, with what the
+				agent sees and what the system does at each step.
 			</p>
 			<ZineFlow
 				Title="THE TURN CYCLE // SIX HOOKS, ONE LOOP"
@@ -969,7 +1048,7 @@ const InjectionOrder = [
 				{ Href: "/showcase/", Label: "SHOWCASE" },
 				{ Href: "/workbench/", Label: "WORKBENCH" },
 				{ Href: "/hooks/", Label: "HOOKS" },
-				{ Href: "/docs/plugin/", Label: "DOCS · PLUGIN" },
+				{ Href: "/docs/plugin/hooks/", Label: "DOCS · HOOKS" },
 			]}
 		/>
 	</main>

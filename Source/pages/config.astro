@@ -98,9 +98,14 @@ const Example = [
 				Configuration Playground
 			</h1>
 			<p class="mt-4 max-w-3xl text-base text-zinc-dust">
-				One TOML file, two independent parsers, three places it can live. Edit the shipped
-				example below and watch the resolution order re-decide what wins - env var, per-proxy
-				entry, defaults, or the compiled-in fallback. Everything here runs in your browser.
+				One TOML file, two independent parsers, three places it can live.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Edit the shipped example below and watch the resolution order re-decide what wins
+				- env var, per-proxy entry, defaults, or the compiled-in fallback.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Everything here runs in your browser.
 			</p>
 		</header>
 
@@ -145,8 +150,11 @@ const Example = [
 			</div>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				This is the shipped <code class="text-bone-newsprint">aphrodite.toml.example</code>
-				(sanitized: the api_key sample renders as its env-var name). Edit it - the resolution
-				ladder on the right re-decides every tracked key as you type.
+				(sanitized: the api_key sample renders as its env-var name).
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Edit it - the resolution ladder on the right re-decides every tracked key as you
+				type.
 			</p>
 
 			<div class="mt-8 grid gap-10 lg:grid-cols-2">
@@ -218,11 +226,17 @@ const Example = [
 					</h3>
 					<p class="mt-3 text-base text-zinc-dust">
 						<code class="text-bone-newsprint">config/proxy.rs</code>, active whenever an
-						aphrodite.toml is found. It reads <code>[[proxies]]</code>, <code>[defaults]</code>,
-						the four hot-reload thresholds in <code>[compression]</code>, and
-						<code>[previews] preview_max_chars</code>. For every field except
-						<code>api_key</code>, <code>mode</code> and <code>listen</code>: env var &rarr; TOML
-						(per-proxy entry &rarr; <code>[defaults]</code>) &rarr; compiled-in default.
+						aphrodite.toml is found.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						It reads <code>[[proxies]]</code>, <code>[defaults]</code>, the four
+						hot-reload thresholds in <code>[compression]</code>, and
+						<code>[previews] preview_max_chars</code>.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						For every field except <code>api_key</code>, <code>mode</code> and
+						<code>listen</code>: env var &rarr; TOML (per-proxy entry &rarr;
+						<code>[defaults]</code>) &rarr; compiled-in default.
 					</p>
 				</ZineBox>
 				<ZineBox Tone="teal">
@@ -230,14 +244,17 @@ const Example = [
 						THE HERMES DYLIB SESSION
 					</h3>
 					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">config_loader.rs</code>, read once at dylib load:
-						the engine/chain-split/poll keys in <code>[compression]</code>,
+						<code class="text-bone-newsprint">config_loader.rs</code>, read once at dylib
+						load: the engine/chain-split/poll keys in <code>[compression]</code>,
 						<code>[defaults] model</code> / <code>api_url</code>,
 						<code>[flow] budget_chars</code>, <code>[directives] active</code>,
-						<code>[prompts] session_inject</code>. The FFI runtime-override variant is the
-						<code>aphrodite_config_get</code> / <code>aphrodite_config_set</code> pair on the
-						C-ABI bridge - it surfaces values and changes them mid-session, while the standalone HTTP
-						proxy never reads the dylib-only keys.
+						<code>[prompts] session_inject</code>.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						The FFI runtime-override variant is the
+						<code>aphrodite_config_get</code> / <code>aphrodite_config_set</code> pair on
+						the C-ABI bridge - it surfaces values and changes them mid-session, while the
+						standalone HTTP proxy never reads the dylib-only keys.
 					</p>
 				</ZineBox>
 			</div>
@@ -276,11 +293,13 @@ const Example = [
 					WARNING - THE 0.0.0.0 LINES
 				</p>
 				<p class="mt-2 max-w-3xl text-base text-zinc-dust">
-					Listeners bind loopback-only by default, and the router rejects non-loopback peers
-					(and non-loopback Host headers) on every route except /health. Uncommenting
-					<code class="text-bone-newsprint">listen = "0.0.0.0:..."</code> exposes an
-					unauthenticated listener to your LAN: /retrieve, /history and /ccr/* have no
-					authentication of their own.
+					Listeners bind loopback-only by default, and the router rejects non-loopback
+					peers (and non-loopback Host headers) on every route except /health.
+				</p>
+				<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+					Uncommenting <code class="text-bone-newsprint">listen = "0.0.0.0:..."</code>
+					exposes an unauthenticated listener to your LAN: /retrieve, /history and /ccr/*
+					have no authentication of their own.
 				</p>
 			</div>
 		</section>
@@ -295,9 +314,12 @@ const Example = [
 				<ZineStamp Label="POST /reload" Color="raw" Rotate="-rotate-1" />
 			</div>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Edit + save - or <code class="text-bone-newsprint">POST /reload</code>, or the config
-				file watcher - re-applies the four proxy thresholds (and the preview cap) with no
-				restart. Everything else about a proxy is fixed at startup (README.md:389-391).
+				Edit + save - or <code class="text-bone-newsprint">POST /reload</code>, or the
+				config file watcher - re-applies the four proxy thresholds (and the preview cap)
+				with no restart.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Everything else about a proxy is fixed at startup (README.md:389-391).
 			</p>
 			<div class="mt-8 overflow-x-auto border-4 border-blood-crimson bg-carbon-void">
 				<table class="w-full min-w-[42rem] text-left text-base">
@@ -351,10 +373,15 @@ const Example = [
 						[FLOW]
 					</h3>
 					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">budget_chars = 2600</code> - the hard cap on ALL
-						per-turn injected context (directives + nudges + recall catalog + retrieve hint).
-						Sections drop bottom-up when over budget; directives and nudges never drop. Dylib
-						only; env: <code>APHRODITE_FLOW_BUDGET_CHARS</code>.
+						<code class="text-bone-newsprint">budget_chars = 2600</code> - the hard cap on
+						ALL per-turn injected context (directives + nudges + recall catalog + retrieve
+						hint).
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						Sections drop bottom-up when over budget; directives and nudges never drop.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						Dylib only; env: <code>APHRODITE_FLOW_BUDGET_CHARS</code>.
 					</p>
 				</ZineBox>
 				<ZineBox Tone="subtle">
@@ -362,11 +389,17 @@ const Example = [
 						[DIRECTIVES]
 					</h3>
 					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">active = ["focus", "foresight"]</code> - which
-						loaded directives start active; swap mid-conversation via
-						<code>aphrodite_directive</code>. Names not in the loaded set are silently filtered;
-						an empty list seeds focus + foresight + lazy. Built-in set: focus, foresight,
-						ccr-handling, cleanup, explore, lazy, lazy-eval.
+						<code class="text-bone-newsprint">active = ["focus", "foresight"]</code> -
+						which loaded directives start active; swap mid-conversation via
+						<code>aphrodite_directive</code>.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						Names not in the loaded set are silently filtered; an empty list seeds focus +
+						foresight + lazy.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						Built-in set: focus, foresight, ccr-handling, cleanup, explore, lazy,
+						lazy-eval.
 					</p>
 				</ZineBox>
 				<ZineBox Tone="subtle">
@@ -374,10 +407,14 @@ const Example = [
 						[PREVIEWS]
 					</h3>
 					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">preview_max_chars = 120</code> - caps the whole
-						rendered preview string, not per line; 0 = unlimited. Env
-						<code>APHRODITE_PREVIEW_MAX_CHARS</code> &gt; TOML &gt; unlimited. Re-applied by
-						POST /reload.
+						<code class="text-bone-newsprint">preview_max_chars = 120</code> - caps the
+						whole rendered preview string, not per line; 0 = unlimited.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						Env <code>APHRODITE_PREVIEW_MAX_CHARS</code> &gt; TOML &gt; unlimited.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						Re-applied by POST /reload.
 					</p>
 				</ZineBox>
 			</div>
@@ -391,8 +428,11 @@ const Example = [
 			</h2>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				These keys parse cleanly but nothing in the current codebase reads them back out -
-				setting one is a silent no-op. They are kept and marked for forward compatibility; the
-				shipped example labels each one in place.
+				setting one is a silent no-op.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				They are kept and marked for forward compatibility; the shipped example labels each
+				one in place.
 			</p>
 			<div class="mt-8 flex flex-wrap gap-3">
 				{
@@ -460,9 +500,14 @@ const Example = [
 			<p class="mt-2 max-w-3xl text-base text-zinc-dust">
 				Real on this page: the pick chain, the precedence rules, the two-stack split, the
 				defaults and the unwired ledger - all quoted from aphrodite.toml.example,
-				README.md:371-442 and docs/config/aphrodite-toml.md. Simulated: the TOML parsing (a
-				browser-side reader, not the Rust or dylib parser), the resolution ladder, and the
-				POST /reload response. No network, no runtime - everything happens in this tab.
+				README.md:371-442 and docs/config/aphrodite-toml.md.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Simulated: the TOML parsing (a browser-side reader, not the Rust or dylib parser),
+				the resolution ladder, and the POST /reload response.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				No network, no runtime - everything happens in this tab.
 			</p>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				Sanitization: the editor ships the repository's example file - never a user's real
@@ -475,7 +520,7 @@ const Example = [
 			Links={[
 				{ Href: "/setup/", Label: "SETUP" },
 				{ Href: "/workbench/", Label: "WORKBENCH" },
-				{ Href: "/docs/config/", Label: "DOCS · CONFIG" },
+				{ Href: "/docs/config/aphrodite-toml/", Label: "DOCS · CONFIG" },
 			]}
 		/>
 	</main>

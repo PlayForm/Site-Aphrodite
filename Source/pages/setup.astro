@@ -87,7 +87,10 @@ $ hermes`}
 						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
 							The catalog entry is reviewed and pinned -
 							<code class="font-mono text-base text-weathered-teal">hermes plugins install</code>
-							checks out exactly that commit, never a branch tip. Do NOT run
+							checks out exactly that commit, never a branch tip.
+						</p>
+						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+							Do NOT run
 							<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>
 							in a catalog-managed directory - still run
 							<code class="font-mono text-base text-weathered-teal">download.sh</code>
@@ -101,8 +104,13 @@ $ hermes`}
 						</div>
 						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
 							Start <code class="font-mono text-base text-weathered-teal">hermes</code>.
-							The plugin should log that Aphrodite is enabled. If the binaries are
-							missing, it logs the setup command and stays disabled until you run it.
+						</p>
+						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+							The plugin should log that Aphrodite is enabled.
+						</p>
+						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+							If the binaries are missing, it logs the setup command and stays disabled
+							until you run it.
 						</p>
 					</div>
 					<div class="mt-2 font-mono text-base text-zinc-dust">
@@ -151,8 +159,13 @@ $ hermes`}
 						</div>
 						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
 							Start <code class="font-mono text-base text-weathered-teal">hermes</code>.
-							The plugin should log that Aphrodite is enabled. If the binaries are
-							missing, it logs the setup command and stays disabled until you run it.
+						</p>
+						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+							The plugin should log that Aphrodite is enabled.
+						</p>
+						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+							If the binaries are missing, it logs the setup command and stays disabled
+							until you run it.
 						</p>
 					</div>
 				</div>
@@ -191,6 +204,8 @@ $ aphrodite setup`}
 						Option 3 does not install the plugin by itself - after
 						<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>
 						writes the loader, start <code class="font-mono text-base text-weathered-teal">hermes</code>.
+					</p>
+					<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
 						The plugin should log that Aphrodite is enabled; if the binaries are missing,
 						it logs the setup command and stays disabled until you run it.
 					</p>
@@ -255,7 +270,10 @@ $ cargo build --release -p aphrodite -p aphrodite-hermes`}
 					<code class="font-mono text-base text-weathered-teal">base_url</code> at
 					<code class="font-mono text-base text-weathered-teal">http://localhost:9798</code>
 					(token) or <code class="font-mono text-base text-weathered-teal">:9797</code>
-					(cache), and responses compress over plain HTTP. Invoked without an
+					(cache), and responses compress over plain HTTP.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					Invoked without an
 					<code class="font-mono text-base text-weathered-teal">aphrodite.toml</code>,
 					the binary needs
 					<code class="font-mono text-base text-weathered-teal">--api-key</code> or
@@ -300,9 +318,11 @@ $ cargo build --release -p aphrodite -p aphrodite-hermes`}
 				</div>
 				<p class="mt-2 font-body text-base leading-relaxed text-zinc-dust">
 					Two shipped files stay in sync: aphrodite.toml.example (the annotated reference)
-					and the embedded template the binary ships with. Keys not yet wired into the
-					runtime are annotated DOCUMENTED BUT UNWIRED in the example - it is the source
-					of truth for the documented surface.
+					and the embedded template the binary ships with.
+				</p>
+				<p class="mt-2 font-body text-base leading-relaxed text-zinc-dust">
+					Keys not yet wired into the runtime are annotated DOCUMENTED BUT UNWIRED in the
+					example - it is the source of truth for the documented surface.
 				</p>
 			</div>
 		</section>

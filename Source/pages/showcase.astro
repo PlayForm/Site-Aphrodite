@@ -88,11 +88,16 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 				The plugin, worked
 			</h1>
 			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Every example below is a real behavior of the pipeline dressed in generic
-				content: what the agent sends (the raw stream), what it sees back (the enriched
-				preview), how the bytes come home (the retrieval round-trip), and why the
-				thresholds made that decision. All previews marked as corpus lines are
-				byte-identical to the docs catalog; the rest are faithful fragments.
+				Every example below is a real behavior of the pipeline dressed in generic content:
+				what the agent sends (the raw stream), what it sees back (the enriched preview),
+				how the bytes come home (the retrieval round-trip), and why the thresholds made
+				that decision.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				All previews marked as corpus lines are byte-identical to the docs catalog; the
+				rest are faithful fragments.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Anonymized throughout - no names, no secrets, no real sessions.
 			</p>
 			<div class="mt-8 flex max-w-4xl flex-wrap items-center gap-4">
@@ -288,9 +293,15 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 				</div>
 				<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The five pipelines above are worked examples; these are the pipes they run
-					through. Each traversal steps through its hook or endpoint with two
-					synchronized panes - what the agent sees, what the system does - and every
-					step carries its source anchor. Press PLAY to watch one run.
+					through.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Each traversal steps through its hook or endpoint with two synchronized panes -
+					what the agent sees, what the system does - and every step carries its source
+					anchor.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Press PLAY to watch one run.
 				</p>
 			</div>
 
@@ -699,13 +710,21 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 						The registered engine is opt-in (<code class="font-mono text-base text-weathered-teal">APHRODITE_CONTEXT_ENGINE=1</code>;
 						the TOML key defaults true) and requires Hermes &gt;= 0.20.2 - the first
 						release with <code class="font-mono text-base text-weathered-teal">pre_tool_call</code> modify.
-						What it does: records token usage from each response. What it never does:
+					</p>
+					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+						What it does: records token usage from each response.
+					</p>
+					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+						What it never does:
 						<code class="font-mono text-base text-weathered-teal">should_compress</code> always
 						returns false (it defers to Hermes' own accounting), and
 						<code class="font-mono text-base text-weathered-teal">compress</code> returns the
 						transcript unchanged - non-destructive, because the transform hooks already
-						shrank the tool output. It never forces a compaction, never rewrites
-						messages, and never touches the inline store.
+						shrank the tool output.
+					</p>
+					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+						It never forces a compaction, never rewrites messages, and never touches the
+						inline store.
 					</p>
 					<div class="mt-6 font-mono text-base text-zinc-dust">
 						SRC: docs/plugin/context-engine.md:38-48

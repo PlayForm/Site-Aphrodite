@@ -97,37 +97,55 @@ const ProxyRows = [
 				<div class="mt-12 space-y-8 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
 					<p>
 						<span class="font-bold text-bone-white">HERMES ALONE -</span> nothing stands
-						between a tool and the model. Every file read, build log, and JSON blob enters
-						the message history raw, because nothing intercepts it - the agent spends its
-						token budget reading noise instead of reasoning. That is the baseline cost the
-						other two configurations exist to remove.
+						between a tool and the model.
+					</p>
+					<p>
+						Every file read, build log, and JSON blob enters the message history raw,
+						because nothing intercepts it - the agent spends its token budget reading
+						noise instead of reasoning.
+					</p>
+					<p>
+						That is the baseline cost the other two configurations exist to remove.
 					</p>
 					<p>
 						<span class="font-bold text-weathered-teal">HERMES + APHRODITE -</span> the
-						plugin lane intercepts output before it becomes message history. The hooks
-						classify, store, and replace raw output with a type-aware marker of ~15 tokens
-						instead of hundreds, the agent retrieves the full content only when it actually
-						needs it, and the injection assembler adds directives, nudges, and the recall
-						catalog to every turn under a hard byte budget. Measured over 200 real Hermes sessions:
-						26.9% of all context tokens deflected, a median session saved ratio of 22.9%,
-						and ~22,921 tokens saved per API call. THE TRADE-OFF IS STATED PLAINLY: the
-						hooks are Hermes' contract - no other client can register them, so this lane
-						works with Hermes only.
+						plugin lane intercepts output before it becomes message history.
+					</p>
+					<p>
+						The hooks classify, store, and replace raw output with a type-aware marker of
+						~15 tokens instead of hundreds, the agent retrieves the full content only when
+						it actually needs it, and the injection assembler adds directives, nudges, and
+						the recall catalog to every turn under a hard byte budget.
+					</p>
+					<p>
+						Measured over 200 real Hermes sessions: 26.9% of all context tokens deflected,
+						a median session saved ratio of 22.9%, and ~22,921 tokens saved per API call.
+					</p>
+					<p>
+						THE TRADE-OFF IS STATED PLAINLY: the hooks are Hermes' contract - no other
+						client can register them, so this lane works with Hermes only.
 					</p>
 					<p>
 						<span class="font-bold text-stamped-canary">HERMES + APHRODITE + THE PROXY -</span>
 						the plugin already spawns both listeners, so the third configuration is running
 						without extra setup: point <code class="font-mono text-weathered-teal">base_url</code>
 						at <code class="font-mono text-weathered-teal">:9798</code> and any
-						OpenAI-compatible client gets the same CCR compression over plain HTTP. That is
-						the agent-to-agent path - a second agent, a script, or an external tool can
-						converse through the same compressed channel, share the persistent SQLite store
-						(which survives a restart; the plugin lane's inline store is session-scoped),
-						and call the tool relay to retrieve or create CCR entries. THE LIMIT IS REAL
-						TOO: the proxy only sees HTTP traffic - no tool-output interception, no terminal
-						compression, no directives, no context engine, and SSE streams pass through
-						uncompressed. Because of that the proxy extends the stack to other callers; it
-						does not replace the hooks inside Hermes.
+						OpenAI-compatible client gets the same CCR compression over plain HTTP.
+					</p>
+					<p>
+						That is the agent-to-agent path - a second agent, a script, or an external
+						tool can converse through the same compressed channel, share the persistent
+						SQLite store (which survives a restart; the plugin lane's inline store is
+						session-scoped), and call the tool relay to retrieve or create CCR entries.
+					</p>
+					<p>
+						THE LIMIT IS REAL TOO: the proxy only sees HTTP traffic - no tool-output
+						interception, no terminal compression, no directives, no context engine, and
+						SSE streams pass through uncompressed.
+					</p>
+					<p>
+						Because of that the proxy extends the stack to other callers; it does not
+						replace the hooks inside Hermes.
 					</p>
 					<p class="mt-1 block">SRC: README.md:91-99, 219-299, 467-482; docs/guides/hermes-integration.md:115-141; docs/proxy/architecture.md:12-31; docs/tool-relay/callbacks.md:89-92.</p>
 				</div>

@@ -118,11 +118,16 @@ const Layers = [
 					Why Aphrodite<br />is shaped <span class="text-stamped-canary">this way</span>
 				</h1>
 				<p class="mt-16 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
-					Not a tour of the code - an argument about the shape. An agent's context is a
-					budget, and every tool call spends it on raw output before the agent can decide
-					whether any of it mattered. Aphrodite's answer is structural: show the shape of
-					the output, keep the substance on call, and make the agent - not the engine -
-					the one who pays for detail.
+					Not a tour of the code - an argument about the shape.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
+					An agent's context is a budget, and every tool call spends it on raw output
+					before the agent can decide whether any of it mattered.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
+					Aphrodite's answer is structural: show the shape of the output, keep the
+					substance on call, and make the agent - not the engine - the one who pays for
+					detail.
 				</p>
 				<!-- Monument stat -->
 				<div
@@ -167,22 +172,32 @@ const Layers = [
 						</h2>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							Every file read, build, code search, or browser open floods the agent's
-							context with raw output - compilation logs, accessibility trees, JSON
-							blobs. The agent spends its budget reading noise instead of reasoning.
+							context with raw output - compilation logs, accessibility trees, JSON blobs.
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							The structural failure is that raw output arrives <em>before any decision</em>:
-							the context pays the full price for content the agent may never use.
+							The agent spends its budget reading noise instead of reasoning.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The structural failure is that raw output arrives{" "}
+							<em>before any decision</em>: the context pays the full price for content
+							the agent may never use.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							Compression applied after the fact cannot refund a turn that already
-							happened. So the intervention point has to be <strong class="text-bone-white"
-								>before the LLM sees anything</strong
-							>.
+							happened.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							So the intervention point has to be{" "}
+							<strong class="text-bone-white">before the LLM sees anything</strong>.
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							That is the first design commitment: intercept at the tool boundary, not
-							inside the prompt. Aphrodite replaces the output with a compact, structured
-							preview - ~15 tokens of metadata instead of hundreds - and keeps the full
-							content retrievable.
+							inside the prompt.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Aphrodite replaces the output with a compact, structured preview - ~15
+							tokens of metadata instead of hundreds - and keeps the full content
+							retrievable.
 						</p>
 					</div>
 					<!-- Stream pane: what the model used to see -->
@@ -247,28 +262,42 @@ const Layers = [
 							The classifier is the gate
 						</h2>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							Why classify before compressing? Because "compress everything equally"
-							destroyed signal. A compiler error and a verbose build log are both output -
-							but one must stay visible and the other should never have been shown in
-							full. A single compression policy cannot serve both.
+							Why classify before compressing?
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							So the type-aware classifier runs first - 40 to 123 nanoseconds, first match
-							wins - and each content type carries its own compression threshold tier. The
-							README's pipeline renders {Classifier.PipelineTypes} types in its catalog,
-							from <code class="font-mono text-base">build</code> to
-							<code class="font-mono text-base">text</code>; the full classification registry
-							backing it is {Classifier.RegistryTypes} types
-							(docs/classification/content-types.md). When the classifier only reaches a
-							generic bucket, a conservative semantic detector upgrades it to the
-							high-signal shapes (git, gitlog, grep, ls, test); ordinary prose is never
-							mis-tagged.
+							Because "compress everything equally" destroyed signal.
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							This is the "secret sauce" made plain: <strong class="text-bone-white"
-								>the classifier is the gate</strong
-							>. Nothing is compressed, stored, or marked until the gate has named it -
-							and the name is what everything downstream keys on.
+							A compiler error and a verbose build log are both output - but one must
+							stay visible and the other should never have been shown in full.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							A single compression policy cannot serve both.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							So the type-aware classifier runs first - 40 to 123 nanoseconds, first
+							match wins - and each content type carries its own compression threshold
+							tier.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The README's pipeline renders {Classifier.PipelineTypes} types in its
+							catalog, from <code class="font-mono text-base">build</code> to
+							<code class="font-mono text-base">text</code>; the full classification
+							registry backing it is {Classifier.RegistryTypes} types
+							(docs/classification/content-types.md).
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							When the classifier only reaches a generic bucket, a conservative semantic
+							detector upgrades it to the high-signal shapes (git, gitlog, grep, ls,
+							test); ordinary prose is never mis-tagged.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							This is the "secret sauce" made plain:{" "}
+							<strong class="text-bone-white">the classifier is the gate</strong>.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Nothing is compressed, stored, or marked until the gate has named it - and
+							the name is what everything downstream keys on.
 						</p>
 					</div>
 					<!-- Threshold tier table -->
@@ -330,7 +359,10 @@ const Layers = [
 						</h2>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							Replacing output with a summary only works if the missing content stays
-							reachable. The bridge between the two is a single string:
+							reachable.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The bridge between the two is a single string:
 						</p>
 						<div
 							class="ccr-marker border border-oxblood-dark bg-soot-black px-4 py-3 font-mono text-base text-weathered-teal"
@@ -338,14 +370,23 @@ const Layers = [
 							{"<<<CCR:0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e|build|1420>>>"}
 						</div>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							Hash, type, size - in that order, on purpose. The <strong class="text-bone-white"
-								>hash</strong
-							> is the full 40-char BLAKE3 digest, the address of the stored original. The
-							<strong class="text-bone-white">type</strong> tells the agent what kind of
-							thing it skipped. The <strong class="text-bone-white">size</strong> tells it
-							how much. Three fields are all an agent needs to decide whether retrieval is
-							worth it - which is exactly why the marker, not a tool call, is the
-							contract: every retrieval entry point (<code class="font-mono text-base"
+							Hash, type, size - in that order, on purpose.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The <strong class="text-bone-white">hash</strong> is the full 40-char BLAKE3
+							digest, the address of the stored original.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The <strong class="text-bone-white">type</strong> tells the agent what kind
+							of thing it skipped.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The <strong class="text-bone-white">size</strong> tells it how much.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Three fields are all an agent needs to decide whether retrieval is worth it
+							- which is exactly why the marker, not a tool call, is the contract: every
+							retrieval entry point (<code class="font-mono text-base"
 								>aphrodite_retrieve</code
 							>, <code class="font-mono text-base">/retrieve</code>,
 							<code class="font-mono text-base">resolve</code>) accepts the marker body
@@ -355,9 +396,12 @@ const Layers = [
 							The store behind it is deliberately boring: BLAKE3 → SQLite (persistent, the
 							<span class="text-weathered-teal">:9798</span> token listener) or in-memory
 							DashMap (10K entries, the <span class="text-weathered-teal">:9797</span>
-							cache listener). Storage is not the interesting problem; the interesting
-							problem is that the agent's decision needs a stable address - and that is
-							all the marker has to be.
+							cache listener).
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Storage is not the interesting problem; the interesting problem is that the
+							agent's decision needs a stable address - and that is all the marker has to
+							be.
 						</p>
 					</div>
 					<!-- Paired panes: stream vs preview with marker -->
@@ -418,10 +462,12 @@ const Layers = [
 					Four layers, one decision
 				</h2>
 				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The pipeline is short on purpose: classify, preview, store, decide. The whole
-					compress step is sub-millisecond - end-to-end latency is {Bench.Latency} including
-					the HTTP round-trip - because the design spends its complexity budget on the
-					decision, not the transform.
+					The pipeline is short on purpose: classify, preview, store, decide.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The whole compress step is sub-millisecond - end-to-end latency is {Bench.Latency}
+					including the HTTP round-trip - because the design spends its complexity budget
+					on the decision, not the transform.
 				</p>
 				<!-- The layer grid: 2x2 until xl - aligned with the index stage grid,
 				     where 4-across between 1024-1279px squished the cards. -->
@@ -456,17 +502,23 @@ const Layers = [
 					}
 				</div>
 				<div class="mt-16 border border-oxblood-dark bg-asphalt-panel p-5 font-body text-base leading-relaxed text-bone-newsprint">
-					And the engine stays polite about it: compression is opt-in and non-destructive -
-					everything the agent ever saw stays retrievable unchanged. What the <code
-						class="font-mono text-base">pre_llm_call</code
-					> hook adds each turn is an injection assembler, not a rewrite: directives are
-					never dropped, nudges are capped at 2, background status and recall are the first
-					things to yield, and the whole injection lives inside a 4,000-character budget.
-					Two modes cover every entry point -
-					<strong class="text-bone-white">plugin hooks</strong> intercept tool results
-					directly with no API round-trip, and the <strong class="text-bone-white">reverse
-						proxy</strong
-					> compresses Chat Completions responses for any OpenAI-compatible client.
+					<p>
+						And the engine stays polite about it: compression is opt-in and non-destructive
+						- everything the agent ever saw stays retrievable unchanged.
+					</p>
+					<p class="mt-3">
+						What the <code class="font-mono text-base">pre_llm_call</code> hook adds each
+						turn is an injection assembler, not a rewrite: directives are never dropped,
+						nudges are capped at 2, background status and recall are the first things to
+						yield, and the whole injection lives inside a 4,000-character budget.
+					</p>
+					<p class="mt-3">
+						Two modes cover every entry point -
+						<strong class="text-bone-white">plugin hooks</strong> intercept tool results
+						directly with no API round-trip, and the{" "}
+						<strong class="text-bone-white">reverse proxy</strong> compresses Chat
+						Completions responses for any OpenAI-compatible client.
+					</p>
 				</div>
 			</div>
 		</section>
@@ -642,25 +694,33 @@ const Layers = [
 					</div>
 					<div class="flex flex-col gap-12">
 						<div class="border border-oxblood-dark bg-asphalt-panel p-5 font-body text-base leading-relaxed text-bone-newsprint">
-							<span class="font-mono text-base font-bold uppercase tracking-widest text-raw-blood">
-								THE RETRIEVAL TAX ·{" "}
-							</span>
-							Retrieval re-entry cost {Study.TaxCalls} calls and {Study.TaxTokens} tokens
-							across the study - the price of going back for detail. It is the reason the
-							design pushes previews so hard: the tax only gets paid when the preview
-							fails to answer the question, so the preview is engineered to answer most
-							of them.
+							<p>
+								<span class="font-mono text-base font-bold uppercase tracking-widest text-raw-blood">
+									THE RETRIEVAL TAX ·{" "}
+								</span>
+								Retrieval re-entry cost {Study.TaxCalls} calls and {Study.TaxTokens} tokens
+								across the study - the price of going back for detail.
+							</p>
+							<p class="mt-3">
+								It is the reason the design pushes previews so hard: the tax only gets paid
+								when the preview fails to answer the question, so the preview is engineered
+								to answer most of them.
+							</p>
 						</div>
 						<div class="border border-oxblood-dark bg-asphalt-panel p-5 font-body text-base leading-relaxed text-bone-newsprint">
-							<span class="font-mono text-base font-bold uppercase tracking-widest text-raw-blood">
-								CONFIDENCE ·{" "}
-							</span>
-							The causal result - CCR removes context pressure for large repeated tool
-							outputs, and tool-heavy usage benefits far more than chat - is high. The
-							exact percentage is a band: the marker's byte size is the only trace of the
-							original content (the inline store is session-scoped), so savings were
-							estimated with a calibrated chars/tok ratio; sensitivity across{" "}
-							{Study.CharsPerTok} chars/tok spans {Study.Band}, centered {Study.BandCenter}.
+							<p>
+								<span class="font-mono text-base font-bold uppercase tracking-widest text-raw-blood">
+									CONFIDENCE ·{" "}
+								</span>
+								The causal result - CCR removes context pressure for large repeated tool
+								outputs, and tool-heavy usage benefits far more than chat - is high.
+							</p>
+							<p class="mt-3">
+								The exact percentage is a band: the marker's byte size is the only trace of
+								the original content (the inline store is session-scoped), so savings were
+								estimated with a calibrated chars/tok ratio; sensitivity across{" "}
+								{Study.CharsPerTok} chars/tok spans {Study.Band}, centered {Study.BandCenter}.
+							</p>
 						</div>
 					</div>
 				</div>
@@ -814,10 +874,15 @@ cargo run --release -p aphrodite --example bench_04_ema`}
 						))}
 					</div>
 					<p class="font-body text-base leading-relaxed text-bone-newsprint">
-						That is the whole architecture. No clever model, no lossy summarizer in the
-						loop - just an honest receipt, a fast gate, and a set of knobs the evidence
-						can turn. The agent keeps its budget for reasoning, and pays for detail only
-						when detail is the answer.
+						That is the whole architecture.
+					</p>
+					<p class="font-body text-base leading-relaxed text-bone-newsprint">
+						No clever model, no lossy summarizer in the loop - just an honest receipt, a
+						fast gate, and a set of knobs the evidence can turn.
+					</p>
+					<p class="font-body text-base leading-relaxed text-bone-newsprint">
+						The agent keeps its budget for reasoning, and pays for detail only when detail
+						is the answer.
 					</p>
 				</div>
 			</div>
@@ -837,8 +902,13 @@ cargo run --release -p aphrodite --example bench_04_ema`}
 					Five incidents that set the laws
 				</h2>
 				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Every rule on this page was paid for once. Each arc below runs the same
-					three beats: the incident, the fix, and the mechanic that still stands today.
+					Every rule on this page was paid for once.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Each arc below runs the same three beats: the incident, the fix, and the
+					mechanic that still stands today.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					All of it is public record - the CHANGELOG entries and the release notes.
 				</p>
 				<div class="mt-24 flex flex-col gap-32">
@@ -938,8 +1008,10 @@ cargo run --release -p aphrodite --example bench_04_ema`}
 							override, then <code class="font-mono text-base">&lt;hermes-home&gt;/aphrodite</code>,
 							then <code class="font-mono text-base">~/.hermes/aphrodite</code>) and exports
 							it to the Rust half through <code class="font-mono text-base">APHRODITE_HOME</code>,
-							so the dylib and the spawned proxy agree by construction. Legacy installs
-							are adopted with a one-line warning, never migrated.
+							so the dylib and the spawned proxy agree by construction.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+							Legacy installs are adopted with a one-line warning, never migrated.
 						</p>
 						<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 							<strong class="text-bone-white">Mechanics today.</strong> Per-Hermes-home
@@ -960,8 +1032,10 @@ cargo run --release -p aphrodite --example bench_04_ema`}
 							<strong class="text-bone-white">The incident.</strong> The download scripts
 							used to fetch the release-hosted per-target checksums and had
 							warn-and-skip paths - a missing checksum file or tool degraded to a
-							warning instead of a refusal. A plugin-hardening catalog review called it
-							out.
+							warning instead of a refusal.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+							A plugin-hardening catalog review called it out.
 						</p>
 						<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 							<strong class="text-bone-white">The fix.</strong> The pinned tree's
@@ -970,9 +1044,11 @@ cargo run --release -p aphrodite --example bench_04_ema`}
 							<code class="font-mono text-base">BINARY_VERSION</code> mismatch, a missing
 							target block, or a missing asset entry is a hard refusal (exit 1), and a
 							missing <code class="font-mono text-base">shasum</code>/<code class="font-mono text-base">sha256sum</code>
-							tool is a hard refusal rather than a skipped check. The legacy
-							<code class="font-mono text-base">~/.hermes/aphrodite</code> home adoption in
-							the runtime lookup is also gone.
+							tool is a hard refusal rather than a skipped check.
+						</p>
+						<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+							The legacy <code class="font-mono text-base">~/.hermes/aphrodite</code> home
+							adoption in the runtime lookup is also gone.
 						</p>
 						<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 							<strong class="text-bone-white">Mechanics today.</strong> Every release

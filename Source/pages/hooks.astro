@@ -94,8 +94,11 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
 						Resets every piece of per-session state to a clean baseline: turn counter,
 						conversation index, recent markers, referenced files, tool-event telemetry,
-						ephemeral directives. Injects nothing - the one-shot first-turn orientation
-						renders later, on the first <span class="font-mono text-base text-weathered-teal">pre_llm_call</span>.
+						ephemeral directives.
+					</p>
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
+						Injects nothing - the one-shot first-turn orientation renders later, on the
+						first <span class="font-mono text-base text-weathered-teal">pre_llm_call</span>.
 					</p>
 				</div>
 				<!-- 2 pre_tool_call -->
@@ -108,12 +111,20 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 						02 // pre_tool_call
 					</div>
 					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
-						Two interventions before a tool executes. <span class="font-bold text-bone-white">Auto-backgrounding</span>:
-						the hook rewrites long-running terminal/process calls to run in the
-						background (poll worker, default on). <span class="font-bold text-bone-white">Chain splitting</span>
-						(opt-in): the hook splits chained commands with invisible segment
-						markers so each segment compresses into its own CCR marker. Otherwise the call passes through
-						unchanged.
+						Two interventions before a tool executes.
+					</p>
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
+						<span class="font-bold text-bone-white">Auto-backgrounding</span>: the hook
+						rewrites long-running terminal/process calls to run in the background (poll
+						worker, default on).
+					</p>
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
+						<span class="font-bold text-bone-white">Chain splitting</span> (opt-in): the
+						hook splits chained commands with invisible segment markers so each segment
+						compresses into its own CCR marker.
+					</p>
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
+						Otherwise the call passes through unchanged.
 					</p>
 				</div>
 				<!-- 3 transform_tool_result -->
@@ -129,7 +140,10 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 						After every tool call: record telemetry, run the skip gates, classify the
 						content type, hash (BLAKE3), store, and replace the output with
 						<span class="ccr-marker font-mono text-base text-weathered-teal">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</span>
-						plus a compact preview. The hook tracks file references before the gates, so
+						plus a compact preview.
+					</p>
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
+						The hook tracks file references before the gates, so
 						<span class="font-mono text-base text-weathered-teal">aphrodite_files</span> sees
 						every read even when nothing was compressed.
 					</p>
@@ -144,10 +158,13 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 						04 // transform_terminal_output
 					</div>
 					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
-						Same pipeline for shell stdout/stderr. The hook records non-zero exit codes as
-						failures for the error-loop detector; chain-split segments compress
-						unconditionally, before the threshold gate, so marked output never leaks raw;
-						everything else passes the 1,024-char gate first.
+						Same pipeline for shell stdout/stderr.
+					</p>
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
+						The hook records non-zero exit codes as failures for the error-loop detector;
+						chain-split segments compress unconditionally, before the threshold gate, so
+						marked output never leaks raw; everything else passes the 1,024-char gate
+						first.
 					</p>
 				</div>
 				<!-- 5 pre_llm_call -->
@@ -165,7 +182,10 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 						(never dropped), <span class="font-mono text-base text-weathered-teal">[nudge:]</span>
 						one-shots at most two (never dropped), background-task status, and the
 						<span class="font-mono text-base text-weathered-teal">[recall]</span> catalog -
-						the first section dropped under pressure. One hard budget: 4,000 chars.
+						the first section dropped under pressure.
+					</p>
+					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
+						One hard budget: 4,000 chars.
 					</p>
 				</div>
 				<!-- 6 post_llm_call -->

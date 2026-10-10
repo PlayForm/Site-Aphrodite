@@ -196,8 +196,11 @@ const Tools = [
 					<div class="text-zinc-dust">→ {'{ found: false, error }'}</div>
 				</div>
 				<p class="font-body text-base leading-relaxed text-zinc-dust">
-					Give hash or path - if both are present, path wins. The query parameter is the
-					cheap way to poke at a large entry without pulling all of it into context.
+					Give hash or path - if both are present, path wins.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					The query parameter is the cheap way to poke at a large entry without pulling
+					all of it into context.
 				</p>
 				<figure class="mt-20 border border-oxblood-dark bg-soot-black p-4" data-diagram="marker-format">
 					<div class="overflow-x-auto" set:html={MarkerFormat} />
@@ -226,8 +229,10 @@ const Tools = [
 					<code class="font-mono text-base text-weathered-teal">aphrodite_stats</code> or
 					<code class="font-mono text-base text-weathered-teal">aphrodite_catalog</code>) is
 					expanded inline, never compressed - the agent always sees its own engine's
-					status in full. Compressing the catalog would just be the engine hiding its own
-					ledger.
+					status in full.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					Compressing the catalog would just be the engine hiding its own ledger.
 				</p>
 			</div>
 		</section>
