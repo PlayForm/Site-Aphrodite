@@ -107,8 +107,8 @@ const ProxyRows = [
 						plugin lane intercepts output before it becomes message history. The hooks
 						classify, store, and replace raw output with a type-aware marker of ~15 tokens
 						instead of hundreds, the agent retrieves the full content only when it actually
-						needs it, and every turn gets directives, nudges, and the recall catalog
-						injected under a hard byte budget. Measured over 200 real Hermes sessions:
+						needs it, and the injection assembler adds directives, nudges, and the recall
+						catalog to every turn under a hard byte budget. Measured over 200 real Hermes sessions:
 						26.9% of all context tokens deflected, a median session saved ratio of 22.9%,
 						and ~22,921 tokens saved per API call. THE TRADE-OFF IS STATED PLAINLY: the
 						hooks are Hermes' contract - no other client can register them, so this lane

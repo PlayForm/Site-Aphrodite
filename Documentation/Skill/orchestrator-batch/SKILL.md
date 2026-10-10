@@ -109,7 +109,13 @@ the count is dynamic). The routing law: every lane is GLM 5.3 flash low
 3. THE ACK-TRAP: an amendment acknowledgment ("<NAME> SPEC AMENDED - ACK")
    is NOT work - the lane must then DO the mandate; a lane whose turn ends
    after the ACK gets a "CONTINUE + deliver the report" nudge; the urgent
-   form: "do not acknowledge without the work".
+   form: "do not acknowledge without the work". THE MESSAGE-FORM RULE (the
+   2026-10-10 lesson): the orchestrator's amendment messages to ACTIVE lanes
+   NEVER end with "Acknowledge with exactly one line ... nothing else" -
+   that instruction makes the lane comply and end its turn WITHOUT the work;
+   the amendment + the work happen in the SAME turn, and the message says so
+   ("EXECUTE NOW - the acknowledgment + the work in the same turn; do not
+   end without the deliverable").
 4. THE RE-PAUSE: the message "RE-PAUSE - the batch runs 2 at a time only.
    STOP all work NOW" - the lane acknowledges "<NAME> PAUSED - IDLE"; the
    partial state persists in the session for the resume with the fresh state.

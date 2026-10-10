@@ -238,10 +238,10 @@ const InjectionOrder = [
 							Compress, marker, retrieve, byte-exact
 						</h2>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							The lifecycle of one payload: the hook hashes it (BLAKE3), stores the
-							bytes in the session store, and replaces the output with a
+							The lifecycle of one payload: the hook hashed it (BLAKE3), stored the
+							bytes in the session store, and replaced the output with a
 							<code class="ccr-marker font-mono text-base">{"<<<CCR:hash|type|size>>>"}</code> marker
-							plus a preview. The transcript now carries the marker instead of the
+							plus a preview. The transcript then carried the marker instead of the
 							content - hash, type, size, ~15 tokens.
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
@@ -360,8 +360,8 @@ const InjectionOrder = [
 							enabled, <code class="font-mono text-base">pre_tool_call</code> rewrites a
 							chained shell command by echoing segment markers, and
 							<code class="font-mono text-base">transform_terminal_output</code> splits
-							the produced output into per-segment pieces - each segment compressed
-							into its own marker, so the model sees several compact previews instead
+							the produced output into per-segment pieces - the hook compresses each
+							segment into its own marker, so the model sees several compact previews instead
 							of one large blob (docs/proxy/compression.md:366-379).
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
@@ -644,10 +644,10 @@ const InjectionOrder = [
 							passes through without a store entry ever existing.
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							One subtlety: file references are tracked <em>before</em> the skip gates,
+							One subtlety: the hook tracks file references <em>before</em> the skip gates,
 							so <code class="font-mono text-base">read_file</code> and
 							<code class="font-mono text-base">search_files</code> results feed the
-							recall catalog even when they are never compressed (docs/plugin/hooks.md:92-94).
+							recall catalog even when it never compresses them (docs/plugin/hooks.md:92-94).
 						</p>
 					</div>
 					<div class="flex flex-col gap-8">
@@ -713,8 +713,8 @@ const InjectionOrder = [
 						</p>
 						<p class="font-body text-base leading-relaxed text-bone-newsprint">
 							The parallel that matters: the same payload crosses the plugin-hook lane
-							(intercepted directly at the tool boundary, no API round-trip) and the
-							proxy lane (Chat Completions responses compressed in flight) - and the
+							(the hook intercepts it at the tool boundary, no API round-trip) and the
+							proxy lane (the proxy compresses Chat Completions responses in flight) - and the
 							marker it becomes is byte-identical across the two paths, as are the
 							enriched previews (CHANGELOG.md:616-617). The preview-doubling
 							regression of v1.3.4 was caught precisely because the two paths were

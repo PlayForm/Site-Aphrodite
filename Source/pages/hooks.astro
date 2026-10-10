@@ -109,10 +109,10 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					</div>
 					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
 						Two interventions before a tool executes. <span class="font-bold text-bone-white">Auto-backgrounding</span>:
-						long-running terminal/process calls are rewritten to run in the background
-						(poll worker, default on). <span class="font-bold text-bone-white">Chain splitting</span>
-						(opt-in): chained commands get invisible segment markers so each segment
-						compresses into its own CCR marker. Otherwise the call passes through
+						the hook rewrites long-running terminal/process calls to run in the
+						background (poll worker, default on). <span class="font-bold text-bone-white">Chain splitting</span>
+						(opt-in): the hook splits chained commands with invisible segment
+						markers so each segment compresses into its own CCR marker. Otherwise the call passes through
 						unchanged.
 					</p>
 				</div>
@@ -129,7 +129,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 						After every tool call: record telemetry, run the skip gates, classify the
 						content type, hash (BLAKE3), store, and replace the output with
 						<span class="ccr-marker font-mono text-base text-weathered-teal">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</span>
-						plus a compact preview. File references are tracked before the gates, so
+						plus a compact preview. The hook tracks file references before the gates, so
 						<span class="font-mono text-base text-weathered-teal">aphrodite_files</span> sees
 						every read even when nothing was compressed.
 					</p>
@@ -144,7 +144,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 						04 // transform_terminal_output
 					</div>
 					<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
-						Same pipeline for shell stdout/stderr. Non-zero exit codes are recorded as
+						Same pipeline for shell stdout/stderr. The hook records non-zero exit codes as
 						failures for the error-loop detector; chain-split segments compress
 						unconditionally, before the threshold gate, so marked output never leaks raw;
 						everything else passes the 1,024-char gate first.
@@ -210,7 +210,7 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 					read_terminal
 				</div>
 				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
-					Aphrodite's own tools and headroom helpers are also skipped - compressing
+					Aphrodite also skips its own tools and headroom helpers - compressing
 					<span class="font-mono text-base text-weathered-teal">aphrodite_retrieve</span>
 					would just replace resolved content with another marker.
 				</p>

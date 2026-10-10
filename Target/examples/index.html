@@ -81,10 +81,10 @@ II // THE RETRIEVAL ROUND-TRIP
 </div> <div class="zine-box-canary w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:rotate-[0.5deg] sm:p-12"> <div class="grid grid-cols-1 gap-32 lg:grid-cols-2"> <div class="flex flex-col gap-12"> <h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 Compress, marker, retrieve, byte-exact
 </h2> <p class="font-body text-base leading-relaxed text-bone-newsprint">
-The lifecycle of one payload: the hook hashes it (BLAKE3), stores the
-							bytes in the session store, and replaces the output with a
+The lifecycle of one payload: the hook hashed it (BLAKE3), stored the
+							bytes in the session store, and replaced the output with a
 <a class="code-link" href="https://github.com/PlayForm/Aphrodite/tree/Current/crates/aphrodite/src/marker/format.rs" title="Source: https://github.com/PlayForm/Aphrodite/tree/Current/crates/aphrodite/src/marker/format.rs"><code class="ccr-marker font-mono text-base">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</code></a> marker
-							plus a preview. The transcript now carries the marker instead of the
+							plus a preview. The transcript then carried the marker instead of the
 							content - hash, type, size, ~15 tokens.
 </p> <p class="font-body text-base leading-relaxed text-bone-newsprint">
 When the next action needs the substance, the agent calls
@@ -129,8 +129,8 @@ Chain-split is a Hermes plugin-side feature, not a proxy one: with it
 							enabled, <a class="code-link" href="https://github.com/PlayForm/Aphrodite/tree/Current/crates/aphrodite/src/hooks.rs" title="Source: https://github.com/PlayForm/Aphrodite/tree/Current/crates/aphrodite/src/hooks.rs"><code class="font-mono text-base">pre_tool_call</code></a> rewrites a
 							chained shell command by echoing segment markers, and
 <a class="code-link" href="https://github.com/PlayForm/Aphrodite/tree/Current/crates/aphrodite/src/hooks.rs" title="Source: https://github.com/PlayForm/Aphrodite/tree/Current/crates/aphrodite/src/hooks.rs"><code class="font-mono text-base">transform_terminal_output</code></a> splits
-							the produced output into per-segment pieces - each segment compressed
-							into its own marker, so the model sees several compact previews instead
+							the produced output into per-segment pieces - the hook compresses each
+							segment into its own marker, so the model sees several compact previews instead
 							of one large blob (<a class="code-link" href="https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/compression.md" title="Source: https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/compression.md">docs/proxy/compression.md:366-379</a>).
 </p> <p class="font-body text-base leading-relaxed text-bone-newsprint">
 It is opt-in: <code class="font-mono text-base">chain_split = false</code> by
@@ -261,10 +261,10 @@ The logic is not protectionism - it is information theory per surface.
 							size gate is the quiet one - most tool output is simply small, and
 							passes through without a store entry ever existing.
 </p> <p class="font-body text-base leading-relaxed text-bone-newsprint">
-One subtlety: file references are tracked <em>before</em> the skip gates,
+One subtlety: the hook tracks file references <em>before</em> the skip gates,
 							so <code class="font-mono text-base">read_file</code> and
 <code class="font-mono text-base">search_files</code> results feed the
-							recall catalog even when they are never compressed (<a class="code-link" href="https://github.com/PlayForm/Aphrodite/tree/Current/docs/plugin/hooks.md#L92-L94" title="Source: https://github.com/PlayForm/Aphrodite/tree/Current/docs/plugin/hooks.md#L92-L94">docs/plugin/hooks.md:92-94</a>).
+							recall catalog even when it never compresses them (<a class="code-link" href="https://github.com/PlayForm/Aphrodite/tree/Current/docs/plugin/hooks.md#L92-L94" title="Source: https://github.com/PlayForm/Aphrodite/tree/Current/docs/plugin/hooks.md#L92-L94">docs/plugin/hooks.md:92-94</a>).
 </p> </div> <div class="flex flex-col gap-8"> <div class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 THE GATES // IN ORDER
 </div> <div class="border border-oxblood-dark bg-asphalt-panel px-4 py-3 font-mono text-base"> <span class="font-black text-bone-white">01 EMPTY</span> <span class="ml-4 text-zinc-dust">nothing to compress</span> </div> <div class="border border-oxblood-dark bg-asphalt-panel px-4 py-3 font-mono text-base"> <span class="font-black text-bone-white">02 ESSENTIAL SET</span> <span class="ml-4 text-zinc-dust">the agent needs raw output</span> </div> <div class="border border-oxblood-dark bg-asphalt-panel px-4 py-3 font-mono text-base"> <span class="font-black text-bone-white">03 SELF TOOLS</span> <span class="ml-4 text-zinc-dust">already compact metadata</span> </div> <div class="border border-oxblood-dark bg-asphalt-panel px-4 py-3 font-mono text-base"> <span class="font-black text-bone-white">04 SIZE GATE</span> <span class="ml-4 text-zinc-dust">4,096 chars default; 0 disables the gate</span> </div> <a class="border border-raw-blood bg-soot-black px-4 py-2 text-center font-mono text-base font-black uppercase tracking-widest text-stamped-canary transition-colors hover:text-bone-white" href="/workbench/">
@@ -286,8 +286,8 @@ A single binary can run two listeners with different roles - the cache
 							bind to loopback by default (<a class="code-link" href="https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/architecture.md#L9-L35" title="Source: https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/architecture.md#L9-L35">docs/proxy/architecture.md:9-35</a>).
 </p> <p class="font-body text-base leading-relaxed text-bone-newsprint">
 The parallel that matters: the same payload crosses the plugin-hook lane
-							(intercepted directly at the tool boundary, no API round-trip) and the
-							proxy lane (Chat Completions responses compressed in flight) - and the
+							(the hook intercepts it at the tool boundary, no API round-trip) and the
+							proxy lane (the proxy compresses Chat Completions responses in flight) - and the
 							marker it becomes is byte-identical across the two paths, as are the
 							enriched previews (<a class="code-link" href="https://github.com/PlayForm/Aphrodite/tree/Current/CHANGELOG.md#L616-L617" title="Source: https://github.com/PlayForm/Aphrodite/tree/Current/CHANGELOG.md#L616-L617">CHANGELOG.md:616-617</a>). The preview-doubling
 							regression of v1.3.4 was caught precisely because the two paths were
