@@ -23,10 +23,14 @@ drift surface this rule exists to kill.
 ## 2. The byte-exact facts law
 
 The numbers inside a canonical module are the Drift-checked primaries:
-byte-exact from README.md, never reworded, rounded, or reformatted when the
+byte-exact from README.md or, for figures a page cites directly from the
+CHANGELOG (the history content's CHANGELOG.md anchors), byte-exact from
+CHANGELOG.md - the CHANGELOG is the secondary figure-primary, so the
+unrounded forms it prints (like 132.82× and 225×) are the legal glyphs where
+it is the cited source. Never reworded, rounded, or reformatted when the
 module restructures. A redesign changes the CONTAINER (the header row, the
 ledger rows, the accent colors), never the VALUES. The arbiter stays
-`pnpm prepublishOnly` + `pnpm run Drift` after every touched file.
+`pnpm run Drift` after every touched file.
 
 ## 3. The voice-color accents
 
