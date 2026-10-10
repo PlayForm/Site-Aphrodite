@@ -127,7 +127,11 @@ tags itself. The contract every page inherits:
    the OG block (type/title/description/image), and the Twitter block
    (card/title/description/image) are layout-fixed - never duplicated
    per page.
-3. `og:image` / `twitter:image` are `/Brand/OG.png` (relative) and the
+3. `og:image` / `twitter:image` are `/Brand/OG.png?v=2` (relative; the
+   `?v=2` cache-buster added 2026-10-10 — `/Brand/*` is served with
+   `Cache-Control: immutable`, so a stale or errored response cached for
+   the exact URL key at the edge or in a browser sticks for a year; bump
+   the version whenever the OG raster meaningfully changes) and the
    canonical link + `og:url` are ABSENT because the site URL is unset
    (`astro.config.ts` line 25 placeholder). When the user sets the URL,
    add the conditional canonical + absolute image/og:url in

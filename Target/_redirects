@@ -2,10 +2,11 @@
 #
 # All rules use 200 (rewrite) to serve content directly.
 # This prevents the service worker from breaking on redirect chains.
-# Run `node Scripts/GenerateRedirects.mjs` to regenerate.
+# Regenerated on every build by Source/Library/Redirects.ts.
 
-# ── VARIANT REWRITES (200) - 1106 rules ──
+# ── VARIANT REWRITES (200) - 1107 rules ──
 # kebab-case, lowerCase, UPPERCASE, TitleCase, plural/singular, flat forms → canonical.
+//                                    /                                     200
 /benchmark                            /benchmarks/                          200
 /BENCHMARK                            /benchmarks/                          200
 /benchmark/                           /benchmarks/                          200
@@ -1115,6 +1116,7 @@
 
 # ── TRAILING-SLASH REWRITES (200) ──
 # One rule per canonical page.
+/                                     /                                     200
 /                                     /                                     200
 /benchmarks                           /benchmarks/                          200
 /case-study                           /case-study/                          200

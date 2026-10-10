@@ -66,6 +66,16 @@ export default defineConfig({
 			? (await import("astrojs-service-worker")).default()
 			: null,
 		(await import("@astrojs/sitemap")).default(),
+		// Route Redirect - the Cloudflare _redirects pass (the CodeEditorLand
+		// WebSite borrow, user-mandated 2026-10-10). Runs on every build after
+		// the sitemap: the astro:build:done hook regenerates Public/_redirects
+		// and Target/_redirects from the LIVE route map (every page Astro
+		// built - the top-level routes and the docs slugs alike), so the
+		// deploy always carries fresh 200-rewrite rules (the variant
+		// permutations, the aliases, the /_astro//Brand//Font/ asset
+		// pass-throughs). No catch-all: no shell page here, and a catch-all
+		// would shadow the automatic 404.html serving.
+		(await import("./Source/Library/Redirects.ts")).default(),
 		// Beasties inlines the critical CSS into each HTML page; pruning must
 		// stay off or the shared stylesheet chunk is gutted across pages.
 		(await import("@playform/inline")).default({

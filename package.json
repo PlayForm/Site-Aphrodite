@@ -28,7 +28,7 @@
     "Diagrams": "node --experimental-strip-types Scripts/Diagrams.ts && node Source/Content/Mermaid/Render.mjs",
     "Docs": "node --experimental-strip-types Scripts/Docs.ts",
     "Drift": "node Scripts/Drift-Guard.mjs",
-    "Redirects": "node Scripts/GenerateRedirects.mjs",
+    "Redirects": "node --experimental-strip-types Scripts/GenerateRedirects.mjs",
     "prepublishOnly": "astro build"
   },
   "dependencies": {
