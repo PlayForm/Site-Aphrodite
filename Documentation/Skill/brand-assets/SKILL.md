@@ -84,8 +84,12 @@ whenToUse: Mandatory before adding, editing, or placing any file under Site/Publ
    3:1 banner `aphrodite-header.svg` (root `assets/` copy and
    `Public/Brand/` copy) no longer appears on any surface - the root
    `README.md` header `<img>` points at `assets/aphrodite.svg` (the red
-   mark, width 480 for the square aspect). The banner files are
-   unreferenced and the user removes them; do not re-reference them.
+   mark, width 480 for the square aspect). Both banner copies (root
+   `assets/aphrodite-header.svg` and `Public/Brand/aphrodite-header.svg`)
+   are DELETED (2026-10-10, BRAND-HEADER-FIX: the user's "recheck all and
+   fix all" — the banner drew hand-copied kiss paths from the removed
+   `aphrodite-mark.svg` and was referenced nowhere, so it was removed
+   rather than rebuilt); do not recreate or re-reference them.
 8. WORDMARK SIZING LAW (retained for any future composed banner): SVG
    renderers do not reliably honor `textLength`/`lengthAdjust` (rsvg 2.63
    ignores it), so size the `<text>` elements so their natural
