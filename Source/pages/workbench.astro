@@ -75,12 +75,12 @@ const Samples = [
 			"}",
 			"",
 			"fn classify(blob: &str) -> Source {",
-			"    if blob.contains(\"exit code\") { Source::Terminal } else { Source::Tool }",
+			'    if blob.contains("exit code") { Source::Terminal } else { Source::Tool }',
 			"}",
 			"",
 			"fn main() {",
 			"    let cache: HashMap<String, Preview> = HashMap::new();",
-			"    println!(\"{:?}\", cache.len());",
+			'    println!("{:?}", cache.len());',
 			"}",
 		].join("\n"),
 	},
@@ -121,7 +121,7 @@ const Samples = [
 			"+    let kind = classify(&blob);",
 			"diff --git a/Cargo.toml b/Cargo.toml",
 			"+++ b/Cargo.toml",
-			"+version = \"0.4.3\"",
+			'+version = "0.4.3"',
 		].join("\n"),
 	},
 	{
@@ -155,18 +155,15 @@ const Samples = [
 	<main class="mx-auto w-full max-w-[1440px] flex-1 flex-col gap-28 px-5 py-32 sm:px-8">
 		<!-- Stamps row -->
 		<div class="flex flex-wrap items-center gap-8">
-			<span
-				class="border-2 border-black bg-stamped-canary px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-black shadow-[3px_3px_0px_#000]"
-				>SIMULATION - CLIENT-SIDE, NO RUNTIME</span
-			>
-			<span
-				class="bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-				>PREVIEW DEMO</span
-			>
-			<span
-				class="border-2 border-raw-blood bg-carbon-void px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-newsprint shadow-[3px_3px_0px_#000]"
-				>CLASSIFIER 40-123 NS</span
-			>
+			<span class="border-2 border-black bg-stamped-canary px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-black shadow-[3px_3px_0px_#000]">
+				SIMULATION - CLIENT-SIDE, NO RUNTIME
+			</span>
+			<span class="bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
+				PREVIEW DEMO
+			</span>
+			<span class="border-2 border-raw-blood bg-carbon-void px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-newsprint shadow-[3px_3px_0px_#000]">
+				CLASSIFIER 40-123 NS
+			</span>
 		</div>
 
 		<!-- Tape-stamp header -->
@@ -178,9 +175,9 @@ const Samples = [
 				Preview Workbench
 			</h1>
 			<p class="mt-8 max-w-3xl text-base text-zinc-dust">
-				Paste any tool output - a build log, a test run, a grep result - and this page
-				shows the enriched preview line Aphrodite would hand the agent, plus the CCR
-				marker it would store.
+				Paste any tool output - a build log, a test run, a grep result - and this page shows
+				the enriched preview line Aphrodite would hand the agent, plus the CCR marker it
+				would store.
 			</p>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				The four live-reloadable thresholds and the engine knob are yours to turn.
@@ -192,22 +189,20 @@ const Samples = [
 
 		<!-- Sample switchboard -->
 		<section class="wb-skew flex flex-wrap items-center gap-6" aria-label="Sample outputs">
-			<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust"
-				>LOAD SAMPLE:</span
-			>
-			{
-				Samples.map((Sample, Index) => (
-					<button
-						type="button"
-						class="wb-pill"
-						data-sample={Sample.Id}
-						data-active={Index === 0 ? "" : undefined}
-						aria-pressed={Index === 0}
-					>
-						{Sample.Label}
-					</button>
-				))
-			}
+			<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
+				LOAD SAMPLE:
+			</span>
+			{Samples.map((Sample, Index) => (
+				<button
+					type="button"
+					class="wb-pill"
+					data-sample={Sample.Id}
+					data-active={Index === 0 ? "" : undefined}
+					aria-pressed={Index === 0}
+				>
+					{Sample.Label}
+				</button>
+			))}
 			<button type="button" class="wb-pill wb-exec" data-action="exec" aria-pressed="false">
 				RUN PIPELINE
 			</button>
@@ -218,19 +213,24 @@ const Samples = [
 			<!-- Raw stream pane -->
 			<div class="wb-skew flex flex-col border-4 border-blood-crimson bg-carbon-void shadow-[6px_6px_0px_#7a0a1e]">
 				<div class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3">
-					<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary"
-						>RAW STREAM</span
-					>
-					<span class="font-mono text-base text-zinc-dust" data-stat="raw-bytes">0 B</span>
+					<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+						RAW STREAM
+					</span>
+					<span class="font-mono text-base text-zinc-dust" data-stat="raw-bytes">
+						0 B
+					</span>
 				</div>
 				<div class="relative flex-1">
-					<label class="sr-only" for="wb-input">Tool output to classify</label>
+					<label class="sr-only" for="wb-input">
+						Tool output to classify
+					</label>
 					<textarea
 						id="wb-input"
 						data-input
 						spellcheck="false"
 						class="wb-terminal h-72 w-full resize-y bg-transparent p-5 text-bone-newsprint"
-						placeholder="paste any output here - or load a sample"></textarea>
+						placeholder="paste any output here - or load a sample"
+					></textarea>
 					<!-- The opacity-fade suppression overlay: the tail of the raw
 					     feed dims toward the bottom of the pane. -->
 					<div
@@ -247,10 +247,12 @@ const Samples = [
 			<!-- Enriched preview pane -->
 			<div class="wb-skew flex flex-col border-4 border-blood-crimson bg-carbon-void shadow-[6px_6px_0px_#7a0a1e]">
 				<div class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3">
-					<span class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal"
-						>ENRICHED PREVIEW</span
-					>
-					<span class="font-mono text-base text-zinc-dust" data-stat="classify-ns">- ns</span>
+					<span class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
+						ENRICHED PREVIEW
+					</span>
+					<span class="font-mono text-base text-zinc-dust" data-stat="classify-ns">
+						- ns
+					</span>
 				</div>
 				<div class="flex grow flex-col gap-10 p-6">
 					<!-- The preview line, inset bone-white result -->
@@ -258,7 +260,10 @@ const Samples = [
 						<p class="font-mono text-base font-black uppercase tracking-widest text-black/60">
 							PREVIEW LINE
 						</p>
-						<p class="wb-preview mt-4 break-all font-mono text-base text-black" data-preview>
+						<p
+							class="wb-preview mt-4 break-all font-mono text-base text-black"
+							data-preview
+						>
 							[press RUN PIPELINE]
 						</p>
 					</div>
@@ -295,8 +300,8 @@ const Samples = [
 						<p class="mt-4 font-mono text-base text-bone-newsprint">
 							<span class="text-stamped-canary">[directives:]</span> →
 							<span class="text-stamped-canary">[nudge:]</span> →
-							<span class="text-weathered-teal">[recall]</span>
-							— assembled per turn, under the 4,000-char budget
+							<span class="text-weathered-teal">[recall]</span>- assembled per turn,
+							under the 4,000-char budget
 						</p>
 					</div>
 				</div>
@@ -304,50 +309,107 @@ const Samples = [
 		</section>
 
 		<!-- Threshold knobs -->
-		<section class="wb-skew border-4 border-blood-crimson bg-carbon-void p-8 shadow-[6px_6px_0px_#7a0a1e]" aria-label="Threshold knobs">
+		<section
+			class="wb-skew border-4 border-blood-crimson bg-carbon-void p-8 shadow-[6px_6px_0px_#7a0a1e]"
+			aria-label="Threshold knobs"
+		>
 			<div class="flex flex-wrap items-center justify-between gap-6">
 				<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 					THRESHOLD KNOBS
 				</h2>
-				<button type="button" class="wb-pill" data-action="reload">POST /RELOAD</button>
+				<button type="button" class="wb-pill" data-action="reload">
+					POST /RELOAD
+				</button>
 			</div>
 			<p class="mt-6 font-mono text-base text-zinc-dust">
 				aphrodite.toml [compression] - the four proxy thresholds are live-reloadable; edit +
 				save (or POST /reload) re-applies them immediately (README.md:389).
 			</p>
 			<div class="mt-12 grid gap-16 md:grid-cols-2">
-				{
-					[
-						{ Key: "tool_threshold_token", Label: "tool_threshold_token", Min: 64, Max: 4096, Step: 64, Default: 512, Unit: "B", Note: "token proxy threshold (bytes)" },
-						{ Key: "tool_threshold_cache", Label: "tool_threshold_cache", Min: 256, Max: 16384, Step: 256, Default: 4096, Unit: "B", Note: "cache proxy threshold (bytes)" },
-						{ Key: "inline_threshold", Label: "inline_threshold", Min: 256, Max: 16384, Step: 256, Default: 2048, Unit: "B", Note: "inline-vs-durable CCR storage cutoff" },
-						{ Key: "code_multiplier", Label: "code_multiplier", Min: 1, Max: 8, Step: 0.5, Default: 3, Unit: "x", Note: "threshold multiplier for code_* types" },
-						{ Key: "engine_threshold_pct", Label: "engine_threshold_pct", Min: 0, Max: 100, Step: 5, Default: 45, Unit: "%", Note: "100+ = engine-off escape hatch" },
-					].map((Knob) => (
-						<div class="border-2 border-blood-crimson/60 bg-soot-black p-6">
-							<div class="flex items-baseline justify-between">
-								<label class="font-mono text-base font-bold text-bone-newsprint" for={`wb-knob-${Knob.Key}`}>
-									{Knob.Label}
-								</label>
-								<output class="font-mono text-base font-black text-stamped-canary" data-knob-value={Knob.Key} for={`wb-knob-${Knob.Key}`}>
-									{Knob.Default}
-									{Knob.Unit}
-								</output>
-							</div>
-							<input
-								id={`wb-knob-${Knob.Key}`}
-								data-knob={Knob.Key}
-								type="range"
-								min={Knob.Min}
-								max={Knob.Max}
-								step={Knob.Step}
-								value={Knob.Default}
-								class="wb-slider mt-8 w-full"
-							/>
-							<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">{Knob.Note}</p>
+				{[
+					{
+						Key: "tool_threshold_token",
+						Label: "tool_threshold_token",
+						Min: 64,
+						Max: 4096,
+						Step: 64,
+						Default: 512,
+						Unit: "B",
+						Note: "token proxy threshold (bytes)",
+					},
+					{
+						Key: "tool_threshold_cache",
+						Label: "tool_threshold_cache",
+						Min: 256,
+						Max: 16384,
+						Step: 256,
+						Default: 4096,
+						Unit: "B",
+						Note: "cache proxy threshold (bytes)",
+					},
+					{
+						Key: "inline_threshold",
+						Label: "inline_threshold",
+						Min: 256,
+						Max: 16384,
+						Step: 256,
+						Default: 2048,
+						Unit: "B",
+						Note: "inline-vs-durable CCR storage cutoff",
+					},
+					{
+						Key: "code_multiplier",
+						Label: "code_multiplier",
+						Min: 1,
+						Max: 8,
+						Step: 0.5,
+						Default: 3,
+						Unit: "x",
+						Note: "threshold multiplier for code_* types",
+					},
+					{
+						Key: "engine_threshold_pct",
+						Label: "engine_threshold_pct",
+						Min: 0,
+						Max: 100,
+						Step: 5,
+						Default: 30,
+						Unit: "%",
+						Note: "100+ = engine-off escape hatch",
+					},
+				].map((Knob) => (
+					<div class="border-2 border-blood-crimson/60 bg-soot-black p-6">
+						<div class="flex items-baseline justify-between">
+							<label
+								class="font-mono text-base font-bold text-bone-newsprint"
+								for={`wb-knob-${Knob.Key}`}
+							>
+								{Knob.Label}
+							</label>
+							<output
+								class="font-mono text-base font-black text-stamped-canary"
+								data-knob-value={Knob.Key}
+								for={`wb-knob-${Knob.Key}`}
+							>
+								{Knob.Default}
+								{Knob.Unit}
+							</output>
 						</div>
-					))
-				}
+						<input
+							id={`wb-knob-${Knob.Key}`}
+							data-knob={Knob.Key}
+							type="range"
+							min={Knob.Min}
+							max={Knob.Max}
+							step={Knob.Step}
+							value={Knob.Default}
+							class="wb-slider mt-8 w-full"
+						/>
+						<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
+							{Knob.Note}
+						</p>
+					</div>
+				))}
 			</div>
 			<!-- The verdict strip -->
 			<div class="mt-16 border-2 border-raw-blood bg-soot-black p-4">
@@ -362,23 +424,30 @@ const Samples = [
 
 		<!-- Stat bars -->
 		<section class="grid gap-20 md:grid-cols-3" aria-label="Session stats">
-			{
-				[
-					{ Key: "ratio", Label: "COMPRESSION RATIO", Value: 0, Cap: 100, Suffix: "%" },
-					{ Key: "turns", Label: "BLOBS CLASSIFIED", Value: 0, Cap: 40, Suffix: "" },
-					{ Key: "saved", Label: "CONTEXT SAVED", Value: 0, Cap: 100, Suffix: " KB" },
-				].map((Stat) => (
-					<div class="wb-skew border-4 border-blood-crimson bg-carbon-void p-6 shadow-[6px_6px_0px_#7a0a1e]">
-						<p class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">{Stat.Label}</p>
-						<p class="mt-4 font-mono text-2xl font-black text-bone-white" data-stat-value={Stat.Key}>
-							0{Stat.Suffix}
-						</p>
-						<div class="mt-6 h-3 border-2 border-black bg-soot-black">
-							<div class="h-full bg-raw-blood transition-all" data-stat-bar={Stat.Key} style="width:0%"></div>
-						</div>
+			{[
+				{ Key: "ratio", Label: "COMPRESSION RATIO", Value: 0, Cap: 100, Suffix: "%" },
+				{ Key: "turns", Label: "BLOBS CLASSIFIED", Value: 0, Cap: 40, Suffix: "" },
+				{ Key: "saved", Label: "CONTEXT SAVED", Value: 0, Cap: 100, Suffix: " KB" },
+			].map((Stat) => (
+				<div class="wb-skew border-4 border-blood-crimson bg-carbon-void p-6 shadow-[6px_6px_0px_#7a0a1e]">
+					<p class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+						{Stat.Label}
+					</p>
+					<p
+						class="mt-4 font-mono text-2xl font-black text-bone-white"
+						data-stat-value={Stat.Key}
+					>
+						0{Stat.Suffix}
+					</p>
+					<div class="mt-6 h-3 border-2 border-black bg-soot-black">
+						<div
+							class="h-full bg-raw-blood transition-all"
+							data-stat-bar={Stat.Key}
+							style="width:0%"
+						></div>
 					</div>
-				))
-			}
+				</div>
+			))}
 		</section>
 
 		<!-- Diagrams: the store topology and the config surface -->
@@ -404,7 +473,10 @@ const Samples = [
 		</section>
 
 		<!-- SIM NOTES: the benchmark arc numbers behind the sim -->
-		<section class="wb-skew border-l-4 border-stamped-canary bg-carbon-void p-8" aria-label="Benchmark notes">
+		<section
+			class="wb-skew border-l-4 border-stamped-canary bg-carbon-void p-8"
+			aria-label="Benchmark notes"
+		>
 			<p class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 				SIM NOTES · THE MEASURED ARC
 			</p>
@@ -418,18 +490,22 @@ const Samples = [
 					<div class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 						v1.3.4 · STANDARD CORPUS (20 SAMPLES, 106 KB)
 					</div>
-					<div class="mt-3 font-mono text-2xl font-black text-bone-white">132.82× overall</div>
+					<div class="mt-3 font-mono text-2xl font-black text-bone-white">
+						132.82× overall
+					</div>
 					<p class="mt-2 font-mono text-base text-zinc-dust">
-						3×–610× per type · 9–40 ms end-to-end at v1.3.4 (the README's current
-						latency figure is 8-40 ms) · 20/20 retrieve OK · the CHANGELOG
-						entry prints the unrounded overall at 132.82
+						3×-610× per type · 9-40 ms end-to-end at v1.3.4 (the README's current
+						latency figure is 8-40 ms) · 20/20 retrieve OK · the CHANGELOG entry prints
+						the unrounded overall at 132.82
 					</p>
 				</div>
 				<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
 					<div class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 						v1.2.2 · REAL-WORLD EXAMPLE
 					</div>
-					<div class="mt-3 font-mono text-2xl font-black text-bone-white">216 KB → 12 markers</div>
+					<div class="mt-3 font-mono text-2xl font-black text-bone-white">
+						216 KB → 12 markers
+					</div>
 					<p class="mt-2 font-mono text-base text-zinc-dust">
 						54K → 240 tokens · the CHANGELOG entry prints the ratio as 225×
 					</p>
@@ -439,7 +515,7 @@ const Samples = [
 						v1.2.2 · CLASSIFICATION &amp; CCR STORE (APPLE M2 MAX)
 					</div>
 					<div class="mt-3 font-mono text-base font-black text-bone-white">
-						classify 40–123 ns · put 453 ns · get 119.4 ns
+						classify 40-123 ns · put 453 ns · get 119.4 ns
 					</div>
 					<p class="mt-2 font-mono text-base text-zinc-dust">
 						CCR mixed MT, 8 threads: DashMap 229 µs vs Mutex 1.15 ms
@@ -449,7 +525,9 @@ const Samples = [
 					<div class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 						WHY THE STORE LOOKS LIKE IT DOES
 					</div>
-					<div class="mt-3 font-mono text-base font-black text-weathered-teal">5× at 8 threads</div>
+					<div class="mt-3 font-mono text-base font-black text-weathered-teal">
+						5× at 8 threads
+					</div>
 					<p class="mt-2 font-mono text-base text-zinc-dust">
 						The DashMap-over-Mutex result is why the in-memory CCR backend is a sharded
 						map, not one guarded table.
@@ -457,7 +535,9 @@ const Samples = [
 				</div>
 			</div>
 			<p class="mt-6 font-mono text-base text-zinc-dust">
-				SRC: CHANGELOG.md:632-635 (the standard corpus entry, unrounded overall 132.82) · CHANGELOG.md:962-973 (the ns/µs table) · CHANGELOG.md:983 (216 KB → 12 markers) · README.md:460 (the current 8-40 ms latency figure)
+				SRC: CHANGELOG.md:632-635 (the standard corpus entry, unrounded overall 132.82) ·
+				CHANGELOG.md:962-973 (the ns/µs table) · CHANGELOG.md:983 (216 KB → 12 markers) ·
+				README.md:460 (the current 8-40 ms latency figure)
 			</p>
 		</section>
 
@@ -518,11 +598,11 @@ const Samples = [
 
 	// ---- Threshold state: the real defaults (README.md:395-420) ----
 	const Thresholds: Record<string, number> = {
-		tool_threshold_token: 512,
-		tool_threshold_cache: 4096,
-		inline_threshold: 2048,
-		code_multiplier: 3.0,
-		engine_threshold_pct: 45,
+		tool_threshold_token: 256,
+		tool_threshold_cache: 2048,
+		inline_threshold: 1024,
+		code_multiplier: 1.0,
+		engine_threshold_pct: 30,
 	};
 
 	// ---- Tier multipliers (README.md:192-198) ----
@@ -579,7 +659,10 @@ const Samples = [
 		if (Lines.length > 0 && ModeLines.length / Lines.length > 0.5) return "ls";
 
 		// test summaries.
-		if (/test result:|=== RUN|passed|failed.*finished in|pytest|jest/i.test(Text) && /test/i.test(Text))
+		if (
+			/test result:|=== RUN|passed|failed.*finished in|pytest|jest/i.test(Text) &&
+			/test/i.test(Text)
+		)
 			return "test";
 
 		// grep: path:line:match hits, majority.
@@ -587,7 +670,8 @@ const Samples = [
 		if (Lines.length > 0 && GrepLines.length / Lines.length > 0.5) return "grep";
 
 		// code variants (keyword pairs).
-		if (/\bfn\b|\bimpl\b|\bstruct\b|\benum\b/.test(Text) && /->|&|\buse\b/.test(Text)) return "code_rust";
+		if (/\bfn\b|\bimpl\b|\bstruct\b|\benum\b/.test(Text) && /->|&|\buse\b/.test(Text))
+			return "code_rust";
 		if (/\bdef\b/.test(Text) && /import|class|from|self\./.test(Text)) return "code_python";
 		if (/\bfunc\b|\bpackage\b/.test(Text) && /import \(/.test(Text)) return "code_go";
 		if (/function|const|=>/.test(Text) && /import|export/.test(Text)) return "code_js";
@@ -627,7 +711,8 @@ const Samples = [
 	function PreviewLine(Type: string, Text: string, Hint: number): string {
 		const Lines = Text.split("\n").filter((Line) => Line.trim() !== "");
 		const ByteLen = new TextEncoder().encode(Text).length;
-		const Ellipsis = (Part: string) => (Part.length > Hint ? `${Part.slice(0, Hint)}...` : Part);
+		const Ellipsis = (Part: string) =>
+			Part.length > Hint ? `${Part.slice(0, Hint)}...` : Part;
 		const CodeCounts = (Re: RegExp, Name: string) => `${CountMatches(Text, Re)}${Name}`;
 
 		switch (Type) {
@@ -641,7 +726,10 @@ const Samples = [
 				const Fail = Number(Summary?.[2] ?? CountMatches(Text, /\. \.\.\. FAILED/g));
 				const Ignored = Number(Summary?.[3] ?? 0);
 				const Secs = Text.match(/finished in ([\d.]+)s/)?.[1] ?? "0.00s";
-				const Body = Fail > 0 ? ` | FAIL ${Ellipsis(Text.match(/failures:\s*\n\s*(\S+)/)?.[1] ?? "")}` : "";
+				const Body =
+					Fail > 0
+						? ` | FAIL ${Ellipsis(Text.match(/failures:\s*\n\s*(\S+)/)?.[1] ?? "")}`
+						: "";
 				return `[test:${Pass} pass ${Fail} fail ${Ignored} ignored | ${Secs}${Body}]`;
 			}
 			case "terminal": {
@@ -654,8 +742,13 @@ const Samples = [
 			case "code_js":
 			case "code": {
 				const Fns = CodeCounts(/\bfn\b|\bdef\b|\bfunc\b|function|const \w+ = \(/g, "fns");
-				const Structs = Type === "code_rust" ? `|${CodeCounts(/\bstruct\b/g, "structs")} ` : " ";
-				const Signature = Ellipsis(Lines.find((Line) => /^(fn|def|func|function) |^(pub )?fn /.test(Line.trim())) ?? "");
+				const Structs =
+					Type === "code_rust" ? `|${CodeCounts(/\bstruct\b/g, "structs")} ` : " ";
+				const Signature = Ellipsis(
+					Lines.find((Line) =>
+						/^(fn|def|func|function) |^(pub )?fn /.test(Line.trim()),
+					) ?? "",
+				);
 				return `[code:${Fns}${Structs}${Signature} ${Lines.length}L]`;
 			}
 			case "grep": {
@@ -686,7 +779,7 @@ const Samples = [
 			case "gitlog": {
 				const Commits = CountMatches(Text, /^commit /gm);
 				const Hashes = Text.match(/commit ([0-9a-f]{7,40})/g) ?? [];
-				return `[gitlog:${Commits} commits | ${Ellipsis((Hashes[0]?.slice(7, 14) ?? "") + " fix")} -> ${(Hashes[1]?.slice(7, 14) ?? "")} feat]`;
+				return `[gitlog:${Commits} commits | ${Ellipsis((Hashes[0]?.slice(7, 14) ?? "") + " fix")} -> ${Hashes[1]?.slice(7, 14) ?? ""} feat]`;
 			}
 			case "diff": {
 				const Files = CountMatches(Text, /^diff --git /gm);
@@ -775,7 +868,9 @@ const Samples = [
 		// engine itself is opt-in and non-destructive - no compaction pass
 		// is depicted here).
 		const Tier = TierOf(Type);
-		const TokenLimit = Thresholds.tool_threshold_token * (Type.startsWith("code") ? Thresholds.code_multiplier : Tier > 1 ? Tier : 1);
+		const TokenLimit =
+			Thresholds.tool_threshold_token *
+			(Type.startsWith("code") ? Thresholds.code_multiplier : Tier > 1 ? Tier : 1);
 		const TokenCompress = ByteLen > TokenLimit;
 		const CacheCompress = ByteLen > Thresholds.tool_threshold_cache;
 		const Inline = ByteLen <= Thresholds.inline_threshold;
@@ -798,12 +893,18 @@ const Samples = [
 		].join(" - ");
 
 		// Stats.
-		const Ratio = TokenCompress ? Math.min(99, Math.round((1 - Preview.length / ByteLen) * 100)) : 0;
+		const Ratio = TokenCompress
+			? Math.min(99, Math.round((1 - Preview.length / ByteLen) * 100))
+			: 0;
 		SetStat("ratio", Ratio);
 		BumpStat("turns", 1);
-		BumpStat("saved", TokenCompress ? Math.max(1, Math.round((ByteLen - Preview.length) / 1024)) : 0);
+		BumpStat(
+			"saved",
+			TokenCompress ? Math.max(1, Math.round((ByteLen - Preview.length) / 1024)) : 0,
+		);
 		document.querySelector<HTMLElement>("[data-stat='classify-ns']")!.textContent = `${Ns} ns`;
-		document.querySelector<HTMLElement>("[data-stat='raw-bytes']")!.textContent = `${ByteLen.toLocaleString("en-US")} B`;
+		document.querySelector<HTMLElement>("[data-stat='raw-bytes']")!.textContent =
+			`${ByteLen.toLocaleString("en-US")} B`;
 	}
 
 	function HintFor(): number {
@@ -815,7 +916,11 @@ const Samples = [
 	function SetStat(Key: string, Value: number) {
 		const ValueNode = document.querySelector<HTMLElement>(`[data-stat-value='${Key}']`);
 		const Bar = document.querySelector<HTMLElement>(`[data-stat-bar='${Key}']`);
-		const Caps: Record<string, [number, string]> = { ratio: [100, "%"], turns: [40, ""], saved: [100, " KB"] };
+		const Caps: Record<string, [number, string]> = {
+			ratio: [100, "%"],
+			turns: [40, ""],
+			saved: [100, " KB"],
+		};
 		const [Cap, Suffix] = Caps[Key] ?? [100, ""];
 		if (ValueNode) ValueNode.textContent = `${Value.toLocaleString("en-US")}${Suffix}`;
 		if (Bar) Bar.style.width = `${Math.min(100, (Value / Cap) * 100)}%`;
@@ -893,7 +998,8 @@ const Samples = [
 			const Value = Number(Slider.value);
 			Thresholds[Key] = Value;
 			const Out = document.querySelector<HTMLElement>(`[data-knob-value='${Key}']`);
-			if (Out) Out.textContent = `${Key === "code_multiplier" ? Value.toFixed(1) : Value}${Key === "code_multiplier" ? "x" : Key === "engine_threshold_pct" ? "%" : " B"}`;
+			if (Out)
+				Out.textContent = `${Key === "code_multiplier" ? Value.toFixed(1) : Value}${Key === "code_multiplier" ? "x" : Key === "engine_threshold_pct" ? "%" : " B"}`;
 			if (Key === "engine_threshold_pct" && Value >= 100) {
 				Verdict.textContent = "engine OFF - the 100+ escape hatch, raw passes through";
 			}
@@ -920,7 +1026,6 @@ const Samples = [
 </script>
 
 <script type="application/json" data-samples-json set:html={JSON.stringify(Samples)} />
-
 <style is:global>
 	/* WORKBENCH-scoped zine styling. Self-contained: does not depend on the
 	DESIGN lane's Global.css pass. Soot-black / carbon-void / blood-crimson

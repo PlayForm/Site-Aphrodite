@@ -3,7 +3,9 @@
 > items such as the Centers or unwired with PENDING or WIP in the sidebar,
 > since some of the documentation documents unwired code"). No DeepSeek
 > counterpart. This is the specialized truth for this site's sessions.
+
 ---
+
 name: wip-marking
 description: THE laws for marking WIP/unwired/roadmap content on the Aphrodite site - the identification pass (what earns a mark vs what does not), the single WipDocs registry in Source/pages/docs/[...slug].astro that drives the sidebar badge, the section-card badge, and the page-header stamp, the upstream-first content rule (Source/Content/Docs is generated), and the truth law (FLAG never invent a status). Load before marking any doc as WIP or changing the WIP marks.
 whenToUse: Mandatory before adding, removing, or restyling any WIP/PENDING mark on the docs (the sidebar, the docs page headers, the config docs' reserved-key markings). If you are about to label a doc WIP, or a doc's implementation status changed and its WIP mark may be stale, STOP and read this manual first.
@@ -15,8 +17,9 @@ whenToUse: Mandatory before adding, removing, or restyling any WIP/PENDING mark 
 
 A doc gets the WIP mark only when a SOURCE states its incompleteness - the
 page itself (e.g. docs/centers.md: "v2-v4 are unimplemented design
-sketches"), the config docs' "Reserved - no reader" / "Not read by anything"
-verdicts, or the CHANGELOG. If the sources do not state a status, FLAG in
+sketches"), the config docs' "Reserved - no reader" verdicts and
+"Parsed for schema compatibility" notes, or the CHANGELOG. If the sources do
+not state a status, FLAG in
 the report - never invent a PENDING. A doc that ACCURATELY documents inert
 keys (architecture/07-config-resolution.md) is NOT WIP - it describes
 reality correctly; the WIP token belongs on the keys, not the page.
@@ -25,11 +28,11 @@ Current marked set (verify against sources before changing):
 
 - `centers` - roadmap page: v1 shipped, v2-v4 unimplemented sketches.
 - The reserved/unwired config keys carry the `(WIP)` token in the upstream
-  docs: docs/config/aphrodite-toml.md ("Reserved - no reader (WIP)" cells,
-  the engine_* write-only note, "Not read by anything (WIP)",
-  `[templates.*]` reserved/aspirational), docs/config/env-vars.md
-  ("Documented but currently unwired (WIP)" heading + its intro reference),
-  docs/plugin/context-engine.md (the write-only `engine_*` WIP note).
+  docs: docs/config/aphrodite-toml.md ("Reserved - no reader (WIP)" cells
+  for `code_structure_map` / `rust_preview_lines`, the "Parsed for schema
+  compatibility" note for `catalog_mode` / `classifier_poll` / `prefetch`),
+  docs/config/env-vars.md ("Documented but currently inactive" heading +
+  its intro reference).
 
 ## 2. The single registry drives every Site mark
 

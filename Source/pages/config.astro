@@ -31,12 +31,15 @@ const Example = [
 	"#",
 	"# Two independent parsers read this file:",
 	"#   - the Rust HTTP proxy (config/proxy.rs, when an aphrodite.toml is found):",
-	"#     [[proxies]], [defaults], the four hot-reload thresholds in",
-	"#     [compression], and [previews] preview_max_chars (also re-applied by",
-	"#     POST /reload and the config-file watcher);",
+	"#     [[proxies]], [defaults], the four hot-reload thresholds plus",
+	"#     auto_expand/auto_expand_limit/max_request_body_size in [compression],",
+	"#     and [previews] preview_max_chars (also re-applied by POST /reload and",
+	"#     the config-file watcher);",
 	"#   - the Hermes dylib session (config_loader.rs): the [compression]",
-	"#     engine/chain-split/poll keys, [defaults] model/api_url, [flow],",
-	"#     [directives], [prompts] session_inject, [previews] preview_max_chars.",
+	"#     engine/chain-split/poll/live_container/recursive_depth keys, [defaults]",
+	"#     model/api_url, [flow], [directives], [prompts] session_inject +",
+	"#     retrieve_guidance/ccr_marker_hint/catalog_intent_hints, [templates],",
+	"#     [previews] preview_max_chars.",
 	"#",
 	"# ── Proxies ─────────────────────────────────────────────────────────────────",
 	"[[proxies]]",
@@ -64,29 +67,49 @@ const Example = [
 	"# APHRODITE_API_KEY env var. Only uncomment if you cannot use the env var.",
 	"",
 	"[compression]",
-	"engine_threshold_pct = 45   # 100+ = documented engine-off escape hatch",
-	"tool_threshold_token = 512  # token proxy threshold (bytes) - hot-reloads",
-	"tool_threshold_cache = 4096 # cache proxy threshold (bytes) - hot-reloads",
-	"terminal_threshold = 1024   # dylib terminal-output threshold (bytes)",
-	"inline_threshold = 2048     # inline zlib fallback threshold (bytes) - hot-reloads",
-	"code_multiplier = 3.0       # multiply threshold for code types (hot-reloads)",
+	"engine_threshold_pct = 30   # LOAD-BEARING (dylib): middle-turn archiving + engine_offload prompt; 100+ = off",
+	"engine_protect_first = 2    # LOAD-BEARING (dylib): messages kept at the start",
+	"engine_protect_last = 5     # LOAD-BEARING (dylib): messages kept at the end",
+	"engine_min_msgs = 8         # LOAD-BEARING (dylib): minimum messages before the engine activates",
+	"tool_threshold_token = 256  # token proxy threshold (bytes) - hot-reloads",
+	"tool_threshold_cache = 2048 # cache proxy threshold (bytes) - hot-reloads",
+	"terminal_threshold = 256    # dylib terminal-output threshold (bytes)",
+	"inline_threshold = 1024     # inline zlib fallback threshold (bytes) - hot-reloads",
+	"auto_expand = true          # WIRED (proxy): resolve just-stored content inline instead of a marker",
+	"auto_expand_limit = 102400  # WIRED (proxy): byte cap for auto-expanded content",
+	"live_container = false      # WIRED (dylib): instant 'live' CCR markers for large tool results",
+	"recursive_depth = 5         # WIRED (dylib): max nested expansion depth",
+	"code_multiplier = 1.0       # multiply threshold for code types (hot-reloads)",
 	"context_engine = true       # dylib-path only; the HTTP proxy never reads it",
+	"auto_reload = true          # dylib-path: watch aphrodite.toml and re-apply config on change",
 	"",
 	"[previews]",
-	"preview_max_chars = 120     # caps the rendered preview string; 0 = unlimited",
+	"preview_max_chars = 0       # caps the whole rendered preview string; 0 = unlimited",
+	'model_family = "code_first" # selects the [templates.preview.<family>.*] family',
+	"",
+	"[prompts]",
+	'retrieve_guidance = "minimal" # how much the system prompt explains CCR retrieval',
+	"ccr_marker_hint = false       # append a retrieval hint after markers",
+	"catalog_intent_hints = false  # intent hints in catalog output",
+	"",
+	"# ── Templates (live config - optional format strings) ───────────────────────",
+	'# [templates.preview.<family>.<ctype>] = "format string"  # {type} {ln} {size} {fns} {sigs} ...',
+	"# [templates.marker] format/hint · [templates.prompts] session_inject/engine_offload",
+	"# [templates.reverse] ctype -> key remap. Absent = hardcoded builders.",
 	"",
 	"[directives]",
-	'active = ["focus", "foresight"]',
+	'active = ["lazy", "lazy-eval", "foresight"]',
 	"",
 	"[flow]",
 	"budget_chars = 2600         # hard cap on per-turn injected context",
 ].join("\n");
 ---
 
-<Base title="Configuration Playground" description="The interactive aphrodite.toml explorer - the pick chain, the two stacks, the [[proxies]] pair and the compression knobs, simulated client-side.">
-	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col px-5 pt-16 sm:px-8 lg:px-14"
-	>
+<Base
+	title="Configuration Playground"
+	description="The interactive aphrodite.toml explorer - the pick chain, the two stacks, the [[proxies]] pair and the compression knobs, simulated client-side."
+>
+	<main class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col px-5 pt-16 sm:px-8 lg:px-14">
 		<Breadcrumbs />
 		<!-- Header -->
 		<header class="relative border-l-4 border-blood-crimson bg-carbon-void p-8">
@@ -101,8 +124,8 @@ const Example = [
 				One TOML file, two independent parsers, three places it can live.
 			</p>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Edit the shipped example below and watch the resolution order re-decide what wins
-				- env var, per-proxy entry, defaults, or the compiled-in fallback.
+				Edit the shipped example below and watch the resolution order re-decide what wins -
+				env var, per-proxy entry, defaults, or the compiled-in fallback.
 			</p>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				Everything here runs in your browser.
@@ -122,10 +145,22 @@ const Example = [
 			<div class="mt-8">
 				<ZineStream
 					Lines={[
-						{ Text: "1&nbsp;&nbsp;APHRODITE_CONFIG_PATH&nbsp;&nbsp;&mdash;&nbsp;explicit override. A path that does not exist still counts as set: it falls through to CLI-flag mode, it never silently redirects.", Tone: "canary" },
-						{ Text: "2&nbsp;&nbsp;./aphrodite.toml&nbsp;&nbsp;&mdash;&nbsp;the default: the current working directory.", Tone: "plain" },
-						{ Text: "3&nbsp;&nbsp;~/.hermes/aphrodite/aphrodite.toml&nbsp;&nbsp;&mdash;&nbsp;the fallback, consulted only when the env var was NOT set; this is where <b>aphrodite setup</b> writes its generated config.", Tone: "plain" },
-						{ Text: "4&nbsp;&nbsp;none found&nbsp;&nbsp;&mdash;&nbsp;CLI-flag mode: a single proxy, --mode / --listen / --api-key and friends.", Tone: "fade" },
+						{
+							Text: "1&nbsp;&nbsp;APHRODITE_CONFIG_PATH&nbsp;&nbsp;&mdash;&nbsp;explicit override. A path that does not exist still counts as set: it falls through to CLI-flag mode, it never silently redirects.",
+							Tone: "canary",
+						},
+						{
+							Text: "2&nbsp;&nbsp;./aphrodite.toml&nbsp;&nbsp;&mdash;&nbsp;the default: the current working directory.",
+							Tone: "plain",
+						},
+						{
+							Text: "3&nbsp;&nbsp;~/.hermes/aphrodite/aphrodite.toml&nbsp;&nbsp;&mdash;&nbsp;the fallback, consulted only when the env var was NOT set; this is where <b>aphrodite setup</b> writes its generated config.",
+							Tone: "plain",
+						},
+						{
+							Text: "4&nbsp;&nbsp;none found&nbsp;&nbsp;&mdash;&nbsp;CLI-flag mode: a single proxy, --mode / --listen / --api-key and friends.",
+							Tone: "fade",
+						},
 					]}
 				/>
 			</div>
@@ -160,36 +195,39 @@ const Example = [
 			<div class="mt-8 grid gap-10 lg:grid-cols-2">
 				<!-- Editor pane -->
 				<div class="flex flex-col border-4 border-blood-crimson bg-carbon-void">
-					<div
-						class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3"
-					>
-						<span
-							class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary"
-						>
+					<div class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3">
+						<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 							aphrodite.toml
 						</span>
-						<span class="font-mono text-base text-zinc-dust" data-editor-status aria-live="polite">parsed</span>
+						<span
+							class="font-mono text-base text-zinc-dust"
+							data-editor-status
+							aria-live="polite"
+						>
+							parsed
+						</span>
 					</div>
-					<label class="sr-only" for="config-editor">aphrodite.toml contents</label>
+					<label class="sr-only" for="config-editor">
+						aphrodite.toml contents
+					</label>
 					<textarea
 						id="config-editor"
 						data-editor
 						spellcheck="false"
 						class="h-[36rem] w-full resize-y bg-transparent p-5 font-mono text-base leading-relaxed text-bone-newsprint"
-						placeholder="loading the shipped example..."></textarea>
+						placeholder="loading the shipped example..."
+					></textarea>
 				</div>
 
 				<!-- Resolution ladder pane -->
 				<div class="flex flex-col border-4 border-blood-crimson bg-carbon-void">
-					<div
-						class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3"
-					>
-						<span
-							class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal"
-						>
+					<div class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3">
+						<span class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
 							EFFECTIVE CONFIG - WHO WINS
 						</span>
-						<span class="font-mono text-base text-zinc-dust">env &gt; toml &gt; compiled</span>
+						<span class="font-mono text-base text-zinc-dust">
+							env &gt; toml &gt; compiled
+						</span>
 					</div>
 					<div class="flex-1 space-y-4 p-5" data-ladder aria-live="polite">
 						<!-- rendered client-side -->
@@ -205,9 +243,7 @@ const Example = [
 				data-diagram="config-resolution"
 			>
 				<div class="overflow-x-auto" set:html={ConfigResolution} />
-				<figcaption
-					class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
-				>
+				<figcaption class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 					M7 // CONFIG RESOLUTION
 				</figcaption>
 			</figure>
@@ -230,7 +266,9 @@ const Example = [
 					</p>
 					<p class="mt-3 text-base text-zinc-dust">
 						It reads <code>[[proxies]]</code>, <code>[defaults]</code>, the four
-						hot-reload thresholds in <code>[compression]</code>, and
+						hot-reload thresholds plus
+						<code>auto_expand</code> / <code>auto_expand_limit</code> in
+						<code>[compression]</code>, and
 						<code>[previews] preview_max_chars</code>.
 					</p>
 					<p class="mt-3 text-base text-zinc-dust">
@@ -244,17 +282,21 @@ const Example = [
 						THE HERMES DYLIB SESSION
 					</h3>
 					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">config_loader.rs</code>, read once at dylib
-						load: the engine/chain-split/poll keys in <code>[compression]</code>,
+						<code class="text-bone-newsprint">config_loader.rs</code>, read once at
+						dylib load: the engine / chain-split / poll / live_container /
+						recursive_depth / auto_reload keys in <code>[compression]</code>,
 						<code>[defaults] model</code> / <code>api_url</code>,
 						<code>[flow] budget_chars</code>, <code>[directives] active</code>,
-						<code>[prompts] session_inject</code>.
+						<code>[prompts] session_inject</code> +<code>retrieve_guidance</code> /{" "}
+						<code>ccr_marker_hint</code> /<code>catalog_intent_hints</code>,{" "}
+						<code>[templates]</code>, and
+						<code>[previews] preview_max_chars</code>.
 					</p>
 					<p class="mt-3 text-base text-zinc-dust">
 						The FFI runtime-override variant is the
-						<code>aphrodite_config_get</code> / <code>aphrodite_config_set</code> pair on
-						the C-ABI bridge - it surfaces values and changes them mid-session, while the
-						standalone HTTP proxy never reads the dylib-only keys.
+						<code>aphrodite_config_get</code> / <code>aphrodite_config_set</code> pair
+						on the C-ABI bridge - it surfaces values and changes them mid-session, while
+						the standalone HTTP proxy never reads the dylib-only keys.
 					</p>
 				</ZineBox>
 			</div>
@@ -272,8 +314,8 @@ const Example = [
 						cache &middot; 127.0.0.1:9797
 					</p>
 					<p class="mt-2 text-base text-zinc-dust">
-						mode <code class="text-bone-newsprint">"cache"</code> - the in-memory backend,
-						threshold 8192 bytes compiled-in (the example lowers it to 4096).
+						mode <code class="text-bone-newsprint">"cache"</code> - the in-memory
+						backend, threshold 8192 bytes compiled-in (the example lowers it to 2048).
 						<code>tool_relay = true</code> enables the /tool/relay endpoint.
 					</p>
 				</ZineBox>
@@ -282,8 +324,9 @@ const Example = [
 						token &middot; 127.0.0.1:9798
 					</p>
 					<p class="mt-2 text-base text-zinc-dust">
-						mode <code class="text-bone-newsprint">"token"</code> - the SQLite-backed durable
-						store, threshold 1024 compiled-in (the example lowers it to 512), TTL from
+						mode <code class="text-bone-newsprint">"token"</code> - the SQLite-backed
+						durable store, threshold 1024 compiled-in (the example lowers it to 256),
+						TTL from
 						<code>ccr_ttl_seconds</code>.
 					</p>
 				</ZineBox>
@@ -315,8 +358,8 @@ const Example = [
 			</div>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				Edit + save - or <code class="text-bone-newsprint">POST /reload</code>, or the
-				config file watcher - re-applies the four proxy thresholds (and the preview cap)
-				with no restart.
+				config file watcher - re-applies the four proxy thresholds, auto_expand /
+				auto_expand_limit (and the preview cap) with no restart.
 			</p>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				Everything else about a proxy is fixed at startup (README.md:389-391).
@@ -333,31 +376,133 @@ const Example = [
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-oxblood-dark/50">
-						{
-							[
-								{ K: "tool_threshold_token", E: "512", C: "1024", V: "APHRODITE_TOOL_THRESHOLD_TOKEN", N: "token proxy threshold (bytes) - hot-reloads" },
-								{ K: "tool_threshold_cache", E: "4096", C: "8192", V: "APHRODITE_TOOL_THRESHOLD_CACHE", N: "cache proxy threshold (bytes) - hot-reloads" },
-								{ K: "inline_threshold", E: "2048", C: "256", V: "APHRODITE_INLINE_THRESHOLD", N: "inline-vs-durable cutoff (bytes) - hot-reloads" },
-								{ K: "code_multiplier", E: "3.0", C: "3.0", V: "APHRODITE_CODE_MULTIPLIER", N: "multiplies the threshold for code_* types - hot-reloads" },
-								{ K: "terminal_threshold", E: "1024", C: "1024", V: "APHRODITE_TERMINAL_THRESHOLD", N: "dylib terminal-output threshold" },
-								{ K: "engine_threshold_pct", E: "45", C: "-", V: "-", N: "dylib state only; 100+ = the documented engine-off escape hatch" },
-								{ K: "context_engine", E: "true", C: "true", V: "APHRODITE_CONTEXT_ENGINE", N: "opt-in dylib status flag; the HTTP proxy never reads it" },
-							].map((Row) => (
-								<tr class="text-zinc-dust">
-									<td class="px-5 py-3 font-mono text-base text-bone-newsprint">{Row.K}</td>
-									<td class="px-5 py-3 font-mono text-base text-stamped-canary">{Row.E}</td>
-									<td class="px-5 py-3 font-mono text-base">{Row.C}</td>
-									<td class="px-5 py-3 font-mono text-base">{Row.V}</td>
-									<td class="px-5 py-3 text-base">{Row.N}</td>
-								</tr>
-							))
-						}
+						{[
+							{
+								K: "tool_threshold_token",
+								E: "256",
+								C: "1024",
+								V: "APHRODITE_TOOL_THRESHOLD_TOKEN",
+								N: "token proxy threshold (bytes) - hot-reloads",
+							},
+							{
+								K: "tool_threshold_cache",
+								E: "2048",
+								C: "8192",
+								V: "APHRODITE_TOOL_THRESHOLD_CACHE",
+								N: "cache proxy threshold (bytes) - hot-reloads",
+							},
+							{
+								K: "inline_threshold",
+								E: "1024",
+								C: "256",
+								V: "APHRODITE_INLINE_THRESHOLD",
+								N: "inline-vs-durable cutoff (bytes) - hot-reloads",
+							},
+							{
+								K: "code_multiplier",
+								E: "1.0",
+								C: "3.0",
+								V: "APHRODITE_CODE_MULTIPLIER",
+								N: "multiplies the threshold for code_* types - hot-reloads",
+							},
+							{
+								K: "auto_expand",
+								E: "true",
+								C: "false",
+								V: "APHRODITE_AUTO_EXPAND",
+								N: "resolve just-stored content inline instead of a marker - hot-reloads",
+							},
+							{
+								K: "auto_expand_limit",
+								E: "102400",
+								C: "102400",
+								V: "APHRODITE_AUTO_EXPAND_LIMIT",
+								N: "byte cap for auto-expanded content; 0 = unlimited",
+							},
+							{
+								K: "terminal_threshold",
+								E: "256",
+								C: "1024",
+								V: "APHRODITE_TERMINAL_THRESHOLD",
+								N: "dylib terminal-output threshold",
+							},
+							{
+								K: "engine_threshold_pct",
+								E: "30",
+								C: "45",
+								V: "APHRODITE_ENGINE_THRESHOLD_PCT",
+								N: "LOAD-BEARING (dylib): middle-turn archiving + engine_offload prompt; 100+ = off",
+							},
+							{
+								K: "engine_protect_first",
+								E: "2",
+								C: "2",
+								V: "APHRODITE_ENGINE_PROTECT_FIRST",
+								N: "LOAD-BEARING (dylib): turns kept at the start of the index",
+							},
+							{
+								K: "engine_protect_last",
+								E: "5",
+								C: "5",
+								V: "APHRODITE_ENGINE_PROTECT_LAST",
+								N: "LOAD-BEARING (dylib): turns kept at the end of the index",
+							},
+							{
+								K: "engine_min_msgs",
+								E: "8",
+								C: "8",
+								V: "APHRODITE_ENGINE_MIN_MSGS",
+								N: "LOAD-BEARING (dylib): minimum messages before the engine activates",
+							},
+							{
+								K: "live_container",
+								E: "false",
+								C: "false",
+								V: "APHRODITE_LIVE_CONTAINER",
+								N: "instant 'live' CCR markers for large tool results",
+							},
+							{
+								K: "recursive_depth",
+								E: "5",
+								C: "5",
+								V: "APHRODITE_RECURSIVE_DEPTH",
+								N: "max nested marker expansion depth",
+							},
+							{
+								K: "context_engine",
+								E: "true",
+								C: "true",
+								V: "APHRODITE_CONTEXT_ENGINE",
+								N: "opt-in dylib status flag; the HTTP proxy never reads it",
+							},
+							{
+								K: "auto_reload",
+								E: "true",
+								C: "false",
+								V: "APHRODITE_AUTO_RELOAD",
+								N: "watch aphrodite.toml and re-apply config fields on change",
+							},
+						].map((Row) => (
+							<tr class="text-zinc-dust">
+								<td class="px-5 py-3 font-mono text-base text-bone-newsprint">
+									{Row.K}
+								</td>
+								<td class="px-5 py-3 font-mono text-base text-stamped-canary">
+									{Row.E}
+								</td>
+								<td class="px-5 py-3 font-mono text-base">{Row.C}</td>
+								<td class="px-5 py-3 font-mono text-base">{Row.V}</td>
+								<td class="px-5 py-3 text-base">{Row.N}</td>
+							</tr>
+						))}
 					</tbody>
 				</table>
 			</div>
 			<p class="mt-4 max-w-3xl font-mono text-base uppercase tracking-widest text-zinc-dust">
-				Reload reaches the four bolded thresholds + preview_max_chars; the dylib keys ride
-				aphrodite_config_set, and the file watcher applies only the four thresholds.
+				Reload reaches the four bolded thresholds + auto_expand / auto_expand_limit +
+				preview_max_chars (plus the marker format/hint and the ccr_marker_hint knob); the
+				dylib keys ride aphrodite_config_set, and the file watcher applies the same
+				hot-reloadable set.
 			</p>
 		</section>
 
@@ -373,9 +518,9 @@ const Example = [
 						[FLOW]
 					</h3>
 					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">budget_chars = 2600</code> - the hard cap on
-						ALL per-turn injected context (directives + nudges + recall catalog + retrieve
-						hint).
+						<code class="text-bone-newsprint">budget_chars = 2600</code> - the hard cap
+						on ALL per-turn injected context (directives + nudges + recall catalog +
+						retrieve hint).
 					</p>
 					<p class="mt-3 text-base text-zinc-dust">
 						Sections drop bottom-up when over budget; directives and nudges never drop.
@@ -389,13 +534,15 @@ const Example = [
 						[DIRECTIVES]
 					</h3>
 					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">active = ["focus", "foresight"]</code> -
-						which loaded directives start active; swap mid-conversation via
+						<code class="text-bone-newsprint">
+							active = ["lazy", "lazy-eval", "foresight"]
+						</code>{" "}
+						- which loaded directives start active; swap mid-conversation via
 						<code>aphrodite_directive</code>.
 					</p>
 					<p class="mt-3 text-base text-zinc-dust">
-						Names not in the loaded set are silently filtered; an empty list seeds focus +
-						foresight + lazy.
+						Names not in the loaded set are silently filtered; an empty list seeds focus
+						+ foresight + lazy.
 					</p>
 					<p class="mt-3 text-base text-zinc-dust">
 						Built-in set: focus, foresight, ccr-handling, cleanup, explore, lazy,
@@ -407,15 +554,18 @@ const Example = [
 						[PREVIEWS]
 					</h3>
 					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">preview_max_chars = 120</code> - caps the
+						<code class="text-bone-newsprint">preview_max_chars = 0</code> - caps the
 						whole rendered preview string, not per line; 0 = unlimited.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						<code class="text-bone-newsprint">model_family = "code_first"</code> -
+						selects the <code>[templates.preview.&lt;family&gt;.*]</code> family when
+						<code>[templates]</code> is configured.
 					</p>
 					<p class="mt-3 text-base text-zinc-dust">
 						Env <code>APHRODITE_PREVIEW_MAX_CHARS</code> &gt; TOML &gt; unlimited.
 					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						Re-applied by POST /reload.
-					</p>
+					<p class="mt-3 text-base text-zinc-dust">Re-applied by POST /reload.</p>
 				</ZineBox>
 			</div>
 		</section>
@@ -435,28 +585,21 @@ const Example = [
 				one in place.
 			</p>
 			<div class="mt-8 flex flex-wrap gap-3">
-				{
-					[
-						"auto_expand",
-						"auto_expand_limit",
-						"catalog_mode",
-						"classifier_poll",
-						"previews.model_family",
-						"previews.code_structure_map",
-						"prompts.retrieve_guidance",
-						"prompts.ccr_marker_hint",
-						"prompts.catalog_intent_hints",
-					].map((K) => (
-						<span class="border-2 border-stamped-canary bg-soot-black px-3 py-1.5 font-mono text-base text-stamped-canary">
-							{K}
-						</span>
-					))
-				}
+				{[
+					"catalog_mode",
+					"classifier_poll",
+					"previews.code_structure_map",
+					"previews.rust_preview_lines",
+				].map((K) => (
+					<span class="border-2 border-stamped-canary bg-soot-black px-3 py-1.5 font-mono text-base text-stamped-canary">
+						{K}
+					</span>
+				))}
 			</div>
 			<p class="mt-6 max-w-3xl font-mono text-base uppercase tracking-widest text-zinc-dust">
-				No parser home at all - <code>compression.prefetch</code> and the old
-				<code>[templates.*]</code> sections were removed from the shipped files; marker and
-				preview formats are compiled into the binary.
+				The <code>[templates.*]</code> section is live configuration - preview families, the
+				marker block, prompt templates and the reverse key map render from these format
+				strings (hardcoded builders apply when a block is absent).
 			</p>
 		</section>
 
@@ -476,10 +619,9 @@ const Example = [
 				</button>
 			</div>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Simulated from your editor state: /reload answers <code class="text-bone-newsprint">
-					"applied": true </code
-				> with the values that took effect, and a <code>"parsed_only"</code> object for the
-				fields that do not.
+				Simulated from your editor state: /reload answers{" "}
+				<code class="text-bone-newsprint">"applied": true </code> with the values that took
+				effect, and a <code>"parsed_only"</code> object for the fields that do not.
 			</p>
 			<div class="mt-8">
 				<div
@@ -547,11 +689,19 @@ const Example = [
 		{ Key: "tool_threshold_cache", Env: "APHRODITE_TOOL_THRESHOLD_CACHE", Compiled: "8192" },
 		{ Key: "inline_threshold", Env: "APHRODITE_INLINE_THRESHOLD", Compiled: "256" },
 		{ Key: "code_multiplier", Env: "APHRODITE_CODE_MULTIPLIER", Compiled: "3.0" },
+		{ Key: "auto_expand", Env: "APHRODITE_AUTO_EXPAND", Compiled: "false" },
+		{ Key: "auto_expand_limit", Env: "APHRODITE_AUTO_EXPAND_LIMIT", Compiled: "102400" },
 		{ Key: "terminal_threshold", Env: "APHRODITE_TERMINAL_THRESHOLD", Compiled: "1024" },
 	];
 	const DylibChain = [
-		{ Key: "engine_threshold_pct", Env: null, Compiled: "-" },
+		{ Key: "engine_threshold_pct", Env: "APHRODITE_ENGINE_THRESHOLD_PCT", Compiled: "45" },
+		{ Key: "engine_protect_first", Env: "APHRODITE_ENGINE_PROTECT_FIRST", Compiled: "2" },
+		{ Key: "engine_protect_last", Env: "APHRODITE_ENGINE_PROTECT_LAST", Compiled: "5" },
+		{ Key: "engine_min_msgs", Env: "APHRODITE_ENGINE_MIN_MSGS", Compiled: "8" },
 		{ Key: "context_engine", Env: "APHRODITE_CONTEXT_ENGINE", Compiled: "true" },
+		{ Key: "live_container", Env: "APHRODITE_LIVE_CONTAINER", Compiled: "false" },
+		{ Key: "recursive_depth", Env: "APHRODITE_RECURSIVE_DEPTH", Compiled: "5" },
+		{ Key: "auto_reload", Env: "APHRODITE_AUTO_RELOAD", Compiled: "false" },
 	];
 	const DefaultsChain = [
 		{ Key: "api_url", Env: "APHRODITE_API_URL", Compiled: "https://api.openai.com" },
@@ -664,9 +814,14 @@ const Example = [
 					[
 						Chip(`env: ${Entry.Env} (unset here)`, "dim"),
 						Winner ?? Chip("toml: absent", "dim"),
-						Chip(`compiled: ${Entry.Compiled}`, Toml !== undefined ? "dim" : "fallback"),
+						Chip(
+							`compiled: ${Entry.Compiled}`,
+							Toml !== undefined ? "dim" : "fallback",
+						),
 					],
-					Toml !== undefined ? "TOML wins - one of the four hot-reload thresholds" : "compiled default wins",
+					Toml !== undefined
+						? "TOML wins - one of the four hot-reload thresholds"
+						: "compiled default wins",
 				),
 			);
 		}
@@ -678,8 +833,12 @@ const Example = [
 				Row(
 					`${Entry.Key} (dylib)`,
 					[
-						Entry.Env ? Chip(`env: ${Entry.Env} (unset here)`, "dim") : Chip("env: none documented", "dim"),
-						Toml !== undefined ? Chip(`toml: ${Toml}`, "live") : Chip("toml: absent", "dim"),
+						Entry.Env
+							? Chip(`env: ${Entry.Env} (unset here)`, "dim")
+							: Chip("env: none documented", "dim"),
+						Toml !== undefined
+							? Chip(`toml: ${Toml}`, "live")
+							: Chip("toml: absent", "dim"),
 						Chip(`default: ${Entry.Compiled}`, Toml !== undefined ? "dim" : "fallback"),
 					],
 					"read once at dylib load; runtime changes ride aphrodite_config_set",
@@ -703,7 +862,10 @@ const Example = [
 				Steps.push(Chip("defaults: absent", "dim"));
 			}
 			Steps.push(
-				Chip(`compiled: ${Entry.Compiled}`, !Proxy && Default === undefined ? "fallback" : "dim"),
+				Chip(
+					`compiled: ${Entry.Compiled}`,
+					!Proxy && Default === undefined ? "fallback" : "dim",
+				),
 			);
 			Parts.push(Row(Entry.Key, Steps, "env > per-proxy > defaults > compiled"));
 		}
@@ -730,8 +892,12 @@ const Example = [
 			Row(
 				"listen / mode (TOML-ONLY)",
 				[
-					Cache ? Chip(`cache: ${Cache.listen ?? "?"}`, "live") : Chip("cache proxy: absent", "dim"),
-					Token ? Chip(`token: ${Token.listen ?? "?"}`, "live") : Chip("token proxy: absent", "dim"),
+					Cache
+						? Chip(`cache: ${Cache.listen ?? "?"}`, "live")
+						: Chip("cache proxy: absent", "dim"),
+					Token
+						? Chip(`token: ${Token.listen ?? "?"}`, "live")
+						: Chip("token proxy: absent", "dim"),
 					Chip("no env override in multi-proxy mode", "dim"),
 				],
 				"a process-wide APHRODITE_MODE / APHRODITE_LISTEN would hit every proxy at once",
@@ -745,7 +911,14 @@ const Example = [
 		if (!ReloadOut || !ReloadParent) return;
 
 		const Compression = Parsed.Sections.compression ?? {};
-		const Applied = ["tool_threshold_token", "tool_threshold_cache", "inline_threshold", "code_multiplier"]
+		const Applied = [
+			"tool_threshold_token",
+			"tool_threshold_cache",
+			"inline_threshold",
+			"code_multiplier",
+			"auto_expand",
+			"auto_expand_limit",
+		]
 			.filter((Key) => Compression[Key] !== undefined)
 			.map((Key) => `"${Key}": ${Compression[Key]}`);
 		const Preview = Parsed.Sections.previews?.preview_max_chars;
@@ -753,12 +926,20 @@ const Example = [
 			Applied.push(`"preview_max_chars": ${Preview}`);
 		}
 
-		const Unwired = ["auto_expand", "auto_expand_limit", "catalog_mode", "classifier_poll"].filter(
+		const Unwired = ["catalog_mode", "classifier_poll"].filter(
 			(Key) => Compression[Key] !== undefined,
 		);
-		const Dylib = ["engine_threshold_pct", "context_engine", "terminal_threshold"].filter(
-			(Key) => Compression[Key] !== undefined,
-		);
+		const Dylib = [
+			"engine_threshold_pct",
+			"engine_protect_first",
+			"engine_protect_last",
+			"engine_min_msgs",
+			"context_engine",
+			"terminal_threshold",
+			"live_container",
+			"recursive_depth",
+			"auto_reload",
+		].filter((Key) => Compression[Key] !== undefined);
 
 		const Lines = [
 			'<span class="text-weathered-teal">{</span>',

@@ -21,11 +21,23 @@ const Previews = [
 ];
 
 const ProxyRows = [
-	{ F: "Tool output compression", Plugin: "transform_tool_result intercepts", Proxy: "proxy only sees HTTP traffic" },
+	{
+		F: "Tool output compression",
+		Plugin: "transform_tool_result intercepts",
+		Proxy: "proxy only sees HTTP traffic",
+	},
 	{ F: "Terminal compression", Plugin: "transform_terminal_output", Proxy: "no visibility" },
-	{ F: "Context engine", Plugin: "opt-in; catalog injected via pre_llm_call", Proxy: "unavailable" },
+	{
+		F: "Context engine",
+		Plugin: "opt-in; catalog injected via pre_llm_call",
+		Proxy: "unavailable",
+	},
 	{ F: "Auto-launch", Plugin: "proxies spawn at plugin load", Proxy: "manual aphrodite command" },
-	{ F: "aphrodite_* tools", Plugin: "13 tools in agent namespace", Proxy: "agent doesn't know about them" },
+	{
+		F: "aphrodite_* tools",
+		Plugin: "13 tools in agent namespace",
+		Proxy: "agent doesn't know about them",
+	},
 	{ F: "Prompt injection", Plugin: "directives, nudges, catalog", Proxy: "unavailable" },
 	{ F: "CCR storage", Plugin: "token + cache proxy", Proxy: "token + cache proxy" },
 ];
@@ -35,60 +47,72 @@ const ProxyRows = [
 	Title="HERMES // APHRODITE"
 	Description="How Hermes loads the Aphrodite plugin: the hook chain around a turn, the session lifecycle, the dual proxies on :9797 and :9798, and what the agent actually sees - type-aware previews instead of raw output."
 >
-	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
-	>
+	<main class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40">
 		<!-- HERO -->
 		<header class="relative flex w-full flex-col items-start">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
+			<div class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
 				HERMES // THE INTEGRATION
 			</div>
-			<h1
-				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
-			>
+			<h1 class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl">
 				Living inside Hermes
 			</h1>
 			<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a
 				client at.
-				<span class="mt-1 block text-base">It is the reason the interception lives inside
-				the turn: tool output never hits a wire, so only hook-level registration can catch
-				it before it becomes message history - six hooks, thirteen tools, and an optional
-				context engine, every call forwarded into the Rust dylib.</span>
-				<span class="mt-1 block text-base">Two proxy processes still run alongside as
-				subprocesses, and a canonical runtime home under
-				<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>
-				holds the binaries, config, CCR database, directives, and logs.</span>
+				<span class="mt-1 block text-base">
+					It is the reason the interception lives inside the turn: tool output never hits
+					a wire, so only hook-level registration can catch it before it becomes message
+					history - six hooks, thirteen tools, and an optional context engine, every call
+					forwarded into the Rust dylib.
+				</span>
+				<span class="mt-1 block text-base">
+					Two proxy processes still run alongside as subprocesses, and a canonical runtime
+					home under
+					<code class="font-mono text-base text-weathered-teal">
+						~/.hermes/aphrodite/
+					</code>
+					holds the binaries, config, CCR database, directives, and logs.
+				</span>
 			</p>
 		</header>
 
 		<!-- WHY NOT JUST A PROXY -->
 		<section class="relative w-full">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
+			<div class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
 				COMPARISON // WHY NOT JUST A PROXY
 			</div>
-			<div
-				class="zine-box-crimson w-full -rotate-[1deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
+			<div class="zine-box-crimson w-full -rotate-[1deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12">
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse font-mono text-base">
 						<thead>
 							<tr class="border-b-2 border-oxblood-dark text-left">
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">CAPABILITY</th>
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">NATIVE HERMES PLUGIN</th>
-								<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">GENERIC PROXY</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+									CAPABILITY
+								</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+									NATIVE HERMES PLUGIN
+								</th>
+								<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">
+									GENERIC PROXY
+								</th>
 							</tr>
 						</thead>
 						<tbody>
 							{ProxyRows.map((Row, I) => (
-								<tr class={I < ProxyRows.length - 1 ? "border-b border-oxblood-dark" : ""}>
+								<tr
+									class={
+										I < ProxyRows.length - 1
+											? "border-b border-oxblood-dark"
+											: ""
+									}
+								>
 									<td class="py-3 pr-4 align-top text-bone-white">{Row.F}</td>
-									<td class="py-3 pr-4 align-top text-weathered-teal">{Row.Plugin}</td>
-									<td class="py-3 align-top text-zinc-dust line-through decoration-raw-blood/60">{Row.Proxy}</td>
+									<td class="py-3 pr-4 align-top text-weathered-teal">
+										{Row.Plugin}
+									</td>
+									<td class="py-3 align-top text-zinc-dust line-through decoration-raw-blood/60">
+										{Row.Proxy}
+									</td>
 								</tr>
 							))}
 						</tbody>
@@ -104,31 +128,33 @@ const ProxyRows = [
 						because nothing intercepts it - the agent spends its token budget reading
 						noise instead of reasoning.
 					</p>
-					<p>
-						That is the baseline cost the other two configurations exist to remove.
-					</p>
+					<p>That is the baseline cost the other two configurations exist to remove.</p>
 					<p>
 						<span class="font-bold text-weathered-teal">HERMES + APHRODITE -</span> the
 						plugin lane intercepts output before it becomes message history.
 					</p>
 					<p>
-						The hooks classify, store, and replace raw output with a type-aware marker of
-						~15 tokens instead of hundreds, the agent retrieves the full content only when
-						it actually needs it, and the injection assembler adds directives, nudges, and
-						the recall catalog to every turn under a hard byte budget.
+						The hooks classify, store, and replace raw output with a type-aware marker
+						of ~15 tokens instead of hundreds, the agent retrieves the full content only
+						when it actually needs it, and the injection assembler adds directives,
+						nudges, and the recall catalog to every turn under a hard byte budget.
 					</p>
 					<p>
-						Measured over 200 real Hermes sessions: 26.9% of all context tokens deflected,
-						a median session saved ratio of 22.9%, and ~22,921 tokens saved per API call.
+						Measured over 200 real Hermes sessions: 26.9% of all context tokens
+						deflected, a median session saved ratio of 22.9%, and ~22,921 tokens saved
+						per API call.
 					</p>
 					<p>
 						THE TRADE-OFF IS STATED PLAINLY: the hooks are Hermes' contract - no other
 						client can register them, so this lane works with Hermes only.
 					</p>
 					<p>
-						<span class="font-bold text-stamped-canary">HERMES + APHRODITE + THE PROXY -</span>
-						the plugin already spawns both listeners, so the third configuration is running
-						without extra setup: point <code class="font-mono text-weathered-teal">base_url</code>
+						<span class="font-bold text-stamped-canary">
+							HERMES + APHRODITE + THE PROXY -
+						</span>
+						the plugin already spawns both listeners, so the third configuration is
+						running without extra setup: point{" "}
+						<code class="font-mono text-weathered-teal">base_url</code>
 						at <code class="font-mono text-weathered-teal">:9798</code> and any
 						OpenAI-compatible client gets the same CCR compression over plain HTTP.
 					</p>
@@ -147,19 +173,19 @@ const ProxyRows = [
 						Because of that the proxy extends the stack to other callers; it does not
 						replace the hooks inside Hermes.
 					</p>
-					<p class="mt-1 block">SRC: README.md:91-99, 219-299, 467-482; docs/guides/hermes-integration.md:115-141; docs/proxy/architecture.md:12-31; docs/tool-relay/callbacks.md:89-92.</p>
+					<p class="mt-1 block">
+						SRC: README.md:91-99, 219-299, 467-482;
+						docs/guides/hermes-integration.md:115-141; docs/proxy/architecture.md:12-31;
+						docs/tool-relay/callbacks.md:89-92.
+					</p>
 				</div>
 			</div>
 		</section>
 
 		<!-- SESSION LIFECYCLE -->
 		<section class="relative w-full lg:w-10/12 lg:self-end">
-			<div
-				class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
-				<div
-					class="absolute -top-5 left-6 z-10 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
-				>
+			<div class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12">
+				<div class="absolute -top-5 left-6 z-10 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]">
 					LIFECYCLE // SESSION TO SESSION
 				</div>
 				<h2 class="mb-12 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
@@ -167,20 +193,40 @@ const ProxyRows = [
 				</h2>
 				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
 					<div class="text-bone-white">hermes starts</div>
-					<div class="pl-4 text-bone-newsprint">→ plugin loads · dylib resolved once per process, smoke-tested in a subprocess</div>
-					<div class="pl-4 text-bone-newsprint">→ a faulting image degrades to "plugin disabled" instead of killing the gateway</div>
-					<div class="pl-4 text-bone-newsprint">→ two proxies spawn - a healthy pair is reused, never duplicated</div>
-					<div class="pl-4 text-stamped-canary">→ on_session_start resets all per-session state</div>
-					<div class="pl-4 text-weathered-teal">→ turn loop: pre_tool_call → transforms → pre_llm_call → post_llm_call</div>
-					<div class="pl-4 text-zinc-dust">→ session ends · markers do not survive a restart - a new session starts a fresh store</div>
+					<div class="pl-4 text-bone-newsprint">
+						→ plugin loads · dylib resolved once per process, smoke-tested in a
+						subprocess
+					</div>
+					<div class="pl-4 text-bone-newsprint">
+						→ a faulting image degrades to "plugin disabled" instead of killing the
+						gateway
+					</div>
+					<div class="pl-4 text-bone-newsprint">
+						→ two proxies spawn - a healthy pair is reused, never duplicated
+					</div>
+					<div class="pl-4 text-stamped-canary">
+						→ on_session_start resets all per-session state
+					</div>
+					<div class="pl-4 text-weathered-teal">
+						→ turn loop: pre_tool_call → transforms → pre_llm_call → post_llm_call
+					</div>
+					<div class="pl-4 text-zinc-dust">
+						→ session ends · markers do not survive a restart - a new session starts a
+						fresh store
+					</div>
 				</div>
 				<p class="mt-12 font-body text-base leading-relaxed text-zinc-dust">
 					THE DUAL PROXIES: TOKEN ON :9798 (SQLITE, PERSISTENT, COMPRESSES ABOVE 1 KB) AND
 					CACHE ON :9797 (IN-MEMORY, COMPRESSES ABOVE 8 KB). NO HOT-RELOAD - RESTART THE
 					SESSION TO PICK UP A NEW BUILD.
-					<span class="mt-1 block text-base">SRC: README.md:298-299; docs/guides/hermes-integration.md:107-108.</span>
+					<span class="mt-1 block text-base">
+						SRC: README.md:298-299; docs/guides/hermes-integration.md:107-108.
+					</span>
 				</p>
-				<figure class="mt-20 border border-oxblood-dark bg-soot-black p-4" data-diagram="session-lifecycle">
+				<figure
+					class="mt-20 border border-oxblood-dark bg-soot-black p-4"
+					data-diagram="session-lifecycle"
+				>
 					<div class="overflow-x-auto" set:html={SessionLifecycle} />
 					<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 						M8 // SESSION LIFECYCLE
@@ -191,21 +237,19 @@ const ProxyRows = [
 
 		<!-- PREVIEW SHOWCASE -->
 		<section class="relative w-full">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
+			<div class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
 				EVIDENCE // WHAT THE AGENT SEES
 			</div>
-			<div
-				class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
+			<div class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12">
 				<h2 class="mb-12 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					The twelve preview shapes
 				</h2>
 				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
 					{Previews.map((Line) => (
 						<div class="text-bone-newsprint">
-							<span class="text-stamped-canary">{Line.slice(0, Line.indexOf(":") + 1)}</span>
+							<span class="text-stamped-canary">
+								{Line.slice(0, Line.indexOf(":") + 1)}
+							</span>
 							{Line.slice(Line.indexOf(":") + 1)}
 						</div>
 					))}
@@ -216,8 +260,8 @@ const ProxyRows = [
 							WITHOUT APHRODITE:
 						</div>
 						<div class="border border-oxblood-dark bg-asphalt-panel p-4 font-mono text-base text-zinc-dust">
-							500 tokens of build output... scrolling... error? no... warning? no... ok it
-							passed. That was 500 tokens I'll never get back.
+							500 tokens of build output... scrolling... error? no... warning? no...
+							ok it passed. That was 500 tokens I'll never get back.
 						</div>
 					</div>
 					<div>
@@ -226,7 +270,10 @@ const ProxyRows = [
 						</div>
 						<div class="border border-oxblood-dark bg-asphalt-panel p-4 font-mono text-base">
 							<span class="text-bone-white">[build:0E 0W 1L]</span>
-							<span class="text-zinc-dust"> ← a few tokens. The agent knows: build passed.</span>
+							<span class="text-zinc-dust">
+								{" "}
+								← a few tokens. The agent knows: build passed.
+							</span>
 						</div>
 					</div>
 				</div>
@@ -240,29 +287,57 @@ const ProxyRows = [
 
 		<!-- CONTEXT ENGINE -->
 		<section class="relative w-full lg:w-9/12 lg:self-start">
-			<div
-				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
-				<div
-					class="absolute -top-5 right-6 z-10 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
-				>
+			<div class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12">
+				<div class="absolute -top-5 right-6 z-10 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
 					OPT-IN // CONTEXT ENGINE
 				</div>
 				<h2 class="mb-6 mt-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					The optional third integration point
 				</h2>
 				<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
-					Enable with <code class="font-mono text-base text-weathered-teal">APHRODITE_CONTEXT_ENGINE=1</code>.
-					It is non-destructive by design - the engine's
-					<code class="font-mono text-base text-weathered-teal">should_compress</code> always
-					returns False, deferring to Hermes' own threshold accounting while the proxy and
-					hooks do the heavy lifting.
+					Enable with{" "}
+					<code class="font-mono text-base text-weathered-teal">
+						APHRODITE_CONTEXT_ENGINE=1
+					</code>
+					. The engine is the session's middle-turn archiver: when the conversation index
+					fills past{" "}
+					<code class="font-mono text-base text-weathered-teal">
+						engine_threshold_pct
+					</code>
+					, it packs the middle turns (keeping
+					<code class="font-mono text-base text-weathered-teal">
+						engine_protect_first
+					</code>
+					at the start and
+					<code class="font-mono text-base text-weathered-teal">engine_protect_last</code>
+					at the end, once
+					<code class="font-mono text-base text-weathered-teal">engine_min_msgs</code>
+					turns exist) into one compact CCR entry and replaces them with a single marker,
+					so the model sees a short head + marker + tail history. The archive is in-place
+					but recoverable via{" "}
+					<code class="font-mono text-base text-weathered-teal">aphrodite_retrieve</code>.
 				</p>
 				<div class="space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-base text-bone-newsprint">
-					<div><span class="text-zinc-dust">engine_threshold_pct</span> <span class="text-stamped-canary">45</span> <span class="text-zinc-dust"># compress at % context fill</span></div>
-					<div><span class="text-zinc-dust">engine_protect_first</span> <span class="text-stamped-canary">2</span> <span class="text-zinc-dust"># messages kept at the start</span></div>
-					<div><span class="text-zinc-dust">engine_protect_last</span> <span class="text-stamped-canary">5</span> <span class="text-zinc-dust"># messages kept at the end</span></div>
-					<div><span class="text-zinc-dust">engine_min_msgs</span> <span class="text-stamped-canary">8</span> <span class="text-zinc-dust"># minimum messages before activating</span></div>
+					<div>
+						<span class="text-zinc-dust">engine_threshold_pct</span>{" "}
+						<span class="text-stamped-canary">30</span>{" "}
+						<span class="text-zinc-dust"># archive middle turns at % context fill</span>
+					</div>
+					<div>
+						<span class="text-zinc-dust">engine_protect_first</span>{" "}
+						<span class="text-stamped-canary">2</span>{" "}
+						<span class="text-zinc-dust"># messages kept at the start</span>
+					</div>
+					<div>
+						<span class="text-zinc-dust">engine_protect_last</span>{" "}
+						<span class="text-stamped-canary">5</span>{" "}
+						<span class="text-zinc-dust"># messages kept at the end</span>
+					</div>
+					<div>
+						<span class="text-zinc-dust">engine_min_msgs</span>{" "}
+						<span class="text-stamped-canary">8</span>{" "}
+						<span class="text-zinc-dust"># minimum messages before activating</span>
+					</div>
 				</div>
 			</div>
 		</section>

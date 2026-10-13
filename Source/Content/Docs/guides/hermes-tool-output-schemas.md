@@ -158,7 +158,7 @@ examples from the enriched catalog:
 When the classifier only reaches a generic bucket (`text`/`terminal`/`log`/
 empty), a semantic detector upgrades the arm to a high-signal shape (git
 status, git log, grep, ls, test) before Aphrodite builds the preview. The rendered
-preview length is capped by `preview_max_chars` (default 120;
+preview length is capped by `preview_max_chars` (default 0 = unlimited;
 `APHRODITE_PREVIEW_MAX_CHARS` overrides it, and environment beats TOML).
 The [Enriched Preview
 Catalog](/docs/proxy/compression/#enriched-preview-catalog) is authoritative

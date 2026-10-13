@@ -212,11 +212,10 @@ applied by the proxy.
 		"code_multiplier": 2.0
 	},
 	"parsed_only": {
-		"auto_expand": null,
-		"auto_expand_limit": null,
 		"terminal_threshold": null,
 		"engine_threshold_pct": null,
-		"catalog_mode": null
+		"catalog_mode": null,
+		"classifier_poll": null
 	}
 }
 ```

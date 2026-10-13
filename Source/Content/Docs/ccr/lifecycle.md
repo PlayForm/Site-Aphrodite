@@ -24,10 +24,13 @@ large enough to be worth compressing:
    rendered marker. A content block is only replaced when the store actually
    holds the hash - a failed store leaves the content uncompressed rather
    than emitting an unresolvable marker.
-4. If the content is above the inline threshold but below the compression
+4. With `[compression] auto_expand` enabled (the shipped default), the
+   just-stored content resolves inline instead of emitting a marker - capped
+   by `auto_expand_limit` (0 = unlimited).
+5. If the content is above the inline threshold but below the compression
    threshold, store it in the inline cache instead (see
    [Inline](/docs/ccr/backends/inline/)).
-5. Update the savings counters and the compression-ratio EMA used by
+6. Update the savings counters and the compression-ratio EMA used by
    auto-tune.
 
 `tool_calls[].function.arguments` is never a compression target: it is
@@ -102,11 +105,23 @@ The HTTP `/retrieve` endpoint resolves a hash to its original content:
 Full-document retrieval is byte-identical - including a trailing newline -
 so the returned body hashes back to the marker's own hash.
 
+### The retrieval-price law
+
+A marker's `size` is its retrieval cost: resolving it re-adds that many
+bytes to context. The priced-retrieval doctrine - the shipped default
+posture (`[directives] active = ["lazy", "lazy-eval", "foresight"]` plus the
+first-turn `session_inject` orientation) - treats every marker as a priced
+option: judge from the preview, type, and size whether the content is needed
+for the next action, retrieve deliberately, batch the markers you need into
+one turn, and defer the rest. Deferral is safe and free - the marker
+persists and stays retrievable.
+
 The Hermes `aphrodite_retrieve` tool is a separate path that resolves against
 the session's in-process inline store:
 
-- Recursive expansion of nested markers up to 5 levels deep; at the depth
-  limit the raw content is returned rather than a placeholder.
+- Recursive expansion of nested markers up to `recursive_depth` (default 5)
+  levels; at the depth limit the raw content is returned rather than a
+  placeholder.
 - Workspace-bounded file-path reads (10 MiB cap).
 - Inline-store fallback; never writes expanded content back over the stored
   entry, preserving the content-address invariant.
@@ -131,7 +146,10 @@ the session's in-process inline store:
 | Inline         | 256     | All   |
 
 Each is resolved as env var > TOML `[compression]` value > compiled-in
-default. The code multiplier defaults to 3.0.
+default. The code multiplier defaults to 3.0. The shipped example config
+lowers the proxy thresholds (`tool_threshold_token` 256,
+`tool_threshold_cache` 2048, `inline_threshold` 1024) and sets
+`code_multiplier` 1.0.
 
 ### Per-Type Multipliers
 

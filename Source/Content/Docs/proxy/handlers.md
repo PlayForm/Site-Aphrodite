@@ -313,9 +313,10 @@ POST /reload
 }
 ```
 
-`parsed_only` echoes `[compression]` keys that have no consumer in the proxy
-path (auto-expand, terminal threshold, engine threshold, catalog mode) - they
-are reported for visibility but not applied. A parse failure returns 500 with
+`parsed_only` echoes `[compression]` keys that the proxy path does not apply -
+the dylib-only settings (terminal threshold, engine threshold) and the
+parsed-but-unwired keys (catalog mode, classifier poll) - reported for
+visibility but not applied. A parse failure returns 500 with
 the error message.
 
 ## health_check
