@@ -1,6 +1,6 @@
 ---
 title: "Tool Relay Tools"
-section: "Tool-relay"
+section: "Tool Relay"
 ---
 
 # Tool Relay Tools

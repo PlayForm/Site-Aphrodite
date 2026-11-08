@@ -87,7 +87,10 @@ short-line structure:
    long prose lines, sentence per line, blank lines only between
    paragraphs), then `pnpm run Docs` to regenerate `Source/Content/Docs/`.
    A Markdown blank line splits a paragraph - do not add one inside a
-   sentence group.
+   sentence group. The generator skips `docs/research/`: an explorer report
+   written against a live Hermes runtime home carries local paths and
+   captured session state, so it stays repository-internal instead of
+   becoming a `/docs/research/` page.
 6. The arbiters: `pnpm run Drift` (all PASS) after every file; the
    whitespace check is zero space-indented lines (tabs only, tabWidth 4)
    and balanced `<p>` tags. NO `prepublishOnly` as the routine guard.
@@ -128,7 +131,7 @@ tags itself. The contract every page inherits:
    (card/title/description/image) are layout-fixed - never duplicated
    per page.
 3. `og:image` / `twitter:image` are `/Brand/OG.png?v=2` (relative; the
-   `?v=2` cache-buster added 2026-10-10 — `/Brand/*` is served with
+   `?v=2` cache-buster added 2026-10-10 - `/Brand/*` is served with
    `Cache-Control: immutable`, so a stale or errored response cached for
    the exact URL key at the edge or in a browser sticks for a year; bump
    the version whenever the OG raster meaningfully changes) and the

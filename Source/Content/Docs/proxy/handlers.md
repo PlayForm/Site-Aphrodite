@@ -287,8 +287,8 @@ DELETE /ccr/{hash}
 ## handle_ccr_reload
 
 Hot-reloads `aphrodite.toml` and applies the `[compression]` thresholds
-(cache, token, inline, code multiplier) plus the preview cap to the live
-`AppState`.
+(cache, token, inline, code multiplier), the auto-expand knobs, and the
+preview cap to the live `AppState`.
 
 ### Endpoint
 
@@ -307,17 +307,18 @@ POST /reload
 		"tool_threshold_cache": 8192,
 		"tool_threshold_token": 1024,
 		"inline_threshold": 256,
-		"code_multiplier": 3.0
+		"code_multiplier": 3.0,
+		"auto_expand": true,
+		"auto_expand_limit": 102400
 	},
 	"parsed_only": { ... }
 }
 ```
 
-`parsed_only` echoes `[compression]` keys that the proxy path does not apply -
-the dylib-only settings (terminal threshold, engine threshold) and the
-parsed-but-unwired keys (catalog mode, classifier poll) - reported for
-visibility but not applied. A parse failure returns 500 with
-the error message.
+`parsed_only` echoes `[compression]` keys that have no consumer in the proxy
+path (terminal threshold, engine threshold, catalog mode) - they are reported
+for visibility but not applied. A parse failure returns 500 with the error
+message.
 
 ## health_check
 
@@ -342,12 +343,26 @@ load-balancer probes work. Does not call the upstream - see
 	"ccr": true,
 	"mode": "token",
 	"version": "1.6.5",
-	"fill_pct": 90.0
+	"fill_pct": 90.0,
+	"fill_pct_kind": "compression_headroom",
+	"store_entries": 0
 }
 ```
 
-`version` reports the compiled `CARGO_PKG_VERSION`; `fill_pct` is the current
-headroom fill percentage (0.0-99.0).
+`version` reports the compiled `CARGO_PKG_VERSION`.
+
+`fill_pct` is a **compression-headroom** number, not store occupancy: it is
+`100 - compression_ratio_ema/20` clamped to `[1, 99]`, so a fresh process
+reports exactly `90.0` **with an empty store** and drifts toward `99` as the
+ratio approaches `1.0` (i.e. when little is being compressed). `fill_pct_kind`
+states that explicitly so the field cannot be misread as a capacity gauge.
+Store occupancy is `store_entries` here, and the full picture is on
+`/stats/db` (`total_entries`, `total_bytes_original`, `database_size_bytes`,
+`freelist_bytes`, `max_entries`, `max_bytes`, `evicted_total`). In
+`/stats/db`, `max_entries` / `max_bytes` are `null` when no cap is set
+(`store_max_entries` / `store_max_bytes` = `0` = unlimited), and
+`freelist_bytes` is the reclaimable slack the file still holds after
+purges and evictions.
 
 ## handle_retrieve
 

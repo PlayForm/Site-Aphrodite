@@ -80,6 +80,13 @@ const Example = [
 	"live_container = false      # WIRED (dylib): instant 'live' CCR markers for large tool results",
 	"recursive_depth = 5         # WIRED (dylib): max nested expansion depth",
 	"code_multiplier = 1.0       # multiply threshold for code types (hot-reloads)",
+	"# ── Store retention (SQLite token proxy) ─────────────────────────────────",
+	"# ccr_ttl_seconds bounds the store in TIME; these two bound it in SPACE:",
+	"# past either cap the least-recently-accessed rows are evicted, and an",
+	"# evicted hash becomes a retrieval miss, exactly like an expired one.",
+	"# Read at store open (NOT hot-reloaded); 0 = unlimited.",
+	"store_max_entries = 100000  # max live rows (env APHRODITE_STORE_MAX_ENTRIES)",
+	"store_max_bytes = 536870912 # max stored payload bytes, SUM(LENGTH(original)) (env APHRODITE_STORE_MAX_BYTES)",
 	"context_engine = true       # dylib-path only; the HTTP proxy never reads it",
 	"auto_reload = true          # dylib-path: watch aphrodite.toml and re-apply config on change",
 	"",
@@ -406,6 +413,20 @@ const Example = [
 								N: "multiplies the threshold for code_* types - hot-reloads",
 							},
 							{
+								K: "store_max_entries",
+								E: "100000",
+								C: "100000",
+								V: "APHRODITE_STORE_MAX_ENTRIES",
+								N: "max live rows in the SQLite store - LRU evicts past it; read at store open, not hot-reloaded",
+							},
+							{
+								K: "store_max_bytes",
+								E: "536870912",
+								C: "536870912",
+								V: "APHRODITE_STORE_MAX_BYTES",
+								N: "max stored payload bytes, SUM(LENGTH(original)) - LRU evicts past it; read at store open, not hot-reloaded",
+							},
+							{
 								K: "auto_expand",
 								E: "true",
 								C: "false",
@@ -502,7 +523,9 @@ const Example = [
 				Reload reaches the four bolded thresholds + auto_expand / auto_expand_limit +
 				preview_max_chars (plus the marker format/hint and the ccr_marker_hint knob); the
 				dylib keys ride aphrodite_config_set, and the file watcher applies the same
-				hot-reloadable set.
+				hot-reloadable set. The two store retention caps are the exception: they are read
+				when the SQLite store is opened, so a change takes effect on the next proxy
+				restart - not on save.
 			</p>
 		</section>
 
@@ -689,6 +712,8 @@ const Example = [
 		{ Key: "tool_threshold_cache", Env: "APHRODITE_TOOL_THRESHOLD_CACHE", Compiled: "8192" },
 		{ Key: "inline_threshold", Env: "APHRODITE_INLINE_THRESHOLD", Compiled: "256" },
 		{ Key: "code_multiplier", Env: "APHRODITE_CODE_MULTIPLIER", Compiled: "3.0" },
+		{ Key: "store_max_entries", Env: "APHRODITE_STORE_MAX_ENTRIES", Compiled: "100000" },
+		{ Key: "store_max_bytes", Env: "APHRODITE_STORE_MAX_BYTES", Compiled: "536870912" },
 		{ Key: "auto_expand", Env: "APHRODITE_AUTO_EXPAND", Compiled: "false" },
 		{ Key: "auto_expand_limit", Env: "APHRODITE_AUTO_EXPAND_LIMIT", Compiled: "102400" },
 		{ Key: "terminal_threshold", Env: "APHRODITE_TERMINAL_THRESHOLD", Compiled: "1024" },

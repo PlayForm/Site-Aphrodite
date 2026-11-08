@@ -5,12 +5,20 @@ import { Head } from "astro-capo";
 import { ClientRouter } from "astro:transitions";
 
 import { AllLinks, IsActive, MenuLinks, PrimaryLinks } from "@Library/Links";
-import { Stamps } from "@Library/Versions";
+import { Stamps, Versions } from "@Library/Versions";
 
 const { Title = "Aphrodite", Description = "" } = Astro.props;
 
 const DescriptionText =
 	Description || "CCR compression proxy + absorptive preview pipeline for Hermes Agent.";
+
+// The canonical origin, from `site` in astro.config.ts. Absolute URLs are
+// required for canonical links, og:url and the social image; when `site` is
+// unset the paths stay relative rather than resolving to a wrong origin.
+const Origin = Astro.site?.origin;
+
+const Absolute = (Path: string): string =>
+	Origin ? new URL(Path, Origin).href : Path;
 
 interface Props {
 	Title?: string;
@@ -43,27 +51,35 @@ interface Props {
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={Title} />
 		<meta name="twitter:description" content={DescriptionText} />
-		<meta name="twitter:image" content="/Brand/OG.png?v=2" />
+		<meta name="twitter:image" content={Absolute("/Brand/OG.png?v=2")} />
 
 		<!-- Open Graph -->
 		<meta property="og:type" content="website" />
 		<meta property="og:title" content={Title} />
 		<meta property="og:description" content={DescriptionText} />
-		<meta property="og:image" content="/Brand/OG.png?v=2" />
+		<meta property="og:image" content={Absolute("/Brand/OG.png?v=2")} />
+		<meta property="og:url" content={Absolute(Astro.url.pathname)} />
+		<link rel="canonical" href={Absolute(Astro.url.pathname)} />
 
-		<!-- Structured data -->
-		<script is:inline type="application/ld+json">
-			{
+		<!-- Structured data: the live version and the canonical URL, composed
+		     at build time rather than typed. -->
+		<script
+			is:inline
+			type="application/ld+json"
+			set:html={JSON.stringify({
 				"@context": "https://schema.org",
 				"@type": "SoftwareApplication",
-				"name": "Aphrodite",
-				"applicationCategory": "DeveloperApplication",
-				"operatingSystem": "Linux, macOS, Windows",
-				"offers": { "@type": "Offer", "price": "0" },
-				"license": "https://spdx.org/licenses/CC0-1.0.html",
-				"description": "CCR compression proxy + absorptive preview pipeline for Hermes Agent."
-			}
-		</script>
+				name: "Aphrodite",
+				applicationCategory: "DeveloperApplication",
+				operatingSystem: "Linux, macOS, Windows",
+				softwareVersion: Versions.Binary,
+				url: Absolute("/"),
+				offers: { "@type": "Offer", price: "0" },
+				license: "https://spdx.org/licenses/CC0-1.0.html",
+				description:
+					"CCR compression proxy + absorptive preview pipeline for Hermes Agent.",
+			})}
+		/>
 
 		<!-- Links -->
 		<link

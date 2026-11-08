@@ -1,6 +1,6 @@
 ---
 title: "Callbacks"
-section: "Tool-relay"
+section: "Tool Relay"
 ---
 
 # Callbacks

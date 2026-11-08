@@ -1,21 +1,23 @@
 {
-  "name": "@playform/starter",
+  "name": "@playform/aphrodite-site",
   "version": "0.0.1",
   "private": true,
-  "description": "Starter 📄",
+  "description": "Aphrodite site: the documentation and design surface for the CCR compression proxy and absorptive preview pipeline for Hermes Agent.",
   "keywords": [
+    "aphrodite",
+    "ccr",
+    "compression",
+    "hermes",
     "astro",
-    "starter",
-    "skeleton",
-    "playform"
+    "documentation"
   ],
-  "homepage": "https://GitHub.Com/PlayForm/Starter#readme",
+  "homepage": "https://Aphrodite.PlayForm.Cloud",
   "bugs": {
-    "url": "https://GitHub.Com/PlayForm/Starter/issues"
+    "url": "https://GitHub.Com/PlayForm/Aphrodite/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PlayForm/Starter.git"
+    "url": "git+https://github.com/PlayForm/Aphrodite.git"
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": {
@@ -39,15 +41,15 @@
     "@tailwindcss/aspect-ratio": "0.4.2",
     "@tailwindcss/forms": "0.5.11",
     "@tailwindcss/typography": "0.5.20",
-    "astro": "7.4.3",
+    "astro": "7.4.7",
     "astro-capo": "0.0.1",
     "astrojs-service-worker": "2.0.3",
     "autoprefixer": "10.6.2",
     "cssnano": "9.9.0",
     "cssnano-preset-advanced": "10.0.0",
     "dotenv": "18.0.9",
-    "firebase": "13.1.0",
-    "mermaid": "12.2.0",
+    "firebase": "13.2.0",
+    "mermaid": "12.3.0",
     "postcss": "8.5.32",
     "postcss-combine-duplicated-selectors": "11.0.0",
     "postcss-combine-media-query": "2.1.0",
@@ -55,7 +57,7 @@
     "postcss-reporter": "7.1.0",
     "postcss-url": "10.1.4",
     "puppeteer": "25.16.0",
-    "shiki": "4.5.0",
+    "shiki": "4.6.0",
     "tailwindcss": "3.4.19",
     "typescript": "7.0.2",
     "zod": "4.6.7"

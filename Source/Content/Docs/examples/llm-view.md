@@ -141,12 +141,10 @@ graph TD
 - The same listing compressed in later sessions yields the identical marker -
   the hash `e357cd16...|ls|5896` reappears byte-for-byte across several
   captures because the tree contents were identical at those moments.
-- `auto_expand = true` (the shipped example's default) resolves just-stored
-  output inline - capped by `auto_expand_limit` - so the model sees full
-  content without an explicit retrieve; `auto_expand = false` leaves the
-  marker in context and the model retrieves deliberately. The stored entry is
-  identical either way - auto-expansion changes what the session renders,
-  never what is stored.
+- `auto_expand = true` (default) expands such markers inline so the model sees
+  full content without an explicit retrieve; `auto_expand = false` leaves the
+  marker and the model retrieves deliberately. Either way the relayed marker
+  string is identical - auto-expansion is a client-side behavior.
 
 ## Scenario 5: Expanded vs Unexpanded
 
@@ -207,11 +205,11 @@ different preview text:
 
 Two more preview knobs from the captures:
 
-- `preview_max_chars` (0 = unlimited default) caps the rendered preview
-  string; longer signatures truncate with an ellipsis when a cap is set.
-- `code_structure_map` (documented but unwired - no reader) would control
-  whether function/type structure extraction feeds the code preview; today
-  the extraction is always on.
+- `preview_max_chars` (shipped default 0 = unlimited) caps the rendered
+  preview string; longer signatures truncate with an ellipsis.
+- `code_structure_map` stays unwired: it is parsed for schema compatibility
+  but not consulted, so function/type structure extraction always feeds the
+  code preview.
 
 ## Token Economics
 

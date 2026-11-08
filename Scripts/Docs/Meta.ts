@@ -9,7 +9,11 @@ export default (Content: string, Path: string): { Title: string; Section: string
 		Line ? Line.slice(2) : Path
 	).replaceAll(/\[([^\]]*)\]\([^)]*\)/g, "$1").trim();
 
-	const Names: Record<string, string> = { api: "API", ccr: "CCR" };
+	const Names: Record<string, string> = {
+		api: "API",
+		ccr: "CCR",
+		"tool-relay": "Tool Relay",
+	};
 
 	const First = Path.includes("/") ? (Path.split("/")[0] ?? "") : "";
 

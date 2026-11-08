@@ -104,7 +104,8 @@ const Tape: TapeStamp[] = [
 		Ver: `v${Versions.Binary}`,
 		Date: Versions.ChangelogDate,
 		Pair: `PLUGIN v${Versions.Plugin}`,
-		Landed: "Path guards: aphrodite_prefetch refuses .env, auth.json, ~/.ssh, the Hermes home, and non-file paths outright; the context engine is re-described as opt-in.",
+		Landed:
+			"Bounded CCR store: store_max_entries / store_max_bytes evict the least-recently-accessed rows past either cap, the expiry sweep turns debounced and index-driven (a missing-hash retrieve went 37.40 ms -> 0.22 ms on a 300k-row store), and fill_pct is relabelled as compression headroom; aphrodite-headroom-core 0.2.0 carries the fork-side store limits.",
 		Tag: "CURRENT PAIRING",
 		Enlarged: false,
 	},
@@ -315,7 +316,7 @@ const Tape: TapeStamp[] = [
 				}
 			</div>
 			<p class="mt-10 text-base text-zinc-dust">
-				SRC: CHANGELOG.md release headers (v0.7.0:1101, v1.2.2:948, v1.3.2:659, v1.3.4:606, v1.5.0:200, v1.5.1:191, v1.6.0:175, v1.6.3:104, v1.6.5:39, v1.6.6:3) + the GitHub release notes (Aphrodite/v*, incl. v1.4.6's chain-split + plugin-first note)
+				SRC: CHANGELOG.md release headers (v0.7.0:1219, v1.2.2:1066, v1.3.2:777, v1.3.4:724, v1.5.0:318, v1.5.1:309, v1.6.0:293, v1.6.3:222, v1.6.5:157, v1.6.6:121, v1.8.0:3) + the GitHub release notes (Aphrodite/v*, incl. v1.4.6's chain-split + plugin-first note)
 			</p>
 		</section>
 

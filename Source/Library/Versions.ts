@@ -73,6 +73,18 @@ function ReadYamlVersion(): string | null {
 	return Text?.match(/^version:\s*([^\s#]+)/m)?.[1] ?? null;
 }
 
+/**
+ * The vendored fork crate's version, or null. The fork lives at
+ * vendor/headroom (a git submodule); the binary links its headroom-core
+ * library only - upstream's proxy features are not part of the build.
+ */
+function ReadHeadroomVersion(): string | null {
+	const Text = ReadText(
+		join(Root, "vendor", "headroom", "crates", "headroom-core", "Cargo.toml"),
+	);
+	return Text?.match(/^version\s*=\s*"([^"]+)"/m)?.[1] ?? null;
+}
+
 /** The pinned binary version file's trimmed contents, or null. */
 function ReadBinaryVersionFile(): string | null {
 	return ReadText(join(Root, "plugins", "aphrodite", "BINARY_VERSION"))?.trim() || null;
@@ -107,15 +119,16 @@ export function ReleaseNote(Version: string): string {
 
 /** The documented fallbacks: the previously verified pairing, kept in the same shapes the Drift checks extract. */
 const Fallback = {
-	Binary: "1.6.6",
-	Hermes: "1.6.6",
-	Plugin: "2.2.6",
+	Binary: "1.8.0",
+	Hermes: "1.8.0",
+	Plugin: "2.3.1",
+	Headroom: "0.2.0",
 	BinaryVersionFile: "1.6.4",
 	Changelog: {
-		Version: "1.6.6",
-		Date: "2026-10-07",
-		Title: "Catalog review: prefetch path guard, setup hardening, opt-in context engine",
-		Pairing: "Binary `1.6.5 → 1.6.6`, plugin `2.2.5 → 2.2.6`",
+		Version: "1.8.0",
+		Date: "2026-11-08",
+		Title: "Bounded CCR store: retention caps, index-driven sweep, truthful telemetry",
+		Pairing: "Binary `1.7.0 → 1.8.0`, plugin `2.3.0 → 2.3.1`",
 	},
 };
 
@@ -127,6 +140,8 @@ export const Versions = {
 	Hermes: ReadCargoVersion("aphrodite-hermes") ?? Fallback.Hermes,
 	/** The Hermes plugin spec version (plugins/aphrodite/plugin.yaml). */
 	Plugin: ReadYamlVersion() ?? Fallback.Plugin,
+	/** The vendored fork crate's version (vendor/headroom/crates/headroom-core/Cargo.toml). */
+	Headroom: ReadHeadroomVersion() ?? Fallback.Headroom,
 	/** The plugin downloader's pinned binary version (plugins/aphrodite/BINARY_VERSION). */
 	BinaryVersionFile: ReadBinaryVersionFile() ?? Fallback.BinaryVersionFile,
 	/** The CHANGELOG head's entry version (the Drift-aligned current release). */

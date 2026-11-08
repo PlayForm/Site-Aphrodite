@@ -12,7 +12,10 @@ OpenAI-compatible client, or a native Hermes plugin with hook-level
 interception. CCR (Compress-Cache-Retrieve) storage, a 30-type classifier,
 context engine, and prefetch pipeline - all under 1ms.
 
-This tree documents the 1.6.6 binary and 2.2.6 plugin.
+This tree documents the current binary and plugin pairing. The version numbers
+are not repeated here - they live in `crates/aphrodite/Cargo.toml`,
+`plugins/aphrodite/plugin.yaml`, and the newest `CHANGELOG` entry, so a release
+never leaves this page advertising an older one.
 
 ## Getting Started
 
@@ -56,7 +59,7 @@ This tree documents the 1.6.6 binary and 2.2.6 plugin.
   `[defaults]`, `[compression]`, `[previews]`, `[templates.*]`, `[flow]`,
   precedence rules, config reload
 - [Environment Variables](/docs/config/env-vars/) - the `APHRODITE_*` registry
-  with the documented-but-unwired list
+  with the documented-but-inactive list
 
 ## Proxy
 

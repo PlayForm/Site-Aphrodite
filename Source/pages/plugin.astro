@@ -256,6 +256,18 @@ $ hermes`}
 					Hermes' provider config is NOT reused, and there is no keyless mode: without a
 					key the proxy refuses to start.
 				</p>
+				<p class="mt-12 border-t border-oxblood-dark pt-8 font-body text-base leading-relaxed text-zinc-dust">
+					A MISSING CONFIG IS REPORTED, NOT INFERRED: when
+					<code class="font-mono text-base text-weathered-teal">aphrodite.toml</code> is
+					absent the plugin says so, and the binary falls back to a single token-mode
+					listener on the first port - the second proxy never binds, and every
+					<code class="font-mono text-base text-weathered-teal">[compression]</code> knob,
+					the store retention caps included, is simply absent.
+					<span class="mt-1 block text-base">It is the reason the install runs
+					<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>:
+					the config file is written before the binary is ever started, so the fallback
+					never becomes the everyday state.</span>
+				</p>
 			</div>
 		</section>
 

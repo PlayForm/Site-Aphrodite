@@ -21,8 +21,11 @@ export default defineConfig({
 	srcDir: "./Source",
 	publicDir: "./Public",
 	outDir: "./Target",
-	// TODO Place your site URL here
-	// site: "",
+	// The site's canonical origin: the repository's own `homepage`
+	// (GitHub.Com/PlayForm/Site-Aphrodite -> https://Aphrodite.PlayForm.Cloud).
+	// @astrojs/sitemap needs it to emit absolute <loc> URLs, and every social
+	// and canonical tag composes against it, so it is stated here once.
+	site: "https://Aphrodite.PlayForm.Cloud",
 	compressHTML: true,
 	// The markdown code fences render through shiki (bundled with Astro) with
 	// the dark github-dark theme: the site is dark-only (soot-black panes), so

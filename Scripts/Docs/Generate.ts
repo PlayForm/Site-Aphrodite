@@ -20,6 +20,12 @@ const Source = process.env.DOCS_SOURCE
 // The generated content collection the /docs routes build from.
 const Target = resolve(Root, "Source", "Content", "Docs");
 
+// The docs sources that stay repository-internal: `research/` holds explorer
+// reports written against a live Hermes runtime home (local paths, captured
+// session state, README line citations), which is not public documentation.
+// The filter is by path prefix so a new report never silently becomes a page.
+const Internal = [/^research\//];
+
 export default async (): Promise<void> => {
 	// Hermetic fallback: when the root docs source is absent (e.g. the
 	// deployed Site repository), the committed generated content in
@@ -34,7 +40,11 @@ export default async (): Promise<void> => {
 
 	await rm(Target, { force: true, recursive: true });
 
-	const Files = await Collect(Source);
+	const Files = (await Collect(Source)).filter((File) => {
+		const Path = relative(Source, File).replaceAll("\\", "/");
+
+		return !Internal.some((Prefix) => Prefix.test(Path));
+	});
 
 	const Routes = new Map<string, string>();
 

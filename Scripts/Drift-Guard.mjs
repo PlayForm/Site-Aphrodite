@@ -105,8 +105,13 @@ Check(
 const CodeMultiplier = TomlExample.match(/^code_multiplier\s*=\s*([\d.]+)/m)?.[1] ?? null;
 const TemplateMultiplier = TomlTemplate.match(/^code_multiplier\s*=\s*([\d.]+)/m)?.[1] ?? null;
 Check("aphrodite.toml.example code_multiplier = the shipped template's", TemplateMultiplier, CodeMultiplier);
-const ReadmeCodeTier = Readme.match(/^\| Code\s*\|[^|]+\|\s*([^|]+?)\s*\|$/m)?.[1] ?? null;
-Check("README Code tier multiplier = the config's code_multiplier", CodeMultiplier, ReadmeCodeTier?.replace(/^×/, ""));
+const ReadmeCodeTier = Readme.match(/^\|\s*Code\s*\|[^|]+\|\s*([^|]+?)\s*\|$/m)?.[1] ?? null;
+// The cell states the multiplier and then explains it ("×1.0 (scaled by
+// `code_multiplier`)"): the guard compares the leading number, not the whole
+// cell, so a clarifying parenthetical is not reported as drift.
+const ReadmeCodeTierValue =
+	ReadmeCodeTier?.replace(/^×/, "").match(/^[\d.]+/)?.[0] ?? ReadmeCodeTier;
+Check("README Code tier multiplier = the config's code_multiplier", CodeMultiplier, ReadmeCodeTierValue);
 const LifecycleDoc = await Read(join(Docs, "ccr/lifecycle.md"));
 const TypesDoc = await Read(join(Docs, "classification/content-types.md"));
 Check(
