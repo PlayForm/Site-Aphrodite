@@ -21,10 +21,10 @@ import { Timeline } from "./Timeline.ts";
 
 /** "00:12.4" - the transport clock, one decimal so a 64-second cut reads precisely. */
 const Stamp = (Seconds: number): string => {
-	const Whole = Math.max(0, Seconds);
-	const Minutes = Math.floor(Whole / 60);
+	const Rounded = Math.round(Math.max(0, Seconds) * 10) / 10;
+	const Minutes = Math.floor(Rounded / 60);
 
-	return `${String(Minutes).padStart(2, "0")}:${(Whole - Minutes * 60).toFixed(1).padStart(4, "0")}`;
+	return `${String(Minutes).padStart(2, "0")}:${(Rounded - Minutes * 60).toFixed(1).padStart(4, "0")}`;
 };
 
 export default (): void => {
@@ -128,6 +128,7 @@ export default (): void => {
 			const Value = Number(Counter.dataset.count) || 0;
 			const Generation = (Counters.get(Counter) ?? 0) + 1;
 			const Start = performance.now();
+			let Painted = 0;
 
 			Counters.set(Counter, Generation);
 
@@ -137,6 +138,17 @@ export default (): void => {
 				}
 
 				const Progress = Short ? 1 : Math.min(1, (Now - Start) / 900);
+
+				// The counter repaints at most every 60ms: a per-frame text
+				// change forces a layout on every frame of the entrance.
+				if (Progress < 1 && Now - Painted < 60) {
+					requestAnimationFrame(Step);
+
+					return;
+				}
+
+				Painted = Now;
+
 				const Eased = 1 - (1 - Progress) ** 3;
 
 				Counter.textContent = Math.round(Value * Eased).toLocaleString("en-US");

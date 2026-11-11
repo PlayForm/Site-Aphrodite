@@ -50,6 +50,13 @@ body:has([data-deck]) footer {
 	pointer-events: none;
 }
 
+/* The site's code-mention pass turns file tokens inside the deck's copy into
+   source links. They must never take a click during a recording: the frame
+   is a control surface, not a document. */
+.deck a {
+	pointer-events: none;
+}
+
 /* ---- The scene stack ---- */
 
 /* The crossfade is asymmetric: the incoming scene eases in over 300 ms while
@@ -371,6 +378,7 @@ body:has([data-deck]) footer {
 	font-family: "Space Grotesk", sans-serif;
 	font-size: calc(5.2cqw * var(--type-scale));
 	font-weight: 700;
+	font-variant-numeric: tabular-nums;
 	line-height: 0.9;
 }
 
