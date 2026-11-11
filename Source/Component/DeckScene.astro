@@ -1,0 +1,320 @@
+---
+// DeckScene.astro - one beat of the 30-second deck: the tape stamp, the claim,
+// the supporting sentence, and the visual that carries the mechanism.
+//
+// Six visual branches, one per scene. The copy arrives typed from
+// Presentation/Scenes.ts; the hook and stage registries below trace to
+// plugins/aphrodite/plugin.yaml (six hooks, thirteen tools) and the site's
+// /hooks and /pipeline pages.
+
+import { Versions } from "@Library/Versions";
+
+import type { Scene } from "../Presentation/Scenes.ts";
+
+interface Props {
+	Scene: Scene;
+	Index: number;
+	Total: number;
+}
+
+const { Scene, Index, Total } = Astro.props;
+
+const Ordinal = String(Index + 1).padStart(2, "0");
+const Count = String(Total).padStart(2, "0");
+
+// The turn order the plugin registers: names from plugin.yaml's
+// provides_hooks, roles from the /hooks page. H3 and H4 are the intercept, so
+// they carry the hot state.
+const Hooks = [
+	{ Chip: "H1", Name: "on_session_start", Role: "resets per-session state", Hot: false },
+	{
+		Chip: "H2",
+		Name: "pre_tool_call",
+		Role: "backgrounds slow calls, splits chains",
+		Hot: false,
+	},
+	{
+		Chip: "H3",
+		Name: "transform_tool_result",
+		Role: "every tool result becomes a marker",
+		Hot: true,
+	},
+	{
+		Chip: "H4",
+		Name: "transform_terminal_output",
+		Role: "shell output becomes a marker, exit code kept",
+		Hot: true,
+	},
+	{
+		Chip: "H5",
+		Name: "pre_llm_call",
+		Role: "directives, nudges, recall under 4,000 chars",
+		Hot: false,
+	},
+	{
+		Chip: "H6",
+		Name: "post_llm_call",
+		Role: "archives the turn, advances the counter",
+		Hot: false,
+	},
+];
+
+// The four-stage pipeline: timings and storage from README.md's architecture
+// section and the site's pipeline module.
+const Stages = [
+	{ Index: "01", Name: "Classify", Metric: "40-123 ns", Note: "type-aware, first match wins" },
+	{ Index: "02", Name: "Preview", Metric: "~15 tokens", Note: "the enriched line, not the blob" },
+	{ Index: "03", Name: "Store", Metric: "BLAKE3", Note: "SQLite :9798, memory :9797" },
+	{ Index: "04", Name: "Decide", Metric: "on demand", Note: "aphrodite_retrieve(hash)" },
+];
+
+// The comparison is about the interception point, not a feature checklist:
+// a wire-level proxy only ever sees the HTTP payload.
+const Comparison = [
+	{
+		Side: "proxy",
+		Head: "Wire-level proxy // Headroom · RTK",
+		Rows: ["sees HTTP only", "raw already in history", "lossy, no address"],
+	},
+	{
+		Side: "plugin",
+		Head: "Boundary-level plugin // Aphrodite",
+		Rows: ["sees the tool call", "marker is the history", "retrievable address"],
+	},
+];
+
+// The measured study: 200 Hermes sessions, Sep 2026 (README.md).
+const Numbers = [
+	{ Value: "26.9%", Label: "of the budget deflected" },
+	{ Value: "156.3M", Label: "tokens saved" },
+	{ Value: "1.3%", Label: "retrieval tax" },
+	{ Value: "200", Label: "sessions measured" },
+];
+
+// The raw flood: a 142-line build output, the shape the classifier turns into
+// one marker. The tiers are the site's suppression opacities; the errors stay
+// at full signal because that is the classifier's whole point.
+const Terminal = [
+	{ Text: "$ cargo build --release 2>&1", Tier: "dim" },
+	{ Text: "   Compiling libc v0.2.168", Tier: "dim" },
+	{ Text: "   Compiling tokio v1.47.1", Tier: "fade" },
+	{ Text: "   Compiling serde v1.0.219", Tier: "fade" },
+	{ Text: "   Compiling axum v0.8.4", Tier: "fade" },
+	{ Text: "   ... 136 more identical lines ...", Tier: "mute" },
+	{ Text: "warning: unused import: `HashMap`", Tier: "signal" },
+	{ Text: "error[E0432]: unresolved import `crate::stage3`", Tier: "signal" },
+	{ Text: "error: could not compile `aphrodite` due to 1 previous error", Tier: "signal" },
+];
+---
+
+<section
+	class="deck-scene"
+	data-scene
+	data-active={String(Index === 0)}
+	data-visual={Scene.Visual}
+	aria-hidden={Index === 0 ? "false" : "true"}
+	aria-label={`Beat ${Ordinal}: ${Scene.Title}`}
+	inert={Index !== 0}
+>
+	{
+		Scene.Visual === "opening" && (
+			<div class="deck-open">
+				<div class="deck-open-plate deck-reveal" style="--delay:80ms">
+					<div class="deck-open-mark">
+						<img
+							src="/Brand/aphrodite.svg"
+							alt="Aphrodite brand mark"
+							width="160"
+							height="160"
+						/>
+					</div>
+					<span class="deck-open-tape">CCR CORE // STENCIL</span>
+				</div>
+				<div class="deck-open-copy">
+					<span class="deck-kicker deck-reveal">{Scene.Beat}</span>
+					<h1 class="deck-open-title deck-reveal" style="--delay:140ms">
+						{Scene.Title}
+					</h1>
+					<p class="deck-open-body deck-reveal" style="--delay:240ms">
+						{Scene.Body}
+					</p>
+					<div class="deck-chips deck-reveal" style="--delay:340ms">
+						<span class="deck-chip">aphrodite.playform.cloud</span>
+						<span class="deck-chip" data-tone="canary">{`plugin v${Versions.Plugin}`}</span>
+						<span class="deck-chip" data-tone="teal">{`binary v${Versions.Binary}`}</span>
+					</div>
+				</div>
+			</div>
+		)
+	}
+
+	{
+		Scene.Visual === "closing" && (
+			<div class="deck-close">
+				<span class="deck-kicker deck-reveal">{Scene.Beat}</span>
+				<h2 class="deck-close-title deck-reveal" style="--delay:120ms">
+					{Scene.Title}
+				</h2>
+				<p class="deck-close-body deck-reveal" style="--delay:220ms">{Scene.Body}</p>
+				<div class="deck-commands deck-reveal" style="--delay:300ms">
+					<div class="deck-command">
+						<span class="deck-command-prompt">$</span>
+						{" hermes plugins install aphrodite"}
+					</div>
+					<div class="deck-command">
+						<span class="deck-command-prompt">$</span>
+						{" cd ~/.hermes/plugins/aphrodite && bash download.sh"}
+					</div>
+				</div>
+				<div class="deck-close-foot deck-reveal" style="--delay:380ms">
+					<span class="deck-url">aphrodite.playform.cloud</span>
+					<span class="deck-chip">one binary</span>
+					<span class="deck-chip">six hooks</span>
+					<span class="deck-chip">thirteen tools</span>
+				</div>
+			</div>
+		)
+	}
+
+	{
+		(Scene.Visual === "flood" ||
+			Scene.Visual === "pipeline" ||
+			Scene.Visual === "hooks" ||
+			Scene.Visual === "ledger") && (
+			<div class="deck-slide">
+				<div class="deck-head">
+					<span class="deck-kicker deck-reveal">{Scene.Beat}</span>
+					<span class="deck-count deck-reveal" style="--delay:60ms">
+						{Ordinal} / {Count}
+					</span>
+				</div>
+				<h2 class="deck-title deck-reveal" style="--delay:120ms">
+					{Scene.Title}
+				</h2>
+				<p class="deck-body deck-reveal" style="--delay:220ms">{Scene.Body}</p>
+				<div class="deck-visual deck-reveal" style="--delay:320ms">
+					{Scene.Visual === "flood" && (
+						<div class="deck-flood">
+							<div class="deck-terminal">
+								<div class="deck-terminal-bar">
+									<span>raw // tool result</span>
+									<span>142 lines</span>
+								</div>
+								<div class="deck-terminal-body">
+									{Terminal.map((Line) => (
+										<div class="deck-line" data-tier={Line.Tier}>
+											{Line.Text}
+										</div>
+									))}
+								</div>
+							</div>
+							<div class="deck-budget">
+								<div class="deck-meter">
+									<div class="deck-meter-head">
+										<span>raw result</span>
+										<span class="deck-meter-value">1,400 tok</span>
+									</div>
+									<div class="deck-meter-track">
+										<div class="deck-meter-fill" style="width:100%" />
+									</div>
+								</div>
+								<div class="deck-meter" data-kind="marker">
+									<div class="deck-meter-head">
+										<span>marker</span>
+										<span class="deck-meter-value">15 tok</span>
+									</div>
+									<div class="deck-meter-track">
+										<div class="deck-meter-fill" style="width:3%" />
+									</div>
+								</div>
+								<p class="deck-budget-note">
+									One line the model can act on. The rest waits behind a hash.
+								</p>
+							</div>
+						</div>
+					)}
+
+					{Scene.Visual === "pipeline" && (
+						<div class="deck-pipeline">
+							<div class="deck-stages">
+								{Stages.map((Stage) => (
+									<div class="deck-stage">
+										<span class="deck-stage-index">{Stage.Index} // STAGE</span>
+										<span class="deck-stage-name">{Stage.Name}</span>
+										<span class="deck-stage-metric">{Stage.Metric}</span>
+										<span class="deck-stage-note">{Stage.Note}</span>
+									</div>
+								))}
+							</div>
+							<div class="deck-marker-pane">
+								<div>
+									<div class="deck-preview">
+										{"[build:1E 1W 142L | error[E0432]: unresolved import ...]"}
+									</div>
+									<div class="deck-marker">
+										{"<<<CCR:0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e|build|1420>>>"}
+									</div>
+								</div>
+								<div class="deck-marker-side">
+									<span class="deck-marker-value">1,420 B</span>
+									<span class="deck-marker-label">original, unchanged</span>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{Scene.Visual === "hooks" && (
+						<div class="deck-hooks">
+							<div class="deck-hook-grid">
+								{Hooks.map((Hook) => (
+									<div class="deck-hook" data-hot={String(Hook.Hot)}>
+										<span class="deck-hook-chip">{Hook.Chip}</span>
+										<span class="deck-hook-name">{Hook.Name}</span>
+										<span class="deck-hook-role">{Hook.Role}</span>
+									</div>
+								))}
+							</div>
+							<div class="deck-hook-foot">
+								<span class="deck-badge">6 hooks registered</span>
+								<span class="deck-badge">13 tools in namespace</span>
+								<span class="deck-badge" data-tone="teal">ctypes shim -&gt; rust dylib</span>
+								<span class="deck-badge">4,096 / 1,024 char gates</span>
+							</div>
+						</div>
+					)}
+
+					{Scene.Visual === "ledger" && (
+						<div class="deck-ledger">
+							<div class="deck-compare">
+								{Comparison.map((Side) => (
+									<div class="deck-side" data-side={Side.Side}>
+										<span class="deck-side-head">{Side.Head}</span>
+										{Side.Rows.map((Row) => (
+											<div class="deck-side-row">
+												<span
+													class="deck-mark"
+													data-mark={Side.Side === "proxy" ? "no" : "yes"}
+												>
+													{Side.Side === "proxy" ? "×" : "✓"}
+												</span>
+												<span>{Row}</span>
+											</div>
+										))}
+									</div>
+								))}
+							</div>
+							<div class="deck-numbers">
+								{Numbers.map((Entry) => (
+									<div class="deck-number">
+										<span class="deck-number-value">{Entry.Value}</span>
+										<span class="deck-number-label">{Entry.Label}</span>
+									</div>
+								))}
+							</div>
+						</div>
+					)}
+				</div>
+			</div>
+		)
+	}
+</section>

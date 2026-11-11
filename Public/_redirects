@@ -4,7 +4,7 @@
 # This prevents the service worker from breaking on redirect chains.
 # Regenerated on every build by Source/Library/Redirects.ts.
 
-# ── VARIANT REWRITES (200) - 1107 rules ──
+# ── VARIANT REWRITES (200) - 1116 rules ──
 # kebab-case, lowerCase, UPPERCASE, TitleCase, plural/singular, flat forms → canonical.
 //                                    /                                     200
 /benchmark                            /benchmarks/                          200
@@ -1064,6 +1064,15 @@
 /PLUGINS                              /plugin/                              200
 /plugins/                             /plugin/                              200
 /PLUGINS/                             /plugin/                              200
+/Presentation                         /presentation/                        200
+/PRESENTATION                         /presentation/                        200
+/presentation/                        /presentation/                        200
+/Presentation/                        /presentation/                        200
+/PRESENTATION/                        /presentation/                        200
+/presentations                        /presentation/                        200
+/PRESENTATIONS                        /presentation/                        200
+/presentations/                       /presentation/                        200
+/PRESENTATIONS/                       /presentation/                        200
 /reference                            /docs/                                200
 /reference/                           /docs/                                200
 /Setup                                /setup/                               200
@@ -1175,6 +1184,7 @@
 /hermes                               /hermes/                              200
 /hooks                                /hooks/                               200
 /plugin                               /plugin/                              200
+/presentation                         /presentation/                        200
 /setup                                /setup/                               200
 /showcase                             /showcase/                            200
 /tools                                /tools/                               200

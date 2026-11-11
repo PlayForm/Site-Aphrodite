@@ -1,0 +1,69 @@
+---
+// presentation.astro - the 30-second browser deck for aphrodite.playform.cloud.
+//
+// The route renders every beat at build time (the deck is readable and
+// inspectable without JavaScript) and hands the clock to Presentation/Player.ts.
+// The frame is a fixed 16:9 box, so a recording of any window carries the same
+// composition; the transport retracts during playback and the progress hairline
+// stays.
+
+import Base from "@Layout/Base.astro";
+
+import DeckScene from "@Component/DeckScene.astro";
+
+import { Scenes } from "../Presentation/Scenes.ts";
+import { Timeline } from "../Presentation/Timeline.ts";
+
+import "@Stylesheet/Deck.css";
+
+const Total = Scenes.length;
+
+// The static clock reads the same total the player seeks against, so the
+// no-JavaScript frame is not a wrong number.
+const Span = `${String(Math.floor(Timeline.Total / 60)).padStart(2, "0")}:${(Timeline.Total % 60).toFixed(1).padStart(4, "0")}`;
+---
+
+<Base
+	Title="PRESENTATION // APHRODITE"
+	Description="A 30-second browser presentation: how Aphrodite's Hermes plugin intercepts tool output at the hook boundary, and why the token saving beats a wire-level proxy."
+>
+	<main class="deck" data-deck data-ui="hidden">
+		<div class="deck-frame" data-frame>
+			{
+				Scenes.map((Scene, Index) => (
+					<DeckScene Scene={Scene} Index={Index} Total={Total} />
+				))
+			}
+
+			<div class="deck-progress" aria-hidden="true">
+				<div class="deck-progress-fill" data-progress-fill></div>
+				{
+					Timeline.Starts.map((Start, Index) =>
+						Index === 0 ? null : (
+							<span
+								class="deck-progress-tick"
+								style={`left:${((Start / Timeline.Total) * 100).toFixed(3)}%`}
+							/>
+						),
+					)
+				}
+			</div>
+
+			<div class="deck-ui" data-control>
+				<button class="deck-ui-button" type="button" data-toggle data-control>PLAY</button>
+				<span class="deck-ui-clock" data-clock>{`00:00.0 / ${Span}`}</span>
+				<span class="deck-ui-status" data-status>PAUSED</span>
+				<span class="deck-ui-spacer"></span>
+				<span class="deck-ui-keys">
+					SPACE PLAY/PAUSE · LEFT/RIGHT SCENE · R RESTART · F FULLSCREEN · H HIDE UI
+				</span>
+			</div>
+		</div>
+	</main>
+
+	<script>
+		import Player from "../Presentation/Player.ts";
+
+		Player();
+	</script>
+</Base>
