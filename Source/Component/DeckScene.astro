@@ -1,12 +1,15 @@
 ---
-// DeckScene.astro - one beat of the 60-second deck: the tape stamp, the claim,
+// DeckScene.astro - one beat of the 64-second deck: the tape stamp, the claim,
 // the supporting sentence, and the visual that carries the mechanism.
 //
-// Ten visual branches, one per scene. The copy arrives typed from
+// Eleven visual branches, one per scene. The copy arrives typed from
 // Presentation/Scenes.ts; the hook registry traces to
 // plugins/aphrodite/plugin.yaml (six hooks, thirteen tools), the threshold
 // tiers to aphrodite.toml's defaults, and the preview shapes to the README's
 // own catalog.
+//
+// The content root carries data-enter: the player animates it once per entry,
+// as one transform for the whole scene. Nothing inside a scene is staggered.
 
 import { Versions } from "@Library/Versions";
 
@@ -117,12 +120,14 @@ const Shapes = [
 const Comparison = [
 	{
 		Side: "proxy",
+		State: "without",
 		Head: "Wire-level proxy // Headroom · RTK",
 		Rows: ["sees HTTP only", "raw already in history", "lossy, no address"],
 	},
 	{
 		Side: "plugin",
-		Head: "Boundary-level plugin // Aphrodite",
+		State: "with aphrodite",
+		Head: "Boundary-level plugin",
 		Rows: ["sees the tool call", "marker is the history", "retrievable address"],
 	},
 ];
@@ -138,20 +143,38 @@ const Numbers = [
 // The raw flood: a 142-line build output, the shape the classifier turns into
 // one marker. The tiers are the site's suppression opacities; the errors stay
 // at full signal because that is the classifier's whole point.
-const Terminal = [
+const Log = [
 	{ Text: "$ cargo build --release 2>&1", Tier: "dim" },
-	{ Text: "   Compiling libc v0.2.168", Tier: "dim" },
-	{ Text: "   Compiling tokio v1.47.1", Tier: "fade" },
+	{ Text: "   Compiling libc v0.2.168", Tier: "fade" },
+	{ Text: "   Compiling proc-macro2 v1.0.94", Tier: "fade" },
+	{ Text: "   Compiling unicode-ident v1.0.18", Tier: "mute" },
+	{ Text: "   Compiling cfg-if v1.0.3", Tier: "fade" },
 	{ Text: "   Compiling serde v1.0.219", Tier: "fade" },
+	{ Text: "   Compiling tokio v1.47.1", Tier: "fade" },
+	{ Text: "   Compiling futures-core v0.3.31", Tier: "mute" },
 	{ Text: "   Compiling axum v0.8.4", Tier: "fade" },
-	{ Text: "   ... 136 more identical lines ...", Tier: "mute" },
+	{ Text: "   Compiling hyper v1.6.0", Tier: "mute" },
+	{ Text: "   Compiling tower v0.5.2", Tier: "fade" },
+	{ Text: "   Compiling aphrodite v1.8.0", Tier: "dim" },
 	{ Text: "warning: unused import: `HashMap`", Tier: "signal" },
+	{ Text: "  --> crates/aphrodite/src/preview.rs:12:5", Tier: "fade" },
+	{ Text: "   Compiling aphrodite-hermes v1.8.0", Tier: "dim" },
 	{ Text: "error[E0432]: unresolved import `crate::stage3`", Tier: "signal" },
+	{ Text: "  --> crates/aphrodite/src/main.rs:14:5", Tier: "fade" },
 	{ Text: "error: could not compile `aphrodite` due to 1 previous error", Tier: "signal" },
 ];
 
+// The scroll track holds two copies of the log, so a -50% translation loops
+// seamlessly while the panel shows a continuous fast scroll.
+const Scroll = [...Log, ...Log];
+
+// The streaming copy for the split scene: twelve lines, ending on the two
+// error lines, so the digest on the right lands after the failure is visible.
+const StreamLog = Log.slice(0, 12);
+
 const Sliding = [
-	"flood",
+	"default",
+	"transform",
 	"overview",
 	"classify",
 	"preview",
@@ -166,7 +189,6 @@ const Sliding = [
 	class="deck-scene"
 	data-scene
 	data-active={String(Index === 0)}
-	data-reveal={Index === 0 ? "true" : "false"}
 	data-visual={Scene.Visual}
 	aria-hidden={Index === 0 ? "false" : "true"}
 	aria-label={`Beat ${Ordinal}: ${Scene.Title}`}
@@ -174,8 +196,8 @@ const Sliding = [
 >
 	{
 		Scene.Visual === "opening" && (
-			<div class="deck-open">
-				<div class="deck-open-plate deck-reveal" style="--delay:40ms">
+			<div class="deck-open" data-enter>
+				<div class="deck-open-plate">
 					<div class="deck-open-mark">
 						<img
 							src="/Brand/aphrodite.svg"
@@ -187,14 +209,10 @@ const Sliding = [
 					<span class="deck-open-tape">CCR CORE // STENCIL</span>
 				</div>
 				<div class="deck-open-copy">
-					<span class="deck-kicker deck-reveal">{Scene.Beat}</span>
-					<h1 class="deck-open-title deck-reveal" style="--delay:90ms">
-						{Scene.Title}
-					</h1>
-					<p class="deck-open-body deck-reveal" style="--delay:150ms">
-						{Scene.Body}
-					</p>
-					<div class="deck-chips deck-reveal" style="--delay:210ms">
+					<span class="deck-kicker">{Scene.Beat}</span>
+					<h1 class="deck-open-title">{Scene.Title}</h1>
+					<p class="deck-open-body">{Scene.Body}</p>
+					<div class="deck-chips">
 						<span class="deck-chip">aphrodite.playform.cloud</span>
 						<span class="deck-chip" data-tone="canary">{`plugin v${Versions.Plugin}`}</span>
 						<span class="deck-chip" data-tone="teal">{`binary v${Versions.Binary}`}</span>
@@ -206,13 +224,11 @@ const Sliding = [
 
 	{
 		Scene.Visual === "closing" && (
-			<div class="deck-close">
-				<span class="deck-kicker deck-reveal">{Scene.Beat}</span>
-				<h2 class="deck-close-title deck-reveal" style="--delay:80ms">
-					{Scene.Title}
-				</h2>
-				<p class="deck-close-body deck-reveal" style="--delay:140ms">{Scene.Body}</p>
-				<div class="deck-commands deck-reveal" style="--delay:200ms">
+			<div class="deck-close" data-enter>
+				<span class="deck-kicker">{Scene.Beat}</span>
+				<h2 class="deck-close-title">{Scene.Title}</h2>
+				<p class="deck-close-body">{Scene.Body}</p>
+				<div class="deck-commands">
 					<div class="deck-command">
 						<span class="deck-command-prompt">$</span>
 						{" hermes plugins install aphrodite"}
@@ -222,7 +238,7 @@ const Sliding = [
 						{" cd ~/.hermes/plugins/aphrodite && bash download.sh"}
 					</div>
 				</div>
-				<div class="deck-close-foot deck-reveal" style="--delay:260ms">
+				<div class="deck-close-foot">
 					<span class="deck-url">aphrodite.playform.cloud</span>
 					<span class="deck-chip">one binary</span>
 					<span class="deck-chip">six hooks</span>
@@ -234,59 +250,89 @@ const Sliding = [
 
 	{
 		Sliding.includes(Scene.Visual) && (
-			<div class="deck-slide">
+			<div class="deck-slide" data-enter>
 				<div class="deck-head">
-					<span class="deck-kicker deck-reveal">{Scene.Beat}</span>
-					<span class="deck-count deck-reveal" style="--delay:40ms">
+					<span class="deck-kicker">{Scene.Beat}</span>
+					<span class="deck-count">
 						{Ordinal} / {Count}
 					</span>
 				</div>
-				<h2 class="deck-title deck-reveal" style="--delay:70ms">
-					{Scene.Title}
-				</h2>
-				<p class="deck-body deck-reveal" style="--delay:130ms">{Scene.Body}</p>
-				<div class="deck-visual deck-reveal" style="--delay:190ms">
-					{Scene.Visual === "flood" && (
-						<div class="deck-flood">
+				<h2 class="deck-title">{Scene.Title}</h2>
+				<p class="deck-body">{Scene.Body}</p>
+				<div class="deck-visual">
+					{Scene.Visual === "default" && (
+						<div class="deck-default">
 							<div class="deck-terminal">
 								<div class="deck-terminal-bar">
-									<span>raw // tool result</span>
-									<span>142 lines</span>
+									<span class="deck-state" data-state="default">by default</span>
+									<span>raw tool output</span>
+									<span class="deck-terminal-metric">streaming</span>
 								</div>
-								<div class="deck-terminal-body">
-									{Terminal.map((Line) => (
+								<div class="deck-scroll">
+									<div class="deck-scroll-track">
+										{Scroll.map((Line) => (
+											<div class="deck-line" data-tier={Line.Tier}>
+												{Line.Text}
+											</div>
+										))}
+									</div>
+								</div>
+							</div>
+							<div class="deck-default-stat">
+								<span class="deck-default-value" data-count="1400">1,400</span>
+								<span class="deck-default-label">tokens per build</span>
+								<p class="deck-default-note">
+									Every line enters the context. Every later turn pays for it again.
+								</p>
+								<div class="deck-badges">
+									<span class="deck-badge">142 lines</span>
+									<span class="deck-badge">1 error</span>
+									<span class="deck-badge" data-tone="teal">no marker</span>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{Scene.Visual === "transform" && (
+						<div class="deck-split">
+							<div class="deck-split-side" data-side="user" data-enter>
+								<div class="deck-split-head">
+									<span class="deck-state" data-state="default">by default</span>
+									<span>user // terminal</span>
+									<span class="deck-split-metric">streaming</span>
+								</div>
+								<div class="deck-split-log" data-stream>
+									{StreamLog.map((Line) => (
 										<div class="deck-line" data-tier={Line.Tier}>
 											{Line.Text}
 										</div>
 									))}
-									<div class="deck-line">
-										<span class="deck-cursor" />
-									</div>
 								</div>
+								<span class="deck-split-foot">
+									<span data-count="1400">1,400</span>
+									{" tokens, still on screen"}
+								</span>
 							</div>
-							<div class="deck-budget">
-								<div class="deck-meter">
-									<div class="deck-meter-head">
-										<span>raw result</span>
-										<span class="deck-meter-value">1,400 tok</span>
-									</div>
-									<div class="deck-meter-track">
-										<div class="deck-meter-fill" style="width:100%" />
-									</div>
-								</div>
-								<div class="deck-meter" data-kind="marker">
-									<div class="deck-meter-head">
-										<span>marker</span>
-										<span class="deck-meter-value">15 tok</span>
-									</div>
-									<div class="deck-meter-track">
-										<div class="deck-meter-fill" style="width:3%" />
-									</div>
-								</div>
-								<p class="deck-budget-note">
-									One line the model can act on. The rest waits behind a hash.
-								</p>
+							<div class="deck-split-mid" data-enter="980">
+								<span class="deck-type-pill">build</span>
+								<span class="deck-split-arrow">→</span>
+								<span class="deck-split-steps">classify · preview · store</span>
 							</div>
+							<div class="deck-split-side" data-side="agent" data-enter="1080">
+								<div class="deck-split-head">
+									<span class="deck-state" data-state="active">with aphrodite</span>
+									<span>agent // context</span>
+									<span class="deck-split-metric">~15 tokens</span>
+								</div>
+								<div class="deck-preview-line">
+									{"[build:1E 1W 142L | error[E0432]: unresolved import ...]"}
+								</div>
+								<div class="deck-marker-line">
+									{"<<<CCR:0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e|build|1420>>>"}
+								</div>
+								<span class="deck-split-foot">the original is one call away</span>
+							</div>
+							<span class="deck-wipe" data-wipe="980" />
 						</div>
 					)}
 
@@ -344,11 +390,8 @@ const Sliding = [
 
 					{Scene.Visual === "preview" && (
 						<div class="deck-shapes">
-							{Shapes.map((Shape, ShapeIndex) => (
-								<div
-									class="deck-shape deck-reveal"
-									style={`--delay:${220 + ShapeIndex * 55}ms`}
-								>
+							{Shapes.map((Shape) => (
+								<div class="deck-shape">
 									<span class="deck-shape-type">{Shape.Type}</span>
 									<code class="deck-shape-line">{Shape.Line}</code>
 								</div>
@@ -359,27 +402,15 @@ const Sliding = [
 					{Scene.Visual === "store" && (
 						<div class="deck-store">
 							<div class="deck-marker-map">
-								<div
-									class="deck-marker-field deck-reveal"
-									data-field="hash"
-									style="--delay:220ms"
-								>
+								<div class="deck-marker-field" data-field="hash">
 									<span class="deck-marker-field-label">hash // 40 hex</span>
 									<code>0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e</code>
 								</div>
-								<div
-									class="deck-marker-field deck-reveal"
-									data-field="type"
-									style="--delay:300ms"
-								>
+								<div class="deck-marker-field" data-field="type">
 									<span class="deck-marker-field-label">type</span>
 									<code>build</code>
 								</div>
-								<div
-									class="deck-marker-field deck-reveal"
-									data-field="size"
-									style="--delay:360ms"
-								>
+								<div class="deck-marker-field" data-field="size">
 									<span class="deck-marker-field-label">size</span>
 									<code>1420</code>
 								</div>
@@ -464,7 +495,15 @@ const Sliding = [
 							<div class="deck-compare">
 								{Comparison.map((Side) => (
 									<div class="deck-side" data-side={Side.Side}>
-										<span class="deck-side-head">{Side.Head}</span>
+										<span class="deck-side-head">
+											<span
+												class="deck-state"
+												data-state={Side.Side === "proxy" ? "default" : "active"}
+											>
+												{Side.State}
+											</span>
+											<span>{Side.Head}</span>
+										</span>
 										{Side.Rows.map((Row) => (
 											<div class="deck-side-row">
 												<span

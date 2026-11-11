@@ -1,4 +1,4 @@
-/* Deck.css - the 60-second presentation surface.
+/* Deck.css - the 64-second presentation surface.
    Page-specific by design: the deck is a fixed 16:9 frame with its own type
    scale, so none of these rules belong in the shared sheet. Colors come from
    the Global.css tokens only; every size is a container unit (cqw/cqh), which
@@ -34,6 +34,10 @@ body:has([data-deck]) footer {
 	background: var(--soot-black);
 	container-type: size;
 	user-select: none;
+	--type-scale: 1.18;
+	/* The before/after border pair: neutral gray is the default state, the
+	   blood family is the state with Aphrodite installed. */
+	--deck-neutral: color-mix(in srgb, var(--zinc-dust) 58%, var(--soot-black));
 }
 
 /* The photocopy vignette: focus at the center, soot at the corners. */
@@ -48,49 +52,30 @@ body:has([data-deck]) footer {
 
 /* ---- The scene stack ---- */
 
-/* The crossfade is asymmetric: the incoming scene eases in over 320 ms while
-   the outgoing one leaves in 180 ms, so two texts never sit at half opacity
-   over each other. */
+/* The crossfade is asymmetric: the incoming scene eases in over 300 ms while
+   the outgoing one leaves in 170 ms, so two texts never sit at half opacity
+   over each other for long. */
 .deck-scene {
 	position: absolute;
 	inset: 0;
 	opacity: 0;
 	pointer-events: none;
-	transition: opacity 180ms cubic-bezier(0.4, 0, 1, 1);
+	transition: opacity 170ms cubic-bezier(0.4, 0, 1, 1);
 }
 
 .deck-scene[data-active="true"] {
 	opacity: 1;
 	pointer-events: auto;
-	transition: opacity 320ms cubic-bezier(0.16, 0.84, 0.28, 1);
+	transition: opacity 300ms cubic-bezier(0.16, 0.84, 0.28, 1);
 }
 
-/* The reveal is a transition rather than an animation: the incoming scene
-   re-arms its data-reveal attribute, and every child travels from its offset
-   to rest with one easing curve and a per-element delay. */
-.deck-reveal {
-	opacity: 0;
-	transform: translate3d(0, 1.3cqw, 0);
-	transition:
-		opacity 520ms cubic-bezier(0.16, 0.84, 0.28, 1) var(--delay, 0ms),
-		transform 520ms cubic-bezier(0.16, 0.84, 0.28, 1) var(--delay, 0ms);
-}
-
-.deck-scene[data-reveal="true"] .deck-reveal {
+/* The entrance is one Web Animation on the content root, created by the
+   player: a single transform for the whole scene, never a per-element
+   stagger. The base state is the settled one, so a scene with JavaScript off
+   still reads. */
+[data-enter] {
 	opacity: 1;
-	transform: translate3d(0, 0, 0);
-}
-
-/* One frame of transition-free styling, used by the player to snap a hidden
-   scene's content back to its start before re-arming the entrance. */
-.deck-snap .deck-reveal {
-	transition: none !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.deck-reveal {
-		transition-delay: 0ms !important;
-	}
+	transform: none;
 }
 
 /* ---- The shared slide ---- */
@@ -118,7 +103,7 @@ body:has([data-deck]) footer {
 	padding: 0.5cqw 0.95cqw;
 	color: var(--bone-white);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.92cqw;
+	font-size: calc(0.92cqw * var(--type-scale));
 	font-weight: 800;
 	letter-spacing: 0.2em;
 	line-height: 1;
@@ -128,7 +113,7 @@ body:has([data-deck]) footer {
 .deck-count {
 	color: var(--zinc-dust);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.82cqw;
+	font-size: calc(0.82cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.22em;
 }
@@ -137,7 +122,7 @@ body:has([data-deck]) footer {
 	max-width: 88cqw;
 	color: var(--bone-white);
 	font-family: "Space Grotesk", sans-serif;
-	font-size: 3.15cqw;
+	font-size: calc(3.15cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: -0.012em;
 	line-height: 1.02;
@@ -149,7 +134,7 @@ body:has([data-deck]) footer {
 	max-width: 70cqw;
 	color: var(--bone-newsprint);
 	font-family: "DM Sans", sans-serif;
-	font-size: 1.28cqw;
+	font-size: calc(1.28cqw * var(--type-scale));
 	line-height: 1.45;
 }
 
@@ -197,7 +182,7 @@ body:has([data-deck]) footer {
 	padding: 0.42cqw 0.8cqw;
 	color: var(--bone-white);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 800;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
@@ -225,7 +210,7 @@ body:has([data-deck]) footer {
 	max-width: 46cqw;
 	color: var(--bone-newsprint);
 	font-family: "DM Sans", sans-serif;
-	font-size: 1.42cqw;
+	font-size: calc(1.42cqw * var(--type-scale));
 	line-height: 1.5;
 }
 
@@ -241,7 +226,7 @@ body:has([data-deck]) footer {
 	padding: 0.42cqw 0.78cqw;
 	color: var(--soot-black);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
@@ -255,51 +240,65 @@ body:has([data-deck]) footer {
 	background: var(--weathered-teal);
 }
 
-/* ---- Flood ---- */
-
-.deck-flood {
-	display: grid;
-	grid-template-columns: 1.5fr 0.8fr;
-	gap: 2.2cqw;
-	height: 100%;
-	min-height: 0;
-}
+/* ---- The terminal ---- */
 
 .deck-terminal {
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
-	border: 2px solid var(--blood-crimson);
+	border: 2px solid var(--deck-neutral);
 	background: #050506;
-	box-shadow: 0.3cqw 0.3cqw 0 #000;
 }
 
 .deck-terminal-bar {
 	display: flex;
-	justify-content: space-between;
+	align-items: center;
+	gap: 0.55cqw;
 	border-bottom: 1px solid var(--oxblood-dark);
 	padding: 0.55cqw 1cqw;
 	color: var(--zinc-dust);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
 }
 
-.deck-terminal-body {
-	overflow: hidden;
-	padding: 0.9cqw 1.1cqw;
-	color: var(--bone-newsprint);
+.deck-terminal-metric {
+	margin-left: auto;
+}
+
+/* The state stamp: gray for the default path, blood for the installed one. */
+.deck-state {
+	border: 1px solid #000;
+	padding: 0.28cqw 0.6cqw;
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.8cqw;
-	line-height: 1.55;
+	font-size: calc(0.72cqw * var(--type-scale));
+	font-weight: 800;
+	letter-spacing: 0.14em;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+.deck-state[data-state="default"] {
+	background: var(--zinc-dust);
+	color: var(--soot-black);
+}
+
+.deck-state[data-state="active"] {
+	background: var(--raw-blood);
+	box-shadow: 0.18cqw 0.18cqw 0 #000;
+	color: var(--bone-white);
 }
 
 .deck-line {
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+	color: var(--bone-newsprint);
+	font-family: "JetBrains Mono", monospace;
+	font-size: calc(0.8cqw * var(--type-scale));
+	line-height: 1.55;
 }
 
 .deck-line[data-tier="dim"] {
@@ -318,72 +317,202 @@ body:has([data-deck]) footer {
 	color: var(--stamped-canary);
 }
 
-.deck-cursor {
-	display: inline-block;
-	width: 0.55cqw;
-	height: 0.95cqw;
-	background: var(--bone-newsprint);
-	animation: deck-blink 1.1s steps(2) infinite;
+/* ---- Default: the fast scroll ---- */
+
+.deck-default {
+	display: grid;
+	grid-template-columns: 1.45fr 0.75fr;
+	gap: 2.2cqw;
+	height: 100%;
+	min-height: 0;
 }
 
-@keyframes deck-blink {
-	50% {
-		opacity: 0;
+.deck-scroll {
+	position: relative;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+	padding: 0.9cqw 1.1cqw;
+}
+
+/* Two copies of the log, translated by exactly one copy: the loop has no
+   seam, and the motion is a compositor transform. */
+.deck-scroll-track {
+	animation: deck-scroll 3.6s linear infinite;
+}
+
+@keyframes deck-scroll {
+	from {
+		transform: translate3d(0, 0, 0);
+	}
+
+	to {
+		transform: translate3d(0, -50%, 0);
 	}
 }
 
-.deck-budget {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	gap: 1.7cqw;
-	border: 2px solid var(--oxblood-dark);
-	background: var(--carbon-void);
-	padding: 1.6cqw;
+@media (prefers-reduced-motion: reduce) {
+	.deck-scroll-track {
+		animation: none !important;
+		transform: none;
+	}
 }
 
-.deck-meter {
+.deck-default-stat {
 	display: grid;
-	gap: 0.55cqw;
+	align-content: center;
+	gap: 0.8cqw;
+	border-left: 2px solid var(--deck-neutral);
+	padding-left: 1.4cqw;
 }
 
-.deck-meter-head {
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
+.deck-default-value {
+	color: var(--stamped-canary);
+	font-family: "Space Grotesk", sans-serif;
+	font-size: calc(5.2cqw * var(--type-scale));
+	font-weight: 700;
+	line-height: 0.9;
+}
+
+.deck-default-label {
 	color: var(--zinc-dust);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.78cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
 }
 
-.deck-meter-value {
-	color: var(--bone-white);
-	font-size: 0.95cqw;
-}
-
-.deck-meter-track {
-	height: 1.1cqw;
-	border: 1px solid var(--outline-oxblood);
-	background: #0b0a0d;
-}
-
-.deck-meter-fill {
-	height: 100%;
-	background: var(--raw-blood);
-}
-
-.deck-meter[data-kind="marker"] .deck-meter-fill {
-	background: var(--stamped-canary);
-}
-
-.deck-budget-note {
+.deck-default-note {
+	max-width: 24cqw;
 	color: var(--bone-newsprint);
 	font-family: "DM Sans", sans-serif;
-	font-size: 0.92cqw;
+	font-size: calc(1cqw * var(--type-scale));
+	line-height: 1.45;
+}
+
+/* ---- The transformation: user keeps it, agent reads the digest ---- */
+
+.deck-split {
+	position: relative;
+	display: grid;
+	grid-template-columns: 1fr 13cqw 1fr;
+	gap: 1.2cqw;
+	height: 100%;
+	min-height: 0;
+}
+
+.deck-split-side {
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+	gap: 0.7cqw;
+	min-height: 0;
+	border: 2px solid var(--deck-neutral);
+	background: var(--carbon-void);
+	padding: 1cqw 1.2cqw;
+}
+
+.deck-split-side[data-side="agent"] {
+	grid-template-rows: auto 1fr auto auto;
+	border-color: var(--blood-crimson);
+	background: var(--asphalt-panel);
+	box-shadow:
+		0.3cqw 0.3cqw 0 #000,
+		0.5cqw 0.5cqw 0 var(--oxblood-dark);
+}
+
+.deck-split-head {
+	display: flex;
+	align-items: center;
+	gap: 0.55cqw;
+	border-bottom: 1px solid var(--oxblood-dark);
+	padding-bottom: 0.5cqw;
+	color: var(--zinc-dust);
+	font-family: "JetBrains Mono", monospace;
+	font-size: calc(0.72cqw * var(--type-scale));
+	font-weight: 700;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+}
+
+.deck-split-metric {
+	margin-left: auto;
+}
+
+.deck-split-log {
+	min-height: 0;
+	overflow: hidden;
+	padding-top: 0.3cqw;
+}
+
+.deck-split-foot {
+	color: var(--zinc-dust);
+	font-family: "JetBrains Mono", monospace;
+	font-size: calc(0.72cqw * var(--type-scale));
+	letter-spacing: 0.08em;
+}
+
+.deck-split-mid {
+	display: grid;
+	align-content: center;
+	justify-items: center;
+	gap: 0.6cqw;
+	text-align: center;
+}
+
+.deck-type-pill {
+	border: 1px solid #000;
+	background: var(--stamped-canary);
+	padding: 0.35cqw 0.7cqw;
+	color: var(--soot-black);
+	font-family: "JetBrains Mono", monospace;
+	font-size: calc(0.78cqw * var(--type-scale));
+	font-weight: 800;
+	letter-spacing: 0.12em;
+}
+
+.deck-split-arrow {
+	color: var(--raw-blood);
+	font-family: "Space Grotesk", sans-serif;
+	font-size: calc(2.4cqw * var(--type-scale));
+	line-height: 1;
+}
+
+.deck-split-steps {
+	color: var(--zinc-dust);
+	font-family: "JetBrains Mono", monospace;
+	font-size: calc(0.72cqw * var(--type-scale));
+	letter-spacing: 0.1em;
 	line-height: 1.4;
+	text-transform: uppercase;
+}
+
+.deck-preview-line {
+	align-self: center;
+	color: var(--bone-white);
+	font-family: "JetBrains Mono", monospace;
+	font-size: calc(0.95cqw * var(--type-scale));
+	line-height: 1.4;
+}
+
+.deck-marker-line {
+	color: var(--weathered-teal);
+	font-family: "JetBrains Mono", monospace;
+	font-size: calc(0.72cqw * var(--type-scale));
+	line-height: 1.4;
+	overflow-wrap: anywhere;
+}
+
+.deck-wipe {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 2px;
+	background: var(--raw-blood);
+	box-shadow: 0 0 1.2cqw rgba(147, 17, 40, 0.85);
+	opacity: 0;
+	pointer-events: none;
 }
 
 /* ---- Overview ---- */
@@ -416,7 +545,7 @@ body:has([data-deck]) footer {
 .deck-stage-index {
 	color: var(--zinc-dust);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.2em;
 }
@@ -424,7 +553,7 @@ body:has([data-deck]) footer {
 .deck-stage-name {
 	color: var(--bone-white);
 	font-family: "Space Grotesk", sans-serif;
-	font-size: 1.5cqw;
+	font-size: calc(1.5cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.01em;
 	text-transform: uppercase;
@@ -433,14 +562,14 @@ body:has([data-deck]) footer {
 .deck-stage-metric {
 	color: var(--stamped-canary);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.92cqw;
+	font-size: calc(0.92cqw * var(--type-scale));
 	font-weight: 700;
 }
 
 .deck-stage-note {
 	color: var(--bone-newsprint);
 	font-family: "DM Sans", sans-serif;
-	font-size: 0.82cqw;
+	font-size: calc(0.82cqw * var(--type-scale));
 	line-height: 1.35;
 }
 
@@ -456,7 +585,7 @@ body:has([data-deck]) footer {
 	padding: 0.4cqw 0.75cqw;
 	color: var(--zinc-dust);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
@@ -494,7 +623,7 @@ body:has([data-deck]) footer {
 	padding-bottom: 0.55cqw;
 	color: var(--zinc-dust);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
@@ -513,7 +642,7 @@ body:has([data-deck]) footer {
 	padding: 0.34cqw 0.62cqw;
 	color: var(--bone-newsprint);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 700;
 }
 
@@ -534,7 +663,7 @@ body:has([data-deck]) footer {
 .deck-tier-name {
 	color: var(--bone-white);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.8cqw;
+	font-size: calc(0.8cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -543,7 +672,7 @@ body:has([data-deck]) footer {
 .deck-tier-mult {
 	color: var(--stamped-canary);
 	font-family: "Space Grotesk", sans-serif;
-	font-size: 1.2cqw;
+	font-size: calc(1.2cqw * var(--type-scale));
 	font-weight: 700;
 	line-height: 1;
 	text-align: right;
@@ -553,7 +682,7 @@ body:has([data-deck]) footer {
 	grid-column: 1 / -1;
 	color: var(--bone-newsprint);
 	font-family: "DM Sans", sans-serif;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	line-height: 1.3;
 }
 
@@ -581,7 +710,7 @@ body:has([data-deck]) footer {
 .deck-shape-type {
 	color: var(--zinc-dust);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
@@ -591,7 +720,7 @@ body:has([data-deck]) footer {
 	align-self: center;
 	color: var(--bone-white);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.8cqw;
+	font-size: calc(0.8cqw * var(--type-scale));
 	line-height: 1.35;
 }
 
@@ -627,7 +756,7 @@ body:has([data-deck]) footer {
 .deck-marker-field-label {
 	color: var(--zinc-dust);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
@@ -636,7 +765,7 @@ body:has([data-deck]) footer {
 .deck-marker-field code {
 	color: var(--bone-white);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.82cqw;
+	font-size: calc(0.82cqw * var(--type-scale));
 	overflow-wrap: anywhere;
 }
 
@@ -646,7 +775,7 @@ body:has([data-deck]) footer {
 	padding: 0.62cqw 1cqw;
 	color: var(--weathered-teal);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.85cqw;
+	font-size: calc(0.85cqw * var(--type-scale));
 	overflow-wrap: anywhere;
 }
 
@@ -667,7 +796,7 @@ body:has([data-deck]) footer {
 .deck-store-name {
 	color: var(--bone-white);
 	font-family: "Space Grotesk", sans-serif;
-	font-size: 1.35cqw;
+	font-size: calc(1.35cqw * var(--type-scale));
 	font-weight: 700;
 	text-transform: uppercase;
 }
@@ -675,7 +804,7 @@ body:has([data-deck]) footer {
 .deck-store-note {
 	color: var(--bone-newsprint);
 	font-family: "DM Sans", sans-serif;
-	font-size: 0.75cqw;
+	font-size: calc(0.75cqw * var(--type-scale));
 	line-height: 1.35;
 }
 
@@ -713,7 +842,7 @@ body:has([data-deck]) footer {
 .deck-decide-label {
 	color: var(--zinc-dust);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
@@ -722,14 +851,14 @@ body:has([data-deck]) footer {
 .deck-decide-value {
 	color: var(--bone-white);
 	font-family: "Space Grotesk", sans-serif;
-	font-size: 1.2cqw;
+	font-size: calc(1.2cqw * var(--type-scale));
 	font-weight: 700;
 }
 
 .deck-decide-arrow {
 	color: var(--raw-blood);
 	font-family: "Space Grotesk", sans-serif;
-	font-size: 1.7cqw;
+	font-size: calc(1.7cqw * var(--type-scale));
 	line-height: 1;
 }
 
@@ -791,7 +920,7 @@ body:has([data-deck]) footer {
 	padding: 0.28cqw 0.45cqw;
 	color: var(--bone-white);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 800;
 	letter-spacing: 0.12em;
 }
@@ -804,7 +933,7 @@ body:has([data-deck]) footer {
 .deck-hook-name {
 	color: var(--bone-white);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.95cqw;
+	font-size: calc(0.95cqw * var(--type-scale));
 	font-weight: 700;
 	line-height: 1.2;
 	overflow-wrap: anywhere;
@@ -813,7 +942,7 @@ body:has([data-deck]) footer {
 .deck-hook-role {
 	color: var(--bone-newsprint);
 	font-family: "DM Sans", sans-serif;
-	font-size: 0.8cqw;
+	font-size: calc(0.8cqw * var(--type-scale));
 	line-height: 1.3;
 }
 
@@ -844,7 +973,7 @@ body:has([data-deck]) footer {
 	display: grid;
 	align-content: start;
 	gap: 0.65cqw;
-	border: 2px solid var(--oxblood-dark);
+	border: 2px solid var(--deck-neutral);
 	background: var(--carbon-void);
 	padding: 1.1cqw 1.3cqw;
 }
@@ -852,13 +981,19 @@ body:has([data-deck]) footer {
 .deck-side[data-side="plugin"] {
 	border-color: var(--blood-crimson);
 	background: var(--asphalt-panel);
+	box-shadow:
+		0.3cqw 0.3cqw 0 #000,
+		0.5cqw 0.5cqw 0 var(--oxblood-dark);
 }
 
 .deck-side-head {
+	display: flex;
+	align-items: center;
+	gap: 0.55cqw;
 	margin-bottom: 0.2cqw;
 	color: var(--bone-white);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.74cqw;
+	font-size: calc(0.74cqw * var(--type-scale));
 	font-weight: 800;
 	letter-spacing: 0.16em;
 	line-height: 1.3;
@@ -872,13 +1007,13 @@ body:has([data-deck]) footer {
 	gap: 0.7cqw;
 	color: var(--bone-newsprint);
 	font-family: "DM Sans", sans-serif;
-	font-size: 0.95cqw;
+	font-size: calc(0.95cqw * var(--type-scale));
 	line-height: 1.3;
 }
 
 .deck-mark {
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.9cqw;
+	font-size: calc(0.9cqw * var(--type-scale));
 	font-weight: 700;
 	line-height: 1;
 }
@@ -907,7 +1042,7 @@ body:has([data-deck]) footer {
 .deck-number-value {
 	color: var(--stamped-canary);
 	font-family: "Space Grotesk", sans-serif;
-	font-size: 2.5cqw;
+	font-size: calc(2.5cqw * var(--type-scale));
 	font-weight: 700;
 	line-height: 1;
 }
@@ -915,7 +1050,7 @@ body:has([data-deck]) footer {
 .deck-number-label {
 	color: var(--zinc-dust);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.14em;
 	line-height: 1.3;
@@ -939,7 +1074,7 @@ body:has([data-deck]) footer {
 	max-width: 74cqw;
 	color: var(--bone-white);
 	font-family: "Space Grotesk", sans-serif;
-	font-size: 5.4cqw;
+	font-size: calc(5.4cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: -0.02em;
 	line-height: 0.94;
@@ -951,7 +1086,7 @@ body:has([data-deck]) footer {
 	max-width: 52cqw;
 	color: var(--bone-newsprint);
 	font-family: "DM Sans", sans-serif;
-	font-size: 1.2cqw;
+	font-size: calc(1.2cqw * var(--type-scale));
 	line-height: 1.45;
 }
 
@@ -968,7 +1103,7 @@ body:has([data-deck]) footer {
 	padding: 0.62cqw 1.3cqw;
 	color: var(--bone-white);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.92cqw;
+	font-size: calc(0.92cqw * var(--type-scale));
 	letter-spacing: 0.02em;
 	text-align: left;
 }
@@ -987,7 +1122,7 @@ body:has([data-deck]) footer {
 .deck-url {
 	color: var(--weathered-teal);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.82cqw;
+	font-size: calc(0.82cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
@@ -1033,7 +1168,7 @@ body:has([data-deck]) footer {
 	padding: 1.5cqw 1.7cqw 0.9cqw;
 	color: var(--zinc-dust);
 	font-family: "JetBrains Mono", monospace;
-	font-size: 0.72cqw;
+	font-size: calc(0.72cqw * var(--type-scale));
 	font-weight: 700;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
