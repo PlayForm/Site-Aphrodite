@@ -1,11 +1,12 @@
 ---
-// DeckScene.astro - one beat of the 30-second deck: the tape stamp, the claim,
+// DeckScene.astro - one beat of the 60-second deck: the tape stamp, the claim,
 // the supporting sentence, and the visual that carries the mechanism.
 //
-// Six visual branches, one per scene. The copy arrives typed from
-// Presentation/Scenes.ts; the hook and stage registries below trace to
-// plugins/aphrodite/plugin.yaml (six hooks, thirteen tools) and the site's
-// /hooks and /pipeline pages.
+// Ten visual branches, one per scene. The copy arrives typed from
+// Presentation/Scenes.ts; the hook registry traces to
+// plugins/aphrodite/plugin.yaml (six hooks, thirteen tools), the threshold
+// tiers to aphrodite.toml's defaults, and the preview shapes to the README's
+// own catalog.
 
 import { Versions } from "@Library/Versions";
 
@@ -68,6 +69,49 @@ const Stages = [
 	{ Index: "04", Name: "Decide", Metric: "on demand", Note: "aphrodite_retrieve(hash)" },
 ];
 
+// The classifier's output surface: the README's pipeline catalog (16 types)
+// and the full registry's 30 types, named here by their high-traffic members.
+const Types = [
+	"build",
+	"test",
+	"git",
+	"gitlog",
+	"grep",
+	"ls",
+	"diff",
+	"search",
+	"json",
+	"code_rust",
+	"code_python",
+	"terminal",
+	"log",
+	"linter",
+	"error",
+];
+
+// The threshold tiers from the README's table: higher means the content stays
+// visible longer before it is compressed.
+const Tiers = [
+	{ Name: "Error", Multiplier: "×8", Note: "an error stays visible longest" },
+	{ Name: "Code", Multiplier: "×3", Note: "source earns patience" },
+	{ Name: "Diff / git", Multiplier: "×2", Note: "history, halved" },
+	{ Name: "Default", Multiplier: "×1", Note: "tool_output, json, the rest" },
+	{ Name: "Noisy", Multiplier: "×1", Note: "build, linter, log - never halved" },
+];
+
+// The twelve preview shapes the README documents: what the model actually
+// reads in place of the blob.
+const Shapes = [
+	{ Type: "build", Line: "[build:1E 1W 142L | error[E0432]: unresolved import ...]" },
+	{ Type: "test", Line: "[test:220 pass 0 fail 1 ignored | 0.31s]" },
+	{ Type: "git", Line: "[git:2M 1A 1D 3?? | src/x.rs src/y.rs +5 more]" },
+	{ Type: "diff", Line: "[diff:2F +7/-3 12L | src/main.rs Cargo.toml +N more]" },
+	{ Type: "grep", Line: "[grep:4 hits in 3 files | src/preview.rs:12 ...]" },
+	{ Type: "json", Line: "[json:30 keys 1L | status, error, ...]" },
+	{ Type: "terminal", Line: "[terminal:14L exit code: 0]" },
+	{ Type: "code", Line: "[code:3fns|2structs fn main() 414L]" },
+];
+
 // The comparison is about the interception point, not a feature checklist:
 // a wire-level proxy only ever sees the HTTP payload.
 const Comparison = [
@@ -105,12 +149,24 @@ const Terminal = [
 	{ Text: "error[E0432]: unresolved import `crate::stage3`", Tier: "signal" },
 	{ Text: "error: could not compile `aphrodite` due to 1 previous error", Tier: "signal" },
 ];
+
+const Sliding = [
+	"flood",
+	"overview",
+	"classify",
+	"preview",
+	"store",
+	"decide",
+	"hooks",
+	"ledger",
+];
 ---
 
 <section
 	class="deck-scene"
 	data-scene
 	data-active={String(Index === 0)}
+	data-reveal={Index === 0 ? "true" : "false"}
 	data-visual={Scene.Visual}
 	aria-hidden={Index === 0 ? "false" : "true"}
 	aria-label={`Beat ${Ordinal}: ${Scene.Title}`}
@@ -119,7 +175,7 @@ const Terminal = [
 	{
 		Scene.Visual === "opening" && (
 			<div class="deck-open">
-				<div class="deck-open-plate deck-reveal" style="--delay:80ms">
+				<div class="deck-open-plate deck-reveal" style="--delay:40ms">
 					<div class="deck-open-mark">
 						<img
 							src="/Brand/aphrodite.svg"
@@ -132,13 +188,13 @@ const Terminal = [
 				</div>
 				<div class="deck-open-copy">
 					<span class="deck-kicker deck-reveal">{Scene.Beat}</span>
-					<h1 class="deck-open-title deck-reveal" style="--delay:140ms">
+					<h1 class="deck-open-title deck-reveal" style="--delay:90ms">
 						{Scene.Title}
 					</h1>
-					<p class="deck-open-body deck-reveal" style="--delay:240ms">
+					<p class="deck-open-body deck-reveal" style="--delay:150ms">
 						{Scene.Body}
 					</p>
-					<div class="deck-chips deck-reveal" style="--delay:340ms">
+					<div class="deck-chips deck-reveal" style="--delay:210ms">
 						<span class="deck-chip">aphrodite.playform.cloud</span>
 						<span class="deck-chip" data-tone="canary">{`plugin v${Versions.Plugin}`}</span>
 						<span class="deck-chip" data-tone="teal">{`binary v${Versions.Binary}`}</span>
@@ -152,11 +208,11 @@ const Terminal = [
 		Scene.Visual === "closing" && (
 			<div class="deck-close">
 				<span class="deck-kicker deck-reveal">{Scene.Beat}</span>
-				<h2 class="deck-close-title deck-reveal" style="--delay:120ms">
+				<h2 class="deck-close-title deck-reveal" style="--delay:80ms">
 					{Scene.Title}
 				</h2>
-				<p class="deck-close-body deck-reveal" style="--delay:220ms">{Scene.Body}</p>
-				<div class="deck-commands deck-reveal" style="--delay:300ms">
+				<p class="deck-close-body deck-reveal" style="--delay:140ms">{Scene.Body}</p>
+				<div class="deck-commands deck-reveal" style="--delay:200ms">
 					<div class="deck-command">
 						<span class="deck-command-prompt">$</span>
 						{" hermes plugins install aphrodite"}
@@ -166,7 +222,7 @@ const Terminal = [
 						{" cd ~/.hermes/plugins/aphrodite && bash download.sh"}
 					</div>
 				</div>
-				<div class="deck-close-foot deck-reveal" style="--delay:380ms">
+				<div class="deck-close-foot deck-reveal" style="--delay:260ms">
 					<span class="deck-url">aphrodite.playform.cloud</span>
 					<span class="deck-chip">one binary</span>
 					<span class="deck-chip">six hooks</span>
@@ -177,22 +233,19 @@ const Terminal = [
 	}
 
 	{
-		(Scene.Visual === "flood" ||
-			Scene.Visual === "pipeline" ||
-			Scene.Visual === "hooks" ||
-			Scene.Visual === "ledger") && (
+		Sliding.includes(Scene.Visual) && (
 			<div class="deck-slide">
 				<div class="deck-head">
 					<span class="deck-kicker deck-reveal">{Scene.Beat}</span>
-					<span class="deck-count deck-reveal" style="--delay:60ms">
+					<span class="deck-count deck-reveal" style="--delay:40ms">
 						{Ordinal} / {Count}
 					</span>
 				</div>
-				<h2 class="deck-title deck-reveal" style="--delay:120ms">
+				<h2 class="deck-title deck-reveal" style="--delay:70ms">
 					{Scene.Title}
 				</h2>
-				<p class="deck-body deck-reveal" style="--delay:220ms">{Scene.Body}</p>
-				<div class="deck-visual deck-reveal" style="--delay:320ms">
+				<p class="deck-body deck-reveal" style="--delay:130ms">{Scene.Body}</p>
+				<div class="deck-visual deck-reveal" style="--delay:190ms">
 					{Scene.Visual === "flood" && (
 						<div class="deck-flood">
 							<div class="deck-terminal">
@@ -206,6 +259,9 @@ const Terminal = [
 											{Line.Text}
 										</div>
 									))}
+									<div class="deck-line">
+										<span class="deck-cursor" />
+									</div>
 								</div>
 							</div>
 							<div class="deck-budget">
@@ -234,8 +290,8 @@ const Terminal = [
 						</div>
 					)}
 
-					{Scene.Visual === "pipeline" && (
-						<div class="deck-pipeline">
+					{Scene.Visual === "overview" && (
+						<div class="deck-overview">
 							<div class="deck-stages">
 								{Stages.map((Stage) => (
 									<div class="deck-stage">
@@ -246,19 +302,139 @@ const Terminal = [
 									</div>
 								))}
 							</div>
-							<div class="deck-marker-pane">
-								<div>
-									<div class="deck-preview">
-										{"[build:1E 1W 142L | error[E0432]: unresolved import ...]"}
+							<div class="deck-badges">
+								<span class="deck-badge">one output</span>
+								<span class="deck-badge" data-tone="teal">one marker</span>
+								<span class="deck-badge">sub-millisecond compress</span>
+								<span class="deck-badge">no API round-trip</span>
+							</div>
+						</div>
+					)}
+
+					{Scene.Visual === "classify" && (
+						<div class="deck-classify">
+							<div class="deck-panel">
+								<div class="deck-panel-head">
+									<span>what it names</span>
+									<span>first match wins</span>
+								</div>
+								<div class="deck-type-grid">
+									{Types.map((Type) => (
+										<span class="deck-type">{Type}</span>
+									))}
+								</div>
+							</div>
+							<div class="deck-panel">
+								<div class="deck-panel-head">
+									<span>threshold tiers</span>
+									<span>higher = stays visible</span>
+								</div>
+								<div class="deck-tiers">
+									{Tiers.map((Tier) => (
+										<div class="deck-tier">
+											<span class="deck-tier-name">{Tier.Name}</span>
+											<span class="deck-tier-mult">{Tier.Multiplier}</span>
+											<span class="deck-tier-note">{Tier.Note}</span>
+										</div>
+									))}
+								</div>
+							</div>
+						</div>
+					)}
+
+					{Scene.Visual === "preview" && (
+						<div class="deck-shapes">
+							{Shapes.map((Shape, ShapeIndex) => (
+								<div
+									class="deck-shape deck-reveal"
+									style={`--delay:${220 + ShapeIndex * 55}ms`}
+								>
+									<span class="deck-shape-type">{Shape.Type}</span>
+									<code class="deck-shape-line">{Shape.Line}</code>
+								</div>
+							))}
+						</div>
+					)}
+
+					{Scene.Visual === "store" && (
+						<div class="deck-store">
+							<div class="deck-marker-map">
+								<div
+									class="deck-marker-field deck-reveal"
+									data-field="hash"
+									style="--delay:220ms"
+								>
+									<span class="deck-marker-field-label">hash // 40 hex</span>
+									<code>0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e</code>
+								</div>
+								<div
+									class="deck-marker-field deck-reveal"
+									data-field="type"
+									style="--delay:300ms"
+								>
+									<span class="deck-marker-field-label">type</span>
+									<code>build</code>
+								</div>
+								<div
+									class="deck-marker-field deck-reveal"
+									data-field="size"
+									style="--delay:360ms"
+								>
+									<span class="deck-marker-field-label">size</span>
+									<code>1420</code>
+								</div>
+							</div>
+							<div class="deck-marker-full">
+								{"<<<CCR:0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e|build|1420>>>"}
+							</div>
+							<div class="deck-store-grid">
+								<div class="deck-store-card">
+									<span class="deck-store-name">Cache :9797</span>
+									<span class="deck-store-note">
+										in-memory DashMap, 10K entries, compresses above 8 KB
+									</span>
+								</div>
+								<div class="deck-store-card">
+									<span class="deck-store-name">Token :9798</span>
+									<span class="deck-store-note">
+										SQLite, persistent, compresses above 1 KB, tool relay
+									</span>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{Scene.Visual === "decide" && (
+						<div class="deck-decide">
+							<div class="deck-decide-flow">
+								<div class="deck-decide-node">
+									<span class="deck-decide-label">preview</span>
+									<span class="deck-decide-value">~15 tokens</span>
+								</div>
+								<span class="deck-decide-arrow">→</span>
+								<div class="deck-decide-node" data-node="question">
+									<span class="deck-decide-label">enough?</span>
+									<span class="deck-decide-value">the agent decides</span>
+								</div>
+								<span class="deck-decide-arrow">→</span>
+								<div class="deck-decide-branches">
+									<div class="deck-decide-branch" data-branch="skip">
+										<span class="deck-decide-label">yes // skip</span>
+										<span class="deck-decide-value">keep reasoning</span>
 									</div>
-									<div class="deck-marker">
-										{"<<<CCR:0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e|build|1420>>>"}
+									<div class="deck-decide-branch" data-branch="retrieve">
+										<span class="deck-decide-label">
+											no // aphrodite_retrieve(hash)
+										</span>
+										<span class="deck-decide-value">1,420 B, unchanged</span>
 									</div>
 								</div>
-								<div class="deck-marker-side">
-									<span class="deck-marker-value">1,420 B</span>
-									<span class="deck-marker-label">original, unchanged</span>
-								</div>
+							</div>
+							<div class="deck-badges">
+								<span class="deck-badge">retrieval tax 1.3%</span>
+								<span class="deck-badge">2,275 calls in 200 sessions</span>
+								<span class="deck-badge" data-tone="teal">recursive resolve</span>
+								<span class="deck-badge">compression is reversible</span>
 							</div>
 						</div>
 					)}

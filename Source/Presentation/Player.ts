@@ -1,10 +1,16 @@
-// Player.ts - the browser runtime for the 30-second deck.
+// Player.ts - the browser runtime for the 60-second deck.
 //
-// It owns the clock (requestAnimationFrame over Timeline), the scene switch
-// (one data-active scene at a time), the progress hairline, the transport UI,
-// and the keyboard: space toggles, arrows step scenes, R restarts, F goes
-// fullscreen, H hides the UI. Playback starts on load unless the URL carries
-// `?hold=1`, and the last frame holds when the deck ends.
+// It owns the clock (requestAnimationFrame over Timeline), the scene switch,
+// the progress hairline, the transport UI, and the keyboard: space toggles,
+// arrows step scenes, R restarts, F goes fullscreen, H locks the transport
+// hidden. Playback starts on load unless the URL carries `?hold=1`, and the
+// last frame holds when the deck ends.
+//
+// The render loop is split by cost: the scene switch and the label text update
+// only when their value changes, and the per-frame work is one compositor-only
+// transform on the progress fill. Writing every attribute every frame was the
+// jank source: six full-screen scenes each toggling inert, aria-hidden and
+// data-active sixty times a second.
 //
 // The player reads the rendered DOM rather than re-rendering scenes, so the
 // build output is the deck: with JavaScript off, every scene is still in the
@@ -12,7 +18,7 @@
 
 import { Timeline } from "./Timeline.ts";
 
-/** "00:12.4" - the transport clock, one decimal so a 30-second cut reads precisely. */
+/** "00:12.4" - the transport clock, one decimal so a 60-second cut reads precisely. */
 const Stamp = (Seconds: number): string => {
 	const Whole = Math.max(0, Seconds);
 	const Minutes = Math.floor(Whole / 60);
@@ -40,43 +46,84 @@ export default (): void => {
 	let Previous = 0;
 	let Locked = false;
 	let Started = false;
+	let SceneIndex = -1;
+	let ClockText = "";
+	let StatusText = "";
+	let ToggleText = "";
+	let PlayingText = "";
 
-	const Render = (): void => {
-		const Moment = Timeline.At(Elapsed);
-
-		Scenes.forEach((Scene, Index) => {
-			const Active = Index === Moment.Index;
+	// The scene switch, run once per boundary. A scene keeps its reveal state
+	// while it is hidden so its text does not vanish before the crossfade
+	// finishes; on entry the content is snapped back to zero with transitions
+	// disabled for one flush, then re-armed, so the entrance always runs from
+	// the start instead of reversing a finished transition.
+	const Switch = (Index: number): void => {
+		Scenes.forEach((Scene, Position) => {
+			const Active = Position === Index;
 
 			Scene.dataset.active = String(Active);
 			Scene.setAttribute("aria-hidden", String(!Active));
 			Scene.inert = !Active;
+
+			if (!Active) {
+				return;
+			}
+
+			Scene.classList.add("deck-snap");
+			Scene.dataset.reveal = "false";
+			void Scene.offsetWidth;
+			Scene.classList.remove("deck-snap");
+			Scene.dataset.reveal = "true";
 		});
+	};
+
+	const Render = (): void => {
+		const Moment = Timeline.At(Elapsed);
+
+		if (Moment.Index !== SceneIndex) {
+			SceneIndex = Moment.Index;
+			Switch(Moment.Index);
+		}
 
 		if (Fill) {
 			Fill.style.transform = `scaleX(${Moment.Progress})`;
 		}
 
-		if (Clock) {
-			Clock.textContent = `${Stamp(Elapsed)} / ${Stamp(Timeline.Total)}`;
+		const NextClock = `${Stamp(Elapsed)} / ${Stamp(Timeline.Total)}`;
+
+		if (Clock && NextClock !== ClockText) {
+			ClockText = NextClock;
+			Clock.textContent = NextClock;
 		}
 
-		if (Status) {
-			Status.textContent = Playing
-				? "PLAYING"
-				: Elapsed >= Timeline.Total
-					? "ENDED"
-					: "PAUSED";
+		const NextStatus = Playing
+			? "PLAYING"
+			: Elapsed >= Timeline.Total
+				? "ENDED"
+				: "PAUSED";
+
+		if (Status && NextStatus !== StatusText) {
+			StatusText = NextStatus;
+			Status.textContent = NextStatus;
 		}
 
-		if (Toggle) {
-			Toggle.textContent = Playing
-				? "PAUSE"
-				: Elapsed >= Timeline.Total
-					? "REPLAY"
-					: "PLAY";
+		const NextToggle = Playing
+			? "PAUSE"
+			: Elapsed >= Timeline.Total
+				? "REPLAY"
+				: "PLAY";
+
+		if (Toggle && NextToggle !== ToggleText) {
+			ToggleText = NextToggle;
+			Toggle.textContent = NextToggle;
 		}
 
-		Deck.dataset.playing = String(Playing);
+		const NextPlaying = String(Playing);
+
+		if (NextPlaying !== PlayingText) {
+			PlayingText = NextPlaying;
+			Deck.dataset.playing = NextPlaying;
+		}
 	};
 
 	// The transport is cinema-clean: it is hidden for the whole run and comes

@@ -4,9 +4,10 @@
 // Every figure traces to the monorepo primaries: the 200-session ledger
 // (26.9% deflected, 156,342,817 tokens, 1.3% retrieval tax) is README.md's
 // measured study, the six hooks and thirteen tools are plugin.yaml's declared
-// surface, and the preview and marker shapes are the README's own samples.
+// surface, the preview shapes are the README's own samples, and the threshold
+// tiers are aphrodite.toml's defaults.
 //
-// The durations sum to exactly 30 seconds - the brief's fixed length.
+// The durations sum to exactly 60 seconds - the brief's fixed length.
 
 export interface Scene {
 	/** Stable scene key, also the visual branch the renderer switches on. */
@@ -20,16 +21,26 @@ export interface Scene {
 	/** Seconds this scene holds the frame. */
 	readonly Duration: number;
 	/** The visual composition the scene renderer draws. */
-	readonly Visual: "opening" | "flood" | "pipeline" | "hooks" | "ledger" | "closing";
+	readonly Visual:
+		| "opening"
+		| "flood"
+		| "overview"
+		| "classify"
+		| "preview"
+		| "store"
+		| "decide"
+		| "hooks"
+		| "ledger"
+		| "closing";
 }
 
 export const Scenes: readonly Scene[] = [
 	{
 		Identifier: "opening",
-		Beat: "CCR CORE // 30 SECOND BRIEF",
+		Beat: "CCR CORE // 60 SECOND BRIEF",
 		Title: "Aphrodite",
-		Body: "Tool output stops reaching the model raw. Six hooks classify it, store it, and hand back a marker.",
-		Duration: 3.2,
+		Body: "Tool output stops reaching the model raw. Four steps turn every result into a marker the agent can retrieve.",
+		Duration: 4,
 		Visual: "opening",
 	},
 	{
@@ -37,39 +48,71 @@ export const Scenes: readonly Scene[] = [
 		Beat: "01 // THE FLOOD",
 		Title: "Every tool result enters the context raw.",
 		Body: "Build logs, diffs, browser trees, JSON blobs. The agent pays for noise before it reasons.",
-		Duration: 4.6,
+		Duration: 5.5,
 		Visual: "flood",
 	},
 	{
-		Identifier: "pipeline",
-		Beat: "02 // THE INTERCEPT",
-		Title: "Classify, preview, store, decide.",
-		Body: "The raw never becomes message history. A 40-character BLAKE3 address keeps it retrievable.",
-		Duration: 5.0,
-		Visual: "pipeline",
+		Identifier: "overview",
+		Beat: "02 // THE PIPELINE",
+		Title: "Four steps, one decision.",
+		Body: "Classify, preview, store, decide. The whole compress step stays under a millisecond.",
+		Duration: 5,
+		Visual: "overview",
+	},
+	{
+		Identifier: "classify",
+		Beat: "03 // STEP 1 - CLASSIFY",
+		Title: "The classifier is the gate.",
+		Body: "One type per invocation, first match wins. Each type carries its own threshold, so an error stays visible while a build log gets squeezed.",
+		Duration: 6.5,
+		Visual: "classify",
+	},
+	{
+		Identifier: "preview",
+		Beat: "04 // STEP 2 - PREVIEW",
+		Title: "The agent reads a line, not a blob.",
+		Body: "An enriched, type-aware preview carries the signal the next decision needs: the error, the counts, the paths.",
+		Duration: 7,
+		Visual: "preview",
+	},
+	{
+		Identifier: "store",
+		Beat: "05 // STEP 3 - STORE",
+		Title: "The marker is the receipt.",
+		Body: "BLAKE3 over the bytes, a 40-character address, and the original parked in SQLite or in memory.",
+		Duration: 6.5,
+		Visual: "store",
+	},
+	{
+		Identifier: "decide",
+		Beat: "06 // STEP 4 - DECIDE",
+		Title: "Retrieve only when the answer needs the bytes.",
+		Body: "The preview is enough most of the time. When it is not, aphrodite_retrieve resolves the marker, recursively and unchanged.",
+		Duration: 6.5,
+		Visual: "decide",
 	},
 	{
 		Identifier: "hooks",
-		Beat: "03 // THE HOOKS",
+		Beat: "07 // THE HOOKS",
 		Title: "Six hooks, one turn.",
 		Body: "The plugin is a ctypes shim over a Rust dylib. Hermes calls it at every seam, so the intercept lands before the model sees anything.",
-		Duration: 7.0,
+		Duration: 7.5,
 		Visual: "hooks",
 	},
 	{
 		Identifier: "ledger",
-		Beat: "04 // THE LEDGER",
+		Beat: "08 // THE LEDGER",
 		Title: "A proxy sees the wire. Aphrodite sees the tool call.",
 		Body: "The intercept lands before history, so the saving repeats on every later turn. Every marker stays resolvable.",
-		Duration: 6.4,
+		Duration: 7,
 		Visual: "ledger",
 	},
 	{
 		Identifier: "closing",
-		Beat: "05 // THE INSTALL",
+		Beat: "09 // THE INSTALL",
 		Title: "Compress at the tool boundary.",
 		Body: "The hooks run inside Hermes. The proxy stays for every other client.",
-		Duration: 3.8,
+		Duration: 4.5,
 		Visual: "closing",
 	},
 ];
