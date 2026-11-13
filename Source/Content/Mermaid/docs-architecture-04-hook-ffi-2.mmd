@@ -8,7 +8,7 @@ flowchart LR
     B --> D
     C --> D
     D --> E["directives = build_directive_context - NEVER dropped"]
-    D --> F["nudges = render_nudges - ≤2 inline [nudge:…], never dropped"]
+    D --> F["nudges = render_nudges - ≤2 inline [nudge:...], never dropped"]
     D --> G["recall = session::catalog_summary - droppable FIRST"]
     E --> H["assemble top-down under state.flow_budget_chars (default 4000)"]
     F --> H
@@ -17,4 +17,4 @@ flowchart LR
     I -->|yes| J["pop last section (recall block) - directives+nudges survive"]
     I -->|no| K["emit context"]
     J --> I
-    K --> L["injected into model turn:<br/>[directives]…<br/>[nudge:…]<br/>[recall]…<br/>retrieve hint"]
+    K --> L["injected into model turn:<br/>[directives]...<br/>[nudge:...]<br/>[recall]...<br/>retrieve hint"]

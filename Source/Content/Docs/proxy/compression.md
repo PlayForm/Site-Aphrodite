@@ -235,10 +235,10 @@ from the classifier is always honored as-is.
 | build / build_output / build_error   | `[build:1E 1W 142L \| error[E0432]: unresolved import ...]` (first error msg) |
 | diff                                 | `[diff:2F +7/-3 12L \| src/main.rs Cargo.toml +N more]` (first file names)    |
 | git status (`git`)                   | `[git:2M 2A 1D 3?? \| src/x.rs src/y.rs +5 more]` (code tallies + paths)      |
-| git log (`gitlog`)                   | `[gitlog:2 commits \| abc1234 fix… → def5678 feat…]` (first→last hash/subj)   |
+| git log (`gitlog`)                   | `[gitlog:2 commits \| abc1234 fix... → def5678 feat...]` (first→last hash/subj)   |
 | directory listing (`ls`)             | `[ls:3 files 2 dirs \| .rs×2 .md×1]` (file/dir counts + top extensions)       |
 | test output (`test`)                 | `[test:220 pass 0 fail 1 ignored \| 0.31s]` (or `\| FAIL name` on failure)    |
-| grep / ripgrep (`grep`)              | `[grep:4 hits in 3 files \| src/preview.rs:12 …]` (hits, files, first loc)    |
+| grep / ripgrep (`grep`)              | `[grep:4 hits in 3 files \| src/preview.rs:12 ...]` (hits, files, first loc)    |
 | source_code / code_* (`code`)        | `[code:3fns\|2structs fn main() 414L]` (structure map + first signature)      |
 | search (`search`)                    | `[search:Nhits ML]`                                                           |
 | json_array (`json`)                  | `[json:5items 3L]`                                                            |

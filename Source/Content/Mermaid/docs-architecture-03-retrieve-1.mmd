@@ -31,6 +31,6 @@ sequenceDiagram
     else full-document window
         P-->>HR: (content verbatim, truncated=false)  ← byte-exact, keeps trailing \n
     else partial window
-        P-->>HR: ("[lines a-b/total]\n…", truncated=true)
+        P-->>HR: ("[lines a-b/total]\n...", truncated=true)
     end
     HR-->>C: 200 {found:true, content, source:"ccr", truncated}

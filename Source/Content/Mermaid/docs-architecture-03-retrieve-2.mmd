@@ -9,7 +9,7 @@ flowchart LR
     H -->|yes| I["return cached"]
     H -->|no| J["content = resolve_one(hash)?  (None → propagate)"]
     J --> K["resolved.insert(hash, content)"]
-    K --> L["find_markers(content) - scan &lt;&lt;&lt;CCR:…&gt;&gt;&gt;"]
+    K --> L["find_markers(content) - scan &lt;&lt;&lt;CCR:...&gt;&gt;&gt;"]
     L --> M{"nested markers?"}
     M -->|none| N["return content"]
     M -->|yes| O["for each nested: recurse(depth+1) or reuse cache"]

@@ -169,7 +169,7 @@
             "category": "git/gitlog",
             "corpus": false,
             "raw": "commit 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b\nAuthor: Dev <dev@example.com>\nDate:   (anonymized)\n\n    fix: clamp preview width at the char boundary\n\ncommit 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b\nAuthor: Dev <dev@example.com>\nDate:   (anonymized)\n\n    feat: add per-type preview templates",
-            "preview": "[gitlog:2 commits | abc1234 fix… → def5678 feat…]",
+            "preview": "[gitlog:2 commits | abc1234 fix... → def5678 feat...]",
             "marker": "commit 1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b\n[gitlog: commits=2]\n<<<CCR:e5b8c1d4f7a0e3b6c9d2f5a8b1e4c7f0a3d6b9e245|gitlog|391>>>",
             "retrieval": {
                 "tool": "aphrodite_retrieve",
