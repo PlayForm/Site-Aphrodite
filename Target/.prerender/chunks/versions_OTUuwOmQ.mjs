@@ -1,0 +1,182 @@
+import { n as createComponent, r as __exportAll } from "./compiler_DE9Ou0YP.mjs";
+import { C as addAttribute, _ as maybeRenderHead, g as renderTemplate, l as renderComponent } from "./server_CNuTCIdA.mjs";
+import { a as Versions, i as Stamps, r as ReleaseNote, t as $$Base } from "./Base_BfYuyvJ_.mjs";
+import { t as $$Related } from "./Related_CkbaEjP9.mjs";
+import { t as $$PageShell } from "./PageShell_C9X8T8VS.mjs";
+import { t as $$PageHeader } from "./PageHeader_D0XsGtrC.mjs";
+import { t as $$ZineTape } from "./ZineTape_PKiqfpjH.mjs";
+import { t as $$ZineBox } from "./ZineBox_CmppvIAU.mjs";
+import { t as $$ZineSource } from "./ZineSource_BCTAhSKW.mjs";
+// Source/pages/versions.astro
+var versions_exports = /* @__PURE__ */ __exportAll({
+	default: () => $$Versions,
+	file: () => $$file,
+	url: () => $$url
+});
+var $$Versions = createComponent(($$result, $$props, $$slots) => {
+	const NoteFor = (Ver) => ReleaseNote(Ver.startsWith("v") ? Ver.slice(1) : Ver);
+	const Releases = [
+		{
+			Ver: "v0.7.0",
+			Date: "2026-06-17",
+			Pair: "PLUGIN: PYTHON ERA (PRE-2.0)",
+			Landed: "Atomization + live containers: the Python plugin split into 29 nested modules; terminal output streams instead of blocking.",
+			Tag: "THE FIRST ARCHITECTURE",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.2.2",
+			Date: "2026-07-13",
+			Pair: "PLUGIN v2.0.5",
+			Landed: "First crates.io publish: aphrodite-headroom-core 0.1.1 -> aphrodite 1.2.2 -> aphrodite-hermes 1.2.2; classification re-measured at 40-123 ns.",
+			Tag: "FIRST CRATES.IO",
+			Emphasis: true
+		},
+		{
+			Ver: "v1.3.2 -> v1.3.4",
+			Note: "v1.3.4",
+			Date: "2026-07-14",
+			Pair: "PLUGIN v2.0.x",
+			Landed: "Rust maturity: the losslessness sweep (hash the ORIGINAL, never the wrapper) and the lossy-arguments fix; then high-intelligibility previews at 132× overall.",
+			Tag: "RUST MATURITY",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.4.6",
+			Date: "2026-09-19",
+			Pair: "PLUGIN v2.1.4",
+			Landed: "Chain-split CCR + the first plugin-first release: the plugin tagged before the parent, so BINARY_VERSION 1.4.6 points at assets that already exist.",
+			Tag: "CHAIN-SPLIT + PLUGIN-FIRST",
+			Emphasis: true
+		},
+		{
+			Ver: "v1.5.0",
+			Date: "2026-09-20",
+			Pair: "PLUGIN v2.2.0",
+			Landed: "Edition-2024 + atomization: the flat src/*.rs promoted into per-item module trees; the aphrodite_debug tool lands.",
+			Tag: "EDITION-2024",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.5.1",
+			Date: "2026-09-21",
+			Pair: "PLUGIN v2.1.5",
+			Landed: "Headroom fork publication 0.1.3: the fork's accumulated changes finally reach crates.io, replacing the stale July 0.1.2.",
+			Tag: "FORK PUBLISHED",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.6.0",
+			Date: "2026-09-24",
+			Pair: "PLUGIN v2.2.0",
+			Landed: "Config diagnostics + opt-in auto-reload (issue #38): a broken aphrodite.toml can no longer fail silently to defaults.",
+			Tag: "DIAGNOSTICS",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.6.3",
+			Date: "2026-09-25",
+			Pair: "PLUGIN v2.2.3",
+			Landed: "One runtime home (issue #40): the shim and the Rust half resolve one shared home instead of $HERMES_HOME vs $HOME.",
+			Tag: "ONE HOME",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.6.5",
+			Date: "2026-10-05",
+			Pair: "PLUGIN v2.2.5",
+			Landed: "Checksum law: the in-tree SHA256SUMS.txt is the only checksum source of truth; a missing file, version mismatch, or missing asset entry is a hard refusal.",
+			Tag: "CHECKSUM LAW",
+			Emphasis: false
+		},
+		{
+			Ver: `v${Versions.Binary}`,
+			Date: Versions.ChangelogDate,
+			Pair: `PLUGIN v${Versions.Plugin}`,
+			Landed: "Bounded CCR store: store_max_entries / store_max_bytes evict the least-recently-accessed rows past either cap, the expiry sweep turns debounced and index-driven (a missing-hash retrieve went 37.40 ms -> 0.22 ms on a 300k-row store), and fill_pct is relabelled as compression headroom; aphrodite-headroom-core 0.2.0 carries the fork-side store limits.",
+			Tag: "CURRENT PAIRING",
+			Emphasis: false
+		}
+	];
+	const Changes = [
+		{
+			Label: "CATALOG REVIEW",
+			Tone: "canary",
+			Intro: "Catalog review: prefetch path guard, setup hardening, opt-in context engine.",
+			Lines: [
+				"- fix: aphrodite_prefetch refuses .env, auth.json, ~/.ssh, Hermes home, non-file paths",
+				"- fix: aphrodite setup treats Hermes-home plugin dir as report-only",
+				"- fix: dylib arm refuses install when in-tree SHA256SUMS.txt is missing"
+			]
+		},
+		{
+			Label: "FEATURES",
+			Tone: "teal",
+			Lines: [
+				"+ context engine opt-in at registration: APHRODITE_CONTEXT_ENGINE=1 (TOML default true)",
+				"+ non-destructive: should_compress always False; transcript unchanged",
+				"+ pre_tool_call behavior disclosed: auto-backgrounds long terminal commands",
+				"+ requires_hermes: >=0.20.2"
+			]
+		},
+		{
+			Label: "CHORE + DOCS",
+			Tone: "dust",
+			Lines: [
+				"- config 1:1 audit: dead [templates.*] subtree and compression.prefetch removed",
+				"- chain_split_min/max_segments and defaults.api_url/model added; unwired keys annotated",
+				"- 21 doc files fixed; version stamps 1.6.5 → 1.6.6"
+			]
+		}
+	];
+	const ToneText = {
+		canary: "text-stamped-canary",
+		teal: "text-weathered-teal",
+		dust: "text-zinc-dust"
+	};
+	return renderTemplate`${renderComponent($$result, "Base", $$Base, {
+		"Title": "VERSIONS // APHRODITE",
+		"Description": `Aphrodite v${Versions.Binary}, plugin v${Versions.Plugin} (${Versions.ChangelogDate}). The current release, its changelog, and pointers to the full benchmarks.`
+	}, { "default": ($$result) => renderTemplate` ${renderComponent($$result, "PageShell", $$PageShell, { "Rhythm": "wide" }, { "default": ($$result) => renderTemplate` ${renderComponent($$result, "PageHeader", $$PageHeader, {
+		"Tape": "VERSIONS // RELEASE LOG",
+		"Title": "Versions",
+		"Lead": [
+			`Current release: binary <strong>${Stamps.Binary()}</strong>, plugin <strong>${Stamps.Plugin()}</strong> (v${Versions.Binary}, ${Versions.ChangelogDate}).`,
+			`Requires Rust 1.88+.`,
+			`Licensed CC0-1.0.`
+		]
+	})}  ${maybeRenderHead($$result)}<section class="relative w-full"> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": `RELEASE REGISTER // v0.7.0 -> v${Versions.Binary}`
+	})} ${renderComponent($$result, "ZineBox", $$ZineBox, {
+		"Size": "lg",
+		"Rotate": "-rotate-[1deg]"
+	}, { "default": ($$result) => renderTemplate` <div class="overflow-x-auto"> <table class="w-full border-collapse font-mono text-base"> <tbody> ${Releases.map(({ Ver, Date, Pair, Landed, Tag, Emphasis, Note }) => renderTemplate`<tr class="border-b border-oxblood-dark"> <td class="py-3 pr-4 align-top whitespace-nowrap"> <div class="text-base font-black text-weathered-teal">${Ver}</div> <div${addAttribute(`mt-1 text-base font-black uppercase tracking-widest ${Emphasis ? "text-stamped-canary" : "text-zinc-dust"}`, "class")}> ${Tag} </div> <a class="mt-1 inline-block text-base font-black uppercase tracking-widest text-weathered-teal transition-colors hover:text-bone-white"${addAttribute(NoteFor(Note ?? Ver), "href")}>
+RELEASE NOTE ↗
+</a> </td> <td class="py-3 pr-4 align-top whitespace-nowrap text-base text-zinc-dust"> ${Date} </td> <td class="py-3 pr-4 align-top whitespace-nowrap text-base text-zinc-dust"> ${Pair} </td> <td class="py-3 align-top text-base text-bone-newsprint">${Landed}</td> </tr>`)} <!-- The changelog is a footer row, not a release row: it is the register's subject. --> <tr> <td colspan="4" class="pt-6 pb-4"> <div class="text-base font-black uppercase tracking-widest text-zinc-dust"> ${`CHANGELOG // V${Versions.ChangelogVersion}`} </div> ${Changes.map(({ Label, Tone, Intro, Lines }) => renderTemplate`<div class="mt-4 border border-oxblood-dark bg-soot-black p-3.5"> <div${addAttribute(`text-base font-black uppercase tracking-widest ${ToneText[Tone]}`, "class")}> ${Label} </div> ${Intro && renderTemplate`<p class="mt-1 font-body text-base text-bone-newsprint">${Intro}</p>`} <div class="mt-2 space-y-1 font-mono text-base text-zinc-dust"> ${Lines.map((Line) => renderTemplate`<div>${Line}</div>`)} </div> </div>`)} </td> </tr> </tbody> </table> </div> <p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
+THE CANARY TAGS MARK THE TWO RELEASES THAT CHANGED THE PROJECT'S SHAPE: THE FIRST
+					CRATES.IO PUBLISH, AND THE CHAIN-SPLIT CCR.
+</p> ` })} ${renderComponent($$result, "ZineSource", $$ZineSource, { "Lines": [
+		`SRC: README.md:12; CHANGELOG.md v${Versions.ChangelogVersion}`,
+		`SRC: CHANGELOG.md v${Versions.ChangelogVersion} ("${Versions.ChangelogPairing}")`,
+		"SRC: CHANGELOG.md release headers (v0.7.0:1219, v1.2.2:1066, v1.3.2:777, v1.3.4:724, v1.5.0:318, v1.5.1:309, v1.6.0:293, v1.6.3:222, v1.6.5:157, v1.6.6:121, v1.8.0:3) + the GitHub release notes (Aphrodite/v*, incl. v1.4.6's chain-split + plugin-first note)"
+	] })} </section>  ${renderComponent($$result, "Related", $$Related, { "Links": [
+		{
+			Href: "/benchmarks/",
+			Label: "BENCHMARKS"
+		},
+		{
+			Href: "/setup/",
+			Label: "SETUP"
+		},
+		{
+			Href: "/case-study/",
+			Label: "CASE STUDY"
+		}
+	] })} ` })} ` })}`;
+}, "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/pages/versions.astro", void 0);
+var $$file = "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/pages/versions.astro";
+var $$url = "/versions";
+// \0virtual:astro:page:Source/pages/versions@_@astro
+var page = () => versions_exports;
+export { page };
