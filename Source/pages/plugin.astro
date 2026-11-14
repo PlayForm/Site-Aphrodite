@@ -27,8 +27,8 @@ const Head = "font-headline text-lg font-black uppercase text-bone-white sm:text
 /**
  * THE INSTALL SEQUENCE - one string, two readers: the fence above prints it
  * with the `$ ` prompts, and the copy control on that fence copies this exact
- * payload, so what a reader pastes is what a reader saw. The payload stays a
- * single-quoted-line string (escaped newlines) because it is copied verbatim.
+ * payload, so what a reader pastes is what a reader saw. The payload is one
+ * line of source with escaped newlines, because it is copied verbatim.
  */
 const InstallCommands =
 	"git clone https://github.com/PlayForm/Aphrodite-Hermes.git\ncd Aphrodite-Hermes\nln -s \"$(pwd)\" ~/.hermes/plugins/aphrodite\nbash download.sh\ncd ..\nhermes plugins enable aphrodite\nhermes";
@@ -54,7 +54,10 @@ const Sequence = [
 	{ Text: "→ pre_tool_call · auto-background, chain split", Tone: "canary" },
 	{ Text: "↓", Tone: "mute" },
 	{ Text: "tool or terminal runs", Tone: "result" },
-	{ Text: "→ transform_tool_result / transform_terminal_output · compress to marker", Tone: "canary" },
+	{
+		Text: "→ transform_tool_result / transform_terminal_output · compress to marker",
+		Tone: "canary",
+	},
 	{ Text: "↓", Tone: "mute" },
 	{ Text: "→ pre_llm_call · inject directives, nudges, recall catalog", Tone: "canary" },
 	{ Text: "↓", Tone: "mute" },
@@ -77,8 +80,8 @@ const Hooks = [
 		Rotate: "sm:-rotate-[1.4deg]",
 		Body: [
 			"Resets every piece of per-session state to a clean baseline: turn counter, conversation index, recent markers, referenced files, tool-event telemetry, ephemeral directives.",
-			"Injects nothing - the one-shot first-turn orientation renders later, on the first <span class=\"font-mono text-base text-weathered-teal\">pre_llm_call</span>.",
-			"<span class=\"font-bold text-bone-white\">Fails on:</span> a resumed session that skipped the reset carries the previous session's counters into the new one, and the turn-0 orientation never renders because the counter is not zero.",
+			'Injects nothing - the one-shot first-turn orientation renders later, on the first <span class="font-mono text-base text-weathered-teal">pre_llm_call</span>.',
+			'<span class="font-bold text-bone-white">Fails on:</span> a resumed session that skipped the reset carries the previous session\'s counters into the new one, and the turn-0 orientation never renders because the counter is not zero.',
 		],
 	},
 	{
@@ -89,10 +92,10 @@ const Hooks = [
 		Rotate: "sm:rotate-[1.4deg]",
 		Body: [
 			"Two interventions before a tool executes.",
-			"<span class=\"font-bold text-bone-white\">Auto-backgrounding</span>: the hook rewrites long-running terminal/process calls to run in the background (poll worker, default on).",
-			"<span class=\"font-bold text-bone-white\">Chain splitting</span> (opt-in): the hook splits chained commands with invisible segment markers so each segment compresses into its own CCR marker.",
+			'<span class="font-bold text-bone-white">Auto-backgrounding</span>: the hook rewrites long-running terminal/process calls to run in the background (poll worker, default on).',
+			'<span class="font-bold text-bone-white">Chain splitting</span> (opt-in): the hook splits chained commands with invisible segment markers so each segment compresses into its own CCR marker.',
 			"Otherwise the call passes through unchanged.",
-			"<span class=\"font-bold text-bone-white\">Fails on:</span> a rewritten call the agent never asked for still reads as a foreground result - the poll worker owns the status, and a stopped poll worker leaves the background job running with no reader.",
+			'<span class="font-bold text-bone-white">Fails on:</span> a rewritten call the agent never asked for still reads as a foreground result - the poll worker owns the status, and a stopped poll worker leaves the background job running with no reader.',
 		],
 	},
 	{
@@ -102,9 +105,9 @@ const Hooks = [
 		Tone: "crimson",
 		Rotate: "sm:-rotate-[1deg]",
 		Body: [
-			"After every tool call: record telemetry, run the skip gates, classify the content type, hash (BLAKE3), store, and replace the output with <span class=\"ccr-marker font-mono text-base text-weathered-teal\">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</span> plus a compact preview.",
-			"The hook tracks file references before the gates, so <span class=\"font-mono text-base text-weathered-teal\">aphrodite_files</span> sees every read even when nothing was compressed.",
-			"<span class=\"font-bold text-bone-white\">Fails on:</span> a store that cannot write. The gate still passes, the marker still renders, and the bytes it addresses are gone - which is why the preview is written to answer the common question without the retrieve.",
+			'After every tool call: record telemetry, run the skip gates, classify the content type, hash (BLAKE3), store, and replace the output with <span class="ccr-marker font-mono text-base text-weathered-teal">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</span> plus a compact preview.',
+			'The hook tracks file references before the gates, so <span class="font-mono text-base text-weathered-teal">aphrodite_files</span> sees every read even when nothing was compressed.',
+			'<span class="font-bold text-bone-white">Fails on:</span> a store that cannot write. The gate still passes, the marker still renders, and the bytes it addresses are gone - which is why the preview is written to answer the common question without the retrieve.',
 		],
 	},
 	{
@@ -116,7 +119,7 @@ const Hooks = [
 		Body: [
 			"Same pipeline for shell stdout/stderr.",
 			"The hook records non-zero exit codes as failures for the error-loop detector; chain-split segments compress unconditionally, before the threshold gate, so marked output never leaks raw; everything else passes the 1,024-char gate first.",
-			"<span class=\"font-bold text-bone-white\">Fails on:</span> interleaved stdout and stderr. The stream is compressed as one buffer, so the ordering the terminal showed is the ordering the marker keeps - and a reader who needs the two separated must retrieve.",
+			'<span class="font-bold text-bone-white">Fails on:</span> interleaved stdout and stderr. The stream is compressed as one buffer, so the ordering the terminal showed is the ordering the marker keeps - and a reader who needs the two separated must retrieve.',
 		],
 	},
 	{
@@ -126,9 +129,9 @@ const Hooks = [
 		Tone: "canary",
 		Rotate: "sm:-rotate-[1.6deg] lg:-translate-y-1",
 		Body: [
-			"Runs the poll-worker checkpoint, then the context assembler: first-turn orientation (turn 0 only), <span class=\"font-mono text-base text-weathered-teal\">[directives:]</span> (never dropped), <span class=\"font-mono text-base text-weathered-teal\">[nudge:]</span> one-shots at most two (never dropped), background-task status, and the <span class=\"font-mono text-base text-weathered-teal\">[recall]</span> catalog - the first section dropped under pressure.",
+			'Runs the poll-worker checkpoint, then the context assembler: first-turn orientation (turn 0 only), <span class="font-mono text-base text-weathered-teal">[directives:]</span> (never dropped), <span class="font-mono text-base text-weathered-teal">[nudge:]</span> one-shots at most two (never dropped), background-task status, and the <span class="font-mono text-base text-weathered-teal">[recall]</span> catalog - the first section dropped under pressure.',
 			"One hard budget: 4,000 chars.",
-			"<span class=\"font-bold text-bone-white\">Fails on:</span> a budget with no room left. Directives and nudges are never dropped, so the sections that lose are the recall catalog first and the background status after it - the model is told less, never told wrong.",
+			'<span class="font-bold text-bone-white">Fails on:</span> a budget with no room left. Directives and nudges are never dropped, so the sections that lose are the recall catalog first and the background status after it - the model is told less, never told wrong.',
 		],
 	},
 	{
@@ -138,8 +141,8 @@ const Hooks = [
 		Tone: "crimson",
 		Rotate: "sm:rotate-[1.2deg] lg:translate-y-2",
 		Body: [
-			"Archives the last marker of the turn into the conversation index (so <span class=\"font-mono text-base text-weathered-teal\">aphrodite_diff</span> can report per-turn compressions), advances the turn counter, purges expired nudges after the counter advances - a one-shot nudge renders exactly once - and expires stale poll-worker tasks.",
-			"<span class=\"font-bold text-bone-white\">Fails on:</span> a turn that never completes. No post-turn archive means no per-turn diff entry for it, and the nudge that should have expired waits for the next completed turn.",
+			'Archives the last marker of the turn into the conversation index (so <span class="font-mono text-base text-weathered-teal">aphrodite_diff</span> can report per-turn compressions), advances the turn counter, purges expired nudges after the counter advances - a one-shot nudge renders exactly once - and expires stale poll-worker tasks.',
+			'<span class="font-bold text-bone-white">Fails on:</span> a turn that never completes. No post-turn archive means no per-turn diff entry for it, and the nudge that should have expired waits for the next completed turn.',
 		],
 	},
 ];
@@ -147,12 +150,36 @@ const Hooks = [
 // THE SIX LANES - the same six seams as a WHEN / DOES grid, which is the shape
 // a reader scans when they already know the names and only want the trigger.
 const Lanes = [
-	{ Hook: "on_session_start", When: "session starts", Does: "resets all per-session state to a clean baseline - injects nothing" },
-	{ Hook: "pre_tool_call", When: "before a tool executes", Does: "auto-backgrounds long-running calls; splits chained commands" },
-	{ Hook: "transform_tool_result", When: "after every tool call", Does: "compresses large tool results into CCR markers" },
-	{ Hook: "transform_terminal_output", When: "after every terminal execution", Does: "compresses large terminal output into CCR markers" },
-	{ Hook: "pre_llm_call", When: "before each LLM request", Does: "injects directives, nudges, and the recall catalog" },
-	{ Hook: "post_llm_call", When: "after each LLM response", Does: "archives the turn, advances the counter, expires stale state" },
+	{
+		Hook: "on_session_start",
+		When: "session starts",
+		Does: "resets all per-session state to a clean baseline - injects nothing",
+	},
+	{
+		Hook: "pre_tool_call",
+		When: "before a tool executes",
+		Does: "auto-backgrounds long-running calls; splits chained commands",
+	},
+	{
+		Hook: "transform_tool_result",
+		When: "after every tool call",
+		Does: "compresses large tool results into CCR markers",
+	},
+	{
+		Hook: "transform_terminal_output",
+		When: "after every terminal execution",
+		Does: "compresses large terminal output into CCR markers",
+	},
+	{
+		Hook: "pre_llm_call",
+		When: "before each LLM request",
+		Does: "injects directives, nudges, and the recall catalog",
+	},
+	{
+		Hook: "post_llm_call",
+		When: "after each LLM response",
+		Does: "archives the turn, advances the counter, expires stale state",
+	},
 ];
 
 // THE FOUR LAYERS - each one names its job and the failure it owns. The point
@@ -264,24 +291,36 @@ const Dispatch = [
 		<section class="relative w-full">
 			<ZineTape Variant="section" Label="plugin.yaml // THE DECLARED SURFACE" />
 			<ZineBox Size="lg" Rotate="-rotate-[1deg]">
-				<h2 id="manifest" class={`mb-8 ${Head}`}>What the manifest declares</h2>
+				<h2 id="manifest" class={`mb-8 ${Head}`}>
+					What the manifest declares
+				</h2>
 				<p class="mb-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The manifest is read before a line of Python loads. Hermes takes the name it will list,
-					the spec version it will pin, the six hook names it must find a registration for, the
-					thirteen tool schemas it will advertise to the model, and the flag that says an engine
-					is present.
+					The manifest is read before a line of Python loads. Hermes takes the name it
+					will list, the spec version it will pin, the six hook names it must find a
+					registration for, the thirteen tool schemas it will advertise to the model, and
+					the flag that says an engine is present.
 				</p>
 				<p class="mb-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Nothing in the file describes behavior. Every field is an identity, a requirement, or a
-					promise about what the dylib will answer when it is asked - which is why a manifest that
-					overstates the surface fails validation instead of failing at runtime.
+					Nothing in the file describes behavior. Every field is an identity, a
+					requirement, or a promise about what the dylib will answer when it is asked -
+					which is why a manifest that overstates the surface fails validation instead of
+					failing at runtime.
 				</p>
 
 				<div class="grid grid-cols-1 gap-10 md:grid-cols-2">
 					<div class="space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-base">
-						<div><span class="text-zinc-dust">name:</span> <span class="text-bone-white">aphrodite</span></div>
-						<div><span class="text-zinc-dust">version:</span> <span class="text-bone-white">{Versions.Plugin}</span></div>
-						<div><span class="text-zinc-dust">kind:</span> <span class="text-bone-white">standalone</span></div>
+						<div>
+							<span class="text-zinc-dust">name:</span>{" "}
+							<span class="text-bone-white">aphrodite</span>
+						</div>
+						<div>
+							<span class="text-zinc-dust">version:</span>{" "}
+							<span class="text-bone-white">{Versions.Plugin}</span>
+						</div>
+						<div>
+							<span class="text-zinc-dust">kind:</span>{" "}
+							<span class="text-bone-white">standalone</span>
+						</div>
 						<div>
 							<span class="text-zinc-dust">requires_hermes:</span>
 							<span class="text-stamped-canary">&gt;=0.20.2</span>
@@ -298,37 +337,56 @@ const Dispatch = [
 					<div class="space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-base">
 						<div class="text-weathered-teal"># provides_hooks (6)</div>
 						<div class="text-bone-newsprint">on_session_start · pre_tool_call</div>
-						<div class="text-bone-newsprint">transform_tool_result · transform_terminal_output</div>
+						<div class="text-bone-newsprint">
+							transform_tool_result · transform_terminal_output
+						</div>
 						<div class="text-bone-newsprint">pre_llm_call · post_llm_call</div>
 						<div class="pt-6 text-weathered-teal"># provides_tools (13)</div>
-						<div class="text-bone-newsprint">retrieve · compress · stats · rebuild · files · diff</div>
+						<div class="text-bone-newsprint">
+							retrieve · compress · stats · rebuild · files · diff
+						</div>
 						<div class="text-bone-newsprint">search · directive · test · catalog</div>
-						<div class="text-bone-newsprint">reclassify · prefetch · prefetch_status</div>
+						<div class="text-bone-newsprint">
+							reclassify · prefetch · prefetch_status
+						</div>
 					</div>
 				</div>
 
 				<div class="mt-12 grid grid-cols-1 gap-8 border-t border-oxblood-dark pt-8 md:grid-cols-2">
 					<div class="space-y-4">
-						<ZineStatBar Label="DECLARED SURFACE = RUNNING SURFACE" Ratio="13 / 13" Percent={100} />
+						<ZineStatBar
+							Label="DECLARED SURFACE = RUNNING SURFACE"
+							Ratio="13 / 13"
+							Percent={100}
+						/>
 						<p class="font-body text-base leading-relaxed text-zinc-dust">
-							The bar is full because the two sets are compared, not assumed: the manifest's
-							<code class="font-mono text-base text-weathered-teal">provides_tools</code> list and
-							the schemas the release dylib reports are held to the same thirteen names.
+							The bar is full because the two sets are compared, not assumed: the
+							manifest's
+							<code class="font-mono text-base text-weathered-teal">
+								provides_tools
+							</code>{" "}
+							list and the schemas the release dylib reports are held to the same
+							thirteen names.
 						</p>
 					</div>
 					<div class="space-y-4">
-						<ZineStatBar Label="LOGIC IN THE PYTHON SHIM" Ratio="0%" Percent={0} Color="raw" />
+						<ZineStatBar
+							Label="LOGIC IN THE PYTHON SHIM"
+							Ratio="0%"
+							Percent={0}
+							Color="raw"
+						/>
 						<p class="font-body text-base leading-relaxed text-zinc-dust">
-							The bar is empty on purpose. Nothing in the shim decides anything - a Python
-							traceback means a load failure, never a compression bug.
+							The bar is empty on purpose. Nothing in the shim decides anything - a
+							Python traceback means a load failure, never a compression bug.
 						</p>
 					</div>
 				</div>
 
 				<div class="mt-12 space-y-3 border-t border-oxblood-dark pt-8">
 					<p class="text-base leading-relaxed text-zinc-dust">
-						ENGINE THRESHOLD SEMANTICS: -1 = ALWAYS COMPRESS · 0 = DISABLED · &gt;0 = FILL
-						PERCENT.
+						ENGINE THRESHOLD SEMANTICS: -1 = ALWAYS COMPRESS · 0 = DISABLED · &gt;0 =
+						FILL PERCENT.
 					</p>
 					<p class="text-base leading-relaxed text-zinc-dust">
 						SKILLS ARE NOT SHIPPED WITH THE PLUGIN - THEY LIVE DEV-SIDE.
@@ -343,21 +401,25 @@ const Dispatch = [
 				</div>
 
 				<ZineTape Variant="section" Label="ENGINE // OPT-IN, AND OFF BY DEFAULT" />
-				<h3 id="engine" class={`mb-8 mt-4 ${Head}`}>The engine is a flag, not a behavior</h3>
+				<h3 id="engine" class={`mb-8 mt-4 ${Head}`}>
+					The engine is a flag, not a behavior
+				</h3>
 				<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					<code class="font-mono text-base text-weathered-teal">provides_context_engine: true</code>
-					does not turn anything on. It tells Hermes that the dylib can answer the engine's
-					questions - which file is being read, what the turn's markers were, how much context is
-					left - so the host knows to ask. The engine's own thresholds are the ones that decide
-					whether a result is compressed at all.
+					<code class="font-mono text-base text-weathered-teal">
+						provides_context_engine: true
+					</code>
+					does not turn anything on. It tells Hermes that the dylib can answer the
+					engine's questions - which file is being read, what the turn's markers were, how
+					much context is left - so the host knows to ask. The engine's own thresholds are
+					the ones that decide whether a result is compressed at all.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The three threshold values are the whole tuning surface, and their polarity is the one
-					thing readers get wrong: <span class="text-stamped-canary">-1</span> compresses
-					everything, <span class="text-stamped-canary">0</span> disables the engine, and a
-					positive number is the fill percentage at which compression starts. A
-					<span class="text-stamped-canary">0</span> that reads as "off by default" is the
-					correct reading.
+					The three threshold values are the whole tuning surface, and their polarity is
+					the one thing readers get wrong: <span class="text-stamped-canary">-1</span>{" "}
+					compresses everything, <span class="text-stamped-canary">0</span> disables the
+					engine, and a positive number is the fill percentage at which compression
+					starts. A{" "}<span class="text-stamped-canary">0</span> that reads as "off by
+					default" is the correct reading.
 				</p>
 			</ZineBox>
 			<ZineSource
@@ -371,154 +433,203 @@ const Dispatch = [
 		<section class="relative w-full">
 			<ZineTape Variant="section" Label="ARCHITECTURE // CALL CHAIN" />
 			<ZineBox Size="lg" Rotate="rotate-[1.2deg]">
-				<h2 id="architecture" class={`mb-8 ${Head}`}>A thin shim, a Rust brain</h2>
+				<h2 id="architecture" class={`mb-8 ${Head}`}>
+					A thin shim, a Rust brain
+				</h2>
 				<p class="mb-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Five layers, one contract between each pair. Read top to bottom, the list is the path a
-					single tool result takes; read bottom to top, it is the path a retrieval takes when the
-					model asks for the bytes back.
+					Five layers, one contract between each pair. Read top to bottom, the list is the
+					path a single tool result takes; read bottom to top, it is the path a retrieval
+					takes when the model asks for the bytes back.
 				</p>
 				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
 					<div class="text-bone-white">Hermes Agent (hooks + tool dispatch)</div>
 					<div class="pl-4 text-zinc-dust">│</div>
-					<div class="pl-4 text-bone-newsprint">__init__.py - ctypes FFI, registers hooks/tools/engine · no logic</div>
+					<div class="pl-4 text-bone-newsprint">
+						__init__.py - ctypes FFI, registers hooks/tools/engine · no logic
+					</div>
 					<div class="pl-4 text-zinc-dust">│</div>
-					<div class="pl-4 text-stamped-canary">libaphrodite_hermes.dylib - Hermes bridge (JSON contract) · 6 hooks · 13 tools · schemas</div>
+					<div class="pl-4 text-stamped-canary">
+						libaphrodite_hermes.dylib - Hermes bridge (JSON contract) · 6 hooks · 13
+						tools · schemas
+					</div>
 					<div class="pl-4 text-zinc-dust">│</div>
-					<div class="pl-4 text-bone-newsprint">libaphrodite (core engine) - ALL compression logic: hooks · resolve · retrieve · marker · preview · directives</div>
+					<div class="pl-4 text-bone-newsprint">
+						libaphrodite (core engine) - ALL compression logic: hooks · resolve ·
+						retrieve · marker · preview · directives
+					</div>
 					<div class="pl-4 text-zinc-dust">│</div>
-					<div class="pl-4 text-weathered-teal">CCR store - SQLite :9798 / in-memory :9797 / inline</div>
+					<div class="pl-4 text-weathered-teal">
+						CCR store - SQLite :9798 / in-memory :9797 / inline
+					</div>
 				</div>
 				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
-					Registration is driven by the dylib: the shim asks the dylib for its hook names and tool
-					schemas and registers one callback per name.
+					Registration is driven by the dylib: the shim asks the dylib for its hook names
+					and tool schemas and registers one callback per name.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					It is the reason there is no hot-reload: the dylib is resolved once per process, so to
-					pick up a new build you restart the Hermes session.
+					It is the reason there is no hot-reload: the dylib is resolved once per process,
+					so to pick up a new build you restart the Hermes session.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					The same resolve-once rule is why the plugin never half-loads. Either the dylib opens and
-					every seam registers, or the import raises and nothing registers - there is no state in
-					which three hooks fire and three do not.
+					The same resolve-once rule is why the plugin never half-loads. Either the dylib
+					opens and every seam registers, or the import raises and nothing registers -
+					there is no state in which three hooks fire and three do not.
 				</p>
 
-				<h3 id="layers" class={`mb-8 mt-20 ${Head}`}>What each layer does, and what it fails on</h3>
+				<h3 id="layers" class={`mb-8 mt-20 ${Head}`}>
+					What each layer does, and what it fails on
+				</h3>
 				<div class="isolate grid grid-cols-1 items-start gap-10 lg:grid-cols-2">
-					{
-						Layers.map(({ N, Name, Role, Fails }) => (
-							<div class="relative border-2 border-oxblood-dark bg-soot-black p-6 transition-transform duration-200 hover:rotate-0 sm:even:rotate-[0.6deg] sm:odd:-rotate-[0.6deg]">
-								<div class="flex items-baseline gap-3">
-									<span class="font-mono text-base font-black text-raw-blood">{N}</span>
-									<span class="font-mono text-base font-black text-bone-white">{Name}</span>
-								</div>
-								<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">{Role}</p>
-								<div class="mt-4 border-l-4 border-stamped-canary pl-4">
-									<ZineKicker Tone="canary">FAILS ON</ZineKicker>
-									<p class="mt-2 font-body text-base leading-relaxed text-zinc-dust">{Fails}</p>
-								</div>
+					{Layers.map(({ N, Name, Role, Fails }) => (
+						<div class="relative border-2 border-oxblood-dark bg-soot-black p-6 transition-transform duration-200 hover:rotate-0 sm:even:rotate-[0.6deg] sm:odd:-rotate-[0.6deg]">
+							<div class="flex items-baseline gap-3">
+								<span class="font-mono text-base font-black text-raw-blood">
+									{N}
+								</span>
+								<span class="font-mono text-base font-black text-bone-white">
+									{Name}
+								</span>
 							</div>
-						))
-					}
+							<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
+								{Role}
+							</p>
+							<div class="mt-4 border-l-4 border-stamped-canary pl-4">
+								<ZineKicker Tone="canary">FAILS ON</ZineKicker>
+								<p class="mt-2 font-body text-base leading-relaxed text-zinc-dust">
+									{Fails}
+								</p>
+							</div>
+						</div>
+					))}
 				</div>
 
-				<figure class="mt-20 border border-oxblood-dark bg-soot-black p-4" data-diagram="context-engine">
+				<figure
+					class="mt-20 border border-oxblood-dark bg-soot-black p-4"
+					data-diagram="context-engine"
+				>
 					<div class="overflow-x-auto" set:html={ContextEngine} />
 					<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 						M9 // CONTEXT ENGINE
 					</figcaption>
 				</figure>
 
-				<h3 id="dispatch" class={`mb-8 mt-20 ${Head}`}>One call, end to end</h3>
+				<h3 id="dispatch" class={`mb-8 mt-20 ${Head}`}>
+					One call, end to end
+				</h3>
 				<p class="mb-10 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The left pane is what the agent sees; the right pane is what the process does. Step
-					through it once and the split becomes obvious: every intervention is invisible on the
-					agent's side, and every rewrite is decided on the system's side.
+					The left pane is what the agent sees; the right pane is what the process does.
+					Step through it once and the split becomes obvious: every intervention is
+					invisible on the agent's side, and every rewrite is decided on the system's
+					side.
 				</p>
-				<ZineFlow Title="THE DISPATCH // ONE HOOK CALL" Complete="REPLY RETURNED" Steps={Dispatch} />
+				<ZineFlow
+					Title="THE DISPATCH // ONE HOOK CALL"
+					Complete="REPLY RETURNED"
+					Steps={Dispatch}
+				/>
 				<p class="mt-10 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-					The failure mode of the whole chain sits at the boundary, not in the middle: a hook that
-					raises is logged and skipped, a hook that returns nothing is a no-op, and neither ever
-					aborts the turn. What a hook cannot do is pretend it ran.
+					The failure mode of the whole chain sits at the boundary, not in the middle: a
+					hook that raises is logged and skipped, a hook that returns nothing is a no-op,
+					and neither ever aborts the turn. What a hook cannot do is pretend it ran.
 				</p>
 
 				<ZineTape Variant="section" Label="HOOKS // THE CHAIN" />
-				<h3 id="chain" class={`mb-8 mt-4 ${Head}`}>Six hooks, one turn</h3>
+				<h3 id="chain" class={`mb-8 mt-4 ${Head}`}>
+					Six hooks, one turn
+				</h3>
 				<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Every hook is a thin dispatch that forwards its arguments to the Rust dylib and hands the
-					JSON reply back to Hermes.
+					Every hook is a thin dispatch that forwards its arguments to the Rust dylib and
+					hands the JSON reply back to Hermes.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					It is the reason the shim registers one callback per name: on plugin load it asks the
-					dylib for its hook names, and the six below are always registered together.
+					It is the reason the shim registers one callback per name: on plugin load it
+					asks the dylib for its hook names, and the six below are always registered
+					together.
 				</p>
 				<h4 class="mb-6 mt-12 font-headline text-lg font-black uppercase text-bone-white">
 					The turn, in order
 				</h4>
 				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-4 font-mono text-base leading-relaxed">
-					{
-						Sequence.map(({ Text: Line, Tone }) => (
-							<div class={Tone === "canary" ? "pl-4 text-stamped-canary" : Tone === "mute" ? "pl-4 text-zinc-dust" : Tone === "result" ? "text-bone-white" : "pl-4 text-bone-newsprint"}>
-								{Line}
-							</div>
-						))
-					}
+					{Sequence.map(({ Text: Line, Tone }) => (
+						<div
+							class={
+								Tone === "canary"
+									? "pl-4 text-stamped-canary"
+									: Tone === "mute"
+										? "pl-4 text-zinc-dust"
+										: Tone === "result"
+											? "text-bone-white"
+											: "pl-4 text-bone-newsprint"
+							}
+						>
+							{Line}
+						</div>
+					))}
 				</div>
 				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The loop closes on itself, so the state a turn leaves behind is the state the next turn
-					reads. That is why the reset seam exists: a new session starts from a clean baseline
-					instead of inheriting the previous session's counters and markers.
+					The loop closes on itself, so the state a turn leaves behind is the state the
+					next turn reads. That is why the reset seam exists: a new session starts from a
+					clean baseline instead of inheriting the previous session's counters and
+					markers.
 				</p>
-				<figure class="mt-16 border border-oxblood-dark bg-soot-black p-4" data-diagram="hook-chain">
+				<figure
+					class="mt-16 border border-oxblood-dark bg-soot-black p-4"
+					data-diagram="hook-chain"
+				>
 					<div class="overflow-x-auto" set:html={HookChain} />
 					<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 						M3 // HOOK CHAIN
 					</figcaption>
 				</figure>
 
-				<h3 id="six" class={`mb-8 mt-20 ${Head}`}>The six, one card each</h3>
+				<h3 id="six" class={`mb-8 mt-20 ${Head}`}>
+					The six, one card each
+				</h3>
 				<div class="isolate grid grid-cols-1 items-start gap-16 lg:grid-cols-2 lg:gap-24">
-					{
-						Hooks.map(({ N, Name, Tape, Tone, Rotate, Body }) => (
-							<div
-								class={`zine-box-${Tone} relative border-[3px] bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 ${Rotate} ${
-									Tone === "canary"
-										? "border-stamped-canary/40"
-										: Tone === "crimson"
-											? "border-raw-blood"
-											: N === "04"
-												? "border-zinc-dust/40"
-												: "border-oxblood-dark"
+					{Hooks.map(({ N, Name, Tape, Tone, Rotate, Body }) => (
+						<div
+							class={`zine-box-${Tone} relative border-[3px] bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 ${Rotate} ${
+								Tone === "canary"
+									? "border-stamped-canary/40"
+									: Tone === "crimson"
+										? "border-raw-blood"
+										: N === "04"
+											? "border-zinc-dust/40"
+											: "border-oxblood-dark"
+							}`}
+						>
+							<h4
+								class={`absolute -top-5 left-4 z-10 border border-black px-2 py-0.5 text-base font-black uppercase ${
+									Tape === "canary"
+										? "bg-stamped-canary text-soot-black"
+										: Tape === "bone"
+											? "bg-bone-newsprint text-soot-black"
+											: "bg-raw-blood text-bone-white"
 								}`}
 							>
-								<h4
-									class={`absolute -top-5 left-4 z-10 border border-black px-2 py-0.5 text-base font-black uppercase ${
-										Tape === "canary"
-											? "bg-stamped-canary text-soot-black"
-											: Tape === "bone"
-												? "bg-bone-newsprint text-soot-black"
-												: "bg-raw-blood text-bone-white"
-									}`}
-								>
-									{N} // {Name}
-								</h4>
-								{Body.map((Paragraph, I) => (
-									<p
-										class={I === 0
+								{N} // {Name}
+							</h4>
+							{Body.map((Paragraph, I) => (
+								<p
+									class={
+										I === 0
 											? "mt-4 font-body text-base leading-relaxed text-bone-newsprint"
-											: "mt-3 font-body text-base leading-relaxed text-bone-newsprint"}
-										set:html={Paragraph}
-									/>
-								))}
-							</div>
-						))
-					}
+											: "mt-3 font-body text-base leading-relaxed text-bone-newsprint"
+									}
+									set:html={Paragraph}
+								/>
+							))}
+						</div>
+					))}
 				</div>
 
 				<ZineTape Variant="section" Label="BYPASS // THE ESSENTIAL-TOOL GATE" />
-				<h3 id="gate" class={`mb-8 mt-4 ${Head}`}>What never gets compressed</h3>
+				<h3 id="gate" class={`mb-8 mt-4 ${Head}`}>
+					What never gets compressed
+				</h3>
 				<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
-					A result is left untouched when it is empty, below threshold, or from the essential set -
-					tools the agent needs raw:
+					A result is left untouched when it is empty, below threshold, or from the
+					essential set - tools the agent needs raw:
 				</p>
 				<div class="border border-oxblood-dark bg-soot-black p-4 font-mono text-base text-bone-newsprint">
 					skill_view · skills_list · skill_manage · memory · session_search · read_file ·
@@ -530,20 +641,30 @@ const Dispatch = [
 					would just replace resolved content with another marker.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					The gate is the reason retrieval stays cheap: a marker the model resolves comes back
-					whole, because nothing downstream of the gate rewrites it a second time.
+					The gate is the reason retrieval stays cheap: a marker the model resolves comes
+					back whole, because nothing downstream of the gate rewrites it a second time.
 				</p>
 
 				<ZineTape Variant="section" Label="THRESHOLDS // GATES AND BYPASSES" />
-				<h3 id="thresholds" class={`mb-8 mt-4 ${Head}`}>The numbers that decide</h3>
+				<h3 id="thresholds" class={`mb-8 mt-4 ${Head}`}>
+					The numbers that decide
+				</h3>
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse font-mono text-base">
 						<thead>
 							<tr class="border-b-2 border-oxblood-dark text-left">
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">HOOK</th>
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">SETTING</th>
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">DEFAULT</th>
-								<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">BYPASS</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+									HOOK
+								</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+									SETTING
+								</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+									DEFAULT
+								</th>
+								<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">
+									BYPASS
+								</th>
 							</tr>
 						</thead>
 						<tbody class="text-bone-newsprint">
@@ -551,23 +672,33 @@ const Dispatch = [
 								<td class="py-3 pr-4">transform_tool_result</td>
 								<td class="py-3 pr-4 text-weathered-teal">tool_threshold_token</td>
 								<td class="py-3 pr-4 text-bone-white">4,096</td>
-								<td class="py-3">empty · essential tools · self tools · <span class="text-stamped-canary">0 = always compress</span></td>
+								<td class="py-3">
+									empty · essential tools · self tools ·{" "}
+									<span class="text-stamped-canary">0 = always compress</span>
+								</td>
 							</tr>
 							<tr class="border-b border-oxblood-dark">
 								<td class="py-3 pr-4">transform_terminal_output</td>
 								<td class="py-3 pr-4 text-weathered-teal">terminal_threshold</td>
 								<td class="py-3 pr-4 text-bone-white">1,024</td>
-								<td class="py-3">empty · below threshold · <span class="text-stamped-canary">0 = always compress</span></td>
+								<td class="py-3">
+									empty · below threshold ·{" "}
+									<span class="text-stamped-canary">0 = always compress</span>
+								</td>
 							</tr>
 							<tr class="border-b border-oxblood-dark">
 								<td class="py-3 pr-4">pre_llm_call</td>
 								<td class="py-3 pr-4 text-weathered-teal">flow budget_chars</td>
 								<td class="py-3 pr-4 text-bone-white">4,000</td>
-								<td class="py-3">recall catalog drops first; directives and nudges never drop</td>
+								<td class="py-3">
+									recall catalog drops first; directives and nudges never drop
+								</td>
 							</tr>
 							<tr>
 								<td class="py-3 pr-4">pre_tool_call (chain split)</td>
-								<td class="py-3 pr-4 text-weathered-teal">chain_split_min_segments</td>
+								<td class="py-3 pr-4 text-weathered-teal">
+									chain_split_min_segments
+								</td>
 								<td class="py-3 pr-4 text-bone-white">-</td>
 								<td class="py-3">feature off by default (chain_split = false)</td>
 							</tr>
@@ -575,15 +706,22 @@ const Dispatch = [
 					</table>
 				</div>
 				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
-					PRECEDENCE: ENVIRONMENT &gt; TOML &gt; DEFAULT
-					(APHRODITE_TOOL_THRESHOLD_TOKEN · APHRODITE_TERMINAL_THRESHOLD ·
-					APHRODITE_FLOW_BUDGET_CHARS · APHRODITE_CHAIN_SPLIT).
+					PRECEDENCE: ENVIRONMENT &gt; TOML &gt; DEFAULT (APHRODITE_TOOL_THRESHOLD_TOKEN ·
+					APHRODITE_TERMINAL_THRESHOLD · APHRODITE_FLOW_BUDGET_CHARS ·
+					APHRODITE_CHAIN_SPLIT).
 				</p>
 				<p class="mt-3 text-base leading-relaxed text-zinc-dust">
-					The precedence matters at the edges: a value in the environment wins over the same key
-					in <span class="font-mono text-base text-weathered-teal">aphrodite.toml</span>, and the
-					compiled default is only reached when neither exists. Every knob is listed on
-					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/config/">CONFIG</a>.
+					The precedence matters at the edges: a value in the environment wins over the
+					same key in{" "}
+					<span class="font-mono text-base text-weathered-teal">aphrodite.toml</span>, and
+					the compiled default is only reached when neither exists. Every knob is listed
+					on
+					<a
+						class="text-weathered-teal underline transition-colors hover:text-bone-white"
+						href="/config/"
+					>
+						CONFIG
+					</a>.
 				</p>
 			</ZineBox>
 			<ZineSource
@@ -597,12 +735,14 @@ const Dispatch = [
 		<section class="relative w-full">
 			<ZineTape Variant="section" Label="DOWNLOAD // EXPLICIT STEPS ONLY" />
 			<ZineBox Size="lg" Rotate="-rotate-[1.4deg]">
-				<h2 id="download" class={`mb-8 ${Head}`}>register() never downloads</h2>
+				<h2 id="download" class={`mb-8 ${Head}`}>
+					register() never downloads
+				</h2>
 				<p class="mb-10 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The split is deliberate: loading a plugin is a read, and fetching a binary is a write.
-					Keeping them apart means an agent that starts in a clean environment never silently
-					pulls an executable over the network - the fetch is a step a person runs, with a
-					verdict attached to it.
+					The split is deliberate: loading a plugin is a read, and fetching a binary is a
+					write. Keeping them apart means an agent that starts in a clean environment
+					never silently pulls an executable over the network - the fetch is a step a
+					person runs, with a verdict attached to it.
 				</p>
 				<div class="grid grid-cols-1 gap-16 lg:grid-cols-2">
 					<div>
@@ -610,31 +750,42 @@ const Dispatch = [
 							Binaries are never shipped in the repository.
 						</p>
 						<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
-							Fetching them is an explicit setup step you run yourself - and the verification is
-							mandatory, not best-effort:
+							Fetching them is an explicit setup step you run yourself - and the
+							verification is mandatory, not best-effort:
 						</p>
 						<ul class="space-y-6 font-body text-base text-bone-newsprint">
 							<li class="border-l-4 border-raw-blood pl-4">
-								<span class="font-bold text-bone-white">SHA-256 against the in-tree checksum list</span>
-								- <code class="font-mono text-base text-weathered-teal">SHA256SUMS.txt</code>, generated by CI into the tree; a mismatch is refused outright.
+								<span class="font-bold text-bone-white">
+									SHA-256 against the in-tree checksum list
+								</span>
+								-{" "}
+								<code class="font-mono text-base text-weathered-teal">
+									SHA256SUMS.txt
+								</code>, generated by CI into the tree; a mismatch is refused outright.
 							</li>
 							<li class="border-l-4 border-raw-blood pl-4">
 								<span class="font-bold text-bone-white">Magic-byte validation</span>
-								- the downloaded file must be a real ELF / Mach-O / PE image, or it is rejected.
+								- the downloaded file must be a real ELF / Mach-O / PE image, or it
+								is rejected.
 							</li>
 							<li class="border-l-4 border-raw-blood pl-4">
-								<span class="font-bold text-bone-white">Backup + restore</span>
-								- an existing install is backed up and restored if any step fails. No release-hosted fallback.
+								<span class="font-bold text-bone-white">Backup + restore</span>{" "}- an
+								existing install is backed up and restored if any step fails. No
+								release-hosted fallback.
 							</li>
 							<li class="border-l-4 border-raw-blood pl-4">
-								<span class="font-bold text-bone-white">A missing binary disables, not breaks</span>
-								- the plugin logs the setup command and stays disabled until the binaries are present.
+								<span class="font-bold text-bone-white">
+									A missing binary disables, not breaks
+								</span>
+								- the plugin logs the setup command and stays disabled until the
+								binaries are present.
 							</li>
 						</ul>
 						<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
-							The four checks are ordered by cost, not by importance: the checksum is one hash, the
-							magic bytes are four, the backup is a rename, and the last one is not a check at all
-							- it is what the plugin does when every check above it has already failed.
+							The four checks are ordered by cost, not by importance: the checksum is
+							one hash, the magic bytes are four, the backup is a rename, and the last
+							one is not a check at all - it is what the plugin does when every check
+							above it has already failed.
 						</p>
 					</div>
 					<div>
@@ -653,37 +804,57 @@ const Dispatch = [
 							</span>
 						</div>
 						<p class="mt-6 font-mono text-base leading-relaxed text-zinc-dust">
-							The copy payload is {InstallCommands.split("\n").length} lines: clone, link, fetch,
-							enable, start. The <span class="text-weathered-teal">ln -s</span> line is the one
-							that makes the repo the plugin Hermes sees - the install directory is a symlink,
-							not a copy.
+							The copy payload is {InstallCommands.split("\n").length} lines: clone,
+							link, fetch, enable, start. The{" "}
+							<span class="text-weathered-teal">ln -s</span> line is the one that
+							makes the repo the plugin Hermes sees - the install directory is a
+							symlink, not a copy.
 						</p>
 					</div>
 				</div>
 
 				<p class="mt-12 border-t border-oxblood-dark pt-8 font-body text-base leading-relaxed text-zinc-dust">
-					ALSO ON THE STORE: the plugin is in the Hermes plugin catalog - the reviewed, pinned
-					alternative to the manual clone above.
+					ALSO ON THE STORE: the plugin is in the Hermes plugin catalog - the reviewed,
+					pinned alternative to the manual clone above.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					<code class="font-mono text-base text-weathered-teal">hermes plugins install aphrodite</code>
+					<code class="font-mono text-base text-weathered-teal">
+						hermes plugins install aphrodite
+					</code>
 					checks out the catalog entry's exact commit, then
 					<code class="font-mono text-base text-weathered-teal">bash download.sh</code>
-					from <code class="font-mono text-base text-weathered-teal">~/.hermes/plugins/aphrodite</code>
+					from{" "}
+					<code class="font-mono text-base text-weathered-teal">
+						~/.hermes/plugins/aphrodite
+					</code>
 					still fetches the binaries (never
 					<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>
 					against the catalog-managed directory).
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
 					The full flow is on
-					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/setup/">SETUP</a>;
-					the mechanics are in <a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={ExternalLinks.HermesGuide}>the Hermes plugin guide</a>.
+					<a
+						class="text-weathered-teal underline transition-colors hover:text-bone-white"
+						href="/setup/"
+					>
+						SETUP
+					</a>;
+					the mechanics are in{" "}
+					<a
+						class="text-weathered-teal underline transition-colors hover:text-bone-white"
+						href={ExternalLinks.HermesGuide}
+					>
+						the Hermes plugin guide
+					</a>.
 				</p>
 
-				<h3 id="key" class={`mb-8 mt-16 ${Head}`}>The proxy needs its own key</h3>
+				<h3 id="key" class={`mb-8 mt-16 ${Head}`}>
+					The proxy needs its own key
+				</h3>
 				<p class="font-body text-base leading-relaxed text-zinc-dust">
 					LLM API KEY REQUIRED: the proxy is an OpenAI-compatible forwarder and needs its
-					own credentials - <code class="font-mono text-base text-weathered-teal">APHRODITE_API_KEY</code>,
+					own credentials -{" "}
+					<code class="font-mono text-base text-weathered-teal">APHRODITE_API_KEY</code>,
 					<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>, or
 					<code class="font-mono text-base text-weathered-teal">api_key</code> in
 					~/.hermes/aphrodite/aphrodite.toml.
@@ -693,12 +864,14 @@ const Dispatch = [
 					key the proxy refuses to start.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					That refusal is the point. A forwarder that started without a key would accept a request,
-					hold it, and fail it somewhere downstream - so the proxy checks first and exits with the
-					missing variable named.
+					That refusal is the point. A forwarder that started without a key would accept a
+					request, hold it, and fail it somewhere downstream - so the proxy checks first
+					and exits with the missing variable named.
 				</p>
 
-				<h3 id="config" class={`mb-8 mt-16 ${Head}`}>What happens without a config file</h3>
+				<h3 id="config" class={`mb-8 mt-16 ${Head}`}>
+					What happens without a config file
+				</h3>
 				<p class="font-body text-base leading-relaxed text-zinc-dust">
 					A MISSING CONFIG IS REPORTED, NOT INFERRED: when
 					<code class="font-mono text-base text-weathered-teal">aphrodite.toml</code> is
@@ -714,9 +887,9 @@ const Dispatch = [
 					never becomes the everyday state.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					The fallback is a floor, not a mode: one listener, token compression, no retention
-					promise. It exists so a fresh checkout can answer a request before anyone has written a
-					config, and it is reported every time it is in effect.
+					The fallback is a floor, not a mode: one listener, token compression, no
+					retention promise. It exists so a fresh checkout can answer a request before
+					anyone has written a config, and it is reported every time it is in effect.
 				</p>
 
 				<div class="mt-12">
@@ -738,22 +911,42 @@ const Dispatch = [
 		<section class="relative w-full">
 			<ZineTape Variant="section" Label="FILESYSTEM // CANONICAL LAYOUT" />
 			<ZineBox Size="lg" Rotate="rotate-[1.2deg]">
-				<h2 id="layout" class={`mb-8 ${Head}`}>What changes after install</h2>
+				<h2 id="layout" class={`mb-8 ${Head}`}>
+					What changes after install
+				</h2>
 				<p class="mb-10 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Two directories, two owners. Hermes owns the plugin directory and the plugin owns
-					everything under the runtime home - the arrow annotations below are the whole map of who
-					writes what.
+					Two directories, two owners. Hermes owns the plugin directory and the plugin
+					owns everything under the runtime home - the arrow annotations below are the
+					whole map of who writes what.
 				</p>
 				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed text-bone-newsprint">
 					<div>~/.hermes/</div>
-					<div class="pl-4">├── plugins/aphrodite <span class="text-zinc-dust">← manual symlink to the plugin repo</span></div>
-					<div class="pl-4 text-bone-white">└── aphrodite/ <span class="text-zinc-dust">← runtime home</span></div>
-					<div class="pl-10">├── binaries/aphrodite <span class="text-zinc-dust">← proxy binary, fetched + verified</span></div>
+					<div class="pl-4">
+						├── plugins/aphrodite{" "}
+						<span class="text-zinc-dust">← manual symlink to the plugin repo</span>
+					</div>
+					<div class="pl-4 text-bone-white">
+						└── aphrodite/ <span class="text-zinc-dust">← runtime home</span>
+					</div>
+					<div class="pl-10">
+						├── binaries/aphrodite{" "}
+						<span class="text-zinc-dust">← proxy binary, fetched + verified</span>
+					</div>
 					<div class="pl-10">├── binaries/libaphrodite_hermes.dylib</div>
-					<div class="pl-10">├── aphrodite.toml <span class="text-zinc-dust">← config</span></div>
-					<div class="pl-10">├── directives/ <span class="text-zinc-dust">← 7 built-ins materialized</span></div>
-					<div class="pl-10">├── ccr.db <span class="text-zinc-dust">← SQLite CCR store</span></div>
-					<div class="pl-10">└── proxy-stderr.log <span class="text-zinc-dust">← proxy logs (empty = healthy)</span></div>
+					<div class="pl-10">
+						├── aphrodite.toml <span class="text-zinc-dust">← config</span>
+					</div>
+					<div class="pl-10">
+						├── directives/{" "}
+						<span class="text-zinc-dust">← 7 built-ins materialized</span>
+					</div>
+					<div class="pl-10">
+						├── ccr.db <span class="text-zinc-dust">← SQLite CCR store</span>
+					</div>
+					<div class="pl-10">
+						└── proxy-stderr.log{" "}
+						<span class="text-zinc-dust">← proxy logs (empty = healthy)</span>
+					</div>
 				</div>
 
 				<div class="mt-10 grid grid-cols-1 gap-8 md:grid-cols-3">
@@ -761,34 +954,40 @@ const Dispatch = [
 						<ZineKicker Tone="white">binaries/</ZineKicker>
 						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
 							The only two files that execute. Both arrive through
-							<span class="font-mono text-base text-weathered-teal">download.sh</span> and both
-							are verified before they land; a failed fetch restores the pair that was already
-							there.
+							<span class="font-mono text-base text-weathered-teal">
+								download.sh
+							</span>{" "}
+							and both are verified before they land; a failed fetch restores the pair
+							that was already there.
 						</p>
 					</div>
 					<div class="border-l-4 border-raw-blood pl-4">
 						<ZineKicker Tone="white">directives/</ZineKicker>
 						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
-							The seven built-ins, materialized on first start so an edited directive is never
-							silently overwritten by an upgrade. A deleted one comes back; a changed one stays
-							changed.
+							The seven built-ins, materialized on first start so an edited directive
+							is never silently overwritten by an upgrade. A deleted one comes back; a
+							changed one stays changed.
 						</p>
 					</div>
 					<div class="border-l-4 border-raw-blood pl-4">
 						<ZineKicker Tone="white">ccr.db</ZineKicker>
 						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
-							The address space the markers point into. Delete it and the markers stop resolving
-							- the previews in the transcript still read, which is why the store can be dropped
-							without losing the conversation.
+							The address space the markers point into. Delete it and the markers stop
+							resolving - the previews in the transcript still read, which is why the
+							store can be dropped without losing the conversation.
 						</p>
 					</div>
 				</div>
 
-				<h3 id="selfheal" class={`mb-8 mt-16 ${Head}`}>The self-heal, and where it stops</h3>
+				<h3 id="selfheal" class={`mb-8 mt-16 ${Head}`}>
+					The self-heal, and where it stops
+				</h3>
 				<p class="font-body text-base leading-relaxed text-zinc-dust">
 					The runtime home self-heals toward
-					<code class="font-mono text-base text-weathered-teal">layout_schema.json</code> at
-					startup: the self-heal moves misplaced config and binaries to their canonical
+					<code class="font-mono text-base text-weathered-teal">
+						layout_schema.json
+					</code>{" "}
+					at startup: the self-heal moves misplaced config and binaries to their canonical
 					paths and quarantines stale plugin-source copies.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
@@ -797,10 +996,11 @@ const Dispatch = [
 					never creates, converts, or modifies it.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					The schema is the authority, not the directory listing: a file is misplaced when it is
-					not where the schema says, and the repair is a move - never a copy, never a rewrite.
-					Anything it cannot place it quarantines instead of deleting, so a stale copy is set
-					aside with its bytes intact and the next start does not trip over it again.
+					The schema is the authority, not the directory listing: a file is misplaced when
+					it is not where the schema says, and the repair is a move - never a copy, never
+					a rewrite. Anything it cannot place it quarantines instead of deleting, so a
+					stale copy is set aside with its bytes intact and the next start does not trip
+					over it again.
 				</p>
 				<div class="mt-8">
 					<ZineReveal
@@ -830,26 +1030,31 @@ const Dispatch = [
 					The six hooks, the version pairing, and the 14-to-13 correction
 				</h2>
 				<p class="mb-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Three things grew at once: the seams, the pairing rule that keeps a plugin pointing at a
-					binary that exists, and the discipline that keeps the declared tool count honest. Read
-					together they explain why the plugin can be installed from a tag and verified against a
-					checksum list.
+					Three things grew at once: the seams, the pairing rule that keeps a plugin
+					pointing at a binary that exists, and the discipline that keeps the declared
+					tool count honest. Read together they explain why the plugin can be installed
+					from a tag and verified against a checksum list.
 				</p>
 
-				<h3 id="lanes" class={`mb-8 ${Head}`}>Six lanes, one trigger each</h3>
+				<h3 id="lanes" class={`mb-8 ${Head}`}>
+					Six lanes, one trigger each
+				</h3>
 				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 xl:grid-cols-3 xl:gap-6">
-					{
-						Lanes.map(({ Hook, When, Does }) => (
-							<div class="border-2 border-oxblood-dark bg-soot-black p-5">
-								<div class="font-mono text-base font-black text-bone-white">{Hook}</div>
-								<div class="mt-3 font-mono text-base font-bold uppercase tracking-widest text-stamped-canary">{When}</div>
-								<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">{Does}</p>
+					{Lanes.map(({ Hook, When, Does }) => (
+						<div class="border-2 border-oxblood-dark bg-soot-black p-5">
+							<div class="font-mono text-base font-black text-bone-white">{Hook}</div>
+							<div class="mt-3 font-mono text-base font-bold uppercase tracking-widest text-stamped-canary">
+								{When}
 							</div>
-						))
-					}
+							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+								{Does}
+							</p>
+						</div>
+					))}
 				</div>
 				<p class="mt-8 font-mono text-base text-zinc-dust">
-					SRC: docs/plugin/hooks.md:13-20 - every hook is a thin dispatch that forwards to the Rust dylib; the dylib holds all the behavior.
+					SRC: docs/plugin/hooks.md:13-20 - every hook is a thin dispatch that forwards to
+					the Rust dylib; the dylib holds all the behavior.
 				</p>
 
 				<div class="mt-24 border-2 border-raw-blood bg-soot-black p-6">
@@ -858,7 +1063,9 @@ const Dispatch = [
 					</ZineKicker>
 					<div class="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-3">
 						<div>
-							<div class="font-headline text-2xl font-black text-bone-white">{Stamps.Pairing()}</div>
+							<div class="font-headline text-2xl font-black text-bone-white">
+								{Stamps.Pairing()}
+							</div>
 							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
 								Today's pairing: binary {Versions.Binary}, plugin {Versions.Plugin}.
 							</p>
@@ -867,34 +1074,45 @@ const Dispatch = [
 							</p>
 						</div>
 						<div>
-							<div class="font-headline text-2xl font-black text-bone-white">BUMPED LAST</div>
+							<div class="font-headline text-2xl font-black text-bone-white">
+								BUMPED LAST
+							</div>
 							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-								<code class="font-mono text-base text-weathered-teal">BINARY_VERSION</code> is
-								pinned to a binary release tag the plugin can download.
+								<code class="font-mono text-base text-weathered-teal">
+									BINARY_VERSION
+								</code>{" "}
+								is pinned to a binary release tag the plugin can download.
 							</p>
 							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
 								Since the first plugin-first release (v1.4.6), the plugin is tagged
-								<em>before the parent</em>, so the pinned version points at assets that
-								already exist.
+								<em>before the parent</em>, so the pinned version points at assets
+								that already exist.
 							</p>
 						</div>
 						<div>
-							<div class="font-headline text-2xl font-black text-bone-white">OR IT REFUSES</div>
+							<div class="font-headline text-2xl font-black text-bone-white">
+								OR IT REFUSES
+							</div>
 							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-								The plugin warns before <code class="font-mono text-base">download.sh</code>
-								when the pinned <code class="font-mono text-base">BINARY_VERSION</code> points
-								at a release with no assets - and since v1.6.5, a checksum mismatch is a
+								The plugin warns before{" "}
+								<code class="font-mono text-base">download.sh</code>
+								when the pinned{" "}
+								<code class="font-mono text-base">BINARY_VERSION</code> points at a
+								release with no assets - and since v1.6.5, a checksum mismatch is a
 								hard refusal, not a warning.
 							</p>
 						</div>
 					</div>
 					<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
-						The order is the mechanic. Tagging the plugin first means the pinned version can only
-						ever point backwards, at a release whose assets are already uploaded and hashed -
-						so the download has something to verify against before anyone asks for it.
+						The order is the mechanic. Tagging the plugin first means the pinned version
+						can only ever point backwards, at a release whose assets are already
+						uploaded and hashed - so the download has something to verify against before
+						anyone asks for it.
 					</p>
 					<div class="mt-6 font-mono text-base text-zinc-dust">
-						SRC: CHANGELOG.md v1.4.6/v1.4.4/v1.6.5/v1.6.6 entries · the Aphrodite/v1.4.6 release note ("released plugin-first ... points at assets that already exist")
+						SRC: CHANGELOG.md v1.4.6/v1.4.4/v1.6.5/v1.6.6 entries · the Aphrodite/v1.4.6
+						release note ("released plugin-first ... points at assets that already
+						exist")
 					</div>
 				</div>
 
@@ -907,30 +1125,40 @@ const Dispatch = [
 						registers exactly the 13 declared tools.
 					</p>
 					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						The 14th, <code class="font-mono text-base text-weathered-teal">aphrodite_debug</code>,
-						is <code class="font-mono text-base text-weathered-teal">debug_assertions</code>-gated
-						out of release builds, matching what
-						<code class="font-mono text-base text-weathered-teal">hermes plugins validate</code>
+						The 14th,{" "}
+						<code class="font-mono text-base text-weathered-teal">
+							aphrodite_debug
+						</code>, is{" "}
+						<code class="font-mono text-base text-weathered-teal">
+							debug_assertions
+						</code>-gated out of release builds, matching what
+						<code class="font-mono text-base text-weathered-teal">
+							hermes plugins validate
+						</code>
 						enforces.
 					</p>
 					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 						Earlier, v1.6.1 had already removed it from
-						<code class="font-mono text-base text-weathered-teal">provides_tools</code>, closing
-						the catalog-review mismatch on the pinned tree - and v1.4.6 had done the same
-						for <code class="font-mono text-base text-weathered-teal">aphrodite_navigate</code>,
-						the navigation tool whose feature was unbuildable.
+						<code class="font-mono text-base text-weathered-teal">provides_tools</code>,
+						closing the catalog-review mismatch on the pinned tree - and v1.4.6 had done
+						the same for{" "}
+						<code class="font-mono text-base text-weathered-teal">
+							aphrodite_navigate
+						</code>, the navigation tool whose feature was unbuildable.
 					</p>
 					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 						The declared surface and the running surface are kept identical on purpose.
 					</p>
 					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-						The count is not cosmetic: the validator compares the manifest's tool list against the
-						schemas the dylib reports, so a release that advertises fourteen while registering
-						thirteen fails that comparison before a user ever runs it. A debug-only tool is
-						therefore a build artifact, not a declared surface - and the manifest says so.
+						The count is not cosmetic: the validator compares the manifest's tool list
+						against the schemas the dylib reports, so a release that advertises fourteen
+						while registering thirteen fails that comparison before a user ever runs it.
+						A debug-only tool is therefore a build artifact, not a declared surface -
+						and the manifest says so.
 					</p>
 					<div class="mt-4 font-mono text-base text-zinc-dust">
-						SRC: CHANGELOG.md:61-64 (v1.6.5) · CHANGELOG.md:166-173 (v1.6.1) · v1.4.6 release note
+						SRC: CHANGELOG.md:61-64 (v1.6.5) · CHANGELOG.md:166-173 (v1.6.1) · v1.4.6
+						release note
 					</div>
 				</div>
 			</ZineBox>

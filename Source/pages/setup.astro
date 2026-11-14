@@ -18,10 +18,10 @@ import { ExternalLinks } from "@Library/Links";
 
 // THE FOUR ROUTES - one record per install path. The shape is the point: a
 // route that cannot say what it writes, what it fails on and how you verify
-// it is not finished install documentation, so the fields are mandatory and
-// the card renders all of them. `Comment` is the `//` note block the route
-// carries (the cargo and from-source lanes both need one); `Lesson` is the
-// one aside a single route earns (macOS Gatekeeper, on #3).
+// it is not finished install documentation, so those fields are mandatory and
+// every card renders all of them. `Comment` is the `//` note block a route
+// carries (cargo and from-source both need one); `Lesson` is the one aside a
+// single route earns - macOS Gatekeeper, on #3.
 interface InstallRoute {
 	/** The anchor id the card's `<h2>` carries. */
 	Id: string;
@@ -95,10 +95,8 @@ $ bash download.sh // or: pwsh ./download.ps1 - still required
 $ hermes`,
 		Note: "The catalog is the only lane with no <code class=\"font-mono text-base text-weathered-teal\">git</code> and no Rust in it: one install, one enable, one download.",
 		OutcomeTag: "OUTCOME // CATALOG INSTALL:",
-		Outcome:
-			"Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256 verified, plugin enabled.",
-		Writes:
-			"The catalog checkout only - <code class=\"font-mono text-base text-weathered-teal\">plugin.yaml</code> plus the <code class=\"font-mono text-base text-weathered-teal\">__init__.py</code> shim, in <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/plugins/aphrodite</code>. <code class=\"font-mono text-base text-weathered-teal\">download.sh</code> then fetches the binary and the dylib into <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/aphrodite/binaries/</code>, never into the plugin directory, validated against the in-tree <code class=\"font-mono text-base text-weathered-teal\">SHA256SUMS.txt</code> and magic-byte checked.",
+		Outcome: "Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256 verified, plugin enabled.",
+		Writes: "The catalog checkout only - <code class=\"font-mono text-base text-weathered-teal\">plugin.yaml</code> plus the <code class=\"font-mono text-base text-weathered-teal\">__init__.py</code> shim, in <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/plugins/aphrodite</code>. <code class=\"font-mono text-base text-weathered-teal\">download.sh</code> then fetches the binary and the dylib into <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/aphrodite/binaries/</code>, never into the plugin directory, validated against the in-tree <code class=\"font-mono text-base text-weathered-teal\">SHA256SUMS.txt</code> and magic-byte checked.",
 		Fails: [
 			"No route to GitHub Releases: the fetch step fails and the plugin stays disabled - <code class=\"font-mono text-base text-weathered-teal\">register()</code> never downloads anything on its own.",
 			"A checksum that does not match <code class=\"font-mono text-base text-weathered-teal\">SHA256SUMS.txt</code>: the verify step fails, and the honest fix is a re-run, not a hand-copied file.",
@@ -129,10 +127,8 @@ $ hermes plugins enable aphrodite
 $ hermes`,
 		Note: "Pin both explicitly: <code class=\"font-mono text-base text-weathered-teal\">bash download.sh 1.6.5 x86_64-unknown-linux-gnu</code>. <code class=\"font-mono text-base text-weathered-teal\">register()</code> never downloads - the only escape hatch is <code class=\"font-mono text-base text-weathered-teal\">APHRODITE_AUTO_DOWNLOAD=1</code>, which runs the script itself before launching.",
 		OutcomeTag: "OUTCOME // VERIFIED INSTALL:",
-		Outcome:
-			"Binary + native library (dylib) fetched from GitHub Releases, SHA-256 verified, plugin enabled.",
-		Writes:
-			"<code class=\"font-mono text-base text-weathered-teal\">download.sh</code> resolves the version from the bundled <code class=\"font-mono text-base text-weathered-teal\">BINARY_VERSION</code>, the monorepo's own <code class=\"font-mono text-base text-weathered-teal\">Cargo.toml</code>, or the latest published release, detects your platform, and installs <code class=\"font-mono text-base text-weathered-teal\">aphrodite</code> + <code class=\"font-mono text-base text-weathered-teal\">libaphrodite_hermes</code> into <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/aphrodite/binaries/</code>. Nothing is written inside the plugin tree.",
+		Outcome: "Binary + native library (dylib) fetched from GitHub Releases, SHA-256 verified, plugin enabled.",
+		Writes: "<code class=\"font-mono text-base text-weathered-teal\">download.sh</code> resolves the version from the bundled <code class=\"font-mono text-base text-weathered-teal\">BINARY_VERSION</code>, the monorepo's own <code class=\"font-mono text-base text-weathered-teal\">Cargo.toml</code>, or the latest published release, detects your platform, and installs <code class=\"font-mono text-base text-weathered-teal\">aphrodite</code> + <code class=\"font-mono text-base text-weathered-teal\">libaphrodite_hermes</code> into <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/aphrodite/binaries/</code>. Nothing is written inside the plugin tree.",
 		Fails: [
 			"<code class=\"font-mono text-base text-weathered-teal\">ln -s</code> onto an existing <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/plugins/aphrodite</code> directory: the link lands inside it instead of replacing it. Remove the directory first.",
 			"A <code class=\"font-mono text-base text-weathered-teal\">download.sh</code> run from outside the clone: the script is a file in the tree, so <code class=\"font-mono text-base text-weathered-teal\">cd</code> into it before running it.",
@@ -159,18 +155,16 @@ $ cargo install aphrodite-hermes // dylib + helper bin
 $ aphrodite setup`,
 		Comment: `// cargo installs the binaries only - aphrodite setup then writes a minimal
 // loader into ~/.hermes/plugins/aphrodite. For the full plugin, use Option 1
-// or 2. Needs Rust 1.88+ (the repo toolchain pins nightly).<code class=\"font-mono text-base text-weathered-teal\">,
-		Note: "Setup ends by starting the proxy - pass </code>--no-launch<code class=\"font-mono text-base text-weathered-teal\"> to skip that, and </code>--force<code class=\"font-mono text-base text-weathered-teal\"> to rewrite an existing </code>aphrodite.toml<code class=\"font-mono text-base text-weathered-teal\">.",
+// or 2. Needs Rust 1.88+ (the repo toolchain pins nightly).`,
+		Note: "Setup ends by starting the proxy - pass <code class=\"font-mono text-base text-weathered-teal\">--no-launch</code> to skip that, and <code class=\"font-mono text-base text-weathered-teal\">--force</code> to rewrite an existing <code class=\"font-mono text-base text-weathered-teal\">aphrodite.toml</code>.",
 		OutcomeTag: "OUTCOME // BINARIES + LOADER:",
-		Outcome:
-			"The proxy binary and the dylib installed by cargo, the runtime home provisioned by aphrodite setup, a hooks-only loader written, the plugin registered.",
-		Writes:
-			"</code>aphrodite setup<code class=\"font-mono text-base text-weathered-teal\"> provisions </code>~/.hermes/aphrodite/<code class=\"font-mono text-base text-weathered-teal\"> - the binary, the dylibs, </code>aphrodite.toml<code class=\"font-mono text-base text-weathered-teal\"> from the embedded template (only if none exists, unless </code>--force<code class=\"font-mono text-base text-weathered-teal\">) and the </code>BINARY_VERSION<code class=\"font-mono text-base text-weathered-teal\"> pin - then writes the hooks-only loader, </code>plugin.yaml<code class=\"font-mono text-base text-weathered-teal\"> + </code>__init__.py<code class=\"font-mono text-base text-weathered-teal\">, into </code>~/.hermes/plugins/aphrodite/<code class=\"font-mono text-base text-weathered-teal\">, removing a stale symlink from older installs first. It ends by running </code>hermes plugins enable aphrodite<code class=\"font-mono text-base text-weathered-teal\">.",
+		Outcome: "The proxy binary and the dylib installed by cargo, the runtime home provisioned by aphrodite setup, a hooks-only loader written, the plugin registered.",
+		Writes: "<code class=\"font-mono text-base text-weathered-teal\">aphrodite setup</code> provisions <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/aphrodite/</code> - the binary, the dylibs, <code class=\"font-mono text-base text-weathered-teal\">aphrodite.toml</code> from the embedded template (only if none exists, unless <code class=\"font-mono text-base text-weathered-teal\">--force</code>) and the <code class=\"font-mono text-base text-weathered-teal\">BINARY_VERSION</code> pin - then writes the hooks-only loader, <code class=\"font-mono text-base text-weathered-teal\">plugin.yaml</code> + <code class=\"font-mono text-base text-weathered-teal\">__init__.py</code>, into <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/plugins/aphrodite/</code>, removing a stale symlink from older installs first. It ends by running <code class=\"font-mono text-base text-weathered-teal\">hermes plugins enable aphrodite</code>.",
 		Fails: [
-			"No </code>hermes<code class=\"font-mono text-base text-weathered-teal\"> on </code>PATH<code class=\"font-mono text-base text-weathered-teal\">: step one runs </code>hermes --version<code class=\"font-mono text-base text-weathered-teal\"> and fails fast with a clear error, before anything is written.",
-			"A missing </code>libaphrodite_hermes<code class=\"font-mono text-base text-weathered-teal\"> aborts setup; a missing core </code>libaphrodite<code class=\"font-mono text-base text-weathered-teal\"> only warns - the plugin loads the Hermes dylib, not the core one.",
-			"An existing </code>aphrodite.toml<code class=\"font-mono text-base text-weathered-teal\"> is left alone unless you pass </code>--force<code class=\"font-mono text-base text-weathered-teal\">; </code>--cache-port<code class=\"font-mono text-base text-weathered-teal\"> and </code>--token-port<code class=\"font-mono text-base text-weathered-teal\"> move the pair off 9797/9798 for a second agent on the same machine.",
-			"A failed </code>hermes plugins enable<code class=\"font-mono text-base text-weathered-teal\">: setup prints a warning and carries on - the binaries are installed, the registration is not.",
+			"No <code class=\"font-mono text-base text-weathered-teal\">hermes</code> on <code class=\"font-mono text-base text-weathered-teal\">PATH</code>: step one runs <code class=\"font-mono text-base text-weathered-teal\">hermes --version</code> and fails fast with a clear error, before anything is written.",
+			"A missing <code class=\"font-mono text-base text-weathered-teal\">libaphrodite_hermes</code> aborts setup; a missing core <code class=\"font-mono text-base text-weathered-teal\">libaphrodite</code> only warns - the plugin loads the Hermes dylib, not the core one.",
+			"An existing <code class=\"font-mono text-base text-weathered-teal\">aphrodite.toml</code> is left alone unless you pass <code class=\"font-mono text-base text-weathered-teal\">--force</code>; <code class=\"font-mono text-base text-weathered-teal\">--cache-port</code> and <code class=\"font-mono text-base text-weathered-teal\">--token-port</code> move the pair off 9797/9798 for a second agent on the same machine.",
+			"A failed <code class=\"font-mono text-base text-weathered-teal\">hermes plugins enable</code>: setup prints a warning and carries on - the binaries are installed, the registration is not.",
 		],
 		Verify: [
 			"Option 3 does not install the plugin by itself - after <code class=\"font-mono text-base text-weathered-teal\">aphrodite setup</code> writes the loader, start <code class=\"font-mono text-base text-weathered-teal\">hermes</code>.",
@@ -196,12 +190,10 @@ $ git submodule update --init --recursive
 $ cargo build --release -p aphrodite -p aphrodite-hermes`,
 		Comment: `// needs Rust 1.88+ (the repo toolchain pins nightly). The build outputs land
 // in target/release/ - point APHRODITE_BINARY_PATH / APHRODITE_HERMES_DYLIB_PATH
-// at them, or copy them into ~/.hermes/aphrodite/binaries/.</code>,
+// at them, or copy them into ~/.hermes/aphrodite/binaries/.`,
 		OutcomeTag: "OUTCOME // A LOCAL BUILD:",
-		Outcome:
-			"A release build in target/release/ that you point the plugin at, or copy into the runtime home's binaries/ - no installer script, no download.",
-		Writes:
-			"Nothing outside your checkout: <code class=\"font-mono text-base text-weathered-teal\">cargo build --release</code> writes <code class=\"font-mono text-base text-weathered-teal\">target/release/aphrodite</code> and <code class=\"font-mono text-base text-weathered-teal\">target/release/libaphrodite_hermes.dylib</code> (<code class=\"font-mono text-base text-weathered-teal\">.so</code> on Linux). The plugin reads <code class=\"font-mono text-base text-weathered-teal\">APHRODITE_BINARY_PATH</code> / <code class=\"font-mono text-base text-weathered-teal\">APHRODITE_HERMES_DYLIB_PATH</code>, or you copy the pair into <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/aphrodite/binaries/</code>.",
+		Outcome: "A release build in target/release/ that you point the plugin at, or copy into the runtime home's binaries/ - no installer script, no download.",
+		Writes: "Nothing outside your checkout: <code class=\"font-mono text-base text-weathered-teal\">cargo build --release</code> writes <code class=\"font-mono text-base text-weathered-teal\">target/release/aphrodite</code> and <code class=\"font-mono text-base text-weathered-teal\">target/release/libaphrodite_hermes.dylib</code> (<code class=\"font-mono text-base text-weathered-teal\">.so</code> on Linux). The plugin reads <code class=\"font-mono text-base text-weathered-teal\">APHRODITE_BINARY_PATH</code> / <code class=\"font-mono text-base text-weathered-teal\">APHRODITE_HERMES_DYLIB_PATH</code>, or you copy the pair into <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/aphrodite/binaries/</code>.",
 		Fails: [
 			"A skipped <code class=\"font-mono text-base text-weathered-teal\">git submodule update --init --recursive</code>: vendored dependencies live in submodules and the build stops early.",
 			"A stable toolchain against a repo pinned to nightly: the workspace needs Rust 1.88+ and the repo's toolchain pins nightly.",
@@ -230,8 +222,8 @@ const Layout = `~/.hermes/
     ├── directives/         ← active directive files
     └── logs/               ← proxy/engine logs`;
 
-// What `aphrodite setup` does, in order - the eight steps the docs table
-// carries, as one ordered list inside the fold.
+// What `aphrodite setup` does, in order - the eight steps the install docs
+// carry, as one ordered list inside the fold.
 const SetupSteps = `<ol class="mt-1 list-decimal space-y-2 pl-5">
 	<li><strong class="text-bone-white">Verifies hermes is on PATH</strong> (<code class="font-mono text-base text-weathered-teal">hermes --version</code>) - fails fast with a clear error if not.</li>
 	<li><strong class="text-bone-white">Creates the runtime home</strong>: <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code> and <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/binaries/</code>.</li>
@@ -244,12 +236,13 @@ const SetupSteps = `<ol class="mt-1 list-decimal space-y-2 pl-5">
 </ol>`;
 
 // The other direction: three commands and one directory to remove.
-const Uninstall = `<p>Disable the plugin, remove the loader, then stop anything still running:</p>
+const Uninstall = `
+<p>Disable the plugin, remove the loader, then stop anything still running:</p>
 <p class="mt-2 border border-oxblood-dark bg-soot-black p-3 font-mono text-base leading-relaxed text-bone-newsprint">hermes plugins disable aphrodite<br />rm -rf ~/.hermes/plugins/aphrodite<br />pkill -f "aphrodite" 2&gt;/dev/null || true</p>
 <p class="mt-2">Remove <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code> as well to clean up the binaries, config, CCR database and logs the download scripts or <code class="font-mono text-base text-weathered-teal">aphrodite setup</code> wrote.</p>`;
 
 // The toml excerpt: resolution order, precedence, and the two keys the rest of
-// the site quotes. Rendered as a fence so the `#` voice stays code.
+// the site quotes. A fence, so the `#` voice stays code.
 const Config = `# resolution order:
 ./aphrodite.toml then ~/.hermes/aphrodite/aphrodite.toml
 # precedence:
@@ -389,7 +382,10 @@ budget_chars = 2600 # hard cap per turn`;
 									TapeSide={Side}
 								>
 									<div class="mb-3 mt-2 flex flex-wrap items-center justify-between gap-2">
-										<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+										<h2
+											id={Id}
+											class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+										>
 											{Title}
 										</h2>
 										<span class="font-mono text-base text-zinc-dust">{Steps}</span>
@@ -420,34 +416,34 @@ budget_chars = 2600 # hard cap per turn`;
 											{Outcome}
 										</p>
 										{Guide === true && (
-											<div class="mt-4 border-l-4 border-stamped-canary bg-soot-black p-4">
-												<ZineKicker Tone="canary" As="div">THE CATALOG RULE</ZineKicker>
-												<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
-													The catalog entry is reviewed and pinned -
-													<code class="font-mono text-base text-weathered-teal">hermes plugins install</code>
-													checks out exactly that commit, never a branch tip.
+											<>
+												<div class="mt-4 border-l-4 border-stamped-canary bg-soot-black p-4">
+													<ZineKicker Tone="canary" As="div">THE CATALOG RULE</ZineKicker>
+													<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+														The catalog entry is reviewed and pinned -
+														<code class="font-mono text-base text-weathered-teal">hermes plugins install</code>
+														checks out exactly that commit, never a branch tip.
+													</p>
+													<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+														Do NOT run
+														<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>
+														in a catalog-managed directory - still run
+														<code class="font-mono text-base text-weathered-teal">download.sh</code>
+														(or <code class="font-mono text-base text-weathered-teal">download.ps1</code>
+														on Windows) from the installed plugin folder.
+													</p>
+												</div>
+												<p class="mt-2 font-mono text-base text-zinc-dust">
+													SRC:{" "}
+													<a
+														class="text-weathered-teal underline transition-colors hover:text-bone-white"
+														href={ExternalLinks.HermesGuide}
+													>
+														the Hermes plugin guide
+													</a>{" "}
+													- Installing from the catalog.
 												</p>
-												<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
-													Do NOT run
-													<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>
-													in a catalog-managed directory - still run
-													<code class="font-mono text-base text-weathered-teal">download.sh</code>
-													(or <code class="font-mono text-base text-weathered-teal">download.ps1</code>
-													on Windows) from the installed plugin folder.
-												</p>
-											</div>
-										)}
-										{Guide === true && (
-											<p class="mt-2 font-mono text-base text-zinc-dust">
-												SRC:{" "}
-												<a
-													class="text-weathered-teal underline transition-colors hover:text-bone-white"
-													href={ExternalLinks.HermesGuide}
-												>
-													the Hermes plugin guide
-												</a>{" "}
-												- Installing from the catalog.
-											</p>
+											</>
 										)}
 									</div>
 
@@ -486,18 +482,18 @@ budget_chars = 2600 # hard cap per turn`;
 										</div>
 									)}
 
-									<p class="mt-6 font-mono text-base text-zinc-dust">
-										<a
-											class="text-weathered-teal underline transition-colors hover:text-bone-white"
-											href="#layout">AFTER THIS ROUTE // WHAT CHANGES ON DISK</a
-										>
-									</p>
 								</ZineBox>
 							</div>
 						),
 					)
 				}
 			</div>
+			<p class="mt-12 font-mono text-base text-zinc-dust">
+				Every route above converges on the same two directories -
+				<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="#layout"
+					>what changes on disk</a
+				>.
+			</p>
 			<ZineSource
 				Lines={[
 					"SRC: docs/install/index.md; docs/install/macos-linux.md",
@@ -550,8 +546,16 @@ budget_chars = 2600 # hard cap per turn`;
 					them.
 				</p>
 				<div class="mt-12 flex flex-col gap-4">
-					<ZineFold Label="WHAT APHRODITE SETUP DOES, IN ORDER" Tag="8 STEPS" Body={SetupSteps} />
-					<ZineFold Label="UNINSTALL // THREE COMMANDS AND A DIRECTORY" Tag="REVERSE" Body={Uninstall} />
+					<ZineFold
+						Label="WHAT APHRODITE SETUP DOES, IN ORDER"
+						Tag="8 STEPS"
+						Body={SetupSteps}
+					/>
+					<ZineFold
+						Label="UNINSTALL // THREE COMMANDS AND A DIRECTORY"
+						Tag="REVERSE"
+						Body={Uninstall}
+					/>
 				</div>
 			</ZineBox>
 			<ZineSource
@@ -615,7 +619,7 @@ budget_chars = 2600 # hard cap per turn`;
 					Class="mt-8 border border-oxblood-dark"
 					Copy
 					CopyLabel="PROXY"
-					Code={`$ ./aphrodite --api-key «redacted:sk-...» --listen 127.0.0.1:9798
+					Code={`$ ./aphrodite --api-key «redacted:sk-…» --listen 127.0.0.1:9798
 $ curl http://127.0.0.1:9798/health
 {"status":"healthy","ccr":true,"mode":"token","version":"<current version>","fill_pct":...}`}
 				/>

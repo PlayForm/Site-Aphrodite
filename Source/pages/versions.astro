@@ -360,7 +360,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 					and the changelog head declares the pairing in its first lines.
 				</p>
 				<div class="mt-8 border-t border-oxblood-dark pt-4 font-mono text-base text-zinc-dust">
-					{`SRC: CHANGELOG.md v${Versions.ChangelogVersion} ("${Versions.ChangelogPairing}")`}
+					{`SRC: CHANGELOG.md v${Versions.ChangelogVersion} head; crates/aphrodite/Cargo.toml; plugins/aphrodite/plugin.yaml`}
 				</div>
 
 				<ZineTape Variant="section" Label="STAMPS // WHAT EACH NUMBER IS READ FROM" />
@@ -441,8 +441,9 @@ const Holes = [0, 1, 2, 3, 4, 5];
 			</h2>
 			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				A release is not a tag on one repository. The binary, the plugin spec and the pin that
-				connects them are three files that must agree, and the changelog head is where the
-				agreement is written down so a later reader can check it without diffing manifests.
+				connects them are three files that must agree, the in-tree checksum list is the
+				fourth, and the changelog head is where the agreement is written down so a later
+				reader can check it without diffing manifests.
 			</p>
 			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				The order matters as much as the numbers. Since v1.4.6 the plugin is tagged before the
@@ -460,7 +461,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 						},
 						{
 							Label: "THE CHANGELOG HEAD",
-							Text: `Declares the pairing in its own first lines - ${Versions.ChangelogPairing} - so the release states what it was cut against.`,
+							Text: "Names the version, the date and the one-line title on its first line, and states the pairing the release was cut against - the two manifests are what that sentence is checked against.",
 						},
 						{
 							Label: "THE CHECKSUM",
@@ -619,6 +620,22 @@ const Holes = [0, 1, 2, 3, 4, 5];
 				</p>
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse font-mono text-base">
+						<thead>
+							<tr class="border-b-2 border-oxblood-dark text-left">
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+									VERSION
+								</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+									DATE
+								</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+									PAIRED WITH
+								</th>
+								<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">
+									WHAT LANDED
+								</th>
+							</tr>
+						</thead>
 						<tbody>
 							{
 								Releases.map(({ Ver, Date, Pair, Landed, Tag, Emphasis, Note }) => (
@@ -665,7 +682,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 			<ZineSource
 				Lines={[
 					`SRC: README.md:12; CHANGELOG.md v${Versions.ChangelogVersion}`,
-					`SRC: CHANGELOG.md v${Versions.ChangelogVersion} ("${Versions.ChangelogPairing}")`,
+					`SRC: CHANGELOG.md v${Versions.ChangelogVersion} (pairing v${Versions.Binary}, plugin v${Versions.Plugin})`,
 				]}
 			/>
 		</section>
@@ -760,9 +777,12 @@ const Holes = [0, 1, 2, 3, 4, 5];
 										>
 											{Ver}
 										</div>
-										<p class="mt-3 max-w-2xl font-body text-base leading-relaxed text-bone-newsprint">
-											{Landed}
-										</p>
+										<div class="mt-3">
+											<ZineKicker As="div" Tone="dust">WHAT LANDED</ZineKicker>
+											<p class="mt-1 max-w-2xl font-body text-base leading-relaxed text-bone-newsprint">
+												{Landed}
+											</p>
+										</div>
 										<div
 											class={`mt-4 border-l-2 pl-4 ${
 												Emphasis ? "border-stamped-canary" : "border-oxblood-dark"
@@ -795,7 +815,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 		</section>
 
 		<!-- ============ VI. NUMBERS // WHERE THE MEASUREMENTS LIVE ============ -->
-		<section id="numbers" class="relative w-full">
+		<section id="numbers" class="relative w-full lg:w-8/12 lg:self-end">
 			<ZineTape Variant="section" Label="POINTER // THE MEASUREMENTS" />
 			<ZineBox
 				Size="lg"
@@ -803,7 +823,6 @@ const Holes = [0, 1, 2, 3, 4, 5];
 				Tape="POINTER"
 				TapeColor="raw"
 				TapeSide="right"
-				Class="lg:w-8/12"
 			>
 				<h2
 					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
@@ -849,7 +868,8 @@ const Holes = [0, 1, 2, 3, 4, 5];
 			</ZineBox>
 			<ZineSource
 				Lines={[
-					"SRC: docs/benchmarks/README.md; CHANGELOG.md v1.3.2 (132× previews)",
+					"SRC: README.md:446-463; crates/aphrodite/examples/ (corpus + per-type benches)",
+					"SRC: CHANGELOG.md v1.3.2 (high-intelligibility previews at 132× overall)",
 				]}
 			/>
 		</section>
