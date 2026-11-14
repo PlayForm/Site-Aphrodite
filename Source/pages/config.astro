@@ -1,7 +1,10 @@
 ---
 import Base from "@Layout/Base.astro";
 import ConfigResolution from "../Content/Mermaid/config-resolution.svg?raw";
+import type { ConfigKeyLadderRecord } from "@Library/Records";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
+import SectionNav from "@Component/SectionNav.astro";
+import CopyButton from "@Component/CopyButton.astro";
 import ZineBox from "../Component/ZineBox.astro";
 import ZineKicker from "../Component/ZineKicker.astro";
 import ZineStamp from "../Component/ZineStamp.astro";
@@ -21,10 +24,12 @@ import Related from "@Component/Related.astro";
 // its env-var name).
 //
 // THE KEYS ARRAY IS THE PAGE'S ONE SOURCE PER KNOB. The table renders it, the
-// resolution ladder renders it, and the /reload simulation renders it, so a
-// default cannot disagree with itself the way the three former copies (a
-// [compression] table, the prose enumerating each parser's keys, and the
-// ladder's own chain arrays) could.
+// resolution ladder renders it, the /reload simulation renders it and the
+// classify matrix reads its two threshold rows, so a default cannot disagree
+// with itself the way the three former copies (a [compression] table, the
+// prose enumerating each parser's keys, and the ladder's own chain arrays)
+// could. The record shape lives in Source/Library/Records.ts - the page fills
+// it, it never declares a second copy of it.
 
 // The editor's default text: the shipped example, byte-faithful except the
 // commented api_key sample line, which renders as its env-var name only.
@@ -123,23 +128,9 @@ const Example = [
 // EVERY KEY, ONCE. Section groups the table; Type/Default/Env are the schema
 // doc's own columns (docs/config/aphrodite-toml.md); Reader says which of the
 // two parsers reads it; Live says when a change takes effect; Chain and From
-// are what the resolution ladder needs to walk the value.
-interface Key {
-	Key: string;
-	Section: string;
-	Type: string;
-	Default: string;
-	Env?: string;
-	Reader: "proxy" | "dylib" | "both" | "none";
-	Live: "hot" | "startup" | "load" | "unwired";
-	Effect: string;
-	/** The ladder's chain for this key. */
-	Chain?: "env-first" | "toml-first" | "toml-only";
-	/** Where the ladder reads the TOML value: a section, or the proxy entry. */
-	From?: "section" | "proxy";
-}
-
-const Keys: Key[] = [
+// are what the resolution ladder needs to walk the value. The shape itself is
+// Records.ts - this array fills it, it does not declare it.
+const Keys: ConfigKeyLadderRecord[] = [
 	// [[proxies]] - one entry per listener; [defaults] repeats four of these keys.
 	{ Key: "name", Section: "[[proxies]]", Type: "string", Default: "the listen address", Reader: "proxy", Live: "startup", Effect: "Proxy label; the port overrides (APHRODITE_CACHE_PORT / APHRODITE_TOKEN_PORT) match on it" },
 	{ Key: "listen", Section: "[[proxies]]", Type: '"addr:port"', Default: "127.0.0.1:9797", Env: "port only: APHRODITE_CACHE_PORT / APHRODITE_TOKEN_PORT", Reader: "proxy", Live: "startup", Effect: "Bind address; loopback by default, and non-loopback peers are rejected on every route except /health", Chain: "toml-only", From: "proxy" },
@@ -215,9 +206,51 @@ const SectionNotes: Record<string, string> = {
 		"Live configuration: every block is optional, and when a block (or the whole section) is absent the hardcoded builders and shipped defaults apply.",
 };
 
+// THE CLASSIFY MATRIX. One row per match arm of `threshold_for`
+// (crates/aphrodite/src/proxy.rs:613-644): the base threshold, then one
+// multiplier per content type. `code_multiplier` is a knob, so it is named as
+// one and resolved from the editor rather than frozen to 3.0 here - the table
+// below therefore shows the numbers the running proxy would use, not a
+// restatement of the defaults column.
+const Types: { Type: string; Factor: number | "code_multiplier" }[] = [
+	{ Type: "error", Factor: 8 },
+	{ Type: "code_rust", Factor: "code_multiplier" },
+	{ Type: "code_python", Factor: "code_multiplier" },
+	{ Type: "code_go", Factor: "code_multiplier" },
+	{ Type: "code_js", Factor: "code_multiplier" },
+	{ Type: "code", Factor: "code_multiplier" },
+	{ Type: "diff", Factor: 2 },
+	{ Type: "git", Factor: 2 },
+	{ Type: "text", Factor: 2 },
+	{ Type: "json", Factor: 1 },
+	{ Type: "tool_output", Factor: 1 },
+	{ Type: "any other type", Factor: 1 },
+];
+
+// The compiled defaults, read out of the Keys array rather than repeated: the
+// Default cell's leading number is the binary's value ("1024 (example 256)" is
+// 1024 with the shipped example beside it).
+const CompiledNumber = (Key: string, Fallback: number): number => {
+	const Value = Number.parseFloat(Keys.find((Row) => Row.Key === Key)?.Default ?? "");
+	return Number.isFinite(Value) ? Value : Fallback;
+};
+
+const BaseBytes = CompiledNumber("tool_threshold_token", 1024);
+const CodeMultiplier = CompiledNumber("code_multiplier", 3);
+
+const Effective = (Row: { Factor: number | "code_multiplier" }): number =>
+	Math.round(BaseBytes * (Row.Factor === "code_multiplier" ? CodeMultiplier : Row.Factor));
+
+const FactorLabel = (Row: { Factor: number | "code_multiplier" }): string =>
+	Row.Factor === "code_multiplier" ? "×code_multiplier" : `×${Row.Factor}`;
+
 // What the ladder and the /reload simulation read: the same rows, trimmed to
-// the fields the client-side simulation needs.
-const Tracked = Keys.filter((Row) => Row.Live !== "unwired" && Row.Key !== "dev" && Row.Key !== "notify_url" && Row.Key !== "notify_key" && Row.Key !== "max_context" && Row.Key !== "max_output" && Row.Key !== "timeout" && Row.Key !== "name").map(
+// the fields the client-side simulation needs. The excluded keys are the ones
+// whose value the page must never echo (a key, a callback) or whose absence
+// would say nothing about precedence.
+const LadderExcluded = new Set(["dev", "notify_url", "notify_key", "max_context", "max_output", "timeout", "name"]);
+
+const Tracked = Keys.filter((Row) => Row.Live !== "unwired" && !LadderExcluded.has(Row.Key)).map(
 	({ Key, Section, Env, Default, Reader, Live, Chain, From }) => ({
 		Key,
 		Section,
@@ -229,6 +262,18 @@ const Tracked = Keys.filter((Row) => Row.Live !== "unwired" && Row.Key !== "dev"
 		From: From ?? "section",
 	}),
 );
+
+// The page's own sections, in document order - SectionNav renders exactly
+// these, so an entry can never name a section the page does not have.
+const Sections = [
+	{ Id: "pick-chain", Label: "THE FILE" },
+	{ Id: "editor", Label: "EDITOR" },
+	{ Id: "keys", Label: "EVERY KEY" },
+	{ Id: "classify", Label: "CLASSIFY" },
+	{ Id: "proxies", Label: "THE PAIR" },
+	{ Id: "parsers", Label: "TWO PARSERS" },
+	{ Id: "reload", Label: "/RELOAD" },
+];
 ---
 
 <Base
@@ -255,6 +300,10 @@ const Tracked = Keys.filter((Row) => Row.Live !== "unwired" && Row.Key !== "dev"
 			</p>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">Everything here runs in your browser.</p>
 		</header>
+
+		<div class="mt-10">
+			<SectionNav Sections={Sections} />
+		</div>
 
 		<!-- The pick chain -->
 		<section id="pick-chain" class="relative mt-32" aria-label="The file pick chain">
@@ -297,13 +346,16 @@ const Tracked = Keys.filter((Row) => Row.Live !== "unwired" && Row.Key !== "dev"
 				<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
 					Edit the shipped example
 				</h2>
-				<button
-					type="button"
-					data-action="reset"
-					class="inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-				>
-					Reset example
-				</button>
+				<div class="flex flex-wrap items-center gap-3">
+					<CopyButton Label="COPY TOML" Payload={Example} Tone="teal" Size="md" />
+					<button
+						type="button"
+						data-action="reset"
+						class="inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+					>
+						Reset example
+					</button>
+				</div>
 			</div>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				This is the shipped <code class="text-bone-newsprint">aphrodite.toml.example</code> (sanitized:
@@ -380,6 +432,81 @@ const Tracked = Keys.filter((Row) => Row.Live !== "unwired" && Row.Key !== "dev"
 			</div>
 		</section>
 
+		<!-- THE CLASSIFY MATRIX: one type, one threshold -->
+		<section id="classify" class="relative mt-32" aria-label="The classify matrix">
+			<ZineTape Label="classify" Color="canary" Side="left" />
+			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
+				One type, one threshold
+			</h2>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The gate is <code class="text-bone-newsprint">threshold_for</code> in
+				<code class="text-bone-newsprint">crates/aphrodite/src/proxy.rs</code>: the base threshold,
+				then one multiplier per content type.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The base is the proxy's own mode threshold -
+				<code class="text-bone-newsprint">tool_threshold_token</code> on the token lane,
+				<code class="text-bone-newsprint">tool_threshold_cache</code> on the cache lane.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The bytes column is computed from the editor above, so the matrix follows your values
+				instead of restating the defaults.
+			</p>
+			<div class="mt-8 flex flex-wrap items-center gap-4">
+				<ZineKicker Tone="canary">BASE</ZineKicker>
+				<span class="font-mono text-base text-bone-newsprint">
+					<span data-classify-base>{BaseBytes}</span> B
+				</span>
+				<ZineKicker Tone="teal">CODE_MULTIPLIER</ZineKicker>
+				<span class="font-mono text-base text-bone-newsprint">
+					×<span data-classify-mult>{CodeMultiplier}</span>
+				</span>
+			</div>
+			<div class="mt-6 overflow-x-auto border-4 border-blood-crimson bg-carbon-void">
+				<table class="w-full min-w-[40rem] text-left text-base">
+					<thead>
+						<tr class="border-b-2 border-blood-crimson bg-soot-black font-mono text-base uppercase tracking-widest text-zinc-dust">
+							<th class="px-5 py-3">Type</th>
+							<th class="px-5 py-3">Multiplier</th>
+							<th class="px-5 py-3">At the editor's values</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-oxblood-dark/50">
+						{Types.map((Row) => (
+							<tr class="align-top text-zinc-dust">
+								<td class="px-5 py-3 font-mono text-base text-bone-newsprint">{Row.Type}</td>
+								<td class="px-5 py-3 font-mono text-base">{FactorLabel(Row)}</td>
+								<td class="px-5 py-3 font-mono text-base text-stamped-canary">
+									<span
+										data-effective
+										data-factor={Row.Factor === "code_multiplier" ? 1 : Row.Factor}
+										data-knob={Row.Factor === "code_multiplier" ? "code_multiplier" : undefined}
+									>
+										{Effective(Row)}
+									</span>
+									B
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+			<p class="mt-6 max-w-3xl text-base text-zinc-dust">
+				<code class="text-bone-newsprint">linter</code>,
+				<code class="text-bone-newsprint">build_output</code> and
+				<code class="text-bone-newsprint">log</code> return the base before any multiplier, so
+				those three never scale.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Two runtime factors sit on either side of this table and the page cannot know either: the
+				compression-ratio auto-tune (×2 above a 20× ratio, ×0.5 below 3×) scales the base, and the
+				headroom budget (0.50 to 1.0) scales the result.
+			</p>
+			<p class="mt-6 font-mono text-base uppercase tracking-widest text-zinc-dust">
+				SRC: crates/aphrodite/src/proxy.rs:613-644.
+			</p>
+		</section>
+
 		<!-- The [[proxies]] pair -->
 		<section id="proxies" class="relative mt-32" aria-label="The proxies pair">
 			<ZineTape Label="the pair" Color="bone" Side="left" />
@@ -390,14 +517,13 @@ const Tracked = Keys.filter((Row) => Row.Live !== "unwired" && Row.Key !== "dev"
 				<ZineBox Tone="subtle">
 					<ZineKicker Tone="newsprint">cache &middot; 127.0.0.1:9797</ZineKicker>
 					<p class="mt-2 text-base text-zinc-dust">
-						The in-memory backend: transient, and the lane for results that do not need to
-						survive the process.
+						The lane for results that do not need to survive the process.
 					</p>
 				</ZineBox>
 				<ZineBox Tone="subtle">
 					<ZineKicker Tone="newsprint">token &middot; 127.0.0.1:9798</ZineKicker>
 					<p class="mt-2 text-base text-zinc-dust">
-						The SQLite-backed store: durable, and the lane a retrieval survives a restart from.
+						The lane a retrieval survives a restart from.
 					</p>
 				</ZineBox>
 			</div>
@@ -434,7 +560,7 @@ const Tracked = Keys.filter((Row) => Row.Live !== "unwired" && Row.Key !== "dev"
 						default.
 					</p>
 					<p class="mt-3 text-base text-zinc-dust">
-						Three rows are the exceptions, and the table marks them: the API key is TOML-first,
+						Three rows are the exceptions, and the ladder marks them: the API key is TOML-first,
 						and the bind address and the mode are per-entry by construction.
 					</p>
 				</ZineBox>
@@ -742,6 +868,40 @@ const Tracked = Keys.filter((Row) => Row.Live !== "unwired" && Row.Key !== "dev"
 		Ladder.innerHTML = Parts.join("");
 	}
 
+	// The compiled default is the leading number of a Default cell ("1024
+	// (example 256)" is 1024); an unparsable or absent value falls back to the
+	// compiled value the template rendered.
+	function Number_(Value: string | undefined, Fallback: number): number {
+		const Parsed = Number.parseFloat((Value ?? "").trim());
+		return Number.isFinite(Parsed) && Parsed > 0 ? Parsed : Fallback;
+	}
+
+	// The classify matrix: the same two rows the keys table carries, read from
+	// the editor so the bytes column follows the reader's values. Every cell
+	// declares its own factor, so the page renders the table once (server-side,
+	// at the compiled defaults) and this only re-solves the arithmetic.
+	function RenderClassify(Parsed: Parsed): void {
+		const Token = TrackedKeys().find((Entry) => Entry.Key === "tool_threshold_token");
+		const Multiplier = TrackedKeys().find((Entry) => Entry.Key === "code_multiplier");
+
+		const Base = Number_(Parsed.Sections.compression?.tool_threshold_token, Number_(Token?.Default, 1024));
+		const CodeMultiplier = Number_(
+			Parsed.Sections.compression?.code_multiplier,
+			Number_(Multiplier?.Default, 3),
+		);
+
+		for (const Cell of document.querySelectorAll<HTMLElement>("[data-effective]")) {
+			const Factor = Number_(Cell.getAttribute("data-factor") ?? "1", 1);
+			const Knob = Cell.getAttribute("data-knob") === "code_multiplier";
+			Cell.textContent = String(Math.round(Base * (Knob ? CodeMultiplier : Factor)));
+		}
+
+		const BaseOut = document.querySelector("[data-classify-base]");
+		const MultOut = document.querySelector("[data-classify-mult]");
+		if (BaseOut) BaseOut.textContent = String(Base);
+		if (MultOut) MultOut.textContent = String(CodeMultiplier);
+	}
+
 	function RenderReload(Parsed: Parsed): void {
 		if (!ReloadOut) return;
 
@@ -771,7 +931,12 @@ const Tracked = Keys.filter((Row) => Row.Live !== "unwired" && Row.Key !== "dev"
 	function Recompute(): void {
 		if (!Editor || !Status) return;
 		const Parsed = ParseToml(Editor.value);
+		// The copy CTA rides Base.astro's one [data-copy] runtime, which reads
+		// the attribute at click time - so the payload tracks the buffer the
+		// reader is looking at, never the pristine example they edited away.
+		document.querySelector("#editor [data-copy]")?.setAttribute("data-copy", Editor.value);
 		RenderLadder(Parsed);
+		RenderClassify(Parsed);
 		RenderReload(Parsed);
 		Status.textContent = `parsed - ${Parsed.Proxies.length} proxies`;
 	}

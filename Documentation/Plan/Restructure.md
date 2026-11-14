@@ -5,6 +5,20 @@
 >
 > **NEVER REDUCE CONTENT. If anything, improve - never cut.**
 >
+> **PREFER MORE COPY, AND MORE STRUCTURE AROUND IT.**
+>
+> - **More copy beats less copy.** When in doubt, expand a passage rather than
+>   trim it. A rewrite should leave a page saying *more* than it did, not the
+>   same in fewer lines.
+> - **Structure is welcome and encouraged:** more vertical rhythm, more line
+>   breaks between thoughts, styled panels, coloured links and boxes, visuals,
+>   diagrams, animations.
+> - **Copy must persist inside every structure.** No empty decorative panel, no
+>   icon-only box, no visual or animation without the sentence that explains
+>   it. A panel without words is a defect.
+> - A section may - and should - grow in both dimensions at once: more copy
+>   *and* more structure carrying it.
+>
 > - No page, section, example, figure, key, entry or sentence is deleted to
 >   make a file smaller. A smaller file is not success.
 > - The **only** permitted reduction is *structural* duplication: the same
@@ -18,7 +32,7 @@
 >   before it is generated down. Convergence is the union of the best content at
 >   both ends, never the intersection.
 > - Where an item below proposes a route count, page count or line count going
->   **down**, read it as "the same content, better organised" - and if that is
+>   **down**, read it as "**more** content, better organised" - and if that is
 >   not achievable, keep the old structure and say why.
 >
 > Scope: this file is a PLAN. It changes no page, component, layout or
