@@ -1,0 +1,4 @@
+[submodule "Module/Aphrodite"]
+path = Module/Aphrodite
+url = https://github.com/PlayForm/Aphrodite.git
+shallow = true
