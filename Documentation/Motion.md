@@ -164,6 +164,7 @@ settled frame rather than a half-played one.
 
 - **A page has motion** - `grep -c 'data-enter\|data-reveal\|data-stream\|data-wipe\|data-count\|data-run' Source/pages/<page>.astro`, then load the route and watch the panel arrive once.
 - **A running terminal streams** - load `/`, scroll the pair into view, and sample `[data-run-track]`'s child count: it climbs, the preview beside it changes on the same beat, and the settled build reads `[build:2E 2W 142L | error[E0432]: unresolved import \`crate::noise\`]`. That string must equal the one `RunPreview` renders in the page's own markup - if the two ever disagree, the animation has drifted from the engine.
+- **The mirror is the engine, not a copy of it** - the reference is `aphrodite_compress` on the same text: hand it a stream prefix and it answers with the engine's own `preview`. Diff that against `RunPreview` for the same lines. Measured: a 21-line build tail gives `[build:2E 2W 21L | error[E0432]: unresolved import \`crate::noise\`]` from both, a passing test log gives `[test:2 pass 0 fail 0 ignored | 0.12s]` from both, and an incomplete JSON body gives `[json:~1items 2L]` from both.
 - **No double-binding** - navigate away and back through the client router; a panel must rise once, not twice, and the console must stay quiet.
 - **Reduced motion** - enable *Reduce motion* in the OS, reload: every panel is present, nothing animates, no copy is missing.
 - **No content hidden** - disable JavaScript, reload: every `[data-reveal]` panel is visible (the pre-hide is gated on `html.js`).
