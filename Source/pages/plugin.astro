@@ -2,6 +2,10 @@
 import Base from "@Layout/Base.astro";
 
 import Related from "@Component/Related.astro";
+import PageShell from "@Component/PageShell.astro";
+import PageHeader from "@Component/PageHeader.astro";
+import ZineTape from "@Component/ZineTape.astro";
+import ZineBox from "@Component/ZineBox.astro";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import ContextEngine from "../Content/Mermaid/context-engine.svg?raw";
 import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
@@ -104,47 +108,21 @@ const Hooks = [
 	Title="PLUGIN // APHRODITE"
 	Description={`The Aphrodite Hermes plugin, v${Versions.Plugin}: a thin Python registration shim over a Rust dylib - 6 hooks, 13 tools, an opt-in context engine, and an explicit SHA-256-verified download flow.`}
 >
-	<!-- PENDING SHARED: PageShell (t_130e5ed4) - swap to <PageShell Rhythm="wide"> when it lands -->
-	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
-	>
-		<!-- PENDING SHARED: PageHeader (t_130e5ed4) - swap to <PageHeader Tape Title Lead /> when it lands -->
-		<header class="relative flex w-full flex-col items-start">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				PLUGIN // THE THIN LOADER
-			</div>
-			<h1
-				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
-			>
-				The plugin
-			</h1>
-			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Aphrodite ships as a Hermes Agent plugin: a thin Python registration shim over a Rust
-				dylib.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Six hooks, thirteen tools, and an opt-in context engine - all declared in{" "}
-				<code class="font-mono text-base text-weathered-teal">plugin.yaml</code>, all logic
-				living in <code class="font-mono text-base text-weathered-teal">libaphrodite_hermes.dylib</code>.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				This page documents the {`v${Versions.Plugin}`} plugin spec.
-			</p>
-		</header>
+	<PageShell Rhythm="wide">
+		<PageHeader
+			Tape="PLUGIN // THE THIN LOADER"
+			Title="The plugin"
+			Lead={[
+				`Aphrodite ships as a Hermes Agent plugin: a thin Python registration shim over a Rust dylib.`,
+				`Six hooks, thirteen tools, and an opt-in context engine - all declared in <code class="font-mono text-base text-weathered-teal">plugin.yaml</code>, all logic living in <code class="font-mono text-base text-weathered-teal">libaphrodite_hermes.dylib</code>.`,
+				`This page documents the v${Versions.Plugin} plugin spec.`,
+			]}
+		/>
 
 		<!-- SLOT 3: one claim's evidence - the declared surface, the chain, the gates -->
 		<section class="relative w-full">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				plugin.yaml // THE DECLARED SURFACE
-			</div>
-			<!-- PENDING SHARED: ZineBox Size="lg" Rotate="sm:-rotate-[1deg]" (t_130e5ed4) -->
-			<div
-				class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[1deg] sm:p-12"
-			>
+			<ZineTape Variant="section" Label="plugin.yaml // THE DECLARED SURFACE" />
+			<ZineBox Size="lg" Rotate="-rotate-[1deg]">
 				<h3
 					id="manifest"
 					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
@@ -188,11 +166,7 @@ const Hooks = [
 					SKILLS ARE NOT SHIPPED WITH THE PLUGIN - THEY LIVE DEV-SIDE.
 				</p>
 
-				<div
-					class="mb-6 inline-block -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-				>
-					ARCHITECTURE // CALL CHAIN
-				</div>
+				<ZineTape Variant="section" Label="ARCHITECTURE // CALL CHAIN" />
 				<h3
 					id="architecture"
 					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
@@ -225,11 +199,7 @@ const Hooks = [
 					</figcaption>
 				</figure>
 
-				<div
-					class="mb-6 inline-block -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-				>
-					HOOKS // THE CHAIN
-				</div>
+				<ZineTape Variant="section" Label="HOOKS // THE CHAIN" />
 				<h3
 					id="chain"
 					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
@@ -310,11 +280,7 @@ const Hooks = [
 					}
 				</div>
 
-				<div
-					class="mb-6 inline-block -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-				>
-					BYPASS // THE ESSENTIAL-TOOL GATE
-				</div>
+				<ZineTape Variant="section" Label="BYPASS // THE ESSENTIAL-TOOL GATE" />
 				<h3
 					id="gate"
 					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
@@ -335,11 +301,7 @@ const Hooks = [
 					would just replace resolved content with another marker.
 				</p>
 
-				<div
-					class="mb-6 inline-block -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-				>
-					THRESHOLDS // GATES AND BYPASSES
-				</div>
+				<ZineTape Variant="section" Label="THRESHOLDS // GATES AND BYPASSES" />
 				<h3
 					id="thresholds"
 					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
@@ -389,7 +351,7 @@ const Hooks = [
 					(APHRODITE_TOOL_THRESHOLD_TOKEN · APHRODITE_TERMINAL_THRESHOLD ·
 					APHRODITE_FLOW_BUDGET_CHARS · APHRODITE_CHAIN_SPLIT).
 				</p>
-			</div>
+			</ZineBox>
 		</section>
 
 		<!-- SLOT 4: exactly one onward link -->
@@ -400,6 +362,6 @@ const Hooks = [
 				{ Href: "/setup/", Label: "SETUP" },
 			]}
 		/>
-	</main>
+	</PageShell>
 	<ZineDiagramNav />
 </Base>

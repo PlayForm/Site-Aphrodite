@@ -1,10 +1,12 @@
 ---
 import Base from "@Layout/Base.astro";
 
-import Breadcrumbs from "@Component/Breadcrumbs.astro";
 import Related from "@Component/Related.astro";
-import ZineBox from "@Component/ZineBox.astro";
+import PageShell from "@Component/PageShell.astro";
+import PageHeader from "@Component/PageHeader.astro";
 import ZineTape from "@Component/ZineTape.astro";
+import ZineBox from "@Component/ZineBox.astro";
+import ZineSource from "@Component/ZineSource.astro";
 import { ReleaseNote, Stamps, Versions } from "@Library/Versions";
 
 /** The release-note URL for a row stamp ("v1.6.6" -> the Aphrodite/v1.6.6 tag). */
@@ -17,7 +19,7 @@ const NoteFor = (Ver: string): string =>
 // "what landed" line traces to CHANGELOG.md's release header; every release
 // link is the GitHub release note. The 1.2.2 (first crates.io publish) and
 // 1.4.6 (chain-split CCR + the first plugin-first release) rows carry the
-// canary emphasis treatment, because those two changed the project's shape.
+// canary tag, because those two changed the project's shape.
 interface Change {
 	Label: string;
 	Tone: "canary" | "teal" | "dust";
@@ -121,7 +123,7 @@ const Releases: Release[] = [
 
 // THE CHANGELOG - the current release's own entries, one block per group. It
 // is a footer row of the register rather than a section of its own: the
-// release note it belongs to is the row above, and the group labels are the
+// release it belongs to is the row above, and the group labels are the
 // CHANGELOG.md subsections verbatim.
 const Changes: Change[] = [
 	{
@@ -166,41 +168,21 @@ const ToneText = {
 	Title="VERSIONS // APHRODITE"
 	Description={`Aphrodite v${Versions.Binary}, plugin v${Versions.Plugin} (${Versions.ChangelogDate}). The current release, its changelog, and pointers to the full benchmarks.`}
 >
-	<!-- PENDING SHARED: PageShell (t_130e5ed4) - swap to <PageShell Rhythm="wide"> when it lands -->
-	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
-	>
-		<Breadcrumbs />
+	<PageShell Rhythm="wide">
+		<PageHeader
+			Tape="VERSIONS // RELEASE LOG"
+			Title="Versions"
+			Lead={[
+				`Current release: binary <strong>${Stamps.Binary()}</strong>, plugin <strong>${Stamps.Plugin()}</strong> (v${Versions.Binary}, ${Versions.ChangelogDate}).`,
+				`Requires Rust 1.88+.`,
+				`Licensed CC0-1.0.`,
+			]}
+		/>
 
-		<!-- PENDING SHARED: PageHeader (t_130e5ed4) - swap to <PageHeader Tape Title Lead /> when it lands -->
-		<header class="relative flex w-full flex-col items-start">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				VERSIONS // RELEASE LOG
-			</div>
-			<h1
-				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
-			>
-				Versions
-			</h1>
-			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Current release: binary <strong>{Stamps.Binary()}</strong>, plugin <strong>{Stamps.Plugin()}</strong>
-				({`v${Versions.Binary}`}, {Versions.ChangelogDate}).
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Requires Rust 1.88+.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Licensed CC0-1.0.
-			</p>
-		</header>
-
-		<!-- SLOT 3: the register - one section, one plate, one table -->
+		<!-- SLOT 3: one claim's evidence - the release register -->
 		<section class="relative w-full">
-			<!-- PENDING SHARED: ZineTape Variant="section" (t_130e5ed4) - add Variant when ZineTape gains it -->
-			<ZineTape Label={`RELEASE REGISTER // v0.7.0 -> v${Versions.Binary}`} />
-			<ZineBox Tone="crimson" Size="lg" Rotate="-rotate-[1deg]">
+			<ZineTape Variant="section" Label={`RELEASE REGISTER // v0.7.0 -> v${Versions.Binary}`} />
+			<ZineBox Size="lg" Rotate="-rotate-[1deg]">
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse font-mono text-base">
 						<tbody>
@@ -257,21 +239,21 @@ const ToneText = {
 						</tbody>
 					</table>
 				</div>
+				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
+					THE CANARY TAGS MARK THE TWO RELEASES THAT CHANGED THE PROJECT'S SHAPE: THE FIRST
+					CRATES.IO PUBLISH, AND THE CHAIN-SPLIT CCR.
+				</p>
 			</ZineBox>
+			<ZineSource
+				Lines={[
+					`SRC: README.md:12; CHANGELOG.md v${Versions.ChangelogVersion}`,
+					`SRC: CHANGELOG.md v${Versions.ChangelogVersion} ("${Versions.ChangelogPairing}")`,
+					"SRC: CHANGELOG.md release headers (v0.7.0:1219, v1.2.2:1066, v1.3.2:777, v1.3.4:724, v1.5.0:318, v1.5.1:309, v1.6.0:293, v1.6.3:222, v1.6.5:157, v1.6.6:121, v1.8.0:3) + the GitHub release notes (Aphrodite/v*, incl. v1.4.6's chain-split + plugin-first note)",
+				]}
+			/>
 		</section>
 
-		<!-- PENDING SHARED: ZineSource (t_130e5ed4) - swap to <ZineSource Lines={[...]} /> when it lands -->
-		<div class="max-w-3xl">
-			<p class="text-base text-zinc-dust">SRC: README.md:12; CHANGELOG.md v{Versions.ChangelogVersion}</p>
-			<p class="mt-3 text-base text-zinc-dust">
-				SRC: CHANGELOG.md v{Versions.ChangelogVersion} ("{Versions.ChangelogPairing}")
-			</p>
-			<p class="mt-3 text-base text-zinc-dust">
-				SRC: CHANGELOG.md release headers (v0.7.0:1219, v1.2.2:1066, v1.3.2:777, v1.3.4:724, v1.5.0:318, v1.5.1:309, v1.6.0:293, v1.6.3:222, v1.6.5:157, v1.6.6:121, v1.8.0:3) + the GitHub release notes (Aphrodite/v*, incl. v1.4.6's chain-split + plugin-first note)
-			</p>
-		</div>
-
-		<!-- SLOT 4: the onward link -->
+		<!-- SLOT 4: exactly one onward link -->
 		<Related
 			Links={[
 				{ Href: "/benchmarks/", Label: "BENCHMARKS" },
@@ -279,5 +261,5 @@ const ToneText = {
 				{ Href: "/case-study/", Label: "CASE STUDY" },
 			]}
 		/>
-	</main>
+	</PageShell>
 </Base>

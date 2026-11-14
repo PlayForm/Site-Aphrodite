@@ -73,6 +73,14 @@ const GroupLabels = new Map(
 	]),
 );
 
+// A section's own page opens it: the docs root opens Overview, and a section
+// index page (architecture/index.md, which the collection serves as the id
+// "architecture") opens its section. Id order alone would put "centers" ahead
+// of the docs root. This is DocsSidebar's RankOf verbatim, so the rail and the
+// reading order never disagree about which page opens a section.
+const RankOf = (Name: string, Id: string) =>
+	Id === "index" || Id.toLowerCase() === Name.toLowerCase() ? 0 : 1;
+
 const Sections = [
 	...Pages.sort((A, B) => A.id.localeCompare(B.id))
 	.reduce(
@@ -101,7 +109,16 @@ const Sections = [
 	.sort(([A], [B]) =>
 		A === "Overview" ? -1 : B === "Overview" ? 1 : A.localeCompare(B),
 	)
-	.map(([Name, Entries]) => ({ Entries, Name }));
+	.map(([Name, Entries]) => ({
+		// The group's own page opens it, then id order - the docs tree's numeric
+		// prefixes (architecture/01-startup) ARE its reading order. Same rank
+		// rule as DocsSidebar, so prev/next and the rail are one sequence and a
+		// reader never steps backwards through the rail.
+		Entries: [...Entries].sort(
+			(A, B) => RankOf(A.Id) - RankOf(B.Id) || A.Id.localeCompare(B.Id),
+		),
+		Name,
+	}));
 
 // Reading order for the prev/next navigation: the flattened section tree.
 const Sequence = Sections.flatMap(({ Entries }) => Entries);

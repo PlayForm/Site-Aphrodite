@@ -1,11 +1,15 @@
 ---
 import Base from "@Layout/Base.astro";
 
+import PageShell from "@Component/PageShell.astro";
 import Related from "@Component/Related.astro";
-import CodeFence from "@Component/CodeFence.astro";
-import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
+import SectionNav from "@Component/SectionNav.astro";
+import ZineBox from "@Component/ZineBox.astro";
 import ZineKicker from "@Component/ZineKicker.astro";
 import ZinePipeline from "@Component/ZinePipeline.astro";
+import ZineSource from "@Component/ZineSource.astro";
+import ZineSplit from "@Component/ZineSplit.astro";
+import ZineStatBar from "@Component/ZineStatBar.astro";
 import ZineTape from "@Component/ZineTape.astro";
 import PreviewFlow from "../Content/Mermaid/preview-flow.svg?raw";
 
@@ -26,23 +30,27 @@ const Study = {
 } as const;
 
 // Real-world per-output compression, orig tokens -> ~33-tok marker (README.md:485-495).
+// `Percent` is the ratio read as a bar width: the column is a comparison of
+// magnitudes, so 74x is 74% of the scale and the bars stay honest.
 const RealWorld = [
-	{ Type: "TERMINAL", Ratio: "74×" },
-	{ Type: "TABLE", Ratio: "61×" },
-	{ Type: "SOURCE_CODE", Ratio: "45×" },
-	{ Type: "LS", Ratio: "37×" },
-	{ Type: "DIFF", Ratio: "23×" },
-	{ Type: "BUILD", Ratio: "23×" },
-	{ Type: "SEARCH", Ratio: "20×" },
+	{ Type: "TERMINAL", Ratio: "74×", Percent: 74 },
+	{ Type: "TABLE", Ratio: "61×", Percent: 61 },
+	{ Type: "SOURCE_CODE", Ratio: "45×", Percent: 45 },
+	{ Type: "LS", Ratio: "37×", Percent: 37 },
+	{ Type: "DIFF", Ratio: "23×", Percent: 23 },
+	{ Type: "BUILD", Ratio: "23×", Percent: 23 },
+	{ Type: "SEARCH", Ratio: "20×", Percent: 20 },
 ] as const;
 
-// The per-type benchmark table (README.md:451-457).
+// The per-type benchmark table (README.md:451-457). The `Width` is the bar the
+// corpus plate draws; the label carries the before -> after pair the table
+// states, because a bar alone cannot.
 const BenchTypes = [
-	{ Type: "GIT DIFF (42L)", Without: "~350 tok", With: "~15 tok", Savings: "23×", Width: "18%" },
-	{ Type: "BUILD OUTPUT (142L)", Without: "~1,400 tok", With: "~10 tok", Savings: "140×", Width: "80%" },
-	{ Type: "TERMINAL OUTPUT", Without: "~200 tok", With: "~10 tok", Savings: "20×", Width: "16%" },
-	{ Type: "JSON BLOB (30 KEYS)", Without: "~400 tok", With: "~10 tok", Savings: "40×", Width: "30%" },
-	{ Type: "BROWSER SNAPSHOT (342 EL)", Without: "~5,000 tok", With: "~12 tok", Savings: "416×", Width: "98%" },
+	{ Type: "GIT DIFF (42L)", Pair: "~350 tok → ~15 tok", Savings: "23×", Width: 18 },
+	{ Type: "BUILD OUTPUT (142L)", Pair: "~1,400 tok → ~10 tok", Savings: "140×", Width: 80 },
+	{ Type: "TERMINAL OUTPUT", Pair: "~200 tok → ~10 tok", Savings: "20×", Width: 16 },
+	{ Type: "JSON BLOB (30 KEYS)", Pair: "~400 tok → ~10 tok", Savings: "40×", Width: 30 },
+	{ Type: "BROWSER SNAPSHOT (342 EL)", Pair: "~5,000 tok → ~12 tok", Savings: "416×", Width: 98 },
 ] as const;
 
 // The one corpus figure the narrative quotes (README.md:460).
@@ -69,6 +77,34 @@ const Layers = [
 	{ N: "03", Name: "STORE", Figure: "BLAKE3", Tone: "teal", Note: "SQLite / in-memory, the marker is the receipt" },
 	{ N: "04", Name: "DECIDE", Figure: "RETRIEVE?", Tone: "raw", Note: "the agent, not the engine, spends the budget" },
 ] as const;
+
+// EXHIBIT: the 142-line build, kept by the terminal and replaced by one line
+// in the model's context. ZineSplit reads the leading `dim:` / `fade:` / `mute:`
+// as the suppression tones (70 / 40 / 25%), so the array is the same nine lines
+// in the same order and the tone travels in the text, not in a second field.
+const Flood = [
+	"result:$ cargo build --release 2>&1",
+	"dim:    Compiling libc v0.2.168",
+	"dim:    Compiling tokio v1.47.1",
+	"fade:    Compiling serde v1.0.219",
+	"fade:    Compiling axum v0.8.4",
+	"mute:    Compiling aphrodite v1.6.6",
+	"mute:... 136 more identical lines ...",
+	"canary:warning: unused import: `HashMap`",
+	"mute:Finished `release` [optimized] in 41.7s",
+];
+
+// The page's own section list - SectionNav's only input, which is what keeps
+// the index truthful: a link can never name a section this page does not render.
+const Sections = [
+	{ Id: "problem", Label: "PROBLEM" },
+	{ Id: "gate", Label: "GATE" },
+	{ Id: "contract", Label: "CONTRACT" },
+	{ Id: "loop", Label: "LOOP" },
+	{ Id: "knobs", Label: "KNOBS" },
+	{ Id: "evidence", Label: "EVIDENCE" },
+	{ Id: "history", Label: "HISTORY" },
+];
 
 // The five incidents that set the laws - the page's history spine.
 const Arcs = [
@@ -229,17 +265,11 @@ const Arcs = [
 	Title="CASE STUDY // APHRODITE"
 	Description="Why Aphrodite is shaped this way: the marker is the contract, the classifier is the gate, the thresholds are the knobs - measured at 156,342,817 context tokens saved across 200 real sessions."
 >
-	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
-	>
+	<PageShell Rhythm="wide">
 		<!-- ============ HERO // THE MANIFESTO OPEN ============ -->
 		<header class="relative flex w-full flex-col items-start pt-12">
-			<div
-				class="tape-strip absolute -top-6 left-0 z-10 -rotate-1 border-b border-t border-bone-newsprint/30 px-4 py-1 text-base font-black uppercase tracking-widest text-bone-newsprint"
-			>
-				CASE FILE // APHRODITE-CCR · SEP 2026 · MEASURED
-			</div>
-			<div class="zine-box-crimson relative w-full border-4 border-blood-crimson bg-carbon-void p-8 sm:p-12 lg:p-16">
+			<ZineTape Variant="strip" Label="CASE FILE // APHRODITE-CCR · SEP 2026 · MEASURED" />
+			<ZineBox Tone="crimson" Size="lg" Class="w-full lg:p-16">
 				<ZineKicker Tone="dust">THE CASE STUDY // WHY, NOT HOW</ZineKicker>
 				<h1
 					class="mt-8 font-headline text-5xl font-black uppercase leading-[0.9] tracking-tighter text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-7xl lg:text-8xl"
@@ -273,167 +303,102 @@ const Arcs = [
 						<span class="text-zinc-dust">·</span>
 						<span class="text-zinc-dust">{Study.MedianRatio} MEDIAN SESSION</span>
 					</div>
-					<div class="mt-6 font-mono text-base text-zinc-dust">SRC: README.md:467-511.</div>
+					<ZineSource Lines={["SRC: README.md:467-511."]} />
 				</div>
-			</div>
+			</ZineBox>
 		</header>
 
+		<SectionNav Sections={Sections} />
+
 		<!-- ============ I. THE PROBLEM // CONTEXT FLOOD ============ -->
-		<section class="relative w-full">
-			<div
-				class="relative z-10 -mb-7 ml-6 inline-block border border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000] sm:-rotate-1"
-			>
-				I // THE PROBLEM
+		<section id="problem" class="relative w-full">
+			<ZineTape Variant="tab" Label="I // THE PROBLEM" Color="raw" />
+			<ZineBox Tone="crimson" Size="lg" Rotate="-rotate-[0.6deg]" Class="w-full">
+				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
+					The flood is not the data's fault
+				</h2>
+				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Every file read, build, code search, or browser open floods the agent's
+					context with raw output - compilation logs, accessibility trees, JSON blobs.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The structural failure is that raw output arrives{" "}
+					<em>before any decision</em>: the context pays the full price for content
+					the agent may never use.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Compression applied after the fact cannot refund a turn that already
+					happened.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					So the intervention point has to be{" "}
+					<strong class="text-bone-white">before the LLM sees anything</strong>.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					That is the first design commitment: intercept at the tool boundary, not
+					inside the prompt.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Aphrodite replaces the output with a compact, structured preview - ~15
+					tokens of metadata instead of hundreds - and keeps the full content
+					retrievable.
+				</p>
+			</ZineBox>
+			<!-- THE PAIR: the terminal keeps the flood, the model reads one line. -->
+			<div class="mt-24">
+				<ZineSplit
+					Raw={Flood}
+					Preview="[build:1E 1W 142L | error[E0432]: unresolved import ...]"
+					Hash="&lt;&lt;&lt;CCR:0e3a5c9f...a1e|build|1420&gt;&gt;&gt;"
+				/>
 			</div>
-			<div
-				class="zine-box-crimson w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.6deg] sm:p-12"
-			>
-				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
-					<div>
-						<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
-							The flood is not the data's fault
-						</h2>
-						<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Every file read, build, code search, or browser open floods the agent's
-							context with raw output - compilation logs, accessibility trees, JSON blobs.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							The structural failure is that raw output arrives{" "}
-							<em>before any decision</em>: the context pays the full price for content
-							the agent may never use.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Compression applied after the fact cannot refund a turn that already
-							happened.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							So the intervention point has to be{" "}
-							<strong class="text-bone-white">before the LLM sees anything</strong>.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							That is the first design commitment: intercept at the tool boundary, not
-							inside the prompt.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Aphrodite replaces the output with a compact, structured preview - ~15
-							tokens of metadata instead of hundreds - and keeps the full content
-							retrievable.
-						</p>
-					</div>
-					<!-- EXHIBIT A: what the model used to see. -->
-					<div class="flex flex-col gap-8">
-						<ZineKicker Tone="dust">EXHIBIT A // THE RAW FLOOD (142-LINE BUILD OUTPUT)</ZineKicker>
-						<div class="border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
-							<CodeFence Code="$ cargo build --release 2>&1" />
-							<div class="text-bone-newsprint opacity-90">   Compiling libc v0.2.168</div>
-							<div class="text-bone-newsprint opacity-80">   Compiling tokio v1.47.1</div>
-							<div class="text-bone-newsprint opacity-70">   Compiling serde v1.0.219</div>
-							<div class="text-bone-newsprint opacity-60">   Compiling axum v0.8.4</div>
-							<div class="text-bone-newsprint opacity-50">   Compiling aphrodite v1.6.6</div>
-							<div class="text-bone-newsprint opacity-40">
-								... 136 more identical lines ...
-							</div>
-							<div class="text-bone-newsprint opacity-30">
-								warning: unused import: `HashMap`
-							</div>
-							<div class="text-bone-newsprint opacity-20">
-								Finished `release` [optimized] in 41.7s
-							</div>
-							<div class="mt-8 border-t border-oxblood-dark pt-8 text-base font-bold text-zinc-dust">
-								≈ 1,400 TOKENS · MOSTLY NOISE · ONE LINE MATTERED
-							</div>
-						</div>
-						<!-- The paired preview pane. -->
-						<div class="border border-oxblood-dark bg-asphalt-panel p-5 font-mono text-base">
-							<ZineKicker Tone="dust" As="div">THE PREVIEW INSTEAD</ZineKicker>
-							<div class="mt-6 border border-oxblood-dark bg-soot-black px-4 py-3 text-bone-white">
-								[build:1E 1W 142L | error[E0432]: unresolved import ...]
-							</div>
-							<div class="ccr-marker mt-6 text-weathered-teal">
-								&lt;&lt;&lt;CCR:0e3a5c9f...a1e|build|1420&gt;&gt;&gt;
-							</div>
-						</div>
-					</div>
-				</div>
+			<div class="mt-8">
+				<ZineKicker Tone="dust" As="div">
+					≈ 1,400 TOKENS · MOSTLY NOISE · ONE LINE MATTERED
+				</ZineKicker>
 			</div>
 		</section>
 
 		<!-- ============ II. THE GATE // CLASSIFY ============ -->
-		<section class="relative w-full">
-			<div
-				class="relative z-10 -mb-7 ml-6 inline-block border border-black bg-stamped-canary px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000] sm:rotate-1"
-			>
-				II // THE GATE
-			</div>
-			<div
-				class="zine-box-canary w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:rotate-[0.5deg] sm:p-12"
-			>
-				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
-					<div>
-						<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
-							The classifier is the gate
-						</h2>
-						<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Why classify before compressing? Because "compress everything equally"
-							destroyed signal.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							A compiler error and a verbose build log are both output - but one must
-							stay visible and the other should never have been shown in full.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							A single compression policy cannot serve both.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							So the type-aware classifier runs first - 40 to 123 nanoseconds, first
-							match wins - and each content type carries its own compression threshold
-							tier.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							The README's pipeline renders {Classifier.PipelineTypes} types in its
-							catalog, from <code class="font-mono text-base">build</code> to{" "}
-							<code class="font-mono text-base">text</code>; the full classification
-							registry backing it is {Classifier.RegistryTypes} types
-							(docs/classification/content-types.md).
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							When the classifier only reaches a generic bucket, a conservative semantic
-							detector upgrades it to the high-signal shapes (git, gitlog, grep, ls,
-							test); ordinary prose is never mis-tagged.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Nothing is compressed, stored, or marked until the gate has named it - and
-							the name is what everything downstream keys on.
-						</p>
-					</div>
-					<!-- THRESHOLD TIERS: the knobs the gate sets. -->
-					<div class="flex flex-col gap-6">
-						<ZineKicker Tone="dust">THRESHOLD TIERS // THE KNOBS</ZineKicker>
-						{
-							Tiers.map(({ Tier, Types, Multiplier, Note }) => (
-								<div class="flex items-center justify-between gap-8 border border-oxblood-dark bg-asphalt-panel px-4 py-3">
-									<div class="min-w-0">
-										<div class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
-											{Tier}
-											<span class="ml-2 text-stamped-canary">{Multiplier}</span>
-										</div>
-										<div class="truncate font-mono text-base text-zinc-dust">{Types}</div>
-									</div>
-									<div class="hidden shrink-0 text-right font-mono text-base text-weathered-teal sm:block">
-										{Note}
-									</div>
-								</div>
-							))
-						}
-						<div class="font-mono text-base leading-relaxed text-zinc-dust">
-							HIGHER MULTIPLIER = LONGER THE CONTENT STAYS VISIBLE BEFORE COMPRESSION ·
-							CODE ×3.0 IS THE CONFIG DEFAULT · FOOTNOTE: THE FULL REGISTRY IS{" "}
-							{Classifier.RegistryTypes} TYPES; THE README CATALOG RENDERS{" "}
-							{Classifier.PipelineTypes}. SRC: README.md:187-198.
-						</div>
-					</div>
-				</div>
-			</div>
+		<section id="gate" class="relative w-full">
+			<ZineTape Variant="tab" Label="II // THE GATE" Color="canary" Rotate="rotate-1" />
+			<ZineBox Tone="canary" Size="lg" Rotate="rotate-[0.5deg]" Class="w-full">
+				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
+					The classifier is the gate
+				</h2>
+				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Why classify before compressing? Because "compress everything equally"
+					destroyed signal.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					A compiler error and a verbose build log are both output - but one must
+					stay visible and the other should never have been shown in full.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					A single compression policy cannot serve both.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					So the type-aware classifier runs first - 40 to 123 nanoseconds, first
+					match wins - and each content type carries its own compression threshold
+					tier.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The README's pipeline renders {Classifier.PipelineTypes} types in its
+					catalog, from <code class="font-mono text-base">build</code> to{" "}
+					<code class="font-mono text-base">text</code>; the full classification
+					registry backing it is {Classifier.RegistryTypes} types
+					(docs/classification/content-types.md).
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					When the classifier only reaches a generic bucket, a conservative semantic
+					detector upgrades it to the high-signal shapes (git, gitlog, grep, ls,
+					test); ordinary prose is never mis-tagged.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Nothing is compressed, stored, or marked until the gate has named it - and
+					the name is what everything downstream keys on.
+				</p>
+			</ZineBox>
 			<figure class="mt-24 border border-oxblood-dark bg-asphalt-panel p-4" data-diagram="preview-flow">
 				<div class="overflow-x-auto" set:html={PreviewFlow} />
 				<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
@@ -443,99 +408,62 @@ const Arcs = [
 		</section>
 
 		<!-- ============ III. THE CONTRACT // THE MARKER ============ -->
-		<section class="relative w-full">
-			<div
-				class="relative z-10 -mb-7 ml-6 inline-block border border-black bg-weathered-teal px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000] sm:-rotate-1"
-			>
-				III // THE CONTRACT
-			</div>
-			<div
-				class="zine-box-teal w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.4deg] sm:p-12"
-			>
-				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
-					<div>
-						<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
-							The marker is the contract
-						</h2>
-						<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Replacing output with a summary only works if the missing content stays
-							reachable.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							The bridge between the two is a single string:
-						</p>
-						<div class="ccr-marker mt-6 border border-oxblood-dark bg-soot-black px-4 py-3 font-mono text-base text-weathered-teal">
-							{"<<<CCR:0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e|build|1420>>>"}
-						</div>
-						<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Hash, type, size - in that order, on purpose.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							The <strong class="text-bone-white">hash</strong> is the full 40-char BLAKE3
-							digest, the address of the stored original.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							The <strong class="text-bone-white">type</strong> tells the agent what kind
-							of thing it skipped.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							The <strong class="text-bone-white">size</strong> tells it how much.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Three fields are all an agent needs to decide whether retrieval is worth it
-							- which is exactly why the marker, not a tool call, is the contract: every
-							retrieval entry point (<code class="font-mono text-base">aphrodite_retrieve</code>,
-							<code class="font-mono text-base">/retrieve</code>,
-							<code class="font-mono text-base">resolve</code>) accepts the marker body
-							directly, suffix or no suffix.
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							The store behind it is deliberately boring: BLAKE3 → SQLite (persistent, the
-							<span class="text-weathered-teal">:9798</span> token listener) or in-memory
-							DashMap (10K entries, the <span class="text-weathered-teal">:9797</span>
-							cache listener).
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Storage is not the interesting problem; the interesting problem is that the
-							agent's decision needs a stable address - and that is all the marker has to
-							be.
-						</p>
-					</div>
-					<!-- EXHIBIT B: what retrieval returns, and only when asked. -->
-					<div class="flex flex-col gap-8">
-						<ZineKicker Tone="dust">EXHIBIT B // WHAT RETRIEVAL RETURNS</ZineKicker>
-						<div class="border border-oxblood-dark bg-asphalt-panel p-5 font-mono text-base">
-							<ZineKicker Tone="dust" As="div">THE BYTES, ON REQUEST</ZineKicker>
-							<div class="mt-6 border border-oxblood-dark bg-soot-black px-4 py-3 text-bone-newsprint opacity-90">
-								1,420 BYTES OF ORIGINAL OUTPUT · UNCHANGED
-							</div>
-							<div class="mt-6 text-base text-zinc-dust">
-								RECURSIVE RESOLUTION · NESTED MARKERS HANDLED
-							</div>
-						</div>
-						<div class="flex items-center justify-center text-center font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-							↓ APHRODITE_RETRIEVE(HASH) ONLY IF NEEDED ↓
-						</div>
-						<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Retrieval is the agent's call, and the next section makes that call
-							visible: the same preview either answers the question or resolves to the
-							bytes.
-						</p>
-					</div>
+		<section id="contract" class="relative w-full">
+			<ZineTape Variant="tab" Label="III // THE CONTRACT" Color="teal" />
+			<ZineBox Tone="teal" Size="lg" Rotate="-rotate-[0.4deg]" Class="w-full">
+				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
+					The marker is the contract
+				</h2>
+				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Replacing output with a summary only works if the missing content stays
+					reachable.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The bridge between the two is a single string:
+				</p>
+				<div class="ccr-marker mt-6 border border-oxblood-dark bg-soot-black px-4 py-3 font-mono text-base text-weathered-teal">
+					{"<<<CCR:0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e|build|1420>>>"}
 				</div>
-			</div>
+				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Hash, type, size - in that order, on purpose.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The <strong class="text-bone-white">hash</strong> is the full 40-char BLAKE3
+					digest, the address of the stored original.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The <strong class="text-bone-white">type</strong> tells the agent what kind
+					of thing it skipped.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The <strong class="text-bone-white">size</strong> tells it how much.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Three fields are all an agent needs to decide whether retrieval is worth it
+					- which is exactly why the marker, not a tool call, is the contract: every
+					retrieval entry point (<code class="font-mono text-base">aphrodite_retrieve</code>,
+					<code class="font-mono text-base">/retrieve</code>,
+					<code class="font-mono text-base">resolve</code>) accepts the marker body
+					directly, suffix or no suffix.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The store behind it is deliberately boring: BLAKE3 → SQLite (persistent, the
+					<span class="text-weathered-teal">:9798</span> token listener) or in-memory
+					DashMap (10K entries, the <span class="text-weathered-teal">:9797</span>
+					cache listener).
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Storage is not the interesting problem; the interesting problem is that the
+					agent's decision needs a stable address - and that is all the marker has to
+					be.
+				</p>
+			</ZineBox>
 		</section>
 
 		<!-- ============ IV. THE LOOP // FOUR LAYERS ============ -->
-		<section class="relative w-full">
-			<div
-				class="relative z-10 -mb-7 ml-6 inline-block border border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000] sm:rotate-1"
-			>
-				IV // THE LOOP
-			</div>
-			<div
-				class="zine-box-crimson w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:rotate-[0.4deg] sm:p-12"
-			>
+		<section id="loop" class="relative w-full">
+			<ZineTape Variant="tab" Label="IV // THE LOOP" Color="raw" Rotate="rotate-1" />
+			<ZineBox Tone="crimson" Size="lg" Rotate="rotate-[0.4deg]" Class="w-full">
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					Four layers, one decision
 				</h2>
@@ -601,60 +529,81 @@ const Arcs = [
 				<div class="mt-16">
 					<ZinePipeline Mode="decide" />
 				</div>
-			</div>
+			</ZineBox>
 		</section>
 
 		<!-- ============ V. THE KNOBS // THRESHOLDS ============ -->
-		<section class="relative w-full">
-			<div
-				class="relative z-10 -mb-7 ml-6 inline-block border border-black bg-stamped-canary px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000] sm:-rotate-1"
-			>
-				V // THE KNOBS
-			</div>
-			<div
-				class="zine-box-canary w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.5deg] sm:p-12"
-			>
-				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
-					The thresholds are the knobs
-				</h2>
-				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					A compression policy that cannot be tuned is a policy that will be fought.
-					Aphrodite's tunables are deliberately few and deliberately at the layer where
-					they matter: the threshold multipliers per type (from
-					<code class="font-mono text-base">aphrodite.toml</code>'s
-					<code class="font-mono text-base">[compression]</code>), the
-					<code class="font-mono text-base">preview_max_chars</code> preview budget, and
-					the context engine's fill threshold
-					(<code class="font-mono text-base">engine_threshold_pct</code>).
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Why so few? Because each knob maps to a question the agent actually asks:{" "}
-					<em>how patient should I be with this kind of output?</em>
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The adaptive layer answers it statistically -{" "}
-					<code class="font-mono text-base">post_llm_call</code> captures savings and
-					updates EMA state per type - so the defaults move toward what the sessions
-					themselves prove useful, and the config only has to set the priors.
-				</p>
-				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The savings those priors produce across 200 real sessions - the ledger, the
-					session-shape bands, the retrieval tax - are on the benchmarks page, which owns
-					the study.
-				</p>
-			</div>
+		<section id="knobs" class="relative w-full">
+			<ZineTape Variant="tab" Label="V // THE KNOBS" Color="canary" />
+			<ZineBox Tone="canary" Size="lg" Rotate="-rotate-[0.5deg]" Class="w-full">
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
+					<div>
+						<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
+							The thresholds are the knobs
+						</h2>
+						<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+							A compression policy that cannot be tuned is a policy that will be fought.
+						</p>
+						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+							Aphrodite's tunables are deliberately few and deliberately at the layer
+							where they matter: the threshold multipliers per type (from
+							<code class="font-mono text-base">aphrodite.toml</code>'s{" "}
+							<code class="font-mono text-base">[compression]</code>), the{" "}
+							<code class="font-mono text-base">preview_max_chars</code> preview budget,
+							and the context engine's fill threshold (
+							<code class="font-mono text-base">engine_threshold_pct</code>).
+						</p>
+						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+							Why so few?
+						</p>
+						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+							Because each knob maps to a question the agent actually asks:{" "}
+							<em>how patient should I be with this kind of output?</em>
+						</p>
+						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+							The adaptive layer answers it statistically -{" "}
+							<code class="font-mono text-base">post_llm_call</code> captures savings and
+							updates EMA state per type - so the defaults move toward what the sessions
+							themselves prove useful, and the config only has to set the priors.
+						</p>
+						<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+							The savings those priors produce across 200 real sessions - the ledger, the
+							session-shape bands, the retrieval tax - are on the benchmarks page, which owns
+							the study.
+						</p>
+					</div>
+					<!-- THRESHOLD TIERS: the knobs the gate sets. -->
+					<div class="flex flex-col gap-6">
+						<ZineKicker Tone="dust">THRESHOLD TIERS</ZineKicker>
+						{
+							Tiers.map(({ Tier, Types, Multiplier, Note }) => (
+								<div class="flex items-center justify-between gap-8 border border-oxblood-dark bg-asphalt-panel px-4 py-3">
+									<div class="min-w-0">
+										<div class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+											{Tier}
+											<span class="ml-2 text-stamped-canary">{Multiplier}</span>
+										</div>
+										<div class="truncate font-mono text-base text-zinc-dust">{Types}</div>
+									</div>
+									<div class="hidden shrink-0 text-right font-mono text-base text-weathered-teal sm:block">
+										{Note}
+									</div>
+								</div>
+							))
+						}
+						<div class="font-mono text-base leading-relaxed text-zinc-dust">
+							HIGHER MULTIPLIER = LONGER THE CONTENT STAYS VISIBLE BEFORE COMPRESSION
+						</div>
+						<ZineSource Lines={["SRC: README.md:187-198."]} />
+					</div>
+				</div>
+			</ZineBox>
 		</section>
 
-		<!-- ============ VI. THE EVIDENCE // TWO TABLES ============ -->
-		<section class="relative w-full">
-			<div
-				class="relative z-10 -mb-7 ml-6 inline-block border border-black bg-weathered-teal px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000] sm:rotate-1"
-			>
-				VI // THE EVIDENCE
-			</div>
-			<div
-				class="zine-box-teal w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.4deg] sm:p-12"
-			>
+		<!-- ============ VI. THE EVIDENCE // TWO PLATES ============ -->
+		<section id="evidence" class="relative w-full">
+			<ZineTape Variant="tab" Label="VI // THE EVIDENCE" Color="teal" Rotate="rotate-1" />
+			<ZineBox Tone="teal" Size="lg" Rotate="-rotate-[0.4deg]" Class="w-full">
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					What one output costs
 				</h2>
@@ -668,71 +617,43 @@ const Arcs = [
 				</p>
 				<div class="mt-16 grid grid-cols-1 gap-24 lg:grid-cols-2">
 					<!-- Real-world per-output compression -->
-					<div>
+					<div class="flex flex-col gap-8">
 						<ZineKicker Tone="dust" As="div">
 							REAL-WORLD PER-OUTPUT COMPRESSION (ORIG → ~33-TOK MARKER)
 						</ZineKicker>
-						<div class="mt-8 flex flex-col gap-6">
-							{
-								RealWorld.map(({ Type, Ratio }) => (
-									<div class="flex items-center justify-between border border-oxblood-dark bg-asphalt-panel px-4 py-3">
-										<span class="font-mono text-base font-bold uppercase text-bone-newsprint">
-											{Type}
-										</span>
-										<span class="font-mono text-base font-black text-stamped-canary">
-											{Ratio}
-										</span>
-									</div>
-								))
-							}
-						</div>
+						{
+							RealWorld.map(({ Type, Ratio, Percent }) => (
+								<ZineStatBar Label={Type} Ratio={Ratio} Percent={Percent} Color="canary" />
+							))
+						}
 					</div>
 					<!-- Per-type standard-corpus bars -->
-					<div>
+					<div class="flex flex-col gap-8">
 						<ZineKicker Tone="dust" As="div">
 							PER-TYPE COMPRESSION (STANDARD CORPUS)
 						</ZineKicker>
-						<div class="mt-8 flex flex-col gap-8">
-							{
-								BenchTypes.map(({ Type, Without, With, Savings, Width }) => (
-									<div>
-										<div class="mb-4 flex flex-wrap justify-between gap-x-4 font-mono text-base font-bold uppercase">
-											<span class="text-bone-newsprint">{Type}</span>
-											<span class="text-zinc-dust">
-												{Without} → {With}
-											</span>
-											<span class="text-weathered-teal">{Savings}</span>
-										</div>
-										<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-											<div class="h-full bg-weathered-teal" style={`width: ${Width};`} />
-											<div class="h-full flex-1 bg-asphalt-panel" />
-										</div>
-									</div>
-								))
-							}
-						</div>
+						{
+							BenchTypes.map(({ Type, Pair, Savings, Width }) => (
+								<ZineStatBar Label={`${Type} · ${Pair}`} Ratio={Savings} Percent={Width} Color="teal" />
+							))
+						}
 						<ZineKicker Tone="canary" As="div">
 							20/20 COMPRESSED · 20/20 RETRIEVE OK
 						</ZineKicker>
 					</div>
 				</div>
-				<p class="mt-10 font-mono text-base leading-relaxed text-zinc-dust">
-					SRC: README.md:467-511 (the per-output compression) · README.md:444-465 (the
-					per-type table and the round trips).
-				</p>
-			</div>
+				<ZineSource
+					Lines={[
+						"SRC: README.md:467-511 (the per-output compression) · README.md:444-465 (the per-type table and the round trips).",
+					]}
+				/>
+			</ZineBox>
 		</section>
 
 		<!-- ============ VII. THE HISTORY SPINE ============ -->
-		<section class="relative w-full">
-			<div
-				class="relative z-10 -mb-7 ml-6 inline-block border border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000] sm:-rotate-1"
-			>
-				VII // THE HISTORY SPINE
-			</div>
-			<div
-				class="zine-box-crimson w-full border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.3deg] sm:p-12"
-			>
+		<section id="history" class="relative w-full">
+			<ZineTape Variant="tab" Label="VII // THE HISTORY SPINE" Color="raw" />
+			<ZineBox Tone="crimson" Size="lg" Rotate="-rotate-[0.3deg]" Class="w-full">
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					Five incidents that set the laws
 				</h2>
@@ -768,12 +689,12 @@ const Arcs = [
 									<strong class="text-bone-white">Mechanics today.</strong>{" "}
 									<span set:html={Today} />
 								</p>
-								<div class="mt-6 font-mono text-base text-zinc-dust">{Src}</div>
+								<ZineSource Lines={[Src]} />
 							</article>
 						))
 					}
 				</div>
-			</div>
+			</ZineBox>
 		</section>
 
 		<!-- RELATED: the natural neighbors. -->
@@ -784,6 +705,6 @@ const Arcs = [
 				{ Href: "/setup/", Label: "SETUP" },
 			]}
 		/>
-	</main>
+	</PageShell>
 	<ZineDiagramNav />
 </Base>

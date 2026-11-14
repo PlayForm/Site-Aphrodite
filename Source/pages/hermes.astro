@@ -2,6 +2,11 @@
 import Base from "@Layout/Base.astro";
 
 import Related from "@Component/Related.astro";
+import PageShell from "@Component/PageShell.astro";
+import PageHeader from "@Component/PageHeader.astro";
+import ZineTape from "@Component/ZineTape.astro";
+import ZineBox from "@Component/ZineBox.astro";
+import ZineSource from "@Component/ZineSource.astro";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import SessionLifecycle from "../Content/Mermaid/session-lifecycle.svg?raw";
 
@@ -47,50 +52,21 @@ const ProxyRows = [
 	Title="HERMES // APHRODITE"
 	Description="How Hermes loads the Aphrodite plugin: the hook chain around a turn, the session lifecycle, the dual proxies on :9797 and :9798, and what the agent actually sees - type-aware previews instead of raw output."
 >
-	<!-- PENDING SHARED: PageShell (t_130e5ed4) - swap to <PageShell Rhythm="wide"> when it lands -->
-	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
-	>
-		<!-- PENDING SHARED: PageHeader (t_130e5ed4) - swap to <PageHeader Tape Title Lead /> when it lands -->
-		<header class="relative flex w-full flex-col items-start">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				HERMES // THE INTEGRATION
-			</div>
-			<h1
-				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
-			>
-				Living inside Hermes
-			</h1>
-			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a
-				client at.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				It is the reason the interception lives inside the turn: tool output never hits a
-				wire, so only hook-level registration can catch it before it becomes message history
-				- six hooks, thirteen tools, and an optional context engine, every call forwarded
-				into the Rust dylib.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Two proxy processes still run alongside as subprocesses, and a canonical runtime home
-				under <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>
-				holds the binaries, config, CCR database, directives, and logs.
-			</p>
-		</header>
+	<PageShell Rhythm="wide">
+		<PageHeader
+			Tape="HERMES // THE INTEGRATION"
+			Title="Living inside Hermes"
+			Lead={[
+				`Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a client at.`,
+				`It is the reason the interception lives inside the turn: tool output never hits a wire, so only hook-level registration can catch it before it becomes message history - six hooks, thirteen tools, and an optional context engine, every call forwarded into the Rust dylib.`,
+				`Two proxy processes still run alongside as subprocesses, and a canonical runtime home under <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code> holds the binaries, config, CCR database, directives, and logs.`,
+			]}
+		/>
 
 		<!-- SLOT 3: one claim's evidence - the comparison, then what the turn looks like -->
 		<section class="relative w-full">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				COMPARISON // WHY NOT JUST A PROXY
-			</div>
-			<!-- PENDING SHARED: ZineBox Size="lg" Rotate="sm:-rotate-[1deg]" (t_130e5ed4) -->
-			<div
-				class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[1deg] sm:p-12"
-			>
+			<ZineTape Variant="section" Label="COMPARISON // WHY NOT JUST A PROXY" />
+			<ZineBox Size="lg" Rotate="-rotate-[1deg]">
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse font-mono text-base">
 						<thead>
@@ -183,11 +159,7 @@ const ProxyRows = [
 					</p>
 				</div>
 
-				<div
-					class="mb-6 inline-block -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-				>
-					LIFECYCLE // SESSION TO SESSION
-				</div>
+				<ZineTape Variant="section" Label="LIFECYCLE // SESSION TO SESSION" />
 				<h3
 					id="lifecycle"
 					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
@@ -221,9 +193,6 @@ const ProxyRows = [
 					CACHE ON :9797 (IN-MEMORY, COMPRESSES ABOVE 8 KB). NO HOT-RELOAD - RESTART THE
 					SESSION TO PICK UP A NEW BUILD.
 				</p>
-				<p class="mt-3 font-mono text-base text-zinc-dust">
-					SRC: README.md:298-299; docs/guides/hermes-integration.md:107-108.
-				</p>
 				<figure
 					class="mt-16 border border-oxblood-dark bg-soot-black p-4"
 					data-diagram="session-lifecycle"
@@ -234,11 +203,7 @@ const ProxyRows = [
 					</figcaption>
 				</figure>
 
-				<div
-					class="mb-6 inline-block -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-				>
-					EVIDENCE // WHAT THE AGENT SEES
-				</div>
+				<ZineTape Variant="section" Label="EVIDENCE // WHAT THE AGENT SEES" />
 				<h3
 					id="previews"
 					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
@@ -284,11 +249,7 @@ const ProxyRows = [
 					aphrodite_retrieve(hash) ONLY WHEN IT ACTUALLY NEEDS IT.
 				</p>
 
-				<div
-					class="mb-6 inline-block -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-				>
-					OPT-IN // CONTEXT ENGINE
-				</div>
+				<ZineTape Variant="section" Label="OPT-IN // CONTEXT ENGINE" />
 				<h3
 					id="context-engine"
 					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
@@ -333,12 +294,13 @@ const ProxyRows = [
 						<span class="text-zinc-dust"># minimum messages before activating</span>
 					</div>
 				</div>
-			</div>
-			<!-- PENDING SHARED: ZineSource (t_130e5ed4) - swap to <ZineSource Lines={[...]} /> when it lands -->
-			<p class="mt-8 font-mono text-base text-zinc-dust">
-				SRC: README.md:91-99, 219-299, 467-482; docs/guides/hermes-integration.md:115-141;
-				docs/proxy/architecture.md:12-31; docs/tool-relay/callbacks.md:89-92.
-			</p>
+			</ZineBox>
+			<ZineSource
+				Lines={[
+					"SRC: README.md:91-99, 219-299, 467-482; docs/guides/hermes-integration.md:115-141; docs/proxy/architecture.md:12-31; docs/tool-relay/callbacks.md:89-92.",
+					"SRC: README.md:298-299; docs/guides/hermes-integration.md:107-108.",
+				]}
+			/>
 		</section>
 
 		<!-- SLOT 4: exactly one onward link -->
@@ -349,6 +311,6 @@ const ProxyRows = [
 				{ Href: "/setup/", Label: "SETUP" },
 			]}
 		/>
-	</main>
+	</PageShell>
 	<ZineDiagramNav />
 </Base>
