@@ -4,10 +4,21 @@
  * DeepSeek Links.ts pattern (Link() composition + Resolve() safelist).
  */
 
+/**
+ * The two axes of the registry: which column a route belongs to in the footer,
+ * and which labelled group it belongs to in the header's MORE tree. One field
+ * carries both, so the grouping is a property of the entry rather than a
+ * second array (navigation-registry §1: one registry).
+ */
+export type LinkGroup = "Product" | "Surface" | "Knobs" | "Record";
+
 export interface InternalLink {
 	Href: string;
 
 	Label: string;
+
+	/** The footer column and the MORE group. Unset = Product. */
+	Group?: LinkGroup;
 }
 
 /** Primary header entries - always visible on desktop. */
@@ -20,22 +31,41 @@ export const PrimaryLinks: InternalLink[] = [
 	{ Href: "/showcase/", Label: "SHOWCASE" },
 ];
 
-/** Secondary header entries - collapsed into the mobile menu, listed after the primary set on wide screens. */
+/**
+ * Secondary header entries - the mobile tree's MORE groups, grouped by the
+ * surface they document rather than listed flat. Retired at the restructure:
+ * HOOKS (folded into PLUGIN), FLAVORS (folded into HERMES) and CRATES (folded
+ * into VERSIONS); BRIEF (`/presentation/`, the 64-second deck) is now linked -
+ * it was reachable only by typing the URL.
+ */
 export const MenuLinks: InternalLink[] = [
-	{ Href: "/crates/", Label: "CRATES" },
-	{ Href: "/versions/", Label: "VERSIONS" },
-	{ Href: "/plugin/", Label: "PLUGIN" },
-	{ Href: "/hermes/", Label: "HERMES" },
-	{ Href: "/hooks/", Label: "HOOKS" },
-	{ Href: "/tools/", Label: "TOOLS" },
-	{ Href: "/flavors/", Label: "FLAVORS" },
-	{ Href: "/workbench/", Label: "WORKBENCH" },
-	{ Href: "/config/", Label: "CONFIG" },
-	{ Href: "/examples/", Label: "EXAMPLES" },
+	{ Href: "/plugin/", Label: "PLUGIN", Group: "Surface" },
+	{ Href: "/tools/", Label: "TOOLS", Group: "Surface" },
+	{ Href: "/hermes/", Label: "HERMES", Group: "Surface" },
+	{ Href: "/config/", Label: "CONFIG", Group: "Knobs" },
+	{ Href: "/workbench/", Label: "WORKBENCH", Group: "Knobs" },
+	{ Href: "/examples/", Label: "EXAMPLES", Group: "Knobs" },
+	{ Href: "/versions/", Label: "VERSIONS", Group: "Record" },
+	{ Href: "/presentation/", Label: "BRIEF", Group: "Record" },
 ];
 
-/** Every internal route the header knows about. */
+/** Every internal route the header knows about - still the one flat set. */
 export const AllLinks: InternalLink[] = [...PrimaryLinks, ...MenuLinks];
+
+/** The footer's columns and the MORE groups, in reading order. */
+export const GroupOrder: LinkGroup[] = ["Product", "Surface", "Knobs", "Record"];
+
+/**
+ * The footer's columns: a VIEW of AllLinks, never a second registry, so no
+ * route can go missing from the footer. An entry with no `Group` is Product.
+ */
+export const FooterGroups = GroupOrder.map((Group) => ({
+	Group,
+	Links: AllLinks.filter((Link) => (Link.Group ?? "Product") === Group),
+}));
+
+/** The MORE groups: the same view without the Product column (the bar's set). */
+export const MenuGroups = FooterGroups.filter(({ Group }) => Group !== "Product");
 
 /** External canonical URLs, verbatim from the README's documented flows. */
 export const ExternalLinks = {

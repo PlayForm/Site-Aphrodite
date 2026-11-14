@@ -3,9 +3,26 @@
 //
 // The route renders every beat at build time (the deck is readable and
 // inspectable without JavaScript) and hands the clock to Presentation/Player.ts.
+//
+// The deck is a film AND a document. Every beat is addressable at its
+// Identifier (`/presentation/#classify`), the transport steps and scrubs
+// between beats instead of only watching them, and the exit link always names
+// the page that carries the current beat's argument - so the brief funnels
+// into the docs instead of looping back on itself.
+//
 // The frame is a fixed 16:9 box, so a recording of any window carries the same
 // composition; the transport retracts during playback and the progress hairline
-// stays.
+// stays. Without JavaScript the transport reduces to the exit link (the noscript
+// rule below hides the controls the player would drive) and the frame to beat
+// 01, which is the only scene not marked aria-hidden at build time.
+//
+// Each scene is wrapped in an anchor so the fragment has a real target in the
+// document. The wrapper is display:contents - it carries the id and generates
+// no box, so the scene keeps positioning against .deck-frame exactly as before.
+//
+// The route already has its <h1>: DeckScene renders the opening beat's title as
+// one (DeckScene.astro:213). A second, sr-only heading here would give the page
+// two <h1>s, which is a worse defect than the one it would fix.
 
 import Base from "@Layout/Base.astro";
 
@@ -21,17 +38,25 @@ const Total = Scenes.length;
 // The static clock reads the same total the player seeks against, so the
 // no-JavaScript frame is not a wrong number.
 const Span = `${String(Math.floor(Timeline.Total / 60)).padStart(2, "0")}:${(Timeline.Total % 60).toFixed(1).padStart(4, "0")}`;
+
+// The scrubber counts tenths of a second - the resolution the clock prints.
+const ScrubMax = Math.round(Timeline.Total * 10);
+
+// The build-time state of the transport: beat 01's exit, and beat 01's ordinal.
+const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 ---
 
 <Base
 	Title="PRESENTATION // APHRODITE"
-	Description="A 64-second browser presentation: the default raw log, the split between what the user keeps and what the agent reads, and the four steps - classify, preview, store, decide - behind Aphrodite's Hermes plugin."
+	Description="A 64-second browser presentation: the default raw log, the split between what the user keeps and what the agent reads, and the four steps - classify, preview, store, decide - behind Aphrodite's Hermes plugin. Every beat links to the page that explains it in full."
 >
 	<main class="deck" data-deck data-ui="hidden">
 		<div class="deck-frame" data-frame>
 			{
 				Scenes.map((Scene, Index) => (
-					<DeckScene Scene={Scene} Index={Index} Total={Total} />
+					<div class="deck-beat" id={Scene.Identifier}>
+						<DeckScene Scene={Scene} Index={Index} Total={Total} />
+					</div>
 				))
 			}
 
@@ -49,21 +74,279 @@ const Span = `${String(Math.floor(Timeline.Total / 60)).padStart(2, "0")}:${(Tim
 				}
 			</div>
 
+			<p class="sr-only" role="status" data-live></p>
+
 			<div class="deck-ui" data-control>
-				<button class="deck-ui-button" type="button" data-toggle data-control>PLAY</button>
+				<details class="deck-beats" data-beats data-control data-js-only>
+					<summary class="deck-ui-button deck-beats-summary">BEATS</summary>
+					<div class="deck-beats-panel">
+						<nav aria-label="Beats">
+							<ol class="deck-beats-list">
+								{
+									Scenes.map((Scene, Index) => (
+										<li>
+											<a
+												class="deck-beats-link"
+												href={`#${Scene.Identifier}`}
+												data-beat={Index}
+												aria-current={Index === 0 ? "true" : undefined}
+											>
+												<span class="deck-beats-ordinal">
+													{String(Index + 1).padStart(2, "0")}
+												</span>
+												<span class="deck-beats-name">{Scene.Title}</span>
+											</a>
+										</li>
+									))
+								}
+							</ol>
+						</nav>
+						<p class="deck-beats-keys">
+							SPACE PLAY/PAUSE · LEFT/RIGHT BEAT · HOME/END FIRST/LAST · R
+							RESTART · F FULLSCREEN · H HIDE CONTROLS
+						</p>
+					</div>
+				</details>
+
+				<button
+					class="deck-ui-button"
+					type="button"
+					data-prev
+					data-control
+					data-js-only
+					aria-label="Previous beat"
+				>
+					PREV
+				</button>
+				<button
+					class="deck-ui-button"
+					type="button"
+					data-toggle
+					data-control
+					data-js-only
+				>
+					PLAY
+				</button>
+				<button
+					class="deck-ui-button"
+					type="button"
+					data-next
+					data-control
+					data-js-only
+					aria-label="Next beat"
+				>
+					NEXT
+				</button>
+
 				<span class="deck-ui-clock" data-clock>{`00:00.0 / ${Span}`}</span>
 				<span class="deck-ui-status" data-status>PAUSED</span>
-				<span class="deck-ui-spacer"></span>
-				<span class="deck-ui-keys">
-					SPACE PLAY/PAUSE · LEFT/RIGHT SCENE · R RESTART · F FULLSCREEN · H HIDE UI
-				</span>
+				<span class="deck-ui-beat" data-beat-label>{`01 / ${String(Total).padStart(2, "0")}`}</span>
+
+				<input
+					class="deck-scrub"
+					type="range"
+					min="0"
+					max={ScrubMax}
+					step="1"
+					value="0"
+					data-scrub
+					data-control
+					data-js-only
+					aria-label="Seek through the brief"
+				/>
+
+				<a
+					class="deck-ui-exit"
+					data-exit
+					href={Opening.Href}
+					aria-label={`Read on: ${Opening.Label}`}
+				>
+					<span>READ ON</span>
+					<span class="deck-ui-exit-label" data-exit-label>{Opening.Label}</span>
+					<span aria-hidden="true">→</span>
+				</a>
 			</div>
 		</div>
 	</main>
+
+	<noscript>
+		<style>
+			/* Without the player the controls are dead weight: keep the exit link,
+			   which is a plain anchor and works. */
+			[data-js-only] {
+				display: none;
+			}
+
+			.deck[data-ui="hidden"] .deck-ui {
+				opacity: 1 !important;
+				pointer-events: auto !important;
+			}
+		</style>
+	</noscript>
 
 	<script>
 		import Player from "../Presentation/Player.ts";
 
 		Player();
 	</script>
+
+	<style>
+		/* The beat anchor: it carries the fragment target and generates no box, so
+		   .deck-frame stays the containing block for the absolute scenes. */
+		.deck-beat {
+			display: contents;
+		}
+
+		/* ---- The transport additions ---- */
+
+		/* The beat list is a disclosure: closed by default (the film owns the
+		   frame), one press away when a reader wants to jump. */
+		.deck-beats {
+			position: relative;
+			flex: none;
+		}
+
+		.deck-beats-summary {
+			list-style: none;
+			display: inline-block;
+		}
+
+		.deck-beats-summary::-webkit-details-marker {
+			display: none;
+		}
+
+		.deck-beats-panel {
+			position: absolute;
+			bottom: calc(100% + 0.8cqw);
+			left: 0;
+			z-index: 2;
+			width: max-content;
+			max-width: 46cqw;
+			border: 2px solid var(--oxblood-dark);
+			border-radius: 0;
+			background: var(--carbon-void);
+			box-shadow: 4px 4px 0 #000;
+			padding: 1.1cqw 1.3cqw;
+		}
+
+		.deck-beats-list {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 0.35cqw 1.6cqw;
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+
+		.deck-beats-link {
+			display: flex;
+			gap: 0.7cqw;
+			align-items: baseline;
+			border-left: 3px solid transparent;
+			padding: 0.22cqw 0 0.22cqw 0.7cqw;
+			color: var(--zinc-dust);
+			font-size: calc(0.66cqw * var(--type-scale));
+			letter-spacing: 0.1em;
+			text-decoration: none;
+			text-transform: uppercase;
+			white-space: nowrap;
+			/* Deck.css makes every anchor in the deck inert for recording; a beat
+			   link is the exception, and so is the exit below. */
+			pointer-events: auto;
+		}
+
+		.deck-beats-link:hover,
+		.deck-beats-link:focus-visible {
+			color: var(--bone-white);
+			background: rgba(147, 17, 40, 0.18);
+		}
+
+		.deck-beats-link:focus-visible {
+			outline: 2px solid var(--stamped-canary);
+			outline-offset: 1px;
+		}
+
+		.deck-beats-link[aria-current="true"] {
+			border-left-color: var(--raw-blood);
+			color: var(--bone-white);
+		}
+
+		.deck-beats-ordinal {
+			color: var(--weathered-teal);
+			font-variant-numeric: tabular-nums;
+		}
+
+		.deck-beats-name {
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.deck-beats-keys {
+			margin: 0.9cqw 0 0;
+			border-top: 1px solid var(--oxblood-dark);
+			padding-top: 0.7cqw;
+			color: var(--zinc-dust);
+			font-size: calc(0.58cqw * var(--type-scale));
+			font-weight: 400;
+			letter-spacing: 0.08em;
+		}
+
+		/* The scrubber takes the room the old spacer held: one row, always. */
+		.deck-scrub {
+			flex: 1 1 8cqw;
+			min-width: 6cqw;
+			height: 1.1cqw;
+			margin: 0;
+			accent-color: var(--raw-blood);
+			background: transparent;
+			cursor: pointer;
+		}
+
+		.deck-scrub:focus-visible {
+			outline: 2px solid var(--stamped-canary);
+			outline-offset: 2px;
+		}
+
+		.deck-ui-beat {
+			color: var(--weathered-teal);
+			font-variant-numeric: tabular-nums;
+			white-space: nowrap;
+		}
+
+		/* The exit is the deck's funnel: the one control that leaves the film. */
+		.deck-ui-exit {
+			display: inline-flex;
+			gap: 0.6cqw;
+			align-items: baseline;
+			border: 1px solid var(--oxblood-dark);
+			border-radius: 0;
+			background: var(--raw-blood);
+			padding: 0.38cqw 0.9cqw;
+			color: var(--bone-white);
+			letter-spacing: 0.16em;
+			text-decoration: none;
+			white-space: nowrap;
+			pointer-events: auto;
+		}
+
+		.deck-ui-exit:hover,
+		.deck-ui-exit:focus-visible {
+			background: var(--bone-white);
+			color: var(--soot-black);
+		}
+
+		.deck-ui-exit:focus-visible {
+			outline: 2px solid var(--stamped-canary);
+			outline-offset: 2px;
+		}
+
+		.deck-ui-exit-label {
+			color: var(--stamped-canary);
+		}
+
+		.deck-ui-exit:hover .deck-ui-exit-label,
+		.deck-ui-exit:focus-visible .deck-ui-exit-label {
+			color: var(--raw-blood);
+		}
+	</style>
 </Base>

@@ -8,6 +8,98 @@ import ContextEngine from "../Content/Mermaid/context-engine.svg?raw";
 import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 import { Stamps, Versions } from "@Library/Versions";
 import { ExternalLinks } from "@Library/Links";
+
+// THE SIX HOOKS - one turn, in order. The chain absorbed /hooks/ when that
+// route retired into this page (Restructure.md 2.2): the sequence pane, the
+// six seam cards, the essential-tool gate and the threshold table all live
+// here now, so the hook story has exactly one home.
+const Sequence = [
+	{ Text: "session starts", Tone: "result" },
+	{ Text: "→ on_session_start · reset per-session state", Tone: "canary" },
+	{ Text: "↓", Tone: "mute" },
+	{ Text: "user turn", Tone: "result" },
+	{ Text: "→ pre_tool_call · auto-background, chain split", Tone: "canary" },
+	{ Text: "↓", Tone: "mute" },
+	{ Text: "tool or terminal runs", Tone: "result" },
+	{ Text: "→ transform_tool_result / transform_terminal_output · compress to marker", Tone: "canary" },
+	{ Text: "↓", Tone: "mute" },
+	{ Text: "→ pre_llm_call · inject directives, nudges, recall catalog", Tone: "canary" },
+	{ Text: "↓", Tone: "mute" },
+	{ Text: "LLM responds", Tone: "result" },
+	{ Text: "→ post_llm_call · archive turn, advance counter, expire", Tone: "canary" },
+	{ Text: "↓", Tone: "mute" },
+	{ Text: "⟲ next turn", Tone: "plain" },
+];
+
+const Hooks = [
+	{
+		N: "01",
+		Name: "on_session_start",
+		Tape: "raw",
+		Tone: "subtle",
+		Rotate: "sm:-rotate-[1.4deg]",
+		Body: [
+			"Resets every piece of per-session state to a clean baseline: turn counter, conversation index, recent markers, referenced files, tool-event telemetry, ephemeral directives.",
+			"Injects nothing - the one-shot first-turn orientation renders later, on the first <span class=\"font-mono text-base text-weathered-teal\">pre_llm_call</span>.",
+		],
+	},
+	{
+		N: "02",
+		Name: "pre_tool_call",
+		Tape: "canary",
+		Tone: "canary",
+		Rotate: "sm:rotate-[1.4deg]",
+		Body: [
+			"Two interventions before a tool executes.",
+			"<span class=\"font-bold text-bone-white\">Auto-backgrounding</span>: the hook rewrites long-running terminal/process calls to run in the background (poll worker, default on).",
+			"<span class=\"font-bold text-bone-white\">Chain splitting</span> (opt-in): the hook splits chained commands with invisible segment markers so each segment compresses into its own CCR marker.",
+			"Otherwise the call passes through unchanged.",
+		],
+	},
+	{
+		N: "03",
+		Name: "transform_tool_result",
+		Tape: "raw",
+		Tone: "crimson",
+		Rotate: "sm:-rotate-[1deg]",
+		Body: [
+			"After every tool call: record telemetry, run the skip gates, classify the content type, hash (BLAKE3), store, and replace the output with <span class=\"ccr-marker font-mono text-base text-weathered-teal\">&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;</span> plus a compact preview.",
+			"The hook tracks file references before the gates, so <span class=\"font-mono text-base text-weathered-teal\">aphrodite_files</span> sees every read even when nothing was compressed.",
+		],
+	},
+	{
+		N: "04",
+		Name: "transform_terminal_output",
+		Tape: "bone",
+		Tone: "subtle",
+		Rotate: "sm:rotate-[2deg]",
+		Body: [
+			"Same pipeline for shell stdout/stderr.",
+			"The hook records non-zero exit codes as failures for the error-loop detector; chain-split segments compress unconditionally, before the threshold gate, so marked output never leaks raw; everything else passes the 1,024-char gate first.",
+		],
+	},
+	{
+		N: "05",
+		Name: "pre_llm_call",
+		Tape: "canary",
+		Tone: "canary",
+		Rotate: "sm:-rotate-[1.6deg] lg:-translate-y-1",
+		Body: [
+			"Runs the poll-worker checkpoint, then the context assembler: first-turn orientation (turn 0 only), <span class=\"font-mono text-base text-weathered-teal\">[directives:]</span> (never dropped), <span class=\"font-mono text-base text-weathered-teal\">[nudge:]</span> one-shots at most two (never dropped), background-task status, and the <span class=\"font-mono text-base text-weathered-teal\">[recall]</span> catalog - the first section dropped under pressure.",
+			"One hard budget: 4,000 chars.",
+		],
+	},
+	{
+		N: "06",
+		Name: "post_llm_call",
+		Tape: "raw",
+		Tone: "crimson",
+		Rotate: "sm:rotate-[1.2deg] lg:translate-y-2",
+		Body: [
+			"Archives the last marker of the turn into the conversation index (so <span class=\"font-mono text-base text-weathered-teal\">aphrodite_diff</span> can report per-turn compressions), advances the turn counter, purges expired nudges after the counter advances - a one-shot nudge renders exactly once - and expires stale poll-worker tasks.",
+		],
+	},
+];
 ---
 
 <Base
@@ -15,7 +107,7 @@ import { ExternalLinks } from "@Library/Links";
 	Description={`The Aphrodite Hermes plugin, v${Versions.Plugin}: a thin Python registration shim over a Rust dylib - 6 hooks, 13 tools, an opt-in context engine, and an explicit SHA-256-verified download flow.`}
 >
 	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-32 sm:px-8 lg:gap-40 lg:px-14 lg:py-56"
 	>
 		<!-- HERO -->
 		<header class="relative flex w-full flex-col items-start">
@@ -29,7 +121,7 @@ import { ExternalLinks } from "@Library/Links";
 			>
 				The plugin
 			</h1>
-			<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Aphrodite ships as a Hermes Agent plugin: a thin Python registration shim over a
 				Rust dylib.
 			</p>
@@ -116,7 +208,6 @@ import { ExternalLinks } from "@Library/Links";
 				</p>
 			</div>
 		</section>
-
 		<!-- ARCHITECTURE -->
 		<section class="relative w-full lg:w-10/12 lg:self-end">
 			<div
@@ -144,9 +235,10 @@ import { ExternalLinks } from "@Library/Links";
 				<p class="mt-12 font-body text-base leading-relaxed text-zinc-dust">
 					Registration is driven by the dylib: the shim asks the dylib for its hook names
 					and tool schemas and registers one callback per name.
-					<span class="mt-1 block text-base">It is the reason there is no hot-reload: the
-					dylib is resolved once per process, so to pick up a new build you restart the
-					Hermes session.</span>
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					It is the reason there is no hot-reload: the dylib is resolved once per process,
+					so to pick up a new build you restart the Hermes session.
 				</p>
 				<figure class="mt-20 border border-oxblood-dark bg-soot-black p-4" data-diagram="context-engine">
 					<div class="overflow-x-auto" set:html={ContextEngine} />
@@ -157,285 +249,183 @@ import { ExternalLinks } from "@Library/Links";
 			</div>
 		</section>
 
-		<!-- DOWNLOAD FLOW -->
+		<!-- THE SIX HOOKS // ONE TURN (absorbed from /hooks/) -->
 		<section class="relative w-full">
 			<div
 				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
-				DOWNLOAD // EXPLICIT STEPS ONLY
+				HOOKS // THE CHAIN
 			</div>
+			<h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+				Six hooks, one turn
+			</h2>
+			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				Every hook is a thin dispatch that forwards its arguments to the Rust dylib and
+				hands the JSON reply back to Hermes.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				It is the reason the shim registers one callback per name: on plugin load it asks
+				the dylib for its hook names, and the six below are always registered together.
+			</p>
+			<h3 class="mt-16 mb-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+				The turn, in order
+			</h3>
 			<div
-				class="zine-box-crimson w-full -rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
+				class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
 			>
-				<h2 class="mb-12 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-					register() never downloads
-				</h2>
-				<div class="grid grid-cols-1 gap-16 lg:grid-cols-2">
-					<div>
-						<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
-							Binaries are never shipped in the repository.
-						</p>
-						<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
-							Fetching them is an explicit setup step you run yourself - and the
-							verification is mandatory, not best-effort:
-						</p>
-						<ul class="space-y-6 font-body text-base text-bone-newsprint">
-							<li class="border-l-4 border-raw-blood pl-4">
-								<span class="font-bold text-bone-white">SHA-256 against the in-tree checksum list</span>
-								- <code class="font-mono text-base text-weathered-teal">SHA256SUMS.txt</code>,
-								generated by CI into the tree; a mismatch is refused outright.
-							</li>
-							<li class="border-l-4 border-raw-blood pl-4">
-								<span class="font-bold text-bone-white">Magic-byte validation</span> - the
-								downloaded file must be a real ELF / Mach-O / PE image, or it is rejected.
-							</li>
-							<li class="border-l-4 border-raw-blood pl-4">
-								<span class="font-bold text-bone-white">Backup + restore</span> - an
-								existing install is backed up and restored if any step fails. No
-								release-hosted fallback.
-							</li>
-							<li class="border-l-4 border-raw-blood pl-4">
-								<span class="font-bold text-bone-white">A missing binary disables, not breaks</span>
-								- the plugin logs the setup command and stays disabled until the binaries
-								are present.
-							</li>
-						</ul>
-					</div>
-					<div>
-						<CodeFence
-							Class="mb-10 border border-oxblood-dark"
-							Code={`$ git clone https://github.com/PlayForm/Aphrodite-Hermes.git
-$ cd Aphrodite-Hermes
-$ ln -s "$(pwd)" ~/.hermes/plugins/aphrodite
-$ bash download.sh // or: pwsh ./download.ps1
-$ cd ..
-$ hermes plugins enable aphrodite
-$ hermes`}
-						/>
-						<div
-							class="flex items-center justify-between gap-8 border-2 border-oxblood-dark bg-asphalt-panel p-4"
-						>
-							<span class="text-base font-black uppercase tracking-widest text-stamped-canary">
-								COPY THE FULL SEQUENCE:
-							</span>
-							<button
-								class="border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-								data-copy={"git clone https://github.com/PlayForm/Aphrodite-Hermes.git\ncd Aphrodite-Hermes\nln -s \"$(pwd)\" ~/.hermes/plugins/aphrodite\nbash download.sh\ncd ..\nhermes plugins enable aphrodite\nhermes"}
-							>
-								COPY
-							</button>
-						</div>
-					</div>
-				</div>
-				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
-					ALSO ON THE STORE: the plugin is in the Hermes plugin catalog - the reviewed,
-					pinned alternative to the manual clone above.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					<code class="font-mono text-base text-weathered-teal">hermes plugins install aphrodite</code>
-					checks out the catalog entry's exact commit, then{" "}
-					<code class="font-mono text-base text-weathered-teal">bash download.sh</code>
-					from <code class="font-mono text-base text-weathered-teal">~/.hermes/plugins/aphrodite</code>
-					still fetches the binaries (never{" "}
-					<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>
-					against the catalog-managed directory).
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					The full flow is on
-					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/setup/">SETUP</a>;
-					the mechanics are in <a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={ExternalLinks.HermesGuide}>the Hermes plugin guide</a>.
-				</p>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 font-body text-base leading-relaxed text-zinc-dust">
-					LLM API KEY REQUIRED: the proxy is an OpenAI-compatible forwarder and needs its
-					own credentials - <code class="font-mono text-base text-weathered-teal">APHRODITE_API_KEY</code>,
-					<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>, or
-					<code class="font-mono text-base text-weathered-teal">api_key</code> in
-					~/.hermes/aphrodite/aphrodite.toml.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					Hermes' provider config is NOT reused, and there is no keyless mode: without a
-					key the proxy refuses to start.
-				</p>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 font-body text-base leading-relaxed text-zinc-dust">
-					A MISSING CONFIG IS REPORTED, NOT INFERRED: when
-					<code class="font-mono text-base text-weathered-teal">aphrodite.toml</code> is
-					absent the plugin says so, and the binary falls back to a single token-mode
-					listener on the first port - the second proxy never binds, and every
-					<code class="font-mono text-base text-weathered-teal">[compression]</code> knob,
-					the store retention caps included, is simply absent.
-					<span class="mt-1 block text-base">It is the reason the install runs
-					<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>:
-					the config file is written before the binary is ever started, so the fallback
-					never becomes the everyday state.</span>
-				</p>
-			</div>
-		</section>
-
-		<!-- FILESYSTEM MAP -->
-		<section class="relative w-full lg:w-9/12 lg:self-start">
-			<div
-				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
-				<div
-					class="absolute -top-5 right-6 z-10 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
-				>
-					FILESYSTEM // CANONICAL LAYOUT
-				</div>
-				<h2 class="mb-12 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-					What changes after install
-				</h2>
-				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed text-bone-newsprint">
-					<div>~/.hermes/</div>
-					<div class="pl-4">├── plugins/aphrodite <span class="text-zinc-dust">← manual symlink to the plugin repo</span></div>
-					<div class="pl-4 text-bone-white">└── aphrodite/ <span class="text-zinc-dust">← runtime home</span></div>
-					<div class="pl-10">├── binaries/aphrodite <span class="text-zinc-dust">← proxy binary, fetched + verified</span></div>
-					<div class="pl-10">├── binaries/libaphrodite_hermes.dylib</div>
-					<div class="pl-10">├── aphrodite.toml <span class="text-zinc-dust">← config</span></div>
-					<div class="pl-10">├── directives/ <span class="text-zinc-dust">← 7 built-ins materialized</span></div>
-					<div class="pl-10">├── ccr.db <span class="text-zinc-dust">← SQLite CCR store</span></div>
-					<div class="pl-10">└── proxy-stderr.log <span class="text-zinc-dust">← proxy logs (empty = healthy)</span></div>
-				</div>
-				<p class="mt-12 font-body text-base leading-relaxed text-zinc-dust">
-					The runtime home self-heals toward
-					<code class="font-mono text-base text-weathered-teal">layout_schema.json</code> at
-					startup: the self-heal moves misplaced config and binaries to their canonical
-					paths and quarantines stale plugin-source copies.
-					<span class="mt-1 block text-base">It is the reason the self-healing stops at the
-					Hermes-owned boundary: the
-					~/.hermes/plugins/aphrodite install dir is Hermes' territory, and the plugin
-					never creates, converts, or modifies it.</span>
-				</p>
-				<figure
-					class="mx-auto mt-20 max-w-md border border-oxblood-dark bg-soot-black p-3"
-					data-diagram="hook-chain-mini"
-				>
-					<div class="overflow-x-auto [&_svg]:h-auto" set:html={HookChain} />
-					<figcaption class="mt-4 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-						M3 MINI // HOOK CHAIN
-					</figcaption>
-				</figure>
-			</div>
-		</section>
-
-		<!-- EVOLUTION: how the plugin got here -->
-		<section class="relative w-full lg:w-11/12 lg:self-end">
-			<div
-				class="zine-box-crimson relative -rotate-[0.8deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
-				<div
-					class="absolute -top-5 right-6 z-10 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
-				>
-					EVOLUTION // HOW THE SURFACE GREW
-				</div>
-				<h2 class="mb-12 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-					The six hooks, the version pairing, and the 14-to-13 correction
-				</h2>
-				<!-- The six-lane hook grid: 2x2 through the tablet/wide range;
-				     the three-lane form only at xl, where the enlarged hook
-				     names ("on_session_start") keep room beside the WHEN chips. -->
-				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 xl:grid-cols-3 xl:gap-6">
+				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-4 font-mono text-base leading-relaxed">
 					{
-						[
-							{ Hook: "on_session_start", When: "session starts", Does: "resets all per-session state to a clean baseline - injects nothing" },
-							{ Hook: "pre_tool_call", When: "before a tool executes", Does: "auto-backgrounds long-running calls; splits chained commands" },
-							{ Hook: "transform_tool_result", When: "after every tool call", Does: "compresses large tool results into CCR markers" },
-							{ Hook: "transform_terminal_output", When: "after every terminal execution", Does: "compresses large terminal output into CCR markers" },
-							{ Hook: "pre_llm_call", When: "before each LLM request", Does: "injects directives, nudges, and the recall catalog" },
-							{ Hook: "post_llm_call", When: "after each LLM response", Does: "archives the turn, advances the counter, expires stale state" },
-						].map(({ Hook, When, Does }) => (
-							<div class="border-2 border-oxblood-dark bg-soot-black p-5">
-								<div class="font-mono text-base font-black text-bone-white">{Hook}</div>
-								<div class="mt-3 font-mono text-base font-bold uppercase tracking-widest text-stamped-canary">{When}</div>
-								<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">{Does}</p>
+						Sequence.map(({ Text: Line, Tone }) => (
+							<div class={Tone === "canary" ? "pl-4 text-stamped-canary" : Tone === "mute" ? "pl-4 text-zinc-dust" : Tone === "result" ? "text-bone-white" : "pl-4 text-bone-newsprint"}>
+								{Line}
 							</div>
 						))
 					}
 				</div>
-				<p class="mt-8 font-mono text-base text-zinc-dust">
-					SRC: docs/plugin/hooks.md:13-20 - every hook is a thin dispatch that forwards to the Rust dylib; the dylib holds all the behavior.
+			</div>
+			<figure
+				class="mt-20 w-full border-4 border-blood-crimson bg-carbon-void p-4 shadow-[6px_6px_0px_#7a0a1e]"
+				data-diagram="hook-chain"
+			>
+				<div class="overflow-x-auto" set:html={HookChain} />
+				<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+					M3 // HOOK CHAIN
+				</figcaption>
+			</figure>
+		</section>
+		<!-- ONE CARD PER HOOK -->
+		<section class="relative w-full">
+			<div
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				THE SIX // ONE CARD EACH
+			</div>
+			<div class="isolate grid grid-cols-1 items-start gap-16 lg:grid-cols-2 lg:gap-24">
+				{
+					Hooks.map(({ N, Name, Tape, Tone, Rotate, Body }) => (
+						<div
+							class={`zine-box-${Tone} relative border-[3px] bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 ${Rotate} ${
+								Tone === "canary"
+									? "border-stamped-canary/40"
+									: Tone === "crimson"
+										? "border-raw-blood"
+										: N === "04"
+											? "border-zinc-dust/40"
+											: "border-oxblood-dark"
+							}`}
+						>
+							<h3
+								class={`absolute -top-5 left-4 z-10 border border-black px-2 py-0.5 text-base font-black uppercase ${
+									Tape === "canary"
+										? "bg-stamped-canary text-soot-black"
+										: Tape === "bone"
+											? "bg-bone-newsprint text-soot-black"
+											: "bg-raw-blood text-bone-white"
+								}`}
+							>
+								{N} // {Name}
+							</h3>
+							{Body.map((Paragraph, I) => (
+								<p
+									class={I === 0
+										? "mt-4 font-body text-base leading-relaxed text-bone-newsprint"
+										: "mt-3 font-body text-base leading-relaxed text-bone-newsprint"}
+									set:html={Paragraph}
+								/>
+							))}
+						</div>
+					))
+				}
+			</div>
+		</section>
+		<!-- BYPASS // THE ESSENTIAL-TOOL GATE -->
+		<section class="relative w-full lg:w-10/12 lg:self-end">
+			<div
+				class="mb-12 -rotate-1 border border-black bg-stamped-canary px-3 py-1 text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
+			>
+				BYPASS // THE ESSENTIAL-TOOL GATE
+			</div>
+			<div
+				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
+			>
+				<h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+					What never gets compressed
+				</h2>
+				<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
+					A result is left untouched when it is empty, below threshold, or from the
+					essential set - tools the agent needs raw:
 				</p>
-				<!-- The version-pairing strip -->
-				<div class="mt-24 border-2 border-raw-blood bg-soot-black p-6">
-					<div class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-						THE VERSION PAIRING · BINARY_VERSION MECHANICS
-					</div>
-					<div class="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-3">
-						<div>
-							<div class="font-headline text-2xl font-black text-bone-white">{Stamps.Pairing()}</div>
-							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-								Today's pairing: binary {Versions.Binary}, plugin {Versions.Plugin}.
-							</p>
-							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-								Every release moves both: "{Versions.ChangelogPairing}."
-							</p>
-						</div>
-						<div>
-							<div class="font-headline text-2xl font-black text-bone-white">BUMPED LAST</div>
-							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-								<code class="font-mono text-base text-weathered-teal">BINARY_VERSION</code> is
-								pinned to a binary release tag the plugin can download.
-							</p>
-							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-								Since the first plugin-first release (v1.4.6), the plugin is tagged
-								<em>before the parent</em>, so the pinned version points at assets that
-								already exist.
-							</p>
-						</div>
-						<div>
-							<div class="font-headline text-2xl font-black text-bone-white">OR IT REFUSES</div>
-							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-								The plugin warns before <code class="font-mono text-base">download.sh</code>
-								when the pinned <code class="font-mono text-base">BINARY_VERSION</code> points
-								at a release with no assets - and since v1.6.5, a checksum mismatch is a
-								hard refusal, not a warning.
-							</p>
-						</div>
-					</div>
-					<div class="mt-6 font-mono text-base text-zinc-dust">
-						SRC: CHANGELOG.md v1.4.6/v1.4.4/v1.6.5/v1.6.6 entries · the Aphrodite/v1.4.6 release note ("released plugin-first ... points at assets that already exist")
-					</div>
+				<div class="border border-oxblood-dark bg-soot-black p-4 font-mono text-base text-bone-newsprint">
+					skill_view · skills_list · skill_manage · memory · session_search · read_file ·
+					read_terminal
 				</div>
-				<!-- The 14 -> 13 tool-surface callout -->
-				<div class="mt-16 border-l-4 border-stamped-canary bg-soot-black p-6">
-					<div class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-						13 TOOLS, NOT 14 · THE CORRECTION IS A BEAT
-					</div>
-					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						v1.6.5 corrected the manifest: "14 tools" → "13 tools" - the release dylib
-						registers exactly the 13 declared tools.
-					</p>
-					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						The 14th, <code class="font-mono text-base text-weathered-teal">aphrodite_debug</code>,
-						is <code class="font-mono text-base text-weathered-teal">debug_assertions</code>-gated
-						out of release builds, matching what{" "}
-						<code class="font-mono text-base text-weathered-teal">hermes plugins validate</code>
-						enforces.
-					</p>
-					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						Earlier, v1.6.1 had already removed it from
-						<code class="font-mono text-base text-weathered-teal">provides_tools</code>, closing
-						the catalog-review mismatch on the pinned tree - and v1.4.6 had done the same
-						for <code class="font-mono text-base text-weathered-teal">aphrodite_navigate</code>,
-						the navigation tool whose feature was unbuildable.
-					</p>
-					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						The declared surface and the running surface are kept identical on purpose.
-					</p>
-					<div class="mt-4 font-mono text-base text-zinc-dust">SRC: CHANGELOG.md:61-64 (v1.6.5) · CHANGELOG.md:166-173 (v1.6.1) · v1.4.6 release note</div>
-				</div>
+				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
+					Aphrodite also skips its own tools and headroom helpers - compressing
+					<span class="font-mono text-base text-weathered-teal">aphrodite_retrieve</span>
+					would just replace resolved content with another marker.
+				</p>
 			</div>
 		</section>
 
-		<!-- RELATED: the natural neighbors -->
-		<Related
-			Links={[
-				{ Href: "/setup/", Label: "SETUP" },
-				{ Href: "/hermes/", Label: "HERMES" },
-				{ Href: "/hooks/", Label: "HOOKS" },
-				{ Href: "/flavors/", Label: "FLAVORS" },
-				{ Href: "/tools/", Label: "TOOLS" },
-			]}
-		/>
+		<!-- THRESHOLDS // GATES AND BYPASSES -->
+		<section class="relative w-full">
+			<div
+				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+			>
+				THRESHOLDS // GATES AND BYPASSES
+			</div>
+			<div
+				class="zine-box-crimson w-full -rotate-[1deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
+			>
+				<h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+					The numbers that decide
+				</h2>
+				<div class="overflow-x-auto">
+					<table class="w-full border-collapse font-mono text-base">
+						<thead>
+							<tr class="border-b-2 border-oxblood-dark text-left">
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">HOOK</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">SETTING</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">DEFAULT</th>
+								<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">BYPASS</th>
+							</tr>
+						</thead>
+						<tbody class="text-bone-newsprint">
+							<tr class="border-b border-oxblood-dark">
+								<td class="py-3 pr-4">transform_tool_result</td>
+								<td class="py-3 pr-4 text-weathered-teal">tool_threshold_token</td>
+								<td class="py-3 pr-4 text-bone-white">4,096</td>
+								<td class="py-3">empty · essential tools · self tools · <span class="text-stamped-canary">0 = always compress</span></td>
+							</tr>
+							<tr class="border-b border-oxblood-dark">
+								<td class="py-3 pr-4">transform_terminal_output</td>
+								<td class="py-3 pr-4 text-weathered-teal">terminal_threshold</td>
+								<td class="py-3 pr-4 text-bone-white">1,024</td>
+								<td class="py-3">empty · below threshold · <span class="text-stamped-canary">0 = always compress</span></td>
+							</tr>
+							<tr class="border-b border-oxblood-dark">
+								<td class="py-3 pr-4">pre_llm_call</td>
+								<td class="py-3 pr-4 text-weathered-teal">flow budget_chars</td>
+								<td class="py-3 pr-4 text-bone-white">4,000</td>
+								<td class="py-3">recall catalog drops first; directives and nudges never drop</td>
+							</tr>
+							<tr>
+								<td class="py-3 pr-4">pre_tool_call (chain split)</td>
+								<td class="py-3 pr-4 text-weathered-teal">chain_split_min_segments</td>
+								<td class="py-3 pr-4 text-bone-white">-</td>
+								<td class="py-3">feature off by default (chain_split = false)</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
+					PRECEDENCE: ENVIRONMENT &gt; TOML &gt; DEFAULT
+					(APHRODITE_TOOL_THRESHOLD_TOKEN · APHRODITE_TERMINAL_THRESHOLD ·
+					APHRODITE_FLOW_BUDGET_CHARS · APHRODITE_CHAIN_SPLIT).
+				</p>
+			</div>
+		</section>
+		<!--NEXT-->
 	</main>
 	<ZineDiagramNav />
 </Base>

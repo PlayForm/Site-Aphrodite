@@ -23,30 +23,75 @@ export async function getStaticPaths() {
 
 const { Doc } = Astro.props;
 
-const { Content } = await render(Doc);
+const { Content, headings } = await render(Doc);
+
+// The in-page outline: the page's OWN headings, never a hand-maintained list.
+// Astro assigns each rendered heading an id (github-slugger) and reports the
+// same slug here, so every entry resolves to a real anchor on this page. The
+// body h1 is dropped: the page header already carries the title.
+const Toc = headings
+	.filter(({ depth }) => depth === 2 || depth === 3)
+	.map(({ depth, slug, text }) => ({ Depth: depth, Id: slug, Label: text }));
 
 // The WIP docs: pages that document partly unimplemented or roadmap-only
 // functionality (Centers: v1 shipped, v2-v4 are design sketches). They carry
 // the WIP badge in the sidebar, the section cards, and the page header.
 const WipDocs = new Set(["centers"]);
 
+const Pages = await getCollection("Docs");
+
+// A folder inside a section (docs/ccr/backends/*) is a real level of the
+// hierarchy, so the sidebar renders it as its own cluster instead of four flat
+// siblings. An entry opens a group when it sits inside the folder
+// (ccr/backends/sqlite) or when it IS the folder's index page (ccr/backends) -
+// the index page is the one whose title names the group.
+const IsFolderIndex = (Id: string) =>
+	Pages.some((Page) => Page.id.startsWith(`${Id}/`));
+
+const GroupKeyOf = (Id: string) => {
+	const Segments = Id.split("/");
+
+	switch (true) {
+		case Segments.length >= 3:
+			return Segments.slice(1, -1).join("/");
+		case Segments.length === 2 && IsFolderIndex(Id):
+			return Segments[1];
+		default:
+			return undefined;
+	}
+};
+
+const GroupLabels = new Map(
+	Pages.filter((Page) => IsFolderIndex(Page.id)).map((Page) => [
+		Page.id.split("/").slice(1).join("/"),
+		Page.data.title,
+	]),
+);
+
 const Sections = [
-	...(
-		await getCollection("Docs")
-	)
-		.sort((A, B) => A.id.localeCompare(B.id))
-		.reduce((Groups, Page) => {
-			Groups.set(
-				Page.data.section,
-				[
-					...(Groups.get(Page.data.section) ?? []),
-				{ Id: Page.id, Title: Page.data.title, Wip: WipDocs.has(Page.id) },
-				],
-			);
+	...Pages.sort((A, B) => A.id.localeCompare(B.id))
+	.reduce(
+		(Groups, Page) => {
+			const Key = GroupKeyOf(Page.id);
+
+			Groups.set(Page.data.section, [
+				...(Groups.get(Page.data.section) ?? []),
+				{
+					Id: Page.id,
+					Title: Page.data.title,
+					Wip: WipDocs.has(Page.id),
+					Group: Key === undefined ? undefined : (GroupLabels.get(Key) ?? Key),
+				},
+			]);
 
 			return Groups;
-		}, new Map<string, { Id: string; Title: string }[]>() as Map<string, { Id: string; Title: string }[]>)
-		.entries(),
+		},
+		new Map<
+			string,
+			{ Id: string; Title: string; Wip: boolean; Group?: string }[]
+		>(),
+	)
+	.entries(),
 ]
 	.sort(([A], [B]) =>
 		A === "Overview" ? -1 : B === "Overview" ? 1 : A.localeCompare(B),
@@ -134,11 +179,7 @@ const Purpose = (Body?: string) => {
 	return "";
 };
 
-const Purposes = new Map(
-	(
-		await getCollection("Docs")
-	).map((Page) => [Page.id, Purpose(Page.body)]),
-);
+const Purposes = new Map(Pages.map((Page) => [Page.id, Purpose(Page.body)]));
 
 // This page's own one-line purpose - the unique per-page meta description.
 // The section template stays as the fallback for entries without prose.
@@ -188,7 +229,12 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 			<!-- Desktop: sticky sidebar -->
 			<aside class="hidden lg:block">
 				<div class="sticky top-24">
-					<DocsSidebar Sections={Sections} CurrentId={Doc.id} />
+					<DocsSidebar
+						Sections={Sections}
+						CurrentId={Doc.id}
+						Headings={Toc}
+						Label="Documentation sections"
+					/>
 				</div>
 			</aside>
 
@@ -315,7 +361,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 										{Previous.Title}
 									</span>
 									<span class="mt-1 block font-mono text-base uppercase tracking-widest text-zinc-dust">
-										{`/docs/${Previous.Id}/`}
+										{Href(Previous.Id)}
 									</span>
 								</a>
 							) : (
@@ -334,7 +380,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 										{Next.Title}
 									</span>
 									<span class="mt-1 block font-mono text-base uppercase tracking-widest text-zinc-dust">
-										{`/docs/${Next.Id}/`}
+										{Href(Next.Id)}
 									</span>
 								</a>
 							) : (
@@ -365,7 +411,12 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 			>
 				CLOSE
 			</button>
-			<DocsSidebar Sections={Sections} CurrentId={Doc.id} />
+			<DocsSidebar
+				Sections={Sections}
+				CurrentId={Doc.id}
+				Headings={Toc}
+				Label="Documentation sections (mobile)"
+			/>
 		</div>
 	</div>
 	<ZineDiagramNav />
@@ -377,6 +428,12 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 	   global under the hashed .docs-prose wrapper. */
 	.docs-prose :global(h1:first-child) {
 		display: none; /* the page title already lives in the header */
+	}
+
+	/* Anchor landings: the sticky site header would otherwise cover the heading
+	   a TOC link just jumped to. */
+	.docs-prose :global(:is(h2, h3, h4, h5, h6)) {
+		scroll-margin-top: 7rem;
 	}
 
 	.docs-prose :global(h2) {
@@ -626,7 +683,10 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 		if (Open) {
 			Closer?.focus();
 		} else {
-			Toggle.focus();
+			// preventScroll: a TOC link inside the drawer is about to jump to an
+			// anchor further down the page - handing focus back must not drag the
+			// viewport up to the toggle.
+			Toggle.focus({ preventScroll: true });
 		}
 	};
 
@@ -634,6 +694,12 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 
 		for (const Closer of Drawer.querySelectorAll("[data-drawer-close]")) {
 			Closer.addEventListener("click", () => Set(false));
+		}
+
+		// The drawer carries the in-page outline too: a TOC link jumps to its
+		// heading and the overlay gets out of the way.
+		for (const Anchor of Drawer.querySelectorAll('a[href^="#"]')) {
+			Anchor.addEventListener("click", () => Set(false));
 		}
 
 		document.addEventListener("keydown", (Event) => {

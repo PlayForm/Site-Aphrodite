@@ -1,0 +1,1 @@
+import{t as f}from"./prefetch.BKomlDUg.js";f();

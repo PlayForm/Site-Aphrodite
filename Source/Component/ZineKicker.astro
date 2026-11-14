@@ -1,0 +1,44 @@
+---
+/**
+ * The mono kicker label - D5 of the restructure plan. The site hand-rolled
+ * `text-base font-black uppercase tracking-widest` 222 times across 33 files
+ * with six colour suffixes; this component owns the two forms and the six
+ * voices, so the prop names ARE the voice law (site-development §3): canary =
+ * the saved figure, teal = the ratio / mechanical voice, dust = a label,
+ * white = a heading inside a panel, newsprint = a neutral paired value,
+ * ink = a label sitting ON a canary chip.
+ *
+ * The 13px tape floor does not apply here: a kicker is content text, so the
+ * label form keeps the 16px floor (`text-base`) that the law gives it.
+ */
+interface Props {
+	/** The voice: dust (default) | white | canary | teal | ink | newsprint. */
+	Tone?: "dust" | "white" | "canary" | "teal" | "ink" | "newsprint";
+
+	/** "label" = the mono tracking-widest form; "title" = the font-headline form. */
+	Size?: "label" | "title";
+
+	/** The rendered element - a span by default, so a kicker can sit inside a <p>. */
+	As?: "div" | "span" | "p";
+}
+
+const { Tone = "dust", Size = "label", As = "span" } = Astro.props;
+
+const Palette = {
+	dust: "text-zinc-dust",
+	white: "text-bone-white",
+	canary: "text-stamped-canary",
+	teal: "text-weathered-teal",
+	ink: "text-soot-black",
+	newsprint: "text-bone-newsprint",
+}[Tone];
+
+const Form = {
+	label: "font-mono text-base font-black uppercase tracking-widest",
+	title: "font-headline text-lg font-black uppercase sm:text-xl",
+}[Size];
+
+const Element = As;
+---
+
+<Element class={`${Form} ${Palette}`}><slot /></Element>

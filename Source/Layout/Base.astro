@@ -4,8 +4,10 @@ import "@Stylesheet/Base.css";
 import { Head } from "astro-capo";
 import { ClientRouter } from "astro:transitions";
 
-import { AllLinks, IsActive, MenuLinks, PrimaryLinks } from "@Library/Links";
+import { ExternalLinks, FooterGroups, IsActive, MenuGroups, PrimaryLinks } from "@Library/Links";
 import { Stamps, Versions } from "@Library/Versions";
+
+import ZineKicker from "@Component/ZineKicker.astro";
 
 const { Title = "Aphrodite", Description = "" } = Astro.props;
 
@@ -184,9 +186,9 @@ interface Props {
 				     cells so the order follows the registry. The group labels
 				     carry the tape-stamp skin. -->
 				<div class="flex flex-col gap-6 px-5 py-4">
-					<nav aria-label="Primary" class="flex flex-col gap-2">
+					<nav aria-label="Primary (mobile)" class="flex flex-col gap-2">
 						<p
-							class="w-fit -rotate-1 border border-black bg-raw-blood px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+							class="w-fit border border-black bg-raw-blood px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000] sm:-rotate-1"
 						>
 							PRIMARY
 						</p>
@@ -211,32 +213,43 @@ interface Props {
 							}
 						</div>
 					</nav>
-					<nav aria-label="More" class="flex flex-col gap-2">
+					<!-- MORE: three labelled groups (Surface / Knobs / Record), not a
+					     flat ten-entry list. The grouping is the registry's `Group`
+					     field read through MenuGroups, so the MORE tree and the
+					     footer's columns cannot disagree. -->
+					<nav aria-label="More" class="flex flex-col gap-4">
 						<p
-							class="w-fit rotate-1 border border-black bg-stamped-canary px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+							class="w-fit border border-black bg-stamped-canary px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000] sm:rotate-1"
 						>
 							MORE
 						</p>
-						<div class="grid grid-cols-2 gap-x-4">
-							{
-								MenuLinks.map((Link) => {
-									const Active = IsActive(Astro.url.pathname, Link);
-									return (
-										<a
-											href={Link.Href}
-											aria-current={Active ? "page" : undefined}
-											class={
-												Active
-													? "border-b border-oxblood-dark/50 bg-raw-blood px-2 py-2 font-mono text-base font-bold tracking-widest text-bone-white"
-													: "border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"
-											}
-										>
-											{Link.Label}
-										</a>
-									);
-								})
-							}
-						</div>
+						{
+							MenuGroups.map(({ Group, Links }) => (
+								<div class="flex flex-col gap-2">
+									<p class="w-fit border border-black bg-raw-blood px-2 py-0.5 font-mono text-[13px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+										THE {Group.toUpperCase()}
+									</p>
+									<div class="grid grid-cols-2 gap-x-4">
+										{Links.map((Link) => {
+											const Active = IsActive(Astro.url.pathname, Link);
+											return (
+												<a
+													href={Link.Href}
+													aria-current={Active ? "page" : undefined}
+													class={
+														Active
+															? "border-b border-oxblood-dark/50 bg-raw-blood px-2 py-2 font-mono text-base font-bold tracking-widest text-bone-white"
+															: "border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"
+													}
+												>
+													{Link.Label}
+												</a>
+											);
+										})}
+									</div>
+								</div>
+							))
+						}
 					</nav>
 				</div>
 			</div>
@@ -245,40 +258,107 @@ interface Props {
 		<div class="relative z-10 flex grow flex-col">
 			<slot />
 
-			<!-- Canonical status-bar footer: the single site-wide footer, driven by
-			     the link registry. The version facts below are the shared facts
-			     (binary / Hermes plugin spec / CC0-1.0 license), read at build time
-			     from the monorepo primaries by Library/Versions.ts. -->
-			<footer class="mt-auto border-t-2 border-oxblood-dark">
-				<div
-					class="mx-auto flex w-full max-w-[1440px] flex-col items-center justify-between gap-4 px-5 pb-6 pt-12 sm:flex-row sm:px-8 lg:px-14"
-				>
-					<div class="flex items-center gap-2">
-						<span class="h-2.5 w-2.5 bg-raw-blood"></span>
-						<span
-							class="font-mono text-base font-bold uppercase tracking-widest text-bone-white"
-							>APHRODITE CCR CORE</span
+			<!-- The colophon: the zine's closing page, not a web-app link list.
+			     Three bands, each with one job - the build-time status facts, the
+			     registry's destinations grouped into labelled landmarks, then the
+			     record (license, author, and the external canon). The facts are
+			     <span>s, never links, and the only things inside a <nav> are
+			     destinations, so "v1.8.1 BINARY" can never read as a route. -->
+			<footer class="mt-auto border-t-4 border-blood-crimson">
+				<div class="mx-auto w-full max-w-[1440px] px-5 pb-10 pt-14 sm:px-8 lg:px-14">
+					<!-- 1. STATUS - the facts, as facts -->
+					<div
+						class="flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-oxblood-dark pb-6"
+					>
+						<span class="flex items-center gap-2">
+							<img
+								class="h-4 w-4"
+								src="/Brand/aphrodite.svg"
+								alt=""
+								width="16"
+								height="16"
+							/>
+							<ZineKicker Tone="white">APHRODITE CCR CORE</ZineKicker>
+						</span>
+						<span class="font-mono text-base text-zinc-dust">
+							BINARY <span class="font-bold text-stamped-canary">{Stamps.Binary()}</span>
+						</span>
+						<span class="font-mono text-base text-zinc-dust">
+							PLUGIN <span class="font-bold text-stamped-canary">{Stamps.Plugin()}</span>
+						</span>
+						<a
+							class="font-mono text-base text-zinc-dust transition-colors hover:text-bone-white"
+							href="https://spdx.org/licenses/CC0-1.0.html"
+							rel="license">CC0-1.0</a
 						>
 					</div>
-					<div
-						class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 font-mono text-base text-zinc-dust"
-					>
+
+					<!-- 2. THE COLUMNS - one landmark per registry group, 1 -> 2 -> 4 -->
+					<div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
 						{
-							AllLinks.map((Link) => (
-								<a
-									class="transition-colors hover:text-bone-white"
-									href={Link.Href}
-									aria-current={
-										IsActive(Astro.url.pathname, Link) ? "page" : undefined
-									}
-								>
-									{Link.Label}
-								</a>
+							FooterGroups.map(({ Group, Links }) => (
+								<nav aria-label={`Footer · ${Group}`}>
+									<ZineKicker Tone="dust">{Group.toUpperCase()}</ZineKicker>
+									<ul class="mt-4 flex flex-col gap-2">
+										{Links.map((Link) => {
+											const Active = IsActive(Astro.url.pathname, Link);
+											return (
+												<li>
+													<a
+														class={
+															Active
+																? "font-mono text-base font-bold tracking-widest text-bone-white"
+																: "font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white"
+														}
+														href={Link.Href}
+														aria-current={Active ? "page" : undefined}
+													>
+														{Link.Label}
+													</a>
+												</li>
+											);
+										})}
+									</ul>
+								</nav>
 							))
 						}
-						<span class="font-bold text-stamped-canary">{Stamps.BinarySuffix()}</span>
-						<span class="font-bold text-stamped-canary">{Stamps.PluginSpec()}</span>
-						<span class="font-bold text-stamped-canary">CC0-1.0</span>
+					</div>
+
+					<!-- 3. THE RECORD - the license, the author, the external canon -->
+					<div
+						class="mt-12 flex flex-col gap-5 border-2 border-black bg-carbon-void p-6 shadow-[4px_4px_0px_#000] sm:flex-row sm:items-end sm:justify-between"
+					>
+						<div class="flex flex-col gap-3">
+							<p
+								class="w-fit border border-black bg-raw-blood px-3 py-0.5 font-mono text-[13px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000] sm:-rotate-1"
+							>
+								COLOPHON
+							</p>
+							<p class="font-mono text-base text-zinc-dust">
+								CC0-1.0 · built in the open by
+								<a
+									class="text-bone-newsprint underline decoration-stamped-canary transition-colors hover:text-bone-white"
+									href={ExternalLinks.PlayForm}>PlayForm</a
+								>
+							</p>
+						</div>
+						<nav
+							aria-label="Footer · Elsewhere"
+							class="flex flex-wrap gap-x-6 gap-y-2 font-mono text-base text-zinc-dust"
+						>
+							<a
+								class="tracking-widest transition-colors hover:text-bone-white"
+								href={ExternalLinks.Repository}>REPOSITORY</a
+							>
+							<a
+								class="tracking-widest transition-colors hover:text-bone-white"
+								href={ExternalLinks.Releases}>RELEASES</a
+							>
+							<a
+								class="tracking-widest transition-colors hover:text-bone-white"
+								href={ExternalLinks.Crates}>CRATES.IO</a
+							>
+						</nav>
 					</div>
 				</div>
 			</footer>

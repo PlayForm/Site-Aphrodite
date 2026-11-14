@@ -1,0 +1,109 @@
+---
+/**
+ * ConfigKeys - the config page's single reference for the aphrodite.toml keys.
+ *
+ * One row per key, grouped by TOML section, and that is the ONLY place a key is
+ * documented on the page: the page used to state the same knob three times -
+ * once in the [compression] table, once in the prose enumerating what each
+ * parser reads, and once in the client-side ladder's own chain arrays. The rows
+ * come from the page's one Keys array, which the ladder and the /reload
+ * simulation read too, so a value cannot drift between the table and the
+ * simulation.
+ *
+ * The row shape mirrors the schema doc (docs/config/aphrodite-toml.md): the
+ * compiled default is the binary's value and the shipped example's value is
+ * shown beside it when the two differ, because both are true at once.
+ */
+interface Row {
+	Key: string;
+	/** The TOML section the key lives in, e.g. "[compression]". */
+	Section: string;
+	/** The TOML type: int (bytes), bool, string, "cache" | "token", ... */
+	Type: string;
+	/** The compiled default; the shipped example's value in parentheses. */
+	Default: string;
+	/** The env override, or "-" when the key has none. */
+	Env?: string;
+	/** Which parser reads it. */
+	Reader: "proxy" | "dylib" | "both" | "none";
+	/** When a change takes effect. */
+	Live: "hot" | "startup" | "load" | "unwired";
+	/** What the key does, in one sentence. */
+	Effect: string;
+}
+
+interface Props {
+	Rows: Row[];
+	/** A sentence under a section's heading, for the sections that need one. */
+	Notes?: Record<string, string>;
+}
+
+const { Rows, Notes = {} } = Astro.props;
+
+const ReaderLabel = { proxy: "PROXY", dylib: "DYLIB", both: "BOTH", none: "-" } as const;
+const LiveLabel = { hot: "HOT", startup: "STARTUP", load: "LOAD", unwired: "UNWIRED" } as const;
+const LiveTone = {
+	hot: "border-stamped-canary text-stamped-canary",
+	startup: "border-oxblood-dark text-zinc-dust",
+	load: "border-oxblood-dark text-zinc-dust",
+	unwired: "border-raw-blood text-raw-blood",
+} as const;
+
+// The section order is the order the keys are written in the page's array, so
+// the table reads in the order of the file it documents.
+const Sections = [...new Set(Rows.map((Row) => Row.Section))];
+---
+
+{
+	Sections.map((Section) => (
+		<div class="mt-16 first:mt-0">
+			<div class="flex flex-wrap items-baseline justify-between gap-4">
+				<h3 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+					{Section}
+				</h3>
+				<span class="font-mono text-base uppercase tracking-widest text-zinc-dust">
+					{Rows.filter((Row) => Row.Section === Section).length} keys
+				</span>
+			</div>
+			{Notes[Section] && (
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					{Notes[Section]}
+				</p>
+			)}
+			<div class="mt-6 overflow-x-auto border-4 border-blood-crimson bg-carbon-void">
+				<table class="w-full min-w-[64rem] text-left text-base">
+					<thead>
+						<tr class="border-b-2 border-blood-crimson bg-soot-black font-mono text-base uppercase tracking-widest text-zinc-dust">
+							<th class="px-5 py-3">Key</th>
+							<th class="px-5 py-3">Type</th>
+							<th class="px-5 py-3">Default</th>
+							<th class="px-5 py-3">Env override</th>
+							<th class="px-5 py-3">Reader</th>
+							<th class="px-5 py-3">Live</th>
+							<th class="px-5 py-3">Effect</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-oxblood-dark/50">
+						{Rows.filter((Row) => Row.Section === Section).map((Row) => (
+							<tr class="align-top text-zinc-dust">
+								<td class="px-5 py-3 font-mono text-base text-bone-newsprint">{Row.Key}</td>
+								<td class="px-5 py-3 font-mono text-base">{Row.Type}</td>
+								<td class="px-5 py-3 font-mono text-base text-stamped-canary">{Row.Default}</td>
+								<td class="px-5 py-3 font-mono text-base">{Row.Env ?? "-"}</td>
+								<td class="px-5 py-3 font-mono text-base">{ReaderLabel[Row.Reader]}</td>
+								<td class="px-5 py-3">
+									<span
+										class={`inline-block border px-2 py-0.5 font-mono text-base uppercase tracking-widest ${LiveTone[Row.Live]}`}
+									>
+										{LiveLabel[Row.Live]}
+									</span>
+								</td>
+								<td class="px-5 py-3">{Row.Effect}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	))
+}

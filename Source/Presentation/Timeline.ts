@@ -1,13 +1,18 @@
-// Timeline.ts - the 30-second clock: the scene boundaries derived from the
-// narration, and the one lookup the player calls every frame.
+// Timeline.ts - the deck's clock: the scene boundaries derived from the
+// narration, the one lookup the player calls every frame, and the beat
+// addresses a URL fragment resolves against.
 //
-// The timeline owns time; the scenes own copy. Nothing here reads the DOM, so
-// the page can render the same numbers at build time and the player can seek
-// against them in the browser.
+// The timeline owns time; the scenes own copy and addresses. Nothing here
+// reads the DOM, so the page can render the same numbers at build time and the
+// player can seek against them in the browser.
 //
 // A scene's boundary is the running total BEFORE its duration is added, so
 // Starts[0] is 0 and Total is the sum of every duration. Reading the
 // boundaries as end times instead would make the deck switch one scene late.
+//
+// The total is derived, never written down: it is 64 seconds because the
+// eleven durations in Scenes.ts sum to 64, and it moves the day one of them
+// does.
 
 import { Scenes } from "./Scenes.ts";
 
@@ -37,7 +42,7 @@ const Starts: readonly number[] = Walk.Starts;
 const Total = Walk.Total;
 
 export const Timeline = {
-	/** Total length in seconds (30 by construction). */
+	/** Total length in seconds (64 by construction: the sum of the durations). */
 	Total,
 
 	/** The start time of each scene, in order. */
@@ -61,5 +66,15 @@ export const Timeline = {
 	/** The start time of the scene at an index, clamped to the deck. */
 	StartOf(Index: number): number {
 		return Starts[Math.max(0, Math.min(Scenes.length - 1, Index))] ?? 0;
+	},
+
+	/**
+	 * The index of a beat by its Identifier - the fragment a deep link carries.
+	 * Returns -1 for a fragment the deck does not have, so a caller can tell
+	 * "no such beat" apart from "the first beat" and leave a bad hash alone
+	 * rather than silently landing on the opening.
+	 */
+	IndexOf(Identifier: string): number {
+		return Scenes.findIndex((Scene) => Scene.Identifier === Identifier);
 	},
 };

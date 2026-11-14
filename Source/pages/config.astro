@@ -3,19 +3,28 @@ import Base from "@Layout/Base.astro";
 import ConfigResolution from "../Content/Mermaid/config-resolution.svg?raw";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import ZineBox from "../Component/ZineBox.astro";
+import ZineKicker from "../Component/ZineKicker.astro";
 import ZineStamp from "../Component/ZineStamp.astro";
 import ZineStream from "../Component/ZineStream.astro";
 import ZineTape from "../Component/ZineTape.astro";
+import ConfigKeys from "../Component/ConfigKeys.astro";
 import Breadcrumbs from "@Component/Breadcrumbs.astro";
 import Related from "@Component/Related.astro";
 
 // The CONFIG PLAYGROUND: the aphrodite.toml surface made explorable, as a
 // CLIENT-SIDE SIMULATION (no runtime, no network). Every fact below traces to
 // the shipped sources: aphrodite.toml.example (the full annotated file),
-// README.md:371-442 (the configuration section) and
-// docs/config/aphrodite-toml.md (the complete schema). The SANITIZATION law:
-// the TOML shown in the editor is the SHIPPED EXAMPLE - never a user's real
-// toml, never an api_key value (the key field renders as its env-var name).
+// README.md:371-442 (the configuration section), docs/config/aphrodite-toml.md
+// (the complete schema) and docs/config/env-vars.md (the overrides). The
+// SANITIZATION law: the TOML shown in the editor is the SHIPPED EXAMPLE -
+// never a user's real toml, never an api_key value (the key field renders as
+// its env-var name).
+//
+// THE KEYS ARRAY IS THE PAGE'S ONE SOURCE PER KNOB. The table renders it, the
+// resolution ladder renders it, and the /reload simulation renders it, so a
+// default cannot disagree with itself the way the three former copies (a
+// [compression] table, the prose enumerating each parser's keys, and the
+// ladder's own chain arrays) could.
 
 // The editor's default text: the shipped example, byte-faithful except the
 // commented api_key sample line, which renders as its env-var name only.
@@ -110,11 +119,121 @@ const Example = [
 	"[flow]",
 	"budget_chars = 2600         # hard cap on per-turn injected context",
 ].join("\n");
+
+// EVERY KEY, ONCE. Section groups the table; Type/Default/Env are the schema
+// doc's own columns (docs/config/aphrodite-toml.md); Reader says which of the
+// two parsers reads it; Live says when a change takes effect; Chain and From
+// are what the resolution ladder needs to walk the value.
+interface Key {
+	Key: string;
+	Section: string;
+	Type: string;
+	Default: string;
+	Env?: string;
+	Reader: "proxy" | "dylib" | "both" | "none";
+	Live: "hot" | "startup" | "load" | "unwired";
+	Effect: string;
+	/** The ladder's chain for this key. */
+	Chain?: "env-first" | "toml-first" | "toml-only";
+	/** Where the ladder reads the TOML value: a section, or the proxy entry. */
+	From?: "section" | "proxy";
+}
+
+const Keys: Key[] = [
+	// [[proxies]] - one entry per listener; [defaults] repeats four of these keys.
+	{ Key: "name", Section: "[[proxies]]", Type: "string", Default: "the listen address", Reader: "proxy", Live: "startup", Effect: "Proxy label; the port overrides (APHRODITE_CACHE_PORT / APHRODITE_TOKEN_PORT) match on it" },
+	{ Key: "listen", Section: "[[proxies]]", Type: '"addr:port"', Default: "127.0.0.1:9797", Env: "port only: APHRODITE_CACHE_PORT / APHRODITE_TOKEN_PORT", Reader: "proxy", Live: "startup", Effect: "Bind address; loopback by default, and non-loopback peers are rejected on every route except /health", Chain: "toml-only", From: "proxy" },
+	{ Key: "mode", Section: "[[proxies]]", Type: '"cache" | "token"', Default: '"token"', Reader: "proxy", Live: "startup", Effect: "Backend and compiled threshold: token = SQLite above 1 KB, cache = in-memory above 8 KB", Chain: "toml-only", From: "proxy" },
+	{ Key: "api_key", Section: "[[proxies]]", Type: "string", Default: "none - the proxy refuses to start", Env: "APHRODITE_API_KEY (last, not first)", Reader: "proxy", Live: "startup", Effect: "Upstream key; the one chain where TOML outranks the env var", Chain: "toml-first", From: "proxy" },
+	{ Key: "api_url", Section: "[[proxies]]", Type: "url", Default: "https://api.openai.com", Env: "APHRODITE_API_URL", Reader: "proxy", Live: "startup", Effect: "Upstream API base URL", From: "proxy" },
+	{ Key: "model", Section: "[[proxies]]", Type: "string", Default: '"default-model"', Env: "APHRODITE_MODEL", Reader: "proxy", Live: "startup", Effect: "Model name to forward", From: "proxy" },
+	{ Key: "tool_relay", Section: "[[proxies]]", Type: "bool", Default: "false", Reader: "proxy", Live: "startup", Effect: "Enables the /tool/relay endpoint", From: "proxy" },
+	{ Key: "dev", Section: "[[proxies]]", Type: "bool", Default: "false", Reader: "proxy", Live: "startup", Effect: "Verbose request and response logging" },
+	{ Key: "ccr_ttl_seconds", Section: "[[proxies]]", Type: "int (seconds)", Default: "3600", Env: "APHRODITE_CCR_TTL", Reader: "proxy", Live: "startup", Effect: "CCR entry time-to-live", From: "proxy" },
+	{ Key: "ccr_db_path", Section: "[[proxies]]", Type: "path", Default: "~/.hermes/aphrodite/ccr.db", Env: "APHRODITE_DB", Reader: "proxy", Live: "startup", Effect: "SQLite path for the token proxy; a relative path resolves against the binary's directory", From: "proxy" },
+	{ Key: "notify_url", Section: "[[proxies]]", Type: "url", Default: "none", Env: "APHRODITE_NOTIFY_URL", Reader: "proxy", Live: "startup", Effect: "Hermes callback URL for CCR-create notifications" },
+	{ Key: "notify_key", Section: "[[proxies]]", Type: "string", Default: "none", Env: "APHRODITE_NOTIFY_KEY", Reader: "proxy", Live: "startup", Effect: "Bearer token sent with notify_url" },
+	{ Key: "timeout", Section: "[[proxies]]", Type: "int (seconds)", Default: "300", Reader: "proxy", Live: "startup", Effect: "Upstream request timeout, clamped to 600 with a warning" },
+	{ Key: "max_context", Section: "[[proxies]]", Type: "int (tokens)", Default: "1,000,000", Reader: "proxy", Live: "startup", Effect: "Max context tokens" },
+	{ Key: "max_output", Section: "[[proxies]]", Type: "int (tokens)", Default: "384,000", Reader: "proxy", Live: "startup", Effect: "Max output tokens; the proxy refuses to start when it is at or above max_context" },
+
+	// [compression] - one table, two consumers, which is what the READER column shows.
+	{ Key: "tool_threshold_token", Section: "[compression]", Type: "int (bytes)", Default: "1024 (example 256)", Env: "APHRODITE_TOOL_THRESHOLD_TOKEN", Reader: "proxy", Live: "hot", Effect: "Token-proxy compression threshold - the gate every tool result crosses" },
+	{ Key: "tool_threshold_cache", Section: "[compression]", Type: "int (bytes)", Default: "8192 (example 2048)", Env: "APHRODITE_TOOL_THRESHOLD_CACHE", Reader: "proxy", Live: "hot", Effect: "Cache-proxy compression threshold" },
+	{ Key: "inline_threshold", Section: "[compression]", Type: "int (bytes)", Default: "256 (example 1024)", Env: "APHRODITE_INLINE_THRESHOLD", Reader: "proxy", Live: "hot", Effect: "Inline zlib versus the durable CCR store" },
+	{ Key: "code_multiplier", Section: "[compression]", Type: "float", Default: "3.0 (example 1.0)", Env: "APHRODITE_CODE_MULTIPLIER", Reader: "proxy", Live: "hot", Effect: "Multiplies the threshold for code_* content types; 1.0 gives code no extra headroom" },
+	{ Key: "auto_expand", Section: "[compression]", Type: "bool", Default: "false (example true)", Env: "APHRODITE_AUTO_EXPAND", Reader: "both", Live: "hot", Effect: "Resolve just-stored content inline instead of emitting a marker, capped by auto_expand_limit" },
+	{ Key: "auto_expand_limit", Section: "[compression]", Type: "int (bytes)", Default: "102400", Env: "APHRODITE_AUTO_EXPAND_LIMIT", Reader: "both", Live: "hot", Effect: "Byte cap for auto-expanded content; 0 = unlimited" },
+	{ Key: "max_request_body_size", Section: "[compression]", Type: "int (bytes)", Default: "none - no cap", Env: "APHRODITE_MAX_REQUEST_BODY_SIZE", Reader: "proxy", Live: "startup", Effect: "Request-body cap; an over-size body is rejected with 413 while it is read" },
+	{ Key: "store_max_entries", Section: "[compression]", Type: "int (rows)", Default: "100000", Env: "APHRODITE_STORE_MAX_ENTRIES", Reader: "proxy", Live: "load", Effect: "Max live rows in the SQLite store; past it the least-recently-accessed rows are evicted; 0 = unlimited" },
+	{ Key: "store_max_bytes", Section: "[compression]", Type: "int (bytes)", Default: "536870912", Env: "APHRODITE_STORE_MAX_BYTES", Reader: "proxy", Live: "load", Effect: "Max stored payload bytes, SUM(LENGTH(original)); past it LRU rows are evicted; 0 = unlimited" },
+	{ Key: "terminal_threshold", Section: "[compression]", Type: "int (bytes)", Default: "1024 (example 256)", Env: "APHRODITE_TERMINAL_THRESHOLD", Reader: "dylib", Live: "load", Effect: "Terminal-output threshold gating transform_terminal_output" },
+	{ Key: "poll_worker", Section: "[compression]", Type: "bool", Default: "true", Env: "APHRODITE_POLL_WORKER", Reader: "dylib", Live: "load", Effect: "Auto-backgrounding of slow terminal and process calls in pre_tool_call" },
+	{ Key: "chain_split", Section: "[compression]", Type: "bool", Default: "false", Env: "APHRODITE_CHAIN_SPLIT", Reader: "dylib", Live: "load", Effect: "Opt-in command splitting into per-segment markers" },
+	{ Key: "chain_split_min_segments", Section: "[compression]", Type: "int", Default: "2", Env: "APHRODITE_CHAIN_SPLIT_MIN_SEGMENTS", Reader: "dylib", Live: "load", Effect: "Floor for the adaptive split threshold" },
+	{ Key: "chain_split_max_segments", Section: "[compression]", Type: "int", Default: "6", Env: "APHRODITE_CHAIN_SPLIT_MAX_SEGMENTS", Reader: "dylib", Live: "load", Effect: "Cap for the adaptive split threshold" },
+	{ Key: "context_engine", Section: "[compression]", Type: "bool", Default: "true", Env: "APHRODITE_CONTEXT_ENGINE", Reader: "dylib", Live: "load", Effect: "Enables the context engine; the standalone HTTP proxy never reads it" },
+	{ Key: "engine_threshold_pct", Section: "[compression]", Type: "int (%)", Default: "45 (example 30)", Env: "APHRODITE_ENGINE_THRESHOLD_PCT", Reader: "dylib", Live: "load", Effect: "Context-engine fill gate: middle turns are archived at or above this fill; 0 = never, 100+ = off" },
+	{ Key: "engine_protect_first", Section: "[compression]", Type: "int (turns)", Default: "2", Env: "APHRODITE_ENGINE_PROTECT_FIRST", Reader: "dylib", Live: "load", Effect: "Turns kept at the start of the index" },
+	{ Key: "engine_protect_last", Section: "[compression]", Type: "int (turns)", Default: "5", Env: "APHRODITE_ENGINE_PROTECT_LAST", Reader: "dylib", Live: "load", Effect: "Turns kept at the end of the index" },
+	{ Key: "engine_min_msgs", Section: "[compression]", Type: "int (turns)", Default: "8", Env: "APHRODITE_ENGINE_MIN_MSGS", Reader: "dylib", Live: "load", Effect: "Minimum archived turns before the engine may archive" },
+	{ Key: "live_container", Section: "[compression]", Type: "bool", Default: "false", Env: "APHRODITE_LIVE_CONTAINER", Reader: "dylib", Live: "load", Effect: "Instant CCR markers with the live type, for progressive retrieval" },
+	{ Key: "recursive_depth", Section: "[compression]", Type: "int", Default: "5", Env: "APHRODITE_RECURSIVE_DEPTH", Reader: "dylib", Live: "load", Effect: "Nested marker expansion cap" },
+	{ Key: "auto_reload", Section: "[compression]", Type: "bool", Default: "false (example true)", Env: "APHRODITE_AUTO_RELOAD", Reader: "dylib", Live: "load", Effect: "Watch aphrodite.toml and re-apply config fields on change" },
+	{ Key: "catalog_mode", Section: "[compression]", Type: "-", Default: "none", Reader: "none", Live: "unwired", Effect: "Parses; the catalog layout is compiled-in, so this is a silent no-op" },
+	{ Key: "classifier_poll", Section: "[compression]", Type: "-", Default: "none", Reader: "none", Live: "unwired", Effect: "Parses; nothing reads it back" },
+	{ Key: "prefetch", Section: "[compression]", Type: "-", Default: "none", Reader: "none", Live: "unwired", Effect: "Parses; the aphrodite_prefetch tool exists regardless of this key" },
+
+	// [previews] and [prompts] - the render-side knobs.
+	{ Key: "preview_max_chars", Section: "[previews]", Type: "int (chars)", Default: "0 (unlimited)", Env: "APHRODITE_PREVIEW_MAX_CHARS", Reader: "both", Live: "hot", Effect: "Caps the whole rendered preview string, not per line; 0 = unlimited" },
+	{ Key: "model_family", Section: "[previews]", Type: '"compact" | "code_first" | "balance"', Default: '"code_first"', Reader: "both", Live: "load", Effect: "Selects the [templates.preview.<family>.*] family when templates are configured" },
+	{ Key: "code_structure_map", Section: "[previews]", Type: "bool", Default: "none", Reader: "none", Live: "unwired", Effect: "Reserved: include function, struct and class signatures in code previews" },
+	{ Key: "rust_preview_lines", Section: "[previews]", Type: "int", Default: "none", Reader: "none", Live: "unwired", Effect: "Reserved: lines of Rust source to include in previews" },
+	{ Key: "session_inject", Section: "[prompts]", Type: "string", Default: "the shipped builtin", Env: "APHRODITE_SESSION_INJECT", Reader: "dylib", Live: "load", Effect: 'First-turn orientation text injected on turn 0; "" disables it' },
+	{ Key: "retrieve_guidance", Section: "[prompts]", Type: '"minimal" | "standard" | "verbose"', Default: '"minimal"', Env: "APHRODITE_RETRIEVE_GUIDANCE", Reader: "dylib", Live: "load", Effect: "How much retrieval guidance the per-turn assembler renders as the [retrieval: ...] line" },
+	{ Key: "ccr_marker_hint", Section: "[prompts]", Type: "bool", Default: "false", Env: "APHRODITE_CCR_MARKER_HINT", Reader: "dylib", Live: "hot", Effect: "Append a retrieval hint after markers - it fills the marker template's {hint}" },
+	{ Key: "catalog_intent_hints", Section: "[prompts]", Type: "bool", Default: "false", Env: "APHRODITE_CATALOG_INTENT_HINTS", Reader: "dylib", Live: "load", Effect: "Intent hints alongside the hashes in catalog output" },
+
+	// [directives] and [flow] - the per-turn context knobs.
+	{ Key: "active", Section: "[directives]", Type: "array of strings", Default: "an empty list seeds focus, foresight and lazy", Reader: "dylib", Live: "load", Effect: "Which loaded directives start active; unknown names are filtered out, and the set is runtime-mutable through aphrodite_directive" },
+	{ Key: "budget_chars", Section: "[flow]", Type: "int (chars)", Default: "4000 (example 2600)", Env: "APHRODITE_FLOW_BUDGET_CHARS", Reader: "dylib", Live: "load", Effect: "Hard cap on ALL per-turn injected context; sections drop bottom-up, and directives and nudges never drop" },
+
+	// [templates] - live format strings, absent means the hardcoded builder.
+	{ Key: "preview.<family>.<ctype>", Section: "[templates]", Type: "format string", Default: "the hardcoded builder", Reader: "both", Live: "load", Effect: "Preview format per content type; resolution is family[ctype], then reverse[ctype], then family[_default], then the hardcoded builder" },
+	{ Key: "marker.format / marker.hint", Section: "[templates]", Type: "format string", Default: "the shipped default", Reader: "both", Live: "hot", Effect: "Marker block layout, and the retrieval hint appended after markers" },
+	{ Key: "prompts.<name>", Section: "[templates]", Type: "format string", Default: "the shipped default", Reader: "dylib", Live: "load", Effect: "Named prompt templates rendered into the per-turn context: session_inject, engine_offload, auto_expand_guidance, catalog_context_warn" },
+	{ Key: "reverse.<ctype>", Section: "[templates]", Type: "string", Default: "none", Reader: "both", Live: "load", Effect: "ctype -> key remap: lets a content type borrow another type's format string" },
+];
+
+// A sentence under the sections that need one - the table cannot say these.
+const SectionNotes: Record<string, string> = {
+	"[[proxies]]":
+		"One entry per listener; [defaults] repeats api_url, model, ccr_ttl_seconds and api_key one level up, for every proxy that does not set its own.",
+	"[compression]":
+		"One table, two consumers - the READER column is the split, and it is why the same key can be hot for the proxy and load-once for the dylib.",
+	"[templates]":
+		"Live configuration: every block is optional, and when a block (or the whole section) is absent the hardcoded builders and shipped defaults apply.",
+};
+
+// What the ladder and the /reload simulation read: the same rows, trimmed to
+// the fields the client-side simulation needs.
+const Tracked = Keys.filter((Row) => Row.Live !== "unwired" && Row.Key !== "dev" && Row.Key !== "notify_url" && Row.Key !== "notify_key" && Row.Key !== "max_context" && Row.Key !== "max_output" && Row.Key !== "timeout" && Row.Key !== "name").map(
+	({ Key, Section, Env, Default, Reader, Live, Chain, From }) => ({
+		Key,
+		Section,
+		Env,
+		Default,
+		Reader,
+		Live,
+		Chain: Chain ?? "env-first",
+		From: From ?? "section",
+	}),
+);
 ---
 
 <Base
 	title="Configuration Playground"
-	description="The interactive aphrodite.toml explorer - the pick chain, the two stacks, the [[proxies]] pair and the compression knobs, simulated client-side."
+	description="The interactive aphrodite.toml explorer - every key in one table, the pick chain, the two parsers and the compression knobs, simulated client-side."
 >
 	<main class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col px-5 pt-16 sm:px-8 lg:px-14">
 		<Breadcrumbs />
@@ -131,19 +250,17 @@ const Example = [
 				One TOML file, two independent parsers, three places it can live.
 			</p>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Edit the shipped example below and watch the resolution order re-decide what wins -
-				env var, per-proxy entry, defaults, or the compiled-in fallback.
+				Edit the shipped example below and watch the resolution order re-decide what wins - env var,
+				per-proxy entry, defaults, or the compiled-in fallback.
 			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Everything here runs in your browser.
-			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">Everything here runs in your browser.</p>
 		</header>
 
 		<!-- The pick chain -->
-		<section class="relative mt-32" aria-label="The file pick chain">
+		<section id="pick-chain" class="relative mt-32" aria-label="The file pick chain">
 			<ZineTape Label="the pick chain" Color="teal" Side="right" />
-			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
-				WHERE THE FILE IS FOUND
+			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
+				Where the file is found
 			</h2>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				Three stops, in order - and a hard fall-through when none of them exists
@@ -174,81 +291,62 @@ const Example = [
 		</section>
 
 		<!-- The live editor + the resolution ladder -->
-		<section class="relative mt-32" aria-label="The live TOML editor">
+		<section id="editor" class="relative mt-32" aria-label="The live TOML editor">
 			<ZineTape Label="live editor" Color="canary" Side="left" />
 			<div class="flex flex-wrap items-center justify-between gap-3">
-				<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
-					EDIT THE SHIPPED EXAMPLE
+				<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
+					Edit the shipped example
 				</h2>
-				<div class="flex gap-3">
-					<button
-						type="button"
-						data-action="reset"
-						class="inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-					>
-						Reset example
-					</button>
-				</div>
+				<button
+					type="button"
+					data-action="reset"
+					class="inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+				>
+					Reset example
+				</button>
 			</div>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				This is the shipped <code class="text-bone-newsprint">aphrodite.toml.example</code>
-				(sanitized: the api_key sample renders as its env-var name).
+				This is the shipped <code class="text-bone-newsprint">aphrodite.toml.example</code> (sanitized:
+				the api_key sample renders as its env-var name).
 			</p>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Edit it - the resolution ladder on the right re-decides every tracked key as you
-				type.
+				Edit it - the resolution ladder on the right re-decides every tracked key as you type.
 			</p>
 
 			<div class="mt-8 grid gap-10 lg:grid-cols-2">
 				<!-- Editor pane -->
 				<div class="flex flex-col border-4 border-blood-crimson bg-carbon-void">
 					<div class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3">
-						<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-							aphrodite.toml
-						</span>
-						<span
-							class="font-mono text-base text-zinc-dust"
-							data-editor-status
-							aria-live="polite"
-						>
+						<ZineKicker Tone="canary">aphrodite.toml</ZineKicker>
+						<span class="font-mono text-base text-zinc-dust" data-editor-status aria-live="polite">
 							parsed
 						</span>
 					</div>
-					<label class="sr-only" for="config-editor">
-						aphrodite.toml contents
-					</label>
+					<label class="sr-only" for="config-editor">aphrodite.toml contents</label>
 					<textarea
 						id="config-editor"
 						data-editor
 						spellcheck="false"
 						class="h-[36rem] w-full resize-y bg-transparent p-5 font-mono text-base leading-relaxed text-bone-newsprint"
-						placeholder="loading the shipped example..."
-					></textarea>
+						placeholder="loading the shipped example..."></textarea>
 				</div>
 
 				<!-- Resolution ladder pane -->
 				<div class="flex flex-col border-4 border-blood-crimson bg-carbon-void">
 					<div class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3">
-						<span class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
-							EFFECTIVE CONFIG - WHO WINS
-						</span>
-						<span class="font-mono text-base text-zinc-dust">
-							env &gt; toml &gt; compiled
-						</span>
+						<ZineKicker Tone="teal">EFFECTIVE CONFIG - WHO WINS</ZineKicker>
+						<span class="font-mono text-base text-zinc-dust">env &gt; toml &gt; compiled</span>
 					</div>
 					<div class="flex-1 space-y-4 p-5" data-ladder aria-live="polite">
-						<!-- rendered client-side -->
+						<!-- rendered client-side from the same Keys array the table uses -->
 					</div>
 				</div>
 			</div>
 		</section>
 
 		<!-- The resolution diagram -->
-		<section class="mt-32" aria-label="The config-resolution diagram">
-			<figure
-				class="border-4 border-blood-crimson bg-carbon-void p-4"
-				data-diagram="config-resolution"
-			>
+		<section id="diagram" class="mt-32" aria-label="The config-resolution diagram">
+			<figure class="border-4 border-blood-crimson bg-carbon-void p-4" data-diagram="config-resolution">
 				<div class="overflow-x-auto" set:html={ConfigResolution} />
 				<figcaption class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 					M7 // CONFIG RESOLUTION
@@ -256,382 +354,113 @@ const Example = [
 			</figure>
 		</section>
 
-		<!-- Two stacks -->
-		<section class="relative mt-32" aria-label="The two parser stacks">
-			<ZineTape Label="two stacks" Color="raw" Side="right" />
-			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
-				ONE FILE, TWO PARSERS
+		<!-- THE KEYS: the page's one reference -->
+		<section id="keys" class="relative mt-32" aria-label="Every configuration key">
+			<ZineTape Label="every key" Color="raw" Side="right" />
+			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
+				Every key, once
 			</h2>
-			<div class="mt-8 grid gap-10 lg:grid-cols-2">
-				<ZineBox Tone="crimson">
-					<h3 class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-						THE RUST HTTP PROXY
-					</h3>
-					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">config/proxy.rs</code>, active whenever an
-						aphrodite.toml is found.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						It reads <code>[[proxies]]</code>, <code>[defaults]</code>, the four
-						hot-reload thresholds plus
-						<code>auto_expand</code> / <code>auto_expand_limit</code> in
-						<code>[compression]</code>, and
-						<code>[previews] preview_max_chars</code>.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						For every field except <code>api_key</code>, <code>mode</code> and
-						<code>listen</code>: env var &rarr; TOML (per-proxy entry &rarr;
-						<code>[defaults]</code>) &rarr; compiled-in default.
-					</p>
-				</ZineBox>
-				<ZineBox Tone="teal">
-					<h3 class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
-						THE HERMES DYLIB SESSION
-					</h3>
-					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">config_loader.rs</code>, read once at
-						dylib load: the engine / chain-split / poll / live_container /
-						recursive_depth / auto_reload keys in <code>[compression]</code>,
-						<code>[defaults] model</code> / <code>api_url</code>,
-						<code>[flow] budget_chars</code>, <code>[directives] active</code>,
-						<code>[prompts] session_inject</code> +<code>retrieve_guidance</code> /{" "}
-						<code>ccr_marker_hint</code> /<code>catalog_intent_hints</code>,{" "}
-						<code>[templates]</code>, and
-						<code>[previews] preview_max_chars</code>.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						The FFI runtime-override variant is the
-						<code>aphrodite_config_get</code> / <code>aphrodite_config_set</code> pair
-						on the C-ABI bridge - it surfaces values and changes them mid-session, while
-						the standalone HTTP proxy never reads the dylib-only keys.
-					</p>
-				</ZineBox>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The table below is the page's only reference for the file: one row per key, with its type,
+				its compiled default, the env override, which parser reads it, when a change takes effect,
+				and what it does.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Where the shipped example sets a different value, both are shown - an installation using the
+				example sees the second, a bare binary sees the first.
+			</p>
+			<div class="mt-8 flex flex-wrap gap-3">
+				<ZineStamp Label="hot = /reload + watcher" Color="canary" />
+				<ZineStamp Label="startup = restart" Color="bone" />
+				<ZineStamp Label="load = read at dylib load" Color="bone" />
+				<ZineStamp Label="unwired = silent no-op" Color="raw" />
+			</div>
+			<div class="mt-12">
+				<ConfigKeys Rows={Keys} Notes={SectionNotes} />
 			</div>
 		</section>
 
 		<!-- The [[proxies]] pair -->
-		<section class="relative mt-32" aria-label="The proxies pair">
+		<section id="proxies" class="relative mt-32" aria-label="The proxies pair">
 			<ZineTape Label="the pair" Color="bone" Side="left" />
 			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 				[[PROXIES]] - CACHE :9797 + TOKEN :9798
 			</h2>
 			<div class="mt-8 grid gap-10 md:grid-cols-2">
 				<ZineBox Tone="subtle">
-					<p class="font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
-						cache &middot; 127.0.0.1:9797
-					</p>
+					<ZineKicker Tone="newsprint">cache &middot; 127.0.0.1:9797</ZineKicker>
 					<p class="mt-2 text-base text-zinc-dust">
-						mode <code class="text-bone-newsprint">"cache"</code> - the in-memory
-						backend, threshold 8192 bytes compiled-in (the example lowers it to 2048).
-						<code>tool_relay = true</code> enables the /tool/relay endpoint.
+						The in-memory backend: transient, and the lane for results that do not need to
+						survive the process.
 					</p>
 				</ZineBox>
 				<ZineBox Tone="subtle">
-					<p class="font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
-						token &middot; 127.0.0.1:9798
-					</p>
+					<ZineKicker Tone="newsprint">token &middot; 127.0.0.1:9798</ZineKicker>
 					<p class="mt-2 text-base text-zinc-dust">
-						mode <code class="text-bone-newsprint">"token"</code> - the SQLite-backed
-						durable store, threshold 1024 compiled-in (the example lowers it to 256),
-						TTL from
-						<code>ccr_ttl_seconds</code>.
+						The SQLite-backed store: durable, and the lane a retrieval survives a restart from.
 					</p>
 				</ZineBox>
 			</div>
 			<div class="mt-10 border-l-4 border-raw-blood bg-soot-black p-6">
-				<p class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-					WARNING - THE 0.0.0.0 LINES
-				</p>
+				<ZineKicker Tone="dust">WARNING - THE 0.0.0.0 LINES</ZineKicker>
 				<p class="mt-2 max-w-3xl text-base text-zinc-dust">
-					Listeners bind loopback-only by default, and the router rejects non-loopback
-					peers (and non-loopback Host headers) on every route except /health.
+					Listeners bind loopback-only by default, and the router rejects non-loopback peers (and
+					non-loopback Host headers) on every route except /health.
 				</p>
 				<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-					Uncommenting <code class="text-bone-newsprint">listen = "0.0.0.0:..."</code>
-					exposes an unauthenticated listener to your LAN: /retrieve, /history and /ccr/*
-					have no authentication of their own.
+					Uncommenting <code class="text-bone-newsprint">listen = "0.0.0.0:..."</code> exposes an
+					unauthenticated listener to your LAN: /retrieve, /history and /ccr/* have no authentication of
+					their own.
 				</p>
 			</div>
 		</section>
 
-		<!-- The compression knobs -->
-		<section class="relative mt-32" aria-label="The compression knobs">
-			<ZineTape Label="hot-reload" Color="canary" Side="right" />
-			<div class="flex flex-wrap items-center justify-between gap-3">
-				<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
-					[COMPRESSION] - THE KNOBS
-				</h2>
-				<ZineStamp Label="POST /reload" Color="raw" Rotate="-rotate-1" />
-			</div>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Edit + save - or <code class="text-bone-newsprint">POST /reload</code>, or the
-				config file watcher - re-applies the four proxy thresholds, auto_expand /
-				auto_expand_limit (and the preview cap) with no restart.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Everything else about a proxy is fixed at startup (README.md:389-391).
-			</p>
-			<div class="mt-8 overflow-x-auto border-4 border-blood-crimson bg-carbon-void">
-				<table class="w-full min-w-[42rem] text-left text-base">
-					<thead>
-						<tr class="border-b-2 border-blood-crimson bg-soot-black font-mono text-base uppercase tracking-widest text-zinc-dust">
-							<th class="px-5 py-3">Key</th>
-							<th class="px-5 py-3">Example</th>
-							<th class="px-5 py-3">Compiled</th>
-							<th class="px-5 py-3">Env</th>
-							<th class="px-5 py-3">Note</th>
-						</tr>
-					</thead>
-					<tbody class="divide-y divide-oxblood-dark/50">
-						{[
-							{
-								K: "tool_threshold_token",
-								E: "256",
-								C: "1024",
-								V: "APHRODITE_TOOL_THRESHOLD_TOKEN",
-								N: "token proxy threshold (bytes) - hot-reloads",
-							},
-							{
-								K: "tool_threshold_cache",
-								E: "2048",
-								C: "8192",
-								V: "APHRODITE_TOOL_THRESHOLD_CACHE",
-								N: "cache proxy threshold (bytes) - hot-reloads",
-							},
-							{
-								K: "inline_threshold",
-								E: "1024",
-								C: "256",
-								V: "APHRODITE_INLINE_THRESHOLD",
-								N: "inline-vs-durable cutoff (bytes) - hot-reloads",
-							},
-							{
-								K: "code_multiplier",
-								E: "1.0",
-								C: "3.0",
-								V: "APHRODITE_CODE_MULTIPLIER",
-								N: "multiplies the threshold for code_* types - hot-reloads",
-							},
-							{
-								K: "store_max_entries",
-								E: "100000",
-								C: "100000",
-								V: "APHRODITE_STORE_MAX_ENTRIES",
-								N: "max live rows in the SQLite store - LRU evicts past it; read at store open, not hot-reloaded",
-							},
-							{
-								K: "store_max_bytes",
-								E: "536870912",
-								C: "536870912",
-								V: "APHRODITE_STORE_MAX_BYTES",
-								N: "max stored payload bytes, SUM(LENGTH(original)) - LRU evicts past it; read at store open, not hot-reloaded",
-							},
-							{
-								K: "auto_expand",
-								E: "true",
-								C: "false",
-								V: "APHRODITE_AUTO_EXPAND",
-								N: "resolve just-stored content inline instead of a marker - hot-reloads",
-							},
-							{
-								K: "auto_expand_limit",
-								E: "102400",
-								C: "102400",
-								V: "APHRODITE_AUTO_EXPAND_LIMIT",
-								N: "byte cap for auto-expanded content; 0 = unlimited",
-							},
-							{
-								K: "terminal_threshold",
-								E: "256",
-								C: "1024",
-								V: "APHRODITE_TERMINAL_THRESHOLD",
-								N: "dylib terminal-output threshold",
-							},
-							{
-								K: "engine_threshold_pct",
-								E: "30",
-								C: "45",
-								V: "APHRODITE_ENGINE_THRESHOLD_PCT",
-								N: "LOAD-BEARING (dylib): middle-turn archiving + engine_offload prompt; 100+ = off",
-							},
-							{
-								K: "engine_protect_first",
-								E: "2",
-								C: "2",
-								V: "APHRODITE_ENGINE_PROTECT_FIRST",
-								N: "LOAD-BEARING (dylib): turns kept at the start of the index",
-							},
-							{
-								K: "engine_protect_last",
-								E: "5",
-								C: "5",
-								V: "APHRODITE_ENGINE_PROTECT_LAST",
-								N: "LOAD-BEARING (dylib): turns kept at the end of the index",
-							},
-							{
-								K: "engine_min_msgs",
-								E: "8",
-								C: "8",
-								V: "APHRODITE_ENGINE_MIN_MSGS",
-								N: "LOAD-BEARING (dylib): minimum messages before the engine activates",
-							},
-							{
-								K: "live_container",
-								E: "false",
-								C: "false",
-								V: "APHRODITE_LIVE_CONTAINER",
-								N: "instant 'live' CCR markers for large tool results",
-							},
-							{
-								K: "recursive_depth",
-								E: "5",
-								C: "5",
-								V: "APHRODITE_RECURSIVE_DEPTH",
-								N: "max nested marker expansion depth",
-							},
-							{
-								K: "context_engine",
-								E: "true",
-								C: "true",
-								V: "APHRODITE_CONTEXT_ENGINE",
-								N: "opt-in dylib status flag; the HTTP proxy never reads it",
-							},
-							{
-								K: "auto_reload",
-								E: "true",
-								C: "false",
-								V: "APHRODITE_AUTO_RELOAD",
-								N: "watch aphrodite.toml and re-apply config fields on change",
-							},
-						].map((Row) => (
-							<tr class="text-zinc-dust">
-								<td class="px-5 py-3 font-mono text-base text-bone-newsprint">
-									{Row.K}
-								</td>
-								<td class="px-5 py-3 font-mono text-base text-stamped-canary">
-									{Row.E}
-								</td>
-								<td class="px-5 py-3 font-mono text-base">{Row.C}</td>
-								<td class="px-5 py-3 font-mono text-base">{Row.V}</td>
-								<td class="px-5 py-3 text-base">{Row.N}</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
-			<p class="mt-4 max-w-3xl font-mono text-base uppercase tracking-widest text-zinc-dust">
-				Reload reaches the four bolded thresholds + auto_expand / auto_expand_limit +
-				preview_max_chars (plus the marker format/hint and the ccr_marker_hint knob); the
-				dylib keys ride aphrodite_config_set, and the file watcher applies the same
-				hot-reloadable set. The two store retention caps are the exception: they are read
-				when the SQLite store is opened, so a change takes effect on the next proxy
-				restart - not on save.
-			</p>
-		</section>
-
-		<!-- flow / directives / previews -->
-		<section class="relative mt-32" aria-label="Flow, directives and previews">
-			<ZineTape Label="per-turn context" Color="teal" Side="left" />
-			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
-				[FLOW] / [DIRECTIVES] / [PREVIEWS]
+		<!-- One file, two parsers -->
+		<section id="parsers" class="relative mt-32" aria-label="The two parser stacks">
+			<ZineTape Label="two stacks" Color="raw" Side="right" />
+			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
+				One file, two parsers
 			</h2>
-			<div class="mt-8 grid gap-10 lg:grid-cols-3">
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The READER column above is the whole split - these are the two codepaths that own it.
+			</p>
+			<div class="mt-8 grid gap-10 lg:grid-cols-2">
+				<ZineBox Tone="crimson">
+					<ZineKicker As="h3" Tone="canary">THE RUST HTTP PROXY</ZineKicker>
+					<p class="mt-3 text-base text-zinc-dust">
+						<code class="text-bone-newsprint">config/proxy.rs</code>, active whenever an
+						aphrodite.toml is found: it reads every row marked PROXY or BOTH, resolving each one as
+						env var, then the per-proxy entry, then <code>[defaults]</code>, then the compiled
+						default.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						Three rows are the exceptions, and the table marks them: the API key is TOML-first,
+						and the bind address and the mode are per-entry by construction.
+					</p>
+				</ZineBox>
 				<ZineBox Tone="teal">
-					<h3 class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
-						[FLOW]
-					</h3>
+					<ZineKicker As="h3" Tone="teal">THE HERMES DYLIB SESSION</ZineKicker>
 					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">budget_chars = 2600</code> - the hard cap
-						on ALL per-turn injected context (directives + nudges + recall catalog +
-						retrieve hint).
+						<code class="text-bone-newsprint">config_loader.rs</code>, read once at dylib load: it
+						reads every row marked DYLIB or BOTH, and the standalone HTTP proxy never reads a
+						dylib-only key.
 					</p>
 					<p class="mt-3 text-base text-zinc-dust">
-						Sections drop bottom-up when over budget; directives and nudges never drop.
+						The FFI runtime-override variant is the
+						<code class="text-bone-newsprint">aphrodite_config_get</code> /
+						<code class="text-bone-newsprint">aphrodite_config_set</code> pair on the C-ABI bridge -
+						it surfaces values and changes them mid-session.
 					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						Dylib only; env: <code>APHRODITE_FLOW_BUDGET_CHARS</code>.
-					</p>
-				</ZineBox>
-				<ZineBox Tone="subtle">
-					<h3 class="font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
-						[DIRECTIVES]
-					</h3>
-					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">
-							active = ["lazy", "lazy-eval", "foresight"]
-						</code>{" "}
-						- which loaded directives start active; swap mid-conversation via
-						<code>aphrodite_directive</code>.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						Names not in the loaded set are silently filtered; an empty list seeds focus
-						+ foresight + lazy.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						Built-in set: focus, foresight, ccr-handling, cleanup, explore, lazy,
-						lazy-eval.
-					</p>
-				</ZineBox>
-				<ZineBox Tone="subtle">
-					<h3 class="font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
-						[PREVIEWS]
-					</h3>
-					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">preview_max_chars = 0</code> - caps the
-						whole rendered preview string, not per line; 0 = unlimited.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">model_family = "code_first"</code> -
-						selects the <code>[templates.preview.&lt;family&gt;.*]</code> family when
-						<code>[templates]</code> is configured.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						Env <code>APHRODITE_PREVIEW_MAX_CHARS</code> &gt; TOML &gt; unlimited.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">Re-applied by POST /reload.</p>
 				</ZineBox>
 			</div>
-		</section>
-
-		<!-- Documented but unwired -->
-		<section class="relative mt-32" aria-label="Documented but unwired keys">
-			<ZineTape Label="honest ledger" Color="bone" Side="right" />
-			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
-				DOCUMENTED BUT UNWIRED
-			</h2>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				These keys parse cleanly but nothing in the current codebase reads them back out -
-				setting one is a silent no-op.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				They are kept and marked for forward compatibility; the shipped example labels each
-				one in place.
-			</p>
-			<div class="mt-8 flex flex-wrap gap-3">
-				{[
-					"catalog_mode",
-					"classifier_poll",
-					"previews.code_structure_map",
-					"previews.rust_preview_lines",
-				].map((K) => (
-					<span class="border-2 border-stamped-canary bg-soot-black px-3 py-1.5 font-mono text-base text-stamped-canary">
-						{K}
-					</span>
-				))}
-			</div>
-			<p class="mt-6 max-w-3xl font-mono text-base uppercase tracking-widest text-zinc-dust">
-				The <code>[templates.*]</code> section is live configuration - preview families, the
-				marker block, prompt templates and the reverse key map render from these format
-				strings (hardcoded builders apply when a block is absent).
-			</p>
 		</section>
 
 		<!-- The reload simulation -->
-		<section class="relative mt-32" aria-label="The reload simulation">
+		<section id="reload" class="relative mt-32" aria-label="The reload simulation">
 			<ZineTape Label="simulation" Color="raw" Side="left" />
 			<div class="flex flex-wrap items-center justify-between gap-3">
-				<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
-					POST /RELOAD - WHAT WOULD APPLY
+				<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
+					What /reload would apply
 				</h2>
 				<button
 					type="button"
@@ -642,9 +471,10 @@ const Example = [
 				</button>
 			</div>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Simulated from your editor state: /reload answers{" "}
-				<code class="text-bone-newsprint">"applied": true </code> with the values that took
-				effect, and a <code>"parsed_only"</code> object for the fields that do not.
+				Simulated from your editor state: /reload answers
+				<code class="text-bone-newsprint">"applied": true </code> with the values that took effect, and
+				a <code>"parsed_only"</code> object for the fields that do not - the rows the table marks
+				startup or load.
 			</p>
 			<div class="mt-8">
 				<div
@@ -659,24 +489,22 @@ const Example = [
 
 		<!-- Simulation boundary -->
 		<footer class="mt-32 border-l-4 border-weathered-teal bg-carbon-void p-6">
-			<p class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
-				SIMULATION BOUNDARY
-			</p>
+			<ZineKicker Tone="teal">SIMULATION BOUNDARY</ZineKicker>
 			<p class="mt-2 max-w-3xl text-base text-zinc-dust">
-				Real on this page: the pick chain, the precedence rules, the two-stack split, the
-				defaults and the unwired ledger - all quoted from aphrodite.toml.example,
-				README.md:371-442 and docs/config/aphrodite-toml.md.
+				Real on this page: the pick chain, the precedence rules, the two-stack split, the key table
+				and the unwired ledger - all quoted from aphrodite.toml.example, README.md:371-442 and
+				docs/config/aphrodite-toml.md.
 			</p>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Simulated: the TOML parsing (a browser-side reader, not the Rust or dylib parser),
-				the resolution ladder, and the POST /reload response.
+				Simulated: the TOML parsing (a browser-side reader, not the Rust or dylib parser), the
+				resolution ladder, and the POST /reload response.
 			</p>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				No network, no runtime - everything happens in this tab.
 			</p>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Sanitization: the editor ships the repository's example file - never a user's real
-				toml, never an api_key value; the key field appears only as its env-var name.
+				Sanitization: the editor ships the repository's example file - never a user's real toml,
+				never an api_key value; the key field appears only as its env-var name.
 			</p>
 		</footer>
 
@@ -688,6 +516,7 @@ const Example = [
 				{ Href: "/docs/config/aphrodite-toml/", Label: "DOCS · CONFIG" },
 			]}
 		/>
+		<div data-config-example={JSON.stringify(Example)} data-config-keys={JSON.stringify(Tracked)} hidden></div>
 	</main>
 	<ZineDiagramNav />
 </Base>
@@ -701,38 +530,38 @@ const Example = [
 	let Status: Element | null = null;
 	let Ladder: Element | null = null;
 	let ReloadOut: Element | null = null;
-	let ReloadParent: Element | null = null;
 
 	let InitialValue = "";
 
-	// ---- The tracked keys, with the chain each one resolves through. Env vars
-	// are display-only here: the simulation has no environment to set them in. ----
-	const ProxyChain = [
-		{ Key: "tool_threshold_token", Env: "APHRODITE_TOOL_THRESHOLD_TOKEN", Compiled: "1024" },
-		{ Key: "tool_threshold_cache", Env: "APHRODITE_TOOL_THRESHOLD_CACHE", Compiled: "8192" },
-		{ Key: "inline_threshold", Env: "APHRODITE_INLINE_THRESHOLD", Compiled: "256" },
-		{ Key: "code_multiplier", Env: "APHRODITE_CODE_MULTIPLIER", Compiled: "3.0" },
-		{ Key: "store_max_entries", Env: "APHRODITE_STORE_MAX_ENTRIES", Compiled: "100000" },
-		{ Key: "store_max_bytes", Env: "APHRODITE_STORE_MAX_BYTES", Compiled: "536870912" },
-		{ Key: "auto_expand", Env: "APHRODITE_AUTO_EXPAND", Compiled: "false" },
-		{ Key: "auto_expand_limit", Env: "APHRODITE_AUTO_EXPAND_LIMIT", Compiled: "102400" },
-		{ Key: "terminal_threshold", Env: "APHRODITE_TERMINAL_THRESHOLD", Compiled: "1024" },
-	];
-	const DylibChain = [
-		{ Key: "engine_threshold_pct", Env: "APHRODITE_ENGINE_THRESHOLD_PCT", Compiled: "45" },
-		{ Key: "engine_protect_first", Env: "APHRODITE_ENGINE_PROTECT_FIRST", Compiled: "2" },
-		{ Key: "engine_protect_last", Env: "APHRODITE_ENGINE_PROTECT_LAST", Compiled: "5" },
-		{ Key: "engine_min_msgs", Env: "APHRODITE_ENGINE_MIN_MSGS", Compiled: "8" },
-		{ Key: "context_engine", Env: "APHRODITE_CONTEXT_ENGINE", Compiled: "true" },
-		{ Key: "live_container", Env: "APHRODITE_LIVE_CONTAINER", Compiled: "false" },
-		{ Key: "recursive_depth", Env: "APHRODITE_RECURSIVE_DEPTH", Compiled: "5" },
-		{ Key: "auto_reload", Env: "APHRODITE_AUTO_RELOAD", Compiled: "false" },
-	];
-	const DefaultsChain = [
-		{ Key: "api_url", Env: "APHRODITE_API_URL", Compiled: "https://api.openai.com" },
-		{ Key: "model", Env: "APHRODITE_MODEL", Compiled: "default-model" },
-		{ Key: "ccr_ttl_seconds", Env: "APHRODITE_CCR_TTL", Compiled: "3600" },
-	];
+	interface TrackedKey {
+		Key: string;
+		Section: string;
+		Env?: string;
+		Default: string;
+		Reader: string;
+		Live: string;
+		Chain: "env-first" | "toml-first" | "toml-only";
+		From: "section" | "proxy";
+	}
+
+	// The shipped example and the tracked keys are serialized into
+	// [data-config-*] by the template. Astro does not carry frontmatter
+	// variables into a client script, so both travel as JSON attributes - the
+	// editor's default text and the ladder's key list therefore come from the
+	// page's own arrays, never from a second copy.
+	function Json<T>(Attribute: string, Fallback: T): T {
+		const Raw = document.querySelector(`[${Attribute}]`)?.getAttribute(Attribute);
+		if (!Raw) return Fallback;
+		try {
+			return JSON.parse(Raw) as T;
+		} catch {
+			return Fallback;
+		}
+	}
+
+	function TrackedKeys(): TrackedKey[] {
+		return Json<TrackedKey[]>("data-config-keys", []);
+	}
 
 	interface Parsed {
 		Proxies: Record<string, string>[];
@@ -824,153 +653,114 @@ const Example = [
 		</div>`;
 	}
 
+	const ReaderNote = {
+		proxy: "read by the Rust HTTP proxy",
+		dylib: "read by the dylib session at load",
+		both: "read by both stacks",
+	} as Record<string, string>;
+
 	function RenderLadder(Parsed: Parsed): void {
 		if (!Ladder) return;
 
 		const Parts: string[] = [];
 
-		// The proxy chain: env > TOML > compiled.
-		for (const Entry of ProxyChain) {
-			const Toml = Parsed.Sections.compression?.[Entry.Key];
-			const Winner = Toml !== undefined ? Chip(`toml: ${Toml}`, "live") : null;
+		for (const Entry of TrackedKeys()) {
+			const SectionValue = Parsed.Sections[Entry.Section]?.[Entry.Key];
+			const EnvChip = Entry.Env
+				? Chip(`env: ${Entry.Env} (unset here)`, "dim")
+				: Chip("env: none documented", "dim");
+
+			// TOML-only: the per-proxy entries own it; a process-wide env var
+			// would hit every proxy at once.
+			if (Entry.Chain === "toml-only") {
+				const Holders = Parsed.Proxies.filter((Proxy) => Proxy[Entry.Key] !== undefined);
+				const Chips = Holders.length
+					? Holders.map((Proxy) => Chip(`proxy "${Proxy.name ?? "?"}": ${Proxy[Entry.Key]}`, "live"))
+					: [Chip("proxy: absent", "dim")];
+				Chips.push(Chip("no env override in multi-proxy mode", "dim"));
+				Parts.push(
+					Row(
+						`${Entry.Key} (TOML-ONLY)`,
+						Chips,
+						"a process-wide APHRODITE_MODE / APHRODITE_LISTEN would hit every proxy at once",
+					),
+				);
+				continue;
+			}
+
+			// TOML-first: the one chain where the file outranks the env var.
+			if (Entry.Chain === "toml-first") {
+				const Proxy = Parsed.Proxies.find((Item) => Item[Entry.Key] !== undefined);
+				const Default = Parsed.Sections.defaults?.[Entry.Key];
+				const Chips = [
+					Proxy ? Chip(`proxy "${Proxy.name ?? "?"}": set`, "live") : Chip("proxy: absent", "dim"),
+					Default !== undefined ? Chip("defaults: set", "live") : Chip("defaults: absent", "dim"),
+					Chip(`env: ${Entry.Env ?? "none"} (last, not first)`, "dim"),
+				];
+				Parts.push(
+					Row(
+						`${Entry.Key} (TOML-FIRST EXCEPTION)`,
+						Chips,
+						"the only chain where TOML outranks the env var; value never shown - env-var names only",
+					),
+				);
+				continue;
+			}
+
+			// env > TOML > compiled. A per-proxy key also walks [defaults].
+			const Chips = [EnvChip];
+			let Winner = false;
+			if (Entry.From === "proxy") {
+				const Proxy = Parsed.Proxies.find((Item) => Item[Entry.Key] !== undefined);
+				const Default = Parsed.Sections.defaults?.[Entry.Key];
+				Proxy
+					? Chips.push(Chip(`proxy "${Proxy.name ?? "?"}": ${Proxy[Entry.Key]}`, "live"))
+					: Chips.push(Chip("per-proxy: absent", "dim"));
+				Default !== undefined
+					? Chips.push(Chip(`defaults: ${Default}`, Proxy ? "dim" : "live"))
+					: Chips.push(Chip("defaults: absent", "dim"));
+				Winner = Boolean(Proxy) || Default !== undefined;
+			} else {
+				SectionValue !== undefined
+					? Chips.push(Chip(`toml: ${SectionValue}`, "live"))
+					: Chips.push(Chip("toml: absent", "dim"));
+				Winner = SectionValue !== undefined;
+			}
+			Chips.push(Chip(`compiled: ${Entry.Default}`, Winner ? "dim" : "fallback"));
+
 			Parts.push(
 				Row(
 					Entry.Key,
-					[
-						Chip(`env: ${Entry.Env} (unset here)`, "dim"),
-						Winner ?? Chip("toml: absent", "dim"),
-						Chip(
-							`compiled: ${Entry.Compiled}`,
-							Toml !== undefined ? "dim" : "fallback",
-						),
-					],
-					Toml !== undefined
-						? "TOML wins - one of the four hot-reload thresholds"
-						: "compiled default wins",
+					Chips,
+					Winner
+						? `${ReaderNote[Entry.Reader] ?? Entry.Reader} - TOML wins`
+						: `${ReaderNote[Entry.Reader] ?? Entry.Reader} - the compiled default wins`,
 				),
 			);
 		}
-
-		// The dylib keys: same order, different stack.
-		for (const Entry of DylibChain) {
-			const Toml = Parsed.Sections.compression?.[Entry.Key];
-			Parts.push(
-				Row(
-					`${Entry.Key} (dylib)`,
-					[
-						Entry.Env
-							? Chip(`env: ${Entry.Env} (unset here)`, "dim")
-							: Chip("env: none documented", "dim"),
-						Toml !== undefined
-							? Chip(`toml: ${Toml}`, "live")
-							: Chip("toml: absent", "dim"),
-						Chip(`default: ${Entry.Compiled}`, Toml !== undefined ? "dim" : "fallback"),
-					],
-					"read once at dylib load; runtime changes ride aphrodite_config_set",
-				),
-			);
-		}
-
-		// The defaults chain: env > per-proxy > defaults > compiled.
-		for (const Entry of DefaultsChain) {
-			const Proxy = Parsed.Proxies.find((Item) => Item[Entry.Key] !== undefined);
-			const Default = Parsed.Sections.defaults?.[Entry.Key];
-			const Steps = [Chip(`env: ${Entry.Env} (unset here)`, "dim")];
-			if (Proxy) {
-				Steps.push(Chip(`proxy "${Proxy.name ?? "?"}": ${Proxy[Entry.Key]}`, "live"));
-			} else {
-				Steps.push(Chip("per-proxy: absent", "dim"));
-			}
-			if (Default !== undefined) {
-				Steps.push(Chip(`defaults: ${Default}`, Proxy ? "dim" : "live"));
-			} else {
-				Steps.push(Chip("defaults: absent", "dim"));
-			}
-			Steps.push(
-				Chip(
-					`compiled: ${Entry.Compiled}`,
-					!Proxy && Default === undefined ? "fallback" : "dim",
-				),
-			);
-			Parts.push(Row(Entry.Key, Steps, "env > per-proxy > defaults > compiled"));
-		}
-
-		// The two documented exceptions.
-		const ProxyKey = Parsed.Proxies.find((Item) => Item.api_key !== undefined);
-		Parts.push(
-			Row(
-				"api_key (TOML-FIRST EXCEPTION)",
-				[
-					ProxyKey ? Chip("proxy: set", "live") : Chip("proxy: absent", "dim"),
-					Parsed.Sections.defaults?.api_key !== undefined
-						? Chip("defaults: set", "live")
-						: Chip("defaults: absent", "dim"),
-					Chip("env: APHRODITE_API_KEY (last, not first)", "dim"),
-				],
-				"the only chain where TOML outranks the env var; value never shown - env-var names only",
-			),
-		);
-
-		const Cache = Parsed.Proxies.find((Item) => Item.mode === "cache");
-		const Token = Parsed.Proxies.find((Item) => Item.mode === "token");
-		Parts.push(
-			Row(
-				"listen / mode (TOML-ONLY)",
-				[
-					Cache
-						? Chip(`cache: ${Cache.listen ?? "?"}`, "live")
-						: Chip("cache proxy: absent", "dim"),
-					Token
-						? Chip(`token: ${Token.listen ?? "?"}`, "live")
-						: Chip("token proxy: absent", "dim"),
-					Chip("no env override in multi-proxy mode", "dim"),
-				],
-				"a process-wide APHRODITE_MODE / APHRODITE_LISTEN would hit every proxy at once",
-			),
-		);
 
 		Ladder.innerHTML = Parts.join("");
 	}
 
 	function RenderReload(Parsed: Parsed): void {
-		if (!ReloadOut || !ReloadParent) return;
+		if (!ReloadOut) return;
 
-		const Compression = Parsed.Sections.compression ?? {};
-		const Applied = [
-			"tool_threshold_token",
-			"tool_threshold_cache",
-			"inline_threshold",
-			"code_multiplier",
-			"auto_expand",
-			"auto_expand_limit",
-		]
-			.filter((Key) => Compression[Key] !== undefined)
-			.map((Key) => `"${Key}": ${Compression[Key]}`);
-		const Preview = Parsed.Sections.previews?.preview_max_chars;
-		if (Preview !== undefined) {
-			Applied.push(`"preview_max_chars": ${Preview}`);
-		}
+		const Value = (Entry: TrackedKey): string | undefined =>
+			Entry.From === "proxy"
+				? (Parsed.Proxies.find((Item) => Item[Entry.Key] !== undefined)?.[Entry.Key] ??
+					Parsed.Sections.defaults?.[Entry.Key])
+				: Parsed.Sections[Entry.Section]?.[Entry.Key];
 
-		const Unwired = ["catalog_mode", "classifier_poll"].filter(
-			(Key) => Compression[Key] !== undefined,
-		);
-		const Dylib = [
-			"engine_threshold_pct",
-			"engine_protect_first",
-			"engine_protect_last",
-			"engine_min_msgs",
-			"context_engine",
-			"terminal_threshold",
-			"live_container",
-			"recursive_depth",
-			"auto_reload",
-		].filter((Key) => Compression[Key] !== undefined);
+		const Rows = TrackedKeys().filter((Entry) => Value(Entry) !== undefined);
+		const Quote = (Entry: TrackedKey): string => `"${Entry.Key}": ${Value(Entry)}`;
+		const Applied = Rows.filter((Entry) => Entry.Live === "hot").map(Quote);
+		const ParsedOnly = Rows.filter((Entry) => Entry.Live !== "hot").map((Entry) => `"${Entry.Key}"`);
 
 		const Lines = [
 			'<span class="text-weathered-teal">{</span>',
 			'&nbsp;&nbsp;<span class="text-stamped-canary">"applied"</span>: true,',
 			`&nbsp;&nbsp;<span class="text-stamped-canary">"applied_values"</span>: { ${Applied.join(", ") || "// none present"} },`,
-			`&nbsp;&nbsp;<span class="text-stamped-canary">"parsed_only"</span>: { "dylib_state": [${Dylib.join(", ")}], "unwired": [${Unwired.join(", ")}] },`,
+			`&nbsp;&nbsp;<span class="text-stamped-canary">"parsed_only"</span>: { "startup_or_load": [${ParsedOnly.join(", ")}] },`,
 			'&nbsp;&nbsp;<span class="text-stamped-canary">"note"</span>: "simulated - the real response comes from the running proxy"',
 			'<span class="text-weathered-teal">}</span>',
 		];
@@ -991,7 +781,6 @@ const Example = [
 		Status = document.querySelector("[data-editor-status]");
 		Ladder = document.querySelector("[data-ladder]");
 		ReloadOut = document.querySelector("[data-reload-out]");
-		ReloadParent = ReloadOut?.parentElement ?? null;
 
 		if (!Editor || Editor.dataset.editorBound) {
 			return;
@@ -1002,8 +791,8 @@ const Example = [
 		Editor.dataset.editorBound = "1";
 
 		if (!InitialValue) {
-			InitialValue = Example;
-			Editor.value = Example;
+			InitialValue = Json<string>("data-config-example", "");
+			Editor.value = InitialValue;
 		}
 
 		Editor.addEventListener("input", Recompute);

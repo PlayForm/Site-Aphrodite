@@ -6,21 +6,78 @@ interface Entry {
 
 	/** Roadmap / partly unimplemented docs carry the WIP mark. */
 	Wip?: boolean;
+
+	/** The nested folder this entry belongs to (e.g. "Backends"), if any. */
+	Group?: string;
 }
+
+interface Heading {
+	Depth: number;
+
+	Id: string;
+
+	Label: string;
+}
+
+type Row =
+	| { Kind: "group"; Label: string }
+	| { Kind: "entry"; Entry: Entry };
 
 interface Props {
 	Sections: { Name: string; Entries: Entry[] }[];
 
 	/** Collection id of the page currently being read. */
 	CurrentId: string;
+
+	/** The current page's own headings: the in-page outline, not a registry. */
+	Headings?: Heading[];
+
+	/** Landmark name. The desktop rail and the mobile drawer render this
+	    component twice, so the two must not share one label. */
+	Label?: string;
 }
 
-const { Sections, CurrentId } = Astro.props;
+const {
+	Sections,
+	CurrentId,
+	Headings = [],
+	Label = "Documentation sections",
+} = Astro.props;
 
 const Href = (Id: string) => (Id === "index" ? "/docs/" : `/docs/${Id}/`);
+
+// The section list as flat rows: a nested folder (docs/ccr/backends/*) emits
+// its own label row once, then its members indented beneath it. The docs tree
+// sorts by id, so the folder's index page opens the cluster it names.
+const Rows = (Entries: Entry[]) => {
+	const Rows: Row[] = [];
+	const Seen = new Set<string>();
+
+	for (const Entry of Entries) {
+		switch (Entry.Group) {
+			case undefined:
+				break;
+			default:
+				if (!Seen.has(Entry.Group)) {
+					Seen.add(Entry.Group);
+					Rows.push({ Kind: "group", Label: Entry.Group });
+				}
+		}
+
+		Rows.push({ Kind: "entry", Entry });
+	}
+
+	return Rows;
+};
+
+// The section the reader is in: its label goes bone-white so the 48-entry
+// index shows where the current page sits, not only which link is active.
+const CurrentSection = Sections.find(({ Entries }) =>
+	Entries.some((Entry) => Entry.Id === CurrentId),
+)?.Name;
 ---
 
-<nav aria-label="Documentation sections">
+<nav aria-label={Label}>
 	<div class="relative">
 	<!-- The tape stamp lives OUTSIDE the scroll container: overflow-y-auto
 	     clips absolutely-positioned children that cross its top edge, and
@@ -33,32 +90,77 @@ const Href = (Id: string) => (Id === "index" ? "/docs/" : `/docs/${Id}/`);
 	<div
 		class="relative z-10 max-h-[calc(100vh-9rem)] overflow-y-auto border-4 border-blood-crimson bg-carbon-void p-5 zine-box-subtle"
 	>
+		{
+			Headings.length > 1 && (
+				<nav
+					aria-label={`${Label} · on this page`}
+					class="mb-8 border-b border-oxblood-dark pb-6"
+				>
+					<p class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+						ON THIS PAGE
+					</p>
+					<ul class="mt-3 flex flex-col gap-1 border-l border-oxblood-dark pl-3">
+						{Headings.map(({ Depth, Id, Label: Text }) => (
+							<li class={Depth === 3 ? "pl-3" : undefined}>
+								<a
+									href={`#${Id}`}
+									data-toc-link={Id}
+									class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white"
+								>
+									{Text}
+								</a>
+							</li>
+						))}
+					</ul>
+				</nav>
+			)
+		}
 		<div class="flex flex-col gap-8">
 			{
 				Sections.map(({ Name, Entries }) => (
 					<div class="flex flex-col gap-2">
-						<p class="flex items-center gap-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-							<span class="inline-block h-3 w-1 bg-blood-crimson" aria-hidden="true" />
+						<p
+							class={`flex items-center gap-2 font-mono text-base font-black uppercase tracking-widest ${
+								Name === CurrentSection ? "text-bone-white" : "text-zinc-dust"
+							}`}
+							data-current-section={Name === CurrentSection ? "1" : undefined}
+						>
+							<span
+								class={`inline-block h-3 w-1 ${
+									Name === CurrentSection
+										? "bg-stamped-canary"
+										: "bg-blood-crimson"
+								}`}
+								aria-hidden="true"
+							/>
 							{Name}
 						</p>
 						<ul class="flex flex-col gap-1 border-l border-oxblood-dark pl-3">
-							{Entries.map((Entry) => {
-								const Current = Entry.Id === CurrentId;
-
-								return (
+							{Rows(Entries).map((Row) =>
+								Row.Kind === "group" ? (
+									<li class="mt-1">
+										<p class="px-2 font-mono text-[13px] uppercase tracking-widest text-oxblood-dark">
+											{Row.Label}
+										</p>
+									</li>
+								) : (
 									<li>
 										<a
-											href={Href(Entry.Id)}
-											aria-current={Current ? "page" : undefined}
-											class={`block px-2 py-0.5 font-mono text-base leading-relaxed transition-colors ${
-												Current
+											href={Href(Row.Entry.Id)}
+											aria-current={
+												Row.Entry.Id === CurrentId ? "page" : undefined
+											}
+											class={`block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors ${
+												Row.Entry.Group === undefined ? "pl-2" : "pl-5"
+											} ${
+												Row.Entry.Id === CurrentId
 													? "bg-raw-blood text-bone-white"
 													: "text-zinc-dust hover:text-bone-white"
 											}`}
 										>
-											{Entry.Title}
+											{Row.Entry.Title}
 											{
-												Entry.Wip && (
+												Row.Entry.Wip && (
 													<span
 														class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black"
 														title="Roadmap: partly unimplemented"
@@ -69,13 +171,117 @@ const Href = (Id: string) => (Id === "index" ? "/docs/" : `/docs/${Id}/`);
 											}
 										</a>
 									</li>
-								);
-							})}
+								),
+							)}
 						</ul>
 					</div>
 				))
 			}
 		</div>
-		</div>
+	</div>
 	</div>
 </nav>
+
+<script>
+	// The in-page outline's current-section marker: the last heading above the
+	// reading line wins, so a long page always names where the reader is.
+	function BindOnThisPage() {
+		const Links = Array.from(
+			document.querySelectorAll<HTMLAnchorElement>("a[data-toc-link]"),
+		);
+
+		if (Links.length === 0 || Links[0]?.dataset["tocBound"] === "1") {
+			return;
+		}
+
+		const ById = new Map<string, HTMLAnchorElement[]>();
+
+		for (const Link of Links) {
+			const Id = Link.dataset["tocLink"] ?? "";
+
+			ById.set(Id, [...(ById.get(Id) ?? []), Link]);
+		}
+
+		const Targets = [...ById.keys()]
+			.map((Id) => ({ Id, Element: document.getElementById(Id) }))
+			.filter(
+				(Target): Target is { Id: string; Element: HTMLElement } =>
+					Target.Element !== null,
+			);
+
+		if (Targets.length === 0) {
+			return;
+		}
+
+		const First = Targets[0]!;
+		const Last = Targets[Targets.length - 1]!;
+
+		Links[0]!.dataset["tocBound"] = "1";
+
+		let Current = "";
+
+		const Mark = (Id: string) => {
+			if (Id === Current) {
+				return;
+			}
+
+			Current = Id;
+
+			for (const [Key, Group] of ById) {
+				for (const Link of Group) {
+					switch (Key === Id) {
+						case true:
+							Link.setAttribute("aria-current", "location");
+
+							break;
+						default:
+							Link.removeAttribute("aria-current");
+					}
+				}
+			}
+		};
+
+		const Measure = () => {
+			// 160px: just clear of the sticky site header.
+			let Active = First.Id;
+
+			for (const { Id, Element } of Targets) {
+				if (Element.getBoundingClientRect().top <= 160) {
+					Active = Id;
+				}
+			}
+
+			// The page's own tail: the last heading is what the reader is in.
+			if (
+				window.innerHeight + window.scrollY >=
+				document.documentElement.scrollHeight - 4
+			) {
+				Active = Last.Id;
+			}
+
+			Mark(Active);
+		};
+
+		let Queued = false;
+
+		const OnScroll = () => {
+			switch (Queued) {
+				case true:
+					return;
+				default:
+					Queued = true;
+					requestAnimationFrame(() => {
+						Queued = false;
+						Measure();
+					});
+			}
+		};
+
+		Measure();
+		document.addEventListener("scroll", OnScroll, { passive: true });
+		window.addEventListener("resize", OnScroll);
+	}
+
+	BindOnThisPage();
+	document.addEventListener("astro:page-load", BindOnThisPage);
+</script>
