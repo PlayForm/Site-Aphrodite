@@ -310,7 +310,7 @@ const JsonBody = [
 	'  {"id": "sess_71fa", "type": "json", "tokens_in": 2604, "tokens_out": 41, "ratio": 63.5, "stored": true, "tier": "warm", "hits": 2, "age_s": 187, "sha": "5f6e7d8c", "hash": "d9c8b7a6", "model": "deepseek-v4", "session": "71fa"},',
 	'  {"id": "sess_0a4e", "type": "diff", "tokens_in": 12760, "tokens_out": 58, "ratio": 220.0, "stored": true, "tier": "warm", "hits": 5, "age_s": 240, "sha": "6b7c8d9e", "hash": "1a2b3c4d", "model": "deepseek-v4", "session": "0a4e"},',
 	'  {"id": "sess_c3b9", "type": "html", "tokens_in": 21455, "tokens_out": 52, "ratio": 412.6, "stored": true, "tier": "cold", "hits": 1, "age_s": 611, "sha": "8e9fa0b1", "hash": "5c6d7e8f", "model": "deepseek-v4", "session": "c3b9"},',
-	'  {"id": "sess_6f2d", "type": "log", "tokens_in": 5310, "tokens_out": 37, "ratio": 143.5, "stored": true, "tier": "hot", "hits": 9, "age_s": 3, "sha": "0d1e2f3a", "hash": "b4a59687", "model": "deepseek-v4", "session": "6f2d"},',
+	'  {"id": "sess_6f2d", "type": "log", "tokens_in": 5310, "tokens_out": 37, "ratio": 143.5, "stored": true, "tier": "hot", "hits": 9, "age_s": 3, "sha": "0d1e2f3a", "hash": "b4a59687", "model": "deepseek-v4", "session": "6f2d"}',
 	"]",
 ];
 
@@ -534,8 +534,8 @@ const Cycle: RunScript[] = [
 				The pane below is not a screenshot of that idea. It is a terminal that keeps running:
 				a release build, then a code search, then a directory listing, then a test run, then a
 				JSON body, then back to the build - indefinitely, each at the pace its own tool really
-				prints at. Nothing is scripted to look good; every line is the output that command
-				produces, and the one line on the right is recomputed from those lines as they land.
+				prints at. Nothing in it is invented: every line is the output that command produces,
+				and the one line on the right is recomputed from those lines as they land.
 			</p>
 			<div class="mt-12">
 				<ZineSplit Run={Cycle} Label="ONE LINE, ONE MARKER" Id="hero-run" />
@@ -557,8 +557,8 @@ const Cycle: RunScript[] = [
 				Five commands, five shapes of answer: the build counts errors, warnings and lines; the
 				search counts hits and files; the listing counts entries and extensions; the test run
 				counts passes and failures; the JSON body counts items and keys. That is one engine
-				reading five kinds of output - the classifier naming the content, and the preview
-				rendering the answer that name earns.
+				reading five kinds of output - the tool naming the type, and the preview rendering
+				the answer that name earns.
 			</p>
 		</section>
 

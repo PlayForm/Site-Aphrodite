@@ -96,8 +96,8 @@ const Timing = {
 		 * scrolls, it does not grow without bound.
 		 */
 		Rows: 48,
-		/** The window's height once mounted, in rem. */
-		Window: 15,
+		/** The smallest window the terminal will use, in px. */
+		Floor: 160,
 		/** The screen clear between one command and the next. */
 		Clear: 220,
 		/** The beat before the first line of a new command. */
@@ -495,9 +495,12 @@ const Mount = (): void => {
  * would have produced for it, which is what makes the settled frame true
  * rather than decorative.
  *
- * The type is the classifier's verdict, taken as given: the engine classifies
- * ONCE, on the complete content, so re-running detection over a prefix would
- * be a different function than the one being demonstrated.
+ * The type is the HINT the tool hands the engine, not a re-detection. In
+ * `preview/type.rs::resolve_effective_type` an explicit non-generic hint wins
+ * outright (`other => Cow::Borrowed(other)`) - that is how a tool names its
+ * own arm - and detection runs only for a generic one, once, on the complete
+ * content. Re-running detection over a prefix would be a different function
+ * than the one being demonstrated.
  *
  * THE LAWS, applied to a stream:
  *   - No measurement. The track is pinned to the viewport's bottom edge, so
@@ -1345,10 +1348,20 @@ const Run = (Root: HTMLElement): (() => void) => {
 	// The markup ships in flow, so a reader with no JavaScript - or one who
 	// asked for stillness - gets the whole settled frame at its natural height,
 	// exactly as the pair has always read. Mounting turns it into a window: a
-	// fixed height, and a track pinned to the bottom edge so an append scrolls
-	// the pane without a single layout read.
+	// track pinned to the bottom edge so an append scrolls the pane without a
+	// single layout read, inside a box as tall as the frame it replaces.
+	//
+	// That height is MEASURED ONCE, from the settled frame itself, rather than
+	// written down here. A hardcoded height has to guess the font's line box,
+	// and a guess that is wrong is a layout shift on the one element the reader
+	// is already looking at. One read at mount, then never again.
+	const Window = Math.max(
+		Timing.Run.Floor,
+		Math.ceil(Track.getBoundingClientRect().height),
+	);
+
 	Viewport.style.position = "relative";
-	Viewport.style.height = `${Timing.Run.Window}rem`;
+	Viewport.style.height = `${Window}px`;
 	Track.style.position = "absolute";
 	Track.style.insetInline = "0";
 	Track.style.bottom = "0";
@@ -1358,7 +1371,7 @@ const Run = (Root: HTMLElement): (() => void) => {
 	return Stop;
 };
 
-
+/** The discarded page's teardown: no observer, no pending counter frame, nothing left running. */
 export const Teardown = (): void => {
 	Watcher?.disconnect();
 	Watcher = null;
