@@ -50,8 +50,11 @@ loopback gate.
 
 ## fill_pct
 
-`fill_pct` is derived from the compression-ratio EMA: `100 - (ratio_ema / 20)`, clamped to 1-99
-and stored at x100 precision (the JSON body divides by 100).
+`fill_pct` is derived from the compression-ratio EMA:
+
+- `100 - (ratio_ema / 20)`
+- clamped to 1-99
+  and stored at x100 precision (the JSON body divides by 100).
 
 It initializes at 90.0 and recomputes after every compression.
 
@@ -63,5 +66,9 @@ A higher compression ratio lowers the fill percentage, signaling more context he
 not mean the model provider is reachable.
 
 For upstream health use `GET /health/upstream` (loopback only, gated by `APHRODITE_MGMT_TOKEN`
-when set): it probes `GET {api_url}/models` with the configured API key, caches the result
-for 60 seconds, and returns `{"upstream": bool, "cached": bool}`.
+when set):
+
+- it probes `GET {api_url}/models` with the configured API key
+- caches the result
+  for 60 seconds
+- and returns `{"upstream": bool, "cached": bool}`.

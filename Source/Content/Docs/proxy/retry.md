@@ -52,8 +52,12 @@ let ms = (base_ms as f64 * jitter) as u64;
 ## Retry Scope
 
 **Only connect-phase failures** are retried - errors reqwest classifies as `is_connect()`,
-which means the request never left and resending is safe: connection refused,
-DNS resolution failure, TLS handshake error, and connect timeouts.
+which means the request never left and resending is safe:
+
+- connection refused,
+  DNS resolution failure
+- TLS handshake error
+- and connect timeouts.
 
 Everything else fails fast on the first attempt.
 

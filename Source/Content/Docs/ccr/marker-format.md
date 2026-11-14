@@ -38,7 +38,9 @@ There is no prefix or fuzzy matching: the full hash must be supplied.
 ## Marker Layouts
 
 Two pipelines render markers. They share the same vocabulary but differ in layout:
-the proxy pipeline leads with the preview, the hook/FFI pipeline leads with the marker line.
+
+- the proxy pipeline leads with the preview
+- the hook/FFI pipeline leads with the marker line.
 
 ### Proxy Pipeline
 
@@ -122,9 +124,23 @@ or `[` is treated as `text`.
 ### Semantic Detector
 
 `preview::detect_semantic_type` upgrades generic buckets (`text`/`terminal`/`log`)
-to a high-signal shape using conservative line-prefix and majority-vote rules: `json`,
-`test`, `diff`, `code`, `table`, `markdown`, `yaml`, `html`, `xml`, `csv`, `build`, `git`,
-`ls`, `grep`, `gitlog`.
+to a high-signal shape using conservative line-prefix and majority-vote rules:
+
+- `json`,
+  `test`
+- `diff`
+- `code`
+- `table`
+- `markdown`
+- `yaml`
+- `html`
+- `xml`
+- `csv`
+- `build`
+- `git`,
+  `ls`
+- `grep`
+- `gitlog`.
 
 Hermes wrapper envelopes (objects carrying
 `output`/`exit_code`/
@@ -143,10 +159,15 @@ These strings are what appear as the `type` field in hook-pipeline markers.
 Previews are self-describing `[type:...]` strings built by `preview::build_preview`, shared
 by the proxy and hook paths.
 
-They carry decision-relevant facts rather than generic counts: error
-and warning lines are tallied line-by-line (never substring matches),
-the first real error message is surfaced, diffs name the changed files,
-test output shows pass/fail/ignored tallies, and JSON previews show item or key counts.
+They carry decision-relevant facts rather than generic counts:
+
+- error
+  and warning lines are tallied line-by-line (never substring matches),
+  the first real error message is surfaced
+- diffs name the changed files,
+  test output shows pass/fail/ignored tallies
+- and JSON previews show item
+- or key counts.
 
 ### Preview Length Cap
 
@@ -174,8 +195,11 @@ The hook pipeline's `headroom_budget` parameter, when supplied, truncates the pr
 
 ### Sanitization
 
-Both pipelines sanitize preview and metadata text: newlines become spaces,
-control characters are stripped, and `|` in metadata values is replaced with `/`.
+Both pipelines sanitize preview and metadata text:
+
+- newlines become spaces,
+  control characters are stripped
+- and `|` in metadata values is replaced with `/`.
 
 ## Metadata Encoding Rules
 
@@ -187,5 +211,13 @@ control characters are stripped, and `|` in metadata values is replaced with `/`
 | Total cap                | 400 chars                                   | 300 chars                 |
 | Truncation               | char-safe                                   | char-safe, `...` appended |
 
-Common keys: `lang`, `fns`, `structs`, `traits`, `impls`, `classes`, `types`,
-`path` (prefetch), `center`.
+Common keys: `lang`,
+
+- `fns`
+- `structs`
+- `traits`
+- `impls`
+- `classes`
+- `types`,
+  `path` (prefetch)
+- `center`.

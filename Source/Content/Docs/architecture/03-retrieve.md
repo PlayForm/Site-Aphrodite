@@ -6,9 +6,11 @@ section: "Architecture"
 # Retrieve & Recursive Marker Resolution
 
 Two related paths turn a `<<<CCR:hash|type|size>>>` marker back into content:
-the HTTP `/retrieve` endpoint (inline_ccr → CcrStore, query filter + pagination,
-byte-exact round-trip) and the in-process recursive resolver `resolve::expand` (nested
-markers, depth limit, cycle-safe, never writes back).
+
+- the HTTP `/retrieve` endpoint (inline_ccr → CcrStore, query filter + pagination,
+  byte-exact round-trip)
+- and the in-process recursive resolver `resolve::expand` (nested
+  markers, depth limit, cycle-safe, never writes back).
 
 ## /retrieve HTTP path
 
@@ -51,8 +53,11 @@ sequenceDiagram
     HR-->>C: 200 {found:true, content, source:"ccr", truncated}
 ```
 
-Pagination facts: an explicit nonzero `limit` clamps to a 10,000-line server cap;
-`limit == 0` is not capped and returns the full document.
+Pagination facts:
+
+- an explicit nonzero `limit` clamps to a 10,000-line server cap;
+  `limit == 0` is not capped
+- and returns the full document.
 
 An empty stored document (`content: ""`) is a valid zero-line result, not an out-of-range offset.
 

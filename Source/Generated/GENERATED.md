@@ -20,6 +20,11 @@ hand: a change made in this directory is overwritten by the next run.
 - `Source/Generated/Module.json` <- `Module/Aphrodite/package.json` (Facts) - every generated header's provenance, the README's pin line
 - `Source/Generated/Primary/README.md` <- `Module/Aphrodite/README.md` (Copy) - /versions/ (the release badges, the tier table), /setup/
 - `Source/Generated/Primary/plugin.yaml` <- `Module/Aphrodite/plugins/aphrodite/plugin.yaml` (Copy) - /plugin/ (the manifest a reader can read in full)
+- `Source/Generated/Facts/Study.json` <- `Module/Aphrodite/README.md` (Facts) - the case study's hero monument and evidence plates, /benchmarks/ (StudyLedger), the landing stat badges
+- `Source/Generated/Facts/Benchmark.json` <- `Module/Aphrodite/README.md` (Facts) - /benchmarks/ (the four plates, the per-type chart, the limits), the case study's corpus plates
+- `Source/Generated/Facts/Narrative.json` <- `Module/Aphrodite/README.md` (Facts) - the case study (the catalog count, the threshold tiers, the shipped code_multiplier)
+- `Source/Generated/Facts/Narrative.json` <- `Module/Aphrodite/docs/classification/content-types.md` (Facts) - the case study (the registry size the catalog footnote quotes)
+- `Source/Generated/Facts/Releases.json` <- `Module/Aphrodite/CHANGELOG.md` (Facts) - /versions/ (the release register's versions and dates, the stamp count)
 
 ## What is declared and held
 

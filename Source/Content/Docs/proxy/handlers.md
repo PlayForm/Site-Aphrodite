@@ -350,9 +350,11 @@ Does not call the upstream - see `/health/upstream` for that.
 `version` reports the compiled `CARGO_PKG_VERSION`.
 
 `fill_pct` is a **compression-headroom** number, not store occupancy:
-it is `100 - compression_ratio_ema/20` clamped to `[1, 99]`,
-so a fresh process reports exactly `90.0` **with an empty store** and drifts toward `99`
-as the ratio approaches `1.0` (i.e. when little is being compressed).
+
+- it is `100 - compression_ratio_ema/20` clamped to `[1, 99]`,
+  so a fresh process reports exactly `90.0` **with an empty store**
+- and drifts toward `99`
+  as the ratio approaches `1.0` (i.e. when little is being compressed).
 
 `fill_pct_kind` states that explicitly so the field cannot be misread as a capacity gauge.
 

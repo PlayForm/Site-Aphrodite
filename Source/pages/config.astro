@@ -306,7 +306,7 @@ const Sections = [
 		<SectionNav Sections={Sections} />
 
 		<!-- The pick chain -->
-		<section id="pick-chain" class="relative w-full" aria-label="The file pick chain">
+		<section id="pick-chain" class="relative w-full" aria-label="The file pick chain" data-reveal>
 			<ZineTape Label="the pick chain" Color="teal" Side="right" />
 			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
 				Where the file is found
@@ -427,6 +427,60 @@ const Sections = [
 				<ZineStamp Label="load = read at dylib load" Color="bone" />
 				<ZineStamp Label="unwired = silent no-op" Color="raw" />
 			</div>
+			<!-- THE FILTER: a plain input over the rows already in the table. The
+			     table below is complete without it - the control is not rendered
+			     at all when the head script never set html.js - so a reader
+			     without JavaScript reads every key, and a reader with it can
+			     narrow 44 rows to the four they are chasing. -->
+			<div
+				class="mt-12 border-4 border-blood-crimson bg-carbon-void"
+				data-key-filter-wrap
+			>
+				<div
+					class="flex flex-wrap items-baseline justify-between gap-4 border-b-2 border-blood-crimson bg-soot-black px-5 py-3"
+				>
+					<label
+						for="key-filter"
+						class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary"
+					>
+						FILTER THE TABLE
+					</label>
+					<span
+						class="font-mono text-base uppercase tracking-widest text-zinc-dust"
+						data-key-filter-count
+						aria-live="polite"
+					>
+						{Keys.length} KEYS
+					</span>
+				</div>
+				<div class="px-5 py-4">
+					<input
+						id="key-filter"
+						data-key-filter
+						type="search"
+						autocomplete="off"
+						spellcheck="false"
+						placeholder="threshold · APHRODITE_ · dylib · hot"
+						class="w-full border border-oxblood-dark bg-soot-black px-4 py-2 font-mono text-base text-bone-newsprint placeholder:text-zinc-dust"
+					/>
+					<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+						One field, matched against every column of every row: a key name
+						(<code class="text-bone-newsprint">threshold</code>), an env override
+						(<code class="text-bone-newsprint">APHRODITE_</code>), a reader
+						(<code class="text-bone-newsprint">dylib</code>), a live class
+						(<code class="text-bone-newsprint">hot</code>) or any word of an effect.
+					</p>
+					<p class="mt-2 max-w-3xl text-base text-zinc-dust">
+						A section whose every row is filtered out takes its heading with it, so what is
+						left is the answer and not the shape of the file.
+					</p>
+					<p class="mt-2 max-w-3xl text-base text-zinc-dust">
+						Clear the field to get the whole table back - this hides rows that are already on
+						the page and never asks the network for anything.
+					</p>
+				</div>
+			</div>
+
 			<div class="mt-12">
 				<ConfigKeys Rows={Keys} Notes={SectionNotes} />
 			</div>
@@ -839,6 +893,16 @@ const Sections = [
 	<ZineDiagramNav />
 </Base>
 
+<style>
+	/* The key filter is an enhancement, never a requirement: the head script's
+	   html.js is what tells us scripting is alive, so a reader without
+	   JavaScript is not shown a control that would do nothing. The table itself
+	   is server-rendered and complete in both cases. */
+	:global(html:not(.js)) [data-key-filter-wrap] {
+		display: none;
+	}
+</style>
+
 <script>
 	// ---- The editor default (captured on first init - the reset restores it
 	// verbatim). The element references are re-queried on every init: the
@@ -1200,4 +1264,72 @@ const Sections = [
 
 	Init();
 	document.addEventListener("astro:page-load", Init);
+
+	// ---- THE KEY FILTER: a plain input over the rows already rendered. No
+	// framework, no fetch, no re-render - it toggles `hidden` on rows the table
+	// already shipped, which is why it also works with the editor above it
+	// untouched. A section whose every row is filtered out is hidden whole, so
+	// the reader never sees a heading with nothing under it. ----
+	function BindKeyFilter(): void {
+		const Input = document.querySelector<HTMLInputElement>("[data-key-filter]");
+		const Root = document.querySelector<HTMLElement>("#keys");
+
+		if (!Input || !Root || Input.dataset.filterBound) {
+			return;
+		}
+
+		Input.dataset.filterBound = "1";
+
+		const Count = Root.querySelector<HTMLElement>("[data-key-filter-count]");
+		const Groups = Array.from(Root.querySelectorAll<HTMLElement>("[data-key-group]"));
+		const Rows = Groups.flatMap((Group) =>
+			Array.from(Group.querySelectorAll<HTMLTableRowElement>("[data-key-row]")).map((Row) => ({
+				Group,
+				Row,
+				// The whole row, not one column: a reader searching "hot" wants the
+				// live column, searching "APHRODITE_" wants the env column, and both
+				// are the same gesture.
+				Text: (Row.textContent ?? "").toLowerCase(),
+			})),
+		);
+
+		if (Rows.length === 0) {
+			return;
+		}
+
+		const Apply = (): void => {
+			const Query = Input.value.trim().toLowerCase();
+			let Shown = 0;
+			const Live = new Set<HTMLElement>();
+
+			for (const { Group, Row, Text } of Rows) {
+				const Match = Query === "" || Text.includes(Query);
+
+				Row.hidden = !Match;
+
+				if (Match) {
+					Shown += 1;
+					Live.add(Group);
+				}
+			}
+
+			for (const Group of Groups) {
+				Group.hidden = !Live.has(Group);
+			}
+
+			if (Count) {
+				Count.textContent =
+					Query === "" ? `${Shown} KEYS` : `${Shown} OF ${Rows.length} KEYS`;
+			}
+		};
+
+		Input.addEventListener("input", Apply);
+
+		// The table ships complete, so the first paint is already the "no query"
+		// state; Apply() only normalises the count for a re-entered page.
+		Apply();
+	}
+
+	BindKeyFilter();
+	document.addEventListener("astro:page-load", BindKeyFilter);
 </script>

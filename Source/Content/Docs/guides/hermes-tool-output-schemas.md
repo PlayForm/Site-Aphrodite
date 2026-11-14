@@ -11,8 +11,11 @@ grep listings, markdown, console logs.
 Aphrodite classifies each result into a content type, builds a compact preview, and -
 when the result is above the compression threshold and eligible - replaces it with a CCR marker.
 
-This page maps the tool surface: what each tool returns, how Aphrodite classifies that output,
-and how much compression typically helps.
+This page maps the tool surface:
+
+- what each tool returns
+- how Aphrodite classifies that output,
+  and how much compression typically helps.
 
 The catalog below covers 43 tool-output shapes: 31 Hermes tools, 10 Aphrodite meta-tools,
 and two special entries.

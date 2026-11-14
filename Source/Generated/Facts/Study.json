@@ -1,0 +1,51 @@
+{
+	"_Generated": {
+		"By": "Scripts/Prepare.ts",
+		"From": [
+			"Module/Aphrodite/README.md"
+		],
+		"Transform": [
+			"Facts"
+		],
+		"Note": "Generated. Change the source in PlayForm/Aphrodite, push it, then advance the Module/Aphrodite pin - never this file."
+	},
+	"Study": {
+		"Measured": "Sep 2026",
+		"Sessions": "200",
+		"ApiCalls": "6,843",
+		"Period": "Sep 18-20",
+		"TokensWithMarkers": "424,959,588",
+		"TokensExpanded": "581,302,405",
+		"TokensSaved": "156,342,817",
+		"SavedPct": "26.9%",
+		"SavedMillions": "156M+",
+		"AvgPerCall": "22,921",
+		"SessionsSaved": "183 / 200",
+		"MedianRatio": "22.9%",
+		"TaxCalls": "2,275",
+		"TaxTokens": "2,011,583",
+		"TaxPct": "1.3%",
+		"CharsPerTok": "3.0-4.5",
+		"Band": "~24-33%",
+		"BandCenter": "~27%",
+		"Bands": [
+			{
+				"Range": "~0%",
+				"Percent": 0
+			},
+			{
+				"Range": "~5%",
+				"Percent": 5
+			},
+			{
+				"Range": "20-25%",
+				"Percent": 23
+			},
+			{
+				"Range": "76-82%",
+				"Percent": 79
+			}
+		],
+		"From": "Module/Aphrodite/README.md:694-740"
+	}
+}

@@ -1,4 +1,20 @@
 ---
+/**
+ * ZinePreview - the right half of the stream/preview pair: the one line the
+ * model reads, plus the marker that addresses the original bytes.
+ *
+ * The pair is the product's argument (grammar law 4), and Documentation/Motion.md
+ * renders it as motion: the raw pane prints line by line (`[data-stream]` in
+ * ZineStream) and this pane lands after it, on the frame the last line
+ * finishes. `Enter` is that delay in milliseconds; the caller owns it because
+ * only the caller knows how long the stream beside it is. A preview that
+ * arrives first would be a summary that appeared before the thing it
+ * summarises.
+ *
+ * The entrance root that owns the pair (a `[data-reveal]` section or a
+ * `[data-enter]` panel) runs both halves on its own beat - a panel that rises
+ * also streams and lands, exactly as the deck's Enter(Scene) does.
+ */
 interface Props {
 	/** The micro-label above the result (canary by default). */
 	Label: string;
@@ -11,9 +27,15 @@ interface Props {
 
 	/** Label color: canary (default), teal, raw. */
 	Color?: "canary" | "teal" | "raw";
+
+	/**
+	 * Delay before this pane arrives, in ms (`[data-enter]`). Defaults to the
+	 * deck's own beat for the panel that follows a stream.
+	 */
+	Enter?: number;
 }
 
-const { Label, Result, Hash, Color = "canary" } = Astro.props;
+const { Label, Result, Hash, Color = "canary", Enter = 980 } = Astro.props;
 
 const Palette = {
 	canary: "text-stamped-canary",
@@ -22,7 +44,7 @@ const Palette = {
 }[Color];
 ---
 
-<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
+<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5" data-enter={Enter}>
 	<div class={`mb-1 text-base font-black uppercase tracking-widest ${Palette}`}>{Label}</div>
 	<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold text-bone-white sm:text-base">
 		{Result}

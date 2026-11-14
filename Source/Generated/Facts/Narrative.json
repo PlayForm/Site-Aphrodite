@@ -1,0 +1,55 @@
+{
+	"_Generated": {
+		"By": "Scripts/Prepare.ts",
+		"From": [
+			"Module/Aphrodite/README.md",
+			"Module/Aphrodite/docs/classification/content-types.md"
+		],
+		"Transform": [
+			"Facts"
+		],
+		"Note": "Generated. Change the source in PlayForm/Aphrodite, push it, then advance the Module/Aphrodite pin - never this file."
+	},
+	"Narrative": {
+		"CatalogTypes": 20,
+		"Tiers": [
+			{
+				"Tier": "ERROR",
+				"Types": "error",
+				"Multiplier": "×8",
+				"Qualifier": ""
+			},
+			{
+				"Tier": "CODE",
+				"Types": "code_rust · code_python · code_go · code_js · code",
+				"Multiplier": "×1.0",
+				"Qualifier": "scaled by code_multiplier"
+			},
+			{
+				"Tier": "DIFF / TRACKED",
+				"Types": "diff · git · text",
+				"Multiplier": "×2",
+				"Qualifier": ""
+			},
+			{
+				"Tier": "DEFAULT",
+				"Types": "tool_output · json · everything else",
+				"Multiplier": "×1",
+				"Qualifier": ""
+			},
+			{
+				"Tier": "NOISY (BASE)",
+				"Types": "linter · build_output · log",
+				"Multiplier": "×1",
+				"Qualifier": "never halved"
+			}
+		],
+		"CodeMultiplier": "×1.0",
+		"CodeMultiplierKey": "code_multiplier",
+		"From": "Module/Aphrodite/README.md:305-371"
+	},
+	"Registry": {
+		"Types": 30,
+		"From": "docs/classification/content-types.md:120"
+	}
+}

@@ -9,9 +9,13 @@ Directives are short behavioral instruction files - one `.md` file each -
 that `pre_llm_call` injects inline into the LLM's context on every call.
 
 Unlike file content (which the transform hooks compress into CCR markers),
-directives travel verbatim: they are compact enough to never need compression,
-and the active set can be listed, swapped, and stacked mid-conversation
-via the `aphrodite_directive` tool without touching any config file.
+directives travel verbatim:
+
+- they are compact enough to never need compression,
+  and the active set can be listed
+- swapped
+- and stacked mid-conversation
+  via the `aphrodite_directive` tool without touching any config file.
 
 ## Design principle: usage, not mechanism
 
@@ -132,9 +136,14 @@ for its place in the full 13-tool reference):
 | `remove` | Drop a directive from the active set                   | `{active: [...]}`                                                                    |
 | `reset`  | Clear the active set, ephemerals, and the manual latch | `{active: []}`                                                                       |
 
-`load` is the lazy-activation action: unlike `add` (which is silent when the name is unknown
-or already active), `load` returns a distinct `{loaded, active}` shape and **errors**
-on an unknown name, so a lazy-load typo surfaces instead of being swallowed.
+`load` is the lazy-activation action:
+
+- unlike `add` (which is silent when the name is unknown
+  or already active)
+- `load` returns a distinct `{loaded, active}` shape
+- and **errors**
+  on an unknown name
+- so a lazy-load typo surfaces instead of being swallowed.
 
 It is idempotent when the directive is already active.
 

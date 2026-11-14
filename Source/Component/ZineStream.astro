@@ -2,9 +2,19 @@
 interface Props {
 	/** Terminal lines; Tone maps to the suppression opacities or a highlight. */
 	Lines: { Text: string; Tone?: "plain" | "dim" | "fade" | "mute" | "result" | "canary" | "teal" }[];
+	/**
+	 * Print the lines one after another instead of showing them at once.
+	 *
+	 * This is the motion contract's `[data-stream]` (Documentation/Motion.md):
+	 * the stagger IS the streaming log - the product's argument rendered as
+	 * motion - so it belongs on a pane of real command output and nowhere else.
+	 * The pane's own entrance root (a `[data-reveal]` section) owns the beat:
+	 * the lines print when the panel arrives, not while it is still off-screen.
+	 */
+	Stream?: boolean;
 }
 
-const { Lines } = Astro.props;
+const { Lines, Stream = false } = Astro.props;
 
 const Tone = {
 	plain: "",
@@ -17,6 +27,9 @@ const Tone = {
 };
 ---
 
-<div class="ccr-marker border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
+<div
+	class="ccr-marker border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust"
+	data-stream={Stream ? "" : undefined}
+>
 	{Lines.map(({ Text, Tone: LineTone = "plain" }) => <div class={Tone[LineTone]} set:html={Text} />)}
 </div>

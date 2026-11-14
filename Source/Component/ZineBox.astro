@@ -38,6 +38,24 @@ interface Props {
 
 	/** Extra classes for the plate itself. */
 	Class?: string;
+
+	/**
+	 * Sweep the plate's edge once, on the beat of the entrance root that owns
+	 * it (`[data-wipe]` in Documentation/Motion.md). The plate becomes the
+	 * container-query context, so the bar crosses this plate and not the
+	 * viewport. Opt-in: a plate that carries copy and follows nothing does not
+	 * need a second mark drawing attention to it.
+	 */
+	Wipe?: boolean;
+
+	/**
+	 * Make the plate its own entrance root, on a delay in ms (`[data-enter]`).
+	 * Only for a plate that must land AFTER the panel it sits in - the
+	 * monument figure under the manifesto, a plate under a heading. A plate
+	 * that simply arrives with its section wants no prop at all: the section
+	 * is already the entrance root.
+	 */
+	Enter?: number;
 }
 
 const {
@@ -48,6 +66,8 @@ const {
 	TapeColor = "raw",
 	TapeSide = "left",
 	Class = "",
+	Wipe = false,
+	Enter,
 } = Astro.props;
 
 const Shadow = {
@@ -74,9 +94,12 @@ const Tilt = Rotate === "" ? "max-sm:rotate-0" : `${Rotate} max-sm:rotate-0`;
 		Pad,
 		Shadow,
 		Tilt,
+		Wipe && "motion-wipe-host",
 		Class,
 	]}
+	data-enter={Enter}
 >
+	{Wipe && <span class="motion-wipe" data-wipe aria-hidden="true" />}
 	{Tape !== undefined && <ZineTape Variant="corner" Label={Tape} Color={TapeColor} Side={TapeSide} />}
 	<slot />
 </div>

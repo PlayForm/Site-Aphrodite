@@ -1,0 +1,222 @@
+{
+	"_Generated": {
+		"By": "Scripts/Prepare.ts",
+		"From": [
+			"Module/Aphrodite/CHANGELOG.md"
+		],
+		"Transform": [
+			"Facts"
+		],
+		"Note": "Generated. Change the source in PlayForm/Aphrodite, push it, then advance the Module/Aphrodite pin - never this file."
+	},
+	"Releases": {
+		"Count": 34,
+		"Entries": [
+			{
+				"Version": "1.8.1",
+				"Title": "Docs catch up to the engine, ASCII ellipsis markers, compile-time debug gate",
+				"Date": "2026-11-14",
+				"Line": 3
+			},
+			{
+				"Version": "1.8.0",
+				"Title": "Bounded CCR store: retention caps, index-driven sweep, truthful telemetry",
+				"Date": "2026-11-08",
+				"Line": 74
+			},
+			{
+				"Version": "1.7.0",
+				"Title": "Feature port: TOML templates, auto-expand, context engine, live containers, scripting, caps",
+				"Date": "2026-10-13",
+				"Line": 151
+			},
+			{
+				"Version": "1.6.6",
+				"Title": "Catalog review: prefetch path guard, setup hardening, opt-in context engine",
+				"Date": "2026-10-07",
+				"Line": 192
+			},
+			{
+				"Version": "1.6.5",
+				"Title": "Catalog review: mandatory in-tree checksums + no legacy home adoption",
+				"Date": "2026-10-05",
+				"Line": 228
+			},
+			{
+				"Version": "1.6.4",
+				"Title": "Publish chaining + shim import hygiene + cross-repo child push",
+				"Date": "2026-09-25",
+				"Line": 258
+			},
+			{
+				"Version": "1.6.3",
+				"Title": "One runtime-home decision for both halves",
+				"Date": "2026-09-25",
+				"Line": 293
+			},
+			{
+				"Version": "1.6.2",
+				"Title": "Release-infra SHA256SUMS regeneration + version track",
+				"Date": "2026-09-24",
+				"Line": 345
+			},
+			{
+				"Version": "1.6.1",
+				"Title": "Plugin manifest cleanup + version track",
+				"Date": "2026-09-24",
+				"Line": 354
+			},
+			{
+				"Version": "1.6.0",
+				"Title": "Config diagnostics + opt-in config auto-reload",
+				"Date": "2026-09-24",
+				"Line": 364
+			},
+			{
+				"Version": "1.5.1",
+				"Title": "Headroom fork publication 0.1.3",
+				"Date": "2026-09-21",
+				"Line": 380
+			},
+			{
+				"Version": "1.5.0",
+				"Title": "Edition-2024 + atomization + debug tool",
+				"Date": "2026-09-20",
+				"Line": 389
+			},
+			{
+				"Version": "1.4.5",
+				"Title": "Config template refresh + provider-neutral defaults",
+				"Date": "2026-09-16",
+				"Line": 404
+			},
+			{
+				"Version": "1.4.4",
+				"Title": "Setup reliability hotfix",
+				"Date": "2026-09-16",
+				"Line": 422
+			},
+			{
+				"Version": "1.4.3",
+				"Title": "Development-branch release pipeline, directives override, and plugin hardening",
+				"Date": "2026-09-15",
+				"Line": 445
+			},
+			{
+				"Version": "1.4.2",
+				"Title": "Exclude experimental `s2` from the release workspace (cgmath advisory)",
+				"Date": "2026-08-15",
+				"Line": 506
+			},
+			{
+				"Version": "1.4.1",
+				"Title": "Release-tooling fixes (clippy build break + headroom crate-name rename misses)",
+				"Date": "2026-08-15",
+				"Line": 530
+			},
+			{
+				"Version": "1.4.0",
+				"Title": "Packaging, runtime-cache, and config-default fixes from 1.3.9 feedback",
+				"Date": "2026-08-15",
+				"Line": 551
+			},
+			{
+				"Version": "1.3.9",
+				"Title": "Fix packaged crate missing built-in directive files",
+				"Date": "2026-08-14",
+				"Line": 597
+			},
+			{
+				"Version": "1.3.8",
+				"Title": "Tool Schema Self-Documentation + Lazy Directive + Release Channel Fix",
+				"Date": "2026-08-14",
+				"Line": 641
+			},
+			{
+				"Version": "1.3.6",
+				"Title": "Preview Pipe Sanitization Fix",
+				"Date": "2026-07-24",
+				"Line": 762
+			},
+			{
+				"Version": "1.3.5",
+				"Title": "S2 Context Navigation & Delta Catalog",
+				"Date": "2026-07-22",
+				"Line": 776
+			},
+			{
+				"Version": "1.3.4",
+				"Title": "Preview Intelligence & Release Hardening",
+				"Date": "2026-07-14",
+				"Line": 795
+			},
+			{
+				"Version": "1.3.3",
+				"Title": "Self-Bootstrapping Setup & FFI Hardening",
+				"Date": "2026-07-14",
+				"Line": 826
+			},
+			{
+				"Version": "1.3.2",
+				"Title": "Correctness Sweep: Compression Losslessness, Proxy Security, Release Channel",
+				"Date": "2026-07-14",
+				"Line": 848
+			},
+			{
+				"Version": "1.3.0",
+				"Title": "Hermes Wrapper-Unwrap Fix, cargo install Support",
+				"Date": "2026-07-13",
+				"Line": 1012
+			},
+			{
+				"Version": "1.2.6",
+				"Title": "CHANGELOG Backfill, Docs Sync",
+				"Date": "2026-07-13",
+				"Line": 1060
+			},
+			{
+				"Version": "1.2.5",
+				"Title": "macOS Gatekeeper Fix",
+				"Date": "2026-07-13",
+				"Line": 1075
+			},
+			{
+				"Version": "1.2.3",
+				"Title": "Conversational Directives System",
+				"Date": "2026-07-13",
+				"Line": 1095
+			},
+			{
+				"Version": "1.2.2",
+				"Title": "crates.io Publish + Doc Sync",
+				"Date": "2026-07-13",
+				"Line": 1137
+			},
+			{
+				"Version": "1.2.1",
+				"Title": "Silent Startup Failures",
+				"Date": "2026-07-11",
+				"Line": 1174
+			},
+			{
+				"Version": "1.2.0",
+				"Title": "Headroom Upstream Sync",
+				"Date": "2026-07-11",
+				"Line": 1216
+			},
+			{
+				"Version": "1.1.0",
+				"Title": "Configurable Proxy Ports",
+				"Date": "2026-07-03",
+				"Line": 1265
+			},
+			{
+				"Version": "0.7.0",
+				"Title": "Atomization + Live Containers",
+				"Date": "2026-06-17",
+				"Line": 1290
+			}
+		],
+		"From": "CHANGELOG.md:1290-3"
+	}
+}

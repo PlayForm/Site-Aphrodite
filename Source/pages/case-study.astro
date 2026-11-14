@@ -37,12 +37,38 @@ const Study = {
 	BandCenter: "~27%",
 } as const;
 
-// The four secondary figures, as a labelled strip: the label is the claim and
-// the unit is the qualifier, so neither travels without the other.
+// The three secondary figures, as a labelled strip: the label is the claim and
+// the unit is the qualifier, so neither travels without the other. `Count` is
+// the same figure as a number the counter climbs to ([data-count]), and
+// `Suffix` is everything the number is not - the percent sign, the denominator
+// - so the markup reads "183 / 200" before any script runs and reads the same
+// after it. The three figures are Study's, split at the point where the digits
+// stop.
 const Metrics = [
-	{ Label: "AVG SAVED / CALL", Value: Study.AvgPerCall, Unit: "TOKENS PER CALL", Accent: "text-weathered-teal" },
-	{ Label: "SESSIONS THAT SAVED", Value: Study.SessionsSaved, Unit: "OF THE 200 MEASURED", Accent: "text-bone-white" },
-	{ Label: "MEDIAN SESSION RATIO", Value: Study.MedianRatio, Unit: "SAVED OF THE BUDGET", Accent: "text-weathered-teal" },
+	{
+		Label: "AVG SAVED / CALL",
+		Value: Study.AvgPerCall,
+		Count: 22921,
+		Suffix: "",
+		Unit: "TOKENS PER CALL",
+		Accent: "text-weathered-teal",
+	},
+	{
+		Label: "SESSIONS THAT SAVED",
+		Value: "183",
+		Count: 183,
+		Suffix: " / 200",
+		Unit: "OF THE 200 MEASURED",
+		Accent: "text-bone-white",
+	},
+	{
+		Label: "MEDIAN SESSION RATIO",
+		Value: "22.9",
+		Count: 22.9,
+		Suffix: "%",
+		Unit: "SAVED OF THE BUDGET",
+		Accent: "text-weathered-teal",
+	},
 ] as const;
 
 // Savings by session shape (README.md:497-499). The label carries the shape,
@@ -355,7 +381,7 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 >
 	<PageShell Rhythm="wide">
 		<!-- ============ HERO // THE MANIFESTO OPEN ============ -->
-		<header class="relative flex w-full flex-col items-start pt-12">
+		<header class="relative flex w-full flex-col items-start pt-12" data-enter>
 			<ZineTape Variant="strip" Label="CASE FILE // APHRODITE-CCR · SEP 2026 · MEASURED" />
 			<ZineBox Tone="crimson" Size="lg" Class="w-full lg:p-16">
 				<ZineKicker Tone="dust">THE CASE STUDY // WHY, NOT HOW</ZineKicker>
@@ -376,26 +402,39 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					substance on call, and make the agent - not the engine - the one who pays for
 					detail.
 				</p>
-				<!-- Monument stat: the hook. The study's full ledger lives on /benchmarks/. -->
-				<div class="zine-box-subtle mt-24 w-full max-w-4xl border-[3px] border-raw-blood bg-soot-black p-8 sm:p-10">
+				<!-- Monument stat: the hook. The study's full ledger lives on /benchmarks/.
+				     It is its own entrance root, 240ms behind the manifesto it follows,
+				     and the two figures climb to their values once. -->
+				<div
+					class="zine-box-subtle mt-24 w-full max-w-4xl border-[3px] border-raw-blood bg-soot-black p-8 sm:p-10"
+					data-enter="240"
+				>
 					<ZineKicker Tone="dust">CONTEXT TOKENS SAVED · 200 REAL SESSIONS</ZineKicker>
 					<div
 						class="mt-6 font-headline text-5xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-7xl"
 					>
-						{Study.Saved}
+						<span data-count="156342817">{Study.Saved}</span>
 					</div>
 					<div class="mt-6 flex flex-wrap items-center gap-8 font-mono text-base font-bold">
-						<span class="text-stamped-canary">{Study.SavedPct} OF THE TOTAL BUDGET</span>
+						<span class="text-stamped-canary"
+							><span data-count="26.9">26.9</span>% OF THE TOTAL BUDGET</span
+						>
 					</div>
+					<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+						The percentage is the honest way to read the number: 156 million tokens is
+						only impressive once you know what it was a share of. 17 of the 200 sessions
+						saved nothing at all, and the mean is pulled up by the long tool-heavy runs -
+						which is why the median sits beside it below.
+					</p>
 					<div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
 						{
-							Metrics.map(({ Label, Value, Unit, Accent }) => (
+							Metrics.map(({ Label, Value, Count, Suffix, Unit, Accent }) => (
 								<div class="border-t border-oxblood-dark pt-4">
 									<div class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 										{Label}
 									</div>
 									<div class={`mt-2 font-headline text-2xl font-black tracking-tight ${Accent}`}>
-										{Value}
+										<span data-count={Count}>{Value}</span>{Suffix}
 									</div>
 									<div class="mt-1 font-mono text-base text-zinc-dust">{Unit}</div>
 								</div>
@@ -408,13 +447,19 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 		</header>
 
 		<!-- ============ THE THREE CLAIMS ============ -->
-		<section id="claims" class="relative w-full">
+		<section id="claims" class="relative w-full" data-reveal>
 			<ZineTape Variant="tab" Label="THE THREE CLAIMS" Color="raw" />
 			<p class="mt-16 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				The whole argument fits in three lines, and every section below is the evidence for one of
 				them.
 			</p>
-			<div class="mt-16 isolate grid grid-cols-1 gap-16 lg:grid-cols-3">
+			<!-- The three claims arrive as one plate on a delay of their own: they
+			     are a single argument stated three ways, so staggering them one by
+			     one would make them read as three separate points. -->
+			<div
+				class="mt-16 isolate grid grid-cols-1 gap-16 lg:grid-cols-3"
+				data-enter="180"
+			>
 				{
 					Claims.map(({ Stamp, Subject, Verb, Body }) => (
 						<div class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-6 pt-9 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg] sm:hover:rotate-0">
@@ -443,9 +488,9 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 		<SectionNav Sections={Sections} />
 
 		<!-- ============ I. THE PROBLEM // CONTEXT FLOOD ============ -->
-		<section id="problem" class="relative w-full">
+		<section id="problem" class="relative w-full" data-reveal>
 			<ZineTape Variant="tab" Label="I // THE PROBLEM" Color="raw" />
-			<ZineBox Tone="crimson" Size="lg" Rotate="-rotate-[0.6deg]" Class="w-full">
+			<ZineBox Tone="crimson" Size="lg" Rotate="-rotate-[0.6deg]" Class="w-full" Wipe>
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					The flood is not the data's fault
 				</h2>
@@ -495,9 +540,9 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 		</section>
 
 		<!-- ============ II. THE GATE // CLASSIFY ============ -->
-		<section id="gate" class="relative w-full">
+		<section id="gate" class="relative w-full" data-reveal>
 			<ZineTape Variant="tab" Label="II // THE GATE" Color="canary" Rotate="rotate-1" />
-			<ZineBox Tone="canary" Size="lg" Rotate="rotate-[0.5deg]" Class="w-full">
+			<ZineBox Tone="canary" Size="lg" Rotate="rotate-[0.5deg]" Class="w-full" Wipe>
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					The classifier is the gate
 				</h2>
@@ -540,7 +585,11 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					the name is what everything downstream keys on.
 				</p>
 			</ZineBox>
-			<figure class="mt-24 border border-oxblood-dark bg-asphalt-panel p-4" data-diagram="preview-flow">
+			<figure
+				class="mt-24 border border-oxblood-dark bg-asphalt-panel p-4"
+				data-diagram="preview-flow"
+				data-enter="220"
+			>
 				<div class="overflow-x-auto" set:html={PreviewFlow} />
 				<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 					M2 // PREVIEW FLOW
@@ -576,9 +625,9 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 		</section>
 
 		<!-- ============ III. THE CONTRACT // THE MARKER ============ -->
-		<section id="contract" class="relative w-full">
+		<section id="contract" class="relative w-full" data-reveal>
 			<ZineTape Variant="tab" Label="III // THE CONTRACT" Color="teal" />
-			<ZineBox Tone="teal" Size="lg" Rotate="-rotate-[0.4deg]" Class="w-full">
+			<ZineBox Tone="teal" Size="lg" Rotate="-rotate-[0.4deg]" Class="w-full" Wipe>
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					The marker is the contract
 				</h2>
@@ -634,9 +683,9 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 		</section>
 
 		<!-- ============ IV. THE LOOP // FOUR LAYERS ============ -->
-		<section id="loop" class="relative w-full">
+		<section id="loop" class="relative w-full" data-reveal>
 			<ZineTape Variant="tab" Label="IV // THE LOOP" Color="raw" Rotate="rotate-1" />
-			<ZineBox Tone="crimson" Size="lg" Rotate="rotate-[0.4deg]" Class="w-full">
+			<ZineBox Tone="crimson" Size="lg" Rotate="rotate-[0.4deg]" Class="w-full" Wipe>
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					Four layers, one decision
 				</h2>
@@ -650,7 +699,10 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 				</p>
 				<!-- The layer grid: 2x2 until xl - aligned with the index stage grid,
 				     where 4-across between 1024-1279px squished the cards. -->
-				<div class="mt-16 isolate grid grid-cols-1 items-start gap-16 sm:grid-cols-2 xl:grid-cols-4">
+				<div
+					class="mt-16 isolate grid grid-cols-1 items-start gap-16 sm:grid-cols-2 xl:grid-cols-4"
+					data-enter="200"
+				>
 					{
 						Layers.map(({ N, Name, Figure, Tone, Note }) => (
 							<div class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-6 pt-9 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.2deg] sm:hover:rotate-0">
@@ -706,10 +758,10 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 		</section>
 
 		<!-- ============ V. THE KNOBS // THRESHOLDS ============ -->
-		<section id="knobs" class="relative w-full">
+		<section id="knobs" class="relative w-full" data-reveal>
 			<ZineTape Variant="tab" Label="V // THE KNOBS" Color="canary" />
-			<ZineBox Tone="canary" Size="lg" Rotate="-rotate-[0.5deg]" Class="w-full">
-				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2">
+			<ZineBox Tone="canary" Size="lg" Rotate="-rotate-[0.5deg]" Class="w-full" Wipe>
+				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2" data-enter="200">
 					<div>
 						<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 							The thresholds are the knobs
@@ -777,9 +829,9 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 		</section>
 
 		<!-- ============ VI. THE EVIDENCE // TWO PLATES ============ -->
-		<section id="evidence" class="relative w-full">
+		<section id="evidence" class="relative w-full" data-reveal>
 			<ZineTape Variant="tab" Label="VI // THE EVIDENCE" Color="teal" Rotate="rotate-1" />
-			<ZineBox Tone="teal" Size="lg" Rotate="-rotate-[0.4deg]" Class="w-full">
+			<ZineBox Tone="teal" Size="lg" Rotate="-rotate-[0.4deg]" Class="w-full" Wipe>
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					What one output costs
 				</h2>

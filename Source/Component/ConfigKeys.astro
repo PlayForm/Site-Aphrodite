@@ -47,7 +47,7 @@ const Sections = [...new Set(Rows.map((Row) => Row.Section))];
 
 {
 	Sections.map((Section) => (
-		<div class="mt-16 first:mt-0">
+		<div class="mt-16 first:mt-0" data-key-group>
 			<div class="flex flex-wrap items-baseline justify-between gap-4">
 				<h3 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 					{Section}
@@ -76,7 +76,7 @@ const Sections = [...new Set(Rows.map((Row) => Row.Section))];
 					</thead>
 					<tbody class="divide-y divide-oxblood-dark/50">
 						{Rows.filter((Row) => Row.Section === Section).map((Row) => (
-							<tr class="align-top text-zinc-dust">
+							<tr class="align-top text-zinc-dust" data-key-row={Row.Key}>
 								<td class="px-5 py-3 font-mono text-base text-bone-newsprint">{Row.Key}</td>
 								<td class="px-5 py-3 font-mono text-base">{Row.Type}</td>
 								<td class="px-5 py-3 font-mono text-base text-stamped-canary">{Row.Default}</td>

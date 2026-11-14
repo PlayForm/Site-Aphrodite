@@ -7,8 +7,11 @@ section: "Overview"
 
 Aphrodite compresses context before it hits the LLM.
 
-It is the reason there are two integration paths: a reverse proxy
-for any OpenAI-compatible client, or a native Hermes plugin with hook-level interception.
+It is the reason there are two integration paths:
+
+- a reverse proxy
+  for any OpenAI-compatible client
+- or a native Hermes plugin with hook-level interception.
 
 CCR (Compress-Cache-Retrieve) storage, a 30-type classifier, context engine,
 and prefetch pipeline - all under 1ms.

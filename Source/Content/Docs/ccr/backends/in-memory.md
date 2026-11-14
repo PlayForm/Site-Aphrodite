@@ -45,9 +45,13 @@ InMemoryCcrStore::with_capacity_and_ttl(10_000, Duration::from_secs(cli.ccr_ttl_
 
 ## Expiry: Sliding Idle Window
 
-Like the SQLite backend, the TTL is an idle window: every successful `get` restarts the
-entry's clock via `last_accessed`, bounded by an absolute max lifetime
-of 8x the idle TTL measured from insertion - so constant access can never pin an entry forever.
+Like the SQLite backend, the TTL is an idle window:
+
+- every successful `get` restarts the
+  entry's clock via `last_accessed`
+- bounded by an absolute max lifetime
+  of 8x the idle TTL measured from insertion - so constant access can never pin an entry
+  forever.
 
 ## Operations
 

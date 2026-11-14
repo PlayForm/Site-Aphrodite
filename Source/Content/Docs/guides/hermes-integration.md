@@ -10,9 +10,13 @@ Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point 
 It is the reason the interception lives inside the turn: tool output never hits a wire,
 so only hook-level registration can catch it before it becomes message history.
 
-The plugin is a thin Python loader: it registers six hooks, thirteen tools,
-and an optional context engine with Hermes, then forwards every call into a Rust dylib
-that holds all of the actual behavior.
+The plugin is a thin Python loader:
+
+- it registers six hooks
+- thirteen tools,
+  and an optional context engine with Hermes
+- then forwards every call into a Rust dylib
+  that holds all of the actual behavior.
 
 Two proxy processes - a cache proxy and a token proxy - run alongside as subprocesses,
 and a canonical runtime home under `~/.hermes/aphrodite/` holds the binaries, config,
@@ -46,9 +50,14 @@ per process** (no hot-reload) and smoke-tests in a subprocess
 before loading (a faulting image degrades to a graceful "plugin disabled" instead
 of killing the gateway).
 
-Registration is driven by the dylib: the shim asks the dylib for its hook names and tool schemas
-and registers one callback per name, so the hook set and tool set are always registered together
-and a broken callback is isolated without failing the others.
+Registration is driven by the dylib:
+
+- the shim asks the dylib for its hook names
+- and tool schemas
+  and registers one callback per name
+- so the hook set
+- and tool set are always registered together
+  and a broken callback is isolated without failing the others.
 
 `plugin.yaml` declares the same six hooks and thirteen tools for Hermes' manifest.
 
@@ -66,9 +75,14 @@ that forwards its arguments to the dylib and hands the JSON reply back to Hermes
 | `pre_llm_call`              | Before each LLM request        | Inject directives, nudges, and the recall catalog under a hard byte budget  |
 | `post_llm_call`             | After each LLM response        | Archive the turn, advance the counter, expire nudges and stale tasks        |
 
-`transform_tool_result` is where tool output becomes a marker: the hook classified the result
-into a content type, hashed it (BLAKE3), stored it, and replaced it with a marker
-of the form `<<<CCR:hash|type|size>>>` with a compact preview.
+`transform_tool_result` is where tool output becomes a marker:
+
+- the hook classified the result
+  into a content type
+- hashed it (BLAKE3)
+- stored it
+- and replaced it with a marker
+  of the form `<<<CCR:hash|type|size>>>` with a compact preview.
 
 The agent can recover the exact original bytes with `aphrodite_retrieve`.
 
@@ -76,9 +90,21 @@ See [Plugin Hooks](/docs/plugin/hooks/) for the full per-hook reference.
 
 ## Tools
 
-The plugin registers thirteen `aphrodite_*` tools from the dylib's schemas: `retrieve`,
-`compress`, `stats`, `rebuild`, `files`, `diff`, `search`, `directive`, `test`,
-`catalog`, `reclassify`, `prefetch`, and `prefetch_status`.
+The plugin registers thirteen `aphrodite_*` tools from the dylib's schemas:
+
+- `retrieve`,
+  `compress`
+- `stats`
+- `rebuild`
+- `files`
+- `diff`
+- `search`
+- `directive`
+- `test`,
+  `catalog`
+- `reclassify`
+- `prefetch`
+- and `prefetch_status`.
 
 They teach the agent how to interact with the CCR engine - retrieving stored content,
 inspecting the catalog, adjusting directives - and `auto_expand` expands them inline rather
@@ -91,8 +117,11 @@ See [Tool Relay: Tools](/docs/tool-relay/tools/) for the reference.
 The plugin declares context-engine support and can register a Hermes context engine when opted
 in with `APHRODITE_CONTEXT_ENGINE=1`.
 
-By default no engine is registered: the `pre_llm_call` hook injects the per-turn catalog
-summary instead, so the context assembler remains the single source of what the model sees.
+By default no engine is registered:
+
+- the `pre_llm_call` hook injects the per-turn catalog
+  summary instead
+- so the context assembler remains the single source of what the model sees.
 
 See [Context Engine](/docs/plugin/context-engine/) for details.
 
@@ -114,16 +143,22 @@ $HERMES_HOME/ (default ~/.hermes/)
 ```
 
 On plugin startup `layout_check.py` checks toward this schema but is **report-only**:
-it logs deviations and never moves them - and the `plugins/aphrodite` install path is
-Hermes-owned (the plugin never creates or recreates it).
+
+- it logs deviations
+- and never moves them -
+- and the `plugins/aphrodite` install path is
+  Hermes-owned (the plugin never creates or recreates it).
 
 The plugin directory stays a pure loader.
 
 ## Proxy subprocesses
 
-Two proxies launch when the plugin loads: a cache proxy on `:9797` (in-memory backend,
-compresses payloads above 8 KB) and a token proxy on `:9798` (SQLite backend,
-compresses above 1 KB).
+Two proxies launch when the plugin loads:
+
+- a cache proxy on `:9797` (in-memory backend,
+  compresses payloads above 8 KB)
+- and a token proxy on `:9798` (SQLite backend,
+  compresses above 1 KB).
 
 The plugin guards the launch - it probes both health endpoints first and skips launching
 when a healthy proxy already owns the ports, and `APHRODITE_NO_AUTO_LAUNCH` disables
@@ -176,31 +211,49 @@ reading noise instead of reasoning.
 **Hermes + Aphrodite.**
 
 The plugin lane intercepts output before it becomes message history:
-`transform_tool_result` classifies, stores, and replaces raw output
-with a type-aware marker (~15 tokens instead of hundreds),
-the agent retrieves the full content only when it actually needs it,
-and `pre_llm_call` injects directives, nudges, and the recall catalog under a hard byte budget.
 
-Measured over 200 real Hermes sessions: 26.9% of all context tokens deflected,
-a median session saved ratio of 22.9%, and ~22,921 tokens saved per API call.
+- `transform_tool_result` classifies
+- stores
+- and replaces raw output
+  with a type-aware marker (~15 tokens instead of hundreds),
+  the agent retrieves the full content only when it actually needs it,
+  and `pre_llm_call` injects directives
+- nudges
+- and the recall catalog under a hard byte budget.
 
-The trade-off is stated plainly: the hooks are Hermes' contract - no other client can register
-them, so this lane works with Hermes only.
+Measured over 200 real Hermes sessions:
+
+- 26.9% of all context tokens deflected,
+  a median session saved ratio of 22.9%
+- and ~22,921 tokens saved per API call.
+
+The trade-off is stated plainly:
+
+- the hooks are Hermes' contract - no other client can register
+  them
+- so this lane works with Hermes only.
 
 **Hermes + Aphrodite + the Aphrodite proxy.**
 
 The plugin already spawns both listeners, so the third configuration runs without extra setup:
-point `base_url` at `:9798` and any OpenAI-compatible client gets the same CCR compression
-over plain HTTP.
+
+- point `base_url` at `:9798`
+- and any OpenAI-compatible client gets the same CCR compression
+  over plain HTTP.
 
 That is the agent-to-agent path - a second agent, a script, or an external tool can converse
 through the same compressed channel, share the persistent SQLite store
 (which survives a restart; the plugin lane's inline store is session-scoped),
 and call the tool relay to retrieve or create CCR entries.
 
-The limit is real too: the proxy only sees HTTP traffic - no tool-output interception,
-no terminal compression, no directives, no context engine, and SSE streams pass
-through uncompressed.
+The limit is real too:
+
+- the proxy only sees HTTP traffic - no tool-output interception,
+  no terminal compression
+- no directives
+- no context engine
+- and SSE streams pass
+  through uncompressed.
 
 The proxy extends the stack to other callers; it does not replace the hooks inside Hermes.
 

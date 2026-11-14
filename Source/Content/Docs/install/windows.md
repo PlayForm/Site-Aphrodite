@@ -43,8 +43,11 @@ It writes the binary and dylib into `%USERPROFILE%\.hermes\aphrodite\binaries\` 
 canonical runtime home the plugin resolves on launch - validating them
 against the in-tree `SHA256SUMS.txt`.
 
-The plugin **never downloads**: if you skip the script, `register()` logs the setup command
-and the plugin stays disabled until the binaries are present.
+The plugin **never downloads**:
+
+- if you skip the script
+- `register()` logs the setup command
+  and the plugin stays disabled until the binaries are present.
 
 If you're working from a local monorepo clone instead, there is no separate installer script
 to run - build the crates with cargo, then let the plugin handle installation itself.
@@ -62,8 +65,11 @@ cargo install aphrodite
 aphrodite setup --api-key sk-... --api-url https://api.deepseek.com --model deepseek-v4-pro
 ```
 
-The link step is a manual follow-up: either a directory junction (no admin rights needed
-on modern Windows) or a copy of the runtime home:
+The link step is a manual follow-up:
+
+- either a directory junction (no admin rights needed
+  on modern Windows)
+- or a copy of the runtime home:
 
 ```powershell
 New-Item -ItemType Directory -Force "$env:USERPROFILE\.hermes\plugins" | Out-Null
@@ -72,8 +78,11 @@ New-Item -ItemType Junction -Path "$env:USERPROFILE\.hermes\plugins\aphrodite" -
 
 By default setup ends by starting the proxy; pass `--no-launch` to skip that.
 
-Flags: `--cache-port`/`--token-port` (run multiple concurrent Hermes Agents, each
-on its own port pair), `--force` (rewrite an existing `aphrodite.toml`).
+Flags:
+
+- `--cache-port`/`--token-port` (run multiple concurrent Hermes Agents, each
+  on its own port pair)
+- `--force` (rewrite an existing `aphrodite.toml`).
 
 See [macOS/Linux: what `aphrodite
 setup` does](/docs/install/macos-linux/#option-2-cargo-install--aphrodite-setup)
@@ -125,8 +134,10 @@ Fetch them ahead of time with one of:
 | Build from source               | `git submodule update --init --recursive && cargo build --release -p aphrodite -p aphrodite-hermes`, then copy `target\release\aphrodite.exe` and `target\release\aphrodite_hermes.dll` into `%USERPROFILE%\.hermes\aphrodite\binaries\`                                                                                                                                                  |
 
 If none of these ran and you skip straight to enabling the plugin, `register()` never downloads:
-it logs the explicit setup command and the plugin stays disabled until the binaries are present -
-see [Troubleshooting](/docs/install/troubleshooting/#proxy-doesnt-auto-launch).
+
+- it logs the explicit setup command
+- and the plugin stays disabled until the binaries are present -
+  see [Troubleshooting](/docs/install/troubleshooting/#proxy-doesnt-auto-launch).
 
 ### Step 4: Enable the plugin
 

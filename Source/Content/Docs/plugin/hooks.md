@@ -11,12 +11,17 @@ Every hook is a thin dispatch that forwards its arguments
 to the Rust dylib (`libaphrodite_hermes.dylib`); the dylib holds all of the actual behavior
 and replies with JSON that the Python module hands back to Hermes.
 
-Registration is driven by the dylib's hook list: on plugin load the shim asks the dylib
-for its hook names and registers one callback per name.
+Registration is driven by the dylib's hook list:
+
+- on plugin load the shim asks the dylib
+  for its hook names
+- and registers one callback per name.
 
 It is the reason the six hooks below are always registered together:
-the dispatch surface is the dylib's own contract, and `plugin.yaml` declares the same set
-under `provides_hooks`.
+
+- the dispatch surface is the dylib's own contract
+- and `plugin.yaml` declares the same set
+  under `provides_hooks`.
 
 | Hook                        | Purpose                                                           | When it fires                  |
 | --------------------------- | ----------------------------------------------------------------- | ------------------------------ |
@@ -44,15 +49,28 @@ flowchart TD
 
 Fires when a Hermes session starts.
 
-It resets every piece of per-session state to a clean baseline: the turn counter,
-the conversation index, recent markers, referenced files, tool-event telemetry,
-ephemeral directives, and the manual directive latch.
+It resets every piece of per-session state to a clean baseline:
+
+- the turn counter,
+  the conversation index
+- recent markers
+- referenced files
+- tool-event telemetry,
+  ephemeral directives
+- and the manual directive latch.
 
 It injects nothing.
 
 The one-shot first-turn orientation is rendered later by the context assembler
 on the first `pre_llm_call` (see below), so a session reset followed
 by a fresh turn behaves exactly like a new session.
+
+The loop closes on itself, so the state a turn leaves behind is the state the next
+turn reads. That is why the reset seam exists:
+
+- a new session starts from a clean
+  baseline instead of inheriting the previous session's counters
+- and markers.
 
 ## pre_tool_call
 
@@ -62,10 +80,14 @@ both driven by the poll worker and chain-split features:
 - **Auto-backgrounding.** When the poll worker is enabled
   (`APHRODITE_POLL_WORKER`, default on), the hook rewrites a `terminal` or
   `process` call whose command matches the long-running patterns to run in the
-  background: it returns a modify action with `background: true` and
-  `notify_on_complete: true`, and Hermes runs the tool asynchronously. The
-  agent observes completion through its normal poll flow. `process` calls
-  with `action: poll` are never backgrounded - they are checks, not work.
+  background:
+
+- it returns a modify action with `background: true` and
+    `notify_on_complete: true`
+- and Hermes runs the tool asynchronously. The
+    agent observes completion through its normal poll flow. `process` calls
+    with `action: poll` are never backgrounded - they are checks
+- not work.
 - **Chain splitting.** When chain splitting is enabled
   (`APHRODITE_CHAIN_SPLIT=1` or `[compression] chain_split = true`, default
   off), the hook rewrites a chained terminal command (`cd x && cargo build &&
@@ -101,6 +123,12 @@ Fires after every tool call with the tool's result. The pipeline:
 
 The hook tracks file references before the skip gates, so it records `read_file`
 and `search_files` results for `aphrodite_files` and the catalog even when it never compresses them.
+
+The gate is the reason retrieval stays cheap:
+
+- a marker the model resolves comes back
+  whole
+- because nothing downstream of the gate rewrites it a second time.
 
 ## transform_terminal_output
 

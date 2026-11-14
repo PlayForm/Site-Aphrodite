@@ -9,9 +9,13 @@ The Hermes plugin path: Hermes fires a hook → the Python ctypes shim resolves 
 for each call → the C ABI in `crates/aphrodite-hermes` (`aphrodite_hermes_call_hook`,
 panic-guarded) → the core `aphrodite` crate hook bodies.
 
-The `pre_llm_call` arm is the choke point: the bridge, the core `hooks::pre_llm_call`,
-and the `context_engine_pre_llm` tool all converge on the single
-assembler `flow::build_turn_context`, so directive injection can never fork between paths.
+The `pre_llm_call` arm is the choke point:
+
+- the bridge
+- the core `hooks::pre_llm_call`,
+  and the `context_engine_pre_llm` tool all converge on the single
+  assembler `flow::build_turn_context`
+- so directive injection can never fork between paths.
 
 FFI declarations come from the **generated `_bindings.py`** (cbindgen → ctypesgen, regenerated
 by the build script whenever the C ABI surface changes):

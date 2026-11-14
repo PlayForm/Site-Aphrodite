@@ -40,7 +40,10 @@ const RawStream = [
 		     stamped wordmark below, which is the page's identity, so a swap would
 		     ship two h1s and shrink the wordmark from 144px to 48px. The lead below
 		     keeps PageHeader's rhythm - one sentence, one <p>. -->
-		<header class="relative flex w-full flex-col items-center justify-center pt-4 text-center">
+		<header
+			class="relative flex w-full flex-col items-center justify-center pt-4 text-center"
+			data-enter
+		>
 			<!-- Brand card: the red aphrodite.svg mark in the crimson module,
 			     oxblood offset underlay (user instruction: the red mark everywhere) -->
 			<div
@@ -103,13 +106,19 @@ const RawStream = [
 			</p>
 			<!-- Rotated stat badges: the hook, kept (plan 3.3), and each one now
 			     carries its own one-line reading. A figure without its qualifier is
-			     a poster; the caption is what makes it a measurement. -->
-			<div class="mt-20 flex max-w-4xl flex-wrap items-start justify-center gap-3 sm:gap-4">
+			     a poster; the caption is what makes it a measurement. The grid lands
+			     after the lead rather than with it, and each figure climbs to its
+			     value once ([data-count]) - the three exact counts, not the ~10ms
+			     estimate, because a count-up on an approximation is false precision. -->
+			<div
+				class="mt-20 flex max-w-4xl flex-wrap items-start justify-center gap-3 sm:gap-4"
+				data-enter="260"
+			>
 				<div class="flex flex-col items-center gap-2">
 					<span
 						class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000] sm:text-base"
 					>
-						610&times; COMPRESSION
+						<span data-count="610">610</span>&times; COMPRESSION
 					</span>
 					<span class="max-w-[13rem] text-base leading-relaxed text-zinc-dust">
 						Best case, on large low-entropy prose.
@@ -119,7 +128,7 @@ const RawStream = [
 					<span
 						class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000] sm:text-base"
 					>
-						132&times; OVERALL
+						<span data-count="132">132</span>&times; OVERALL
 					</span>
 					<span class="max-w-[13rem] text-base leading-relaxed text-zinc-dust">
 						The whole standard corpus: 106 KB to 800 B.
@@ -139,7 +148,7 @@ const RawStream = [
 					<span
 						class="-rotate-1 border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[4px_4px_0px_#000] sm:text-base"
 					>
-						156M+ TOKENS SAVED
+						<span data-count="156">156</span>M+ TOKENS SAVED
 					</span>
 					<span class="max-w-[13rem] text-base leading-relaxed text-zinc-dust">
 						200 real sessions, 6,843 API calls, Sep 2026.
@@ -151,8 +160,10 @@ const RawStream = [
 		<!-- THE PAIR // STREAM + PREVIEW - the product's whole argument, and the
 		     second thing on the page. ZineSplit owns the plate and the two panes;
 		     the prose above it is the section's claim, the note below it the one
-		     caption. -->
-		<section class="relative w-full">
+		     caption. The section is the entrance root: it reveals on first view,
+		     its plate wipes once, the raw pane prints line by line and the preview
+		     lands on the frame the last line finishes. -->
+		<section class="relative w-full" data-reveal>
 			<!-- The tape keeps its fitted width: ZineTape's section shape is in
 			     flow without `w-fit`, and the 103 hand-rolled section stamps this
 			     replaces were all fitted. -->
@@ -196,22 +207,45 @@ const RawStream = [
 			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
 				The agent pays for them only when the preview fails to answer the question.
 			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
+				Watch the left pane print: that is the flood arriving, one line at a time, and
+				every line of it is budget. The right pane lands after the last one, because a
+				marker only means something once there is a flood behind it to address.
+			</p>
 		</section>
 
 		<!-- THE HOW // 4-STAGE ABSORPTION - below the pair, because the pair is
 		     the argument and this is the mechanism behind it. -->
-		<section class="relative w-full">
+		<section class="relative w-full" data-reveal>
 			<div class="w-fit">
 				<ZineTape Variant="section" Label="PIPELINE // 4-STAGE ABSORPTION" />
 			</div>
-			<h2 class="mb-12 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+			<h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 				Four steps, one decision
 			</h2>
+			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				Every tool result runs the same four steps in the same order, and only one of them
+				costs anything measurable.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				The first two are the engine's: name the content, then render the one line that
+				describes it. The third is storage, and it is deliberately boring. The fourth is
+				not the engine's at all - it is the agent's, and it is the only step that spends
+				the budget the other three just saved.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
+				Read the grid left to right, then top to bottom: each card is one step, the figure
+				on it is what that step costs, and the line under the rule is what it decides.
+			</p>
 			<!-- The stage grid: 2x2 through the tablet/wide range - at 4-across
 			     the enlarged stage labels ("STAGE // B 02 // ENRICH") squished
 			     against the stamp chips between 1024-1279px. 4-across returns
-			     only at xl, where each card gets ~330px+. -->
-			<div class="grid grid-cols-1 items-start gap-12 sm:grid-cols-2 sm:gap-14 xl:grid-cols-4 xl:gap-14">
+			     only at xl, where each card gets ~330px+. It follows the heading
+			     on a delay of its own rather than arriving with it. -->
+			<div
+				class="mt-16 grid grid-cols-1 items-start gap-12 sm:grid-cols-2 sm:gap-14 xl:grid-cols-4 xl:gap-14"
+				data-enter="180"
+			>
 				<!-- Stage 01 -->
 				<div
 					class="zine-box-subtle isolate relative border-[3px] border-oxblood-dark bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.8deg] lg:-translate-y-2"
@@ -312,6 +346,7 @@ const RawStream = [
 		     and the telemetry module that used to sit above it is /benchmarks/'. -->
 		<p
 			class="w-full border-t border-oxblood-dark pt-8 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust"
+			data-reveal
 		>
 			FULL INSTRUCTIONS ON THE <a class="text-stamped-canary" href="/setup/">SETUP PAGE</a>
 		</p>

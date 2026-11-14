@@ -36,7 +36,18 @@ import type { ExamplePanel, ExampleRecord } from "@Library/Records";
 // adding it to the record, and the renderer fails to compile until it renders.
 
 /** The props ARE the record: a scenario is a data entry, not markup. */
-type Props = ExampleRecord;
+type Props = ExampleRecord & {
+	/**
+	 * The motion contract's opt-ins (Documentation/Motion.md), default off so
+	 * this component's rendering is unchanged for a page that has not asked:
+	 * `Reveal` gives the whole scenario one scroll entrance, `Stream` prints
+	 * its OUTPUT pane line by line on that entrance's beat. The OUTPUT pane is
+	 * the one genuine command output on the page, which is why the stagger
+	 * belongs there and never on the claim's prose.
+	 */
+	Reveal?: boolean;
+	Stream?: boolean;
+};
 
 const {
 	Id,
@@ -54,12 +65,22 @@ const {
 	Panels = [],
 	Diagram,
 	Src,
+	Reveal = false,
+	Stream = false,
 } = Astro.props;
 
 const TapeColor = { crimson: "raw", canary: "canary", teal: "teal" } as const;
+
+/**
+ * When the marker lands: the frame the last printed output line finishes.
+ * Documentation/Motion.md's `[data-stream]` beat - 140ms lead, 70ms per line,
+ * 160ms per line - read over this scenario's own line count, so the preview
+ * never arrives before the output it summarises has stopped arriving.
+ */
+const StreamBeat = 140 + Math.max(0, Output.length - 1) * 70 + 160;
 ---
 
-<section id={Id} class="relative w-full scroll-mt-24">
+<section id={Id} class="relative w-full scroll-mt-24" data-reveal={Reveal ? "" : undefined}>
 	<ZineBox Tone={Tone} Rotate={Rotate}>
 		<ZineTape Label={`${N} // ${Label}`} Color={TapeColor[Tone]} Side="left" />
 		<div class="mt-6 grid grid-cols-1 gap-12 lg:grid-cols-2">
@@ -92,13 +113,13 @@ const TapeColor = { crimson: "raw", canary: "canary", teal: "teal" } as const;
 				<div>
 					<ZineKicker As="h3" Tone="dust">THE OUTPUT</ZineKicker>
 					<div class="mt-3">
-						<ZineStream Lines={Output} />
+						<ZineStream Lines={Output} Stream={Stream} />
 					</div>
 				</div>
 				<div>
 					<ZineKicker As="h3" Tone="dust">THE MARKER</ZineKicker>
 					<div class="mt-3">
-						<ZinePreview Label="PREVIEW + HASH" Result={Preview} Hash={Marker} />
+						<ZinePreview Label="PREVIEW + HASH" Result={Preview} Hash={Marker} Enter={StreamBeat} />
 					</div>
 				</div>
 			</div>

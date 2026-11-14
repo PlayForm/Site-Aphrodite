@@ -25,3 +25,34 @@
 		opacity: 0;
 	}
 }
+
+/* The wipe bar. [data-wipe] animates this element and nothing else: a 2px
+   crimson hairline that crosses its plate once, the same mark the deck's
+   .deck-wipe draws. It is decoration over a plate that already carries copy,
+   never the only thing in a block.
+
+   The host is the container-query context, so the runtime's 91cqw travel is
+   91% of the PLATE's inline size rather than of the viewport - a plate inside
+   a max-width shell is narrower than the window, and without this the bar
+   would run past the border it is supposed to cross. The same rule is why the
+   deck puts `container-type` on .deck-scene: the motion is measured against
+   the panel, not the screen.
+
+   opacity: 0 is the settled frame as well as the pre-hide: a reader without
+   JavaScript, or one who asked for stillness, never sees a stray bar. */
+.motion-wipe-host {
+	container-type: inline-size;
+}
+
+.motion-wipe {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 20;
+	width: 2px;
+	background: var(--raw-blood);
+	box-shadow: 0 0 1.2cqw rgba(147, 17, 40, 0.85);
+	opacity: 0;
+	pointer-events: none;
+}

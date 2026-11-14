@@ -14,6 +14,11 @@
  * Tones come in on the line, not as a second array: a leading `dim:`, `fade:`
  * or `mute:` selects the suppression opacity (law 4's 70/40/25%), so a caller
  * passes the terminal lines as strings and the pane stays a rendering detail.
+ *
+ * The motion is the argument, not a decoration on it (Documentation/Motion.md):
+ * the raw pane prints line by line, and the preview pane lands on the frame
+ * the last line finishes. Both run on the beat of whichever entrance root owns
+ * this plate - a section that reveals, or a panel that enters.
  */
 import ZineBox from "./ZineBox.astro";
 import ZineKicker from "./ZineKicker.astro";
@@ -35,9 +40,12 @@ interface Props {
 
 	/** The preview micro-label. */
 	Label?: string;
+
+	/** Sweep the plate once on entry. On by default: this plate is the claim. */
+	Wipe?: boolean;
 }
 
-const { Raw, Preview, Hash, Label = "ONE LINE, ONE MARKER" } = Astro.props;
+const { Raw, Preview, Hash, Label = "ONE LINE, ONE MARKER", Wipe = true } = Astro.props;
 
 /**
  * A tone prefix is only a tone prefix when the word before the colon is one of
@@ -52,21 +60,41 @@ const Lines = Raw.map((Line) => {
 		? { Text: Line, Tone: "plain" as LineTone }
 		: { Text: Match[2], Tone: Match[1] as LineTone };
 });
+
+/**
+ * When the preview lands: the frame the last printed line finishes. The
+ * numbers are Documentation/Motion.md's `[data-stream]` beat - the first line
+ * starts at 140ms, each next one 70ms later, and each line takes 160ms - so a
+ * nine-line build ends at 860ms and the preview arrives at 860, never before
+ * the output it summarises has stopped arriving.
+ */
+const StreamBeat = 140 + Math.max(0, Lines.length - 1) * 70 + 160;
 ---
 
-<ZineBox Size="lg" Rotate="-rotate-[1deg]">
+<ZineBox Size="lg" Rotate="-rotate-[1deg]" Wipe={Wipe}>
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 		<div>
 			<ZineKicker As="div" Tone="dust">RAW STREAM // WHAT THE TERMINAL KEEPS</ZineKicker>
 			<div class="mt-2">
 				<ZineStream Lines={Lines} />
 			</div>
+			<p class="mt-4 font-body text-base leading-relaxed text-zinc-dust">
+				Read top to bottom: the repeated compile steps fade out, the warnings that were
+				already counted mute, and the one line that stopped the build stays at full
+				strength. Every line here is context the agent would have paid for.
+			</p>
 		</div>
 		<div>
 			<ZineKicker As="div" Tone="canary">PREVIEW // WHAT THE MODEL READS</ZineKicker>
 			<div class="mt-2">
-				<ZinePreview Label={Label} Result={Preview} Hash={Hash} Color="canary" />
+				<ZinePreview Label={Label} Result={Preview} Hash={Hash} Color="canary" Enter={StreamBeat} />
 			</div>
+			<p class="mt-4 font-body text-base leading-relaxed text-zinc-dust">
+				The same build on one line: the type, the counts, and the one error that
+				mattered. The marker underneath is the address of the bytes that stayed
+				behind - the agent pays for them only when this line fails to answer the
+				question.
+			</p>
 		</div>
 	</div>
 </ZineBox>

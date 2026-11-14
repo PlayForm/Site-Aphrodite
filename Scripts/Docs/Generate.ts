@@ -2,6 +2,7 @@ import { readFile, rm, stat } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import Breakdown from "./Breakdown.ts";
 import Collect from "./Collect.ts";
 import Links from "./Links.ts";
 import Meta from "./Meta.ts";
@@ -68,7 +69,7 @@ export default async (): Promise<void> => {
 		const { Title, Section } = Meta(Content, Path);
 
 		const Linked = Links(
-			Content,
+			Breakdown(Content),
 			dirname(Path),
 			Routes,
 			(Link) => Stale.push(`${Path}: ${Link}`),

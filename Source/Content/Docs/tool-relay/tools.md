@@ -8,9 +8,13 @@ section: "Tool Relay"
 Aphrodite exposes 13 tools to the Hermes agent for compression, retrieval, stats,
 and session management.
 
-Every tool is a thin relay into the Rust dylib: the plugin registers each tool
-from the dylib's schema list (toolset `aphrodite`), and every call dispatches
-through `aphrodite_hermes_dispatch_tool` and returns the JSON result verbatim.
+Every tool is a thin relay into the Rust dylib:
+
+- the plugin registers each tool
+  from the dylib's schema list (toolset `aphrodite`)
+- and every call dispatches
+  through `aphrodite_hermes_dispatch_tool`
+- and returns the JSON result verbatim.
 
 There is no separate Python-side tool logic to know about.
 
@@ -360,9 +364,13 @@ reclassify every entry in the session. Returns `{status: "ok", reclassified:
 }
 ```
 
-Despite the name this is synchronous: the tool reads and compresses every path
-before the call returns, so each returned hash
-is immediately resolvable through `aphrodite_retrieve`.
+Despite the name this is synchronous:
+
+- the tool reads
+- and compresses every path
+  before the call returns
+- so each returned hash
+  is immediately resolvable through `aphrodite_retrieve`.
 
 One marker per file, no file bodies in context.
 

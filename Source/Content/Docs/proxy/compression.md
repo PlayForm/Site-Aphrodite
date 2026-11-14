@@ -14,10 +14,14 @@ by hash, replaces it with a compact CCR marker, and tracks token savings.
 "Compression" here means the marker substitution in the model-facing response - the stored bytes
 are kept verbatim, not codec-compressed.
 
-Two sources update the compression-ratio EMA: the Chat Completions path (using the rendered
-marker length) and the direct `/ccr/create` endpoint (using a trigram-uniqueness heuristic
-for the compressed-size estimate), so `/stats` reflects the compressibility
-of everything flowing through the proxy.
+Two sources update the compression-ratio EMA:
+
+- the Chat Completions path (using the rendered
+  marker length)
+- and the direct `/ccr/create` endpoint (using a trigram-uniqueness heuristic
+  for the compressed-size estimate)
+- so `/stats` reflects the compressibility
+  of everything flowing through the proxy.
 
 ## What Is Never Compressed
 
@@ -214,9 +218,14 @@ an enriched preview.
 | Cache | First 512 bytes of the content, raw      | None (empty structure line)                                                                             |
 | Token | Enriched, type-aware preview (see below) | `lang=rs`, `fns=main,init`, `ln=42`, `keys=status,error`, ... (pipe-safe `key=value;key=value`, capped) |
 
-Metadata is generated per content type: line counts (`ln=`),
-language tags (`lang=rs|py|go|js|gen`), function/struct names for code, JSON keys
-for JSON content, and more.
+Metadata is generated per content type:
+
+- line counts (`ln=`),
+  language tags (`lang=rs|py|go|js|gen`)
+- function/struct names for code
+- JSON keys
+  for JSON content
+- and more.
 
 Markers on their own line are easy for the model to scan and to pass back
 to `aphrodite_retrieve` verbatim.
@@ -382,10 +391,12 @@ Initial values at startup:
 ## Chain-Split (Hermes Plugin Side)
 
 Chain-split is a Hermes plugin-side feature, not a proxy one:
-`pre_tool_call` rewrites chained shell commands (`cd x && cargo build && cargo test`)
-by echoing segment markers to stderr, and `transform_tool_result` splits the produced output
-into per-segment pieces so each segment was compressed independently (`[chain:3 | build
-...]` previews).
+
+- `pre_tool_call` rewrites chained shell commands (`cd x && cargo build && cargo test`)
+  by echoing segment markers to stderr
+- and `transform_tool_result` splits the produced output
+  into per-segment pieces so each segment was compressed independently (`[chain:3 | build
+  ...]` previews).
 
 It is opt-in (`chain_split = false` by default), and constructs
 that would corrupt control flow (heredocs, loops spanning segments) are left untouched.

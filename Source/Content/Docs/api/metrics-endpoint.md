@@ -20,8 +20,11 @@ It is always available on loopback without authentication - intentional for loca
 
 Loopback only (subject to `loopback_only` middleware, which also validates the `Host` header).
 
-No auth: `/metrics` stays token-exempt even when `APHRODITE_MGMT_TOKEN` gates the other
-management routes, so Prometheus scrapers keep working unmodified.
+No auth:
+
+- `/metrics` stays token-exempt even when `APHRODITE_MGMT_TOKEN` gates the other
+  management routes
+- so Prometheus scrapers keep working unmodified.
 
 In production, add a reverse-proxy auth layer or firewall this endpoint if it must be exposed.
 

@@ -41,9 +41,14 @@ in the repo root.
 ## Precedence
 
 For every field except the two noted below, the resolution order is **env var → TOML (proxy entry
-→ `[defaults]`) → compiled-in default**: an env var wins if set and parses;
-otherwise the proxy entry's value wins; otherwise `[defaults]`; otherwise the default compiled
-into the binary.
+→ `[defaults]`) → compiled-in default**:
+
+- an env var wins if set
+- and parses;
+  otherwise the proxy entry's value wins
+- otherwise `[defaults]`
+- otherwise the default compiled
+  into the binary.
 
 A present-but-malformed env value (e.g. `APHRODITE_CCR_TTL=abc`) is never treated
 as absent - it logs a warning and falls through to the next level.
@@ -202,8 +207,11 @@ Engine](https://github.com/PlayForm/Aphrodite/tree/Current/docs/plugin/context-e
 for the full behavior.
 
 **Parsed for schema compatibility, echoed by `/reload` for visibility** (no live
-effect): `catalog_mode` (catalog layout is compiled-in), `classifier_poll`,
-`prefetch` (the `aphrodite_prefetch` tool exists regardless of this key).
+effect):
+
+- `catalog_mode` (catalog layout is compiled-in)
+- `classifier_poll`,
+  `prefetch` (the `aphrodite_prefetch` tool exists regardless of this key).
 
 ## `[previews]` and `[prompts]`
 

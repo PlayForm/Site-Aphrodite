@@ -5,13 +5,20 @@ section: "Architecture"
 
 # Architecture
 
-Flow traces of every runtime path in Aphrodite: the CCR compression proxy
-with its dual loopback listeners, the Hermes plugin (Python shim → C-ABI dylib → shared core
-crate), the CI/release pipeline, and the data model underneath.
+Flow traces of every runtime path in Aphrodite:
+
+- the CCR compression proxy
+  with its dual loopback listeners
+- the Hermes plugin (Python shim → C-ABI dylib → shared core
+  crate)
+- the CI/release pipeline
+- and the data model underneath.
 
 Two runtime worlds run in separate processes with separate state:
-the **proxy binary** (HTTP response compression) and the **Hermes plugin**
-(hook-level interception).
+
+- the **proxy binary** (HTTP response compression)
+- and the **Hermes plugin**
+  (hook-level interception).
 
 The plugin is a pure loader - directives are embedded in the binary and materialized
 into `~/.hermes/aphrodite/directives/` at startup, and the dylib/binary live

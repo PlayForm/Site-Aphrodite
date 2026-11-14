@@ -5,9 +5,12 @@ section: "Tool Relay"
 
 # Callbacks
 
-Two distinct callback surfaces exist around the tool relay: the Hermes-side hooks that fire
-when a tool result comes back, and the proxy-side HTTP deliveries (`callback_url`
-on the relay, `notify_url` on CCR creation).
+Two distinct callback surfaces exist around the tool relay:
+
+- the Hermes-side hooks that fire
+  when a tool result comes back
+- and the proxy-side HTTP deliveries (`callback_url`
+  on the relay, `notify_url` on CCR creation).
 
 Both are described below.
 
@@ -35,8 +38,11 @@ for the full hook reference.
 ## Tool relay callback
 
 `POST /tool/relay` runs the tool synchronously unless the request carries a `callback_url`, in
-which case the call becomes asynchronous: the proxy answers immediately and POSTs the real result
-to the callback URL later.
+which case the call becomes asynchronous:
+
+- the proxy answers immediately
+- and POSTs the real result
+  to the callback URL later.
 
 ```
 Hermes Agent
@@ -195,5 +201,7 @@ Metrics](https://github.com/PlayForm/Aphrodite/tree/Current/docs/metrics/prometh
 for the full metrics reference.
 
 `/tool/relay` is one of the loopback-restricted management routes:
-it accepts any loopback caller without a credential until `APHRODITE_MGMT_TOKEN` is set, after
-which the bearer token is required.
+
+- it accepts any loopback caller without a credential until `APHRODITE_MGMT_TOKEN` is set
+- after
+  which the bearer token is required.

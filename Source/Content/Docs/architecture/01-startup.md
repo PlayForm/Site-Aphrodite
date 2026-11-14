@@ -11,10 +11,16 @@ The binary half resolves configuration (env > TOML > default), binds every liste
 before spawning any server, builds one `AppState` per listener with a CCR store backend,
 and arms a config-file reload watcher.
 
-The Hermes plugin half runs once per Hermes home inside `register()`: it loads
-and smoke-tests the dylib, checks the runtime layout (report-only),
-materializes the built-in directives, registers hooks and tools, and launches the proxy
-when it is not already healthy.
+The Hermes plugin half runs once per Hermes home inside `register()`:
+
+- it loads
+  and smoke-tests the dylib
+- checks the runtime layout (report-only),
+  materializes the built-in directives
+- registers hooks
+- and tools
+- and launches the proxy
+  when it is not already healthy.
 
 ## Startup sequence
 
@@ -155,7 +161,9 @@ sequenceDiagram
 ```
 
 The layout check and the directives materialize are best-effort by design:
-either failing degrades to a warning and the plugin still registers (never a raise).
+
+- either failing degrades to a warning
+- and the plugin still registers (never a raise).
 
 The dylib load itself is the one hard gate - if the smoke test
 or the FFI assertion fails, `register()` logs "plugin disabled" and returns.

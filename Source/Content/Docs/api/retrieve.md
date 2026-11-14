@@ -42,8 +42,11 @@ pub struct RetrieveRequest {
 ```
 
 `handle_retrieve` normalized the `hash` argument before lookup:
-it stripped the `|type|size` marker-body suffix and surrounding whitespace, so a hash echoed back
-in full marker form still resolves.
+
+- it stripped the `|type|size` marker-body suffix
+- and surrounding whitespace
+- so a hash echoed back
+  in full marker form still resolves.
 
 ## Response
 

@@ -301,6 +301,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 						<figure
 							class="relative z-10 mt-16 border border-oxblood-dark bg-soot-black p-4"
 							data-diagram={Diagram.Id}
+							data-reveal
 						>
 							<div class="overflow-x-auto [&_svg]:h-auto [&_svg]:max-w-full" set:html={Diagram.Svg} />
 							<figcaption class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
@@ -313,7 +314,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 				<!-- Index pages: the zine index cards with one-line purposes -->
 				{
 					IsIndex && (
-						<section aria-label="Section index" class="relative mt-16">
+						<section aria-label="Section index" class="relative mt-16" data-reveal>
 							<h2 class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 								{IsSectionIndex ? "IN THIS SECTION" : "THE SECTIONS"}
 							</h2>
@@ -378,7 +379,11 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 									+
 								</span>
 							</summary>
-							<ul class="flex flex-col gap-1 border-t border-oxblood-dark px-5 py-4">
+							<p class="border-t border-oxblood-dark px-5 pb-1 pt-3 font-body text-base leading-relaxed text-zinc-dust">
+								The entry marked in crimson is the section you are reading - the list is the
+								page's own headings, and it follows you down the page.
+							</p>
+							<ul class="flex flex-col gap-1 px-5 py-4">
 								{Toc.map(({ Depth, Id, Label }) => (
 									<li class={Depth === 3 ? "pl-4" : undefined}>
 										<a
@@ -395,8 +400,10 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 					)
 				}
 
-				<!-- The reading column -->
-				<article class="docs-prose mt-16 min-w-0">
+				<!-- The reading column. One entrance for the whole column: the
+				     generated markdown cannot carry attributes of its own, so the
+				     column is the content root the shared runtime animates. -->
+				<article class="docs-prose mt-16 min-w-0" data-reveal>
 					<Content />
 				</article>
 
@@ -463,6 +470,10 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 							>
 								<p class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 									ON THIS PAGE
+								</p>
+								<p class="mt-2 border-b border-oxblood-dark pb-3 font-body text-base leading-relaxed text-zinc-dust">
+									The entry marked in crimson is the section you are reading - the rail marks
+									it as you go, from the page's own headings.
 								</p>
 								<ul class="mt-3 flex max-h-[calc(100vh-16rem)] flex-col gap-1 overflow-y-auto border-l border-oxblood-dark pl-3">
 									{Toc.map(({ Depth, Id, Label }) => (
@@ -621,23 +632,12 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 		color: var(--weathered-teal);
 	}
 
-	/* Pre blocks: the raw stream panes - JBM 12px on soot-black. */
-	.docs-prose :global(pre) {
-		margin: 2rem 0;
-		padding: 1rem;
-		border: 1px solid var(--oxblood-dark);
-		background-color: var(--soot-black);
-		overflow-x: auto;
-	}
-
-	.docs-prose :global(pre code) {
-		padding: 0;
-		border: none;
-		background: none;
-		font-size: 16px;
-		line-height: 1.7;
-		color: var(--zinc-dust);
-	}
+	/* Code fences: the plate is defined ONCE - `body pre.astro-code` in
+	   Source/Stylesheet/Global.css (frame, padding, rhythm, overflow, scroll
+	   cue) over the palette in Source/Library/ShikiTheme.ts. A second frame
+	   declared here is drift, and the old `pre code { color: zinc-dust }`
+	   greyed out the tokenless `text`/`plaintext` fences, which carry no
+	   spans of their own to colour. */
 
 	/* Tables: the ledger rows. display:table (not block) + table-layout:
 	   fixed - the block form spanned the container but left the inner table
@@ -800,10 +800,13 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 		});
 	}
 
-	// The outline's current entry: the last heading above the reading line
-	// wins, so a long page always names where the reader is. Both presentations
-	// (right rail, narrow disclosure) carry data-outline-link and are marked
-	// together - the hidden one simply goes unseen.
+	// The outline's current entry, from an IntersectionObserver rather than a
+	// scroll listener: the observer is the browser's own scroll bookkeeping, so
+	// the page pays nothing for being marked. Both presentations (right rail,
+	// narrow disclosure) carry data-outline-link and are marked together - the
+	// hidden one simply goes unseen.
+	let Outline: IntersectionObserver | null = null;
+
 	function BindOutline() {
 		const Links = Array.from(
 			document.querySelectorAll<HTMLAnchorElement>("a[data-outline-link]"),
@@ -835,9 +838,13 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 		}
 
 		const First = Targets[0]!;
-		const Last = Targets[Targets.length - 1]!;
 
 		Links[0]!.dataset["outlineBound"] = "1";
+
+		// A page swapped in by the client router is observed afresh; the
+		// discarded page's observer would otherwise keep watching detached
+		// headings for the life of the tab.
+		Outline?.disconnect();
 
 		let Current = "";
 
@@ -862,45 +869,57 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 			}
 		};
 
-		const Measure = () => {
-			// 160px: just clear of the sticky site header.
-			let Active = First.Id;
+		// The first entry names where the reader landed, including a page opened
+		// straight onto an anchor; the observer corrects it on its first
+		// callback, which the browser delivers on the next frame.
+		Mark(First.Id);
 
-			for (const { Id, Element } of Targets) {
-				if (Element.getBoundingClientRect().top <= 160) {
-					Active = Id;
+		// No IntersectionObserver (an engine that predates it): the outline
+		// still names the opening section instead of naming nothing at all.
+		// Marking is state, not motion, so it works under reduced motion too.
+		if (typeof IntersectionObserver === "undefined") {
+			return;
+		}
+
+		// A band, not a scroll position: a heading names its section while it
+		// sits below the sticky header and above the bottom 55% of the
+		// viewport. The observer's callback reads no layout - it only reads
+		// which headings the browser reported as in the band.
+		const Band = new Set<Element>();
+
+		Outline = new IntersectionObserver(
+			(Entries) => {
+				for (const Entry of Entries) {
+					switch (Entry.isIntersecting) {
+						case true:
+							Band.add(Entry.target);
+
+							break;
+						default:
+							Band.delete(Entry.target);
+					}
 				}
-			}
 
-			// The page's own tail: the last heading is what the reader is in.
-			if (
-				window.innerHeight + window.scrollY >=
-				document.documentElement.scrollHeight - 4
-			) {
-				Active = Last.Id;
-			}
+				// The topmost heading in the band is the section being read.
+				// While a long body scrolls between two headings the band is
+				// empty, so the mark stays on the section the reader is still
+				// inside instead of jumping ahead to the next one.
+				for (const { Id, Element } of Targets) {
+					if (Band.has(Element)) {
+						Mark(Id);
 
-			Mark(Active);
-		};
+						return;
+					}
+				}
+			},
+			// -96px clears the sticky site header; -55% keeps the lower half of
+			// the viewport from claiming a heading the reader has not reached.
+			{ rootMargin: "-96px 0px -55% 0px", threshold: 0 },
+		);
 
-		let Queued = false;
-
-		const OnScroll = () => {
-			switch (Queued) {
-				case true:
-					return;
-				default:
-					Queued = true;
-					requestAnimationFrame(() => {
-						Queued = false;
-						Measure();
-					});
-			}
-		};
-
-		Measure();
-		document.addEventListener("scroll", OnScroll, { passive: true });
-		window.addEventListener("resize", OnScroll);
+		for (const { Element } of Targets) {
+			Outline.observe(Element);
+		}
 	}
 
 	BindDocsDrawer();

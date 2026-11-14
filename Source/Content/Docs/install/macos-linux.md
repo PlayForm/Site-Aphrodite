@@ -91,17 +91,23 @@ What `aphrodite setup` does, in order:
 | 8    | Runs `hermes plugins enable aphrodite` - a failed registration prints a warning, it does not abort                                                                                                                                                                                                                                                        |
 
 Useful flags: `--cache-port`/`--token-port` (run multiple concurrent Hermes Agents
-on one machine, each pointed at its own port pair), `--no-launch` (skip auto-starting the
-proxy after setup), `--force` (rewrite an existing `aphrodite.toml`; the binary, dylibs, loader,
-and version pin are always refreshed on re-run regardless).
+on one machine, each pointed at its own port pair),
+
+- `--no-launch` (skip auto-starting the
+  proxy after setup)
+- `--force` (rewrite an existing `aphrodite.toml`; the binary, dylibs, loader,
+  and version pin are always refreshed on re-run regardless).
 
 ### macOS Gatekeeper handling
 
 On macOS, every artifact copy in `aphrodite setup` (binary, dylibs,
 and the `target/release` dev-build fallback) goes through one Gatekeeper-safe path:
-`ditto` (metadata-preserving copy), falling back to `fs::copy` + `xattr -c` (clear quarantine),
-then `install_name_tool -id @rpath/<name>` and an explicit ad-hoc `codesign -f -s -` re-sign
-for dylibs.
+
+- `ditto` (metadata-preserving copy)
+- falling back to `fs::copy` + `xattr -c` (clear quarantine),
+  then `install_name_tool -id @rpath/<name>`
+- and an explicit ad-hoc `codesign -f -s -` re-sign
+  for dylibs.
 
 Every step that fails prints a specific warning instead
 of being silently swallowed - a machine missing Xcode Command Line Tools previously got
@@ -143,10 +149,14 @@ Then either:
     └── logs/               ← proxy/engine logs
 ```
 
-The plugin directory stays hooks-only: it carries just `plugin.yaml`
-and the `__init__.py` loader that registers hooks/tools, and the plugin never writes, downloads,
-or modifies anything inside it - every runtime artifact (binaries, config, directives,
-CCR state, logs) lives in the runtime home above.
+The plugin directory stays hooks-only:
+
+- it carries just `plugin.yaml`
+  and the `__init__.py` loader that registers hooks/tools
+- and the plugin never writes
+- downloads,
+  or modifies anything inside it - every runtime artifact (binaries, config, directives,
+  CCR state, logs) lives in the runtime home above.
 
 On plugin startup `layout_check.py` (shipped with the source checkout)
 checks toward this schema; installed layouts are already canonical
