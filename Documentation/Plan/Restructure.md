@@ -1,5 +1,26 @@
 # Restructure - the Aphrodite site audit and the plan it produces
 
+> **BINDING DIRECTIVE FROM THE OWNER - this overrides every "shorter", "cut",
+> "retire" or "de-duplicate by deleting" instruction anywhere in this file.**
+>
+> **NEVER REDUCE CONTENT. If anything, improve - never cut.**
+>
+> - No page, section, example, figure, key, entry or sentence is deleted to
+>   make a file smaller. A smaller file is not success.
+> - The **only** permitted reduction is *structural* duplication: the same
+>   markup re-typed in several places collapses into one shared component,
+>   while every sentence still renders - now from that component.
+> - Thin or missing content is a defect fixed by **adding**, sourced from
+>   `Module/Aphrodite`, never by omitting it.
+> - The site and the module sync **both ways and additively**: a site page with
+>   no module counterpart is pushed **up** into `PlayForm/Aphrodite` (or declared
+>   site-only with a reason) - never dropped; a thin module doc is upgraded
+>   before it is generated down. Convergence is the union of the best content at
+>   both ends, never the intersection.
+> - Where an item below proposes a route count, page count or line count going
+>   **down**, read it as "the same content, better organised" - and if that is
+>   not achievable, keep the old structure and say why.
+>
 > Scope: this file is a PLAN. It changes no page, component, layout or
 > stylesheet. Every claim below was measured against the working tree on
 > 2026-11-14 and carries its probe; a claim without a probe is marked CLAIM and

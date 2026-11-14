@@ -5,8 +5,11 @@ import ToolRelay from "../Content/Mermaid/tool-relay.svg?raw";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import ZineFlow from "@Component/ZineFlow.astro";
 import ExampleCase from "@Component/ExampleCase.astro";
-import Breadcrumbs from "@Component/Breadcrumbs.astro";
+import PageShell from "@Component/PageShell.astro";
+import SectionNav from "@Component/SectionNav.astro";
+import ZineSource from "@Component/ZineSource.astro";
 import Related from "@Component/Related.astro";
+import type { ExampleRecord } from "@Library/Records";
 import { Link, OurRepo } from "@Library/Links";
 
 // Examples page ledger - the worked scenarios' single source of truth (the
@@ -19,6 +22,15 @@ import { Link, OurRepo } from "@Library/Links";
 // Every scenario below is ONE shape (ExampleCase): a claim, the command, the
 // real output, the marker it produced, then the scenario's own evidence. The
 // page used to hand-roll that frame seven times in four different layouts.
+//
+// `Cases` is typed by the record itself (`ExampleRecord`), so a scenario cannot
+// carry a field the renderer drops or omit one it requires - the array and
+// `ExampleCase` are one declaration, not two that happen to agree. `Sections`
+// is derived from that same array, so the sticky index can never name a
+// scenario the page does not render.
+
+/** A scenario plus the one line the hero index prints for it. */
+type CaseRecord = ExampleRecord & { Hero: string };
 
 // The four live-reload thresholds AT THEIR SHIPPED-EXAMPLE VALUES
 // (aphrodite.toml.example:95-123, README.md:584-588, docs/config/aphrodite-toml.md:121-131).
@@ -74,7 +86,7 @@ const InjectionOrder = [
 
 // The seven scenarios, one shape each. Id anchors the hero index; Hero is the
 // index line; the rest is what ExampleCase renders.
-const Cases = [
+const Cases: CaseRecord[] = [
 	{
 		Id: "thresholds",
 		N: "I",
@@ -350,17 +362,24 @@ const Cases = [
 		],
 		Src: "SRC: docs/proxy/architecture.md:9-35 · README.md:287-299 · CHANGELOG.md:616-617",
 	},
-] as const;
+];
+
+// The page's own section list, derived from the same array: the seven
+// scenarios by number and title, then the two flows that close the page. Each
+// entry names a section the page really renders, because it is built from the
+// data that renders it.
+const Sections = [
+	...Cases.map(({ Id, N, Title }) => ({ Id, Label: `${N} · ${Title}` })),
+	{ Id: "turn-cycle", Label: "VIII · The turn cycle" },
+	{ Id: "runtime-home", Label: "IX · One runtime home" },
+];
 ---
 
 <Base
 	Title="EXAMPLES // APHRODITE"
 	Description="The worked scenarios: threshold tuning in action, the retrieval round-trip, the chain split, the directives block, the tool-relay callback, the skip gate, and the dual-listener parallel - real mechanics, every claim anchored."
 >
-	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
-	>
-		<Breadcrumbs />
+	<PageShell Crumbs>
 		<!-- ============ HERO // THE WORKED SCENARIOS ============ -->
 		<header class="relative flex w-full flex-col items-start pt-12">
 			<div
@@ -405,6 +424,9 @@ const Cases = [
 				</div>
 			</div>
 		</header>
+
+		<!-- THE PAGE'S OWN SECTIONS // sticky index, from the same data list -->
+		<SectionNav Sections={Sections} />
 
 		<!-- ============ I-VII // THE SEVEN SCENARIOS, ONE SHAPE ============ -->
 		{Cases.map(({ Hero: _Hero, ...Scenario }) => <ExampleCase {...Scenario} />)}
@@ -502,9 +524,9 @@ const Cases = [
 					]}
 				/>
 			</div>
-			<div class="mt-10 font-mono text-base leading-relaxed text-zinc-dust">
-				SRC: docs/plugin/hooks.md:13-20 (the six-hook table) · each step cites its hook section
-			</div>
+			<ZineSource
+				Lines={["SRC: docs/plugin/hooks.md:13-20 (the six-hook table) · each step cites its hook section"]}
+			/>
 		</section>
 
 		<!-- ============ IX // ONE RUNTIME HOME (INTERACTIVE) ============ -->
@@ -582,9 +604,9 @@ const Cases = [
 					]}
 				/>
 			</div>
-			<div class="mt-10 font-mono text-base leading-relaxed text-zinc-dust">
-				SRC: CHANGELOG.md:104-154 (v1.6.3) · CHANGELOG.md:39-67 (v1.6.5) · issue #40
-			</div>
+			<ZineSource
+				Lines={["SRC: CHANGELOG.md:104-154 (v1.6.3) · CHANGELOG.md:39-67 (v1.6.5) · issue #40"]}
+			/>
 		</section>
 
 		<!-- RELATED: the natural neighbors -->
@@ -596,6 +618,6 @@ const Cases = [
 				{ Href: "/docs/plugin/hooks/", Label: "DOCS · HOOKS" },
 			]}
 		/>
-	</main>
+	</PageShell>
 	<ZineDiagramNav />
 </Base>
