@@ -36,9 +36,14 @@ export type Parser =
 	| "YamlVersion"
 	| "VersionFile"
 	| "ChangelogHead"
+	| "ChangelogReleases"
 	| "PluginManifest"
 	| "TomlKeys"
-	| "ModulePin";
+	| "ModulePin"
+	| "ReadmeStudy"
+	| "ReadmeBenchmark"
+	| "ReadmeNarrative"
+	| "RegistryTypes";
 
 export interface Row {
 	/** The source path inside `Module/Aphrodite`. A trailing `/**` means a tree. */
@@ -90,6 +95,23 @@ const Config = "Source/Generated/Facts/Config.json";
 // The pin itself: which commit of the module these bytes came from. Every
 // generated file's header names its source path; this file names the tree.
 const Pin = "Source/Generated/Module.json";
+
+// The measured study: the 200-session ledger the README carries as a table,
+// plus the sensitivity band its confidence note states. The case study's spine
+// and the ledger on /benchmarks/ both render from here.
+const Study = "Source/Generated/Facts/Study.json";
+
+// The benchmark figures: the corpus headline, the per-type table, the
+// real-world per-output table, the latency band and the classification floor.
+const Benchmark = "Source/Generated/Facts/Benchmark.json";
+
+// The narrative's other counted claims: how many content types the catalog
+// renders, the threshold tiers, and the shipped `code_multiplier`.
+const Narrative = "Source/Generated/Facts/Narrative.json";
+
+// The release history, one entry per `## v<version> - <title> (<date>)` header
+// in the CHANGELOG. The register on /versions/ is the annotated view of it.
+const Releases = "Source/Generated/Facts/Releases.json";
 
 const Manifest: Row[] = [
 	// ── The version primaries.
@@ -214,6 +236,61 @@ const Manifest: Row[] = [
 		Stage: "Emit",
 		Consumer: "/plugin/ (the manifest a reader can read in full)",
 		Absent: "Fail",
+	},
+	// ── The narrative half: every measured number the three story pages print.
+	{
+		Source: "README.md",
+		Destination: Study,
+		Transform: "Facts",
+		Parser: "ReadmeStudy",
+		Fact: "Study",
+		Stage: "Emit",
+		Consumer: "the case study's hero monument and evidence plates, /benchmarks/ (StudyLedger), the landing stat badges",
+		Absent: "Fail",
+		Note: "Extracts the figures, never the paragraph: the page composes its own sentence around each one. A number the README stops carrying stops the build.",
+	},
+	{
+		Source: "README.md",
+		Destination: Benchmark,
+		Transform: "Facts",
+		Parser: "ReadmeBenchmark",
+		Fact: "Benchmark",
+		Stage: "Emit",
+		Consumer: "/benchmarks/ (the four plates, the per-type chart, the limits), the case study's corpus plates",
+		Absent: "Fail",
+		Note: "The bar widths are computed here from the ratios (log scale for the per-type chart, the ratio itself for the real-world plate), so a width cannot disagree with the figure it draws.",
+	},
+	{
+		Source: "README.md",
+		Destination: Narrative,
+		Transform: "Facts",
+		Parser: "ReadmeNarrative",
+		Fact: "Narrative",
+		Stage: "Emit",
+		Consumer: "the case study (the catalog count, the threshold tiers, the shipped code_multiplier)",
+		Absent: "Fail",
+	},
+	{
+		Source: "docs/classification/content-types.md",
+		Destination: Narrative,
+		Transform: "Facts",
+		Parser: "RegistryTypes",
+		Fact: "Registry",
+		Stage: "Emit",
+		Consumer: "the case study (the registry size the catalog footnote quotes)",
+		Absent: "Fail",
+		Note: "The catalog renders a subset of the registry, so the page states both numbers and the file each comes from.",
+	},
+	{
+		Source: "CHANGELOG.md",
+		Destination: Releases,
+		Transform: "Facts",
+		Parser: "ChangelogReleases",
+		Fact: "Releases",
+		Stage: "Emit",
+		Consumer: "/versions/ (the release register's versions and dates, the stamp count)",
+		Absent: "Fail",
+		Note: "The register's `Why` and `Tag` lines are the site's own prose and stay in the page; the version, the date and the set of releases come from here, so the page cannot list a release the tree does not carry.",
 	},
 	// ── Held: reachable, declared, not yet written.
 	{

@@ -1,8 +1,10 @@
 // Versions.ts - the build-time version layer: the site's dynamic version
-// facts read directly from the monorepo primaries at build time (no runtime
-// fetching), following the DeepSeek Site's Live.ts pattern.
+// facts, read from the GENERATED snapshot `Scripts/Prepare.ts` writes out of
+// the `Module/Aphrodite` submodule (`Source/Generated/Facts/Versions.json`).
 //
-// Every value the pages render is pulled here from the REAL sources:
+// The generated file is the primary. The readers below are the fallback for a
+// tree where Prepare has not run, and they read the same fields from the same
+// files:
 //   - BinaryVersion: the `version` field of crates/aphrodite/Cargo.toml;
 //   - HermesVersion: the `version` field of crates/aphrodite-hermes/Cargo.toml;
 //   - PluginVersion: the `version` key of plugins/aphrodite/plugin.yaml;
@@ -52,6 +54,43 @@ function FindRoot(): string {
 }
 
 const Root = FindRoot();
+
+/**
+ * The generated fact file: `Scripts/Prepare.ts` writes it from
+ * `Module/Aphrodite`, and it is the site's own copy of the primaries - so a
+ * build on a clean clone (no monorepo above it, no submodule checked out)
+ * renders the real versions instead of the documented fallbacks.
+ *
+ * Read from two anchors for the same reason `FindRoot` tries several: Vite's
+ * SSR bundle rewrites `import.meta.url`, and the build's working directory is
+ * the Site root.
+ */
+function ReadGenerated(): {
+	Binary?: { Version?: string };
+	Hermes?: { Version?: string };
+	Plugin?: { Version?: string };
+	Headroom?: { Version?: string };
+	BinaryVersionFile?: { Version?: string };
+	Changelog?: { Version?: string; Date?: string; Title?: string; Pairing?: string };
+} | null {
+	const Candidates = [
+		resolve(dirname(fileURLToPath(import.meta.url)), "..", "Generated", "Facts", "Versions.json"),
+		resolve(process.cwd(), "Source", "Generated", "Facts", "Versions.json"),
+	];
+
+	for (const Candidate of Candidates) {
+		try {
+			return JSON.parse(readFileSync(Candidate, "utf8"));
+		} catch {
+			// Absent, unreadable or half-written: the readers below take over.
+		}
+	}
+
+	return null;
+}
+
+/** The generated snapshot, or null when Prepare has not run in this tree. */
+const Generated = ReadGenerated();
 
 /** Read a text file, or null when it is missing or unreadable. */
 function ReadText(Path: string): string | null {
@@ -133,26 +172,28 @@ const Fallback = {
 	},
 };
 
-/** The build-time snapshot of the monorepo's real versions (fallback when a primary is missing). */
+/** The build-time snapshot of the monorepo's real versions (generated first, then the checkout, then the fallback). */
 export const Versions = {
 	/** The binary crate's version (crates/aphrodite/Cargo.toml). */
-	Binary: ReadCargoVersion("aphrodite") ?? Fallback.Binary,
+	Binary: Generated?.Binary?.Version ?? ReadCargoVersion("aphrodite") ?? Fallback.Binary,
 	/** The Hermes integration crate's version (crates/aphrodite-hermes/Cargo.toml). */
-	Hermes: ReadCargoVersion("aphrodite-hermes") ?? Fallback.Hermes,
+	Hermes: Generated?.Hermes?.Version ?? ReadCargoVersion("aphrodite-hermes") ?? Fallback.Hermes,
 	/** The Hermes plugin spec version (plugins/aphrodite/plugin.yaml). */
-	Plugin: ReadYamlVersion() ?? Fallback.Plugin,
+	Plugin: Generated?.Plugin?.Version ?? ReadYamlVersion() ?? Fallback.Plugin,
 	/** The vendored fork crate's version (vendor/headroom/crates/headroom-core/Cargo.toml). */
-	Headroom: ReadHeadroomVersion() ?? Fallback.Headroom,
+	Headroom: Generated?.Headroom?.Version ?? ReadHeadroomVersion() ?? Fallback.Headroom,
 	/** The plugin downloader's pinned binary version (plugins/aphrodite/BINARY_VERSION). */
-	BinaryVersionFile: ReadBinaryVersionFile() ?? Fallback.BinaryVersionFile,
+	BinaryVersionFile:
+		Generated?.BinaryVersionFile?.Version ?? ReadBinaryVersionFile() ?? Fallback.BinaryVersionFile,
 	/** The CHANGELOG head's entry version (the generated current release). */
-	ChangelogVersion: ChangelogHead?.Version ?? Fallback.Changelog.Version,
+	ChangelogVersion: Generated?.Changelog?.Version ?? ChangelogHead?.Version ?? Fallback.Changelog.Version,
 	/** The CHANGELOG head's entry date. */
-	ChangelogDate: ChangelogHead?.Date ?? Fallback.Changelog.Date,
+	ChangelogDate: Generated?.Changelog?.Date ?? ChangelogHead?.Date ?? Fallback.Changelog.Date,
 	/** The CHANGELOG head's entry title. */
-	ChangelogTitle: ChangelogHead?.Title ?? Fallback.Changelog.Title,
+	ChangelogTitle: Generated?.Changelog?.Title ?? ChangelogHead?.Title ?? Fallback.Changelog.Title,
 	/** The CHANGELOG head's declared pairing ("Binary `1.6.5 → 1.6.6`, plugin `2.2.5 → 2.2.6`"). */
-	ChangelogPairing: ChangelogHead?.Pairing || Fallback.Changelog.Pairing,
+	ChangelogPairing:
+		Generated?.Changelog?.Pairing || ChangelogHead?.Pairing || Fallback.Changelog.Pairing,
 };
 
 /** The version placements' rendered forms, composed from the snapshot. */

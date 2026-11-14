@@ -41,11 +41,13 @@ No autoplay, ever. There is no timer in this file: every animation is triggered 
 
 - **Effect** - the *same* entrance as `[data-enter]`, fired by scroll instead of by mount. Identical distance, duration and easing, so the two read as one language.
 - **Trigger** - `IntersectionObserver`, `rootMargin: 0px 0px -10% 0px`: the panel starts when it is a tenth of the viewport in, not the instant its first pixel clips the fold. Fires **once** per element, then unobserves it.
+- **The release** - an element that can never reach that line (the last short block of a page, a page that cannot scroll any further) would stay hidden forever, so any panel already inside the viewport is released on the observer's first entry. Content wins over motion: the margin only defers what is genuinely below the fold.
 - **Delay** - same attribute value as a delay in milliseconds: `data-reveal="120"`.
 - **This is the site-wide default entrance** for a static page's sections. Reach for `[data-enter]` only when the sequencing is the point.
 - **Reduced motion** - the pre-hide in `Motion.css` lives inside `@media (prefers-reduced-motion: no-preference)`, so it never applies; the panel is already visible and the 1ms rise is a no-op.
 - **Cost** - one observer entry per element, one callback, then unobserved. No scroll handler, no layout read.
 - **The pre-hide** - `Motion.css` holds a `[data-reveal]` panel at `opacity: 0` from the first frame (so it cannot paint and then blink out), gated on `html.js` - the class `Base.astro`'s head script sets before paint - and released by `[data-revealed]`, which the runtime sets in the same tick it starts the rise. A reader with no JavaScript never has content hidden from them.
+- **The gate's one dependency** - that head script must keep `is:inline`. Without it Astro bundles the script into a chunk and it does not reach the built HTML at all, so `html.js` is never set: the pre-hide silently stops applying and every panel blinks instead of arriving. Measured on the built output: `grep -c 'classList.add("js")' Target/index.html` must be 1.
 - **A panel that is not rendered** - the pre-hide is CSS, so a `[data-reveal]` inside a `display: none` container is observed by nothing and stays hidden. Do not put a reveal inside a closed disclosure or a hidden tab; put it on the container that opens instead.
 
 ### `[data-stream]`
