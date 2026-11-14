@@ -5,10 +5,10 @@ section: "CCR"
 
 # CCR Backends
 
-The CCR (Compress-Cache-Retrieve) store has two full backends, selected by
-deployment mode, plus the inline stores that bypass the backend round-trip
-for tiny entries. See [lifecycle](/docs/ccr/lifecycle/) for how a blob moves
-through the tiers.
+The CCR (Compress-Cache-Retrieve) store has two full backends, selected by deployment mode,
+plus the inline stores that bypass the backend round-trip for tiny entries.
+
+See [lifecycle](/docs/ccr/lifecycle/) for how a blob moves through the tiers.
 
 - [In-Memory Backend](/docs/ccr/backends/in-memory/) - process-local, sharded DashMap store
   for cache-mode deployments; ephemeral, capacity-bound eviction only

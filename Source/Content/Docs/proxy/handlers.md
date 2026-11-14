@@ -5,16 +5,16 @@ section: "Proxy"
 
 # Proxy Handlers
 
-The proxy exposes HTTP handlers for proxying LLM API requests, managing CCR
-entries, executing tool relay calls, and health checks. This page documents
-each handler's endpoint, request/response contract, and behavior; the routing
-table, auth model, and middleware are in
+The proxy exposes HTTP handlers for proxying LLM API requests, managing CCR entries,
+executing tool relay calls, and health checks.
+
+This page documents each handler's endpoint, request/response contract, and behavior;
+the routing table, auth model, and middleware are in
 [Proxy Architecture](https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/architecture.md).
 
-Every management handler below (everything except `proxy_handler` and
-`health_check`) additionally requires `Authorization: Bearer <token>` once
-`APHRODITE_MGMT_TOKEN` is set - see
-[Architecture: Management-Route Authentication](https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/architecture.md#management-route-authentication).
+Every management handler below (everything except `proxy_handler` and `health_check`)
+additionally requires `Authorization: Bearer <token>` once `APHRODITE_MGMT_TOKEN` is set -
+see [Architecture: Management-Route Authentication](https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/architecture.md#management-route-authentication).
 
 ## proxy_handler
 
@@ -88,9 +88,9 @@ pub async fn proxy_handler(
 | `X-Aphrodite-Streamed`   | true                            | SSE (text/event-stream) responses                                                 |
 | `X-Aphrodite-Fill-Pct`   | float (0.0-99.0)                | Chat Completions (from fill_pct/100)                                              |
 
-Upstream response headers are propagated on the JSON path, with hop-by-hop
-headers (`content-length`, `content-type`, `transfer-encoding`, `connection`,
-`keep-alive`) skipped.
+Upstream response headers are propagated on the JSON path,
+with hop-by-hop headers (`content-length`, `content-type`, `transfer-encoding`,
+`connection`, `keep-alive`) skipped.
 
 ### Forwarded Headers
 
@@ -108,8 +108,7 @@ Stripped or overridden before forwarding:
 
 ## handle_tool_relay
 
-Executes aphrodite tools (retrieve, compress, list) with optional async
-callback.
+Executes aphrodite tools (retrieve, compress, list) with optional async callback.
 
 ### Endpoint
 
@@ -165,8 +164,8 @@ When `callback_url` is provided:
    counted into `tool_relay_success`/`tool_relay_failure`.
 4. Response: `async_call: true`, stateless.
 
-The callback POST carries no Authorization header (unlike `/ccr/create`
-notifications, which attach `notify_key`).
+The callback POST carries no Authorization header (unlike `/ccr/create` notifications,
+which attach `notify_key`).
 
 ## handle_ccr_create
 
@@ -191,8 +190,8 @@ POST /ccr/create
 
 ### Octet-Stream Mode
 
-Raw bytes treated as the content; the hash is computed via BLAKE3
-(`compute_key`), a `key` cannot be supplied.
+Raw bytes treated as the content; the hash is computed via BLAKE3 (`compute_key`),
+a `key` cannot be supplied.
 
 ### Response
 
@@ -206,8 +205,8 @@ Raw bytes treated as the content; the hash is computed via BLAKE3
 }
 ```
 
-`compressed_size` and `marker_size` equal the bare hash length - the endpoint
-contract is the hash, not a rendered marker.
+`compressed_size` and `marker_size` equal the bare hash length - the endpoint contract is the
+hash, not a rendered marker.
 
 ### Errors
 
@@ -286,9 +285,8 @@ DELETE /ccr/{hash}
 
 ## handle_ccr_reload
 
-Hot-reloads `aphrodite.toml` and applies the `[compression]` thresholds
-(cache, token, inline, code multiplier), the auto-expand knobs, and the
-preview cap to the live `AppState`.
+Hot-reloads `aphrodite.toml` and applies the `[compression]` thresholds (cache, token, inline,
+code multiplier), the auto-expand knobs, and the preview cap to the live `AppState`.
 
 ### Endpoint
 
@@ -315,15 +313,16 @@ POST /reload
 }
 ```
 
-`parsed_only` echoes `[compression]` keys that have no consumer in the proxy
-path (terminal threshold, engine threshold, catalog mode) - they are reported
-for visibility but not applied. A parse failure returns 500 with the error
-message.
+`parsed_only` echoes `[compression]` keys that have no consumer
+in the proxy path (terminal threshold, engine threshold, catalog mode) - they are reported
+for visibility but not applied.
+
+A parse failure returns 500 with the error message.
 
 ## health_check
 
-Liveness endpoint. Always returns 200 - capability state is conveyed in the
-body, since CCR is optional.
+Liveness endpoint. Always returns 200 - capability state is conveyed in the body,
+since CCR is optional.
 
 ### Endpoint
 
@@ -331,9 +330,8 @@ body, since CCR is optional.
 GET /health
 ```
 
-Public (no loopback enforcement, no management token) so external
-load-balancer probes work. Does not call the upstream - see
-`/health/upstream` for that.
+Public (no loopback enforcement, no management token) so external load-balancer probes work.
+Does not call the upstream - see `/health/upstream` for that.
 
 ### Response
 
@@ -351,18 +349,20 @@ load-balancer probes work. Does not call the upstream - see
 
 `version` reports the compiled `CARGO_PKG_VERSION`.
 
-`fill_pct` is a **compression-headroom** number, not store occupancy: it is
-`100 - compression_ratio_ema/20` clamped to `[1, 99]`, so a fresh process
-reports exactly `90.0` **with an empty store** and drifts toward `99` as the
-ratio approaches `1.0` (i.e. when little is being compressed). `fill_pct_kind`
-states that explicitly so the field cannot be misread as a capacity gauge.
-Store occupancy is `store_entries` here, and the full picture is on
-`/stats/db` (`total_entries`, `total_bytes_original`, `database_size_bytes`,
-`freelist_bytes`, `max_entries`, `max_bytes`, `evicted_total`). In
-`/stats/db`, `max_entries` / `max_bytes` are `null` when no cap is set
-(`store_max_entries` / `store_max_bytes` = `0` = unlimited), and
-`freelist_bytes` is the reclaimable slack the file still holds after
-purges and evictions.
+`fill_pct` is a **compression-headroom** number, not store occupancy:
+it is `100 - compression_ratio_ema/20` clamped to `[1, 99]`,
+so a fresh process reports exactly `90.0` **with an empty store** and drifts toward `99`
+as the ratio approaches `1.0` (i.e. when little is being compressed).
+
+`fill_pct_kind` states that explicitly so the field cannot be misread as a capacity gauge.
+
+Store occupancy is `store_entries` here, and the full picture is
+on `/stats/db` (`total_entries`, `total_bytes_original`, `database_size_bytes`,
+`freelist_bytes`, `max_entries`, `max_bytes`, `evicted_total`).
+
+In `/stats/db`, `max_entries` / `max_bytes` are `null` when no cap is set (`store_max_entries`
+/ `store_max_bytes` = `0` = unlimited), and `freelist_bytes` is the reclaimable slack the file
+still holds after purges and evictions.
 
 ## handle_retrieve
 
@@ -409,5 +409,6 @@ POST /retrieve
    document, and prepend a `[lines a-b/total]` header to the content.
 6. Return with source tracking.
 
-Full request/response schemas, the pagination contract, and the `truncated`
-flag semantics: [Retrieve Endpoint](https://github.com/PlayForm/Aphrodite/tree/Current/docs/api/retrieve.md).
+Full request/response schemas, the pagination contract,
+and the `truncated` flag semantics:
+[Retrieve Endpoint](https://github.com/PlayForm/Aphrodite/tree/Current/docs/api/retrieve.md).

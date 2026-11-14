@@ -5,16 +5,16 @@ section: "CCR"
 
 # CCR Lifecycle
 
-CCR (Compress-Cache-Retrieve) is the lossless end-to-end compression path for
-LLM proxy traffic: Aphrodite hashed the content, stored it, and replaced it
-with a compact marker in the response, and the agent retrieved the original
-by hash on demand. This
-document walks the six phases of that lifecycle, from compression to expiry.
+CCR (Compress-Cache-Retrieve) is the lossless end-to-end compression path
+for LLM proxy traffic: Aphrodite hashed the content, stored it, and replaced it
+with a compact marker in the response, and the agent retrieved the original by hash on demand.
+
+This document walks the six phases of that lifecycle, from compression to expiry.
 
 ## Phase 1: Compress
 
-The chat-completions path rewrites each `choices[].message.content` that is
-large enough to be worth compressing:
+The chat-completions path rewrites each `choices[].message.content` that is large enough
+to be worth compressing:
 
 1. Detect the content type (`proxy::proxy_detect_content_type`).
 2. Compute the threshold for that type (base threshold x type multiplier x
@@ -30,24 +30,22 @@ large enough to be worth compressing:
 5. Update the savings counters and the compression-ratio EMA used by
    auto-tune.
 
-`tool_calls[].function.arguments` is never a compression target: it is
-client-executable JSON, not model-facing prose, and compressing it would
-produce a tool call the client cannot parse. Streaming (`text/event-stream`)
-responses bypass this phase entirely.
+`tool_calls[].function.arguments` is never a compression target: it is client-executable JSON,
+not model-facing prose, and compressing it would produce a tool call the client cannot parse.
 
-The direct `POST /ccr/create` endpoint stores content without rendering a
-marker in any response, but feeds the same counters and the same
-compression-ratio EMA (using a byte-entropy estimate - unique 3-byte
-trigrams in the first 4096 bytes - as the effective compressed size).
+Streaming (`text/event-stream`) responses bypass this phase entirely.
+
+The direct `POST /ccr/create` endpoint stores content without rendering a marker
+in any response, but feeds the same counters and the same compression-ratio EMA (using
+a byte-entropy estimate - unique 3-byte trigrams in the first 4096 bytes -
+as the effective compressed size).
 
 ## Phase 2: Cache
 
-Before storing, Aphrodite checked the hash against the backend (`ccr_hits` /
-`ccr_misses` counters) and against the inline cache (`inline_ccr_hits` /
-`inline_ccr_misses`).
+Before storing, Aphrodite checked the hash against the backend (`ccr_hits` / `ccr_misses`
+counters) and against the inline cache (`inline_ccr_hits` / `inline_ccr_misses`).
 
-A separate LLM response cache avoids repeat upstream round-trips for
-identical requests:
+A separate LLM response cache avoids repeat upstream round-trips for identical requests:
 
 | Property        | Detail                                                                                                                                |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
@@ -59,8 +57,7 @@ identical requests:
 
 ## Phase 3: Store
 
-Three storage tiers, plus the session-side inline store used by the Hermes
-plugin integration:
+Three storage tiers, plus the session-side inline store used by the Hermes plugin integration:
 
 | Tier             | Threshold                                                 | Backend                          | Capacity             | Expiry                                             |
 | ---------------- | --------------------------------------------------------- | -------------------------------- | -------------------- | -------------------------------------------------- |
@@ -70,14 +67,15 @@ plugin integration:
 | Token mode       | > 1 KiB                                                   | `SqliteCcrStore` (SQLite)        | Unlimited (disk)     | Sliding idle TTL (default 3600 s), 8x max lifetime |
 
 Backend details live in [backends](/docs/ccr/backends/). Thresholds are configurable:
-env var > TOML `[compression]` > compiled-in default for cache, token,
-inline, and code multiplier.
+env var > TOML `[compression]` > compiled-in default for cache, token, inline, and code multiplier.
 
 ## Phase 4: Return Marker
 
-Cache mode replaces content with a plain 512-character excerpt plus the
-marker line; token mode renders a type-aware summary with metadata. Both use
-the same `format_ccr_output` template (see [Marker Format](/docs/ccr/marker-format/)).
+Cache mode replaces content with a plain 512-character excerpt plus the marker line;
+token mode renders a type-aware summary with metadata.
+
+Both use the same `format_ccr_output` template (see [Marker Format](/docs/ccr/marker-format/)).
+
 Compressed responses carry:
 
 - `X-Aphrodite-Compressed: true`
@@ -102,8 +100,8 @@ The HTTP `/retrieve` endpoint resolves a hash to its original content:
 Full-document retrieval is byte-identical - including a trailing newline -
 so the returned body hashes back to the marker's own hash.
 
-The Hermes `aphrodite_retrieve` tool is a separate path that resolves against
-the session's in-process inline store:
+The Hermes `aphrodite_retrieve` tool is a separate path that resolves
+against the session's in-process inline store:
 
 - Recursive expansion of nested markers up to 5 levels deep; at the depth
   limit the raw content is returned rather than a placeholder.
@@ -130,8 +128,8 @@ the session's in-process inline store:
 | Token compress | 1,024   | Token |
 | Inline         | 256     | All   |
 
-Each is resolved as env var > TOML `[compression]` value > compiled-in
-default. The code multiplier defaults to 3.0.
+Each is resolved as env var > TOML `[compression]` value > compiled-in default. The code
+multiplier defaults to 3.0.
 
 ### Per-Type Multipliers
 
@@ -143,8 +141,8 @@ default. The code multiplier defaults to 3.0.
 | `tool_output`, `json`                                | x1 (base)                       |
 | `linter`, `build_output`, `log`                      | x1 (base, never discounted)     |
 
-`linter`, `build_output`, and `log` are pinned at the base threshold before
-any multiplier is applied, so build output stays visible in coding sessions.
+`linter`, `build_output`, and `log` are pinned at the base threshold
+before any multiplier is applied, so build output stays visible in coding sessions.
 
 ### Auto-Tune
 
@@ -159,8 +157,8 @@ The compression-ratio EMA (x100) adjusts every threshold:
 
 ### Budget Multiplier
 
-An `x-headroom-budget` request header (fill percentage 0-100) scales the
-effective threshold on a smooth linear curve, never below 0.5x:
+An `x-headroom-budget` request header (fill percentage 0-100) scales the effective threshold
+on a smooth linear curve, never below 0.5x:
 
 ```
 budget_mult = clamp(0.50 + (budget% / 100) * 0.50, 0.50, 1.0)
@@ -174,8 +172,9 @@ budget_mult = clamp(0.50 + (budget% / 100) * 0.50, 0.50, 1.0)
 
 ## Session Catalog Emission
 
-Per-turn catalog summaries were emitted delta-only: the renderer remembers
-`last_emitted_marker_count` and `last_emitted_file_count` and reports
-`+N new compressions this turn` / `+N new files` only when new items
-arrived, with a stable "no change" line otherwise. Counters reset on session
-start.
+Per-turn catalog summaries were emitted delta-only: the renderer
+remembers `last_emitted_marker_count` and `last_emitted_file_count`
+and reports `+N new compressions this turn` / `+N new files` only when new items arrived,
+with a stable "no change" line otherwise.
+
+Counters reset on session start.

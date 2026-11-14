@@ -33,9 +33,10 @@ const Toc = headings
 	.filter(({ depth }) => depth === 2 || depth === 3)
 	.map(({ depth, slug, text }) => ({ Depth: depth, Id: slug, Label: text }));
 
-// A single-heading page has no outline to speak of; the rail and the narrow
-// disclosure both stay out of the way rather than printing one lone entry.
-const HasToc = Toc.length > 1;
+// A page with no h2/h3 has no outline to speak of, so the rail and the narrow
+// disclosure stay out of the way; a page with even one gets its entry, because
+// the list is the page's own headings and never a judgement about them.
+const HasToc = Toc.length > 0;
 
 // The WIP docs: pages that document partly unimplemented or roadmap-only
 // functionality (Centers: v1 shipped, v2-v4 are design sketches). They carry

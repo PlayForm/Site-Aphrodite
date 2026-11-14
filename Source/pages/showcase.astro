@@ -1,12 +1,14 @@
 ---
 import Base from "@Layout/Base.astro";
 import ZineTape from "@Component/ZineTape.astro";
-import ZinePreview from "@Component/ZinePreview.astro";
+import ZineBox from "@Component/ZineBox.astro";
 import ZineFlow from "@Component/ZineFlow.astro";
-import { Link, OurRepo } from "@Library/Links";
 import ZineToggle from "@Component/ZineToggle.astro";
 import Breadcrumbs from "@Component/Breadcrumbs.astro";
 import Related from "@Component/Related.astro";
+import ExampleCase from "@Component/ExampleCase.astro";
+import { Link, OurRepo } from "@Library/Links";
+import type { ExampleOutputLine, ExampleRecord } from "@Library/Records";
 import Examples from "../Content/Showcase/Examples.json";
 
 // ---- The bank, typed at the annotation (the Astro compiler's frontmatter
@@ -31,57 +33,127 @@ const Bank: {
 	}[];
 } = Examples;
 
-// The CCR marker contract pieces, parsed from the bank's marker strings:
-// <<<CCR:hash|type|size>>>.
-function MarkerParts(Marker: string | null): { Hash: string; Type: string; Size: string } | null {
-	if (!Marker) return null;
-	const Match = Marker.match(/<<<CCR:([0-9a-f]+)\|([a-z_]+)\|(\d+)>>>/);
-	return Match ? { Hash: Match[1], Type: Match[2], Size: Match[3] } : null;
+// ---- The page's one section label. Every section on this page wears it, so
+// the label is one class string in one place instead of five copies drifting
+// apart - the defect the restructure exists to remove. ----
+const SectionTape =
+	"mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]";
+
+// ---- The gallery: ONE array of ONE record shape. Every entry below supplies
+// every field `ExampleCase` renders, so adding or removing an example is a
+// change to the bank (Source/Content/Showcase/Examples.json) and never a
+// change to this file. ----
+
+// The three record fields that carry markup (`Claim`, `Output`, `Marker`) are
+// rendered through `set:html`, so a `<` in a compiler's own output has to be
+// escaped or the browser reads it as a tag. The ampersand goes first: escaping
+// it last would rewrite the entities the other two replacements produce.
+function Escape(Text: string): string {
+	return Text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
-// The enriched preview pane's teal hash line, escaped so set:html renders the
-// angle brackets literally instead of parsing them.
-function EscapeAngle(Text: string): string {
-	return Text.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+// One sentence per block: the PROSE BREAKDOWN applied to a bank note. The
+// lookahead keeps "e.g. before ..." whole - a break needs a new subject after
+// the period, not merely a period.
+function Sentences(Note: string): string[] {
+	return Note.split(/(?<=[.!?])\s+(?=[A-Z(`"\u2014-])/)
+		.map((Sentence) => Sentence.trim())
+		.filter(Boolean);
 }
 
-// The raw stream pane's line tones: the first line is the context keeper the
-// preview carries forward, error/failure lines are canary highlights, and the
-// rest sit at the suppression opacities - the fade the model still sees.
-function RawLines(Raw: string | null): { Text: string; Tone: string }[] {
-	if (!Raw) return [];
-	return Raw.split("\n").map((Line, Index) => {
-		const Failure = /error|fail|warn|panic|traceback/i.test(Line);
-		const Tone = Failure
-			? "text-stamped-canary"
+// The bank's raw stream, one line per entry, in the suppression fade law 4
+// describes: the context keeper brightest, failures canary, the tail dimmed.
+function OutputLines(Raw: string | null): ExampleOutputLine[] {
+	if (!Raw) {
+		return [{ Text: "(no raw stream - the block is generated, not captured)", Tone: "dim" }];
+	}
+	const Lines = Raw.split("\n");
+	return Lines.map((Text, Index) => ({
+		Text: Escape(Text) || "&nbsp;",
+		Tone: /error|fail|warn|panic|traceback/i.test(Text)
+			? "canary"
 			: Index === 0
-				? "text-bone-newsprint"
-				: Index === Raw.split("\n").length - 1
-					? "opacity-70"
-					: "opacity-40";
-		return { Text: Line, Tone };
-	});
+				? "result"
+				: Index === Lines.length - 1
+					? "dim"
+					: "fade",
+	}));
 }
 
-// The category registry for the filter bar, in first-appearance order.
-const Categories = [...new Set(Bank.examples.map((Example) => Example.category))];
+// The CCR marker contract, taken from the bank's own marker string instead of
+// rebuilt from parsed parts: <<<CCR:hash|type|size>>>.
+function MarkerLine(Marker: string | null): string {
+	const Match = Marker?.match(/<<<CCR:[^>]+>>>/);
+	return Match ? Escape(Match[0]) : "(stays raw - no marker stored)";
+}
+
+// The round-trip is the entry's command: the call the agent made. What the call
+// answers is invariant across all twenty entries, so the answer - and the
+// store's read rules - are stated once on the page, under the gallery heading,
+// instead of repeated inside every entry.
+function CommandCode(Retrieval: { tool: string; args: { hash: string } } | null): string {
+	if (!Retrieval) {
+		return "(stays raw - no retrieval call)";
+	}
+	return `${Retrieval.tool}(hash: "${Retrieval.args.hash}")`;
+}
+
+// The scenario number the tape carries, computed from the entry's position so
+// the bank can grow past twenty without a table to edit.
+function Roman(Value: number): string {
+	const Numerals: [number, string][] = [
+		[10, "X"],
+		[9, "IX"],
+		[5, "V"],
+		[4, "IV"],
+		[1, "I"],
+	];
+	let Left = Value;
+	let Out = "";
+	for (const [Amount, Numeral] of Numerals) {
+		while (Left >= Amount) {
+			Out += Numeral;
+			Left -= Amount;
+		}
+	}
+	return Out;
+}
+
+const Cases: ExampleRecord[] = Bank.examples.map(
+	(Example, Index): ExampleRecord => ({
+		Id: Example.id,
+		N: Roman(Index + 1),
+		Label: Example.category.toUpperCase(),
+		Title: Example.title,
+		Tone: Example.corpus ? "teal" : "crimson",
+		Rotate: Index % 2 === 0 ? "rotate-[0.5deg]" : "-rotate-[0.5deg]",
+		Claim: Sentences(Example.note).map(Escape),
+		Command: { Lang: "text", Code: CommandCode(Example.retrieval) },
+		Output: OutputLines(Example.raw),
+		Preview: Example.preview ?? "(stays raw - no preview line)",
+		Marker: MarkerLine(Example.marker),
+		Src: `SRC: Source/Content/Showcase/Examples.json · ${Example.id}`,
+	}),
+);
+
+// The category registry for the filter bar, in first-appearance order, read off
+// the records the gallery renders so the buttons cannot list a category no
+// entry carries.
+const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCase()))];
 ---
 
 <Base
 	Title="SHOWCASE // APHRODITE"
 	Description="The plugin in action: 20 anonymized worked examples - build, test, terminal, code, grep, git, diff, json, error, log, the tool relay, the directives, the chain split, and the threshold tiers - each showing the raw stream, the enriched preview, the retrieval round-trip and the threshold decision."
 >
+	<!-- PENDING SHARED: PageShell (t_130e5ed4) - swap this <main> for <PageShell Rhythm="wide"> when it lands -->
 	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-32 sm:px-8 lg:gap-40 lg:px-14 lg:py-56"
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
 	>
 		<Breadcrumbs />
-		<!-- HERO -->
+		<!-- PENDING SHARED: PageHeader (t_130e5ed4) - swap this <header> for <PageHeader Tape Title Lead /> when it lands -->
 		<header class="relative flex w-full flex-col items-start">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				SHOWCASE // THE PLUGIN IN ACTION
-			</div>
+			<div class={SectionTape}>SHOWCASE // THE PLUGIN IN ACTION</div>
 			<h1
 				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
 			>
@@ -100,30 +172,13 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Anonymized throughout - no names, no secrets, no real sessions.
 			</p>
-			<div class="mt-8 flex max-w-4xl flex-wrap items-center gap-4">
-				<span
-					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000]"
-				>
-					{Bank.examples.length} WORKED EXAMPLES
-				</span>
-				<span
-					class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]"
-				>
-					{Categories.length} CATEGORIES
-				</span>
-			</div>
 		</header>
 
 		<!-- THE DEFAULTS IN PLAY -->
 		<section class="relative w-full">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				THE DEFAULTS // APHRODITE.TOML
-			</div>
-			<div
-				class="zine-box-crimson w-full rotate-[0.8deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
+			<!-- PENDING SHARED: ZineTape Variant="section" (t_130e5ed4) - every section label on this page is {SectionTape}, defined once in the frontmatter -->
+			<div class={SectionTape}>THE DEFAULTS // APHRODITE.TOML</div>
+			<ZineBox Tone="crimson" Rotate="rotate-[0.8deg]">
 				<p class="font-mono text-base leading-loose text-bone-newsprint">
 					{Object.entries(Bank.defaults).map(([Key, Value]) => (
 						<span class="mr-6 inline-block whitespace-nowrap">
@@ -141,19 +196,13 @@ const Categories = [...new Set(Bank.examples.map((Example) => Example.category))
 					<code class="font-mono text-base text-weathered-teal">aphrodite_*</code>
 					tools themselves are always raw regardless of size.
 				</p>
-			</div>
+			</ZineBox>
 		</section>
 
 		<!-- FILTER BAR -->
 		<section class="relative w-full" data-registry>
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				THE REGISTRY // FILTER BY CATEGORY, SEARCH BY KEYWORD
-			</div>
-			<div
-				class="zine-box-crimson relative -rotate-[0.6deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
-			>
+			<div class={SectionTape}>THE REGISTRY // FILTER BY CATEGORY, SEARCH BY KEYWORD</div>
+			<ZineBox Tone="crimson" Rotate="-rotate-[0.6deg]">
 				<div class="flex flex-wrap items-center gap-2" data-filters>
 					<button
 						type="button"
