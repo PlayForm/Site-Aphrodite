@@ -23,7 +23,11 @@ const Delta = {
 };
 ---
 
-<div class="zine-box-subtle border-[3px] border-oxblood-dark bg-carbon-void">
+<!-- The table cannot shrink below its content's min-content width, so on a
+	narrow viewport it widened the PAGE (/versions/ by 226px) instead of
+	scrolling. The box is the scroll container: the border stays put, the
+	rows move. Same pattern as every hand-written table on the site. -->
+<div class="zine-box-subtle overflow-x-auto border-[3px] border-oxblood-dark bg-carbon-void">
 	<table class="w-full border-collapse font-mono text-base">
 		{Headers && (
 			<thead>

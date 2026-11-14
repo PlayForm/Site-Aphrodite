@@ -130,7 +130,7 @@ const Example = [
 // two parsers reads it; Live says when a change takes effect; Chain and From
 // are what the resolution ladder needs to walk the value. The shape itself is
 // Records.ts, and the rows are generated - see the roster below.
-import { Assert, ConfigKeys as GeneratedKeys, ConfigNames } from "@Library/Roster";
+import { Assert, ConfigKeys as GeneratedKeys, ConfigNames, EnvVars } from "@Library/Roster";
 import { ConfigProse } from "@Library/Prose/Config";
 // THE KEY ROSTER - generated, never typed here.
 //
@@ -235,6 +235,7 @@ const Sections = [
 	{ Id: "knobs", Label: "THE KNOBS" },
 	{ Id: "flow", Label: "PER-TURN" },
 	{ Id: "unwired", Label: "UNWIRED" },
+	{ Id: "env", Label: "OVERRIDES" },
 	{ Id: "classify", Label: "CLASSIFY" },
 	{ Id: "proxies", Label: "THE PAIR" },
 	{ Id: "parsers", Label: "TWO PARSERS" },
@@ -623,6 +624,68 @@ const Sections = [
 			</p>
 		</section>
 
+		<!-- THE OVERRIDE LEDGER: every environment variable the module documents -->
+		<section id="env" class="relative w-full" aria-label="Every environment variable" data-reveal>
+			<ZineTape Label="env" Color="canary" Side="right" />
+			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
+				Every override, live or not
+			</h2>
+			<p class="mt-4 max-w-3xl text-base text-bone-newsprint">
+				A TOML key is only half the story: the environment wins wherever it is set, and the module
+				documents {EnvVars.length} variables across three surfaces - the Rust proxy, the
+				<code class="text-bone-newsprint">aphrodite setup</code> subcommand, and the Hermes dylib
+				session.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The last two groups are the ones that matter most: a variable with no reader is a silent
+				no-op, and a build-time variable exported at runtime changes nothing.
+			</p>
+			{
+				[...new Set(EnvVars.map((Entry) => Entry.Surface))].map((Surface) => (
+					<div class="mt-12">
+						<h3 class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+							{Surface}
+						</h3>
+						<div class="mt-4 overflow-x-auto">
+							<table class="w-full border-collapse font-mono text-base">
+								<thead>
+									<tr class="border-b-2 border-oxblood-dark text-left">
+										<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+											VARIABLE
+										</th>
+										<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+											PRECEDENCE
+										</th>
+										<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+											DEFAULT
+										</th>
+										<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">
+											EFFECT
+										</th>
+									</tr>
+								</thead>
+								<tbody class="text-bone-newsprint">
+									{EnvVars.filter((Entry) => Entry.Surface === Surface).map((Entry) => (
+										<tr class="border-b border-oxblood-dark">
+											<td class="py-3 pr-4 align-top whitespace-nowrap text-weathered-teal">
+												{Entry.Variable}
+											</td>
+											<td class="py-3 pr-4 align-top text-zinc-dust">{Entry.Precedence ?? "-"}</td>
+											<td class="py-3 pr-4 align-top text-bone-white">{Entry.Default ?? "-"}</td>
+											<td class="py-3 align-top">{Entry.Effect}</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				))
+			}
+			<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
+				SRC: docs/config/env-vars.md - every row above is generated from it.
+			</p>
+		</section>
+
 		<!-- THE CLASSIFY MATRIX: one type, one threshold -->
 		<section id="classify" class="relative w-full" aria-label="The classify matrix" data-reveal>
 			<ZineTape Label="classify" Color="canary" Side="left" />
@@ -1000,20 +1063,29 @@ const Sections = [
 		return Result;
 	}
 
+	// The ladder prints config KEYS and VALUES as text: `preview.<family>.<ctype>`
+	// is a key name, not markup. Interpolating it raw let the browser parse
+	// <family>/<ctype> as elements, which swallowed the label - the visible
+	// line read "preview.." and the page carried three stray elements. Same
+	// failure the COPY TOML payload had; the boundary is the escape.
+	function Escape(Text: string): string {
+		return Text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+	}
+
 	function Chip(Text: string, State: "dim" | "live" | "fallback"): string {
 		const Style = {
 			dim: "border-oxblood-dark text-zinc-dust opacity-50",
 			live: "border-stamped-canary text-stamped-canary",
 			fallback: "border-weathered-teal text-weathered-teal",
 		}[State];
-		return `<span class="inline-block border px-2 py-0.5 font-mono text-base uppercase tracking-widest ${Style}">${Text}</span>`;
+		return `<span class="inline-block border px-2 py-0.5 font-mono text-base uppercase tracking-widest ${Style}">${Escape(Text)}</span>`;
 	}
 
 	function Row(Label: string, Chips: string[], Note: string): string {
 		return `<div class="border-l-2 border-oxblood-dark pl-3">
-			<p class="font-mono text-base uppercase tracking-widest text-zinc-dust">${Label}</p>
+			<p class="font-mono text-base uppercase tracking-widest text-zinc-dust">${Escape(Label)}</p>
 			<div class="mt-1 flex flex-wrap items-center gap-2">${Chips.join('<span class="text-zinc-dust">&rarr;</span>')}</div>
-			<p class="mt-1 font-mono text-base text-zinc-dust">${Note}</p>
+			<p class="mt-1 font-mono text-base text-zinc-dust">${Escape(Note)}</p>
 		</div>`;
 	}
 

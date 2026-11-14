@@ -21,7 +21,12 @@ nothing parallaxes, nothing elevates. Radius stays 0.
 - **Reduced motion is the same code settling the final frame.** Under `prefers-reduced-motion: reduce` every duration collapses to 1ms and every delay to 0. Nothing is hidden from a reader who asked for stillness, and no animation is skipped in a way that would leave a frame half-applied.
 - **Copy stays inside the motion.** Every attribute belongs on a content root that *says something*. An animated panel with no sentence under it is a defect; a `[data-count]` with no line explaining the number is decoration. The runtime cannot enforce this - the caller must.
 
-No autoplay, ever. There is no timer in this file: every animation is triggered by a mount or by the reader's own scroll.
+No autoplay, ever - with one named exception. Every animation here is triggered
+by a mount or by the reader's own scroll, never by a clock that starts itself.
+The exception is `[data-run]`, the running terminal: it exists to keep
+producing output, so it owns a single `setTimeout` chain, and it only starts
+when its entrance root has revealed it - a terminal below the fold costs
+nothing until the reader reaches it.
 
 ---
 
@@ -79,6 +84,39 @@ No autoplay, ever. There is no timer in this file: every animation is triggered 
 - **Cost** - one `requestAnimationFrame` loop that repaints text at most every 60ms, and stops on the frame it reaches the value. It is the only non-compositor animation in the runtime.
 - **Copy rule** - the number needs the line that says what it means. "1,400" alone is decoration; "1,400 tokens per build" is the claim.
 
+### `[data-run]`
+
+- **Effect** - a terminal that never stops. It reads a scripted command list from a JSON payload (`script[data-run-script="<id>"]`), streams each command's lines on that command's own rhythm, and rewrites the preview, the marker and the tally from the lines that have arrived so far. When a command settles it holds, clears, and starts the next one, forever.
+- **The marker is never a lie** - `RunPreview` is a mirror of the engine's own `build_preview` arms (`Module/Aphrodite`, `crates/aphrodite/src/preview/builders/*.rs`): the same predicates, the same tallies, the same 60-character cap on the first error message, the same `[json:~Nitems NL]` fallback while a JSON body is still incomplete. A stream that ended here would produce exactly this line. `RunMarker` sizes the marker from the bytes of that same prefix, so the address grows with the flood it addresses.
+- **The type is taken as given** - it is the classifier's verdict, not a re-detection. The engine classifies once, on the complete content; re-running detection over a prefix would be a different function than the one being demonstrated.
+- **Rhythm is per command** - `Pace` carries `Beat`, `Jitter`, `Every`/`Stall` and `Turn`. `Turn` is the pause added when the arriving line's KIND changes into a warning or an error, so the stall follows the classification: a compiler that has just found something does not print at the speed it compiled at. Jitter comes from a seeded generator, so a reload reproduces the same stream exactly.
+- **No measurement** - the track is pinned to the viewport's bottom edge, so an append scrolls the pane with no layout read at all. The pane is a `<pre>`: it preserves the leading spaces rustc's snippets are made of, it is the one container the build's code-mention pass skips, and it keeps an HTML minifier from collapsing the indentation.
+- **Bounded** - the pane keeps `Timing.Run.Rows` rows (48); the window shows about ten, so a dropped row has always already left the viewport. One timer, never a frame loop; the preview text is rewritten at most every `Timing.Run.Repaint` ms (60) because a text change is a layout.
+- **The markup ships in flow, and mounts into a window** - a reader with no JavaScript, or one who asked for stillness, reads the whole settled frame at its natural height. Mounting sets the fixed height and pins the track; `Teardown`, and a mid-page switch to reduced motion, put the flow and the server-rendered frame back verbatim.
+- **Reduced motion** - the settled build frame the page server-rendered. No stream, no cycling, nothing to wait for: `Run` returns before it touches anything.
+- **Copy rule** - every line is the real output of the command printed above it. A stream of invented lines is decoration with a timer, and a marker computed from invented lines is a lie with a hash on it.
+
+---
+
+## THE TWO RULES ABOUT TRANSFORMS AND OPACITY
+
+An entrance animates `transform` and `opacity` with `fill: both`, and a filled
+Web Animation outranks an ordinary author declaration. Two traps follow, and
+both of them destroy something the page was already saying:
+
+- **A plate must never be its own entrance root.** A `ZineBox` with `Rotate`, a
+  section with a CSS `skew` - any element whose decorative transform is its
+  identity - will have that transform pinned to the animation's last frame
+  (`translate3d(0, 0, 0)`) for as long as it lives. It arrives straight and
+  stays straight. Put `[data-reveal]` / `[data-enter]` on a plain wrapper, or
+  keep the plate as a child of the root that carries the attribute.
+- **A line must never carry its tone as opacity.** `[data-stream]` fills
+  `opacity: 1` on every line it prints, so a stream pane that encodes the
+  suppression law as `opacity-70` / `opacity-40` / `opacity-25` loses it the
+  moment the log finishes printing. `ZineStream` puts the tone on a span
+  INSIDE each line for exactly this reason: the line animates, the span keeps
+  its tone, and the two opacities multiply.
+
 ---
 
 ## THE CROSSFADE (CSS, not this runtime)
@@ -124,7 +162,8 @@ settled frame rather than a half-played one.
 
 ## HOW TO CHECK IT
 
-- **A page has motion** - `grep -c 'data-enter\|data-reveal\|data-stream\|data-wipe\|data-count' Source/pages/<page>.astro`, then load the route and watch the panel arrive once.
+- **A page has motion** - `grep -c 'data-enter\|data-reveal\|data-stream\|data-wipe\|data-count\|data-run' Source/pages/<page>.astro`, then load the route and watch the panel arrive once.
+- **A running terminal streams** - load `/`, scroll the pair into view, and sample `[data-run-track]`'s child count: it climbs, the preview beside it changes on the same beat, and the settled build reads `[build:2E 2W 142L | error[E0432]: unresolved import \`crate::noise\`]`. That string must equal the one `RunPreview` renders in the page's own markup - if the two ever disagree, the animation has drifted from the engine.
 - **No double-binding** - navigate away and back through the client router; a panel must rise once, not twice, and the console must stay quiet.
 - **Reduced motion** - enable *Reduce motion* in the OS, reload: every panel is present, nothing animates, no copy is missing.
 - **No content hidden** - disable JavaScript, reload: every `[data-reveal]` panel is visible (the pre-hide is gated on `html.js`).

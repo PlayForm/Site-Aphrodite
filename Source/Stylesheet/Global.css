@@ -188,6 +188,37 @@ a.code-link:hover code {
 	overflow-wrap: anywhere;
 }
 
+/* Long unbreakable tokens - repository paths, 40-hex hashes, TOML keys,
+   dotted identifiers - carry no break opportunity, so they set the
+   min-content width of every box that holds them. On a 375px viewport that
+   min-content width BECAME the page's scrollWidth: the docs PREV/NEXT links,
+   the prose file citations, the mono chips and the SRC footer lines pushed
+   12 routes 12-226px past the viewport. `anywhere` (not `break-word`) is
+   required here: only `anywhere` also shrinks the min-content contribution,
+   which is what lets a grid or flex item stay inside its own track instead
+   of widening its container. Fenced code is untouched (`white-space: pre`
+   never wraps), and table cells keep `normal` so a wide table scrolls in its
+   own box rather than shredding its paths mid-token. */
+body {
+	overflow-wrap: anywhere;
+}
+
+td,
+th {
+	overflow-wrap: normal;
+}
+
+/* A tilted plate's BOUNDING box is wider than its layout box: the tilt is
+   1.2deg, so a 6.5k-px-tall plate adds height·sin(1.2deg) - 137px - to its
+   width, and /plugin/ poked 12px past a 1440px viewport (no scrollbar, since
+   body clips; the viewport still kept a 12px scroll area, so scrollWidth was
+   1452). The section is the tilt's frame: `clip` - not `hidden` - because
+   clip creates no scroll container, so position:sticky and the tape corners
+   keep behaving exactly as before. */
+main > section {
+	overflow-x: clip;
+}
+
 /* Exec-demo spin: hard stepped rotation, no easing curve (the grammar: hard offsets only). */
 .zine-exec-spin {
 	animation: zine-exec-spin 0.42s steps(6) infinite;

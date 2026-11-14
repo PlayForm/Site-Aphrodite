@@ -90,7 +90,19 @@ export default defineConfig({
 			Logger: 1,
 			Beasties: { pruneSource: false },
 		}),
-		(await import("@playform/compress")).default({ Logger: 1 }),
+		// html-minifier-terser's `processScripts` list tells it to re-parse the
+		// TEXT of a matching <script> type as HTML (it calls its own minifier
+		// recursively). The default list includes application/json, so the
+		// samples island on /workbench/ - a JSON array inside
+		// <script type="application/json"> - came back with `</String>`
+		// appended, and every JSON.parse of it threw "Unexpected non-whitespace
+		// character after JSON at position 2454". No script here holds an HTML
+		// template (the site's islands are JSON data), so the recursive pass is
+		// off; every other minifier option keeps its shipped default.
+		(await import("@playform/compress")).default({
+			Logger: 1,
+			HTML: { "html-minifier-terser": { processScripts: [] } },
+		}),
 	],
 	experimental: {
 		clientPrerender: true,

@@ -187,9 +187,84 @@ lookup, the byte-exact return). Two hard rules:
    decision (no max-height, no overflow-y).
 2. A pane value is a string or a list of mono lines. The per-line tone
    convention: a line containing `<<<CCR:` renders as the marker chip
-   (`.ccr-marker` + canary bold), `» ` highlights teal, `→ ` dims, `· `
-   fades to opacity-40. Content must be corpus-anchored (hooks.md,
+   (`.ccr-marker` + canary bold), `» ` highlights teal, `→ ` dims, `· ` fades
+   to opacity-40. Content must be corpus-anchored (hooks.md,
    retrieve.md, the backends and install docs, the enriched preview catalog
    at docs/proxy/compression.md:228-241); the marker and preview shapes are
    the corpus's own examples, never invented formats. Flag any step whose
    two-view content the sources do not support.
+
+## 11. The page-overflow law (nothing may widen the document)
+
+The page's horizontal overflow is `document.documentElement.scrollWidth -
+window.innerWidth`, and it is the ONLY honest reading: `body` carries
+`overflow-x-hidden`, so a real overflow never shows a scrollbar - it just
+leaves the document scrollable, which `window.scrollTo(400, 0)` proves
+(`window.scrollX` stays above 0). A route that reports a non-zero value is
+broken even when nothing looks wrong. Five ways it happens here, each with
+the arbiter that finds it:
+
+- **A payload rendered as text.** A `data-*` attribute is TEXT to the
+  browser until something writes markup into it or splits the tag open.
+  `Source/Library/CodeMentions.ts` walks the built HTML as tokens; its tag
+  patterns are quote-aware (`Attrs` = `(?:[^>"']|"[^"]*"|'[^']*')*`) so a
+  `>` inside a quoted value cannot end the tag - with `[^>]*` the rest of
+  the value becomes a "text node", the prose pass links a file name inside
+  it, and the element breaks open (the /config/ COPY TOML button rendered
+  its whole 4.5 KB payload and measured 2034px). The same law binds every
+  HTML string built in frontmatter: `Chip`/`Row` in `pages/config.astro`
+  interpolate a key name, so they run it through `Escape` - unescaped,
+  `preview.<family>.<ctype>` became three real elements and the label read
+  `preview..`. Arbiter:
+  `document.querySelectorAll("family, ctype").length === 0` and a
+  `[data-copy]` button whose `textContent` is only its label.
+- **`processScripts` re-parsing a JSON island.** `@playform/compress`
+  ships `html-minifier-terser` with `processScripts` including
+  `application/json`; that option makes the minifier parse a matching
+  `<script>`'s TEXT as HTML recursively, and a JSON array long enough came
+  back with `</String>` appended - every `JSON.parse` then threw
+  `Unexpected non-whitespace character after JSON at position 2454`.
+  `astro.config.ts` therefore passes
+  `HTML: { "html-minifier-terser": { processScripts: [] } }` (deep-merged,
+  so every other minifier option keeps its default). Arbiter:
+  `grep -c '</String>' Target/workbench/index.html` must print `0`.
+- **A long unbreakable token.** Repository paths, 40-hex hashes, TOML keys
+  and dotted identifiers carry no break opportunity, so they set the
+  MIN-CONTENT width of every box that holds them - which is why a chip or a
+  PREV/NEXT link can widen the page from inside a grid. `body {
+  overflow-wrap: anywhere }` in `Global.css` is the fix, and it must be
+  `anywhere`, not `break-word`: only `anywhere` also shrinks the min-content
+  contribution, which is what lets a grid/flex item stay inside its track.
+  `td, th` keep `normal` on purpose - a wide table scrolls in its own box
+  instead of shredding paths mid-token. Arbiter: the widest text node whose
+  `Range.getClientRects()` right edge passes the viewport.
+- **A table with no scroll box.** A table cannot shrink below its
+  min-content width, so it widens the page unless an ancestor scrolls.
+  `Component/ZineLedger.astro` is the pattern: the bordered box itself
+  carries `overflow-x-auto` (`/versions/` was 226px over without it). Every
+  `<table>` on the site lives inside a scroll container - grep
+  `<table` and check the parent.
+- **A tilted plate.** `ZineBox` rotates from `sm` up, and a rotated box's
+  BOUNDING box is wider than its layout box: 1.2deg on a 6.5k-px-tall plate
+  adds height·sin(1.2deg) - 137px - to the width, which put `/plugin/` 12px
+  past a 1440px viewport with no content actually out of place.
+  `main > section { overflow-x: clip }` is the frame: `clip`, not `hidden`,
+  because clip creates no scroll container, so `position: sticky` and the
+  tape corners behave exactly as before.
+
+Diagnosis ladder - each step exists because the previous one lies:
+
+1. Element boxes sorted by `getBoundingClientRect().right` report CLIPPED
+   children (a table inside `overflow-x-auto`) at their unclipped width.
+   Filter out any element with an ancestor whose `overflow-x` is not
+   `visible` before trusting the list.
+2. When no unclipped element is at fault, scan text nodes
+   (`document.createTreeWalker` + `Range.getClientRects()`) - a long token
+   inside an inline box is invisible to the element scan.
+3. When neither finds it, hide each child in turn and keep the one whose
+   `display: none` collapses `scrollWidth` back to `innerWidth`, descending
+   into it. Several siblings can each overflow, so a single-child bisect
+   stops early; confirm by re-measuring after the fix.
+
+The full acceptance is a sweep of every sitemap route at 375 and 1440 -
+`0` everywhere, not just on the routes that were reported.

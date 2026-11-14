@@ -43,7 +43,7 @@ const Tools: (ToolRecord & { N: string; Note?: string })[] = Roster.map((Tool, I
 
 		<!-- SLOT 3: one claim's evidence - the register, its contract, its two schemas -->
 		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="REGISTRY // 13 ENTRIES" />
+			<ZineTape Variant="section" Label={`REGISTRY // ${Tools.length} ENTRIES`} />
 			<ZineBox Size="lg" Rotate="-rotate-[1deg]">
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse font-mono text-base">

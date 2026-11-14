@@ -21,10 +21,12 @@ import { ResolveCode, ResolveFile, SourceLink } from "./SourceLinks";
  *
  * Safety: code inside <pre> fences is never touched, text inside <code>, <a>
  * or <script>/<style>/<title> is never prose-matched (so no nested anchors
- * and no re-wrapping of the code chips), entities are decoded only for
- * matching (the original captured text is re-emitted byte-for-byte), and an
- * unresolvable or locally missing path degrades to plain text instead of a
- * 404 anchor.
+ * and no re-wrapping of the code chips), attribute values are never treated
+ * as text (every tag pattern is quote-aware, so a payload attribute holding
+ * `>` or a file name cannot be rewritten into markup), entities are decoded
+ * only for matching (the original captured text is re-emitted byte-for-byte),
+ * and an unresolvable or locally missing path degrades to plain text instead
+ * of a 404 anchor.
  */
 
 /** Decode the five entities the inline code text can carry for matching. */
@@ -36,17 +38,34 @@ const Decode = (Text: string): string =>
 		.replaceAll("&#39;", "'")
 		.replaceAll("&amp;", "&");
 
+/**
+ * One tag's attribute list, quote-aware: a quoted value is consumed whole, so
+ * a `>` or `<` INSIDE a value can never end the tag early. The naive
+ * `[^>]*` splits `<button data-copy="... a > b ...">` at the first `>`,
+ * which turns the rest of the attribute into a text node - and the prose pass
+ * then injects an anchor into the middle of a quoted attribute value, which
+ * breaks the element open in the browser. (Measured on /config/: the COPY
+ * TOML button rendered the whole 4.5 KB payload as its textContent.)
+ */
+const Attrs = `(?:[^>"']|"[^"]*"|'[^']*')*`;
+
 /** Split out the <pre> blocks so fenced code is never transformed. */
-const PreSplit = /(<pre[^>]*>[\s\S]*?<\/pre>)/g;
+const PreSplit = new RegExp(`(<pre${Attrs}>[\\s\\S]*?<\\/pre>)`, "g");
 
 /** Split out existing anchors so a code span inside link text is never wrapped (no nested <a>). */
-const AnchorSplit = /(<a\b[^>]*>[\s\S]*?<\/a>)/g;
+const AnchorSplit = new RegExp(`(<a\\b${Attrs}>[\\s\\S]*?<\\/a>)`, "g");
 
 /** One inline code element (with or without attributes), element-only text. */
-const CodeElement = /<code([^>]*)>((?:[^<>]|&(?:amp|lt|gt|quot|#39);)*)<\/code>/g;
+const CodeElement = new RegExp(
+	`<code(${Attrs})>((?:[^<>]|&(?:amp|lt|gt|quot|#39);)*)<\\/code>`,
+	"g",
+);
 
 /** One mono span whose entire text may be an identifier (the hand-written pages' chips). */
-const MonoSpan = /<span([^>]*class="[^"]*font-mono[^"]*"[^>]*)>((?:[^<>]|&(?:amp|lt|gt|quot|#39);)*)<\/span>/g;
+const MonoSpan = new RegExp(
+	`<span((?:[^>"']|"[^"]*"|'[^']*')*?class="[^"]*font-mono[^"]*"${Attrs})>((?:[^<>]|&(?:amp|lt|gt|quot|#39);)*)<\\/span>`,
+	"g",
+);
 
 const Wrap = (Open: string, Inner: string, Tag: string): string => {
 	const Entry = ResolveCode(Decode(Inner));
@@ -145,7 +164,12 @@ const WrapProseToken = (Text: string): string => {
  */
 const SkipTags = /^(code|a|pre|script|style|title|textarea)$/;
 
-const TagOrText = /<[^>]+>|[^<]+/g;
+/**
+ * The token walk: one tag or one run of text. Quote-aware for the same reason
+ * as Attrs above - a `>` inside a quoted attribute value must not split the
+ * tag, or the remainder of that value is treated as prose and gets linked.
+ */
+const TagOrText = new RegExp(`<${Attrs}>|[^<]+`, "g");
 
 const WrapProse = (Html: string): string => {
 	let Depth = 0;
@@ -193,7 +217,7 @@ const WrapProse = (Html: string): string => {
 	});
 };
 
-const Rewrite = (Html: string): string =>
+export const Rewrite = (Html: string): string =>
 	Html.split(PreSplit).map((Segment) =>
 		Segment.startsWith("<pre")
 			? Segment
