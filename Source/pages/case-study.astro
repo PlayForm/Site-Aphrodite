@@ -107,7 +107,10 @@ const Sections = [
 	{ Id: "history", Label: "HISTORY" },
 ];
 
-// The five incidents that set the laws - the page's history spine.
+// The five incidents that set the laws - the page's history spine. Each arc
+// runs three beats; a beat is one sentence, or an array of sentences when the
+// record states more than one, so the template can render the breakdown law's
+// one-<p>-per-sentence without touching a word.
 const Arcs = [
 	{
 		N: "ARC 1",
@@ -117,14 +120,18 @@ const Arcs = [
 		Border: "border-raw-blood",
 		Title: "Hash the ORIGINAL, never the wrapper",
 		Incident: [
-			"Compressing a Hermes wrapper stored the <em>extracted</em> content under",
-			"<code class=\"font-mono text-base\">hash(extracted)</code> and discarded the original.",
-			"A failed command's <code class=\"font-mono text-base\">exit_code</code> and",
-			"<code class=\"font-mono text-base\">error</code> fields were unrecoverable after",
-			"compression, and caller JSON that merely matched a wrapper shape - e.g.",
-			"<code class=\"font-mono text-base\">{\"content\":\"hi\",\"id\":42}</code> - got",
-			"permanently collapsed to one field.",
-		].join(" "),
+			[
+				"Compressing a Hermes wrapper stored the <em>extracted</em> content under",
+				"<code class=\"font-mono text-base\">hash(extracted)</code> and discarded the original.",
+			].join(" "),
+			[
+				"A failed command's <code class=\"font-mono text-base\">exit_code</code> and",
+				"<code class=\"font-mono text-base\">error</code> fields were unrecoverable after",
+				"compression, and caller JSON that merely matched a wrapper shape - e.g.",
+				"<code class=\"font-mono text-base\">{\"content\":\"hi\",\"id\":42}</code> - got",
+				"permanently collapsed to one field.",
+			].join(" "),
+		],
 		Fix: [
 			"Both the hook and the tool paths now hash and store the ORIGINAL content always;",
 			"the unwrapped view is used only for classification and preview.",
@@ -145,16 +152,21 @@ const Arcs = [
 		Border: "border-stamped-canary",
 		Title: "The tarball that compiled locally and failed everywhere else",
 		Incident: [
-			"v1.3.8 published to crates.io but was <em>uninstallable</em>:",
-			"<code class=\"font-mono text-base\">Cargo.toml</code> had",
-			"<code class=\"font-mono text-base\">exclude = [..., \"*.md\", ...]</code>, and cargo",
-			"applies <code class=\"font-mono text-base\">exclude</code> at publish time -",
-			"recursively. The six <code class=\"font-mono text-base\">builtin_directives/*.md</code>",
-			"files embedded via <code class=\"font-mono text-base\">include_str!</code> were",
-			"stripped from the tarball, so the local checkout built fine and CI's Test job",
-			"passed - but <code class=\"font-mono text-base\">cargo install aphrodite</code>",
-			"failed at compile time.",
-		].join(" "),
+			[
+				"v1.3.8 published to crates.io but was <em>uninstallable</em>:",
+				"<code class=\"font-mono text-base\">Cargo.toml</code> had",
+				"<code class=\"font-mono text-base\">exclude = [..., \"*.md\", ...]</code>, and cargo",
+				"applies <code class=\"font-mono text-base\">exclude</code> at publish time -",
+				"recursively.",
+			].join(" "),
+			[
+				"The six <code class=\"font-mono text-base\">builtin_directives/*.md</code>",
+				"files embedded via <code class=\"font-mono text-base\">include_str!</code> were",
+				"stripped from the tarball, so the local checkout built fine and CI's Test job",
+				"passed - but <code class=\"font-mono text-base\">cargo install aphrodite</code>",
+				"failed at compile time.",
+			].join(" "),
+		],
 		Fix: [
 			"Drop the recursive <code class=\"font-mono text-base\">*.md</code> exclusion (and",
 			"never combine <code class=\"font-mono text-base\">include</code> with",
@@ -180,22 +192,28 @@ const Arcs = [
 		Border: "border-weathered-teal",
 		Title: "One decision, made once, by both halves",
 		Incident: [
-			"Issue #40: the plugin's Python shim resolved the runtime home from",
-			"<code class=\"font-mono text-base\">$HERMES_HOME</code> while the Rust half",
-			"resolved it from <code class=\"font-mono text-base\">$HOME</code>. Whenever they",
-			"diverged - the shipped Docker image, profile gateways - the shim looked for",
-			"binaries in a directory that never existed, disabled the plugin, and orphaned",
-			"the previous runtime home, config and provider API key included.",
-		].join(" "),
+			[
+				"Issue #40: the plugin's Python shim resolved the runtime home from",
+				"<code class=\"font-mono text-base\">$HERMES_HOME</code> while the Rust half",
+				"resolved it from <code class=\"font-mono text-base\">$HOME</code>.",
+			].join(" "),
+			[
+				"Whenever they diverged - the shipped Docker image, profile gateways - the shim",
+				"looked for binaries in a directory that never existed, disabled the plugin, and",
+				"orphaned the previous runtime home, config and provider API key included.",
+			].join(" "),
+		],
 		Fix: [
-			"The shim resolves the runtime home once",
-			"(<code class=\"font-mono text-base\">$APHRODITE_HOME</code> override, then",
-			"<code class=\"font-mono text-base\">&lt;hermes-home&gt;/aphrodite</code>, then",
-			"<code class=\"font-mono text-base\">~/.hermes/aphrodite</code>) and exports it to",
-			"the Rust half through <code class=\"font-mono text-base\">APHRODITE_HOME</code>, so",
-			"the dylib and the spawned proxy agree by construction. Legacy installs are",
-			"adopted with a one-line warning, never migrated.",
-		].join(" "),
+			[
+				"The shim resolves the runtime home once",
+				"(<code class=\"font-mono text-base\">$APHRODITE_HOME</code> override, then",
+				"<code class=\"font-mono text-base\">&lt;hermes-home&gt;/aphrodite</code>, then",
+				"<code class=\"font-mono text-base\">~/.hermes/aphrodite</code>) and exports it to",
+				"the Rust half through <code class=\"font-mono text-base\">APHRODITE_HOME</code>, so",
+				"the dylib and the spawned proxy agree by construction.",
+			].join(" "),
+			"Legacy installs are adopted with a one-line warning, never migrated.",
+		],
 		Today: [
 			"Per-Hermes-home isolation extends to the whole stack, and the startup log names",
 			"the decision: <code class=\"font-mono text-base\">runtime home: &lt;path&gt; (decided by ...)</code>.",
@@ -210,20 +228,28 @@ const Arcs = [
 		Border: "border-raw-blood",
 		Title: "In-tree SHA256SUMS.txt is the only truth",
 		Incident: [
-			"The download scripts used to fetch the release-hosted per-target checksums and",
-			"had warn-and-skip paths - a missing checksum file or tool degraded to a warning",
-			"instead of a refusal. A plugin-hardening catalog review called it out.",
-		].join(" "),
+			[
+				"The download scripts used to fetch the release-hosted per-target checksums and",
+				"had warn-and-skip paths - a missing checksum file or tool degraded to a warning",
+				"instead of a refusal.",
+			].join(" "),
+			"A plugin-hardening catalog review called it out.",
+		],
 		Fix: [
-			"The pinned tree's <code class=\"font-mono text-base\">SHA256SUMS.txt</code> became",
-			"the only checksum source of truth: a missing file, a",
-			"<code class=\"font-mono text-base\">BINARY_VERSION</code> mismatch, a missing",
-			"target block, or a missing asset entry is a hard refusal (exit 1), and a missing",
-			"<code class=\"font-mono text-base\">shasum</code>/<code class=\"font-mono text-base\">sha256sum</code>",
-			"tool is a hard refusal rather than a skipped check. The legacy",
-			"<code class=\"font-mono text-base\">~/.hermes/aphrodite</code> home adoption in the",
-			"runtime lookup is also gone.",
-		].join(" "),
+			[
+				"The pinned tree's <code class=\"font-mono text-base\">SHA256SUMS.txt</code> became",
+				"the only checksum source of truth: a missing file, a",
+				"<code class=\"font-mono text-base\">BINARY_VERSION</code> mismatch, a missing",
+				"target block, or a missing asset entry is a hard refusal (exit 1), and a missing",
+				"<code class=\"font-mono text-base\">shasum</code>/<code class=\"font-mono text-base\">sha256sum</code>",
+				"tool is a hard refusal rather than a skipped check.",
+			].join(" "),
+			[
+				"The legacy",
+				"<code class=\"font-mono text-base\">~/.hermes/aphrodite</code> home adoption in the",
+				"runtime lookup is also gone.",
+			].join(" "),
+		],
 		Today: [
 			"Every release ships 12 artifacts - 4 targets x (binary, plugin dylib,",
 			"SHA256SUMS) - and the dylib arm refuses installs when the in-tree checksums are",
@@ -260,6 +286,18 @@ const Arcs = [
 		Src: "SRC: CHANGELOG.md:3-37 · the Aphrodite/v1.6.6 release note",
 	},
 ] as const;
+
+// The arcs with their three beats normalized: `[Beat].flat()` turns a
+// single-sentence beat into a one-entry array and leaves a multi-sentence beat
+// as it is, so the template has exactly one shape to render.
+const ArcsWithBeats = Arcs.map((Arc) => ({
+	...Arc,
+	Beats: [
+		{ Label: "The incident.", Sentences: [Arc.Incident].flat() },
+		{ Label: "The fix.", Sentences: [Arc.Fix].flat() },
+		{ Label: "Mechanics today.", Sentences: [Arc.Today].flat() },
+	],
+}));
 ---
 
 <Base
@@ -368,8 +406,10 @@ const Arcs = [
 					The classifier is the gate
 				</h2>
 				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Why classify before compressing? Because "compress everything equally"
-					destroyed signal.
+					Why classify before compressing?
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Because "compress everything equally" destroyed signal.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					A compiler error and a verbose build log are both output - but one must
@@ -405,6 +445,20 @@ const Arcs = [
 				<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 					M2 // PREVIEW FLOW
 				</figcaption>
+				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Read the figure left to right: every blob is classified first, then routed into
+					one of five threshold groups - error ×8, code ×3.0, tracked ×2, default ×1, and
+					the noisy base group.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The noisy group is pinned - linter, build_output and log are never halved and
+					never tuned.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					On top of the tier sits the EMA auto-tune: a type whose measured ratio stays
+					above 20 doubles its patience, a type under 3 halves it, and the budget header
+					scales the result between ×0.5 and ×1.0.
+				</p>
 			</figure>
 		</section>
 
@@ -446,6 +500,11 @@ const Arcs = [
 					<code class="font-mono text-base">/retrieve</code>,
 					<code class="font-mono text-base">resolve</code>) accepts the marker body
 					directly, suffix or no suffix.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The marker carries no content of its own - three fields and no payload - so it can
+					be printed, copied and passed around without spending the budget it was minted to
+					save.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The store behind it is deliberately boring: BLAKE3 → SQLite (persistent, the
@@ -573,7 +632,7 @@ const Arcs = [
 							the study.
 						</p>
 					</div>
-					<!-- THRESHOLD TIERS: the knobs the gate sets. -->
+					<!-- THRESHOLD TIERS: the multiplier each content type carries. -->
 					<div class="flex flex-col gap-6">
 						<ZineKicker Tone="dust">THRESHOLD TIERS</ZineKicker>
 						{
@@ -595,6 +654,9 @@ const Arcs = [
 						<div class="font-mono text-base leading-relaxed text-zinc-dust">
 							HIGHER MULTIPLIER = LONGER THE CONTENT STAYS VISIBLE BEFORE COMPRESSION
 						</div>
+						<div class="font-mono text-base leading-relaxed text-zinc-dust">
+							CODE ×3.0 IS THE CONFIG DEFAULT - SOURCE EARNS THREE TIMES THE DEFAULT THRESHOLD
+						</div>
 						<ZineSource Lines={["SRC: README.md:187-198."]} />
 					</div>
 				</div>
@@ -615,6 +677,14 @@ const Arcs = [
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The corpus ratios, the 610× ceiling, the median and the reproduce commands are
 					on the benchmarks page.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Every bar is its ratio read as a width - 74× fills 74% of the scale - so the two
+					columns compare magnitudes without normalising either one.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Read together, the plates carry the argument's sharpest claim: the ratio is a
+					property of the content type, not of the session that produced it.
 				</p>
 				<div class="mt-16 grid grid-cols-1 gap-24 lg:grid-cols-2">
 					<!-- Real-world per-output compression -->
@@ -670,7 +740,7 @@ const Arcs = [
 				</p>
 				<div class="mt-24 flex flex-col gap-32">
 					{
-						Arcs.map(({ N, Span, Law, Tone, Border, Title, Incident, Fix, Today, Src }) => (
+						ArcsWithBeats.map(({ N, Span, Law, Tone, Border, Title, Beats, Src }) => (
 							<article class={`border-l-4 ${Border} pl-6 sm:pl-10`}>
 								<ZineKicker Tone={Tone} As="div">
 									{`${N} · ${Span} · ${Law}`}
@@ -678,18 +748,25 @@ const Arcs = [
 								<h3 class="mt-6 font-headline text-xl font-black uppercase tracking-tight text-bone-white sm:text-2xl">
 									{Title}
 								</h3>
-								<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-									<strong class="text-bone-white">The incident.</strong>{" "}
-									<span set:html={Incident} />
-								</p>
-								<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-									<strong class="text-bone-white">The fix.</strong>{" "}
-									<span set:html={Fix} />
-								</p>
-								<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-									<strong class="text-bone-white">Mechanics today.</strong>{" "}
-									<span set:html={Today} />
-								</p>
+								{
+									Beats.map((Beat, BeatIndex) =>
+										Beat.Sentences.map((Sentence, Index) => (
+											<p
+												class:list={[
+													BeatIndex === 0 && Index === 0 ? "mt-6" : "mt-3",
+													"max-w-3xl font-body text-base leading-relaxed text-bone-newsprint",
+												]}
+											>
+												{Index === 0 && (
+													<>
+														<strong class="text-bone-white">{Beat.Label}</strong>{" "}
+													</>
+												)}
+												<span set:html={Sentence} />
+											</p>
+										)),
+									)
+								}
 								<ZineSource Lines={[Src]} />
 							</article>
 						))

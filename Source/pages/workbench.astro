@@ -80,10 +80,30 @@ const Knobs = [
 ] as const;
 
 // The two topology diagrams the page's subject needs: the store's dual
-// listener, and the config surface that feeds it.
+// listener, and the config surface that feeds it. Each carries its own prose
+// because a figure without the sentence explaining it is a panel that says
+// nothing - the reader gets the shape AND the reading of it.
 const Diagrams = [
-	{ Id: "dual-listener", Caption: "M5 // DUAL LISTENER", Svg: DualListener },
-	{ Id: "config-resolution", Caption: "M7 // CONFIG RESOLUTION", Svg: ConfigResolution },
+	{
+		Id: "dual-listener",
+		Caption: "M5 // DUAL LISTENER",
+		Svg: DualListener,
+		Note: [
+			"One binary serves both lanes: the cache listener answers on :9797 from a 10K-entry DashMap for content over 8 KB, and the token listener answers on :9798 from SQLite for content over 1 KB plus the tool relay.",
+			"Both lanes share the BLAKE3 hash and the marker wire format, so a marker minted by one resolves through the other - the address is the contract, not the port.",
+			"SSE streams pass through uncompressed, and a healthy running proxy is reused at startup rather than a second being spawned.",
+		],
+	},
+	{
+		Id: "config-resolution",
+		Caption: "M7 // CONFIG RESOLUTION",
+		Svg: ConfigResolution,
+		Note: [
+			"The file is found by the same three-step search on every start: APHRODITE_CONFIG_PATH first, ./aphrodite.toml in the working directory second, the copy under the Hermes home last.",
+			"Inside the file, values resolve env over TOML over default - except mode and listen, which get no blanket env override and keep their ports per-mode through APHRODITE_CACHE_PORT and APHRODITE_TOKEN_PORT.",
+			"A Modify event on aphrodite.toml debounces 500 ms and resolves the thresholds into the four atomics; POST /reload does the same thing on demand.",
+		],
+	},
 ];
 
 // The measured arc this sim gestures at - one plate per release, each figure
@@ -137,6 +157,13 @@ const Arc = [
 				Aphrodite's four steps over it: the enriched preview line the agent would read, the
 				marker the store would hold, and the decision the agent would make.
 			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				The four live-reloadable thresholds and the engine knob are yours to turn.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				Nothing below is a screenshot of the deck: the sliders move the real decision, and
+				every figure the page prints is recomputed as you turn them.
+			</p>
 		</header>
 
 		<SectionNav Sections={Sections} />
@@ -145,6 +172,26 @@ const Arc = [
 		     own <section>, so the anchor the index links to is this wrapper. -->
 		<div id="pipeline">
 			<ZinePipeline Mode="full" />
+		</div>
+
+		<!-- THE CLASSIFIER, IN PROSE: what the rail above is naming, and why one
+		     name is enough for every stage downstream. -->
+		<div class="mt-16 border-l-4 border-raw-blood bg-asphalt-panel p-6">
+			<ZineKicker Tone="dust" As="div">CLASSIFIER FRAMING</ZineKicker>
+			<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				The 16 pipeline types the rail renders follow the README catalog
+				(README.md:155-176); the full classification registry behind them is 30 types,
+				printed in docs/classification/content-types.md:118-151.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				A type is a routing decision, not a description: the first rule that matches wins,
+				and every later stage reads that one name.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				A generic bucket is not the end of the road - a conservative semantic detector
+				upgrades the git, gitlog, grep, ls and test shapes, and ordinary prose is never
+				mis-tagged.
+			</p>
 		</div>
 
 		<!-- THE KNOBS: aphrodite.toml [compression], live. -->
@@ -160,6 +207,14 @@ const Arc = [
 			<p class="mt-6 font-mono text-base leading-relaxed text-zinc-dust">
 				aphrodite.toml [compression] - the four proxy thresholds are live-reloadable; edit +
 				save (or POST /reload) re-applies them immediately (README.md:389).
+			</p>
+			<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				Only four values are atomics the running engine swaps: cache, token, inline and
+				code_multiplier. Everything else in the file waits for a restart.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				The engine knob is an escape hatch rather than a dial - past 100 the context engine
+				stands down and the four proxy thresholds keep working alone.
 			</p>
 			<div class="mt-12 grid gap-16 md:grid-cols-2">
 				{
@@ -204,11 +259,19 @@ const Arc = [
 				<p class="mt-4 font-mono text-base text-bone-newsprint" data-verdict>
 					turn the knobs, then RUN PIPELINE
 				</p>
+				<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The strip reports the decision for the sample loaded in the rail above: the token
+					mode, whether the store was inline or durable, and the ratio that produced it.
+				</p>
 			</div>
 		</section>
 
 		<!-- THE TOPOLOGY: the store and the config surface. -->
 		<section id="topology" class="grid gap-20 lg:grid-cols-2" aria-label="Diagrams">
+			<p class="col-span-full max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				Two diagrams carry the parts of the pipeline the rail above cannot show: where the
+				store actually lives, and where the thresholds come from.
+			</p>
 			{
 				Diagrams.map((Diagram) => (
 					<figure
@@ -219,6 +282,18 @@ const Arc = [
 						<figcaption class="mt-6">
 							<ZineKicker Tone="dust">{Diagram.Caption}</ZineKicker>
 						</figcaption>
+						{
+							Diagram.Note.map((Sentence, Index) => (
+								<p
+									class:list={[
+										Index === 0 ? "mt-6" : "mt-3",
+										"max-w-3xl font-body text-base leading-relaxed text-bone-newsprint",
+									]}
+								>
+									{Sentence}
+								</p>
+							))
+						}
 					</figure>
 				))
 			}
@@ -231,7 +306,15 @@ const Arc = [
 			aria-label="Benchmark notes"
 		>
 			<ZineKicker Tone="canary">SIM NOTES · THE MEASURED ARC</ZineKicker>
-			<div class="mt-8 grid gap-6 md:grid-cols-2">
+			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				The numbers this sim gestures at are real: each plate prints the figure the CHANGELOG
+				carried at that release, and the benchmarks page carries the reproduce commands.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				Read a plate as a receipt - the figure is what the release printed, the note is what
+				the number means for the design.
+			</p>
+			<div class="mt-12 grid gap-6 md:grid-cols-2">
 				{
 					Arc.map((Plate) => (
 						<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
@@ -270,6 +353,10 @@ const Arc = [
 			</p>
 			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				No network, no runtime - everything happens in this tab.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				Not depicted: the context engine's auto-compaction pass and the injection assembler's
+				directive budget - this tab simulates the tool-output path only.
 			</p>
 			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				The full registry is larger - the 30-type content catalog lives in

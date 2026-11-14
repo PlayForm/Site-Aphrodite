@@ -7,85 +7,183 @@ import PageHeader from "@Component/PageHeader.astro";
 import ZineTape from "@Component/ZineTape.astro";
 import ZineBox from "@Component/ZineBox.astro";
 import ZineSource from "@Component/ZineSource.astro";
+import ZineStatBar from "@Component/ZineStatBar.astro";
+import ZineLedger from "@Component/ZineLedger.astro";
+import ZineLesson from "@Component/ZineLesson.astro";
+import ZineFold from "@Component/ZineFold.astro";
+import ZineReveal from "@Component/ZineReveal.astro";
+import StudyLedger from "@Component/StudyLedger.astro";
+import CodeFence from "@Component/CodeFence.astro";
 
-// THE MEASUREMENT REGISTER - one row per figure, three row groups. The
-// headline plates, the per-type ratios and the 200-session study are the same
-// claim (what the numbers are), so they live in one table instead of four
-// plates: a figure a reader cannot compare to its neighbours is a poster, not
-// a data sheet. Every figure and every note is byte-exact from the sources the
-// SRC block cites; a Group row opens a band of rows.
-interface Row {
-	/** A row group's label; a group row carries no figure. */
-	Group?: string;
-	/** A group row's second line - the study's period and scope. */
-	Scope?: string;
-	Measure?: string;
-	Figure?: string;
-	Means?: string;
+// THE FOUR HEADLINE PLATES - one figure each, and every plate carries the
+// sentence that keeps it honest. A ratio without its corpus is a poster: the
+// 610x plate is the best case on one long document, so its own body says the
+// per-type chart below tops out at 416x, and the reader is never left to
+// assume the headline is the typical case.
+interface Plate {
+	Tape: string;
+	TapeColor: "raw" | "canary" | "teal" | "bone";
+	Tone: "crimson" | "canary" | "teal" | "subtle";
+	Figure: string;
+	Caption: string;
+	Body: string[];
+	Src: string;
+	Rotate: string;
 }
-const Rows: Row[] = [
-	{ Group: "THE HEADLINE" },
+
+const Plates: Plate[] = [
 	{
-		Measure: "MAX COMPRESSION",
+		Tape: "MAX COMPRESSION",
+		TapeColor: "raw",
+		Tone: "crimson",
 		Figure: "610×",
-		Means:
-			"Best case on large low-entropy prose. 132× overall on the same corpus, 106 KB → 800 B. The best case is not part of the per-type chart below - that chart peaks at 416×.",
+		Caption: "THE CEILING",
+		Body: [
+			"Best case on large low-entropy prose.",
+			"132× overall on the same corpus, 106 KB → 800 B.",
+			"The best case is not part of the per-type chart below - that chart peaks at 416×.",
+		],
+		Src: "SRC: README.md:12, 446",
+		Rotate: "-rotate-[1.8deg]",
 	},
 	{
-		Measure: "END-TO-END",
+		Tape: "END-TO-END",
+		TapeColor: "canary",
+		Tone: "canary",
 		Figure: "8-40 ms",
-		Means: "Including the HTTP round-trip; the headline figure is ~10 ms.",
+		Caption: "THE LATENCY BAND",
+		Body: [
+			"Including the HTTP round-trip; the headline figure is ~10 ms.",
+			"The floor is the fast case, the ceiling the slow one: one call, compression and retrieve path included.",
+		],
+		Src: "SRC: README.md:460, 12",
+		Rotate: "rotate-[2.2deg]",
 	},
 	{
-		Measure: "CLASSIFICATION",
+		Tape: "CLASSIFICATION",
+		TapeColor: "teal",
+		Tone: "teal",
 		Figure: "40-123 ns",
-		Means: "The compress path itself stays under 1 ms.",
+		Caption: "THE FLOOR",
+		Body: [
+			"The compress path itself stays under 1 ms.",
+			"Naming the content type is the only step that runs on every call, which is why it is timed on its own.",
+		],
+		Src: "SRC: README.md:461, 133; docs/README.md:7",
+		Rotate: "-rotate-[1deg]",
 	},
 	{
-		Measure: "MEDIAN",
+		Tape: "MEDIAN",
+		TapeColor: "bone",
+		Tone: "subtle",
 		Figure: "23×",
-		Means: "Fewer tokens on tool output - the median the README reports for its per-type table.",
+		Caption: "THE TYPICAL CASE",
+		Body: [
+			"Fewer tokens on tool output - the median the README reports for its per-type table.",
+			"Half the corpus does better than this, half worse; it is the number to plan a context budget against.",
+		],
+		Src: "SRC: README.md:459",
+		Rotate: "rotate-[2.5deg]",
 	},
-	{ Group: "RATIO BY OUTPUT CLASS (README STANDARD CORPUS, LOG SCALE):" },
-	{ Measure: "BROWSER SNAPSHOT", Figure: "416×" },
-	{ Measure: "BUILD OUTPUT", Figure: "140×" },
-	{ Measure: "JSON", Figure: "40×" },
-	{ Measure: "GIT DIFF", Figure: "23×" },
-	{ Measure: "TERMINAL", Figure: "20×" },
-	{ Group: "REAL-WORLD STUDY // MEASURED, SEP 2026", Scope: "200 HERMES SESSIONS • 6,843 API CALLS • SEP 18-20" },
+];
+
+// THE PER-TYPE CHART - the README's standard-corpus table, one bar per output
+// class. Widths are the baseline's log-scale reading of each ratio (416x at
+// full width), so the bars stay comparable to the plate above them; `Corpus`
+// says what the sample behind each row actually is, because a ratio for
+// "JSON" is meaningless until the reader knows which JSON.
+const Classes = [
 	{
-		Measure: "TOKENS SAVED",
-		Figure: "156,342,817",
-		Means: "26.9% of the expanded context budget deflected",
-	},
-	{
-		Measure: "WITH MARKERS / EXPANDED",
-		Figure: "424,959,588 / 581,302,405",
-		Means:
-			"tokens as stored vs the same payload with every marker expanded (stock Hermes)",
-	},
-	{
-		Measure: "SESSIONS SAVED",
-		Figure: "183 / 200",
-		Means: "median session ratio 22.9%; avg 22,921 saved per call",
-	},
-	{
-		Measure: "SESSION-SHAPE BAND",
-		Figure: "20-25% tool-heavy · 76-82% pure-tool",
-		Means: "the same engine, four payoffs - savings track tool-output volume",
+		Label: "BROWSER SNAPSHOT",
+		Ratio: "416×",
+		Percent: 100,
+		Color: "teal" as const,
+		Corpus:
+			"one serialised page: every element, every attribute, the same wrapper nesting repeated to the leaves",
 	},
 	{
-		Measure: "RETRIEVAL TAX",
-		Figure: "2,275 calls / 2,011,583 tokens",
-		Means: "the re-entry toll, roughly 1.3% of the tokens saved",
+		Label: "BUILD OUTPUT",
+		Ratio: "140×",
+		Percent: 82,
+		Color: "raw" as const,
+		Corpus:
+			"a compiler and linker log - repeated paths, repeated warning shapes, one error restated at the end",
 	},
-	{ Measure: "CHAT-ONLY SESSIONS", Figure: "~0%" },
-	{ Measure: "LIGHT DEVELOPER SESSIONS", Figure: "~5%" },
-	{ Measure: "TOOL-HEAVY SESSIONS", Figure: "20-25%" },
 	{
-		Measure: "SIMULATED PURE-TOOL LOOP",
-		Figure: "76-82%",
-		Means: "a simulated diff+ls+build+search workload - a stress test, not real usage",
+		Label: "JSON",
+		Ratio: "40×",
+		Percent: 61,
+		Color: "canary" as const,
+		Corpus:
+			"one structured API payload: keys, nesting, and the values a reader needs kept byte-exact",
+	},
+	{
+		Label: "GIT DIFF",
+		Ratio: "23×",
+		Percent: 52,
+		Color: "raw" as const,
+		Corpus:
+			"a patch: hunk headers, context lines, and the same file path on both sides of every change",
+	},
+	{
+		Label: "TERMINAL",
+		Ratio: "20×",
+		Percent: 50,
+		Color: "canary" as const,
+		Corpus:
+			"shell output - listings, test runners, the progress lines that carry no verdict",
+	},
+];
+
+// THE HARNESS - five examples in the aphrodite crate, one per question the
+// plates above answer. Each body is the example's own promise: what it spawns,
+// what it asserts, and what makes it exit non-zero.
+const Harness = [
+	{
+		Tag: "01",
+		Label: "bench_01_corpus - the standard corpus, end to end",
+		Body: "Spawns the cache and token proxies on benchmark ports, pushes one sample per content type through <code>/ccr/create</code>, retrieves each one through <code>/retrieve</code>, then prints the per-label table. Exits non-zero on any retrieve miss, so a ratio it prints is a ratio that survived the round-trip.",
+	},
+	{
+		Tag: "02",
+		Label: "bench_02_threshold - the size boundaries",
+		Body: "Sweeps <code>/ccr/create</code> and <code>/retrieve</code> across the threshold-adjacent sizes - the inline zone, then 1 KB, 4 KB and 8 KB - in both cache and token mode. Content is always stored, a hash is always returned, and the stored bytes come back byte-for-byte; a boundary violation exits non-zero.",
+	},
+	{
+		Tag: "03",
+		Label: "bench_03_retrieve - retrieval correctness",
+		Body: "Ten labelled cases: same-port retrieve in both modes, cross-port isolation in both directions, the inline zone, UTF-8 content retrieved byte-for-byte, a fifty-insert storm with no misses, deletion, and a double store of the same content. This is the example that proves a marker is a promise and not a summary.",
+	},
+	{
+		Tag: "04",
+		Label: "bench_04_ema - the auto-tune loop",
+		Body: "Drives the compression-ratio EMA through three phases: ten highly repetitive payloads, then ten near-incompressible ones, then ten more repetitive ones. The EMA must climb, decay, and partially recover - and the per-type threshold multipliers must not flip a linter or build-output sample to the wrong half.",
+	},
+	{
+		Tag: "05",
+		Label: "bench_05_type_coverage - one sample per class",
+		Body: "Pushes one representative sample per content type through a token-mode proxy and reports each type's ratio plus the classifier's verdict. Build, diff, git, gitlog, ls, test, grep, Rust, Python, Go, JavaScript, JSON, error, log, linter and plain text: a type that fails to compress, or whose retrieve round-trip misses, exits non-zero.",
+	},
+];
+
+// WHAT A RUN NEEDS - the preconditions, stated before the commands so a reader
+// who lacks one of them learns it here rather than from a linker error.
+const Needs = [
+	{
+		Label: "A source checkout",
+		Text: "The examples live in the aphrodite crate, not in the published binary - clone the repository and stay on the branch the site documents.",
+	},
+	{
+		Label: "A Rust toolchain",
+		Text: "The versions the site builds against are on the SETUP page; the harness is ordinary cargo, so a toolchain that builds the crate builds the benchmarks.",
+	},
+	{
+		Label: "Initialised submodules",
+		Text: "The plugin and the vendored Headroom fork are submodules - without them the crate resolves but the integration path does not.",
+	},
+	{
+		Label: "The release profile",
+		Text: "Every figure above is a release run. A debug build measures the same work with different constants and is not comparable to the plates.",
 	},
 ];
 ---
@@ -94,86 +192,493 @@ const Rows: Row[] = [
 	Title="BENCHMARKS // APHRODITE"
 	Description="Aphrodite benchmarks: up to 610x compression on the standard corpus (132x overall, 106 KB to 800 B), 8-40 ms end-to-end, 40-123 ns classification, and the 200-session real-world study."
 >
-	<PageShell Rhythm="wide">
+	<PageShell Rhythm="wide" Crumbs>
 		<PageHeader
 			Tape="BENCHMARKS // MEASURED FIGURES"
 			Title="Benchmarks"
 			Lead={[
 				`These figures come from the project's own benchmarks and from a study of the author's real Hermes sessions.`,
 				`Benchmark ratios are measured; session savings are estimated, and the uncertainty band is shown below.`,
+				`Every plate carries the corpus it was measured on and the SRC line that contains it, and the harness at the foot of the page re-derives all of it from a checkout.`,
 			]}
 		/>
 
-		<!-- SLOT 3: one claim's evidence - the register -->
+		<!-- SLOT 3: one claim's evidence - the four plates, the method, the chart,
+		     the study, the harness, the limits -->
+
+		<!-- THE HEADLINE: four monument plates. 2x2 through the tablet range,
+		     four-across only at xl, where each plate keeps room for its figure. -->
 		<section class="relative w-full">
-			<ZineTape Variant="section" Label="MEASURED // RATIOS + THE STUDY" />
-			<ZineBox Size="lg" Rotate="-rotate-[1deg]">
-				<div class="overflow-x-auto">
-					<table class="w-full border-collapse font-mono text-base">
-						<tbody>
-							{
-								Rows.map(({ Group, Scope, Measure, Figure, Means }, I) =>
-									Group ? (
-										<tr>
-											<td
-												colspan="3"
-												class={`pb-1 text-base font-black uppercase tracking-widest text-stamped-canary ${
-													I === 0 ? "" : "pt-10"
-												}`}
-											>
-												{Group}
-												{Scope && (
-													<div class="mt-1 text-base font-bold uppercase tracking-wider text-zinc-dust">
-														{Scope}
-													</div>
-												)}
-											</td>
-										</tr>
-									) : (
-										<tr class={I < Rows.length - 1 ? "border-b border-oxblood-dark" : ""}>
-											<td class="py-3 pr-4 align-top text-base font-black text-zinc-dust">
-												{Measure}
-											</td>
-											<td class="py-3 pr-6 align-top whitespace-nowrap text-base font-black text-weathered-teal">
-												{Figure}
-											</td>
-											<td class="py-3 align-top text-bone-newsprint">{Means}</td>
-										</tr>
-									),
-								)
-							}
-						</tbody>
-					</table>
-				</div>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
-					The study is the author's own work - multi-agent atomization fan-outs, merge/PR work,
-					plugin integration - reconstructed payload-by-payload from the session transcripts.
-				</p>
-				<p class="mt-3 text-base leading-relaxed text-zinc-dust">
-					<span class="font-black uppercase tracking-widest text-stamped-canary">CAVEAT &bull; </span>
-					THE EXACT PERCENTAGE IS A BAND: ~24-33% ACROSS A 3.0-4.5 CHARS/TOKEN SENSITIVITY RANGE,
-					CENTERED ~27%.
-				</p>
-			</ZineBox>
+			<ZineTape Variant="section" Label="THE HEADLINE // FOUR FIGURES" />
+			<h2
+				id="headline"
+				class="mb-10 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+			>
+				Four figures, four corpora
+			</h2>
+			<div
+				class="grid grid-cols-1 gap-14 sm:grid-cols-2 sm:gap-12 xl:grid-cols-4 xl:gap-8"
+			>
+				{
+					Plates.map(({ Tape, TapeColor, Tone, Figure, Caption, Body, Src, Rotate }) => (
+						<ZineBox
+							Tone={Tone}
+							Rotate={Rotate}
+							Tape={Tape}
+							TapeColor={TapeColor}
+							Class="flex flex-col"
+						>
+							<div class="mt-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+								{Caption}
+							</div>
+							<div class="zine-plate-figure font-headline text-4xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-5xl">
+								{Figure}
+							</div>
+							<div class="mt-4 border-t border-oxblood-dark pt-3">
+								{Body.map((Sentence, I) => (
+									<p
+										class={
+											I === 1
+												? "mt-2 text-base leading-relaxed text-weathered-teal"
+												: "text-base leading-relaxed text-zinc-dust"
+										}
+									>
+										{Sentence}
+									</p>
+								))}
+							</div>
+							<div class="mt-auto pt-6 font-mono text-base text-zinc-dust">
+								{Src}
+							</div>
+						</ZineBox>
+					))
+				}
+			</div>
+			<p class="mt-14 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				Read the four together and the shape of the product is in them: a ceiling that
+				belongs to one long document, a band for the round-trip, a floor for the step
+				that runs on every call, and a median for the ordinary case.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
+				The ceiling is the number quoted in the repository's first line; the median is the
+				one to plan against.
+			</p>
 			<ZineSource
 				Lines={[
 					"SRC: README.md:12, 446",
 					"SRC: README.md:460, 12",
 					"SRC: README.md:461, 133; docs/README.md:7",
 					"SRC: README.md:459",
-					"SRC: README.md:451-457",
-					"SRC: README.md:467-511.",
 				]}
 			/>
 		</section>
 
-		<!-- SLOT 4: the onward link -->
+		<!-- THE METHOD: what the number is before it is a number -->
+		<section class="relative w-full">
+			<ZineTape Variant="section" Label="METHOD // ONE PAYLOAD, COUNTED TWICE" />
+			<ZineBox Size="lg" Rotate="rotate-[0.8deg]">
+				<h2
+					id="method"
+					class="mb-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+				>
+					How a ratio is computed
+				</h2>
+				<p class="font-body text-base leading-relaxed text-bone-newsprint">
+					A ratio on this page is one payload counted twice: the tokens the tool produced,
+					the tokens the model actually reads, and the first divided by the second.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					Nothing else enters the number - no weighting, no projection, no averaging
+					across calls.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					The denominator is not the raw output minus a preview.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					It is the whole replacement the model receives: the marker, its type, its size,
+					and the short preview that lets the model decide whether the bytes are worth
+					retrieving.
+				</p>
+				<div class="mt-8">
+					<ZineLedger
+						Headers={["STEP", "WHAT IS COUNTED", "WHERE IT COMES FROM"]}
+						Rows={[
+							{
+								Cells: [
+									{ Text: "BEFORE" },
+									{ Text: "the payload as the tool produced it, in tokens" },
+									{ Text: "the corpus sample" },
+								],
+							},
+							{
+								Cells: [
+									{ Text: "AFTER" },
+									{ Text: "the marker plus its preview, in tokens" },
+									{ Text: "the compressed sample" },
+								],
+							},
+							{
+								Cells: [
+									{ Text: "RATIO", Delta: "up" },
+									{ Text: "before ÷ after, reported as a whole multiple" },
+									{ Text: "the two counts above", Delta: "up" },
+								],
+							},
+						]}
+					/>
+				</div>
+				<p class="mt-8 font-body text-base leading-relaxed text-bone-newsprint">
+					The corpus is fixed, and it is the same corpus for every row: the per-type table
+					takes one representative sample per output class, and the headline figure
+					aggregates the whole set - 106 KB in, 800 B out, 132× overall, with the single
+					best document reaching 610×.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					Timing is reported on a different axis on purpose.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					Classification is 40-123 ns and is timed on its own because it runs on every
+					call; the compress path stays under 1 ms; 8-40 ms is what a client waits once the
+					HTTP round-trip is included, and the ~10 ms headline sits near the fast end of
+					that band.
+				</p>
+
+				<ZineTape Variant="section" Label="TWO HALVES // TWO CONFIDENCE LEVELS" Color="teal" />
+				<h3
+					id="confidence"
+					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+				>
+					What is measured and what is estimated
+				</h3>
+				<p class="font-body text-base leading-relaxed text-bone-newsprint">
+					The page has two halves and they do not carry the same confidence.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					Everything in the plates and the per-type chart is measured: a fixed payload goes
+					in, a marker comes out, and the quotient is arithmetic.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					The session study is an estimate by construction: it reconstructs what each API
+					call would have carried with every marker expanded, so its figure depends on the
+					tokenizer used to count that reconstruction.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					That is why it ships as a band with a stated sensitivity range rather than as a
+					single percentage.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					Neither half is a vendor number. A reader with a checkout can re-derive the
+					measured half exactly and the estimated half to within its band - the harness
+					section below is the first half of that sentence, and
+					<a
+						class="text-weathered-teal underline transition-colors hover:text-bone-white"
+						href="/case-study/">the case study</a
+					> is where the second half is argued.
+				</p>
+			</ZineBox>
+			<ZineSource
+				Lines={[
+					"SRC: README.md:446, 451-457",
+					"SRC: README.md:459-463",
+					"SRC: README.md:467-511",
+				]}
+			/>
+		</section>
+
+		<!-- THE CHART: the per-type ratios, one bar per output class -->
+		<section class="relative w-full">
+			<ZineTape Variant="section" Label="MEASURED // PER-TYPE COMPRESSION" Color="canary" />
+			<ZineBox Size="lg" Rotate="-rotate-[0.6deg]">
+				<h2
+					id="per-type"
+					class="mb-3 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+				>
+					Ratio by output class
+				</h2>
+				<div class="mb-10 font-mono text-base font-bold uppercase tracking-wider text-zinc-dust">
+					RATIO BY OUTPUT CLASS (README STANDARD CORPUS, LOG SCALE):
+				</div>
+				<div class="space-y-8">
+					{
+						Classes.map(({ Label, Ratio, Percent, Color, Corpus }) => (
+							<div>
+								<ZineStatBar
+									Label={Label}
+									Ratio={Ratio}
+									Percent={Percent}
+									Color={Color}
+								/>
+								<p class="mt-2 font-body text-base leading-relaxed text-zinc-dust">
+									{Corpus}
+								</p>
+							</div>
+						))
+					}
+				</div>
+				<p class="mt-12 border-t border-oxblood-dark pt-8 font-body text-base leading-relaxed text-bone-newsprint">
+					The bars are drawn at the ratios' log-scale positions, so the top row sits at full
+					width and each row below it reads as a step down. The chart peaks at 416×, on the
+					browser snapshot: a serialised DOM repeats the same wrapper nesting down to the
+					leaves, and the ratio is a measure of exactly that repetition.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					The 610× plate is deliberately outside this chart. It is not a sixth class: it is
+					the best case on a single long low-entropy document, while the five rows above are
+					one representative sample per class and 132× is the whole corpus counted at once.
+					Plotting a best case beside five class samples would invite a comparison the
+					number cannot support.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					Read the chart as a ranking, not a promise: a diff, a build log and a terminal
+					session are the ordinary material of an agent turn, and they land between 20× and
+					140×, which is where the median of 23× comes from.
+				</p>
+				<div class="mt-8">
+					<ZineReveal
+						Tag="SUPPRESSED"
+						Cover="the smallest row, TERMINAL at 20×, is still a fifth of the tokens"
+						Raw={`<span class="font-bold text-stamped-canary">20×</span> - the floor of the chart, and the floor is the useful number: a terminal dump that compresses 20× is a dump the model can afford to keep.`}
+					/>
+				</div>
+			</ZineBox>
+			<ZineSource Lines={["SRC: README.md:451-457", "SRC: README.md:459"]} />
+		</section>
+
+		<!-- THE STUDY: 200 real sessions, reconstructed payload by payload -->
+		<section class="relative w-full">
+			<ZineTape Variant="section" Label="REAL-WORLD STUDY // 200 SESSIONS" />
+			<ZineBox Size="lg" Rotate="-rotate-[1.2deg]">
+				<h2
+					id="study"
+					class="mb-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+				>
+					What 200 sessions measured
+				</h2>
+				<p class="font-body text-base leading-relaxed text-bone-newsprint">
+					The study takes 200 real Hermes sessions - 6,843 API calls over three days - and
+					reconstructs every call's payload from the session transcript. Each payload is
+					counted twice: as the model saw it, with the CCR markers in place, and with every
+					marker expanded back to the content it replaced, which is what stock Hermes would
+					have sent.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					The difference between those two counts is the saving. Nothing is simulated in
+					that arithmetic - the markers, the retrieval calls and the expansions are the
+					ones the transcripts contain - but the expansion depends on a tokenizer, so the
+					result is a band rather than a point.
+				</p>
+				<div class="mt-10">
+					<StudyLedger Scale="full" ShowBars />
+				</div>
+
+				<ZineTape Variant="section" Label="THE SHAPE OF A SESSION // FOUR PAYOFFS" Color="teal" />
+				<h3
+					id="shape"
+					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+				>
+					Why the same engine reports four numbers
+				</h3>
+				<p class="font-body text-base leading-relaxed text-bone-newsprint">
+					Savings track tool-output volume, not session count. A chat-only session has
+					nothing to compress, so it saves ~0%; a light developer session saves ~5%; a
+					tool-heavy session lands in the 20-25% band; and a simulated pure-tool loop - a
+					diff, an ls, a build and a search on repeat - reaches 76-82%. That last figure is
+					a stress test, not real usage, and the bars above label it as one.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					The 183 / 200 row is the other way to read the same data: in 183 of the 200
+					sessions something was saved. The two rates beside it answer different questions -
+					22.9% is the median session's saved ratio, 22,921 is what an average call did not
+					have to carry - and both are reported because neither alone describes the study.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					The retrieval tax is the cost side of the ledger: 2,275 retrieve calls returned
+					2,011,583 tokens, roughly 1.3% of what was saved. Savings are gross; this row is
+					what the model paid to get its bytes back.
+				</p>
+			</ZineBox>
+			<ZineSource
+				Lines={["SRC: README.md:467-511.", "SRC: README.md:497-499"]}
+			/>
+		</section>
+
+		<!-- THE HARNESS: how a reader runs it, and what each example proves -->
+		<section class="relative w-full">
+			<ZineTape Variant="section" Label="REPRODUCE // BENCH HARNESS" Color="teal" />
+			<ZineBox Size="lg" Rotate="rotate-[1.4deg]">
+				<h2
+					id="reproduce"
+					class="mb-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+				>
+					Run the numbers yourself
+				</h2>
+				<p class="mb-6 font-body text-base leading-relaxed text-bone-newsprint">
+					The harness is five examples in the aphrodite crate, and each one prints the figure
+					its row above quotes.
+				</p>
+				<p class="mb-6 font-body text-base leading-relaxed text-bone-newsprint">
+					Nothing in the table is a vendor number: a reader with a checkout can re-derive every
+					row on their own machine.
+				</p>
+				<CodeFence
+					Copy
+					CopyLabel="BASH"
+					Class="border border-oxblood-dark"
+					Code={`# requires a source checkout + Rust (see the SETUP page for versions)
+$ git clone https://github.com/PlayForm/Aphrodite.git && cd Aphrodite
+$ git submodule update --init --recursive
+$ cargo run --release -p aphrodite --example bench_01_corpus
+$ cargo run --release -p aphrodite --example bench_02_threshold
+$ cargo run --release -p aphrodite --example bench_03_retrieve
+$ cargo run --release -p aphrodite --example bench_04_ema
+$ cargo run --release -p aphrodite --example bench_05_type_coverage`}
+				/>
+				<p class="mt-4 font-mono text-base text-zinc-dust">SRC: README.md:463</p>
+
+				<ZineTape Variant="section" Label="FIVE EXAMPLES // WHAT EACH ONE PROVES" Color="canary" />
+				<h3
+					id="examples"
+					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+				>
+					What a run actually does
+				</h3>
+				<p class="mb-6 font-body text-base leading-relaxed text-bone-newsprint">
+					Each example starts its own proxies, drives them over HTTP, and exits non-zero the
+					moment a promise breaks - so a green run is a verdict, not a printout.
+				</p>
+				<div class="space-y-3">
+					{Harness.map(({ Tag, Label, Body }) => <ZineFold Tag={Tag} Label={Label} Body={Body} />)}
+				</div>
+
+				<ZineTape Variant="section" Label="WHAT A RUN NEEDS // PRECONDITIONS" />
+				<h3
+					id="needs"
+					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+				>
+					Before the first command
+				</h3>
+				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+					{
+						Needs.map(({ Label, Text }) => (
+							<div class="border-l-4 border-blood-crimson bg-asphalt-panel p-4">
+								<div class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+									{Label}
+								</div>
+								<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
+									{Text}
+								</p>
+							</div>
+						))
+					}
+				</div>
+				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
+					The versions the site builds against are on
+					<a
+						class="text-weathered-teal underline transition-colors hover:text-bone-white"
+						href="/setup/">SETUP</a
+					>, and the crate layout that holds the examples is on
+					<a
+						class="text-weathered-teal underline transition-colors hover:text-bone-white"
+						href="/crates/">CRATES</a
+					>.
+				</p>
+			</ZineBox>
+			<ZineSource
+				Lines={[
+					"SRC: README.md:463",
+					"SRC: crates/aphrodite/examples/bench_01_corpus.rs",
+					"SRC: crates/aphrodite/examples/bench_05_type_coverage.rs",
+				]}
+			/>
+		</section>
+
+		<!-- THE LIMITS: what these numbers are not -->
+		<section class="relative w-full">
+			<ZineTape Variant="section" Label="LIMITS // WHAT THE NUMBERS ARE NOT" />
+			<ZineBox Size="lg" Rotate="-rotate-[0.9deg]">
+				<h2
+					id="limits"
+					class="mb-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+				>
+					Where the figures stop
+				</h2>
+				<div class="space-y-5">
+					<ZineLesson
+						Label="NOT A TYPICAL CASE"
+						Color="raw"
+						Text="610× is the ceiling on one long low-entropy document. The per-type chart peaks at 416×, and the median the same table reports is 23× - quote the ceiling only with the corpus attached."
+					/>
+					<ZineLesson
+						Label="NOT A SINGLE PERCENTAGE"
+						Color="canary"
+						Text="The session saving is a band, not a point: ~24-33% across a 3.0-4.5 chars/token sensitivity range, centered ~27%. Any single number inside that band is a reading of the same data, not a better measurement."
+					/>
+					<ZineLesson
+						Label="NOT REAL USAGE"
+						Color="teal"
+						Text="The 76-82% pure-tool figure comes from a simulated diff+ls+build+search loop. It is a stress test of the engine, and the real sessions it sits beside saved 20-25% when they were tool-heavy."
+					/>
+					<ZineLesson
+						Label="NOT NET OF RETRIEVAL"
+						Color="canary"
+						Text="Savings are counted before retrieval. The study's own tax row - 2,275 calls, 2,011,583 tokens - is what the model spent getting bytes back, roughly 1.3% of the tokens saved."
+					/>
+				</div>
+				<p class="mt-10 border-t border-oxblood-dark pt-8 font-body text-base leading-relaxed text-bone-newsprint">
+					None of this weakens the claim the page makes. A compression proxy earns its
+					place on the ordinary turn - a diff, a build log, a terminal dump - where the
+					ratio is 20× to 140× and the model keeps working from the preview. The ceiling is
+					what the engine can do; the median is what a session gets.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					If a number here disagrees with your own run, the harness is the arbiter: the
+					examples ship with the crate, and the SRC lines above name the README section each
+					figure is copied from.
+				</p>
+			</ZineBox>
+			<ZineSource
+				Lines={[
+					"SRC: README.md:12, 446, 459",
+					"SRC: README.md:467-511",
+					"SRC: crates/aphrodite/examples/",
+				]}
+			/>
+		</section>
+
+		<!-- SLOT 4: the onward links -->
 		<Related
 			Links={[
 				{ Href: "/case-study/", Label: "CASE STUDY" },
 				{ Href: "/versions/", Label: "VERSIONS" },
+				{ Href: "/crates/", Label: "CRATES" },
 				{ Href: "/setup/", Label: "SETUP" },
 			]}
 		/>
 	</PageShell>
 </Base>
+
+<style>
+	/* The plate figures stamp in on a hard step - no easing, the same grammar
+	   the stat bars and the reveal layers use. Mobile and reduced-motion
+	   readers get the figure at rest. */
+	.zine-plate-figure {
+		animation: zine-plate-stamp 0.36s steps(4) both;
+	}
+
+	@keyframes zine-plate-stamp {
+		from {
+			opacity: 0;
+			transform: translateY(6px);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.zine-plate-figure {
+			animation: none;
+		}
+	}
+</style>

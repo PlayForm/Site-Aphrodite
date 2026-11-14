@@ -1,10 +1,12 @@
 ---
 import Base from "@Layout/Base.astro";
+import PageShell from "@Component/PageShell.astro";
+import PageHeader from "@Component/PageHeader.astro";
+import SectionNav from "@Component/SectionNav.astro";
 import ZineTape from "@Component/ZineTape.astro";
 import ZineBox from "@Component/ZineBox.astro";
 import ZineFlow from "@Component/ZineFlow.astro";
 import ZineToggle from "@Component/ZineToggle.astro";
-import Breadcrumbs from "@Component/Breadcrumbs.astro";
 import Related from "@Component/Related.astro";
 import ExampleCase from "@Component/ExampleCase.astro";
 import { Link, OurRepo } from "@Library/Links";
@@ -33,16 +35,9 @@ const Bank: {
 	}[];
 } = Examples;
 
-// ---- The page's one section label. Every section on this page wears it, so
-// the label is one class string in one place instead of five copies drifting
-// apart - the defect the restructure exists to remove. ----
-const SectionTape =
-	"mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]";
-
-// The traversals are the page's second pillar and wear the canary accent, the
-// one deliberate exception to the raw-blood label above.
-const SectionTapeAccent =
-	"mb-12 -rotate-1 border border-black bg-stamped-canary px-3 py-1 text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]";
+// ---- The section label is now ZineTape's `section` variant (the site's one
+// tape shape). The traversals keep the canary accent through its `Color` prop,
+// so the page no longer carries a second class string that can drift. ----
 
 // ---- The gallery: ONE array of ONE record shape. Every entry below supplies
 // every field `ExampleCase` renders, so adding or removing an example is a
@@ -151,38 +146,33 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 	Title="SHOWCASE // APHRODITE"
 	Description="The plugin in action: 20 anonymized worked examples - build, test, terminal, code, grep, git, diff, json, error, log, the tool relay, the directives, the chain split, and the threshold tiers - each showing the raw stream, the enriched preview, the retrieval round-trip and the threshold decision."
 >
-	<!-- PENDING SHARED: PageShell (t_130e5ed4) - swap this <main> for <PageShell Rhythm="wide"> when it lands -->
-	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
-	>
-		<Breadcrumbs />
-		<!-- PENDING SHARED: PageHeader (t_130e5ed4) - swap this <header> for <PageHeader Tape Title Lead /> when it lands -->
-		<header class="relative flex w-full flex-col items-start">
-			<div class={SectionTape}>SHOWCASE // THE PLUGIN IN ACTION</div>
-			<h1
-				class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
-			>
-				The plugin, worked
-			</h1>
-			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Every example below is a real behavior of the pipeline dressed in generic content:
-				what the agent sends (the raw stream), what it sees back (the enriched preview),
-				how the bytes come home (the retrieval round-trip), and why the thresholds made
-				that decision.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				All previews marked as corpus lines are byte-identical to the docs catalog; the
-				rest are faithful fragments.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Anonymized throughout - no names, no secrets, no real sessions.
-			</p>
-		</header>
+	<!-- The four slots the rest of the site renders: shell, header, sections,
+	     one Related. The gallery inside them is unchanged - one Cases array,
+	     one ExampleCase render site. -->
+	<PageShell Rhythm="wide" Crumbs>
+		<PageHeader
+			Tape="SHOWCASE // THE PLUGIN IN ACTION"
+			Title="The plugin, worked"
+			Lead={[
+				"Every example below is a real behavior of the pipeline dressed in generic content: what the agent sends (the raw stream), what it sees back (the enriched preview), how the bytes come home (the retrieval round-trip), and why the thresholds made that decision.",
+				"All previews marked as corpus lines are byte-identical to the docs catalog; the rest are faithful fragments.",
+				"Anonymized throughout - no names, no secrets, no real sessions.",
+			]}
+		/>
+
+		<SectionNav
+			Sections={[
+				{ Id: "defaults", Label: "DEFAULTS" },
+				{ Id: "registry", Label: "REGISTRY" },
+				{ Id: "examples", Label: "EXAMPLES" },
+				{ Id: "traversals", Label: "TRAVERSALS" },
+				{ Id: "deeper", Label: "GO DEEPER" },
+			]}
+		/>
 
 		<!-- THE DEFAULTS IN PLAY -->
-		<section class="relative w-full">
-			<!-- PENDING SHARED: ZineTape Variant="section" (t_130e5ed4) - every section label on this page is {SectionTape}, defined once in the frontmatter -->
-			<div class={SectionTape}>THE DEFAULTS // APHRODITE.TOML</div>
+		<section id="defaults" class="relative w-full scroll-mt-24">
+			<ZineTape Variant="section" Label="THE DEFAULTS // APHRODITE.TOML" />
 			<ZineBox Tone="crimson" Rotate="rotate-[0.8deg]">
 				<p class="font-mono text-base leading-loose text-bone-newsprint">
 					{Object.entries(Bank.defaults).map(([Key, Value]) => (
@@ -205,8 +195,8 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 		</section>
 
 		<!-- FILTER BAR -->
-		<section class="relative w-full" data-registry>
-			<div class={SectionTape}>THE REGISTRY // FILTER BY CATEGORY, SEARCH BY KEYWORD</div>
+		<section id="registry" class="relative w-full scroll-mt-24" data-registry>
+			<ZineTape Variant="section" Label="THE REGISTRY // FILTER BY CATEGORY, SEARCH BY KEYWORD" />
 			<ZineBox Tone="crimson" Rotate="-rotate-[0.6deg]">
 				<div class="flex flex-wrap items-center gap-2" data-filters>
 					<button
@@ -240,9 +230,9 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 		</section>
 
 		<!-- THE EXAMPLES // ONE SHAPE EACH -->
-		<section class="relative flex w-full flex-col" data-examples>
+		<section id="examples" class="relative flex w-full scroll-mt-24 flex-col" data-examples>
 			<div class="w-full">
-				<div class={SectionTape}>THE EXAMPLES // ONE SHAPE EACH</div>
+				<ZineTape Variant="section" Label="THE EXAMPLES // ONE SHAPE EACH" />
 				<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					{Bank.examples.length} worked examples
 				</h2>
@@ -278,9 +268,9 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 		</section>
 
 		<!-- THE TRAVERSALS: the interactive flows, agent view vs system path -->
-		<section class="relative flex w-full flex-col gap-28 lg:gap-36">
+		<section id="traversals" class="relative flex w-full scroll-mt-24 flex-col gap-28 lg:gap-36">
 			<div class="w-full">
-				<div class={SectionTapeAccent}>THE TRAVERSALS // AGENT-VIEW vs SYSTEM-PATH, STEP BY STEP</div>
+				<ZineTape Variant="section" Color="canary" Label="THE TRAVERSALS // AGENT-VIEW vs SYSTEM-PATH, STEP BY STEP" />
 				<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					The traversals
 				</h2>
@@ -754,8 +744,8 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 		</section>
 
 		<!-- CROSS-LINKS -->
-		<section class="relative w-full">
-			<div class={SectionTape}>GO DEEPER // THE SURFACES THESE EXAMPLES EXERCISE</div>
+		<section id="deeper" class="relative w-full scroll-mt-24">
+			<ZineTape Variant="section" Label="GO DEEPER // THE SURFACES THESE EXAMPLES EXERCISE" />
 			<ZineBox Tone="crimson" Rotate="rotate-[-0.8deg]">
 				<ul class="grid gap-5 font-body text-base text-bone-newsprint sm:grid-cols-2">
 					<li class="border-l-4 border-weathered-teal pl-4">
@@ -795,7 +785,7 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 				{ Href: "/plugin/", Label: "PLUGIN" },
 			]}
 		/>
-	</main>
+	</PageShell>
 </Base>
 
 <script>

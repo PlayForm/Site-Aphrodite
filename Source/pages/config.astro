@@ -11,7 +11,7 @@ import ZineStamp from "../Component/ZineStamp.astro";
 import ZineStream from "../Component/ZineStream.astro";
 import ZineTape from "../Component/ZineTape.astro";
 import ConfigKeys from "../Component/ConfigKeys.astro";
-import Breadcrumbs from "@Component/Breadcrumbs.astro";
+import PageShell from "@Component/PageShell.astro";
 import Related from "@Component/Related.astro";
 
 // The CONFIG PLAYGROUND: the aphrodite.toml surface made explorable, as a
@@ -280,8 +280,7 @@ const Sections = [
 	title="Configuration Playground"
 	description="The interactive aphrodite.toml explorer - every key in one table, the pick chain, the two parsers and the compression knobs, simulated client-side."
 >
-	<main class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col px-5 pt-16 sm:px-8 lg:px-14">
-		<Breadcrumbs />
+	<PageShell Crumbs>
 		<!-- Header -->
 		<header class="relative border-l-4 border-blood-crimson bg-carbon-void p-8">
 			<ZineTape Label="aphrodite.toml" Color="raw" Side="left" />
@@ -301,12 +300,10 @@ const Sections = [
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">Everything here runs in your browser.</p>
 		</header>
 
-		<div class="mt-10">
-			<SectionNav Sections={Sections} />
-		</div>
+		<SectionNav Sections={Sections} />
 
 		<!-- The pick chain -->
-		<section id="pick-chain" class="relative mt-32" aria-label="The file pick chain">
+		<section id="pick-chain" class="relative w-full" aria-label="The file pick chain">
 			<ZineTape Label="the pick chain" Color="teal" Side="right" />
 			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
 				Where the file is found
@@ -340,7 +337,7 @@ const Sections = [
 		</section>
 
 		<!-- The live editor + the resolution ladder -->
-		<section id="editor" class="relative mt-32" aria-label="The live TOML editor">
+		<section id="editor" class="relative w-full" aria-label="The live TOML editor">
 			<ZineTape Label="live editor" Color="canary" Side="left" />
 			<div class="flex flex-wrap items-center justify-between gap-3">
 				<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
@@ -397,7 +394,7 @@ const Sections = [
 		</section>
 
 		<!-- The resolution diagram -->
-		<section id="diagram" class="mt-32" aria-label="The config-resolution diagram">
+		<section id="diagram" class="w-full" aria-label="The config-resolution diagram">
 			<figure class="border-4 border-blood-crimson bg-carbon-void p-4" data-diagram="config-resolution">
 				<div class="overflow-x-auto" set:html={ConfigResolution} />
 				<figcaption class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
@@ -407,7 +404,7 @@ const Sections = [
 		</section>
 
 		<!-- THE KEYS: the page's one reference -->
-		<section id="keys" class="relative mt-32" aria-label="Every configuration key">
+		<section id="keys" class="relative w-full" aria-label="Every configuration key">
 			<ZineTape Label="every key" Color="raw" Side="right" />
 			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
 				Every key, once
@@ -433,7 +430,7 @@ const Sections = [
 		</section>
 
 		<!-- THE CLASSIFY MATRIX: one type, one threshold -->
-		<section id="classify" class="relative mt-32" aria-label="The classify matrix">
+		<section id="classify" class="relative w-full" aria-label="The classify matrix">
 			<ZineTape Label="classify" Color="canary" Side="left" />
 			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
 				One type, one threshold
@@ -508,7 +505,7 @@ const Sections = [
 		</section>
 
 		<!-- The [[proxies]] pair -->
-		<section id="proxies" class="relative mt-32" aria-label="The proxies pair">
+		<section id="proxies" class="relative w-full" aria-label="The proxies pair">
 			<ZineTape Label="the pair" Color="bone" Side="left" />
 			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
 				[[PROXIES]] - CACHE :9797 + TOKEN :9798
@@ -542,7 +539,7 @@ const Sections = [
 		</section>
 
 		<!-- One file, two parsers -->
-		<section id="parsers" class="relative mt-32" aria-label="The two parser stacks">
+		<section id="parsers" class="relative w-full" aria-label="The two parser stacks">
 			<ZineTape Label="two stacks" Color="raw" Side="right" />
 			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
 				One file, two parsers
@@ -582,7 +579,7 @@ const Sections = [
 		</section>
 
 		<!-- The reload simulation -->
-		<section id="reload" class="relative mt-32" aria-label="The reload simulation">
+		<section id="reload" class="relative w-full" aria-label="The reload simulation">
 			<ZineTape Label="simulation" Color="raw" Side="left" />
 			<div class="flex flex-wrap items-center justify-between gap-3">
 				<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
@@ -614,7 +611,7 @@ const Sections = [
 		</section>
 
 		<!-- Simulation boundary -->
-		<footer class="mt-32 border-l-4 border-weathered-teal bg-carbon-void p-6">
+		<footer class="w-full border-l-4 border-weathered-teal bg-carbon-void p-6">
 			<ZineKicker Tone="teal">SIMULATION BOUNDARY</ZineKicker>
 			<p class="mt-2 max-w-3xl text-base text-zinc-dust">
 				Real on this page: the pick chain, the precedence rules, the two-stack split, the key table
@@ -642,8 +639,12 @@ const Sections = [
 				{ Href: "/docs/config/aphrodite-toml/", Label: "DOCS · CONFIG" },
 			]}
 		/>
-		<div data-config-example={JSON.stringify(Example)} data-config-keys={JSON.stringify(Tracked)} hidden></div>
-	</main>
+		<div
+			data-config-example={encodeURIComponent(Example)}
+			data-config-keys={encodeURIComponent(JSON.stringify(Tracked))}
+			hidden
+		></div>
+	</PageShell>
 	<ZineDiagramNav />
 </Base>
 
@@ -671,22 +672,31 @@ const Sections = [
 	}
 
 	// The shipped example and the tracked keys are serialized into
-	// [data-config-*] by the template. Astro does not carry frontmatter
-	// variables into a client script, so both travel as JSON attributes - the
-	// editor's default text and the ladder's key list therefore come from the
-	// page's own arrays, never from a second copy.
-	function Json<T>(Attribute: string, Fallback: T): T {
+	// [data-config-*] by the template, PERCENT-ENCODED. Astro does not carry
+	// frontmatter variables into a client script, so both travel as attributes
+	// - and plain JSON in an attribute does not survive the build: the
+	// code-mention pass rewrites every repo-relative path in the finished HTML
+	// into an anchor, and an anchor's quotes end the attribute it was written
+	// inside. Percent-encoding leaves no quote, no angle bracket and no
+	// slash-form path for that pass to match, so the payload arrives whole.
+	function Text(Attribute: string): string {
 		const Raw = document.querySelector(`[${Attribute}]`)?.getAttribute(Attribute);
-		if (!Raw) return Fallback;
+		if (!Raw) return "";
 		try {
-			return JSON.parse(Raw) as T;
+			return decodeURIComponent(Raw);
 		} catch {
-			return Fallback;
+			return "";
 		}
 	}
 
 	function TrackedKeys(): TrackedKey[] {
-		return Json<TrackedKey[]>("data-config-keys", []);
+		const Raw = Text("data-config-keys");
+		if (!Raw) return [];
+		try {
+			return JSON.parse(Raw) as TrackedKey[];
+		} catch {
+			return [];
+		}
 	}
 
 	interface Parsed {
@@ -956,7 +966,7 @@ const Sections = [
 		Editor.dataset.editorBound = "1";
 
 		if (!InitialValue) {
-			InitialValue = Json<string>("data-config-example", "");
+			InitialValue = Text("data-config-example");
 			Editor.value = InitialValue;
 		}
 
