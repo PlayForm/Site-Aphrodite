@@ -4,7 +4,7 @@
 > sessions.
 ---
 name: site-modules
-description: THE laws for the site's recurring data modules - the one-canonical-form rule (a fact block that appears on more than one page gets one shared component, not per-page copies), the byte-exact facts law (the study figures and other Drift-checked primaries never reword or round), the voice-color accents (canary = the saved/positive figure, teal = the ratio, raw-blood = the band/cost), the caveat-as-own-note rule, and the SRC citation law (plain prose token, linked by the CodeMentions pass, never a hand-built anchor). Load before adding or editing any recurring stat/telemetry/study module.
+description: THE laws for the site's recurring data modules - the one-canonical-form rule (a fact block that appears on more than one page gets one shared component, not per-page copies), the byte-exact facts law (the study figures and other generated primaries never reword or round), the voice-color accents (canary = the saved/positive figure, teal = the ratio, raw-blood = the band/cost), the caveat-as-own-note rule, and the SRC citation law (plain prose token, linked by the CodeMentions pass, never a hand-built anchor). Load before adding or editing any recurring stat/telemetry/study module.
 whenToUse: Mandatory before adding, editing, or duplicating any recurring structured module (the study module Component/StudyLedger, the telemetry modules, any stat/ledger block that appears on two or more pages). If you are about to copy-paste a stat block from one page to another, STOP and read this manual first.
 ---
 
@@ -22,15 +22,17 @@ drift surface this rule exists to kill.
 
 ## 2. The byte-exact facts law
 
-The numbers inside a canonical module are the Drift-checked primaries:
-byte-exact from README.md or, for figures a page cites directly from the
-CHANGELOG (the history content's CHANGELOG.md anchors), byte-exact from
-CHANGELOG.md - the CHANGELOG is the secondary figure-primary, so the
-unrounded forms it prints (like 132.82× and 225×) are the legal glyphs where
-it is the cited source. Never reworded, rounded, or reformatted when the
-module restructures. A redesign changes the CONTAINER (the header row, the
-ledger rows, the accent colors), never the VALUES. The arbiter stays
-`pnpm run Drift` after every touched file.
+The numbers inside a canonical module are the generated primaries:
+byte-exact from `Module/Aphrodite/README.md` or, for figures a page cites
+directly from the CHANGELOG (the history content's CHANGELOG.md anchors),
+byte-exact from `Module/Aphrodite/CHANGELOG.md` - the CHANGELOG is the
+secondary figure-primary, so the unrounded forms it prints (like 132.82× and
+225×) are the legal glyphs where it is the cited source. Never reworded,
+rounded, or reformatted when the module restructures. A redesign changes the
+CONTAINER (the header row, the ledger rows, the accent colors), never the
+VALUES. The arbiter stays `pnpm run Prepare` after every touched file: it
+regenerates `Source/Generated/` from the submodule, so a figure that no longer
+matches the repository is regenerated rather than compared.
 
 ## 3. The voice-color accents
 
@@ -92,7 +94,7 @@ the 40-hex form is ~50+ chars with no break opportunity) carries
 `Source/Stylesheet/Global.css` (or the `.docs-prose :global(code)` /
 `:global(td)` rules for the docs prose, which already carry it). The wrap is
 VISUAL ONLY: the rendered text and every `data-copy` payload stay byte-exact
-(the Drift corpus checks are the arbiter). `truncate` is NOT an acceptable
+(the generated showcase catalog is the arbiter). `truncate` is NOT an acceptable
 substitute on a marker line - it hides the size field instead of wrapping.
 Raw stream panes (ZineStream, the per-page equivalents) take `.ccr-marker` on
 the pane container so every line inherits it; `pre` blocks keep
@@ -120,7 +122,7 @@ flags and the paths are tokenized by the grammar, not hand-colored. The law:
    `font-mono text-base` (the 16px floor) and `[&>pre]:p-3.5`.
 4. Demo data that only SIMULATES a terminal (the workbench compression
    samples, `$ cargo fmt --check` as tool-output content) is exempt - those
-   strings are Drift-checked showcase content, not install instructions.
+   strings are generated showcase content, not install instructions.
 
 ## 10. The flow-pane law (the ZineFlow two-view rule)
 

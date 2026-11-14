@@ -91,7 +91,8 @@ short-line structure:
    written against a live Hermes runtime home carries local paths and
    captured session state, so it stays repository-internal instead of
    becoming a `/docs/research/` page.
-6. The arbiters: `pnpm run Drift` (all PASS) after every file; the
+6. The arbiters: `pnpm run Prepare` (regenerates `Source/Generated/` from
+   `Module/Aphrodite` and names the pin it read) after every file; the
    whitespace check is zero space-indented lines (tabs only, tabWidth 4)
    and balanced `<p>` tags. NO `prepublishOnly` as the routine guard.
 
@@ -149,7 +150,8 @@ tags itself. The contract every page inherits:
    only), `noindex`, own `description` + `theme-color`, `<nav
    aria-label="Primary">` with links that resolve against the built
    tree. Edit it directly; it never passes through Base.
-7. Arbiters: `pnpm run Drift` (all PASS) + the quote-agnostic greps
+7. Arbiters: `pnpm run Prepare` (regenerates `Source/Generated/` and names
+   the pin) + the quote-agnostic greps
    over `Target/` (the production build strips attribute quotes, so
    greps must match both `name="x"` and `name=x`).
 

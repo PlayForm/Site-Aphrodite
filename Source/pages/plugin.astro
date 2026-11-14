@@ -295,11 +295,21 @@ const Dispatch = [
 					What the manifest declares
 				</h2>
 				<p class="mb-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The manifest is read before a line of Python loads. Hermes takes the name it
-					will list, the spec version it will pin, the six hook names it must find a
-					registration for, the thirteen tool schemas it will advertise to the model, and
-					the flag that says an engine is present.
+					The manifest is read before a line of Python loads. Hermes takes:
 				</p>
+				<ul class="mb-12 max-w-3xl space-y-2 font-body text-base leading-relaxed text-bone-newsprint">
+					<li class="border-l-4 border-raw-blood pl-4">the name it will list</li>
+					<li class="border-l-4 border-raw-blood pl-4">the spec version it will pin</li>
+					<li class="border-l-4 border-raw-blood pl-4">
+						the six hook names it must find a registration for
+					</li>
+					<li class="border-l-4 border-raw-blood pl-4">
+						the thirteen tool schemas it will advertise to the model
+					</li>
+					<li class="border-l-4 border-raw-blood pl-4">
+						and the flag that says an engine is present.
+					</li>
+				</ul>
 				<p class="mb-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Nothing in the file describes behavior. Every field is an identity, a
 					requirement, or a promise about what the dylib will answer when it is asked -
@@ -534,9 +544,19 @@ const Dispatch = [
 					Steps={Dispatch}
 				/>
 				<p class="mt-10 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-					The failure mode of the whole chain sits at the boundary, not in the middle: a
-					hook that raises is logged and skipped, a hook that returns nothing is a no-op,
-					and neither ever aborts the turn. What a hook cannot do is pretend it ran.
+					The failure mode of the whole chain sits at the boundary, not in the middle:
+				</p>
+				<ul class="mt-3 max-w-3xl space-y-2 font-body text-base leading-relaxed text-zinc-dust">
+					<li class="border-l-2 border-oxblood-dark pl-3">
+						a hook that raises is logged and skipped
+					</li>
+					<li class="border-l-2 border-oxblood-dark pl-3">
+						a hook that returns nothing is a no-op
+					</li>
+					<li class="border-l-2 border-oxblood-dark pl-3">and neither ever aborts the turn.</li>
+				</ul>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
+					What a hook cannot do is pretend it ran.
 				</p>
 
 				<ZineTape Variant="section" Label="HOOKS // THE CHAIN" />
@@ -788,11 +808,17 @@ const Dispatch = [
 							</li>
 						</ul>
 						<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
-							The four checks are ordered by cost, not by importance: the checksum is
-							one hash, the magic bytes are four, the backup is a rename, and the last
-							one is not a check at all - it is what the plugin does when every check
-							above it has already failed.
+							The four checks are ordered by cost, not by importance:
 						</p>
+						<ul class="mt-3 space-y-2 font-body text-base leading-relaxed text-zinc-dust">
+							<li class="border-l-2 border-oxblood-dark pl-3">the checksum is one hash</li>
+							<li class="border-l-2 border-oxblood-dark pl-3">the magic bytes are four</li>
+							<li class="border-l-2 border-oxblood-dark pl-3">the backup is a rename</li>
+							<li class="border-l-2 border-oxblood-dark pl-3">
+								and the last one is not a check at all - it is what the plugin does when every
+								check above it has already failed.
+							</li>
+						</ul>
 					</div>
 					<div>
 						<CodeFence
@@ -1042,10 +1068,20 @@ const Dispatch = [
 					The six hooks, the version pairing, and the 14-to-13 correction
 				</h2>
 				<p class="mb-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Three things grew at once: the seams, the pairing rule that keeps a plugin
-					pointing at a binary that exists, and the discipline that keeps the declared
-					tool count honest. Read together they explain why the plugin can be installed
-					from a tag and verified against a checksum list.
+					Three things grew at once:
+				</p>
+				<ul class="mb-12 max-w-3xl space-y-2 font-body text-base leading-relaxed text-bone-newsprint">
+					<li class="border-l-4 border-raw-blood pl-4">the seams</li>
+					<li class="border-l-4 border-raw-blood pl-4">
+						the pairing rule that keeps a plugin pointing at a binary that exists
+					</li>
+					<li class="border-l-4 border-raw-blood pl-4">
+						and the discipline that keeps the declared tool count honest.
+					</li>
+				</ul>
+				<p class="mb-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Read together they explain why the plugin can be installed from a tag and verified
+					against a checksum list.
 				</p>
 
 				<h3 id="lanes" class={`mb-8 ${Head}`}>

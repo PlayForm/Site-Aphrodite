@@ -87,7 +87,7 @@ whenToUse: Mandatory before adding, editing, or placing any file under Site/Publ
    mark, width 480 for the square aspect). Both banner copies (root
    `assets/aphrodite-header.svg` and `Public/Brand/aphrodite-header.svg`)
    are DELETED (2026-10-10, BRAND-HEADER-FIX: the user's "recheck all and
-   fix all" — the banner drew hand-copied kiss paths from the removed
+   fix all" - the banner drew hand-copied kiss paths from the removed
    `aphrodite-mark.svg` and was referenced nowhere, so it was removed
    rather than rebuilt); do not recreate or re-reference them.
 8. WORDMARK SIZING LAW (retained for any future composed banner): SVG
@@ -109,7 +109,8 @@ whenToUse: Mandatory before adding, editing, or placing any file under Site/Publ
 ## 5. Verification
 
 10. After any brand-asset or mark-placement change, the arbiters are the
-    fast guards ONLY (no full build): `cd Site && pnpm run Drift` (97
-    checks - the count is dynamic; all PASS), the greps over the touched
+    fast guards ONLY (no full build): `cd Site && pnpm run Prepare`
+    (regenerates `Source/Generated/` from `Module/Aphrodite` and names the pin
+    it read), the greps over the touched
     assets/READMEs (the fill values, the pattern ids, the image refs),
     and for banner/wordmark work an actual raster render of the SVG.

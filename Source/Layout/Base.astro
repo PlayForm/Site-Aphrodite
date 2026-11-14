@@ -380,6 +380,7 @@ interface Props {
 			// with the observer-backed one torn down on astro:before-swap so a
 			// discarded page leaves nothing running.
 			import Mount, { Teardown } from "@Library/Motion";
+			import { BindPlates } from "@Script/CodePlate";
 
 			function BindCopy() {
 				for (const Element of document.querySelectorAll("[data-copy]")) {
@@ -401,12 +402,24 @@ interface Props {
 				}
 			}
 
-			// The code plates are built BEFORE the copy binding: the chip they
-			// add carries `data-copy`, and BindCopy is the one runtime that
-			// binds it - so both run in the same pass, in that order.
+			// The code plates are built BEFORE the copy binding: the chip they add
+			// carries `data-copy`, and BindCopy is the one runtime that binds it -
+			// so both run in the same pass, in that order.
+			//
+			// Each binder is isolated: one that throws (or resolves to undefined
+			// because a module is missing) must never take the rest of this script
+			// down with it. A bare call in here once aborted the whole inline
+			// script and silently killed the nav toggle and the motion runtime.
+			const Binders: ReadonlyArray<() => void> = [BindPlates, BindCopy];
+
 			const BindRuntime = (): void => {
-				BindPlates();
-				BindCopy();
+				for (const Bind of Binders) {
+					try {
+						Bind();
+					} catch (Error) {
+						console.warn("aphrodite: a page binder failed", Error);
+					}
+				}
 			};
 
 			BindRuntime();

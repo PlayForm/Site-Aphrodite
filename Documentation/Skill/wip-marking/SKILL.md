@@ -66,6 +66,7 @@ After any WIP change: `pnpm prepublishOnly` (63 pages), then grep the built
 HTML - the centers page header stamp, the sidebar badge on a non-centers
 docs page (appears twice: desktop sidebar + mobile drawer), the section
 card badge on /docs/, and the `(WIP)` tokens in the built config/plugin
-pages - then `pnpm run Drift` (all PASS, count is dynamic). Report the
+pages - then `pnpm run Prepare` (it regenerates `Source/Generated/` from
+`Module/Aphrodite` and names the pin it read). Report the
 identification table (item -> anchor -> verdict), the before -> after
 anchors, and the arbiter tails.

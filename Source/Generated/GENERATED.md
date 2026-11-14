@@ -26,7 +26,7 @@ hand: a change made in this directory is overwritten by the next run.
 These rows are verified on every run and written by the extraction card that
 owns them, not by this one:
 
-- `docs/**` -> `Source/Content/Docs/**` (Doc) - Held for the docs extraction card. The tree is the same 48 files the committed collection was generated from, so the card's work is repointing Source/Library/Versions.ts and Scripts/Docs/Generate.ts at the module - not re-extracting text. Prepare verifies the tree and reports its file count here.
+- `docs/**` -> `Source/Content/Docs/**` (Doc) - Held for the docs extraction card. The module tree is the same one the committed collection was generated from, so that card's work is repointing Scripts/Docs/Generate.ts and Source/Library/Versions.ts at the module - not re-extracting text. Prepare verifies the tree on every run and reports its file count.
 - `docs/**` -> `Source/Content/Mermaid/**` (Mermaid) - Downstream of the docs row: the extractor reads the generated markdown, so this row cannot land before that one.
 
 ## How a fact changes

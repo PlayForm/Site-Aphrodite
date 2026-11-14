@@ -4,9 +4,9 @@ The single tracking file for the Aphrodite site batch: EACH AND EVERY user
 requirement + feedback item, the agent progress, and the pending delegations.
 Updated by the orchestrator as the batch moves. The user commits; the agents
 never commit. The lanes are GLM 5.3 Flash low, launched IDLE, activated 2 at a
-time. The arbiter: `cd Site && pnpm prepublishOnly` (63 pages) + `pnpm run
-Drift` (all PASS - the count is dynamic). Some lanes error with RATE LIMITED -
-they are restarted with the fresh state.
+time. The arbiter: `cd Site && pnpm prepublishOnly` (Prepare generates the
+content from `Module/Aphrodite`, then the build runs - 63 pages). Some lanes
+error with RATE LIMITED - they are restarted with the fresh state.
 
 ---
 
@@ -227,10 +227,14 @@ resolve.
 
 ## 5. THE ARBITERS (the current facts)
 
-- `pnpm prepublishOnly` -> 63 pages built, Complete.
-- `pnpm run Drift` -> all checks PASS (the count is dynamic: 62-63).
-- The deploy path is hermetic: the Docs fallback + the Drift skip + the
-  allowBuilds + the committed 48 docs pages + the tree/Current links.
+- `pnpm prepublishOnly` -> Prepare generates `Source/Generated/` from
+  `Module/Aphrodite`, then the build runs (63 pages), Complete.
+- Content is generated, never compared: a fact that needs changing is changed
+  in `PlayForm/Aphrodite`, pushed, and the submodule pin advanced - the eight
+  steps are in the site README, "The upstream chain".
+- The deploy path is hermetic: Prepare's own submodule checkout + the Docs
+  fallback + the allowBuilds + the committed 48 docs pages + the tree/Current
+  links.
 
 ## 6. THE STANDING DECISIONS (the user's)
 
@@ -240,7 +244,7 @@ resolve.
 - THE ARBITER LAW (2026-10-09 user directive): the agents do NOT run
   `pnpm prepublishOnly` - the USER runs the build themselves (dum
   prepublishOnly); the agents do development edits only + the fast guards
-  (pnpm run Drift, targeted greps) - never the full build/dev server/tsc.
+  (`pnpm run Prepare`, targeted greps) - never the full build/dev server/tsc.
 - The user commits; the agents never commit.
 - The zine grammar binds (radius 0, the hard shadows, the 16px floor,
   dark-only, the huge-whitespace rhythm, the tree/Current law).

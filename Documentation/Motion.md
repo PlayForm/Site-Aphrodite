@@ -125,4 +125,4 @@ settled frame rather than a half-played one.
 - **No double-binding** - navigate away and back through the client router; a panel must rise once, not twice, and the console must stay quiet.
 - **Reduced motion** - enable *Reduce motion* in the OS, reload: every panel is present, nothing animates, no copy is missing.
 - **No content hidden** - disable JavaScript, reload: every `[data-reveal]` panel is visible (the pre-hide is gated on `html.js`).
-- **The gate** - `pnpm run Drift` from `Site/`.
+- **The gate** - `pnpm run Prepare` from `Site/` (it regenerates the generated area and names the pin it read).

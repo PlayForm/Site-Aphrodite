@@ -87,8 +87,10 @@ edit the generated copies alone - the next sync would clobber the change.
 
 ## 6. The arbiters
 
-- `pnpm run Drift` - all content-integrity checks PASS (the count is
-  dynamic; 97 at the time of writing). The printed tail is the truth.
+- `pnpm run Prepare` - regenerates `Source/Generated/` from `Module/Aphrodite`
+  and prints every file it wrote plus the pin it read. A fact that no longer
+  matches the repository is regenerated, not compared: there is no second copy
+  to drift.
 - The residual greps: `gets compressed|is replaced with|gets classified`
   across pages + generated docs - every remaining hit must be an
   exception-class sentence (§2) or a quoted string.

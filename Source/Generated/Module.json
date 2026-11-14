@@ -16,10 +16,10 @@
 		"Branch": "Current",
 		"Nested": [
 			{
-				"Path": "47e7fa3b47cc57e6531b4ad54a7f2c521475b968 plugins/aphrodite (v2.3.2)",
-				"Commit": null,
-				"Describe": null,
-				"State": "unknown"
+				"Path": "plugins/aphrodite",
+				"Commit": "47e7fa3b47cc57e6531b4ad54a7f2c521475b968",
+				"Describe": "v2.3.2",
+				"State": "clean"
 			},
 			{
 				"Path": "vendor/headroom",

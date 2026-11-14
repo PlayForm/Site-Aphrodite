@@ -52,7 +52,8 @@ SHA, requires_hermes >=0.20.2, requires APHRODITE_API_KEY).
 ## 4. The arbiter order
 
 After the source edits: `pnpm run Docs` (regenerates the copies), then
-`pnpm prepublishOnly` (63 pages), then `pnpm run Drift` (the count is
-dynamic; all PASS), then grep the BUILT HTML under `Target/` - every touched
+`pnpm prepublishOnly` (Prepare generates `Source/Generated/` from
+`Module/Aphrodite`, then the build - 63 pages), then grep the BUILT HTML
+under `Target/` - every touched
 surface must carry the new method's commands and the guide link. Read
 before editing each file; the prose lanes may change copy under you.

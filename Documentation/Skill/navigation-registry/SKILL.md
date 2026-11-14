@@ -78,8 +78,9 @@ page is served.
 ## 6. The arbiter after every change
 
 The FULL build (`pnpm prepublishOnly`) is for structural changes; for
-markup-only nav changes the fast guard is `pnpm run Drift` (the count is
-dynamic; all PASS - 97 checks at the essentials reduction). Verify the
+markup-only nav changes the fast guard is `pnpm run Prepare` (it regenerates
+`Source/Generated/` from `Module/Aphrodite` and names the pin it read).
+Verify the
 markup with greps of the SOURCE when no build ran, and note that the built
 HTML under Target/ is stale until the next full build.
 

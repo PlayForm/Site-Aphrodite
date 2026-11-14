@@ -119,11 +119,16 @@ function ChangelogHead({ Text, Source }: Input): Fragment {
 
 	const Pairing = Text.match(/Binary\s+`([^`]+)`,\s*plugin\s+`([^`]+)`/);
 
+	// The pairing wraps across lines in the source ("Binary `1.7.0 →" / "1.8.0`"),
+	// so the captured text is flattened: the page renders one line, and a
+	// newline inside a value would be invisible until it broke a template.
+	const Flat = (Value: string): string => Value.replace(/\s+/g, " ").trim();
+
 	return {
 		Version: Head[1] ?? "",
 		Date: Head[3]?.trim() ?? "",
 		Title: Head[2]?.trim() ?? "",
-		Pairing: Pairing ? `Binary \`${Pairing[1]}\`, plugin \`${Pairing[2]}\`` : "",
+		Pairing: Pairing ? `Binary \`${Flat(Pairing[1])}\`, plugin \`${Flat(Pairing[2])}\`` : "",
 	};
 }
 
@@ -221,13 +226,20 @@ function ModulePin({ Text, Source, Module }: Input): Fragment {
 			: Status.split("\n")
 					.filter((Line) => Line.trim() !== "")
 					.map((Line) => {
-						const Match = Line.match(/^([ +\-U])([0-9a-f]{40})\s+(\S+)(?:\s+\((.*)\))?$/);
+						// The state column is a leading space for a clean pin, which
+						// `trim()` strips from the first line of the output - so it is
+						// optional here, and an absent column reads as clean.
+						const Match = Line.match(/^([ +\-U]?)([0-9a-f]{40})\s+(\S+)(?:\s+\((.*)\))?$/);
 
 						return {
 							Path: Match?.[3] ?? Line.trim(),
 							Commit: Match?.[2] ?? null,
 							Describe: Match?.[4] ?? null,
-							State: Match?.[1] === " " ? "clean" : (Match?.[1] ?? "unknown"),
+							State:
+								Match === null || Match[1] === "" || Match[1] === " "
+									? "clean"
+									: ({ "+": "ahead", "-": "uninitialised", U: "conflict" }[Match[1]] ??
+										"unknown"),
 						};
 					});
 

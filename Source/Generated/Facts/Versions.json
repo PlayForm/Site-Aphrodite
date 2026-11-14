@@ -33,6 +33,6 @@
 		"Version": "1.8.1",
 		"Date": "2026-11-14",
 		"Title": "Docs catch up to the engine, ASCII ellipsis markers, compile-time debug gate",
-		"Pairing": "Binary `1.7.0 →\n1.8.0`, plugin `2.3.0 → 2.3.1`"
+		"Pairing": "Binary `1.7.0 → 1.8.0`, plugin `2.3.0 → 2.3.1`"
 	}
 }

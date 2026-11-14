@@ -98,9 +98,8 @@ export const CodeLinks: Record<string, Entry> = {
 	"layout_check.py": Hermes("layout_check.py"),
 
 	// ── The site and configuration files (Aphrodite repository).
-	// FLAG: "Render.mjs" and "Drift-Guard.mjs" are NOT mapped - they live
-	// under Site/, which is gitignored, so tree/Current anchors to them
-	// would 404 on GitHub.
+	// FLAG: "Render.mjs" is NOT mapped - it lives under Site/, which is
+	// gitignored, so tree/Current anchors to it would 404 on GitHub.
 	"aphrodite.toml": Ours("aphrodite.toml.example"),
 	"aphrodite.toml.example": Ours("aphrodite.toml.example"),
 	"ccr.db": Ours("crates/aphrodite/src/config/proxy.rs"),

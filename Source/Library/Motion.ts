@@ -347,12 +347,12 @@ const Watch = (): IntersectionObserver => {
 				// is already looking. An element that can never reach that line -
 				// the last short block of a page, a page that cannot scroll
 				// further - would then stay hidden forever, so anything already
-				// inside the viewport is released here instead. Content wins over
-				// motion.
+				// inside the viewport is released here instead. The comparison is
+				// against the viewport, not Entry.rootBounds: rootBounds is the
+				// margin-adjusted rectangle, which is the very line the element
+				// cannot reach. Content wins over motion.
 				const InView =
-					Entry.isIntersecting ||
-					Entry.boundingClientRect.top <
-						(Entry.rootBounds?.bottom ?? window.innerHeight);
+					Entry.isIntersecting || Entry.boundingClientRect.top < window.innerHeight;
 
 				if (!InView) {
 					continue;

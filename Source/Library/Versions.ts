@@ -10,8 +10,9 @@
 //     (the plugin downloader's pinned binary version);
 //   - the CHANGELOG head (the repo root's CHANGELOG.md): the latest entry's
 //     version, date, title and the version pairing it declares ("Binary
-//     `1.6.5 -> 1.6.6`, plugin `2.2.5 -> 2.2.6`") - the Drift-aligned source
-//     the versions page's monument and the pairing quotes cite.
+//     `1.6.5 -> 1.6.6`, plugin `2.2.5 -> 2.2.6`") - the same shapes the
+//     generator emits into Source/Generated/Facts/Versions.json, which the
+//     versions page's monument and the pairing quotes cite.
 //
 // BUILD-TIME ONLY: this module reads the filesystem with node:fs and is
 // imported by the .astro frontmatter (the server). It must never be imported
@@ -117,7 +118,7 @@ export function ReleaseNote(Version: string): string {
 	return `${ExternalLinks.Releases}/tag/Aphrodite%2Fv${Version}`;
 }
 
-/** The documented fallbacks: the previously verified pairing, kept in the same shapes the Drift checks extract. */
+/** The documented fallbacks: the previously verified pairing, kept in the same shapes the generator emits. */
 const Fallback = {
 	Binary: "1.8.0",
 	Hermes: "1.8.0",
@@ -144,7 +145,7 @@ export const Versions = {
 	Headroom: ReadHeadroomVersion() ?? Fallback.Headroom,
 	/** The plugin downloader's pinned binary version (plugins/aphrodite/BINARY_VERSION). */
 	BinaryVersionFile: ReadBinaryVersionFile() ?? Fallback.BinaryVersionFile,
-	/** The CHANGELOG head's entry version (the Drift-aligned current release). */
+	/** The CHANGELOG head's entry version (the generated current release). */
 	ChangelogVersion: ChangelogHead?.Version ?? Fallback.Changelog.Version,
 	/** The CHANGELOG head's entry date. */
 	ChangelogDate: ChangelogHead?.Date ?? Fallback.Changelog.Date,

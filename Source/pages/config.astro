@@ -662,10 +662,16 @@ const Sections = [
 				those three never scale.
 			</p>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Two runtime factors sit on either side of this table and the page cannot know either: the
-				compression-ratio auto-tune (×2 above a 20× ratio, ×0.5 below 3×) scales the base, and the
-				headroom budget (0.50 to 1.0) scales the result.
+				Two runtime factors sit on either side of this table and the page cannot know either:
 			</p>
+			<ul class="mt-3 max-w-3xl space-y-2 text-base text-zinc-dust">
+				<li class="border-l-2 border-oxblood-dark pl-3">
+					the compression-ratio auto-tune (×2 above a 20× ratio, ×0.5 below 3×) scales the base
+				</li>
+				<li class="border-l-2 border-oxblood-dark pl-3">
+					and the headroom budget (0.50 to 1.0) scales the result.
+				</li>
+			</ul>
 			<p class="mt-6 font-mono text-base uppercase tracking-widest text-zinc-dust">
 				SRC: crates/aphrodite/src/proxy.rs:613-644.
 			</p>
@@ -785,14 +791,28 @@ const Sections = [
 		<footer class="w-full border-l-4 border-weathered-teal bg-carbon-void p-6">
 			<ZineKicker Tone="teal">SIMULATION BOUNDARY</ZineKicker>
 			<p class="mt-2 max-w-3xl text-base text-zinc-dust">
-				Real on this page: the pick chain, the precedence rules, the two-stack split, the key table
-				and the unwired ledger - all quoted from aphrodite.toml.example, README.md:371-442 and
-				docs/config/aphrodite-toml.md.
+				Real on this page:
 			</p>
+			<ul class="mt-2 max-w-3xl space-y-1 text-base text-zinc-dust">
+				<li class="border-l-2 border-oxblood-dark pl-3">the pick chain</li>
+				<li class="border-l-2 border-oxblood-dark pl-3">the precedence rules</li>
+				<li class="border-l-2 border-oxblood-dark pl-3">the two-stack split</li>
+				<li class="border-l-2 border-oxblood-dark pl-3">the key table</li>
+				<li class="border-l-2 border-oxblood-dark pl-3">
+					and the unwired ledger - all quoted from aphrodite.toml.example, README.md:371-442 and
+					docs/config/aphrodite-toml.md.
+				</li>
+			</ul>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Simulated: the TOML parsing (a browser-side reader, not the Rust or dylib parser), the
-				resolution ladder, and the POST /reload response.
+				Simulated:
 			</p>
+			<ul class="mt-2 max-w-3xl space-y-1 text-base text-zinc-dust">
+				<li class="border-l-2 border-oxblood-dark pl-3">
+					the TOML parsing (a browser-side reader, not the Rust or dylib parser)
+				</li>
+				<li class="border-l-2 border-oxblood-dark pl-3">the resolution ladder</li>
+				<li class="border-l-2 border-oxblood-dark pl-3">and the POST /reload response.</li>
+			</ul>
 			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
 				No network, no runtime - everything happens in this tab.
 			</p>

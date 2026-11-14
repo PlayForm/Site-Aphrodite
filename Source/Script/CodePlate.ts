@@ -148,9 +148,12 @@ const Payload = (Pre: HTMLPreElement): string => (Pre.textContent ?? "").replace
 const BuildPlate = (Pre: HTMLPreElement): void => {
 	const Host = Pre.parentElement;
 
-	// A block that already carries a copy control (Component/CodeFence.astro's
-	// CopyButton) keeps that control: two copy chips on one block is two truths.
-	const HasCopy = Host?.querySelector("[data-copy]") !== null && Host !== null;
+	// A fence may arrive with its own copy control (Component/CodeFence.astro's
+	// CopyButton). It is MOVED into the chip cluster rather than duplicated:
+	// one block, one copy control, one truth - and the cluster is the only
+	// thing that knows where the plate's top-right corner is.
+	const Existing = Host?.querySelector<HTMLElement>("[data-copy]") ?? null;
+	const Holder = Existing?.parentElement ?? null;
 
 	const Figure = document.createElement("figure");
 
@@ -158,25 +161,32 @@ const BuildPlate = (Pre: HTMLPreElement): void => {
 	Pre.replaceWith(Figure);
 	Figure.appendChild(Pre);
 
-	if (HasCopy) {
-		return;
-	}
-
 	const Bar = document.createElement("div");
 	const Lang = document.createElement("span");
-	const Button = document.createElement("button");
 
 	Bar.className = "zine-plate-bar";
 	Lang.className = "zine-plate-lang";
 	Lang.textContent = (Pre.dataset["language"] ?? "code").toUpperCase();
 	Bar.appendChild(Lang);
 
-	Button.type = "button";
-	Button.className = "zine-plate-copy";
-	Button.dataset["copy"] = Payload(Pre);
-	Button.setAttribute("aria-label", "Copy this code block to the clipboard");
-	Button.innerHTML = '<span aria-hidden="true">⧉</span><span>COPY</span>';
-	Bar.appendChild(Button);
+	if (Existing) {
+		Bar.appendChild(Existing);
+
+		// The wrapper that positioned the button absolutely is now empty; left
+		// in place it would hold a row of the plate open for nothing.
+		if (Holder && Holder !== Host && Holder.childElementCount === 0) {
+			Holder.remove();
+		}
+	} else {
+		const Button = document.createElement("button");
+
+		Button.type = "button";
+		Button.className = "zine-plate-copy";
+		Button.dataset["copy"] = Payload(Pre);
+		Button.setAttribute("aria-label", "Copy this code block to the clipboard");
+		Button.innerHTML = '<span aria-hidden="true">⧉</span><span>COPY</span>';
+		Bar.appendChild(Button);
+	}
 
 	Figure.appendChild(Bar);
 	FlagScroll(Figure, Pre);

@@ -97,9 +97,10 @@ Four machine passes over `Source/`, all runnable again:
 	carries 2,163 words in 59 prose blocks and `examples` 1,847 in 54, while
 	neither page offers a single in-page anchor.
 
-### 0.4 The Drift baseline (read this before accepting any phase)
+### 0.4 The retired content guard's baseline (read this before accepting any phase)
 
-`pnpm run Drift` does NOT currently pass, and this card changed nothing:
+The content-integrity guard this batch measured against did NOT pass when the
+batch started, and this card changed nothing:
 
 ```
 97 checks run.
@@ -115,7 +116,7 @@ server and the auto-committer).
 
 **Therefore the acceptance rule for every phase is "the failing count does not
 rise above 17, and no failure name changes except by re-rendering diagrams",
-not "all PASS".** A worker who reports "Drift all PASS" on this tree has
+not "all PASS".** A worker who reports "all PASS" on this tree has
 misread the output.
 
 ### 0.5 The thesis
@@ -1081,7 +1082,7 @@ Nobody else touches these files while this runs.
 | `Source/Component/{CodeLink,ZineButton,ZineCompose,ZineDiagram,ZineDossier,ZineExample,ZineExecButton,ZineFold,ZineLedger,ZineLesson,ZinePullQuote,ZineRegistry,ZineReveal,ZineSlider}.astro` | DELETE - D12 (14 files) |
 
 Phase 0 ends with: the components exist and are proven on ONE page (config is
-the natural pilot - it already uses the library), plus `pnpm run Drift` at 17
+the natural pilot - it already uses the library), plus the retired guard at 17
 failures and no new ones.
 
 ### 6.2 Phase 1 - the page conversions (TWO workers, page-disjoint)
@@ -1167,9 +1168,11 @@ primitives (the exact failure this plan diagnoses). The mapping:
 **Two corrections every one of those cards needs before it starts**, because
 their bodies were written before this plan existed:
 
-1. Their "Done when" says `pnpm run Drift` passes. **It does not pass and cannot
-	 on this tree** - 97 checks, 17 pre-existing failures (0.4). The gate is "the
-	 failure count does not rise above 17 and no failure name changes".
+1. Their "Done when" says the content guard passes. **It did not pass and could not
+	 on this tree** - 97 checks, 17 pre-existing failures (0.4). The gate was "the
+	 failure count does not rise above 17 and no failure name changes". The guard
+	 is retired now: content is generated from `Module/Aphrodite`
+	 (`Scripts/Prepare.ts`), so there is nothing left to compare.
 2. `t_20fe49b5`'s file list includes `hooks.astro`, `flavors.astro` and
 	 `crates.astro`, which this plan retires (2.2). Its work on them is the fold
 	 and the deletion, not a restructure.
@@ -1178,11 +1181,12 @@ their bodies were written before this plan existed:
 
 ## 7. Verification, per phase
 
-No phase may claim done without these. **The Drift baseline is 17 failures**
-(0.4) - the number may not rise, and the failure names may not change.
+No phase may claim done without these. **The retired guard's baseline was 17
+failures** (0.4) - the number may not rise, and the failure names may not change.
 
-- **Phase 0** - `timeout 400 pnpm run Drift 2>&1 | tail -3` shows `97 checks run`
-	and 17 failures; `curl -s localhost:9999/config/` renders the new components
+- **Phase 0** - `timeout 400 pnpm run Prepare 2>&1 | tail -3` regenerates
+	`Source/Generated/` from `Module/Aphrodite` and names the pin it read;
+	`curl -s localhost:9999/config/` renders the new components
 	without a markup regression; the reachability pass reports 0 dead components
 	(or 2, the owner decisions).
 - **Phase 1** - per page: `curl -s localhost:9999/<route>/` and check (a) one
@@ -1212,7 +1216,7 @@ No phase may claim done without these. **The Drift baseline is 17 failures**
 - Footer/nav facts: `curl -s localhost:9999/ | grep -o '<footer.*</footer>'`
 	then count `<a `, `<nav`, `aria-label=`.
 - Versions: `Source/Library/Versions.ts` readers, or the footer's own stamps.
-- Drift baseline: `timeout 400 pnpm run Drift`.
+- Content generation baseline: `timeout 400 pnpm run Prepare`.
 
 ---
 

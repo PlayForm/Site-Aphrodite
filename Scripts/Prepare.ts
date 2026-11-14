@@ -164,4 +164,12 @@ function Prepare(): void {
 	}
 }
 
-Prepare();
+// Every failure this generator can raise is environmental - a missing
+// checkout, a half-initialised submodule, a stale pin - so the message is the
+// whole report. A stack trace would only bury the command that fixes it.
+try {
+	Prepare();
+} catch (Cause) {
+	console.error(Cause instanceof Error ? Cause.message : String(Cause));
+	process.exit(1);
+}

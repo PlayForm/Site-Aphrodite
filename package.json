@@ -27,11 +27,11 @@
   },
   "scripts": {
     "Run": "astro dev --host",
+    "Prepare": "node Scripts/Prepare.ts",
     "Diagrams": "node --experimental-strip-types Scripts/Diagrams.ts && node Source/Content/Mermaid/Render.mjs",
     "Docs": "node --experimental-strip-types Scripts/Docs.ts",
-    "Drift": "node Scripts/Drift-Guard.mjs",
     "Redirects": "node --experimental-strip-types Scripts/GenerateRedirects.mjs",
-    "prepublishOnly": "astro build"
+    "prepublishOnly": "node Scripts/Prepare.ts && astro build"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.5",

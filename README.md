@@ -5,10 +5,49 @@ The documentation and design surface for
 (Compress-Cache-Retrieve) compression proxy and absorptive preview pipeline for
 Hermes Agent.
 
-Every figure on the site is derived, not typed: the version stamps read the
-monorepo's own manifests at build time, the documentation pages are generated
-from the repository's `docs/` tree, and a drift guard re-derives the headline
-numbers before the site can ship a value the repository does not contain.
+The site does not copy facts out of the monorepo. It **generates** them.
+`Module/Aphrodite` is a git submodule pinned to the release line - the same tree
+`Aphrodite-Release` tracks and `PlayForm/Aphrodite` publishes - and
+`pnpm run Prepare` resolves that tree, checks it out when it is missing, and
+writes `Source/Generated/` from the manifest in `Scripts/Prepare/Manifest.ts`.
+Every figure the pages render is either generated there or read from the module
+at build time.
+
+**THE INVARIANT.** A fact that needs changing is changed in
+`PlayForm/Aphrodite`, pushed, and the `Module/Aphrodite` pin advanced. It is
+never edited in this repository. There is no second copy to keep in step,
+because there is no second copy: the site no longer copies facts from the
+monorepo, it generates them.
+
+---
+
+## The upstream chain
+
+A fact reaches the site in eight steps. They are the whole procedure - there is
+no shortcut, and editing a generated file is not one of them.
+
+```
+1. EDIT     ~/Developer/Application/PlayForm/Aphrodite          (Development)
+2. PORT     ~/Developer/Application/PlayForm/Aphrodite-Release  (Current)
+3. COMMIT   in Aphrodite-Release
+4. PUSH     Current (and Development)
+5. VERIFY   git ls-remote Source Current → remote tip is your commit
+6. PULL     Site/: git -C Module/Aphrodite fetch && checkout <sha>
+7. STAGE    git add Module/Aphrodite
+8. REBUILD  pnpm Prepare && pnpm prepublishOnly
+```
+
+- **The module is read-only.** The generator reads `Module/Aphrodite`; it never
+  writes, commits or pushes there. A change made inside the submodule is
+  discarded by the next pin advance, and it is invisible to the repository the
+  site is supposed to be describing.
+- **The module is nested.** `Module/Aphrodite` itself carries three submodules:
+  `plugins/aphrodite` (Aphrodite-Hermes), `vendor/headroom` and `vendor/rtk`. A
+  shallow `--init` leaves `plugins/aphrodite/` empty, so `plugin.yaml` is absent
+  and every tool and hook row generates empty - silently. Prepare therefore runs
+  `git submodule update --init --recursive`, and it refuses to generate unless
+  `plugins/aphrodite/plugin.yaml` exists. The pins move with the parent pin, so
+  the recursive update re-runs on every build.
 
 ---
 
@@ -20,8 +59,13 @@ Pages from this repository.
 
 - **Node floor** - Astro 7 refuses an interpreter below its `engines` floor with
   `Node.js v<version> is not supported by Astro`; this site is verified on Node
-  `22.23.4` and newer.
-- **Build** - `pnpm run prepublishOnly` runs `astro build` into `Target/`.
+  `22.23.4` and newer. A build without that floor on `PATH` fails before any
+  page is rendered, so a local run carries it explicitly:
+  `PATH=/Volumes/CORSAIR/Tool/NVM/versions/node/v26.5.1/bin:$PATH pnpm run prepublishOnly`.
+- **Build** - `pnpm run prepublishOnly` runs `node Scripts/Prepare.ts` and then
+  `astro build` into `Target/`. A generation failure stops the build before
+  Astro starts, so a deploy can never publish a site generated from a half
+  checkout.
 - **Dev server** - `pnpm run Run` serves on `127.0.0.1:9999`.
 - **Origin** - `astro.config.ts` sets `site` to the site's canonical origin so
   the sitemap and the absolute social URLs resolve. The origin is also the
@@ -31,23 +75,57 @@ Pages from this repository.
 
 ## The content pipeline
 
-The site does not own its documentation. It renders the repository's `docs/`
-tree and its own page components.
+Four generators, in this order. The first is the one that makes the site a
+generated surface; the other three shape what it renders.
 
-- **Documentation** - `pnpm run Docs` regenerates `Source/Content/Docs/` from
-  `../docs`: every markdown file becomes one `/docs/<slug>/` page, relative
-  links between docs files are rewritten to site routes, and repository
-  deep-links are recomposed through `Source/Library/Links.ts` at the canonical
-  branch. Without the monorepo (a standalone deploy checkout) the committed
-  generated content is used as-is.
+- **Prepare** - `pnpm run Prepare` (and the first half of every build). It
+  resolves `Module/Aphrodite`, checks the submodule out when the trees are
+  missing, fails with the remedy rather than a stack trace when they are
+  unreachable, and emits into `Source/Generated/`. It never writes into the
+  module and never deletes a destination.
+- **Docs** - `pnpm run Docs` regenerates `Source/Content/Docs/` from the docs
+  tree: every markdown file becomes one `/docs/<slug>/` page, relative links
+  between docs files are rewritten to site routes, and repository deep-links are
+  recomposed through `Source/Library/Links.ts` at the canonical branch. Without
+  the monorepo (a standalone deploy checkout) the committed generated content is
+  used as-is.
 - **Diagrams** - `pnpm run Diagrams` extracts every `mermaid` fence, renders it
   to SVG, and writes the placement manifest the pages read.
 - **Redirects** - `pnpm run Redirects` regenerates `Public/_redirects` from the
   live route map; the same generator runs inside every build.
-- **Drift** - `pnpm run Drift` re-derives the version pairings, the threshold
-  multipliers, the hook and tool counts, the headline figures, the quoted
-  preview shapes, and the diagram freshness from the monorepo primaries. A
-  figure the repository does not contain fails the guard.
+
+---
+
+## The extraction manifest
+
+`Scripts/Prepare/Manifest.ts` is the table that decides what the site generates:
+one row per source path inside `Module/Aphrodite`, its destination in the site,
+and the transform that turns one into the other. It is data, not code - the next
+card extends the table, and the generator does nothing the table does not say.
+
+- **A row** is `Source` (path in the module, `/**` for a tree), `Destination`
+  (path in the site), `Transform` (`Facts`, `Copy`, `Doc`, `Mermaid`), the
+  `Parser` and `Fact` key for a facts row, `Stage`, the `Consumer` that reads the
+  destination, and what a missing source means (`Fail` or `Warn`).
+- **Facts fan in.** Six primaries feed `Facts/Versions.json`; rows that share a
+  `Destination` are merged, each under its own `Fact` key, and the destination is
+  written once per run.
+- **Every file names its source.** A JSON destination carries a `_Generated` key
+  listing every `Module/Aphrodite/...` path it was built from; a text
+  destination carries the same facts as a comment in its own syntax.
+- **`Stage: "Hold"` rows are declared, verified, not written.** They exist so a
+  tree that is reachable but not yet wired is visible in the table instead of
+  silently absent. Flipping one to `"Emit"` is the extraction card's change.
+- **The additive law.** A source file with no row is a gap in the manifest, not
+  a licence to skip content - add the row. A page with no module counterpart
+  survives generation: it is pushed up into `PlayForm/Aphrodite` so it gains a
+  source, or the manifest declares it site-only with a reason. Generation is the
+  union of the best content at both ends, never the intersection. Nothing is
+  deleted: a file under `Source/Generated/` that a run did not write is reported
+  as an orphan for a human to decide on.
+
+`Source/Generated/GENERATED.md` restates all of this from the table itself, so
+the area documents what it actually contains.
 
 ---
 
@@ -57,12 +135,18 @@ tree and its own page components.
   route.
 - `Source/Component/` - the `Zine*` and `Study*` component system; a page
   composes them rather than inventing markup.
+- `Source/Generated/` - the generated area: `Facts/` (versions, the plugin
+  manifest, the configuration keys), `Primary/` (verbatim primaries a page
+  renders in full), `Module.json` (the pin), `GENERATED.md` (the area's law).
+  Written by `Scripts/Prepare.ts`; never edited by hand.
 - `Source/Library/` - the build-time layer: `Versions.ts` (live version
   stamps), `Links.ts` (the internal route and external URL registry),
   `Redirects.ts`, `CodeMentions.ts`, `DiagramPanels.ts`, `SourceLinks.ts`.
 - `Source/Stylesheet/` - the token and base sheets; components read
   `var(--token)`, never a literal colour.
-- `Scripts/` - the generators above, plus `Drift-Guard.mjs`.
+- `Scripts/` - the generators above: `Prepare.ts` with `Prepare/{Manifest,
+  Emit,Transform}.ts`, `Docs/`, `Diagrams/`, `GenerateRedirects.mjs`.
+- `Module/Aphrodite/` - the submodule the site generates from. Read-only.
 - `Documentation/` - the project skills that describe how the site is built.
 
 ---
@@ -70,5 +154,6 @@ tree and its own page components.
 ## Contributing
 
 Issues and pull requests belong in the
-[Aphrodite repository](https://GitHub.Com/PlayForm/Aphrodite). Contact:
+[Aphrodite repository](https://GitHub.Com/PlayForm/Aphrodite) - a fact the site
+renders is fixed there, not here. Contact:
 [Community@PlayForm.Cloud](mailto:Community@PlayForm.Cloud).
