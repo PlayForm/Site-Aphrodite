@@ -1,6 +1,7 @@
 ---
 title: "Hermes Tool Output Schemas"
 section: "Guides"
+source: "docs/guides/hermes-tool-output-schemas.md"
 ---
 
 # Hermes Tool Output Schemas
@@ -11,11 +12,8 @@ grep listings, markdown, console logs.
 Aphrodite classifies each result into a content type, builds a compact preview, and -
 when the result is above the compression threshold and eligible - replaces it with a CCR marker.
 
-This page maps the tool surface:
-
-- what each tool returns
-- how Aphrodite classifies that output,
-  and how much compression typically helps.
+This page maps the tool surface: what each tool returns, how Aphrodite classifies that output,
+and how much compression typically helps.
 
 The catalog below covers 43 tool-output shapes: 31 Hermes tools, 10 Aphrodite meta-tools,
 and two special entries.
@@ -40,7 +38,7 @@ for classification and preview.
 
 A caller-supplied type hint always wins.
 
-See [Content Type Taxonomy](/docs/classification/content-types/)
+See [Content Type Taxonomy](/docs/classification/content-types/#classification-pipeline)
 for the full detection order and signals.
 
 ## Threshold Groups
@@ -60,7 +58,7 @@ The base itself is auto-tuned from the historical compression-ratio EMA (ratio a
 ×2.0, below 3 → ×0.5); the noisy group is exempt so build, lint,
 and log output stays readable during a coding session.
 
-See [Content Type Taxonomy](/docs/classification/content-types/)
+See [Content Type Taxonomy](/docs/classification/content-types/#threshold-groups)
 for the full registry.
 
 ## Tool-by-Tool Reference

@@ -1,15 +1,14 @@
 ---
 title: "Component Architecture"
 section: "Architecture"
+source: "docs/architecture/10-component.md"
 ---
 
 # Component Architecture
 
 Top-level components and the two boundaries that matter:
-
-- the **C-ABI** (Python shim ↔ Rust dylib)
-- and the **HTTP** boundary (LLM clients / Hermes ↔ the
-  two loopback proxies ↔ upstream API).
+the **C-ABI** (Python shim ↔ Rust dylib) and the **HTTP** boundary (LLM clients / Hermes ↔ the
+two loopback proxies ↔ upstream API).
 
 Runtime artifacts (binary, dylib, config, directives, logs) live
 in the canonical runtime home `~/.hermes/aphrodite` - the plugin dir holds only the loader +

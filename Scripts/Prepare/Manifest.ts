@@ -96,6 +96,13 @@ const Config = "Source/Generated/Facts/Config.json";
 // generated file's header names its source path; this file names the tree.
 const Pin = "Source/Generated/Module.json";
 
+// ── The reference surface. Four record sets, one per page that documents the
+// shipped product: the tools the plugin registers, the config keys it reads,
+// the environment variables that override them, and the crates that carry it.
+const Tools = "Source/Generated/Facts/Tools.json";
+const Env = "Source/Generated/Facts/Env.json";
+const Crates = "Source/Generated/Facts/Crates.json";
+
 // The measured study: the 200-session ledger the README carries as a table,
 // plus the sensitivity band its confidence note states. The case study's spine
 // and the ledger on /benchmarks/ both render from here.
@@ -292,15 +299,64 @@ const Manifest: Row[] = [
 		Absent: "Fail",
 		Note: "The register's `Why` and `Tag` lines are the site's own prose and stay in the page; the version, the date and the set of releases come from here, so the page cannot list a release the tree does not carry.",
 	},
-	// ── Held: reachable, declared, not yet written.
+	// ── The reference surface: tools, hooks, config keys, crates.
+	//
+	// These four sources are the pages' ROSTERS. Every page in the reference
+	// half of the site renders its list of tools, hooks, keys or crates from
+	// one of these files, so a tool the plugin declares cannot be missing from
+	// the site and a tool the site shows cannot be absent from the plugin.
+	{
+		Source: "crates/aphrodite-hermes/src/schemas.rs",
+		Destination: Tools,
+		Transform: "Facts",
+		Parser: "ToolSchemas",
+		Fact: "Schemas",
+		Stage: "Emit",
+		Consumer: "/tools/, /plugin/ (one description and one parameter list per tool)",
+		Absent: "Fail",
+		Note: "The schema is what the agent actually sees, so it is the only honest source for a tool's description.",
+	},
+	{
+		Source: "docs/config/aphrodite-toml.md",
+		Destination: Config,
+		Transform: "Facts",
+		Parser: "ConfigSchema",
+		Fact: "Schema",
+		Stage: "Emit",
+		Consumer: "/config/, /setup/ (every key with its type, default, env override and reader)",
+		Absent: "Fail",
+		Note: "Joins `aphrodite.toml.example` for the shipped value and the per-key annotation; the union of the two files is the roster.",
+	},
+	{
+		Source: "docs/config/env-vars.md",
+		Destination: Env,
+		Transform: "Facts",
+		Parser: "EnvVars",
+		Fact: "EnvVars",
+		Stage: "Emit",
+		Consumer: "/config/ (the override ledger, live and inactive alike)",
+		Absent: "Fail",
+	},
+	{
+		Source: "Cargo.toml",
+		Destination: Crates,
+		Transform: "Facts",
+		Parser: "CargoWorkspace",
+		Fact: "Workspace",
+		Stage: "Emit",
+		Consumer: "/crates/ (name, version and description per crate)",
+		Absent: "Fail",
+		Note: "Reads every `members` entry's own Cargo.toml plus the vendored headroom-core fork the binary links.",
+	},
+	// ── The docs tree: one row per page in Scripts/Prepare/Docs.ts.
 	{
 		Source: "docs/**",
 		Destination: "Source/Content/Docs/**",
 		Transform: "Doc",
-		Stage: "Hold",
-		Consumer: "the /docs/[...slug] content collection",
+		Stage: "Emit",
+		Consumer: "the /docs/[...slug] content collection, the sidebar, the TOC and prev/next",
 		Absent: "Fail",
-		Note: "Held for the docs extraction card. The module tree is the same one the committed collection was generated from, so that card's work is repointing Scripts/Docs/Generate.ts and Source/Library/Versions.ts at the module - not re-extracting text. Prepare verifies the tree on every run and reports its file count.",
+		Note: "Expanded page by page in Scripts/Prepare/Docs.ts: 48 rows, one per markdown file, plus the Internal and SiteOnly declarations. This row is the gate - a module doc with no row there fails the build rather than disappearing.",
 	},
 	{
 		Source: "docs/**",

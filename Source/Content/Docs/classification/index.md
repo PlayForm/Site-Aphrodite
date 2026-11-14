@@ -1,6 +1,7 @@
 ---
 title: "Classification"
 section: "Classification"
+source: "docs/classification/README.md"
 ---
 
 # Classification

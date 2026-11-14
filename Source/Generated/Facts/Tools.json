@@ -1,0 +1,185 @@
+{
+	"_Generated": {
+		"By": "Scripts/Prepare.ts",
+		"From": [
+			"Module/Aphrodite/crates/aphrodite-hermes/src/schemas.rs"
+		],
+		"Transform": [
+			"Facts"
+		],
+		"Note": "Generated. Change the source in PlayForm/Aphrodite, push it, then advance the Module/Aphrodite pin - never this file."
+	},
+	"Schemas": {
+		"Tools": [
+			{
+				"Name": "aphrodite_compress",
+				"Description": "Store content in CCR and get a marker back. Hashes the content, classifies it (or trusts the `type` hint), keeps it in the session store, and hands back a resolvable `<<<CCR:hash|type|size>>>` marker - park bulky text here instead of carrying it in context, then pull it back with aphrodite_retrieve when you actually need it. Storage is in-process and sub-millisecond; markers stay resolvable for the life of the session but do not survive a process restart. Returns {hash, type, size, preview, marker}.",
+				"Parameters": [
+					{
+						"Name": "content",
+						"Type": "string · minLength 1",
+						"Required": true,
+						"Description": "Exact text to store. Round-trips byte-for-byte through aphrodite_retrieve."
+					},
+					{
+						"Name": "type",
+						"Type": "string · enum: code | log | diff | error | json | build_output | text",
+						"Required": false,
+						"Description": "Content-type hint that steers the preview and compression profile. Omit to auto-detect; \"text\" is treated as no hint."
+					},
+					{
+						"Name": "_ccr_center",
+						"Type": "string",
+						"Required": false,
+						"Description": "Optional label carried alongside the marker and echoed back by aphrodite_catalog - useful for tagging what a stored blob was for."
+					}
+				]
+			},
+			{
+				"Name": "aphrodite_retrieve",
+				"Description": "Expand a CCR marker, or read a file, to full content. Supply `hash` to resolve a marker recorded this session (nested markers are expanded recursively), or `path` to read a file straight from disk. Give one or the other - if both are present `path` wins. `path` reads are confined to the current workspace and capped at 10 MiB, so paths outside it are refused. `query` narrows the result to matching lines, which is the cheap way to poke at a large entry without pulling all of it into context. Returns {found: true, source: \"ccr\"|\"path\", hash|path, content} on success, {found: false, error} when the hash is unknown or the read is refused.",
+				"Parameters": [
+					{
+						"Name": "hash",
+						"Type": "string · pattern ^[0-9a-fA-F]{8,64}$",
+						"Required": false,
+						"Description": "Full hex hash from a `<<<CCR:hash|type|size>>>` marker. Truncated hashes do not resolve - exact match only."
+					},
+					{
+						"Name": "query",
+						"Type": "string",
+						"Required": false,
+						"Description": "Case-insensitive substring; only lines containing it are returned."
+					},
+					{
+						"Name": "path",
+						"Type": "string",
+						"Required": false,
+						"Description": "Workspace-relative or absolute file path to read directly, bypassing CCR."
+					}
+				]
+			},
+			{
+				"Name": "aphrodite_stats",
+				"Description": "Session and proxy health counters for the CCR engine. One call covers both halves of the system: session state held by the dylib, and a live TCP poll of the two proxy ports. Takes no arguments. Returns {version, engine, inline_entries, markers, referenced_files, archived_turns, turn, engine_enabled, threshold_pct, tool_threshold, terminal_threshold, proxies: {token: {port, alive}, cache: {port, alive}}}. `alive: false` means nothing answered on that port within 400ms - the plugin still works, it just is not proxying.",
+				"Parameters": []
+			},
+			{
+				"Name": "aphrodite_files",
+				"Description": "List file paths touched this session. Populated as tool hooks observe reads, writes and prefetches, so it doubles as a record of what has already been looked at. Takes no arguments. Returns {total, files: [{path, tool}]} where `tool` is the tool that first referenced the path.",
+				"Parameters": []
+			},
+			{
+				"Name": "aphrodite_diff",
+				"Description": "Per-turn history of what was compressed. Walks the archived conversation index in turn order, one entry per turn that produced a compression. Takes no arguments. Returns {total, turns: [{turn, hash, summary, size}]}; each `hash` is resolvable through aphrodite_retrieve.",
+				"Parameters": []
+			},
+			{
+				"Name": "aphrodite_search",
+				"Description": "Find already-compressed entries by keyword or type. Matches case-insensitively against each entry's preview line and its CCR type - it does NOT search the full stored bodies, so treat a miss as inconclusive and fall back to aphrodite_catalog. Newest first, capped at 20 results. Returns {query, total, results: [{hash, type, size, preview}]}.",
+				"Parameters": [
+					{
+						"Name": "query",
+						"Type": "string",
+						"Required": true,
+						"Description": "Keyword or phrase to match against preview text and CCR type."
+					},
+					{
+						"Name": "type",
+						"Type": "string",
+						"Required": false,
+						"Description": "Restrict results to one exact CCR type, such as source_code, terminal, build_output, diff, json, search or text."
+					}
+				]
+			},
+			{
+				"Name": "aphrodite_directive",
+				"Description": "Inspect or change the active behavioral directives. Directives are short instruction files injected into every turn through pre_llm_call - \"focus\" for terse, minimal-tool execution, \"explore\" for broad reading, \"lazy\" for defer-until-needed execution, and whatever else ships in directives/. `list` returns {available, active, ephemeral: [{name, inline, expires_after_turn}]}; `swap` replaces the whole active set with one directive and returns {swapped, active}; `add` appends to the set (silent if already active) and returns {active}; `load` activates a directive from the available set on demand and returns {loaded, active} (errors on an unknown name, unlike `add`); `remove` drops one and returns {active}; `reset` clears actives, ephemerals and the manual latch, handing control back to automatic selection. An unknown directive name returns {error} and changes nothing.",
+				"Parameters": [
+					{
+						"Name": "action",
+						"Type": "string · enum: list | swap | add | load | remove | reset · default list",
+						"Required": false,
+						"Description": "What to do. Defaults to `list`. `load` activates a directive just-in-time (lazy activation)."
+					},
+					{
+						"Name": "name",
+						"Type": "string",
+						"Required": false,
+						"Description": "Directive name. Required for swap, add, load and remove; ignored by list and reset."
+					}
+				]
+			},
+			{
+				"Name": "aphrodite_test",
+				"Description": "Smoke-test the compress and retrieve round trip. Compresses built-in samples in-process and checks each one comes back byte-identical, then reports proxy health alongside. Use it to confirm the engine is actually wired up before trusting a marker. Returns {mode, status: \"ok\"|\"fail\", passed, total, checks: [{type, hash, roundtrip}], proxies}. `status` is \"ok\" only when every check round-tripped.",
+				"Parameters": [
+					{
+						"Name": "mode",
+						"Type": "string · enum: quick | full · default quick",
+						"Required": false,
+						"Description": "`quick` runs 1 sample (source code). `full` runs 3 (source code, build output with errors and warnings, JSON). Any unrecognized value behaves like `full`."
+					}
+				]
+			},
+			{
+				"Name": "aphrodite_catalog",
+				"Description": "List every CCR entry recorded this session. The complete inventory, newest first - unlike aphrodite_search it filters nothing, so this is the reliable way to find a marker you half-remember. Returns {mode, total, turn, items: [...]}, where each item is {hash, type, size, preview} in `toc` mode and additionally {turn, center} in `full` mode.",
+				"Parameters": [
+					{
+						"Name": "mode",
+						"Type": "string · enum: full | toc · default full",
+						"Required": false,
+						"Description": "`full` includes turn and center per entry. `toc` is the compact table-of-contents form."
+					}
+				]
+			},
+			{
+				"Name": "aphrodite_reclassify",
+				"Description": "Re-detect type and preview for stored entries. Re-runs classification against content already in the store and rewrites the catalog entry in place, which repairs entries that were typed before a classifier improvement or stored with a wrong hint. Content and hashes are never modified, so existing markers keep resolving. Returns {status: \"ok\", reclassified: <count>}.",
+				"Parameters": [
+					{
+						"Name": "hash",
+						"Type": "string · pattern ^[0-9a-fA-F]{8,64}$",
+						"Required": false,
+						"Description": "Reclassify only this entry. Omit to reclassify every entry in the session."
+					}
+				]
+			},
+			{
+				"Name": "aphrodite_prefetch",
+				"Description": "Read files now and store them as CCR markers. Despite the name this is synchronous: every path is read and compressed before the call returns, so each returned hash is immediately resolvable through aphrodite_retrieve. Batch the files you expect to need next instead of reading them one at a time - one call, one marker per file, no file bodies in context. Oversized files are skipped rather than truncated. Returns {total, loaded, skipped_size, missing, inline_store_bytes, inline_store_byte_budget, results: [{path, status: \"loaded\"|\"skipped\"|\"missing\", hash, type, size, preview, reason}]}. Watch inline_store_bytes against its budget: a batch larger than the budget evicts older entries, including ones from the same batch.",
+				"Parameters": [
+					{
+						"Name": "paths",
+						"Type": "array",
+						"Required": true,
+						"Description": "File paths to read and store. Absolute paths are safest; relative paths resolve against the session working directory."
+					}
+				]
+			},
+			{
+				"Name": "aphrodite_prefetch_status",
+				"Description": "List prefetched files that are resolvable now. Because prefetch is synchronous, `loading` and `errors` are always empty and anything tracked is already `ready` - this is an inventory of file-backed markers, not a progress bar. Takes no arguments. Returns {loading: [], ready: [{path, hash, type, size}], errors: [], total_ready}.",
+				"Parameters": []
+			},
+			{
+				"Name": "aphrodite_rebuild",
+				"Description": "Report dylib version and proxy health. It does not rebuild or install anything - the loaded dylib cannot safely replace itself mid-session - it reports the state an operator needs plus the command to run outside the session. Takes no arguments. Returns {status: \"ok\", version, proxies, hint}.",
+				"Parameters": []
+			},
+			{
+				"Name": "aphrodite_debug",
+				"Description": "Toggle per-session debug output on or off (Rust-side only). When on, every compressed tool result in this session tree (this session plus its subagents/delegated tasks) gets a `[aphrodite-debug ...]` line prepended before the CCR marker; other sessions stay quiet. The flag is a file in the runtime home, scoped to the ROOT session id - subagents resolve to the same root and inherit the toggle. Returns {status, debug, session, flag}.",
+				"Parameters": [
+					{
+						"Name": "on",
+						"Type": "boolean",
+						"Required": false,
+						"Description": "true = enable debug for this session tree, false = disable. Omitted defaults to true."
+					}
+				]
+			}
+		]
+	}
+}

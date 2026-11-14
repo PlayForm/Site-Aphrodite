@@ -25,13 +25,17 @@ hand: a change made in this directory is overwritten by the next run.
 - `Source/Generated/Facts/Narrative.json` <- `Module/Aphrodite/README.md` (Facts) - the case study (the catalog count, the threshold tiers, the shipped code_multiplier)
 - `Source/Generated/Facts/Narrative.json` <- `Module/Aphrodite/docs/classification/content-types.md` (Facts) - the case study (the registry size the catalog footnote quotes)
 - `Source/Generated/Facts/Releases.json` <- `Module/Aphrodite/CHANGELOG.md` (Facts) - /versions/ (the release register's versions and dates, the stamp count)
+- `Source/Generated/Facts/Tools.json` <- `Module/Aphrodite/crates/aphrodite-hermes/src/schemas.rs` (Facts) - /tools/, /plugin/ (one description and one parameter list per tool)
+- `Source/Generated/Facts/Config.json` <- `Module/Aphrodite/docs/config/aphrodite-toml.md` (Facts) - /config/, /setup/ (every key with its type, default, env override and reader)
+- `Source/Generated/Facts/Env.json` <- `Module/Aphrodite/docs/config/env-vars.md` (Facts) - /config/ (the override ledger, live and inactive alike)
+- `Source/Generated/Facts/Crates.json` <- `Module/Aphrodite/Cargo.toml` (Facts) - /crates/ (name, version and description per crate)
+- `Source/Content/Docs/**` <- `Module/Aphrodite/docs/**` (Doc) - the /docs/[...slug] content collection, the sidebar, the TOC and prev/next
 
 ## What is declared and held
 
 These rows are verified on every run and written by the extraction card that
 owns them, not by this one:
 
-- `docs/**` -> `Source/Content/Docs/**` (Doc) - Held for the docs extraction card. The module tree is the same one the committed collection was generated from, so that card's work is repointing Scripts/Docs/Generate.ts and Source/Library/Versions.ts at the module - not re-extracting text. Prepare verifies the tree on every run and reports its file count.
 - `docs/**` -> `Source/Content/Mermaid/**` (Mermaid) - Downstream of the docs row: the extractor reads the generated markdown, so this row cannot land before that one.
 
 ## How a fact changes

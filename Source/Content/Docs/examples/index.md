@@ -1,6 +1,7 @@
 ---
 title: "Examples"
 section: "Examples"
+source: "docs/examples/README.md"
 ---
 
 # Examples
@@ -47,11 +48,8 @@ in the relayed result (full details in [What the LLM Actually Sees](/docs/exampl
 | Git diff            | 987       | ~114 chars       | ~9x   |
 | Build error (rustc) | 801       | ~117 chars       | ~7x   |
 
-The pattern behind every row:
-
-- the model sees the shape and summary of the content for the price
-  of a few hundred characters
-- and pays the full token cost only when it calls `aphrodite_retrieve`.
+The pattern behind every row: the model sees the shape and summary of the content for the price
+of a few hundred characters, and pays the full token cost only when it calls `aphrodite_retrieve`.
 
 ## Reading a marker
 

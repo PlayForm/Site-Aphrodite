@@ -1,0 +1,37 @@
+{
+	"_Generated": {
+		"By": "Scripts/Prepare.ts",
+		"From": [
+			"Module/Aphrodite/Cargo.toml"
+		],
+		"Transform": [
+			"Facts"
+		],
+		"Note": "Generated. Change the source in PlayForm/Aphrodite, push it, then advance the Module/Aphrodite pin - never this file."
+	},
+	"Workspace": {
+		"Crates": [
+			{
+				"Name": "aphrodite",
+				"Version": "1.8.1",
+				"Description": "aphrodite: Chat Completions proxy with CCR, tool relay, and programmatic CCR for Hermes agent integration.",
+				"Path": "crates/aphrodite/Cargo.toml",
+				"Vendored": false
+			},
+			{
+				"Name": "aphrodite-hermes",
+				"Version": "1.8.1",
+				"Description": "aphrodite-hermes: Hermes Agent-specific integration for Aphrodite compression engine - tool schemas, hook dispatch, skill registration",
+				"Path": "crates/aphrodite-hermes/Cargo.toml",
+				"Vendored": false
+			},
+			{
+				"Name": "aphrodite-headroom-core",
+				"Version": "0.2.1",
+				"Description": "Core Headroom types and compression transform traits (Rust).",
+				"Path": "vendor/headroom/crates/headroom-core/Cargo.toml",
+				"Vendored": true
+			}
+		]
+	}
+}

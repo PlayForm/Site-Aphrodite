@@ -1,6 +1,7 @@
 ---
 title: "CCR Entry Lifecycle & EMA Threshold State"
 section: "Architecture"
+source: "docs/architecture/05-ccr-lifecycle.md"
 ---
 
 # CCR Entry Lifecycle & EMA Threshold State

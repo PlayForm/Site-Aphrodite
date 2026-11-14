@@ -1,6 +1,7 @@
 ---
 title: "Content Type Taxonomy"
 section: "Classification"
+source: "docs/classification/content-types.md"
 ---
 
 # Content Type Taxonomy
@@ -37,9 +38,7 @@ or `ls -l` result the same way whether it arrived through the proxy or through a
 ## Base Classifier (7 Types)
 
 The vendored `headroom-core` content detector is regex-based and confidence-gated:
-
-- each candidate type must clear a confidence floor
-- and the first candidate to clear its floor wins.
+each candidate type must clear a confidence floor, and the first candidate to clear its floor wins.
 
 JSON objects deliberately do not match - only arrays do - so an object falls through to `text`.
 

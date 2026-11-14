@@ -1,6 +1,7 @@
 ---
 title: "SSE Streaming Passthrough"
 section: "Architecture"
+source: "docs/architecture/06-sse-streaming.md"
 ---
 
 # SSE Streaming Passthrough
@@ -64,11 +65,8 @@ flowchart TD
     A --> G["mid-stream errors counted separately from<br/>upstream_connect_errors/upstream_timeouts (pre-header only)"]
 ```
 
-Byte accounting:
-
-- only `response_body_bytes` accumulates during the stream
-  (via the `.inspect` closure)
-- `tokens_saved` is not touched because nothing was compressed.
+Byte accounting: only `response_body_bytes` accumulates during the stream
+(via the `.inspect` closure); `tokens_saved` is not touched because nothing was compressed.
 
 `sse_stream_errors` surfaces in `/stats` and `/metrics` (`aphrodite_sse_stream_errors_total`).
 

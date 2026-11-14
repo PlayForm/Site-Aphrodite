@@ -15,6 +15,10 @@ const Docs = defineCollection({
 	schema: z.object({
 		section: z.string(),
 		title: z.string(),
+		// The module file this page was generated from (Scripts/Prepare/Docs.ts).
+		// It is rendered as the page's provenance line, so a reader can always
+		// name the source of a claim and the next editor knows where to fix it.
+		source: z.string().optional(),
 	}),
 });
 

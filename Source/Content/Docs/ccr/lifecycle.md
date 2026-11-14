@@ -1,18 +1,14 @@
 ---
 title: "CCR Lifecycle"
 section: "CCR"
+source: "docs/ccr/lifecycle.md"
 ---
 
 # CCR Lifecycle
 
 CCR (Compress-Cache-Retrieve) is the lossless end-to-end compression path
-for LLM proxy traffic:
-
-- Aphrodite hashed the content
-- stored it
-- and replaced it
-  with a compact marker in the response
-- and the agent retrieved the original by hash on demand.
+for LLM proxy traffic: Aphrodite hashed the content, stored it, and replaced it
+with a compact marker in the response, and the agent retrieved the original by hash on demand.
 
 This document walks the six phases of that lifecycle, from compression to expiry.
 
@@ -35,11 +31,8 @@ to be worth compressing:
 5. Update the savings counters and the compression-ratio EMA used by
    auto-tune.
 
-`tool_calls[].function.arguments` is never a compression target:
-
-- it is client-executable JSON,
-  not model-facing prose
-- and compressing it would produce a tool call the client cannot parse.
+`tool_calls[].function.arguments` is never a compression target: it is client-executable JSON,
+not model-facing prose, and compressing it would produce a tool call the client cannot parse.
 
 Streaming (`text/event-stream`) responses bypass this phase entirely.
 
@@ -75,11 +68,7 @@ Three storage tiers, plus the session-side inline store used by the Hermes plugi
 | Token mode       | > 1 KiB                                                   | `SqliteCcrStore` (SQLite)        | Unlimited (disk)     | Sliding idle TTL (default 3600 s), 8x max lifetime |
 
 Backend details live in [backends](/docs/ccr/backends/). Thresholds are configurable:
-
-- env var > TOML `[compression]` > compiled-in default for cache
-- token
-- inline
-- and code multiplier.
+env var > TOML `[compression]` > compiled-in default for cache, token, inline, and code multiplier.
 
 ## Phase 4: Return Marker
 

@@ -1,6 +1,7 @@
 ---
 title: "SQLite CCR Backend"
 section: "CCR"
+source: "docs/ccr/backends/sqlite.md"
 ---
 
 # SQLite CCR Backend
@@ -42,9 +43,7 @@ which is what keeps retrieval cost independent of store size.
 at open.
 
 Databases created by older binaries are migrated in place:
-
-- `user_version` 2 added `last_accessed` (backfilled from `created_at`)
-- and 3 added the indexes.
+`user_version` 2 added `last_accessed` (backfilled from `created_at`), and 3 added the indexes.
 
 ## Expiry: Sliding Idle Window
 
@@ -116,14 +115,10 @@ that arrangement.
 
 ## Purge
 
-Purge is lazy and debounced:
-
-- a sweep runs from `get` and `put`
-- but
-  at most once every 60 seconds (`PURGE_DEBOUNCE_SECS`)
-- so a compress-heavy,
-  retrieve-light workload cannot accumulate expired rows and concurrent writes do
-  not re-execute the same DELETE.
+Purge is lazy and debounced: a sweep runs from `get` and `put`, but
+at most once every 60 seconds (`PURGE_DEBOUNCE_SECS`), so a compress-heavy,
+retrieve-light workload cannot accumulate expired rows and concurrent writes do
+not re-execute the same DELETE.
 
 `force_purge_now()` runs a sweep on demand for diagnostics.
 
@@ -136,11 +131,8 @@ at 100k rows and 37.40 ms at 300k - all serialized behind the connection mutex.
 
 With the shared debounce plus the index-driven sweep, a missing-hash `POST /retrieve`
 on a 300k-row / 182 MB store went from 37.40 ms to 0.22 ms. Skipping a sweep
-never serves stale content:
-
-- the lookup predicate itself refuses a row past its idle window
-  or lifetime
-- so a deferred sweep only delays reclaiming space.
+never serves stale content: the lookup predicate itself refuses a row past its idle window
+or lifetime, so a deferred sweep only delays reclaiming space.
 
 ## Operations
 

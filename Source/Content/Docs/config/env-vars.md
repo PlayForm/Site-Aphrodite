@@ -1,16 +1,14 @@
 ---
 title: "Environment Variables"
 section: "Config"
+source: "docs/config/env-vars.md"
 ---
 
 # Environment Variables
 
 Aphrodite reads a set of `APHRODITE_*` environment variables (plus a few non-prefixed ones)
-across three surfaces:
-
-- the Rust proxy
-- the `aphrodite setup` subcommand,
-  and the Hermes-plugin dylib session.
+across three surfaces: the Rust proxy, the `aphrodite setup` subcommand,
+and the Hermes-plugin dylib session.
 
 This page lists every variable with a live reader, what precedence applies, and what it gates.
 
@@ -26,13 +24,8 @@ Precedence rule: where it says "env > TOML > default",
 A present-but-malformed value (e.g. `APHRODITE_CCR_TTL=abc`) is never silently treated
 as absent - it logs a warning and falls through to the next precedence level.
 
-Boolean env vars share one truthiness rule everywhere:
-
-- `"1"` / `"true"` (case-insensitive)
-  is true
-- anything else present
-- or absent
-- is false.
+Boolean env vars share one truthiness rule everywhere: `"1"` / `"true"` (case-insensitive)
+is true; anything else present, or absent, is false.
 
 ## Rust proxy - multi-proxy mode (aphrodite.toml present)
 

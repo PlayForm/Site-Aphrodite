@@ -10,11 +10,11 @@
 		"Note": "Generated. Change the source in PlayForm/Aphrodite, push it, then advance the Module/Aphrodite pin - never this file."
 	},
 	"Benchmark": {
-		"Ceiling": "×610",
-		"Overall": "×132",
+		"Ceiling": "610×",
+		"Overall": "132×",
 		"CorpusIn": "106 KB",
 		"CorpusOut": "800 B",
-		"Median": "×23",
+		"Median": "23×",
 		"Latency": "8-40 ms",
 		"LatencyHeadline": "~10 ms",
 		"Classify": "40-123 ns",
@@ -24,7 +24,7 @@
 				"Label": "Git diff (42L)",
 				"Without": "~350 tok",
 				"With": "~15 tok",
-				"Savings": "×23",
+				"Savings": "23×",
 				"Ratio": 23,
 				"Percent": 52
 			},
@@ -32,7 +32,7 @@
 				"Label": "Build output (142L)",
 				"Without": "~1,400 tok",
 				"With": "~10 tok",
-				"Savings": "×140",
+				"Savings": "140×",
 				"Ratio": 140,
 				"Percent": 82
 			},
@@ -40,7 +40,7 @@
 				"Label": "Terminal output",
 				"Without": "~200 tok",
 				"With": "~10 tok",
-				"Savings": "×20",
+				"Savings": "20×",
 				"Ratio": 20,
 				"Percent": 50
 			},
@@ -48,7 +48,7 @@
 				"Label": "JSON blob (30 keys)",
 				"Without": "~400 tok",
 				"With": "~10 tok",
-				"Savings": "×40",
+				"Savings": "40×",
 				"Ratio": 40,
 				"Percent": 61
 			},
@@ -56,7 +56,7 @@
 				"Label": "Browser snapshot (342 el)",
 				"Without": "~5,000 tok",
 				"With": "~12 tok",
-				"Savings": "×416",
+				"Savings": "416×",
 				"Ratio": 416,
 				"Percent": 100
 			}
@@ -64,37 +64,37 @@
 		"RealWorld": [
 			{
 				"Type": "terminal",
-				"Ratio": "×74",
+				"Ratio": "74×",
 				"Percent": 74
 			},
 			{
 				"Type": "table",
-				"Ratio": "×61",
+				"Ratio": "61×",
 				"Percent": 61
 			},
 			{
 				"Type": "source_code",
-				"Ratio": "×45",
+				"Ratio": "45×",
 				"Percent": 45
 			},
 			{
 				"Type": "ls",
-				"Ratio": "×37",
+				"Ratio": "37×",
 				"Percent": 37
 			},
 			{
 				"Type": "diff",
-				"Ratio": "×23",
+				"Ratio": "23×",
 				"Percent": 23
 			},
 			{
 				"Type": "build",
-				"Ratio": "×23",
+				"Ratio": "23×",
 				"Percent": 23
 			},
 			{
 				"Type": "search",
-				"Ratio": "×20",
+				"Ratio": "20×",
 				"Percent": 20
 			}
 		],

@@ -1,6 +1,7 @@
 ---
 title: "Metrics Queries"
 section: "Metrics"
+source: "docs/metrics/queries.md"
 ---
 
 # Metrics Queries

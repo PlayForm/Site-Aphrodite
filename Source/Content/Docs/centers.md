@@ -1,16 +1,14 @@
 ---
 title: "Centers - AI Conversation Memory Tokens"
 section: "Overview"
+source: "docs/centers.md"
 ---
 
 # Centers - AI Conversation Memory Tokens
 
-This is a roadmap page:
-
-- only "v1 (current)" below is implemented (see
-  [Current Implementation](#current-implementation))
-- v2-v4 are unimplemented design sketches,
-  not shipped features.
+This is a roadmap page: only "v1 (current)" below is implemented (see
+[Current Implementation](#current-implementation)); v2-v4 are unimplemented design sketches,
+not shipped features.
 
 Don't configure against this page expecting bucket/filesystem-style centers to exist yet.
 

@@ -151,21 +151,35 @@ const Diagrams = [
 // The measured arc this sim gestures at - one plate per release, each figure
 // printed in the CHANGELOG at that release (CHANGELOG.md:962-973, :983). Size
 // and Tone fall back to the plate's defaults unless a record overrides them.
-const Arc = [
+//
+// A figure is a list of parts, because the numbers in it are the claim and a
+// reader should watch them arrive ([data-count]): literal text stays literal,
+// a `Count` part renders its own number and climbs to it once on first view.
+// The printed string is unchanged either way - "216 KB → 12 markers" is what
+// the markup carries before any script runs.
+type ArcPart = string | { Count: number };
+
+const Arc: readonly {
+	Label: string;
+	Parts: readonly ArcPart[];
+	Note: string;
+	Size?: string;
+	Tone?: string;
+}[] = [
 	{
 		Label: "v1.2.2 · REAL-WORLD EXAMPLE",
-		Figure: "216 KB → 12 markers",
+		Parts: [{ Count: 216 }, " KB → ", { Count: 12 }, " markers"],
 		Note: "54K → 240 tokens · the CHANGELOG entry prints the ratio as 225×",
 	},
 	{
 		Label: "v1.2.2 · CLASSIFICATION & CCR STORE (APPLE M2 MAX)",
-		Figure: "classify 40-123 ns · put 453 ns · get 119.4 ns",
+		Parts: ["classify 40-123 ns · put ", { Count: 453 }, " ns · get 119.4 ns"],
 		Size: "text-base",
 		Note: "CCR mixed MT, 8 threads: DashMap 229 µs vs Mutex 1.15 ms",
 	},
 	{
 		Label: "WHY THE STORE LOOKS LIKE IT DOES",
-		Figure: "5× at 8 threads",
+		Parts: [{ Count: 5 }, "× at 8 threads"],
 		Tone: "text-weathered-teal",
 		Note:
 			"The DashMap-over-Mutex result is why the in-memory CCR backend is a sharded " +
@@ -173,7 +187,7 @@ const Arc = [
 	},
 	{
 		Label: "v1.3.4 · RETRIEVAL INTEGRITY",
-		Figure: "20/20 retrieve OK",
+		Parts: ["20/20 retrieve OK"],
 		Note:
 			"Every compressed blob in the standard corpus was retrieved byte-exact; the " +
 			"corpus ratios themselves live on the benchmarks page.",
@@ -186,39 +200,51 @@ const Arc = [
 	Description="The interactive preview workbench: paste any tool output and watch the Aphrodite preview line, the CCR marker and the threshold knobs work - live, client-side."
 >
 	<PageShell Rhythm="dense" Grow>
-		<!-- THE HEAD: the h1 opens the page, not the sample switchboard. -->
-		<header class="wb-skew relative border-l-4 border-blood-crimson bg-carbon-void p-8 shadow-[6px_6px_0px_#7a0a1e]">
-			<ZineKicker Tone="canary">THE UNEXPLAINABLE BECOMES EFFORTLESS</ZineKicker>
-			<h1
-				class="mt-6 font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
-			>
-				The pipeline, live
-			</h1>
-			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Paste any tool output - a build log, a test run, a grep result - and this page runs
-				Aphrodite's four steps over it: the enriched preview line the agent would read, the
-				marker the store would hold, and the decision the agent would make.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The four live-reloadable thresholds and the engine knob are yours to turn.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Nothing below is a screenshot of the deck: the sliders move the real decision, and
-				every figure the page prints is recomputed as you turn them.
-			</p>
-		</header>
+		<!-- THE HEAD: the h1 opens the page, not the sample switchboard.
+		     The motion attribute always sits on a plain wrapper, never on a
+		     .wb-skew plate: an entrance animates `transform`, and a filled Web
+		     Animation outranks the author's transform, so a plate that was its
+		     own entrance root would lose its skew for good. -->
+		<div data-enter>
+			<header class="wb-skew motion-wipe-host relative border-l-4 border-blood-crimson bg-carbon-void p-8 shadow-[6px_6px_0px_#7a0a1e]">
+				<span class="motion-wipe" data-wipe aria-hidden="true" />
+				<ZineKicker Tone="canary">THE UNEXPLAINABLE BECOMES EFFORTLESS</ZineKicker>
+				<h1
+					class="mt-6 font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
+				>
+					The pipeline, live
+				</h1>
+				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Paste any tool output - a build log, a test run, a grep result - and this page runs
+					Aphrodite's four steps over it: the enriched preview line the agent would read, the
+					marker the store would hold, and the decision the agent would make.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The four live-reloadable thresholds and the engine knob are yours to turn.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Nothing below is a screenshot of the deck: the sliders move the real decision, and
+					every figure the page prints is recomputed as you turn them.
+				</p>
+			</header>
+		</div>
 
 		<SectionNav Sections={Sections} />
 
 		<!-- THE FOUR STEPS: the rail, the pair, the readout. The component owns its
 		     own <section>, so the anchor the index links to is this wrapper. -->
-		<div id="pipeline" role="region" aria-label="Raw stream and enriched preview">
+		<div
+			id="pipeline"
+			role="region"
+			aria-label="Raw stream and enriched preview"
+			data-reveal
+		>
 			<ZinePipeline Mode="full" />
 		</div>
 
 		<!-- THE CLASSIFIER, IN PROSE: what the rail above is naming, and why one
 		     name is enough for every stage downstream. -->
-		<div class="mt-16 border-l-4 border-raw-blood bg-asphalt-panel p-6">
+		<div class="mt-16 border-l-4 border-raw-blood bg-asphalt-panel p-6" data-reveal>
 			<ZineKicker Tone="dust" As="div">CLASSIFIER FRAMING</ZineKicker>
 			<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				The 16 pipeline types the rail renders follow the README catalog
@@ -237,132 +263,135 @@ const Arc = [
 		</div>
 
 		<!-- THE KNOBS: aphrodite.toml [compression], live. -->
-		<section
-			id="knobs"
-			class="wb-skew border-4 border-blood-crimson bg-carbon-void p-8 shadow-[6px_6px_0px_#7a0a1e]"
-			aria-label="Threshold knobs"
-		>
-			<div class="flex flex-wrap items-center justify-between gap-6">
-				<h2><ZineKicker Tone="white">THRESHOLD KNOBS</ZineKicker></h2>
-				<button type="button" class="wb-pill" data-action="reload">POST /RELOAD</button>
-			</div>
-			<p class="mt-6 font-mono text-base leading-relaxed text-zinc-dust">
-				aphrodite.toml [compression] - the four proxy thresholds are live-reloadable; edit +
-				save (or POST /reload) re-applies them immediately (README.md:389).
-			</p>
-			<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Only four values are atomics the running engine swaps: cache, token, inline and
-				code_multiplier. Everything else in the file waits for a restart.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The engine knob is an escape hatch rather than a dial - past 100 the context engine
-				stands down and the four proxy thresholds keep working alone.
-			</p>
-			<div class="mt-12 grid gap-16 md:grid-cols-2">
-				{
-					Knobs.map((Knob) => (
-						<div class="border-2 border-blood-crimson/60 bg-soot-black p-6">
-							<div class="flex items-baseline justify-between">
-								<label
-									class="font-mono text-base font-bold text-bone-newsprint"
-									for={`wb-knob-${Knob.Key}`}
-								>
-									{Knob.Key}
-								</label>
-								<output
-									class="font-mono text-base font-black text-stamped-canary"
-									data-knob-value={Knob.Key}
-									for={`wb-knob-${Knob.Key}`}
-								>
-									{Knob.Default}
-									{Knob.Unit}
-								</output>
-							</div>
-							<input
-								id={`wb-knob-${Knob.Key}`}
-								data-knob={Knob.Key}
-								type="range"
-								min={Knob.Min}
-								max={Knob.Max}
-								step={Knob.Step}
-								value={Knob.Default}
-								class="wb-slider mt-8 w-full"
-							/>
-							<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
-								{Knob.Note}
-							</p>
-							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-								{Knob.Line}
-							</p>
-						</div>
-					))
-				}
-			</div>
-			<!-- The verdict strip: what the current knob set would do. -->
-			<div class="mt-16 border-2 border-raw-blood bg-soot-black p-4">
-				<ZineKicker Tone="canary">COMPRESSION DECISION</ZineKicker>
-				<p class="mt-4 font-mono text-base text-bone-newsprint" data-verdict>
-					turn the knobs, then RUN PIPELINE
+		<div data-reveal>
+			<section
+				id="knobs"
+				class="wb-skew motion-wipe-host relative border-4 border-blood-crimson bg-carbon-void p-8 shadow-[6px_6px_0px_#7a0a1e]"
+				aria-label="Threshold knobs"
+			>
+				<span class="motion-wipe" data-wipe aria-hidden="true" />
+				<div class="flex flex-wrap items-center justify-between gap-6">
+					<h2><ZineKicker Tone="white">THRESHOLD KNOBS</ZineKicker></h2>
+					<button type="button" class="wb-pill" data-action="reload">POST /RELOAD</button>
+				</div>
+				<p class="mt-6 font-mono text-base leading-relaxed text-zinc-dust">
+					aphrodite.toml [compression] - the four proxy thresholds are live-reloadable; edit +
+					save (or POST /reload) re-applies them immediately (README.md:389).
 				</p>
 				<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The strip reports the decision for the sample loaded in the rail above: the token
-					mode, whether the store was inline or durable, and the ratio that produced it.
+					Only four values are atomics the running engine swaps: cache, token, inline and
+					code_multiplier. Everything else in the file waits for a restart.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Move a slider and the strip changes without a reload, because the four thresholds
-					are atomics the running engine swaps - the same sample is inline under a 4 KB
-					limit and stored under a 256 B one.
+					The engine knob is an escape hatch rather than a dial - past 100 the context engine
+					stands down and the four proxy thresholds keep working alone.
 				</p>
-			</div>
-		</section>
-
-		<!-- THE THREE STATES the decision readout can name: the vocabulary the
-		     readout prints, one card per state, each carrying the condition that
-		     produced it and the line explaining what the agent holds. -->
-		<section
-			id="states"
-			class="wb-skew border-4 border-weathered-teal bg-carbon-void p-8 shadow-[6px_6px_0px_#000]"
-			aria-label="Threshold states"
-		>
-			<ZineKicker Tone="teal">THRESHOLD STATES</ZineKicker>
-			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Every run ends in one of three states, and the readout names it: the name is the
-				whole contract, because it says in one line whether the bytes stayed, whether a
-				marker was minted, and whether the engine was in the loop at all.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The first two are decided by the token threshold alone; the third overrides both,
-				which is why the engine knob sits at the end of the slider row.
-			</p>
-			<div class="mt-12 grid gap-8 lg:grid-cols-3">
-				{
-					States.map((State) => (
-						<div class="border-2 border-weathered-teal/60 bg-soot-black p-6">
-							<p class="font-mono text-base font-black text-bone-white">{State.Label}</p>
-							<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
-								WHEN: {State.When}
-							</p>
-							{State.Note.map((Sentence) => (
-								<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-									{Sentence}
+				<div class="mt-12 grid gap-16 md:grid-cols-2" data-enter="180">
+					{
+						Knobs.map((Knob) => (
+							<div class="border-2 border-blood-crimson/60 bg-soot-black p-6">
+								<div class="flex items-baseline justify-between">
+									<label
+										class="font-mono text-base font-bold text-bone-newsprint"
+										for={`wb-knob-${Knob.Key}`}
+									>
+										{Knob.Key}
+									</label>
+									<output
+										class="font-mono text-base font-black text-stamped-canary"
+										data-knob-value={Knob.Key}
+										for={`wb-knob-${Knob.Key}`}
+									>
+										{Knob.Default}
+										{Knob.Unit}
+									</output>
+								</div>
+								<input
+									id={`wb-knob-${Knob.Key}`}
+									data-knob={Knob.Key}
+									type="range"
+									min={Knob.Min}
+									max={Knob.Max}
+									step={Knob.Step}
+									value={Knob.Default}
+									class="wb-slider mt-8 w-full"
+								/>
+								<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
+									{Knob.Note}
 								</p>
-							))}
-							<p class="mt-6 border-t-2 border-weathered-teal/40 pt-4 font-mono text-base text-weathered-teal">
-								HOLDS: {State.Holds}
-							</p>
-						</div>
-					))
-				}
-			</div>
-			<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The compression decision strip in the knobs panel prints the inputs alongside the
-				name - token mode, cache mode and storage - so a run that reads as surprising can
-				be traced back to the threshold that produced it.
-			</p>
-		</section>
+								<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+									{Knob.Line}
+								</p>
+							</div>
+						))
+					}
+				</div>
+				<!-- The verdict strip: what the current knob set would do. -->
+				<div class="mt-16 border-2 border-raw-blood bg-soot-black p-4" data-enter="300">
+					<ZineKicker Tone="canary">COMPRESSION DECISION</ZineKicker>
+					<p class="mt-4 font-mono text-base text-bone-newsprint" data-verdict>
+						turn the knobs, then RUN PIPELINE
+					</p>
+					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+						The strip reports the decision for the sample loaded in the rail above: the token
+						mode, whether the store was inline or durable, and the ratio that produced it.
+					</p>
+					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+						Move a slider and the strip changes without a reload, because the four thresholds
+						are atomics the running engine swaps - the same sample is inline under a 4 KB
+						limit and stored under a 256 B one.
+					</p>
+				</div>
+			</section>
+		</div>
+
+		<div data-reveal>
+			<section
+				id="states"
+				class="wb-skew motion-wipe-host relative border-4 border-weathered-teal bg-carbon-void p-8 shadow-[6px_6px_0px_#000]"
+				aria-label="Threshold states"
+			>
+				<span class="motion-wipe" data-wipe aria-hidden="true" />
+				<ZineKicker Tone="teal">THRESHOLD STATES</ZineKicker>
+				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Every run ends in one of three states, and the readout names it: the name is the
+					whole contract, because it says in one line whether the bytes stayed, whether a
+					marker was minted, and whether the engine was in the loop at all.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The first two are decided by the token threshold alone; the third overrides both,
+					which is why the engine knob sits at the end of the slider row.
+				</p>
+				<div class="mt-12 grid gap-8 lg:grid-cols-3" data-enter="180">
+					{
+						States.map((State) => (
+							<div class="border-2 border-weathered-teal/60 bg-soot-black p-6">
+								<p class="font-mono text-base font-black text-bone-white">{State.Label}</p>
+								<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
+									WHEN: {State.When}
+								</p>
+								{State.Note.map((Sentence) => (
+									<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+										{Sentence}
+									</p>
+								))}
+								<p class="mt-6 border-t-2 border-weathered-teal/40 pt-4 font-mono text-base text-weathered-teal">
+									HOLDS: {State.Holds}
+								</p>
+							</div>
+						))
+					}
+				</div>
+				<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The compression decision strip in the knobs panel prints the inputs alongside the
+					name - token mode, cache mode and storage - so a run that reads as surprising can
+					be traced back to the threshold that produced it.
+				</p>
+			</section>
+		</div>
 
 		<!-- THE TOPOLOGY: the store and the config surface. -->
-		<section id="topology" class="grid gap-20 lg:grid-cols-2" aria-label="Diagrams">
+		<section id="topology" class="grid gap-20 lg:grid-cols-2" aria-label="Diagrams" data-reveal>
 			<p class="col-span-full max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Two diagrams carry the parts of the pipeline the rail above cannot show: where the
 				store actually lives, and where the thresholds come from.
@@ -370,9 +399,10 @@ const Arc = [
 			{
 				Diagrams.map((Diagram) => (
 					<figure
-						class="wb-skew border-4 border-blood-crimson bg-carbon-void p-4 shadow-[6px_6px_0px_#7a0a1e]"
+						class="wb-skew motion-wipe-host relative border-4 border-blood-crimson bg-carbon-void p-4 shadow-[6px_6px_0px_#7a0a1e]"
 						data-diagram={Diagram.Id}
 					>
+						<span class="motion-wipe" data-wipe aria-hidden="true" />
 						<div class="overflow-x-auto" set:html={Diagram.Svg} />
 						<figcaption class="mt-6">
 							<ZineKicker Tone="dust">{Diagram.Caption}</ZineKicker>
@@ -395,88 +425,109 @@ const Arc = [
 		</section>
 
 		<!-- THE ARC: the measured numbers this sim gestures at. -->
-		<section
-			id="arc"
-			class="wb-skew border-l-4 border-stamped-canary bg-carbon-void p-8"
-			aria-label="Benchmark notes"
-		>
-			<ZineKicker Tone="canary">SIM NOTES · THE MEASURED ARC</ZineKicker>
-			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The numbers this sim gestures at are real: each plate prints the figure the CHANGELOG
-				carried at that release, and the benchmarks page carries the reproduce commands.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Read a plate as a receipt - the figure is what the release printed, the note is what
-				the number means for the design.
-			</p>
-			<div class="mt-12 grid gap-6 md:grid-cols-2">
-				{
-					Arc.map((Plate) => (
-						<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
-							<ZineKicker Tone="dust" As="div">{Plate.Label}</ZineKicker>
-							<div
-								class={`mt-3 font-mono font-black ${Plate.Size ?? "text-2xl"} ${Plate.Tone ?? "text-bone-white"}`}
-							>
-								{Plate.Figure}
+		<div data-reveal>
+			<section
+				id="arc"
+				class="wb-skew motion-wipe-host relative border-l-4 border-stamped-canary bg-carbon-void p-8"
+				aria-label="Benchmark notes"
+			>
+				<span class="motion-wipe" data-wipe aria-hidden="true" />
+				<ZineKicker Tone="canary">SIM NOTES · THE MEASURED ARC</ZineKicker>
+				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The numbers this sim gestures at are real: each plate prints the figure the CHANGELOG
+					carried at that release, and the benchmarks page carries the reproduce commands.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Read a plate as a receipt - the figure is what the release printed, the note is what
+					the number means for the design.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The figures climb to their values once, on the view that brings them in: a receipt
+					that counts up is a receipt being read, and the note underneath is what makes it
+					mean something.
+				</p>
+				<div class="mt-12 grid gap-6 md:grid-cols-2" data-enter="180">
+					{
+						Arc.map((Plate) => (
+							<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
+								<ZineKicker Tone="dust" As="div">
+									{Plate.Label}
+								</ZineKicker>
+								<div
+									class={`mt-3 font-mono font-black ${Plate.Size ?? "text-2xl"} ${Plate.Tone ?? "text-bone-white"}`}
+								>
+									{Plate.Parts.map((Part) =>
+										typeof Part === "string" ? (
+											Part
+										) : (
+											<span data-count={Part.Count}>
+												{Part.Count.toLocaleString("en-US")}
+											</span>
+										),
+									)}
+								</div>
+								<p class="mt-2 font-mono text-base text-zinc-dust">{Plate.Note}</p>
 							</div>
-							<p class="mt-2 font-mono text-base text-zinc-dust">{Plate.Note}</p>
-						</div>
-					))
-				}
-			</div>
-			<ZineSource
-				Lines={[
-					"SRC: CHANGELOG.md:962-973 (the ns/µs table) · CHANGELOG.md:983 (216 KB → 12 markers)",
-				]}
-			/>
-		</section>
+						))
+					}
+				</div>
+				<ZineSource
+					Lines={[
+						"SRC: CHANGELOG.md:962-973 (the ns/µs table) · CHANGELOG.md:983 (216 KB → 12 markers)",
+					]}
+				/>
+			</section>
+		</div>
 
 		<!-- THE BOUNDARY: what is real here, and what is not. -->
-		<footer
-			id="boundary"
-			class="wb-skew border-l-4 border-weathered-teal bg-carbon-void p-6"
-		>
-			<ZineKicker Tone="teal">SIMULATION BOUNDARY</ZineKicker>
-			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Real on this page:
-			</p>
-			<ul class="mt-2 max-w-3xl space-y-1 font-body text-base leading-relaxed text-bone-newsprint">
-				<li class="border-l-2 border-oxblood-dark pl-3">
-					the classifier rules (README.md:153-176)
-				</li>
-				<li class="border-l-2 border-oxblood-dark pl-3">
-					the preview line shapes (README.md:108-133)
-				</li>
-				<li class="border-l-2 border-oxblood-dark pl-3">
-					the threshold semantics and defaults (README.md:395-420).
-				</li>
-			</ul>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Simulated:
-			</p>
-			<ul class="mt-2 max-w-3xl space-y-1 font-body text-base leading-relaxed text-bone-newsprint">
-				<li class="border-l-2 border-oxblood-dark pl-3">
-					the BLAKE3 digest (a deterministic stand-in hash - the real 40-char digest needs the
-					Rust store)
-				</li>
-				<li class="border-l-2 border-oxblood-dark pl-3">the 40-123 ns timing readout</li>
-				<li class="border-l-2 border-oxblood-dark pl-3">
-					and aphrodite_retrieve (shown as the decision text, never executed).
-				</li>
-			</ul>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				No network, no runtime - everything happens in this tab.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Not depicted: the context engine's auto-compaction pass and the injection assembler's
-				directive budget - this tab simulates the tool-output path only.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The full registry is larger - the 30-type content catalog lives in
-				docs/classification/content-types.md:118-151; this demo simulates the README tier
-				only.
-			</p>
-		</footer>
+		<div data-reveal>
+			<footer
+				id="boundary"
+				class="wb-skew motion-wipe-host relative border-l-4 border-weathered-teal bg-carbon-void p-6"
+			>
+				<span class="motion-wipe" data-wipe aria-hidden="true" />
+				<ZineKicker Tone="teal">SIMULATION BOUNDARY</ZineKicker>
+				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Real on this page:
+				</p>
+				<ul class="mt-2 max-w-3xl space-y-1 font-body text-base leading-relaxed text-bone-newsprint">
+					<li class="border-l-2 border-oxblood-dark pl-3">
+						the classifier rules (README.md:153-176)
+					</li>
+					<li class="border-l-2 border-oxblood-dark pl-3">
+						the preview line shapes (README.md:108-133)
+					</li>
+					<li class="border-l-2 border-oxblood-dark pl-3">
+						the threshold semantics and defaults (README.md:395-420).
+					</li>
+				</ul>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Simulated:
+				</p>
+				<ul class="mt-2 max-w-3xl space-y-1 font-body text-base leading-relaxed text-bone-newsprint">
+					<li class="border-l-2 border-oxblood-dark pl-3">
+						the BLAKE3 digest (a deterministic stand-in hash - the real 40-char digest needs the
+						Rust store)
+					</li>
+					<li class="border-l-2 border-oxblood-dark pl-3">the 40-123 ns timing readout</li>
+					<li class="border-l-2 border-oxblood-dark pl-3">
+						and aphrodite_retrieve (shown as the decision text, never executed).
+					</li>
+				</ul>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					No network, no runtime - everything happens in this tab.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Not depicted: the context engine's auto-compaction pass and the injection assembler's
+					directive budget - this tab simulates the tool-output path only.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The full registry is larger - the 30-type content catalog lives in
+					docs/classification/content-types.md:118-151; this demo simulates the README tier
+					only.
+				</p>
+			</footer>
+		</div>
 
 		<!-- RELATED: the natural neighbors. -->
 		<Related

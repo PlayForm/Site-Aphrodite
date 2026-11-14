@@ -1,6 +1,7 @@
 ---
 title: "Release & Publish CI"
 section: "Architecture"
+source: "docs/architecture/09-release-ci.md"
 ---
 
 # Release & Publish CI
@@ -74,13 +75,10 @@ flowchart TD
 	C3 -->|no| SKIP4["build only"]
 ```
 
-Ordering rationale:
-
-- `aphrodite` path-depends on the vendored `headroom-core` (published
-  under the alias `aphrodite-headroom-core`)
-- `cargo publish` strips the `path` key,
-  so a matching `aphrodite-headroom-core` version must already exist on crates.io -
-  hence the strict Headroom-Core → Aphrodite → Hermes chain.
+Ordering rationale: `aphrodite` path-depends on the vendored `headroom-core` (published
+under the alias `aphrodite-headroom-core`); `cargo publish` strips the `path` key,
+so a matching `aphrodite-headroom-core` version must already exist on crates.io -
+hence the strict Headroom-Core → Aphrodite → Hermes chain.
 
 The tag-push publish condition on `aphrodite`/`aphrodite-hermes` means a release tag
 genuinely publishes the two main crates; only the vendored `aphrodite-headroom-core` publish step

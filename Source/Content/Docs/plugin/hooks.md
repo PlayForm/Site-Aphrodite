@@ -1,6 +1,7 @@
 ---
 title: "Plugin Hooks"
 section: "Plugin"
+source: "docs/plugin/hooks.md"
 ---
 
 # Plugin Hooks
@@ -11,17 +12,12 @@ Every hook is a thin dispatch that forwards its arguments
 to the Rust dylib (`libaphrodite_hermes.dylib`); the dylib holds all of the actual behavior
 and replies with JSON that the Python module hands back to Hermes.
 
-Registration is driven by the dylib's hook list:
-
-- on plugin load the shim asks the dylib
-  for its hook names
-- and registers one callback per name.
+Registration is driven by the dylib's hook list: on plugin load the shim asks the dylib
+for its hook names and registers one callback per name.
 
 It is the reason the six hooks below are always registered together:
-
-- the dispatch surface is the dylib's own contract
-- and `plugin.yaml` declares the same set
-  under `provides_hooks`.
+the dispatch surface is the dylib's own contract, and `plugin.yaml` declares the same set
+under `provides_hooks`.
 
 | Hook                        | Purpose                                                           | When it fires                  |
 | --------------------------- | ----------------------------------------------------------------- | ------------------------------ |
@@ -66,11 +62,8 @@ on the first `pre_llm_call` (see below), so a session reset followed
 by a fresh turn behaves exactly like a new session.
 
 The loop closes on itself, so the state a turn leaves behind is the state the next
-turn reads. That is why the reset seam exists:
-
-- a new session starts from a clean
-  baseline instead of inheriting the previous session's counters
-- and markers.
+turn reads. That is why the reset seam exists: a new session starts from a clean
+baseline instead of inheriting the previous session's counters and markers.
 
 ## pre_tool_call
 
@@ -120,11 +113,8 @@ Fires after every tool call with the tool's result. The pipeline:
 The hook tracks file references before the skip gates, so it records `read_file`
 and `search_files` results for `aphrodite_files` and the catalog even when it never compresses them.
 
-The gate is the reason retrieval stays cheap:
-
-- a marker the model resolves comes back
-  whole
-- because nothing downstream of the gate rewrites it a second time.
+The gate is the reason retrieval stays cheap: a marker the model resolves comes back
+whole, because nothing downstream of the gate rewrites it a second time.
 
 ## transform_terminal_output
 

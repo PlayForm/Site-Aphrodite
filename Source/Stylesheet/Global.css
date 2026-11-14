@@ -327,7 +327,8 @@ body pre.astro-code:hover::-webkit-scrollbar-thumb {
 /* The inner <code> must inherit the plate's colour: the docs column paints
    `pre code` zinc-dust, which would grey out the 86 tokenless `text`/
    `plaintext` fences that carry no spans to colour. */
-body pre.astro-code > code {
+body pre.astro-code > code,
+body .zine-plate > pre.astro-code > code {
 	padding: 0;
 	border: 0;
 	background: none;

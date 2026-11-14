@@ -8,6 +8,9 @@
     "title": {
       "type": "string"
     },
+    "source": {
+      "type": "string"
+    },
     "$schema": {
       "type": "string"
     }

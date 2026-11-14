@@ -1,6 +1,7 @@
 ---
 title: "Retrieve & Recursive Marker Resolution"
 section: "Architecture"
+source: "docs/architecture/03-retrieve.md"
 ---
 
 # Retrieve & Recursive Marker Resolution

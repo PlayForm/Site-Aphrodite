@@ -14,28 +14,31 @@ import ZineStatBar from "@Component/ZineStatBar.astro";
 import ZineTape from "@Component/ZineTape.astro";
 import PreviewFlow from "../Content/Mermaid/preview-flow.svg?raw";
 
+import {
+	AssertBands,
+	AssertTiers,
+	Benchmark,
+	Cite,
+	Narrative,
+	Registry,
+	Study as StudyFacts,
+} from "@Library/Numbers";
+
 // Case-study content ledger - the page's single source of truth (the borrowed
 // Content.ts pattern, scoped to this page): every dynamic figure the narrative
-// renders comes from this block, exactly as printed in README.md, never
-// reworded or rounded. Anchors cite the README lines each fact came from.
+// renders comes from the generated record `Scripts/Prepare.ts` extracted out of
+// `Module/Aphrodite/README.md`, never reworded or rounded. The anchors cite the
+// README lines each fact came from, and those line numbers are produced by the
+// same pass that produced the figure.
+//
+// What stays here is the page's own: the labels, the explanations, the
+// sentences that turn a figure into a claim. What left is every number.
 
-// The Sep 2026 real-world study (README.md:467-511). Only the four figures the
-// hero monument states live here: the full study - the ledger, the session
-// bands, the retrieval tax, the caveat - is the canonical StudyLedger module on
-// /benchmarks/, and this page does not carry a second copy of it.
-const Study = {
-	Sessions: "200",
-	Saved: "156,342,817",
-	SavedPct: "26.9%",
-	AvgPerCall: "22,921",
-	SessionsSaved: "183 / 200",
-	MedianRatio: "22.9%",
-	TaxCalls: "2,275",
-	TaxTokens: "2,011,583",
-	CharsPerTok: "3.0-4.5",
-	Band: "~24-33%",
-	BandCenter: "~27%",
-} as const;
+// The Sep 2026 real-world study (README.md, "Real-world savings"). Only the
+// figures the hero monument states live here: the full study - the ledger, the
+// session bands, the retrieval tax, the caveat - is the canonical StudyLedger
+// module on /benchmarks/, and this page does not carry a second copy of it.
+const Study = StudyFacts;
 
 // The three secondary figures, as a labelled strip: the label is the claim and
 // the unit is the qualifier, so neither travels without the other. `Count` is
@@ -71,14 +74,23 @@ const Metrics = [
 	},
 ] as const;
 
-// Savings by session shape (README.md:497-499). The label carries the shape,
-// the range carries the measured band, and `Width` is the range read as a bar.
-const Bands = [
-	{ Label: "CHAT-ONLY SESSIONS", Range: "~0%", Width: "4%", Bar: "bg-zinc-dust" },
-	{ Label: "LIGHT DEVELOPER SESSION", Range: "~5%", Width: "10%", Bar: "bg-weathered-teal" },
-	{ Label: "LONG TOOL-HEAVY SESSIONS", Range: "20-25%", Width: "38%", Bar: "bg-stamped-canary" },
-	{ Label: "PURE-TOOL WORKLOADS", Range: "76-82%", Width: "92%", Bar: "bg-raw-blood" },
-] as const;
+// Savings by session shape (README.md, "Real-world savings"). The label
+// carries the shape and the range carries the measured band; both come from
+// the same sentence, so `AssertBands` is what keeps the four labels beside the
+// four ranges. `Width` is the range's midpoint read as a bar.
+const Shape = [
+	{ Label: "CHAT-ONLY SESSIONS", Bar: "bg-zinc-dust" },
+	{ Label: "LIGHT DEVELOPER SESSION", Bar: "bg-weathered-teal" },
+	{ Label: "LONG TOOL-HEAVY SESSIONS", Bar: "bg-stamped-canary" },
+	{ Label: "PURE-TOOL WORKLOADS", Bar: "bg-raw-blood" },
+];
+
+const Bands = AssertBands(Shape).map(({ Label, Bar }, Index) => ({
+	Label,
+	Bar,
+	Range: Study.Bands[Index]!.Range,
+	Width: `${Study.Bands[Index]!.Percent}%`,
+}));
 
 // The three claims the page argues, in the order the sections prove them. Each
 // is one stamp, one subject, one verb and one sentence - the page's thesis in
@@ -104,50 +116,57 @@ const Claims = [
 	},
 ] as const;
 
-// Real-world per-output compression, orig tokens -> ~33-tok marker (README.md:485-495).
-// `Percent` is the ratio read as a bar width: the column is a comparison of
-// magnitudes, so 74x is 74% of the scale and the bars stay honest.
-const RealWorld = [
-	{ Type: "TERMINAL", Ratio: "74×", Percent: 74 },
-	{ Type: "TABLE", Ratio: "61×", Percent: 61 },
-	{ Type: "SOURCE_CODE", Ratio: "45×", Percent: 45 },
-	{ Type: "LS", Ratio: "37×", Percent: 37 },
-	{ Type: "DIFF", Ratio: "23×", Percent: 23 },
-	{ Type: "BUILD", Ratio: "23×", Percent: 23 },
-	{ Type: "SEARCH", Ratio: "20×", Percent: 20 },
-] as const;
+// Real-world per-output compression, orig tokens -> ~33-tok marker (README.md,
+// "Real-world savings"). `Percent` is the ratio read as a bar width: the column
+// is a comparison of magnitudes, so 74x is 74% of the scale and the bars stay
+// honest. The generator computes that width from the ratio.
+const RealWorld = Benchmark.RealWorld.map(({ Type, Ratio, Percent }) => ({
+	Type: Type.replace(/_/g, " ").toUpperCase(),
+	Ratio,
+	Percent,
+}));
 
-// The per-type benchmark table (README.md:451-457). The `Width` is the bar the
-// corpus plate draws; the label carries the before -> after pair the table
-// states, because a bar alone cannot.
-const BenchTypes = [
-	{ Type: "GIT DIFF (42L)", Pair: "~350 tok → ~15 tok", Savings: "23×", Width: 18 },
-	{ Type: "BUILD OUTPUT (142L)", Pair: "~1,400 tok → ~10 tok", Savings: "140×", Width: 80 },
-	{ Type: "TERMINAL OUTPUT", Pair: "~200 tok → ~10 tok", Savings: "20×", Width: 16 },
-	{ Type: "JSON BLOB (30 KEYS)", Pair: "~400 tok → ~10 tok", Savings: "40×", Width: 30 },
-	{ Type: "BROWSER SNAPSHOT (342 EL)", Pair: "~5,000 tok → ~12 tok", Savings: "416×", Width: 98 },
-] as const;
+// The per-type benchmark table (README.md, "Performance"). The `Width` is the
+// bar the corpus plate draws - the ratio's log-scale position, computed by the
+// generator so a bar can never disagree with the figure beside it - and the
+// label carries the before -> after pair the table states, because a bar alone
+// cannot.
+const BenchTypes = Benchmark.Classes.map(({ Label, Without, With, Savings, Percent }) => ({
+	Type: Label.toUpperCase(),
+	Pair: `${Without} → ${With}`,
+	Savings,
+	Width: Percent,
+}));
 
-// The one corpus figure the narrative quotes (README.md:460).
-const Bench = { Latency: "8-40 ms" } as const;
+// The one corpus figure the narrative quotes (README.md, "Performance").
+const Bench = { Latency: Benchmark.Latency } as const;
 
-// The threshold tiers - the knobs (README.md:187-198).
-const Tiers = [
-	{ Tier: "ERROR", Types: "error", Multiplier: "×8", Note: "errors stay visible longest" },
-	{ Tier: "CODE", Types: "code_rust · code_python · code_go · code_js · code", Multiplier: "×3.0", Note: "source earns patience" },
-	{ Tier: "DIFF / TRACKED", Types: "diff · git · text", Multiplier: "×2", Note: "history, halved" },
-	{ Tier: "DEFAULT", Types: "tool_output · json · everything else", Multiplier: "×1", Note: "the baseline" },
-	{ Tier: "NOISY (BASE)", Types: "linter · build_output · log", Multiplier: "×1", Note: "never halved, always squeezed" },
-] as const;
+// The threshold tiers - the knobs (README.md, "Threshold Tiers"). Tier, types
+// and multiplier are the README's table; the note is this page's reading of
+// what the multiplier means, and `AssertTiers` keeps one note beside one tier.
+const TierNotes = [
+	"errors stay visible longest",
+	"source sits at the base threshold unless code_multiplier raises it",
+	"history, halved",
+	"the baseline",
+	"never halved, always squeezed",
+];
 
-// The classifier's visible surface: the 16 pipeline types the README's
-// catalog renders (README.md:155-176), backed by the full 30-type registry in
-// docs/classification/content-types.md:118-151 (the footnote).
-const Classifier = { PipelineTypes: 16, RegistryTypes: 30 } as const;
+const Tiers = AssertTiers(TierNotes).map((Note, Index) => ({
+	...Narrative.Tiers[Index]!,
+	Note,
+}));
 
-// The four pipeline layers (README.md:133-138).
+// The classifier's visible surface: the types the README's catalog renders,
+// backed by the full registry in the docs tree. Both counts are generated, so
+// the footnote cannot outlive the table it describes.
+const Classifier = { PipelineTypes: Narrative.CatalogTypes, RegistryTypes: Registry.Types } as const;
+
+// The four pipeline layers (README.md, "Performance" and "How It Works"). The
+// one measured figure among them - the classifier's own cost - is generated;
+// the rest are the layer's names, not numbers.
 const Layers = [
-	{ N: "01", Name: "CLASSIFY", Figure: "40-123 ns", Tone: "raw", Note: "the gate: one type per invocation, first match wins" },
+	{ N: "01", Name: "CLASSIFY", Figure: Benchmark.Classify, Tone: "raw", Note: "the gate: one type per invocation, first match wins" },
 	{ N: "02", Name: "PREVIEW", Figure: "~15 tok", Tone: "canary", Note: "the answer to 'do I care?' without the content" },
 	{ N: "03", Name: "STORE", Figure: "BLAKE3", Tone: "teal", Note: "SQLite / in-memory, the marker is the receipt" },
 	{ N: "04", Name: "DECIDE", Figure: "RETRIEVE?", Tone: "raw", Note: "the agent, not the engine, spends the budget" },
@@ -377,7 +396,7 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 
 <Base
 	Title="CASE STUDY // APHRODITE"
-	Description="Why Aphrodite is shaped this way: the marker is the contract, the classifier is the gate, the thresholds are the knobs - measured at 156,342,817 context tokens saved across 200 real sessions."
+	Description={`Why Aphrodite is shaped this way: the marker is the contract, the classifier is the gate, the thresholds are the knobs - measured at ${Study.TokensSaved} context tokens saved across ${Study.Sessions} real sessions.`}
 >
 	<PageShell Rhythm="wide">
 		<!-- ============ HERO // THE MANIFESTO OPEN ============ -->
@@ -413,18 +432,18 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					<div
 						class="mt-6 font-headline text-5xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-7xl"
 					>
-						<span data-count="156342817">{Study.Saved}</span>
+						<span data-count={Study.TokensSaved.replace(/,/g, "")}>{Study.TokensSaved}</span>
 					</div>
 					<div class="mt-6 flex flex-wrap items-center gap-8 font-mono text-base font-bold">
 						<span class="text-stamped-canary"
-							><span data-count="26.9">26.9</span>% OF THE TOTAL BUDGET</span
+							><span data-count={Study.SavedPct.replace("%", "")}>{Study.SavedPct.replace("%", "")}</span>% OF THE TOTAL BUDGET</span
 						>
 					</div>
 					<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						The percentage is the honest way to read the number: 156 million tokens is
-						only impressive once you know what it was a share of. 17 of the 200 sessions
-						saved nothing at all, and the mean is pulled up by the long tool-heavy runs -
-						which is why the median sits beside it below.
+						The percentage is the honest way to read the number: {Study.TokensSaved} tokens is
+						only impressive once you know what it was a share of. {Study.SessionsUnsaved} of
+						the {Study.Sessions} sessions saved nothing at all, and the mean is pulled up by
+						the long tool-heavy runs - which is why the median sits beside it below.
 					</p>
 					<div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
 						{
@@ -441,7 +460,7 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 							))
 						}
 					</div>
-					<ZineSource Lines={["SRC: README.md:467-511."]} />
+					<ZineSource Lines={[`SRC: ${Cite(Study.From)}.`]} />
 				</div>
 			</ZineBox>
 		</header>
@@ -820,9 +839,9 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 							HIGHER MULTIPLIER = LONGER THE CONTENT STAYS VISIBLE BEFORE COMPRESSION
 						</div>
 						<div class="font-mono text-base leading-relaxed text-zinc-dust">
-							CODE ×3.0 IS THE CONFIG DEFAULT - SOURCE EARNS THREE TIMES THE DEFAULT THRESHOLD
+							CODE {Narrative.CodeMultiplier} IS THE SHIPPED DEFAULT ({Narrative.CodeMultiplierKey.toUpperCase()}) - SOURCE SITS AT THE BASE THRESHOLD UNTIL AN OPERATOR RAISES IT
 						</div>
-						<ZineSource Lines={["SRC: README.md:187-198."]} />
+						<ZineSource Lines={[`SRC: ${Cite(Narrative.From)}.`]} />
 					</div>
 				</div>
 			</ZineBox>
@@ -840,12 +859,13 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					class compressed to in the wild, and what the standard corpus paid per type.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The corpus ratios, the 610× ceiling, the median and the reproduce commands are
-					on the benchmarks page.
+					The corpus ratios, the {Benchmark.Ceiling} ceiling, the median and the reproduce
+					commands are on the benchmarks page.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Every bar is its ratio read as a width - 74× fills 74% of the scale - so the two
-					columns compare magnitudes without normalising either one.
+					Every bar is its ratio read as a width - {Benchmark.RealWorld[0]!.Ratio} fills{" "}
+					{Benchmark.RealWorld[0]!.Percent}% of the scale - so the two columns compare
+					magnitudes without normalising either one.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Read together, the plates carry the argument's sharpest claim: the ratio is a
@@ -883,8 +903,8 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					<div class="border-l-4 border-weathered-teal pl-6">
 						<ZineKicker Tone="teal" As="div">RETRIEVAL TAX</ZineKicker>
 						<p class="mt-6 font-body text-base leading-relaxed text-bone-newsprint">
-							Retrieval re-entry cost <span data-count="2275">{Study.TaxCalls}</span> calls
-							and <span data-count="2011583">{Study.TaxTokens}</span> tokens across the
+							Retrieval re-entry cost <span data-count={Study.TaxCalls.replace(/,/g, "")}>{Study.TaxCalls}</span> calls
+							and <span data-count={Study.TaxTokens.replace(/,/g, "")}>{Study.TaxTokens}</span> tokens across the
 							study - the price of going back for detail.
 						</p>
 						<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
@@ -893,9 +913,9 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 							to answer most of them.
 						</p>
 						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Read against the ledger, that is about 1.3% of the tokens the study saved:
+							Read against the ledger, that is about {Study.TaxPct} of the tokens the study saved:
 							the whole cost of going back, paid only on the turns a preview did not
-							answer. Paying the full output again instead would have cost roughly 78
+							answer. Paying the full output again instead would have cost roughly {Study.TaxFactor}
 							times as much.
 						</p>
 					</div>
@@ -949,7 +969,7 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 				</div>
 				<ZineSource
 					Lines={[
-						"SRC: README.md:467-511 (the per-output compression) · README.md:444-465 (the per-type table and the round trips) · README.md:497-499 (the session-shape bands).",
+						`SRC: ${Cite(Study.From)} (the per-output compression and the session-shape bands) · ${Cite(Benchmark.From)} (the per-type table and the round trips).`,
 					]}
 				/>
 			</ZineBox>

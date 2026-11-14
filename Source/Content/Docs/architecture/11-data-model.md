@@ -1,6 +1,7 @@
 ---
 title: "Core Data Model"
 section: "Architecture"
+source: "docs/architecture/11-data-model.md"
 ---
 
 # Core Data Model

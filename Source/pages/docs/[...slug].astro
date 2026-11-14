@@ -620,9 +620,11 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 		color: var(--bone-white);
 	}
 
-	/* Inline code: the asphalt chip. Marker chips (<<<CCR:hash|type|size>>>)
-	   wrap mid-token inside the chip instead of overflowing the column. */
-	.docs-prose :global(code) {
+	/* Inline code: the asphalt chip. Scoped away from `pre` on purpose - a
+	   fence's <code> is the whole block and inherits the plate's colour; only
+	   the INLINE chip is teal. Marker chips (<<<CCR:hash|type|size>>>) wrap
+	   mid-token inside the chip instead of overflowing the column. */
+	.docs-prose :global(:not(pre) > code) {
 		padding: 0.1rem 0.4rem;
 		border: 1px solid var(--oxblood-dark);
 		background-color: var(--asphalt-panel);

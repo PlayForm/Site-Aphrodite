@@ -1,6 +1,7 @@
 ---
 title: "aphrodite.toml"
 section: "Config"
+source: "docs/config/aphrodite-toml.md"
 ---
 
 # aphrodite.toml
@@ -205,11 +206,8 @@ Engine](https://github.com/PlayForm/Aphrodite/tree/Current/docs/plugin/context-e
 for the full behavior.
 
 **Parsed for schema compatibility, echoed by `/reload` for visibility** (no live
-effect):
-
-- `catalog_mode` (catalog layout is compiled-in)
-- `classifier_poll`,
-  `prefetch` (the `aphrodite_prefetch` tool exists regardless of this key).
+effect): `catalog_mode` (catalog layout is compiled-in), `classifier_poll`,
+`prefetch` (the `aphrodite_prefetch` tool exists regardless of this key).
 
 ## `[previews]` and `[prompts]`
 

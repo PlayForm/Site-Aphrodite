@@ -1,6 +1,7 @@
 ---
 title: "CCR Examples - What the LLM Actually Sees"
 section: "Examples"
+source: "docs/examples/llm-view.md"
 ---
 
 # CCR Examples - What the LLM Actually Sees
@@ -229,8 +230,5 @@ block that actually enters the model's context:
 
 Ratios are byte compression of the relayed result; actual token savings depend on the tokenizer.
 
-The rule of thumb holds across all five:
-
-- the model sees the shape and the summary
-  of the content
-- and pays full price only when it asks for the details.
+The rule of thumb holds across all five: the model sees the shape and the summary
+of the content, and pays full price only when it asks for the details.

@@ -1,18 +1,16 @@
 ---
 title: "Inline CCR"
 section: "CCR"
+source: "docs/ccr/backends/inline.md"
 ---
 
 # Inline CCR
 
 Tiny entries bypass the CCR backend round-trip entirely.
 
-Two inline stores exist:
-
-- one in the proxy process for chat-completions
-  and HTTP tool-relay traffic
-- and one in the Hermes session engine
-  for the plugin-side compress/retrieve path.
+Two inline stores exist: one in the proxy process for chat-completions
+and HTTP tool-relay traffic, and one in the Hermes session engine
+for the plugin-side compress/retrieve path.
 
 Both provide O(1) retrieval without backend I/O for content that is trivially small.
 
@@ -48,11 +46,8 @@ The inline copy serves reads until eviction; a failed durable put does not fail 
 ## Session Inline Store
 
 The Hermes session engine keeps its own inline store in state (`state.rs`):
-
-- a `HashMap<String, String>` with an LRU order queue (`VecDeque`)
-- entry-count
-  and byte-budget bounds
-- and a promoting `get`.
+a `HashMap<String, String>` with an LRU order queue (`VecDeque`), entry-count
+and byte-budget bounds, and a promoting `get`.
 
 | Parameter   | Value                                                                                      |
 | ----------- | ------------------------------------------------------------------------------------------ |

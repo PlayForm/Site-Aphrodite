@@ -1,6 +1,7 @@
 ---
 title: "Prometheus Metrics"
 section: "Metrics"
+source: "docs/metrics/prometheus.md"
 ---
 
 # Prometheus Metrics
@@ -133,9 +134,7 @@ Scrape `/stats/db` to alert on a store sitting at its cap:
 | `freelist_bytes`  | Pages freed by purge and eviction that the file still holds         |
 
 A store that sits at `max_entries` or `max_bytes` is working as configured, not failing:
-
-- eviction is a cache policy
-- so an evicted hash is a retrieval miss exactly like an expired one.
+eviction is a cache policy, so an evicted hash is a retrieval miss exactly like an expired one.
 
 `evicted_total` climbing steadily while `total_entries` holds flat is the signal that the cap,
 not the TTL, is what is reclaiming the store.

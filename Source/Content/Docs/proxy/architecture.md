@@ -1,6 +1,7 @@
 ---
 title: "Proxy Architecture"
 section: "Proxy"
+source: "docs/proxy/architecture.md"
 ---
 
 # Proxy Architecture

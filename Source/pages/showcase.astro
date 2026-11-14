@@ -172,9 +172,9 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 		/>
 
 		<!-- THE DEFAULTS IN PLAY -->
-		<section id="defaults" class="relative w-full scroll-mt-24">
+		<section id="defaults" class="relative w-full scroll-mt-24" data-reveal>
 			<ZineTape Variant="section" Label="THE DEFAULTS // APHRODITE.TOML" />
-			<ZineBox Tone="crimson" Rotate="rotate-[0.8deg]">
+			<ZineBox Tone="crimson" Rotate="rotate-[0.8deg]" Wipe>
 				<p class="font-mono text-base leading-loose text-bone-newsprint">
 					{Object.entries(Bank.defaults).map(([Key, Value]) => (
 						<span class="mr-6 inline-block whitespace-nowrap">
@@ -196,9 +196,9 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 		</section>
 
 		<!-- FILTER BAR -->
-		<section id="registry" class="relative w-full scroll-mt-24" data-registry>
+		<section id="registry" class="relative w-full scroll-mt-24" data-registry data-reveal>
 			<ZineTape Variant="section" Label="THE REGISTRY // FILTER BY CATEGORY, SEARCH BY KEYWORD" />
-			<ZineBox Tone="crimson" Rotate="-rotate-[0.6deg]">
+			<ZineBox Tone="crimson" Rotate="-rotate-[0.6deg]" Wipe>
 				<div class="flex flex-wrap items-center gap-2" data-filters>
 					<button
 						type="button"
@@ -231,7 +231,7 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 		</section>
 
 		<!-- THE EXAMPLES // ONE SHAPE EACH -->
-		<section id="examples" class="relative flex w-full scroll-mt-24 flex-col" data-examples>
+		<section id="examples" class="relative flex w-full scroll-mt-24 flex-col" data-examples data-reveal>
 			<div class="w-full">
 				<ZineTape Variant="section" Label="THE EXAMPLES // ONE SHAPE EACH" />
 				<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
@@ -250,6 +250,12 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Reads are workspace-confined and capped at 10 MiB; a hash resolves
 					only by exact match - truncated hashes never resolve.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Every entry below is the same argument in a different costume: the raw output
+					prints line by line on the left, the preview lands on the right once the last
+					line has finished, and the marker underneath it is the address of everything
+					the left column did not have to buy.
 				</p>
 			</div>
 			<div class="mt-24 flex w-full flex-col gap-28 lg:gap-36">

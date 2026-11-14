@@ -15,11 +15,18 @@ import ZineReveal from "@Component/ZineReveal.astro";
 import StudyLedger from "@Component/StudyLedger.astro";
 import CodeFence from "@Component/CodeFence.astro";
 
+import { Benchmark, Cite, Study } from "@Library/Numbers";
+
 // THE FOUR HEADLINE PLATES - one figure each, and every plate carries the
 // sentence that keeps it honest. A ratio without its corpus is a poster: the
-// 610x plate is the best case on one long document, so its own body says the
-// per-type chart below tops out at 416x, and the reader is never left to
-// assume the headline is the typical case.
+// ceiling plate is the best case on one long document, so its own body says the
+// per-type chart below tops out lower, and the reader is never left to assume
+// the headline is the typical case.
+//
+// Every figure and every number inside the sentences is generated. The
+// sentences are this page's - a generated number is the frame, the explanation
+// is the content - and each one reads the figure it explains from the same
+// record the plate's figure does.
 interface Plate {
 	Tape: string;
 	TapeColor: "raw" | "canary" | "teal" | "bone";
@@ -31,107 +38,120 @@ interface Plate {
 	Rotate: string;
 }
 
+// The per-type chart's own vocabulary: the README's table row is the key, and
+// the label, the tone and the corpus sentence are the page's. A class the
+// README grows without a row here stops the build rather than rendering
+// unlabelled - which is the difference between a chart and a list of numbers.
+const Chart: Record<string, { Label: string; Color: "teal" | "raw" | "canary"; Corpus: string }> = {
+	"Browser snapshot (342 el)": {
+		Label: "BROWSER SNAPSHOT",
+		Color: "teal",
+		Corpus:
+			"one serialised page: every element, every attribute, the same wrapper nesting repeated to the leaves",
+	},
+	"Build output (142L)": {
+		Label: "BUILD OUTPUT",
+		Color: "raw",
+		Corpus:
+			"a compiler and linker log - repeated paths, repeated warning shapes, one error restated at the end",
+	},
+	"JSON blob (30 keys)": {
+		Label: "JSON",
+		Color: "canary",
+		Corpus:
+			"one structured API payload: keys, nesting, and the values a reader needs kept byte-exact",
+	},
+	"Git diff (42L)": {
+		Label: "GIT DIFF",
+		Color: "raw",
+		Corpus:
+			"a patch: hunk headers, context lines, and the same file path on both sides of every change",
+	},
+	"Terminal output": {
+		Label: "TERMINAL",
+		Color: "canary",
+		Corpus:
+			"shell output - listings, test runners, the progress lines that carry no verdict",
+	},
+};
+
+// THE PER-TYPE CHART - the README's standard-corpus table, one bar per output
+// class, largest ratio first. Widths are the generator's log-scale reading of
+// each ratio (the biggest at full width), so the bars stay comparable to the
+// plate above them and a width can never disagree with its figure. `Corpus`
+// says what the sample behind each row actually is, because a ratio for "JSON"
+// is meaningless until the reader knows which JSON.
+const Classes = [...Benchmark.Classes]
+	.sort((Left, Right) => Right.Ratio - Left.Ratio)
+	.map((Entry) => {
+		const Vocabulary = Chart[Entry.Label];
+
+		if (Vocabulary === undefined) {
+			throw new Error(
+				`[Benchmarks] README.md's per-type table carries "${Entry.Label}", which this page has no label or corpus sentence for. Add it to the Chart map in Source/pages/benchmarks.astro.`,
+			);
+		}
+
+		return { ...Vocabulary, Ratio: Entry.Savings, Percent: Entry.Percent };
+	});
+
+const Peak = Classes[0]!;
+const RunnerUp = Classes[1]!;
+const Floor = Classes[Classes.length - 1]!;
+
 const Plates: Plate[] = [
 	{
 		Tape: "MAX COMPRESSION",
 		TapeColor: "raw",
 		Tone: "crimson",
-		Figure: "610×",
+		Figure: Benchmark.Ceiling,
 		Caption: "THE CEILING",
 		Body: [
 			"Best case on large low-entropy prose.",
-			"132× overall on the same corpus, 106 KB → 800 B.",
-			"The best case is not part of the per-type chart below - that chart peaks at 416×.",
+			`${Benchmark.Overall} overall on the same corpus, ${Benchmark.CorpusIn} → ${Benchmark.CorpusOut}.`,
+			`The best case is not part of the per-type chart below - that chart peaks at ${Peak.Ratio}.`,
 		],
-		Src: "SRC: README.md:12, 446",
+		Src: `SRC: ${Cite(Benchmark.From)}`,
 		Rotate: "-rotate-[1.8deg]",
 	},
 	{
 		Tape: "END-TO-END",
 		TapeColor: "canary",
 		Tone: "canary",
-		Figure: "8-40 ms",
+		Figure: Benchmark.Latency,
 		Caption: "THE LATENCY BAND",
 		Body: [
-			"Including the HTTP round-trip; the headline figure is ~10 ms.",
-			"Eight milliseconds is the fast case, forty the slow one: one call, compression and retrieve path included.",
+			`Including the HTTP round-trip; the headline figure is ${Benchmark.LatencyHeadline}.`,
+			`Eight milliseconds is the fast case, forty the slow one: one call, compression and retrieve path included.`,
 		],
-		Src: "SRC: README.md:460, 12",
+		Src: `SRC: ${Cite(Benchmark.From)}`,
 		Rotate: "rotate-[2.2deg]",
 	},
 	{
 		Tape: "CLASSIFICATION",
 		TapeColor: "teal",
 		Tone: "teal",
-		Figure: "40-123 ns",
+		Figure: Benchmark.Classify,
 		Caption: "THE FLOOR",
 		Body: [
 			"The compress path itself stays under 1 ms.",
 			"Classification is the step before it: naming the content type costs nanoseconds, and it runs on every call.",
 		],
-		Src: "SRC: README.md:461, 133; docs/README.md:7",
+		Src: `SRC: ${Cite(Benchmark.From)}`,
 		Rotate: "-rotate-[1deg]",
 	},
 	{
 		Tape: "MEDIAN",
 		TapeColor: "bone",
 		Tone: "subtle",
-		Figure: "23×",
+		Figure: Benchmark.Median,
 		Caption: "THE TYPICAL CASE",
 		Body: [
 			"Fewer tokens on tool output - the median the README reports for its per-type table.",
 			"It is the number the README reports for that table, and the one to plan a context budget against.",
 		],
-		Src: "SRC: README.md:459",
+		Src: `SRC: ${Cite(Benchmark.From)}`,
 		Rotate: "rotate-[2.5deg]",
-	},
-];
-
-// THE PER-TYPE CHART - the README's standard-corpus table, one bar per output
-// class. Widths are the baseline's log-scale reading of each ratio (416x at
-// full width), so the bars stay comparable to the plate above them; `Corpus`
-// says what the sample behind each row actually is, because a ratio for
-// "JSON" is meaningless until the reader knows which JSON.
-const Classes = [
-	{
-		Label: "BROWSER SNAPSHOT",
-		Ratio: "416×",
-		Percent: 100,
-		Color: "teal" as const,
-		Corpus:
-			"one serialised page: every element, every attribute, the same wrapper nesting repeated to the leaves",
-	},
-	{
-		Label: "BUILD OUTPUT",
-		Ratio: "140×",
-		Percent: 82,
-		Color: "raw" as const,
-		Corpus:
-			"a compiler and linker log - repeated paths, repeated warning shapes, one error restated at the end",
-	},
-	{
-		Label: "JSON",
-		Ratio: "40×",
-		Percent: 61,
-		Color: "canary" as const,
-		Corpus:
-			"one structured API payload: keys, nesting, and the values a reader needs kept byte-exact",
-	},
-	{
-		Label: "GIT DIFF",
-		Ratio: "23×",
-		Percent: 52,
-		Color: "raw" as const,
-		Corpus:
-			"a patch: hunk headers, context lines, and the same file path on both sides of every change",
-	},
-	{
-		Label: "TERMINAL",
-		Ratio: "20×",
-		Percent: 50,
-		Color: "canary" as const,
-		Corpus:
-			"shell output - listings, test runners, the progress lines that carry no verdict",
 	},
 ];
 
@@ -190,7 +210,7 @@ const Needs = [
 
 <Base
 	Title="BENCHMARKS // APHRODITE"
-	Description="Aphrodite benchmarks: up to 610x compression on the standard corpus (132x overall, 106 KB to 800 B), 8-40 ms end-to-end, 40-123 ns classification, and the 200-session real-world study."
+	Description={`Aphrodite benchmarks: up to ${Benchmark.Ceiling} compression on the standard corpus (${Benchmark.Overall} overall, ${Benchmark.CorpusIn} to ${Benchmark.CorpusOut}), ${Benchmark.Latency} end-to-end, ${Benchmark.Classify} classification, and the ${Study.Sessions}-session real-world study.`}
 >
 	<PageShell Rhythm="wide" Crumbs>
 		<PageHeader
@@ -269,10 +289,8 @@ const Needs = [
 			</p>
 			<ZineSource
 				Lines={[
-					"SRC: README.md:12, 446",
-					"SRC: README.md:460, 12",
-					"SRC: README.md:461, 133; docs/README.md:7",
-					"SRC: README.md:459",
+					`SRC: ${Cite(Benchmark.From)} (the ceiling, the corpus, the latency band, the classification floor)`,
+					`SRC: ${Cite(Study.From)} (the 200-session study)`,
 				]}
 			/>
 		</section>
@@ -334,24 +352,25 @@ const Needs = [
 				<p class="mt-8 font-body text-base leading-relaxed text-bone-newsprint">
 					The corpus is fixed, and it is the same corpus for every row: the per-type table
 					takes one representative sample per output class, and the headline figure
-					aggregates the whole set - 106 KB in, 800 B out, 132× overall, with the single
-					best document reaching 610×.
+					aggregates the whole set - {Benchmark.CorpusIn} in, {Benchmark.CorpusOut} out,{" "}
+					{Benchmark.Overall} overall, with the single best document reaching{" "}
+					{Benchmark.Ceiling}.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
 					Timing is reported on a different axis on purpose.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					Classification is 40-123 ns and is timed on its own because it runs on every
+					Classification is {Benchmark.Classify} and is timed on its own because it runs on every
 					call.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
 					The compress path stays under 1 ms.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					8-40 ms is what a client waits once the HTTP round-trip is included.
+					{Benchmark.Latency} is what a client waits once the HTTP round-trip is included.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					And the ~10 ms headline sits near the fast end of that band.
+					And the {Benchmark.LatencyHeadline} headline sits near the fast end of that band.
 				</p>
 
 				<ZineTape Variant="section" Label="TWO HALVES // TWO CONFIDENCE LEVELS" Color="teal" />
@@ -392,9 +411,8 @@ const Needs = [
 			</ZineBox>
 			<ZineSource
 				Lines={[
-					"SRC: README.md:446, 451-457",
-					"SRC: README.md:459-463",
-					"SRC: README.md:467-511",
+					`SRC: ${Cite(Benchmark.From)} (the per-type table, the round trips, the timing axes)`,
+					`SRC: ${Cite(Study.From)} (the session study and its band)`,
 				]}
 			/>
 		</section>
@@ -435,17 +453,17 @@ const Needs = [
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
 					The chart peaks at
-					<span class="text-stamped-canary" data-count="416">416</span>&times;, on the browser
+					<span class="text-stamped-canary" data-count={Peak.Ratio.replace("×", "")}>{Peak.Ratio.replace("×", "")}</span>&times;, on the browser
 					snapshot: a serialised DOM repeats the same wrapper nesting down to the leaves, and
 					the ratio is a measure of exactly that repetition.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					The 610× plate is deliberately outside this chart.
+					The {Benchmark.Ceiling} plate is deliberately outside this chart.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
 					It is not a sixth class: it is the best case on a single long low-entropy
-					document, while the five rows above are one representative sample per class and
-					132× is the whole corpus counted at once.
+					document, while the {Classes.length} rows above are one representative sample per class and{" "}
+					{Benchmark.Overall} is the whole corpus counted at once.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
 					Plotting a best case beside five class samples would invite a comparison the
@@ -453,18 +471,18 @@ const Needs = [
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
 					Read the chart as a ranking, not a promise: a diff, a build log and a terminal
-					session are the ordinary material of an agent turn, and they land between 20× and
-					140×, while the median the README reports for the same table is 23×.
+					session are the ordinary material of an agent turn, and they land between {Floor.Ratio} and{" "}
+					{RunnerUp.Ratio}, while the median the README reports for the same table is {Benchmark.Median}.
 				</p>
 				<div class="mt-8">
 					<ZineReveal
 						Tag="SUPPRESSED"
-						Cover="the smallest row, TERMINAL at 20×, is still a fifth of the tokens"
-						Raw={`<span class="font-bold text-stamped-canary">20×</span> - the floor of the chart, and the floor is the useful number: a terminal dump that compresses 20× is a dump the model can afford to keep.`}
+						Cover={`the smallest row, ${Floor.Label} at ${Floor.Ratio}, is still a fifth of the tokens`}
+						Raw={`<span class="font-bold text-stamped-canary">${Floor.Ratio}</span> - the floor of the chart, and the floor is the useful number: a terminal dump that compresses ${Floor.Ratio} is a dump the model can afford to keep.`}
 					/>
 				</div>
 			</ZineBox>
-			<ZineSource Lines={["SRC: README.md:451-457", "SRC: README.md:459"]} />
+			<ZineSource Lines={[`SRC: ${Cite(Benchmark.From)}`]} />
 		</section>
 
 		<!-- THE STUDY: 200 real sessions, reconstructed payload by payload -->
@@ -475,11 +493,11 @@ const Needs = [
 					id="study"
 					class="mb-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
 				>
-					What 200 sessions measured
+					What {Study.Sessions} sessions measured
 				</h2>
 				<p class="font-body text-base leading-relaxed text-bone-newsprint">
-					The study takes 200 real Hermes sessions -
-					<span class="text-stamped-canary" data-count="6843">6,843</span> API calls over
+					The study takes {Study.Sessions} real Hermes sessions -
+					<span class="text-stamped-canary" data-count={Study.ApiCalls.replace(/,/g, "")}>{Study.ApiCalls}</span> API calls over
 					three days - and reconstructs every call's payload from the session transcript.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
@@ -510,43 +528,43 @@ const Needs = [
 					Savings track tool-output volume, not session count.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					A chat-only session has nothing to compress, so it saves ~0%.
+					A chat-only session has nothing to compress, so it saves {Study.Bands[0]!.Range}.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					A light developer session saves ~5%.
+					A light developer session saves {Study.Bands[1]!.Range}.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					A tool-heavy session lands in the 20-25% band.
+					A tool-heavy session lands in the {Study.Bands[2]!.Range} band.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
 					And a simulated pure-tool loop - a diff, an ls, a build and a search on repeat -
-					reaches 76-82%.
+					reaches {Study.Bands[3]!.Range}.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
 					That last figure is a stress test, not real usage, and the bars above label it as
 					one.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					The 183 / 200 row is the other way to read the same data: in 183 of the 200
-					sessions something was saved.
+					The {Study.SessionsSaved} row is the other way to read the same data: in{" "}
+					{Study.SessionsSaved.split("/")[0]!.trim()} of the {Study.Sessions} sessions something was saved.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					The two rates beside it answer different questions - 22.9% is the median session's
-					saved ratio, 22,921 is what an average call did not have to carry - and both are
+					The two rates beside it answer different questions - {Study.MedianRatio} is the median session's
+					saved ratio, {Study.AvgPerCall} is what an average call did not have to carry - and both are
 					reported because neither alone describes the study.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
 					The retrieval tax is the cost side of the ledger:
-					<span class="text-stamped-canary" data-count="2275">2,275</span> retrieve calls
-					returned <span class="text-stamped-canary" data-count="2011583">2,011,583</span>
-					tokens, roughly 1.3% of what was saved.
+					<span class="text-stamped-canary" data-count={Study.TaxCalls.replace(/,/g, "")}>{Study.TaxCalls}</span> retrieve calls
+					returned <span class="text-stamped-canary" data-count={Study.TaxTokens.replace(/,/g, "")}>{Study.TaxTokens}</span>
+					tokens, roughly {Study.TaxPct} of what was saved.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
 					Savings are gross; this row is what the model paid to get its bytes back.
 				</p>
 			</ZineBox>
 			<ZineSource
-				Lines={["SRC: README.md:467-511.", "SRC: README.md:497-499"]}
+				Lines={[`SRC: ${Cite(Study.From)}.`, `SRC: ${Cite(Benchmark.From)} (the session-shape bands)`]}
 			/>
 		</section>
 
@@ -581,7 +599,7 @@ $ cargo run --release -p aphrodite --example bench_03_retrieve
 $ cargo run --release -p aphrodite --example bench_04_ema
 $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 				/>
-				<p class="mt-4 font-mono text-base text-zinc-dust">SRC: README.md:463</p>
+				<p class="mt-4 font-mono text-base text-zinc-dust">SRC: {Cite(Benchmark.From)}</p>
 
 				<ZineTape Variant="section" Label="FIVE EXAMPLES // WHAT EACH ONE PROVES" Color="canary" />
 				<h3
@@ -633,7 +651,7 @@ $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 			</ZineBox>
 			<ZineSource
 				Lines={[
-					"SRC: README.md:463",
+					`SRC: ${Cite(Benchmark.From)}`,
 					"SRC: crates/aphrodite/examples/bench_01_corpus.rs",
 					"SRC: crates/aphrodite/examples/bench_05_type_coverage.rs",
 				]}
@@ -654,22 +672,22 @@ $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 					<ZineLesson
 						Label="NOT A TYPICAL CASE"
 						Color="raw"
-						Text="610× is the ceiling on one long low-entropy document. The per-type chart peaks at 416×, and the median the same table reports is 23× - quote the ceiling only with the corpus attached."
+						Text={`${Benchmark.Ceiling} is the ceiling on one long low-entropy document. The per-type chart peaks at ${Peak.Ratio}, and the median the same table reports is ${Benchmark.Median} - quote the ceiling only with the corpus attached.`}
 					/>
 					<ZineLesson
 						Label="NOT A SINGLE PERCENTAGE"
 						Color="canary"
-						Text="The session saving is a band, not a point: ~24-33% across a 3.0-4.5 chars/token sensitivity range, centered ~27%. Any single number inside that band is a reading of the same data, not a better measurement."
+						Text={`The session saving is a band, not a point: ${Study.Band} across a ${Study.CharsPerTok} chars/token sensitivity range, centered ${Study.BandCenter}. Any single number inside that band is a reading of the same data, not a better measurement.`}
 					/>
 					<ZineLesson
 						Label="NOT REAL USAGE"
 						Color="teal"
-						Text="The 76-82% pure-tool figure comes from a simulated diff+ls+build+search loop. It is a stress test of the engine, and the real sessions it sits beside saved 20-25% when they were tool-heavy."
+						Text={`The ${Study.Bands[3]!.Range} pure-tool figure comes from a simulated diff+ls+build+search loop. It is a stress test of the engine, and the real sessions it sits beside saved ${Study.Bands[2]!.Range} when they were tool-heavy.`}
 					/>
 					<ZineLesson
 						Label="NOT NET OF RETRIEVAL"
 						Color="canary"
-						Text="Savings are counted before retrieval. The study's own tax row - 2,275 calls, 2,011,583 tokens - is what the model spent getting bytes back, roughly 1.3% of the tokens saved."
+						Text={`Savings are counted before retrieval. The study's own tax row - ${Study.TaxCalls} calls, ${Study.TaxTokens} tokens - is what the model spent getting bytes back, roughly ${Study.TaxPct} of the tokens saved.`}
 					/>
 				</div>
 				<p class="mt-10 border-t border-oxblood-dark pt-8 font-body text-base leading-relaxed text-bone-newsprint">
@@ -691,8 +709,8 @@ $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 			</ZineBox>
 			<ZineSource
 				Lines={[
-					"SRC: README.md:12, 446, 459",
-					"SRC: README.md:467-511",
+					`SRC: ${Cite(Benchmark.From)}`,
+					`SRC: ${Cite(Study.From)}`,
 					"SRC: crates/aphrodite/examples/",
 				]}
 			/>

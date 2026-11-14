@@ -1,6 +1,7 @@
 ---
 title: "Dylib Loading (load-once per process)"
 section: "Architecture"
+source: "docs/architecture/08-dylib-loading.md"
 ---
 
 # Dylib Loading (load-once per process)

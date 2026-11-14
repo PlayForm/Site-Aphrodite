@@ -1,6 +1,7 @@
 ---
 title: "Installing Aphrodite"
 section: "Install"
+source: "docs/install/README.md"
 ---
 
 # Installing Aphrodite

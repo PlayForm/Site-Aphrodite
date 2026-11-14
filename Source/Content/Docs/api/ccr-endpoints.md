@@ -1,6 +1,7 @@
 ---
 title: "CCR Management Endpoints"
 section: "API"
+source: "docs/api/ccr-endpoints.md"
 ---
 
 # CCR Management Endpoints

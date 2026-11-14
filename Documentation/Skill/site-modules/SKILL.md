@@ -91,8 +91,8 @@ grep the other and keep the breakpoints identical.
 Every element that renders a CCR marker string (`<<<CCR:hash|type|size>>>`,
 the 40-hex form is ~50+ chars with no break opportunity) carries
 `overflow-wrap: anywhere` - the shared utility class `.ccr-marker` in
-`Source/Stylesheet/Global.css` (or the `.docs-prose :global(code)` /
-`:global(td)` rules for the docs prose, which already carry it). The wrap is
+`Source/Stylesheet/Global.css` (or the `.docs-prose :global(:not(pre) > code)`
+/ `:global(td)` rules for the docs prose, which already carry it). The wrap is
 VISUAL ONLY: the rendered text and every `data-copy` payload stay byte-exact
 (the generated showcase catalog is the arbiter). `truncate` is NOT an acceptable
 substitute on a marker line - it hides the size field instead of wrapping.
@@ -103,25 +103,70 @@ re-wraps. The 16px floor and the mono chip styling are untouched by the wrap.
 
 ## 9. The codefence law (the command-block rendering rule)
 
-Every command/terminal-line block a hand-written page renders goes through
-`Source/Component/CodeFence.astro` - the shiki github-dark pipeline the docs
-markdown fences use (astro.config.ts shikiConfig), normalized to the same
-`.astro-code github-dark` / `data-language=bash` markup the docs' ``` fences
-get. NEVER render a command run as plain styled divs: the command names, the
-flags and the paths are tokenized by the grammar, not hand-colored. The law:
+Every command/terminal-line block goes through Shiki, and every Shiki block is
+a PLATE. A hand-written page renders one through
+`Source/Component/CodeFence.astro`; a docs ``` fence gets the same markup from
+Astro's markdown pipeline. Both emit the same bare element - normalize to it,
+never hand-roll it:
 
-1. The code string is BYTE-EXACT - the fence changes the rendering, never the
-   text (the byte-exact facts law above applies to the commands too). A
-   trailing `// note` annotation stays in the string even though the bash
-   grammar renders it as a plain token, not a comment.
-2. Simulated OUTPUT lines inside a terminal pane (the `[INIT] ...` receipts,
+```html
+<pre class="astro-code zine-print" data-language="bash"
+      style="background-color:#111014;color:#dedbd2">...</pre>
+```
+
+NEVER render a command run as plain styled divs: the command names, the flags
+and the paths are tokenized by the grammar, not hand-colored. The law:
+
+1. **The palette is the THEME, never the stylesheet.** `ZineTheme` in
+   `Source/Library/ShikiTheme.ts` is imported twice - by `astro.config.ts`
+   (`markdown.shikiConfig.theme`) and by `CodeFence.astro` (`codeToHtml`) - so
+   the two paths cannot drift. Shiki writes its colours as inline
+   `style="color:#..."` attributes on every token span, and an inline style
+   outranks every stylesheet rule short of `!important`; re-colouring a named
+   third-party theme from CSS is a fight that cannot be won. Add a scope to the
+   theme instead. Blood stays CHROME: raw-blood measures ~2.3:1 on carbon-void
+   and is never a code-text colour.
+2. **The frame is declared ONCE.** `body pre.astro-code` (plus
+   `body .zine-plate > pre.astro-code`) in `Source/Stylesheet/Global.css` owns
+   the 1px oxblood hairline, the 3px blood-crimson spine, `radius: 0`, the
+   padding, the 1.75rem rhythm, the hover lift and the scroll cue. A reading
+   column must not declare a second `pre` frame: Astro compiles
+   `.docs-prose :global(pre)` to `.docs-prose[data-astro-cid-...] pre`, which is
+   (0,2,1) and wins the tie against the base rule on source order. The same
+   reason retired `[&>pre]:p-3.5` and `font-mono text-base` from `CodeFence.astro`.
+3. **The hover lift rides `background-image`.** Shiki's inline style sets
+   `background-color` only, so a `linear-gradient` wash over it is the one
+   background a stylesheet can apply without `!important`. Motion settles
+   instantly under `prefers-reduced-motion` (the global rule collapses every
+   transition to 0.01ms).
+4. **One copy control per block.** `Source/Script/CodePlate.ts` wraps each
+   fence in `figure.zine-plate` and hangs a `[data-copy]` chip in
+   `.zine-plate-bar`; `Layout/Base.astro` binds it through the site's ONE
+   clipboard runtime (`BindRuntime` calls `BindPlates()` then `BindCopy()`). A
+   `CodeFence` `Copy` button is MOVED into that cluster, never duplicated. The
+   "this control is mine" test is
+   `Host.querySelectorAll("pre.astro-code").length === 1` - a markdown fence's
+   host is the whole reading column, so a looser test adopts an unrelated CTA
+   from elsewhere on the page and leaves the block with no chip.
+5. **The annotations never edit a character.** In bash a `//` note and the
+   words around it are the SAME token, and `$ ` is whatever the grammar gave
+   the sigil. `MarkPrompt`/`MarkComment` move text nodes into
+   `<span class="zine-prompt">` / `<span class="zine-comment">`, so
+   `textContent` - and therefore the payload, `pre.textContent` minus one
+   trailing newline - stays byte-identical to what Shiki rendered. A class rule
+   on the wrapper outranks the INHERITED inline colour of the token span around
+   it, which is how the two stay distinct without `!important`. `https://` is
+   never an annotation (a `//` preceded by `:` is skipped) and `$env:...` is
+   never a prompt (the character after the sigil is checked).
+6. **Long lines scroll inside the plate.** `overflow-x: auto` lives on the
+   pre (the plate), never on a wrapper, and a styled scrollbar is the
+   persistent cue (`::-webkit-scrollbar` is what makes it non-overlay on
+   macOS); `.zine-plate--scroll` adds the explicit `⇥` mark. A fence may never
+   widen the page.
+7. Simulated OUTPUT lines inside a terminal pane (the `[INIT] ...` receipts,
    the compile flood) are NOT commands - they stay as the pane's styled divs
-   next to the fence, preserving the voice-color accents.
-3. The fence's own inline `#24292e` background is the docs-identical look -
-   do not restyle it toward the pane's `bg-soot-black`; the wrapper keeps
-   `font-mono text-base` (the 16px floor) and `[&>pre]:p-3.5`.
-4. Demo data that only SIMULATES a terminal (the workbench compression
-   samples, `$ cargo fmt --check` as tool-output content) is exempt - those
+   next to the fence, preserving the voice-color accents. Demo data that only
+   SIMULATES a terminal (the workbench compression samples) is exempt: those
    strings are generated showcase content, not install instructions.
 
 ## 10. The flow-pane law (the ZineFlow two-view rule)

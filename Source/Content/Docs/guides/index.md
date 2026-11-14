@@ -1,6 +1,7 @@
 ---
 title: "Guides"
 section: "Guides"
+source: "docs/guides/README.md"
 ---
 
 # Guides

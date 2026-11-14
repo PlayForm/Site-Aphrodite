@@ -19,6 +19,7 @@ import { dirname, join, relative, resolve } from "node:path";
 
 import type { Row } from "./Manifest.ts";
 import { Comment, Parse, Provenance } from "./Transform.ts";
+import GenerateDocs from "../Docs/Generate.ts";
 
 /** What one run produced, for the summary line. */
 export interface Result {
@@ -30,6 +31,15 @@ export interface Result {
 
 	/** The files under `Source/Generated/` this run did not write. */
 	Orphans: string[];
+
+	/** The docs tree's own report: what it wrote, what it could not reach. */
+	Docs: {
+		Written: number;
+		Gaps: string[];
+		Orphans: string[];
+		Stale: string[];
+		Hermetic: boolean;
+	};
 }
 
 /** Every file under a directory, optionally filtered by extension. */
@@ -141,6 +151,7 @@ export function Emit(Module: string, Site: string, Rows: Row[]): Result {
 	const Written: string[] = [];
 	const Held: Result["Held"] = [];
 	const Groups = new Map<string, Row[]>();
+	const DocRows: Row[] = [];
 
 	for (const Row of Rows) {
 		switch (Row.Stage) {
@@ -159,6 +170,12 @@ export function Emit(Module: string, Site: string, Rows: Row[]): Result {
 			case "Emit": {
 				switch (Row.Transform) {
 					case "Doc":
+						// The docs are a BATCH, not a per-row write: every page's
+						// relative links resolve against the whole route map, so
+						// the table is written once after the loop.
+						DocRows.push(Row);
+
+						break;
 					case "Mermaid":
 						throw new Error(
 							`[Prepare] ${Row.Source} is a "${Row.Transform}" row marked Emit, and this generator does not implement that transform. Implement it in Scripts/Prepare/Transform.ts, or declare the row Stage: "Hold" until its extraction card lands.`,
@@ -239,6 +256,21 @@ export function Emit(Module: string, Site: string, Rows: Row[]): Result {
 
 	Written.push(Marker(Site, Rows));
 
+	// The docs batch: one route map, one pass, every page. A gap is a module doc
+	// no row reaches, and it stops the build - a doc the site cannot serve is a
+	// page it silently lost.
+	const Docs = DocRows.length > 0
+		? GenerateDocs(Module, Site)
+		: { Written: [], Gaps: [], Orphans: [], Stale: [], Hermetic: true };
+
+	if (Docs.Gaps.length > 0) {
+		throw new Error(
+			`[Prepare] ${Docs.Gaps.length} module doc(s) have no row in Scripts/Prepare/Docs.ts: ${Docs.Gaps.join(", ")}. Add the row (or declare the file under Internal with a reason) - a doc no row reaches is a page the site does not have.`,
+		);
+	}
+
+	Written.push(...Docs.Written);
+
 	const Known = new Set(Written.map((Destination) => resolve(Site, Destination)));
 	const Area = resolve(Site, "Source", "Generated");
 
@@ -248,5 +280,16 @@ export function Emit(Module: string, Site: string, Rows: Row[]): Result {
 				.map((Path) => relative(Site, Path))
 		: [];
 
-	return { Written, Held, Orphans };
+	return {
+		Written,
+		Held,
+		Orphans,
+		Docs: {
+			Written: Docs.Written.length,
+			Gaps: Docs.Gaps,
+			Orphans: Docs.Orphans,
+			Stale: Docs.Stale,
+			Hermetic: Docs.Hermetic,
+		},
+	};
 }

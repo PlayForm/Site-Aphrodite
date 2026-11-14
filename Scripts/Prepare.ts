@@ -140,7 +140,7 @@ function Prepare(): void {
 		);
 	}
 
-	const { Written, Held, Orphans } = Emit(Root, Site, Manifest);
+	const { Written, Held, Orphans, Docs } = Emit(Root, Site, Manifest);
 
 	const Pin = Written.includes("Source/Generated/Module.json")
 		? (JSON.parse(
@@ -161,6 +161,29 @@ function Prepare(): void {
 	// renamed or dropped, and a human decides which.
 	for (const Entry of Orphans) {
 		console.warn(`[Prepare] orphan ${Entry} - no manifest row writes it; left in place.`);
+	}
+
+	// The docs tree reports its own two edges. A stale link is a source defect
+	// in the repository, so it is named with the file that carries it.
+	switch (true) {
+		case Docs.Hermetic:
+			console.log(
+				"[Prepare] docs: no Module/Aphrodite/docs tree, so the committed Source/Content/Docs pages were kept.",
+			);
+
+			break;
+		default:
+			console.log(`[Prepare] docs: ${Docs.Written} page(s) generated from Module/Aphrodite/docs.`);
+	}
+
+	for (const Entry of Docs.Orphans) {
+		console.warn(
+			`[Prepare] docs orphan ${Entry} - no row in Scripts/Prepare/Docs.ts writes it; left in place. Push it up into PlayForm/Aphrodite so it gains a source, or declare it under SiteOnly with the reason it exists.`,
+		);
+	}
+
+	for (const Entry of Docs.Stale) {
+		console.warn(`[Prepare] docs link ${Entry} - resolves to no docs page; left as the source wrote it.`);
 	}
 }
 

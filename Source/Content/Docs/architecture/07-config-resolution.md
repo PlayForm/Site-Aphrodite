@@ -1,6 +1,7 @@
 ---
 title: "Config Resolution Precedence"
 section: "Architecture"
+source: "docs/architecture/07-config-resolution.md"
 ---
 
 # Config Resolution Precedence

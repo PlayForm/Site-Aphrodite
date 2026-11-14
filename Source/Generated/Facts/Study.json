@@ -25,6 +25,8 @@
 		"TaxCalls": "2,275",
 		"TaxTokens": "2,011,583",
 		"TaxPct": "1.3%",
+		"TaxFactor": 78,
+		"SessionsUnsaved": "17",
 		"CharsPerTok": "3.0-4.5",
 		"Band": "~24-33%",
 		"BandCenter": "~27%",

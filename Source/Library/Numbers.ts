@@ -81,6 +81,8 @@ export const Study = Complete(Require(StudyJson.Study, "Facts/Study.json -> Stud
 	"TaxCalls",
 	"TaxTokens",
 	"TaxPct",
+	"TaxFactor",
+	"SessionsUnsaved",
 	"CharsPerTok",
 	"Band",
 	"BandCenter",

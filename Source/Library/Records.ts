@@ -15,6 +15,75 @@
  */
 
 /* -------------------------------------------------------------------------
+ * THE REFERENCE RECORDS - one shape per generated roster
+ *
+ * These four are written by `Scripts/Prepare.ts` into
+ * `Source/Generated/Facts/`, never by hand: a page that documents the shipped
+ * surface renders one of these arrays, so the list of tools, hooks, config
+ * keys and crates has exactly one source and cannot disagree with itself.
+ * ---------------------------------------------------------------------- */
+
+/** One argument of a tool, as the schema declares it. */
+export interface ToolParameter {
+	/** The argument name, e.g. `content`. */
+	Name: string;
+	/** The JSON-schema gloss: base type plus enum / pattern / bounds. */
+	Type: string;
+	/** Whether the schema lists it as required. */
+	Required: boolean;
+	/** The schema's own sentence for the argument. */
+	Description: string;
+}
+
+/** One tool the plugin registers, with the schema the agent actually sees. */
+export interface ToolRecord {
+	/** The registered name, e.g. `aphrodite_retrieve`. */
+	Name: string;
+	/** The description's first sentence - what the deferred catalog shows. */
+	Summary: string;
+	/** The full description, byte-exact from `schemas.rs`. */
+	Description: string;
+	/** Every argument, in declaration order. */
+	Parameters: ToolParameter[];
+}
+
+/** One hook the plugin registers, in the order the manifest declares it. */
+export interface HookRecord {
+	/** The hook name, e.g. `pre_llm_call`. */
+	Name: string;
+	/** Its ordinal in the manifest, two digits, e.g. `02`. */
+	N: string;
+}
+
+/** One environment variable, with the surface that reads it. */
+export interface EnvVarRecord {
+	/** The variable name, e.g. `APHRODITE_FLOW_BUDGET_CHARS`. */
+	Variable: string;
+	/** The section of `docs/config/env-vars.md` that declares it. */
+	Surface: string;
+	/** The precedence rule, when the doc states one. */
+	Precedence?: string;
+	/** The value with no override. */
+	Default?: string;
+	/** What it gates, in one sentence. */
+	Effect: string;
+}
+
+/** One crate the workspace publishes, or the vendored fork it links. */
+export interface CrateRecord {
+	/** The package name, e.g. `aphrodite-hermes`. */
+	Name: string;
+	/** The version in its own `Cargo.toml`. */
+	Version: string;
+	/** Its one-line `description`. */
+	Description: string;
+	/** The manifest path inside the module. */
+	Path: string;
+	/** True for the vendored fork, which ships as a dependency rather than a target. */
+	Vendored: boolean;
+}
+
+/* -------------------------------------------------------------------------
  * THE CONFIG KEY RECORD - one row of the aphrodite.toml reference
  * ---------------------------------------------------------------------- */
 
