@@ -3,38 +3,43 @@ import type { InternalLink } from "@Library/Links";
 
 interface Props {
 	/** The natural neighbors of the page - truthful links only, never forced. */
-	Links: InternalLink[];
+	Links?: InternalLink[];
 }
 
-const { Links } = Astro.props;
+const { Links = [] } = Astro.props;
+
+// A page without neighbors renders NO module: an empty RELATED plate is a
+// promise the page cannot keep. Links missing a destination are dropped for
+// the same reason - the box only ever ships targets that resolve.
+const Entries = Links.filter(({ Href, Label }) => Boolean(Href) && Boolean(Label));
 ---
 
 <!-- RELATED module: the cross-link web node. Rendered at the foot of each
      page's content; the links are the page's natural neighbors, curated
      per page from the registry. -->
-<nav
-	aria-label="Related pages"
-	class="relative w-full border-2 border-oxblood-dark bg-asphalt-panel p-5"
->
-	<div
-		class="mb-3 flex items-center gap-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
-	>
-		<span class="h-2 w-2 bg-raw-blood"></span>
-		RELATED
-	</div>
-	<div class="flex flex-wrap gap-x-6 gap-y-2">
-		{
-			Links.map((Link) => (
-				<a
-					class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white"
-					href={Link.Href}
-				>
-					<span class="text-oxblood-dark" aria-hidden="true">
-						■
-					</span>
-					{Link.Label}
-				</a>
-			))
-		}
-	</div>
-</nav>
+{
+	Entries.length > 0 && (
+		<nav
+			aria-label="Related pages"
+			class="relative w-full border-2 border-oxblood-dark bg-asphalt-panel p-5"
+		>
+			<div class="mb-3 flex items-center gap-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+				<span class="h-2 w-2 bg-raw-blood" />
+				RELATED
+			</div>
+			<div class="flex flex-wrap gap-x-6 gap-y-2">
+				{Entries.map((Link) => (
+					<a
+						class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white"
+						href={Link.Href}
+					>
+						<span class="text-oxblood-dark" aria-hidden="true">
+							■
+						</span>
+						{Link.Label}
+					</a>
+				))}
+			</div>
+		</nav>
+	)
+}

@@ -5,15 +5,26 @@
 // identical .astro-code markup the docs' ``` fences get - the token spans,
 // the data-language tag, the same theme colors. The code string is rendered
 // byte-exact; only the rendering changes.
+//
+// COPY: pass `Copy` to hang the site's one clipboard control on the block.
+// The payload IS `Code` - the fence never takes a second copy of the command,
+// so the button cannot copy something the reader is not looking at. Off by
+// default: the seven pages that already render fences keep their exact
+// markup, because chrome is a page decision and not a fence decision.
 import { codeToHtml } from "shiki";
+import CopyButton from "./CopyButton.astro";
 
 interface Props {
 	Code: string;
 	Lang?: string;
 	Class?: string;
+	/** Hang a CopyButton on the block, copying `Code` byte-exact. */
+	Copy?: boolean;
+	/** The copy button's label; defaults to the language, uppercased. */
+	CopyLabel?: string;
 }
 
-const { Code, Lang = "bash", Class = "" } = Astro.props;
+const { Code, Lang = "bash", Class = "", Copy = false, CopyLabel } = Astro.props;
 // Astro's markdown pipeline renames shiki's `shiki` class to `astro-code` and
 // adds the data-language attribute plus the overflow-x hint; the component
 // applies the same normalization so the markup matches the docs' fences.
@@ -23,4 +34,15 @@ const Html = (await codeToHtml(Code, { lang: Lang, theme: "github-dark" }))
 	.replace('color:#e1e4e8"', 'color:#e1e4e8;overflow-x:auto"');
 ---
 
-<div class:list={["font-mono text-base leading-relaxed [&>pre]:p-3.5", Class]} set:html={Html} />
+{
+	Copy ? (
+		<div class:list={["relative font-mono text-base leading-relaxed [&>pre]:p-3.5", Class]}>
+			<div class="absolute right-2 top-2 z-10">
+				<CopyButton Label={CopyLabel ?? Lang.toUpperCase()} Payload={Code} Tone="teal" Size="sm" />
+			</div>
+			<div set:html={Html} />
+		</div>
+	) : (
+		<div class:list={["font-mono text-base leading-relaxed [&>pre]:p-3.5", Class]} set:html={Html} />
+	)
+}

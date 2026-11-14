@@ -1,0 +1,174 @@
+import { m as __exportAll, p as createComponent, t as $$Base } from "./Base_DtRxtNeh.mjs";
+import { E as unescapeHTML, _ as renderTemplate, u as renderComponent, v as maybeRenderHead, w as addAttribute } from "./server_DdG-dV1Z.mjs";
+import { t as $$Related } from "./Related_DYsQNd8D.mjs";
+import { t as $$ZineDiagramNav } from "./ZineDiagramNav_mTakJVAP.mjs";
+import { t as tool_relay_default } from "./tool-relay_D8PH-Jpg.mjs";
+import { t as marker_format_default } from "./marker-format_Bool3VbQ.mjs";
+// Source/pages/tools.astro
+var tools_exports = /* @__PURE__ */ __exportAll({
+	default: () => $$Tools,
+	file: () => $$file,
+	url: () => $$url
+});
+var $$Tools = createComponent(($$result, $$props, $$slots) => {
+	const Tools = [
+		{
+			N: "01",
+			Name: "aphrodite_retrieve",
+			What: "Expand a CCR marker, or read a file, to full content"
+		},
+		{
+			N: "02",
+			Name: "aphrodite_compress",
+			What: "Store content in CCR and get a marker back"
+		},
+		{
+			N: "03",
+			Name: "aphrodite_stats",
+			What: "Session and proxy health counters for the CCR engine"
+		},
+		{
+			N: "04",
+			Name: "aphrodite_files",
+			What: "List file paths touched this session"
+		},
+		{
+			N: "05",
+			Name: "aphrodite_diff",
+			What: "Per-turn history of what was compressed"
+		},
+		{
+			N: "06",
+			Name: "aphrodite_search",
+			What: "Find already-compressed entries by keyword or type"
+		},
+		{
+			N: "07",
+			Name: "aphrodite_directive",
+			What: "Inspect or change the active behavioral directives"
+		},
+		{
+			N: "08",
+			Name: "aphrodite_test",
+			What: "Smoke-test the compress and retrieve round trip"
+		},
+		{
+			N: "09",
+			Name: "aphrodite_catalog",
+			What: "List every CCR entry recorded this session"
+		},
+		{
+			N: "10",
+			Name: "aphrodite_reclassify",
+			What: "Re-detect type and preview for stored entries"
+		},
+		{
+			N: "11",
+			Name: "aphrodite_prefetch",
+			What: "Read files now and store them as CCR markers"
+		},
+		{
+			N: "12",
+			Name: "aphrodite_prefetch_status",
+			What: "Live prefetch schedule - what is loaded and ready"
+		},
+		{
+			N: "13",
+			Name: "aphrodite_rebuild",
+			What: "Report binary and proxy state (never rebuilds)"
+		}
+	];
+	return renderTemplate`${renderComponent($$result, "Base", $$Base, {
+		"Title": "TOOLS // APHRODITE",
+		"Description": "The thirteen aphrodite_* tools: a thin relay into the Rust dylib with one shared session store, byte-exact marker retrieval, and the <<<CCR:hash|type|size>>> marker contract."
+	}, { "default": ($$result) => renderTemplate` ${maybeRenderHead($$result)}<main class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"> <!-- HERO --><header class="relative flex w-full flex-col items-start"> <div class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
+TOOLS // THE AGENT'S HANDLES
+</div> <h1 class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl">
+Thirteen tools
+</h1> <p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+Every tool is a thin relay into the Rust dylib: the plugin registers each tool from
+				the dylib's schema list, and every call dispatches through
+<code class="font-mono text-base text-weathered-teal">aphrodite_hermes_dispatch_tool</code>,
+				returning the JSON result verbatim.
+<span class="mt-1 block text-base">It is the reason all handlers share one session
+				store: content compressed by a hook or by
+<code class="font-mono text-base text-weathered-teal">aphrodite_compress</code>
+stays resolvable by
+<code class="font-mono text-base text-weathered-teal">aphrodite_retrieve</code>
+for the life of the session.</span> </p> <div class="mt-16 flex max-w-4xl flex-wrap items-center gap-8"> <span class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000]">
+13 AGENT-FACING TOOLS
+</span> <span class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]">
++ 1 INTERNAL (context_engine_pre_llm)
+</span> </div> </header> <!-- REGISTRY TABLE --> <section class="relative w-full"> <div class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
+REGISTRY // 13 ENTRIES
+</div> <div class="zine-box-crimson w-full -rotate-[1deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"> <div class="overflow-x-auto"> <table class="w-full border-collapse font-mono text-base"> <tbody> ${Tools.map((Tool, I) => renderTemplate`<tr${addAttribute(I < Tools.length - 1 ? "border-b border-oxblood-dark" : "", "class")}> <td class="py-3 pr-4 align-top text-base font-black text-zinc-dust">${Tool.N}</td> <td class="py-3 pr-6 align-top whitespace-nowrap text-weathered-teal">${Tool.Name}</td> <td class="py-3 align-top text-bone-newsprint">${Tool.What}</td> </tr>`)} </tbody> </table> </div> <p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
+THERE IS AN INTERNAL 14TH REGISTRY ENTRY, context_engine_pre_llm - THE CONTEXT
+					ENGINE'S OWN PRE-LLM HOOK, NOT A TOOL AN AGENT CALLS DIRECTLY.
+</p> </div> <figure class="mt-20 border border-oxblood-dark bg-soot-black p-4" data-diagram="tool-relay"> <div class="overflow-x-auto">${unescapeHTML(tool_relay_default)}</div> <figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+M4 // TOOL RELAY
+</figcaption> </figure> </section> <!-- MARKER CONTRACT --> <section class="relative w-full lg:w-10/12 lg:self-end"> <div class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"> <div class="absolute -top-5 left-6 z-10 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]">
+CONTRACT // THE MARKER
+</div> <h2 class="ccr-marker mb-12 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;
+</h2> <div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed"> <div class="ccr-marker text-bone-newsprint">&lt;&lt;&lt;<span class="text-stamped-canary">CCR:</span><span class="text-weathered-teal">a1b2c3d4...</span>|<span class="text-bone-white">build</span>|<span class="text-bone-white">12,408</span>&gt;&gt;&gt;</div> <div class="pl-4 text-zinc-dust">[terminal:14L exit code: 0]</div> </div> <ul class="mt-12 space-y-6 font-body text-base text-bone-newsprint"> <li class="border-l-4 border-raw-blood pl-4"> <span class="font-bold text-bone-white">BLAKE3 hash</span> - pattern
+<code class="font-mono text-base text-weathered-teal">${"^^[0-9a-fA-F]{8,64}$"}</code>;
+						truncated hashes never resolve, exact match only.
+</li> <li class="border-l-4 border-raw-blood pl-4"> <span class="font-bold text-bone-white">Byte-exact round-trip</span> -
+<code class="font-mono text-base text-weathered-teal">aphrodite_retrieve</code>
+returns the original bytes, nested markers expanded recursively.
+</li> <li class="border-l-4 border-raw-blood pl-4"> <span class="font-bold text-bone-white">Workspace-confined reads</span> -
+<code class="font-mono text-base text-weathered-teal">path</code> reads are
+						capped at 10 MiB and refuse paths outside the workspace.
+</li> <li class="border-l-4 border-raw-blood pl-4"> <span class="font-bold text-bone-white">Markers don't survive a session restart</span>
+- the dylib is loaded once per process, so a new session starts a fresh store.
+</li> </ul> </div> </section> <!-- SCHEMA EXEMPLAR 1: compress --> <section class="relative w-full"> <div class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
+SCHEMAS // TWO EXEMPLARS
+</div> <div class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"> <h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+aphrodite_compress
+</h2> <div class="mb-8 space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed"> <div><span class="text-zinc-dust">"content":</span> <span class="text-bone-newsprint">${"{ string, minLength 1, required }"}</span></div> <div><span class="text-zinc-dust">"type":</span> <span class="text-bone-newsprint">${"{ enum: code | log | diff | error | json | build_output | text }"}</span></div> <div><span class="text-zinc-dust">"_ccr_center":</span> <span class="text-bone-newsprint">${"{ string, optional label echoed by aphrodite_catalog }"}</span></div> <div class="pt-4 text-zinc-dust">→ returns ${"{ hash, type, size, preview, marker }"}</div> </div> <p class="font-body text-base leading-relaxed text-zinc-dust">
+Hashes the content, classifies it (or trusts the type hint), keeps it in the
+					session store, and hands back a resolvable marker - park bulky text here instead
+					of carrying it in context.
+</p> </div> </section> <!-- SCHEMA EXEMPLAR 2: retrieve --> <section class="relative w-full lg:w-9/12 lg:self-end"> <div class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"> <div class="absolute -top-5 right-6 z-10 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+EXEMPLAR 2 // RETRIEVE
+</div> <h2 class="mb-8 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+aphrodite_retrieve
+</h2> <div class="mb-8 space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed"> <div><span class="text-zinc-dust">"hash":</span> <span class="text-bone-newsprint">${"{ pattern: ^[0-9a-fA-F]{8,64}$ }"}</span></div> <div><span class="text-zinc-dust">"query":</span> <span class="text-bone-newsprint">${"{ string, case-insensitive line filter }"}</span></div> <div><span class="text-zinc-dust">"path":</span> <span class="text-bone-newsprint">${"{ string, direct workspace read, bypassing CCR }"}</span></div> <div class="pt-4 text-zinc-dust">→ ${"{ found: true, source: \"ccr\"|\"path\", hash|path, content }"}</div> <div class="text-zinc-dust">→ ${"{ found: false, error }"}</div> </div> <p class="font-body text-base leading-relaxed text-zinc-dust">
+Give hash or path - if both are present, path wins.
+</p> <p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+The query parameter is the cheap way to poke at a large entry without pulling
+					all of it into context.
+</p> <figure class="mt-20 border border-oxblood-dark bg-soot-black p-4" data-diagram="marker-format"> <div class="overflow-x-auto">${unescapeHTML(marker_format_default)}</div> <figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+M6 // MARKER FORMAT
+</figcaption> </figure> </div> </section> <!-- AUTO-EXPAND RULE --> <section class="relative w-full lg:w-10/12 lg:self-start"> <div class="zine-box-crimson relative -rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"> <div class="absolute -top-5 left-6 z-10 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]">
+RULE // META-TOOLS
+</div> <h2 class="mb-8 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+Meta-tool output is auto-expanded
+</h2> <p class="font-body text-base leading-relaxed text-bone-newsprint">
+Output from meta-tools (like
+<code class="font-mono text-base text-weathered-teal">aphrodite_stats</code> or
+<code class="font-mono text-base text-weathered-teal">aphrodite_catalog</code>) is
+					expanded inline, never compressed - the agent always sees its own engine's
+					status in full.
+</p> <p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+Compressing the catalog would just be the engine hiding its own ledger.
+</p> </div> </section> <!-- RELATED: the natural neighbors --> ${renderComponent($$result, "Related", $$Related, { "Links": [
+		{
+			Href: "/hooks/",
+			Label: "HOOKS"
+		},
+		{
+			Href: "/workbench/",
+			Label: "WORKBENCH"
+		},
+		{
+			Href: "/plugin/",
+			Label: "PLUGIN"
+		}
+	] })} </main> ${renderComponent($$result, "ZineDiagramNav", $$ZineDiagramNav, {})} ` })}`;
+}, "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/pages/tools.astro", void 0);
+var $$file = "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/pages/tools.astro";
+var $$url = "/tools";
+// \0virtual:astro:page:Source/pages/tools@_@astro
+var page = () => tools_exports;
+export { page };

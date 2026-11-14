@@ -1,0 +1,76 @@
+---
+/**
+ * CopyButton - the one clipboard control (plan D11).
+ *
+ * The site had two COPY CTAs with the same class and DIFFERENT payloads: the
+ * install sequence was written out on `/` and again, one line longer, on
+ * `/plugin/`. Two payloads for one sequence is exactly the drift
+ * `install-surfaces` §1 exists to prevent, so the payload is a prop here and
+ * the page passes the one canonical string.
+ *
+ * The click is NOT handled here. `Source/Layout/Base.astro` owns the only copy
+ * runtime in the site: it binds every `[data-copy]` element, writes
+ * `data-copy` to the clipboard and shows the "COPIED TO SPOOL" toast, and it
+ * re-binds on `astro:page-load` under a bound guard so the view-transitions
+ * router cannot orphan the handler. This component therefore ships markup and
+ * a `data-copy` value, nothing else - a second script here would double the
+ * toast, and a second toast is a second truth.
+ *
+ * `ZineCopyChip` is the small inline chip shape and rides the same runtime; it
+ * is a different size, not a different mechanism. Use this one wherever the
+ * copy is an ACTION in a panel or beside a code fence.
+ *
+ *   <CopyButton Payload={InstallSequence} />
+ *   <CopyButton Label="COPY TOML" Payload={Toml} Tone="teal" Size="sm" />
+ */
+interface Props {
+	/** The visible label and the accessible name; defaults to `COPY`. */
+	Label?: string;
+
+	/**
+	 * The exact string handed to the clipboard - a command block, a TOML
+	 * snippet, an install sequence. Required: a copy button with nothing to
+	 * copy is a dead control, so there is no default and no empty-string case.
+	 */
+	Payload: string;
+
+	/** The fill. `crimson` is the CTA voice; `teal` and `canary` are the marks. */
+	Tone?: "crimson" | "teal" | "canary";
+
+	/** `md` in a panel, `sm` inside a code fence's header. */
+	Size?: "md" | "sm";
+
+	/** Extra classes for the one caller that needs to sit in a flex row. */
+	Class?: string;
+}
+
+const { Label = "COPY", Payload, Tone = "crimson", Size = "md", Class = "" } = Astro.props;
+
+// The measured CTA shape (index:441-451 / plugin:218-226): a black hairline,
+// a hard 3px offset shadow, and a press that collapses both - law 2, nothing
+// floats. raw-blood is a FILL with bone-white text (the AA-LIFT raw-blood law:
+// raw-blood is chrome, never a text colour); the light fills take soot-black.
+const Base =
+	"inline-flex items-center gap-2 border border-black font-mono font-black uppercase tracking-widest transition-colors active:translate-x-0.5 active:translate-y-0.5 active:shadow-none";
+
+const Fill = {
+	crimson: "bg-raw-blood text-bone-white hover:bg-blood-crimson",
+	teal: "bg-weathered-teal text-soot-black hover:bg-weathered-teal",
+	canary: "bg-stamped-canary text-soot-black hover:bg-stamped-canary",
+}[Tone];
+
+const Metrics = {
+	md: "px-4 py-2 text-base shadow-[3px_3px_0px_#000]",
+	sm: "px-2 py-1 text-base shadow-[2px_2px_0px_#000]",
+}[Size];
+---
+
+<button
+	class:list={[Base, Fill, Metrics, Class]}
+	data-copy={Payload}
+	type="button"
+	aria-label={`Copy ${Label} to the clipboard`}
+>
+	<span aria-hidden="true">⧉</span>
+	<span>{Label}</span>
+</button>

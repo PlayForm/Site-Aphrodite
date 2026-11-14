@@ -33,6 +33,10 @@ const Toc = headings
 	.filter(({ depth }) => depth === 2 || depth === 3)
 	.map(({ depth, slug, text }) => ({ Depth: depth, Id: slug, Label: text }));
 
+// A single-heading page has no outline to speak of; the rail and the narrow
+// disclosure both stay out of the way rather than printing one lone entry.
+const HasToc = Toc.length > 1;
+
 // The WIP docs: pages that document partly unimplemented or roadmap-only
 // functionality (Centers: v1 shipped, v2-v4 are design sketches). They carry
 // the WIP badge in the sidebar, the section cards, and the page header.
@@ -225,14 +229,22 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 			}
 		</nav>
 
-		<div class="mt-10 flex flex-col gap-16 lg:grid lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-x-20">
-			<!-- Desktop: sticky sidebar -->
+		<!-- Three tracks once the outline has a home: the docs index, the
+		     reading column, and the page's own outline. Without an outline the
+		     third track is not reserved, so a short page keeps its full measure. -->
+		<div
+			class={`mt-10 flex flex-col gap-16 lg:grid lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-x-20 ${
+				HasToc ? "xl:grid-cols-[17rem_minmax(0,1fr)_15rem] xl:gap-x-12" : ""
+			}`}
+		>
+			<!-- Desktop: sticky sidebar. The index only - the page's outline
+			     lives in the right rail (xl) and the disclosure (below xl), so
+			     no viewport ever shows the same list twice. -->
 			<aside class="hidden lg:block">
 				<div class="sticky top-24">
 					<DocsSidebar
 						Sections={Sections}
 						CurrentId={Doc.id}
-						Headings={Toc}
 						Label="Documentation sections"
 					/>
 				</div>
@@ -336,6 +348,35 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 					)
 				}
 
+				<!-- Narrow viewports: the page's outline as a disclosure. Same
+				     generated list as the right rail - the page derives it once
+				     and presents it twice, and only one is ever visible. -->
+				{
+					HasToc && (
+						<details class="group mt-16 border-4 border-blood-crimson bg-carbon-void xl:hidden">
+							<summary class="flex cursor-pointer list-none items-center justify-between px-5 py-3 font-mono text-base font-black uppercase tracking-widest text-stamped-canary [&::-webkit-details-marker]:hidden">
+								ON THIS PAGE
+								<span aria-hidden="true" class="transition-transform group-open:rotate-45">
+									+
+								</span>
+							</summary>
+							<ul class="flex flex-col gap-1 border-t border-oxblood-dark px-5 py-4">
+								{Toc.map(({ Depth, Id, Label }) => (
+									<li class={Depth === 3 ? "pl-4" : undefined}>
+										<a
+											href={`#${Id}`}
+											data-outline-link={Id}
+											class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white"
+										>
+											{Label}
+										</a>
+									</li>
+								))}
+							</ul>
+						</details>
+					)
+				}
+
 				<!-- The reading column -->
 				<article class="docs-prose mt-16 min-w-0">
 					<Content />
@@ -345,7 +386,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 				{
 					(Previous || Next) && (
 						<nav
-							aria-label="Pagination"
+							aria-label="Docs pagination"
 							class="mt-32 grid gap-16 border-t-4 border-dashed border-oxblood-dark pt-16 sm:grid-cols-2 sm:gap-8"
 						>
 							{Previous ? (
@@ -390,6 +431,39 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 					)
 				}
 			</div>
+
+			<!-- Wide viewports: the in-page outline as a sticky right rail. The
+			     entries come from the page's own headings, so the rail can never
+			     drift from the anchors the renderer emitted. -->
+			{
+				HasToc && (
+					<aside class="hidden xl:block">
+						<div class="sticky top-24">
+							<nav
+								aria-label="On this page"
+								class="relative border-4 border-blood-crimson bg-carbon-void p-5 zine-box-subtle"
+							>
+								<p class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+									ON THIS PAGE
+								</p>
+								<ul class="mt-3 flex max-h-[calc(100vh-16rem)] flex-col gap-1 overflow-y-auto border-l border-oxblood-dark pl-3">
+									{Toc.map(({ Depth, Id, Label }) => (
+										<li class={Depth === 3 ? "pl-3" : undefined}>
+											<a
+												href={`#${Id}`}
+												data-outline-link={Id}
+												class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white"
+											>
+												{Label}
+											</a>
+										</li>
+									))}
+								</ul>
+							</nav>
+						</div>
+					</aside>
+				)
+			}
 		</div>
 	</main>
 
@@ -414,7 +488,6 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 			<DocsSidebar
 				Sections={Sections}
 				CurrentId={Doc.id}
-				Headings={Toc}
 				Label="Documentation sections (mobile)"
 			/>
 		</div>
@@ -696,8 +769,8 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 			Closer.addEventListener("click", () => Set(false));
 		}
 
-		// The drawer carries the in-page outline too: a TOC link jumps to its
-		// heading and the overlay gets out of the way.
+		// A fragment link inside the drawer (a section card pointing at an
+		// anchor) jumps the page and the overlay gets out of the way.
 		for (const Anchor of Drawer.querySelectorAll('a[href^="#"]')) {
 			Anchor.addEventListener("click", () => Set(false));
 		}
@@ -709,6 +782,111 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 		});
 	}
 
+	// The outline's current entry: the last heading above the reading line
+	// wins, so a long page always names where the reader is. Both presentations
+	// (right rail, narrow disclosure) carry data-outline-link and are marked
+	// together - the hidden one simply goes unseen.
+	function BindOutline() {
+		const Links = Array.from(
+			document.querySelectorAll<HTMLAnchorElement>("a[data-outline-link]"),
+		);
+
+		if (Links.length === 0 || Links[0]?.dataset["outlineBound"] === "1") {
+			return;
+		}
+
+		const ById = new Map<string, HTMLAnchorElement[]>();
+
+		for (const Link of Links) {
+			const Id = Link.dataset["outlineLink"] ?? "";
+
+			ById.set(Id, [...(ById.get(Id) ?? []), Link]);
+		}
+
+		// A toc entry whose heading the renderer never emitted is not a target;
+		// dropping it here keeps the marker honest instead of throwing.
+		const Targets = [...ById.keys()]
+			.map((Id) => ({ Id, Element: document.getElementById(Id) }))
+			.filter(
+				(Target): Target is { Id: string; Element: HTMLElement } =>
+					Target.Element !== null,
+			);
+
+		if (Targets.length === 0) {
+			return;
+		}
+
+		const First = Targets[0]!;
+		const Last = Targets[Targets.length - 1]!;
+
+		Links[0]!.dataset["outlineBound"] = "1";
+
+		let Current = "";
+
+		const Mark = (Id: string) => {
+			if (Id === Current) {
+				return;
+			}
+
+			Current = Id;
+
+			for (const [Key, Group] of ById) {
+				for (const Link of Group) {
+					switch (Key === Id) {
+						case true:
+							Link.setAttribute("aria-current", "location");
+
+							break;
+						default:
+							Link.removeAttribute("aria-current");
+					}
+				}
+			}
+		};
+
+		const Measure = () => {
+			// 160px: just clear of the sticky site header.
+			let Active = First.Id;
+
+			for (const { Id, Element } of Targets) {
+				if (Element.getBoundingClientRect().top <= 160) {
+					Active = Id;
+				}
+			}
+
+			// The page's own tail: the last heading is what the reader is in.
+			if (
+				window.innerHeight + window.scrollY >=
+				document.documentElement.scrollHeight - 4
+			) {
+				Active = Last.Id;
+			}
+
+			Mark(Active);
+		};
+
+		let Queued = false;
+
+		const OnScroll = () => {
+			switch (Queued) {
+				case true:
+					return;
+				default:
+					Queued = true;
+					requestAnimationFrame(() => {
+						Queued = false;
+						Measure();
+					});
+			}
+		};
+
+		Measure();
+		document.addEventListener("scroll", OnScroll, { passive: true });
+		window.addEventListener("resize", OnScroll);
+	}
+
 	BindDocsDrawer();
+	BindOutline();
 	document.addEventListener("astro:page-load", BindDocsDrawer);
+	document.addEventListener("astro:page-load", BindOutline);
 </script>

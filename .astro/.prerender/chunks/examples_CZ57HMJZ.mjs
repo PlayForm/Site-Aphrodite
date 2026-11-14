@@ -1,0 +1,714 @@
+import { f as createAstro, l as Link, m as __exportAll, n as $$ZineKicker, p as createComponent, t as $$Base, u as OurRepo } from "./Base_DtRxtNeh.mjs";
+import { E as unescapeHTML, _ as renderTemplate, u as renderComponent, v as maybeRenderHead, w as addAttribute } from "./server_DdG-dV1Z.mjs";
+import { t as config_resolution_default } from "./config-resolution_CNua9ciR.mjs";
+import { t as tool_relay_default } from "./tool-relay_D8PH-Jpg.mjs";
+import { t as $$ZineDiagramNav } from "./ZineDiagramNav_mTakJVAP.mjs";
+import { t as $$ZineFlow } from "./ZineFlow_DkfySTl9.mjs";
+import { t as $$ZineBox } from "./ZineBox_Bt37BuXj.mjs";
+import { t as $$ZineTape } from "./ZineTape_IRUAczxy.mjs";
+import { t as $$ZineStream } from "./ZineStream_CjYF1gbU.mjs";
+import { t as $$ZinePreview } from "./ZinePreview_baeoXlBR.mjs";
+import { t as $$CodeFence } from "./CodeFence_BaE69uUz.mjs";
+import { t as $$Breadcrumbs } from "./Breadcrumbs_DD_NKQL-.mjs";
+import { t as $$Related } from "./Related_DYsQNd8D.mjs";
+// Source/Component/ExampleCase.astro
+createAstro("https://Aphrodite.PlayForm.Cloud");
+var $$ExampleCase = createComponent(($$result, $$props, $$slots) => {
+	const Astro = $$result.createAstro($$props, $$slots);
+	Astro.self = $$ExampleCase;
+	const { Id, N, Label, Title, Tone = "crimson", Rotate = "", Claim, Command, Output, Preview, Marker, Note, Panels = [], Diagram, Src } = Astro.props;
+	const TapeColor = {
+		crimson: "raw",
+		canary: "canary",
+		teal: "teal"
+	};
+	return renderTemplate`${maybeRenderHead($$result)}<section${addAttribute(Id, "id")} class="relative w-full"> ${renderComponent($$result, "ZineBox", $$ZineBox, {
+		"Tone": Tone,
+		"Rotate": Rotate
+	}, { "default": ($$result) => renderTemplate` ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Label": `${N} // ${Label}`,
+		"Color": TapeColor[Tone],
+		"Side": "left"
+	})} <div class="mt-6 grid grid-cols-1 gap-12 lg:grid-cols-2"> <!-- THE CLAIM --><div class="flex flex-col gap-6"> <h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"> ${Title} </h2> ${Claim.map((Sentence, Index) => renderTemplate`<p${addAttribute(["font-body text-base leading-relaxed text-bone-newsprint", Index > 0 && "mt-3"], "class:list")}>${unescapeHTML(Sentence)}</p>`)} </div> <!-- THE MECHANICS: command, output, marker --> <div class="flex flex-col gap-8"> <div> ${renderComponent($$result, "ZineKicker", $$ZineKicker, {
+		"As": "h3",
+		"Tone": "dust"
+	}, { "default": ($$result) => renderTemplate`THE COMMAND` })} <div class="mt-3 border-2 border-oxblood-dark bg-soot-black"> ${renderComponent($$result, "CodeFence", $$CodeFence, {
+		"Code": Command.Code,
+		"Lang": Command.Lang
+	})} </div> </div> <div> ${renderComponent($$result, "ZineKicker", $$ZineKicker, {
+		"As": "h3",
+		"Tone": "dust"
+	}, { "default": ($$result) => renderTemplate`THE OUTPUT` })} <div class="mt-3"> ${renderComponent($$result, "ZineStream", $$ZineStream, { "Lines": Output })} </div> </div> <div> ${renderComponent($$result, "ZineKicker", $$ZineKicker, {
+		"As": "h3",
+		"Tone": "dust"
+	}, { "default": ($$result) => renderTemplate`THE MARKER` })} <div class="mt-3"> ${renderComponent($$result, "ZinePreview", $$ZinePreview, {
+		"Label": "PREVIEW + HASH",
+		"Result": Preview,
+		"Hash": Marker
+	})} </div> </div> </div> </div>  ${Panels.map((Panel) => renderTemplate`<div class="mt-24"> ${renderComponent($$result, "ZineKicker", $$ZineKicker, { "Tone": "dust" }, { "default": ($$result) => renderTemplate`${Panel.Label}` })} ${Panel.Kind === "rows" && renderTemplate`<div class="mt-8 flex flex-col gap-3"> ${Panel.Rows?.map(({ Left, Right, Tag, TagTone = "canary" }) => renderTemplate`<div class="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2 border border-oxblood-dark bg-asphalt-panel px-4 py-3"> <span class="font-mono text-base font-black uppercase tracking-widest text-bone-white"> ${Left} </span> <span class="font-mono text-base text-zinc-dust">${Right}</span> ${Tag && renderTemplate`<span${addAttribute(["border px-2 py-0.5 font-mono text-base font-black", {
+		canary: "border-stamped-canary text-stamped-canary",
+		teal: "border-weathered-teal text-weathered-teal",
+		newsprint: "border-bone-newsprint text-bone-newsprint"
+	}[TagTone]], "class:list")}> ${Tag} </span>`} </div>`)} </div>`} ${Panel.Kind === "cards" && renderTemplate`<div class="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"> ${Panel.Cards?.map(({ Title: CardTitle, Body, Note: CardNote }) => renderTemplate`<div class="zine-box-subtle border-[3px] border-oxblood-dark bg-soot-black p-5"> <div class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust"> ${CardTitle} </div> <div class="mt-4 font-mono text-base text-bone-white">${Body}</div> ${CardNote && renderTemplate`<div class="mt-4 border-t border-oxblood-dark pt-4 font-mono text-base leading-relaxed text-zinc-dust"> ${CardNote} </div>`} </div>`)} </div>`} ${Panel.Kind === "lanes" && renderTemplate`<div class="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2"> ${Panel.Lanes?.map(({ Title: LaneTitle, Lines, Marker: LaneMarker }) => renderTemplate`<div class="border border-oxblood-dark bg-soot-black p-5 font-mono text-base"> <div class="font-black uppercase tracking-widest text-bone-white">${LaneTitle}</div> ${Lines.map((Line) => renderTemplate`<div class="mt-2 text-zinc-dust">${Line}</div>`)} ${LaneMarker && renderTemplate`<div class="ccr-marker mt-4 text-weathered-teal">${unescapeHTML(LaneMarker)}</div>`} </div>`)} </div>`} </div>`)} ${Diagram && renderTemplate`<figure class="mt-24 border border-oxblood-dark bg-asphalt-panel p-4"> <div class="overflow-x-auto">${unescapeHTML(Diagram.Html)}</div> <figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust"> ${Diagram.Caption} </figcaption> </figure>`} ${Note?.length ? renderTemplate`<div class="mt-24 flex flex-col gap-6"> ${Note.map((Sentence, Index) => renderTemplate`<p${addAttribute(["max-w-3xl font-body text-base leading-relaxed text-bone-newsprint", Index > 0 && "mt-3"], "class:list")}>${unescapeHTML(Sentence)}</p>`)} </div>` : null} <div class="mt-16 font-mono text-base leading-relaxed text-zinc-dust">${Src}</div> ` })} </section>`;
+}, "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/Component/ExampleCase.astro", void 0);
+// Source/pages/examples.astro
+var examples_exports = /* @__PURE__ */ __exportAll({
+	default: () => $$Examples,
+	file: () => $$file,
+	url: () => $$url
+});
+var $$Examples = createComponent(($$result, $$props, $$slots) => {
+	const Cases = [
+		{
+			Id: "thresholds",
+			N: "I",
+			Label: "THE THRESHOLD TUNING WALKTHROUGH",
+			Hero: "A threshold edit propagates through a running proxy.",
+			Title: "Four knobs, hot",
+			Tone: "crimson",
+			Rotate: "sm:-rotate-[0.6deg]",
+			Claim: [
+				"The four hot-reload thresholds are the only compression values the running proxy re-reads: <code class=\"font-mono text-base\">tool_threshold_token</code>, <code class=\"font-mono text-base\">tool_threshold_cache</code>, <code class=\"font-mono text-base\">inline_threshold</code> and <code class=\"font-mono text-base\">code_multiplier</code>.",
+				"Edit + save, or <code class=\"font-mono text-base\">POST /reload</code> - the new values apply immediately, with no restart (README.md:389-391).",
+				"Everything else about a proxy is fixed at startup.",
+				"The mechanics of the hot path: the config-file watcher reacts to <code class=\"font-mono text-base\">Modify</code> events on <code class=\"font-mono text-base\">aphrodite.toml</code> with a 500 ms debounce, reloads the file, and stores the four resolved thresholds into every live <code class=\"font-mono text-base\">AppState</code>'s atomics - nothing else is updated live (docs/architecture/07-config-resolution.md:71).",
+				"The dylib session is a different story: it re-applies config fields on change only when <code class=\"font-mono text-base\">auto_reload = true</code> (README.md:390-391)."
+			],
+			Command: {
+				Lang: "text",
+				Code: "POST /reload"
+			},
+			Output: [{
+				Text: "&lt; 1,000 bytes of prose, above the token gate &gt;",
+				Tone: "dim"
+			}, {
+				Text: "SAME BYTES ON THE CACHE LANE: NO PREVIEW, NO MARKER, NO STORE ENTRY",
+				Tone: "dim"
+			}],
+			Preview: "[text:3L 50B | some unrecognizable prose here]",
+			Marker: "&lt;&lt;&lt;CCR:0e3a5c9f...a1e|text|1000&gt;&gt;&gt;",
+			Panels: [{
+				Kind: "rows",
+				Label: "THE FOUR LIVE THRESHOLDS // SHIPPED EXAMPLE, COMPILED DEFAULT",
+				Rows: [
+					{
+						Key: "tool_threshold_token",
+						Shipped: "256",
+						Compiled: "1024",
+						Gate: "TOKEN PROXY",
+						Effect: "tool results above 256 bytes compress"
+					},
+					{
+						Key: "tool_threshold_cache",
+						Shipped: "2048",
+						Compiled: "8192",
+						Gate: "CACHE PROXY",
+						Effect: "tool results above 2048 bytes compress"
+					},
+					{
+						Key: "inline_threshold",
+						Shipped: "1024",
+						Compiled: "256",
+						Gate: "STORAGE CUTOFF",
+						Effect: "above this, store instead of inline zlib"
+					},
+					{
+						Key: "code_multiplier",
+						Shipped: "1.0",
+						Compiled: "3.0",
+						Gate: "CODE TIER",
+						Effect: "code_* types get base threshold x 1.0 - no headroom in the example"
+					}
+				].map(({ Key, Shipped, Compiled, Gate, Effect }) => ({
+					Left: Key,
+					Right: `${Gate} · ${Effect} · compiled ${Compiled}`,
+					Tag: Shipped
+				}))
+			}, {
+				Kind: "rows",
+				Label: "THE WALKTHROUGH // ONE 1,000-BYTE TEXT BLOB, FOUR DOORS",
+				Rows: [
+					{
+						Surface: "TOKEN PROXY (256)",
+						Verdict: "MARKER",
+						Why: "1000 > 256 - compressed, preview + marker"
+					},
+					{
+						Surface: "CACHE PROXY (2048)",
+						Verdict: "RAW",
+						Why: "1000 < 2048 - passes through untouched"
+					},
+					{
+						Surface: "AS SOURCE CODE (256)",
+						Verdict: "MARKER",
+						Why: "256 x 1.0 = 256 headroom; 1000 > 256"
+					},
+					{
+						Surface: "STORAGE CUTOFF (1024)",
+						Verdict: "INLINE",
+						Why: "had it compressed: 1000 < 1024 stays inline zlib"
+					}
+				].map(({ Surface, Verdict, Why }) => ({
+					Left: Surface,
+					Right: Why,
+					Tag: Verdict,
+					TagTone: Verdict === "MARKER" ? "canary" : Verdict === "RAW" ? "teal" : "newsprint"
+				}))
+			}],
+			Diagram: {
+				Html: config_resolution_default,
+				Caption: "THE HOT PATH // EDIT-SAVE - 500 MS DEBOUNCE - FOUR ATOMICS"
+			},
+			Src: "SRC: README.md:389-407,584-588 · docs/architecture/07-config-resolution.md:66-71 · docs/config/aphrodite-toml.md:121-131,204 · aphrodite.toml.example:95-123"
+		},
+		{
+			Id: "retrieval",
+			N: "II",
+			Label: "THE RETRIEVAL ROUND-TRIP",
+			Hero: "A marker travels from compression to byte-exact retrieval.",
+			Title: "Compress, marker, retrieve, byte-exact",
+			Tone: "canary",
+			Rotate: "sm:rotate-[0.5deg]",
+			Claim: [
+				"The lifecycle of one payload: the hook hashed it (BLAKE3), stored the bytes in the session store, and replaced the output with a <code class=\"ccr-marker font-mono text-base\">{\"<<<CCR:hash|type|size>>>\"}</code> marker plus a preview.",
+				"The transcript then carried the marker instead of the content - hash, type, size, ~15 tokens.",
+				"When the next action needs the substance, the agent calls <code class=\"font-mono text-base\">aphrodite_retrieve</code> with the hash - or pastes the marker body directly; every retrieval entry point accepts it, suffix or no suffix.",
+				"What comes back is the original content byte-for-byte, nested markers resolved recursively (docs/ccr/marker-format.md).",
+				"The caveat, printed on the tool's own contract: markers stay resolvable for the life of the session but <strong class=\"text-bone-white\">do not survive a session restart</strong> - the dylib is loaded once per process, so a new session starts a fresh store (docs/tool-relay/tools.md:36-39).",
+				"The proxy's token listener backs its store with SQLite, which is the durability escape from that rule."
+			],
+			Command: {
+				Lang: "text",
+				Code: "APHRODITE_RETRIEVE(HASH)"
+			},
+			Output: [
+				{
+					Text: "turn 7, tool result",
+					Tone: "dim"
+				},
+				{
+					Text: "↓ APHRODITE_RETRIEVE(HASH) - THE AGENT DECIDES, NOT THE ENGINE ↓",
+					Tone: "canary"
+				},
+				{
+					Text: "173 bytes return unchanged · nested markers resolved",
+					Tone: "result"
+				}
+			],
+			Preview: "[git:2M 2A 1D 3?? | src/x.rs src/y.rs +5 more]",
+			Marker: "&lt;&lt;&lt;CCR:d0e3f6a9...d4e7|git|173&gt;&gt;&gt;",
+			Panels: [
+				{
+					Kind: "cards",
+					Label: "THE ANNOTATED ARTIFACTS // PREVIEWS THAT MADE RETRIEVAL UNNECESSARY",
+					Cards: [
+						{
+							Line: "git status",
+							Shape: "[git:2M 2A 1D 3?? | src/x.rs src/y.rs +5 more]",
+							Reads: "2 modified, 2 added, 1 deleted, 3 untracked; first files named"
+						},
+						{
+							Line: "test run",
+							Shape: "[test:220 pass 0 fail 1 ignored | 0.31s]",
+							Reads: "all green - the one ignored test is visible, nothing to retrieve"
+						},
+						{
+							Line: "grep",
+							Shape: "[grep:4 hits in 3 files | src/preview.rs:12 ...]",
+							Reads: "hit count, distinct files, first location - retrieve or narrow the search"
+						}
+					].map(({ Line, Shape, Reads }) => ({
+						Title: Line,
+						Body: Shape,
+						Note: Reads
+					}))
+				},
+				{
+					Kind: "rows",
+					Label: "THREE MARKER FACES // HASH EXTRACTION ACCEPTS ALL THREE",
+					Rows: [
+						{
+							Left: "<<<CCR:hash|type|size>>>",
+							Right: "STANDARD - THE WIRE FORMAT"
+						},
+						{
+							Left: "[CCR:hash]",
+							Right: "BRACKET"
+						},
+						{
+							Left: "⧗CCR:hash⧘",
+							Right: "UNICODE - U+2AF7 / U+2AF8"
+						}
+					]
+				},
+				{
+					Kind: "cards",
+					Label: "THE REGRESSION HISTORY // PREVIEW DOUBLING, v1.3.4",
+					Cards: [{
+						Title: "THE BUG, BEFORE THE FIX",
+						Body: "[text:[text:53L 1913B]]",
+						Note: "AN ALREADY-SELF-DESCRIBING PREVIEW RE-WRAPPED IN RENDER_MARKER - NOW EMITTED EXACTLY ONCE, REGRESSION-TESTED."
+					}]
+				}
+			],
+			Src: "SRC: docs/tool-relay/tools.md:36-39 · docs/ccr/marker-format.md:76-86 · CHANGELOG.md:613-626 · README.md:298-299,506"
+		},
+		{
+			Id: "chain-split",
+			N: "III",
+			Label: "THE CHAIN-SPLIT",
+			Hero: "A compound command splits into segments.",
+			Title: "One command, many markers",
+			Tone: "teal",
+			Rotate: "sm:-rotate-[0.4deg]",
+			Claim: [
+				"Chain-split is a Hermes plugin-side feature, not a proxy one: with it enabled, <code class=\"font-mono text-base\">pre_tool_call</code> rewrites a chained shell command by echoing segment markers, and <code class=\"font-mono text-base\">transform_terminal_output</code> splits the produced output into per-segment pieces - the hook compresses each segment into its own marker, so the model sees several compact previews instead of one large blob (docs/proxy/compression.md:366-379).",
+				"It is opt-in: <code class=\"font-mono text-base\">chain_split = false</code> by default, because invisible segment markers pollute redirected stdout.",
+				"The split floor and cap are <code class=\"font-mono text-base\">chain_split_min_segments = 2</code> and <code class=\"font-mono text-base\">chain_split_max_segments = 6</code>.",
+				"The split is unconditional once marked - segment compression happens before the threshold gate, so marked output never leaks raw.",
+				"And it is careful: constructs that would corrupt control flow (heredocs, loops spanning segments) are left untouched.",
+				"The proxy never performs chain splitting - it only sees Chat Completions responses."
+			],
+			Command: {
+				Lang: "bash",
+				Code: "cd project && cargo build --release && cargo test 2>&1"
+			},
+			Output: [
+				{
+					Text: "PER-SEGMENT MARKERS BEHIND IT - EACH SEGMENT ITS OWN RECEIPT:",
+					Tone: "dim"
+				},
+				{
+					Text: "&lt;&lt;&lt;CCR:f8a1d4c7...b0e3|build_output|210&gt;&gt;&gt;",
+					Tone: "teal"
+				},
+				{
+					Text: "&lt;&lt;&lt;CCR:a9b2c5d8...e1f4|test|188&gt;&gt;&gt;",
+					Tone: "teal"
+				}
+			],
+			Preview: "[chain:3 | build ...]",
+			Marker: "&lt;&lt;&lt;CCR:e7c0f3a6...c1f4|terminal|398&gt;&gt;&gt;",
+			Note: ["<span class=\"font-mono text-base font-bold uppercase tracking-widest text-zinc-dust\">OFF BY DEFAULT · </span>Without the split, the same compound command is one terminal blob with one marker; the build preview and the test preview never separate."],
+			Src: "SRC: docs/proxy/compression.md:366-379 · docs/plugin/hooks.md:59-65,102-106 · README.md:411-413"
+		},
+		{
+			Id: "directives",
+			N: "IV",
+			Label: "THE DIRECTIVES IN ACTION",
+			Hero: "Directives assemble under a budget.",
+			Title: "Seven built-ins, one budget",
+			Tone: "crimson",
+			Rotate: "sm:rotate-[0.5deg]",
+			Claim: [
+				"Short behavioral <code class=\"font-mono text-base\">.md</code> files, baked into the binary and materialized on plugin registration, injected verbatim every <code class=\"font-mono text-base\">pre_llm_call</code> - they teach retrieval vocabulary, never the compression mechanism.",
+				"The discovery order is strictly first-wins, never merged: <code class=\"font-mono text-base\">APHRODITE_DIRECTIVES_DIR</code> → <code class=\"font-mono text-base\">./directives/</code> → <code class=\"font-mono text-base\">~/.hermes/aphrodite/directives/</code> → binary-relative.",
+				"Any <code class=\"font-mono text-base\">.md</code> file in a discovered directory becomes a directive named after its stem - the built-ins are not special-cased (docs/plugin/directives.md:51-58).",
+				"The budget math: 2,000 characters per directive body, 4,000 characters across all active directives combined - and the whole per-turn injection (directives + nudges + recall catalog + retrieve hint) lives under one hard cap, <code class=\"font-mono text-base\">flow_budget_chars</code>, default 4,000 (shipped example: 2,600).",
+				"Sections drop from the bottom when over budget; directives and nudges never drop."
+			],
+			Command: {
+				Lang: "bash",
+				Code: "aphrodite_directive(\"swap\", \"explore\")"
+			},
+			Output: [
+				{
+					Text: "THE ASSEMBLED TURN // pre_llm_call",
+					Tone: "dim"
+				},
+				{
+					Text: "[directives: name1, name2]",
+					Tone: "result"
+				},
+				{
+					Text: "focus: targeted execution, marker-aware retrieval",
+					Tone: "dim"
+				},
+				{
+					Text: "[nudge: ...]",
+					Tone: "result"
+				},
+				{
+					Text: "[recall] catalog summary",
+					Tone: "result"
+				}
+			],
+			Preview: "the directive block, injected verbatim",
+			Marker: "none - the assembler injects text, not markers.",
+			Panels: [{
+				Kind: "rows",
+				Label: "THE BUILT-IN SET // SEVEN, BAKED IN",
+				Rows: [
+					{
+						Name: "focus",
+						Role: "one primary action per turn, marker-aware retrieval"
+					},
+					{
+						Name: "foresight",
+						Role: "prefetch what the next turn will need, never wait on I/O"
+					},
+					{
+						Name: "ccr-handling",
+						Role: "how to read the marker and when to retrieve vs. skip"
+					},
+					{
+						Name: "cleanup",
+						Role: "catalog sweep, summarize, verify nothing left unresolved"
+					},
+					{
+						Name: "explore",
+						Role: "broad context, aggressive prefetch, resolve what matters"
+					},
+					{
+						Name: "lazy",
+						Role: "only what this turn strictly requires; defer the rest"
+					},
+					{
+						Name: "lazy-eval",
+						Role: "markers accumulate across turns; you decide when to resolve"
+					}
+				].map(({ Name, Role }) => ({
+					Left: Name,
+					Right: Role
+				}))
+			}, {
+				Kind: "cards",
+				Label: "THE INJECTION ORDER // PRE_LLM_CALL, TOP TO BOTTOM, DROPS FROM THE BOTTOM",
+				Cards: [
+					{
+						N: "01",
+						Section: "FIRST-TURN ORIENTATION",
+						Rule: "turn 0 only, from [prompts] session_inject"
+					},
+					{
+						N: "02",
+						Section: "DIRECTIVES",
+						Rule: "never dropped"
+					},
+					{
+						N: "03",
+						Section: "NUDGES",
+						Rule: "one-shots, at most two - never dropped"
+					},
+					{
+						N: "04",
+						Section: "BACKGROUND STATUS",
+						Rule: "yields under pressure"
+					},
+					{
+						N: "05",
+						Section: "RECALL CATALOG",
+						Rule: "the first section dropped under budget"
+					}
+				].map(({ N, Section, Rule }) => ({
+					Title: `ORDER // ${N}`,
+					Body: Section,
+					Note: Rule
+				}))
+			}],
+			Note: ["<span class=\"font-mono text-base font-bold uppercase tracking-widest text-stamped-canary\">THE PRIORITY LADDER · </span>Under budget pressure the recall catalog goes first, then background status.", "Directives and nudges are never dropped - nudges are capped at two one-shots, so the floor is always the directive block plus up to two nudges (docs/plugin/hooks.md:123-137)."],
+			Src: "SRC: docs/plugin/directives.md:34-97 · docs/plugin/hooks.md:114-137,146-153 · README.md:415-440 · docs/config/env-vars.md:78"
+		},
+		{
+			Id: "relay",
+			N: "V",
+			Label: "THE TOOL-RELAY CALLBACK",
+			Hero: "A relay call fires a callback.",
+			Title: "Synchronous, unless you say otherwise",
+			Tone: "canary",
+			Rotate: "sm:-rotate-[0.5deg]",
+			Claim: [
+				"<code class=\"font-mono text-base\">POST /tool/relay</code> runs the tool synchronously unless the request carries a <code class=\"font-mono text-base\">callback_url</code> - then the call becomes asynchronous: the proxy answers immediately with <code class=\"font-mono text-base\">{\"{success: true, async_call: true}\"}</code>, executes the tool, and POSTs the real result to the callback URL later (docs/tool-relay/callbacks.md:29-48).",
+				"The guardrails are strict.",
+				"The callback URL must be <strong class=\"text-bone-white\">https-only</strong> - http, including loopback, and any other scheme are rejected with HTTP 400 before anything executes (SSRF protection).",
+				"The delivery is a <strong class=\"text-bone-white\">5-second, fire-and-forget POST</strong>: no auth header, no retries, the outcome untracked (only relay calls themselves are counted in <code class=\"font-mono text-base\">/stats</code>).",
+				"Only <code class=\"font-mono text-base\">aphrodite_retrieve</code>, <code class=\"font-mono text-base\">aphrodite_compress</code> and <code class=\"font-mono text-base\">aphrodite_list</code> are relayable; anything else is an error.",
+				"On graceful shutdown the task tracker waits for in-flight deliveries, so none are lost mid-flight."
+			],
+			Command: {
+				Lang: "text",
+				Code: "POST /tool/relay"
+			},
+			Output: [
+				{
+					Text: "SYNCHRONOUS // NO CALLBACK_URL",
+					Tone: "dim"
+				},
+				{
+					Text: "POST /tool/relay - tool runs - full result inline",
+					Tone: "result"
+				},
+				{
+					Text: "ASYNC // WITH CALLBACK_URL",
+					Tone: "canary"
+				},
+				{
+					Text: "{\"{ \\\"success\\\": true, \\\"result\\\": null, \\\"async_call\\\": true }\"}",
+					Tone: "result"
+				},
+				{
+					Text: "... later, 5s timeout, no auth, no retries ...",
+					Tone: "dim"
+				},
+				{
+					Text: "POST callback_url - the real result",
+					Tone: "result"
+				}
+			],
+			Preview: "compact metadata: hash, type, size, marker",
+			Marker: "none - a relay result stays raw through the hook pipeline.",
+			Note: ["Compressing an <code class=\"font-mono text-base\">aphrodite_retrieve</code> result would replace resolved content with another marker, which is why the result itself is compact metadata and never absorbed."],
+			Diagram: {
+				Html: tool_relay_default,
+				Caption: "M4 // TOOL RELAY"
+			},
+			Src: "SRC: docs/tool-relay/callbacks.md:27-111,139-144 · docs/plugin/hooks.md:76-83"
+		},
+		{
+			Id: "skip-gate",
+			N: "VI",
+			Label: "THE ESSENTIAL-TOOL SKIP GATE",
+			Hero: "Essential tools refuse the machine.",
+			Title: "What stays raw, and why",
+			Tone: "teal",
+			Rotate: "sm:-rotate-[0.4deg]",
+			Claim: [
+				"Before any classification or storage, <code class=\"font-mono text-base\">transform_tool_result</code> runs its skip gates: a result is left untouched when it is empty; when the tool is in the <strong class=\"text-bone-white\">essential set</strong> - <code class=\"font-mono text-base\">skill_view</code>, <code class=\"font-mono text-base\">skills_list</code>, <code class=\"font-mono text-base\">skill_manage</code>, <code class=\"font-mono text-base\">memory</code>, <code class=\"font-mono text-base\">session_search</code>, <code class=\"font-mono text-base\">read_file</code>, <code class=\"font-mono text-base\">read_terminal</code>; when it is one of Aphrodite's own tools or a headroom helper; or when it sits below the tool threshold (docs/plugin/hooks.md:76-83).",
+				"The logic is not protectionism - it is information theory per surface.",
+				"The essential tools return compact, self-describing metadata the agent needs raw: a skill's instructions, a memory entry, a file's content.",
+				"Compressing them would trade precision for nothing.",
+				"The self-tools are already the compressed form: their output is a marker or a catalog, and marking a marker is the preview-doubling bug in slow motion.",
+				"And the size gate is the quiet one - most tool output is simply small, and passes through without a store entry ever existing.",
+				"One subtlety: the hook tracks file references <em>before</em> the skip gates, so <code class=\"font-mono text-base\">read_file</code> and <code class=\"font-mono text-base\">search_files</code> results feed the recall catalog even when it never compresses them (docs/plugin/hooks.md:92-94)."
+			],
+			Command: {
+				Lang: "text",
+				Code: "read_file"
+			},
+			Output: [
+				{
+					Text: "01 EMPTY · nothing to compress",
+					Tone: "result"
+				},
+				{
+					Text: "02 ESSENTIAL SET · the agent needs raw output",
+					Tone: "result"
+				},
+				{
+					Text: "03 SELF TOOLS · already compact metadata",
+					Tone: "result"
+				},
+				{
+					Text: "04 SIZE GATE · 1,024 bytes on the token lane, 8,192 on the cache lane; 0 disables the gate",
+					Tone: "result"
+				}
+			],
+			Preview: "the raw bytes, unchanged",
+			Marker: "none - this is the gate that refuses the machine.",
+			Note: ["The gate order is fixed: the empty check, the essential set, the self-tools, then the size gate (docs/plugin/hooks.md:69-94).", "The classifier demo in <a class=\"text-stamped-canary hover:text-bone-white\" href=\"/workbench/\">the workbench</a> walks the same gates with live output."],
+			Src: "SRC: docs/plugin/hooks.md:69-94,146-153 · docs/config/aphrodite-toml.md:121-131"
+		},
+		{
+			Id: "dual-listener",
+			N: "VII",
+			Label: "THE DUAL-LISTENER PARALLEL",
+			Hero: "And the same payload crosses two listeners without changing shape.",
+			Title: "Same output, two lanes, one marker",
+			Tone: "crimson",
+			Rotate: "sm:rotate-[0.5deg]",
+			Claim: [
+				"A single binary can run two listeners with different roles - the cache proxy on <code class=\"font-mono text-base\">:9797</code> (in-memory DashMap, 10,000 entries, 8192-byte threshold) and the token proxy on <code class=\"font-mono text-base\">:9798</code> (SQLite at <code class=\"font-mono text-base\">ccr.db</code>, 1024-byte threshold, persistent, tool-relay-capable).",
+				"Each has its own <code class=\"font-mono text-base\">AppState</code> and CCR backend; both bind to loopback by default (docs/proxy/architecture.md:9-35).",
+				"The parallel that matters: the same payload crosses the plugin-hook lane (the hook intercepts it at the tool boundary, no API round-trip) and the proxy lane (the proxy compresses Chat Completions responses in flight) - and the marker it becomes is byte-identical across the two paths, as are the enriched previews (CHANGELOG.md:616-617).",
+				"The preview-doubling regression of v1.3.4 was caught precisely because the two paths were held to that standard."
+			],
+			Command: {
+				Lang: "text",
+				Code: "transform_tool_result"
+			},
+			Output: [
+				{
+					Text: "LANE A // PLUGIN HOOKS",
+					Tone: "dim"
+				},
+				{
+					Text: "transform_tool_result → BLAKE3 → marker",
+					Tone: "result"
+				},
+				{
+					Text: "LANE B // PROXY",
+					Tone: "canary"
+				},
+				{
+					Text: "Chat Completions response → classify → threshold → marker",
+					Tone: "result"
+				}
+			],
+			Preview: "the same enriched preview on both lanes",
+			Marker: "&lt;&lt;&lt;CCR:d7b4f2a8...c6b0|terminal|612&gt;&gt;&gt;",
+			Panels: [{
+				Kind: "cards",
+				Label: "TWO LISTENERS, TWO BACKENDS",
+				Cards: [{
+					Title: "CACHE :9797",
+					Body: "DASHMAP · 10,000",
+					Note: "8192-BYTE THRESHOLD · TRANSIENT"
+				}, {
+					Title: "TOKEN :9798",
+					Body: "SQLITE · ccr.db",
+					Note: "1024-BYTE THRESHOLD · PERSISTENT"
+				}]
+			}],
+			Src: "SRC: docs/proxy/architecture.md:9-35 · README.md:287-299 · CHANGELOG.md:616-617"
+		}
+	];
+	return renderTemplate`${renderComponent($$result, "Base", $$Base, {
+		"Title": "EXAMPLES // APHRODITE",
+		"Description": "The worked scenarios: threshold tuning in action, the retrieval round-trip, the chain split, the directives block, the tool-relay callback, the skip gate, and the dual-listener parallel - real mechanics, every claim anchored."
+	}, { "default": ($$result) => renderTemplate` ${maybeRenderHead($$result)}<main class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"> ${renderComponent($$result, "Breadcrumbs", $$Breadcrumbs, {})} <!-- ============ HERO // THE WORKED SCENARIOS ============ --> <header class="relative flex w-full flex-col items-start pt-12"> <div class="tape-strip absolute -top-6 left-0 z-10 -rotate-1 border-b border-t border-bone-newsprint/30 px-4 py-1 text-base font-black uppercase tracking-widest text-bone-newsprint">
+EXAMPLES // MECHANICS-FIRST · THE OTHER SHELF IS /SHOWCASE
+</div> <div class="zine-box-teal relative w-full border-4 border-blood-crimson bg-carbon-void p-8 sm:p-12 lg:p-16"> <p class="font-mono text-base font-bold uppercase tracking-widest text-weathered-teal">
+THE WORKED SCENARIOS // HOW IT ACTUALLY MOVES
+</p> <h1 class="mt-8 font-headline text-5xl font-black uppercase leading-[0.9] tracking-tighter text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-7xl lg:text-8xl">
+Seven scenarios,<br>one <span class="text-stamped-canary">lifecycle</span> </h1> <p class="mt-16 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+Not what the output looks like - what happens to it, step by step.
+</p> <!-- The index: the seven claims, each a jump link to its scenario --> <ol class="mt-12 flex max-w-3xl flex-col gap-3"> ${Cases.map(({ Id, N, Hero }) => renderTemplate`<li> <a class="font-body text-base leading-relaxed text-bone-newsprint transition-colors hover:text-stamped-canary"${addAttribute(`#${Id}`, "href")}> <span class="mr-3 font-mono text-base font-black uppercase tracking-widest text-stamped-canary"> ${N} </span> ${Hero} </a> </li>`)} </ol> <div class="mt-24 flex flex-wrap gap-12 font-mono text-base font-bold uppercase tracking-widest"> <a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-stamped-canary transition-colors hover:text-bone-white" href="/workbench/">TRY THE SIMULATOR</a> <a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-zinc-dust transition-colors hover:text-bone-white" href="/tools/">THE TOOLS</a> <a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-zinc-dust transition-colors hover:text-bone-white" href="/docs/">THE DOCS</a> </div> </div> </header> <!-- ============ I-VII // THE SEVEN SCENARIOS, ONE SHAPE ============ --> ${Cases.map(({ Hero: _Hero, ...Scenario }) => renderTemplate`${renderComponent($$result, "ExampleCase", $$ExampleCase, { ...Scenario })}`)} <!-- ============ VIII // THE TURN CYCLE (INTERACTIVE) ============ --> <section id="turn-cycle" class="relative w-full lg:w-11/12 lg:self-end"> <p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+The scenarios above each zoom into one mechanism.
+</p> <p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+This is the loop that holds them: the six hooks, in firing order, with what the agent sees
+				and what the system does at each step.
+</p> <div class="mt-8"> ${renderComponent($$result, "ZineFlow", $$ZineFlow, {
+		"Title": "THE TURN CYCLE // SIX HOOKS, ONE LOOP",
+		"Complete": "THE LOOP CLOSES",
+		"Steps": [
+			{
+				Title: "SESSION START",
+				Agent: ["a clean slate - nothing injected yet", "· turn 0: no markers, no directives, no recall catalog in the transcript"],
+				System: ["on_session_start resets every piece of per-session state: turn counter, conversation index, recent markers, referenced files, tool-event telemetry, ephemeral directives. It injects nothing; the orientation renders on the first pre_llm_call"],
+				Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
+				AnchorLabel: "hooks.md:22-27"
+			},
+			{
+				Title: "BEFORE THE TOOL",
+				Agent: [
+					"the call may be rewritten before it runs",
+					"» cd x && cargo build && cargo test",
+					"· long-running terminal/process calls may be auto-backgrounded (poll worker, default on); the rewrite is invisible in the transcript"
+				],
+				System: ["pre_tool_call can auto-background long-running terminal/process calls (poll worker, default on) and split chained commands (chain split, off by default). If neither applies, the call passes through unchanged"],
+				Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
+				AnchorLabel: "hooks.md:29-42"
+			},
+			{
+				Title: "AFTER THE TOOL",
+				Agent: [
+					"a large result comes back as a preview and a marker",
+					"» [grep:4 hits in 3 files | src/preview.rs:12 ...]",
+					"» <<<CCR:hash|type|size>>>",
+					"· the full bytes are gone from the transcript - retrievable by hash"
+				],
+				System: ["transform_tool_result runs telemetry, file-reference tracking (read_file and search_files recorded before the skip gates, hooks.md:92-94), the skip gates, classification, the EMA-tuned threshold, then the BLAKE3 store and the swap"],
+				Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
+				AnchorLabel: "hooks.md:44-56"
+			},
+			{
+				Title: "AFTER THE TERMINAL",
+				Agent: ["same treatment for command output - chain split first", "» [terminal:14L exit code: 0]"],
+				System: ["transform_terminal_output mirrors the tool pipeline: telemetry, per-segment chain split before the threshold gate, the 1,024-character gate, classify, store, swap"],
+				Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
+				AnchorLabel: "hooks.md:58-66"
+			},
+			{
+				Title: "BEFORE THE LLM",
+				Agent: [
+					"the turn opens with directives, nudges, and the recall catalog",
+					"→ [aphrodite: first-turn orientation] on turn 0",
+					"· one injection block under a 4,000-character budget - recall drops first; directives and nudges never drop"
+				],
+				System: ["pre_llm_call runs the poll-worker checkpoint, then the assembler composes the injection under one 4,000-character budget, dropping sections from the bottom - recall first to go; directives and nudges never drop"],
+				Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
+				AnchorLabel: "hooks.md:68-79"
+			},
+			{
+				Title: "AFTER THE LLM",
+				Agent: ["the answer arrives - the machinery tidies up", "· the last marker seen in the transcript is archived into the conversation index"],
+				System: ["post_llm_call archives the last marker into the conversation index, advances the turn counter, purges expired nudges (after the counter advances, so a one-shot renders exactly once), and expires stale poll-worker tasks. Then the next turn begins"],
+				Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
+				AnchorLabel: "hooks.md:81-86"
+			}
+		]
+	})} </div> <div class="mt-10 font-mono text-base leading-relaxed text-zinc-dust">
+SRC: docs/plugin/hooks.md:13-20 (the six-hook table) · each step cites its hook section
+</div> </section> <!-- ============ IX // ONE RUNTIME HOME (INTERACTIVE) ============ --> <section id="runtime-home" class="relative w-full lg:w-11/12 lg:self-start"> <p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+The history behind issue #40, as a decision walk: how the runtime home is resolved today,
+				and why both halves of the plugin agree by construction.
+</p> <div class="mt-8"> ${renderComponent($$result, "ZineFlow", $$ZineFlow, {
+		"Title": "THE HOME DECISION // RESOLVED ONCE, SHARED BY BOTH HALVES",
+		"Complete": "ONE HOME",
+		"Steps": [
+			{
+				Title: "EXPLICIT OVERRIDE",
+				Agent: [
+					"you set APHRODITE_HOME - the whole stack obeys",
+					"» export APHRODITE_HOME=/path/to/aphrodite",
+					"· binaries/, aphrodite.toml, ccr.db, directives/, logs all resolve under it"
+				],
+				System: ["the shim resolves the runtime home once at register() and exports it to the Rust half through APHRODITE_HOME + APHRODITE_DIRECTIVES_DIR, so the dylib and the spawned proxy binary agree by construction"],
+				Anchor: Link(OurRepo, "CHANGELOG.md"),
+				AnchorLabel: "CHANGELOG v1.6.3"
+			},
+			{
+				Title: "THE HERMES HOME",
+				Agent: ["per-Hermes-home isolation, extended to the Rust half", "· no override: HERMES_HOME decides, on both halves"],
+				System: ["no override: the home derives from the Hermes home (HERMES_HOME), honored with the same precedence on the Rust side through the shared home module"],
+				Anchor: Link(OurRepo, "CHANGELOG.md"),
+				AnchorLabel: "CHANGELOG v1.6.3"
+			},
+			{
+				Title: "THE LEGACY ADOPTION",
+				Agent: ["upgrades keep working - with a warning, never a migration", "· the legacy ~/.hermes/aphrodite home is adopted with a one-line warning"],
+				System: ["when the Hermes-home-derived home holds no install but the pre-2.2 ~/.hermes/aphrodite does, the legacy home is adopted with a one-line warning. Adoption never fires for throwaway homes (probe scratch, temp homes), preserving the catalog probe's isolation"],
+				Anchor: Link(OurRepo, "CHANGELOG.md"),
+				AnchorLabel: "CHANGELOG v1.6.3"
+			},
+			{
+				Title: "THE DECISION IS NAMED",
+				Agent: ["the startup log tells you which home was chosen and why", "» runtime home: path (decided by ...)"],
+				System: ["the startup log prints: runtime home: path (decided by ...). Before v1.6.3, the shim read HERMES_HOME while the Rust half read HOME - the divergence that orphaned configs and disabled plugins whenever the two differed. Fixed as one decision, shared"],
+				Anchor: Link(OurRepo, "CHANGELOG.md"),
+				AnchorLabel: "CHANGELOG v1.6.3"
+			},
+			{
+				Title: "AND SINCE 1.6.5, NO QUIET SHARING",
+				Agent: ["a non-default HERMES_HOME with no install reports 'not installed'", "· no quiet sharing of one runtime home across profiles"],
+				System: ["the catalog review dropped the legacy ~/.hermes/aphrodite adoption from _runtime_home(): a non-default HERMES_HOME with no install no longer quietly shares one runtime home across profiles"],
+				Anchor: Link(OurRepo, "CHANGELOG.md"),
+				AnchorLabel: "CHANGELOG v1.6.5"
+			}
+		]
+	})} </div> <div class="mt-10 font-mono text-base leading-relaxed text-zinc-dust">
+SRC: CHANGELOG.md:104-154 (v1.6.3) · CHANGELOG.md:39-67 (v1.6.5) · issue #40
+</div> </section> <!-- RELATED: the natural neighbors --> ${renderComponent($$result, "Related", $$Related, { "Links": [
+		{
+			Href: "/showcase/",
+			Label: "SHOWCASE"
+		},
+		{
+			Href: "/workbench/",
+			Label: "WORKBENCH"
+		},
+		{
+			Href: "/hooks/",
+			Label: "HOOKS"
+		},
+		{
+			Href: "/docs/plugin/hooks/",
+			Label: "DOCS · HOOKS"
+		}
+	] })} </main> ${renderComponent($$result, "ZineDiagramNav", $$ZineDiagramNav, {})} ` })}`;
+}, "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/pages/examples.astro", void 0);
+var $$file = "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/pages/examples.astro";
+var $$url = "/examples";
+// \0virtual:astro:page:Source/pages/examples@_@astro
+var page = () => examples_exports;
+export { page };

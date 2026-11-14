@@ -26,52 +26,16 @@ import ZineStream from "./ZineStream.astro";
 import ZinePreview from "./ZinePreview.astro";
 import ZineKicker from "./ZineKicker.astro";
 import CodeFence from "./CodeFence.astro";
+import type { ExamplePanel, ExampleRecord } from "@Library/Records";
 
-type Tone = "plain" | "dim" | "fade" | "mute" | "result" | "canary" | "teal";
+// The record shape - the claim/command/output/marker/panels/src frame and the
+// three panel shapes - lives in Source/Library/Records.ts, not here: the
+// page's Cases array and this component are typed by the same declaration, so
+// a scenario cannot carry a field the renderer drops. A page adds a field by
+// adding it to the record, and the renderer fails to compile until it renders.
 
-/** The scenario's own evidence. Three shapes cover every case on the page. */
-interface Panel {
-	/** rows = one bordered line per item; cards = small plates; lanes = two panes. */
-	Kind: "rows" | "cards" | "lanes";
-	Label: string;
-	/** rows: Left is the term, Right the reading, Tag an optional verdict chip. */
-	Rows?: { Left: string; Right: string; Tag?: string; TagTone?: "canary" | "teal" | "newsprint" }[];
-	/** cards: a small plate per item, with an optional footer note. */
-	Cards?: { Title: string; Body: string; Note?: string }[];
-	/** lanes: two panes side by side, each a title over mono lines. */
-	Lanes?: { Title: string; Lines: string[]; Marker?: string }[];
-}
-
-interface Props {
-	/** The section anchor - the hero index links to it. */
-	Id: string;
-	/** The scenario number, e.g. "I". */
-	N: string;
-	/** The tape label, e.g. "THE THRESHOLD TUNING WALKTHROUGH". */
-	Label: string;
-	Title: string;
-	/** The plate's shadow tone. */
-	Tone?: "crimson" | "canary" | "teal";
-	/** Rotation from the sm breakpoint up; mobile is always flat (law 3). */
-	Rotate?: string;
-	/** The claim, one sentence (or tight group) per block, mt-3 between. */
-	Claim: string[];
-	/** The command that starts the scenario; Code is fenced byte-exact. */
-	Command: { Lang: string; Code: string };
-	/** The real output lines. Text goes through set:html - escape < and >. */
-	Output: { Text: string; Tone?: Tone }[];
-	/** The compact line the model kept. */
-	Preview: string;
-	/** The marker it produced, escaped; or the explicit "none - ..." reason. */
-	Marker: string;
-	/** Closing sentences after the panels - the "what it cost" half. */
-	Note?: string[];
-	Panels?: Panel[];
-	/** An inline diagram SVG (raw import) and its caption. */
-	Diagram?: { Html: string; Caption: string };
-	/** The citation line, e.g. "SRC: README.md:389-407 · ...". */
-	Src: string;
-}
+/** The props ARE the record: a scenario is a data entry, not markup. */
+type Props = ExampleRecord;
 
 const {
 	Id,

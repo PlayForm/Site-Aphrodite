@@ -1,4 +1,6 @@
 ---
+import type { ConfigKeyRecord } from "@Library/Records";
+
 /**
  * ConfigKeys - the config page's single reference for the aphrodite.toml keys.
  *
@@ -14,23 +16,12 @@
  * compiled default is the binary's value and the shipped example's value is
  * shown beside it when the two differ, because both are true at once.
  */
-interface Row {
-	Key: string;
-	/** The TOML section the key lives in, e.g. "[compression]". */
-	Section: string;
-	/** The TOML type: int (bytes), bool, string, "cache" | "token", ... */
-	Type: string;
-	/** The compiled default; the shipped example's value in parentheses. */
-	Default: string;
-	/** The env override, or "-" when the key has none. */
-	Env?: string;
-	/** Which parser reads it. */
-	Reader: "proxy" | "dylib" | "both" | "none";
-	/** When a change takes effect. */
-	Live: "hot" | "startup" | "load" | "unwired";
-	/** What the key does, in one sentence. */
-	Effect: string;
-}
+// The record shape lives in Source/Library/Records.ts, not here: the page's
+// Keys array and this table are typed by the same declaration, so a field
+// cannot be added to one and forgotten in the other. The ladder fields a page
+// adds (`Chain`, `From`) are in ConfigKeyLadderRecord, and this table ignores
+// them by construction.
+type Row = ConfigKeyRecord;
 
 interface Props {
 	Rows: Row[];

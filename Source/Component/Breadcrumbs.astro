@@ -1,26 +1,61 @@
 ---
 import { AllLinks, IsActive } from "@Library/Links";
 
-// The registry-driven breadcrumb trail: OVERVIEW -> the page. Rendered only
-// on deep pages (the root matches only itself, so "/" gets nothing).
+import { DocsTrail } from "./DocsSidebar.astro";
+
+// One trail, one source. Below /docs/ the crumbs are read from the same tree
+// the sidebar renders (DocsSidebar's DocsTrail), so a crumb can never name a
+// page the rail does not show in that position. Every other route resolves
+// through the link registry, which is where its own page lives.
+
+interface Crumb {
+	Label: string;
+	Href?: string;
+}
+
+// "/docs/ccr/backends/sqlite/" -> "ccr/backends/sqlite"; "/docs/" -> "index".
+const DocsId = (Path: string) => {
+	const Rest = Path.replace(/^\/docs\/?/, "").replace(/\/+$/, "");
+
+	return Rest === "" ? "index" : Rest;
+};
+
+const IsDocs = /^\/docs(\/|$)/.test(Astro.url.pathname);
+
 const Active = AllLinks.find((Link) => IsActive(Astro.url.pathname, Link));
+
+const Trail: Crumb[] = IsDocs
+	? await DocsTrail(DocsId(Astro.url.pathname))
+	: Active && Active.Href !== "/"
+		? [{ Label: "OVERVIEW", Href: "/" }, { Label: Active.Label }]
+		: [];
 ---
 
 {
-	Active && Active.Href !== "/" && (
+	// The docs root and the home page each match only themselves: no trail.
+	Trail.length > 1 && (
 		<nav
 			aria-label="Breadcrumb"
-			class="flex items-center gap-2 font-mono text-base uppercase tracking-widest text-zinc-dust"
+			class="flex flex-wrap items-center gap-2 font-mono text-base uppercase tracking-widest text-zinc-dust"
 		>
-			<a class="transition-colors hover:text-bone-white" href="/">
-				OVERVIEW
-			</a>
-			<span class="text-oxblood-dark" aria-hidden="true">
-				//
-			</span>
-			<span class="text-bone-newsprint" aria-current="page">
-				{Active.Label}
-			</span>
+			{Trail.map((Crumb, Position) => (
+				<>
+					{Position > 0 && (
+						<span class="text-oxblood-dark" aria-hidden="true">
+							//
+						</span>
+					)}
+					{Crumb.Href ? (
+						<a class="transition-colors hover:text-bone-white" href={Crumb.Href}>
+							{Crumb.Label}
+						</a>
+					) : (
+						<span class="text-bone-newsprint" aria-current="page">
+							{Crumb.Label}
+						</span>
+					)}
+				</>
+			))}
 		</nav>
 	)
 }
