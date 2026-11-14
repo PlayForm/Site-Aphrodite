@@ -1,1 +1,676 @@
-<svg id="aphrodite-diagram-docs-guides-hermes-integration-1" width="100%" xmlns="http://www.w3.org/2000/svg" class="flowchart" viewBox="-194.11505126953125 -28 2152.6306762695312 251.11666870117188" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#aphrodite-diagram-docs-guides-hermes-integration-1{font-family:JetBrains Mono,ui-monospace,monospace;font-size:16px;fill:#dedbd2;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#aphrodite-diagram-docs-guides-hermes-integration-1 .error-icon{fill:hsl(75, 11.1111111111%, 12.0588235294%);}#aphrodite-diagram-docs-guides-hermes-integration-1 .error-text{fill:rgb(222.5416666667, 220.8333333334, 227.6666666667);stroke:rgb(222.5416666667, 220.8333333334, 227.6666666667);}#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-thickness-normal{stroke-width:1px;}#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-thickness-thick{stroke-width:3.5px;}#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-pattern-solid{stroke-dasharray:0;}#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-thickness-invisible{stroke-width:0;fill:none;}#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-pattern-dashed{stroke-dasharray:3;}#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-pattern-dotted{stroke-dasharray:2;}#aphrodite-diagram-docs-guides-hermes-integration-1 .marker{fill:#3d040d;stroke:#3d040d;}#aphrodite-diagram-docs-guides-hermes-integration-1 .marker.cross{stroke:#3d040d;}#aphrodite-diagram-docs-guides-hermes-integration-1 svg{font-family:JetBrains Mono,ui-monospace,monospace;font-size:16px;}#aphrodite-diagram-docs-guides-hermes-integration-1 p{margin:0;}#aphrodite-diagram-docs-guides-hermes-integration-1 .label{font-family:JetBrains Mono,ui-monospace,monospace;color:#dedbd2;}#aphrodite-diagram-docs-guides-hermes-integration-1 .cluster-label text{fill:rgb(222.5416666667, 220.8333333334, 227.6666666667);}#aphrodite-diagram-docs-guides-hermes-integration-1 .cluster-label span{color:rgb(222.5416666667, 220.8333333334, 227.6666666667);}#aphrodite-diagram-docs-guides-hermes-integration-1 .cluster-label span p{background-color:transparent;}#aphrodite-diagram-docs-guides-hermes-integration-1 .label text,#aphrodite-diagram-docs-guides-hermes-integration-1 span{fill:#dedbd2;color:#dedbd2;}#aphrodite-diagram-docs-guides-hermes-integration-1 .node rect,#aphrodite-diagram-docs-guides-hermes-integration-1 .node circle,#aphrodite-diagram-docs-guides-hermes-integration-1 .node ellipse,#aphrodite-diagram-docs-guides-hermes-integration-1 .node polygon,#aphrodite-diagram-docs-guides-hermes-integration-1 .node path{fill:#111014;stroke:#7a0a1e;stroke-width:1px;}#aphrodite-diagram-docs-guides-hermes-integration-1 .rough-node .label text,#aphrodite-diagram-docs-guides-hermes-integration-1 .node .label text,#aphrodite-diagram-docs-guides-hermes-integration-1 .image-shape .label,#aphrodite-diagram-docs-guides-hermes-integration-1 .icon-shape .label{text-anchor:middle;}#aphrodite-diagram-docs-guides-hermes-integration-1 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#aphrodite-diagram-docs-guides-hermes-integration-1 .rough-node .label,#aphrodite-diagram-docs-guides-hermes-integration-1 .node .label,#aphrodite-diagram-docs-guides-hermes-integration-1 .image-shape .label,#aphrodite-diagram-docs-guides-hermes-integration-1 .icon-shape .label{text-align:center;}#aphrodite-diagram-docs-guides-hermes-integration-1 .node.clickable{cursor:pointer;}#aphrodite-diagram-docs-guides-hermes-integration-1 .root .anchor path{fill:#3d040d!important;stroke-width:0;stroke:#3d040d;}#aphrodite-diagram-docs-guides-hermes-integration-1 .arrowheadPath{fill:#0b0b0b;}#aphrodite-diagram-docs-guides-hermes-integration-1 .edgePaths .path{stroke:#3d040d;stroke-width:1px;}#aphrodite-diagram-docs-guides-hermes-integration-1 .flowchart-link{stroke:#3d040d;fill:none;}#aphrodite-diagram-docs-guides-hermes-integration-1 .edgeLabel{background-color:#111014;text-align:center;}#aphrodite-diagram-docs-guides-hermes-integration-1 .edgeLabel p{background-color:#111014;}#aphrodite-diagram-docs-guides-hermes-integration-1 .edgeLabel rect{opacity:0.5;background-color:#111014;fill:#111014;}#aphrodite-diagram-docs-guides-hermes-integration-1 .labelBkg{background-color:rgba(17, 16, 20, 0.5);}#aphrodite-diagram-docs-guides-hermes-integration-1 .cluster rect{fill:transparent;stroke:#7a0a1e;stroke-width:1px;}#aphrodite-diagram-docs-guides-hermes-integration-1 .cluster text{fill:rgb(222.5416666667, 220.8333333334, 227.6666666667);}#aphrodite-diagram-docs-guides-hermes-integration-1 .cluster span{color:rgb(222.5416666667, 220.8333333334, 227.6666666667);}#aphrodite-diagram-docs-guides-hermes-integration-1 .node .collapsed-indicator{fill:#7a0a1e;stroke:none;opacity:0.6;}#aphrodite-diagram-docs-guides-hermes-integration-1 .node .collapsed-separator{stroke:#7a0a1e;stroke-width:0.75px;}#aphrodite-diagram-docs-guides-hermes-integration-1 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:JetBrains Mono,ui-monospace,monospace;font-size:12px;background:hsl(75, 11.1111111111%, 12.0588235294%);border:1px solid hsl(75, 0%, 2.0588235294%);border-radius:2px;pointer-events:none;z-index:100;}#aphrodite-diagram-docs-guides-hermes-integration-1 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#dedbd2;}#aphrodite-diagram-docs-guides-hermes-integration-1 rect.text{fill:none;stroke-width:0;}#aphrodite-diagram-docs-guides-hermes-integration-1 .icon-shape,#aphrodite-diagram-docs-guides-hermes-integration-1 .image-shape{background-color:#111014;text-align:center;}#aphrodite-diagram-docs-guides-hermes-integration-1 .icon-shape p,#aphrodite-diagram-docs-guides-hermes-integration-1 .image-shape p{background-color:#111014;padding:2px;}#aphrodite-diagram-docs-guides-hermes-integration-1 .icon-shape .label rect,#aphrodite-diagram-docs-guides-hermes-integration-1 .image-shape .label rect{opacity:0.5;background-color:#111014;fill:#111014;}#aphrodite-diagram-docs-guides-hermes-integration-1 .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#aphrodite-diagram-docs-guides-hermes-integration-1 .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#aphrodite-diagram-docs-guides-hermes-integration-1 .node .neo-node{stroke:#7a0a1e;}#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node rect,#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].cluster rect,#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node polygon{stroke:#7a0a1e;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].swimlane.cluster rect{filter:none;}#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node path{stroke:#7a0a1e;stroke-width:1px;}#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node .neo-line path{stroke:#7a0a1e;filter:none;}#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node circle{stroke:#7a0a1e;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node circle .state-start{fill:#000000;}#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].icon-shape .icon{fill:#7a0a1e;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].icon-shape .icon-neo path{stroke:#7a0a1e;filter:drop-shadow( 1px 2px 2px rgba(185,185,185,1));}#aphrodite-diagram-docs-guides-hermes-integration-1 .node rect,#aphrodite-diagram-docs-guides-hermes-integration-1 .node polygon,#aphrodite-diagram-docs-guides-hermes-integration-1 .node circle,#aphrodite-diagram-docs-guides-hermes-integration-1 .node path{stroke-width:2px;rx:0;ry:0;}#aphrodite-diagram-docs-guides-hermes-integration-1 svg{background-color:transparent;}#aphrodite-diagram-docs-guides-hermes-integration-1 .edgeLabel rect{fill:rgb(17, 16, 20);stroke:none;}#aphrodite-diagram-docs-guides-hermes-integration-1 .arrowheadPath{fill:rgb(222, 219, 210);}#aphrodite-diagram-docs-guides-hermes-integration-1 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"/><g class="edges edgePaths"><path d="M164,101.7166659037272L176.92893218813452,101.7166659037272Q184,101.7166659037272 184,94.64559809186173L184,71.37106704892602Q184,64.29999923706055 191.07106781186548,64.29999923706055L427.046875,64.29999923706055" id="aphrodite-diagram-docs-guides-hermes-integration-1-L_A_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 291.13519287109375 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6MTY0LCJ5IjoxMDEuNzE2NjY1OTAzNzI3Mn0seyJ4IjoxODQsInkiOjEwMS43MTY2NjU5MDM3MjcyfSx7IngiOjE4NCwieSI6NjQuMjk5OTk5MjM3MDYwNTV9LHsieCI6NDMxLjA0Njg3NSwieSI6NjQuMjk5OTk5MjM3MDYwNTV9XQ==" data-look="neo" marker-end="url(#aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd-margin)"/><path d="M752.0625,68.13333257039389L764.9914321881345,68.13333257039389Q772.0625,68.13333257039389 772.0625,75.20440038225937L772.0625,96.81226475852839Q772.0625,103.88333257039386 779.1335678118655,103.88333257039386L992.0383071881345,103.88333257039386Q999.109375,103.88333257039386 999.109375,110.95440038225934L999.109375,132.31226475852839Q999.109375,139.38333257039386 1006.1804428118655,139.38333257039386L1053.6458333333333,139.38333257039386" id="aphrodite-diagram-docs-guides-hermes-integration-1-L_B_C_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 358.1768493652344 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_B_C_0" data-points="W3sieCI6NzUyLjA2MjUsInkiOjY4LjEzMzMzMjU3MDM5Mzg5fSx7IngiOjc3Mi4wNjI1LCJ5Ijo2OC4xMzMzMzI1NzAzOTM4OX0seyJ4Ijo3NzIuMDYyNSwieSI6MTAzLjg4MzMzMjU3MDM5Mzg2fSx7IngiOjk5OS4xMDkzNzUsInkiOjEwMy44ODMzMzI1NzAzOTM4Nn0seyJ4Ijo5OTkuMTA5Mzc1LCJ5IjoxMzkuMzgzMzMyNTcwMzkzODZ9LHsieCI6MTA1Ny42NDU4MzMzMzMzMzMzLCJ5IjoxMzkuMzgzMzMyNTcwMzkzODZ9XQ==" data-look="neo" marker-end="url(#aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd-margin)"/><path d="M752.0625,60.46666590372721L764.9914321881345,60.46666590372721Q772.0625,60.46666590372721 772.0625,53.395598091861736L772.0625,40.571067811865476Q772.0625,33.5 779.1335678118655,33.5L1015.109375,33.5" id="aphrodite-diagram-docs-guides-hermes-integration-1-L_B_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 280.6852722167969 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_B_D_0" data-points="W3sieCI6NzUyLjA2MjUsInkiOjYwLjQ2NjY2NTkwMzcyNzIxfSx7IngiOjc3Mi4wNjI1LCJ5Ijo2MC40NjY2NjU5MDM3MjcyMX0seyJ4Ijo3NzIuMDYyNSwieSI6MzMuNX0seyJ4IjoxMDE5LjEwOTM3NSwieSI6MzMuNX1d" data-look="neo" marker-end="url(#aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd-margin)"/><path d="M1057.6458333333333,147.04999923706055L1006.1804428118655,147.04999923706055Q999.109375,147.04999923706055 999.109375,154.12106704892602L999.109375,156.44559732892228Q999.109375,163.51666514078775 992.0383071881345,163.51666514078775L885.5859375,163.51666514078775L297.5234375,163.51666514078775L191.07106781186548,163.51666514078775Q184,163.51666514078775 184,156.44559732892228L184,116.45440038225937Q184,109.38333257039389 176.92893218813452,109.38333257039389L168,109.38333257039389" id="aphrodite-diagram-docs-guides-hermes-integration-1-L_C_A_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 945.58935546875 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_C_A_0" data-points="W3sieCI6MTA1Ny42NDU4MzMzMzMzMzMzLCJ5IjoxNDcuMDQ5OTk5MjM3MDYwNTV9LHsieCI6OTk5LjEwOTM3NSwieSI6MTQ3LjA0OTk5OTIzNzA2MDU1fSx7IngiOjk5OS4xMDkzNzUsInkiOjE2My41MTY2NjUxNDA3ODc3NX0seyJ4Ijo4ODUuNTg1OTM3NSwieSI6MTYzLjUxNjY2NTE0MDc4Nzc1fSx7IngiOjI5Ny41MjM0Mzc1LCJ5IjoxNjMuNTE2NjY1MTQwNzg3NzV9LHsieCI6MTg0LCJ5IjoxNjMuNTE2NjY1MTQwNzg3NzV9LHsieCI6MTg0LCJ5IjoxMDkuMzgzMzMyNTcwMzkzODl9LHsieCI6MTY0LCJ5IjoxMDkuMzgzMzMyNTcwMzkzODl9XQ==" data-look="neo" marker-end="url(#aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd-margin)"/><path d="M1330.4739583333333,143.2166659037272L1574.25,143.2166659037272" id="aphrodite-diagram-docs-guides-hermes-integration-1-L_C_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style="stroke-dasharray: 0 0 239.7760009765625 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge" data-id="L_C_E_0" data-points="W3sieCI6MTMzMC40NzM5NTgzMzMzMzMzLCJ5IjoxNDMuMjE2NjY1OTAzNzI3Mn0seyJ4IjoxNTc4LjI1LCJ5IjoxNDMuMjE2NjY1OTAzNzI3Mn1d" data-look="neo" marker-end="url(#aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd-margin)"/></g><g class="edgeLabels"><g class="edgeLabel" transform="translate(297.5234375, 63.599998474121094)"><g class="label" data-id="L_A_B_0" transform="translate(0, -19.299999237060547)"><g><rect class="background" style="" x="-93.5234375" y="-1" width="187.046875" height="40.599998474121094"/><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">loads</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> plugin</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> at</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">gateway</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> start</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(885.5859375, 103.18333180745442)"><g class="label" data-id="L_B_C_0" transform="translate(0, -19.299999237060547)"><g><rect class="background" style="" x="-93.5234375" y="-1" width="187.046875" height="40.599998474121094"/><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">six</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> hooks,</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> thirteen</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">tools</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(885.5859375, 32.79999923706055)"><g class="label" data-id="L_B_D_0" transform="translate(0, -19.299999237060547)"><g><rect class="background" style="" x="-79.0703125" y="-1" width="158.140625" height="40.599998474121094"/><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">spawns</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> on</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> plugin</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">load</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(591.5546875, 162.8166643778483)"><g class="label" data-id="L_C_A_0" transform="translate(0, -19.299999237060547)"><g><rect class="background" style="" x="-93.515625" y="-1" width="187.03125" height="40.599998474121094"/><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">CCR</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> markers,</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">directives,</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> catalog</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(1492.8984375, 142.7166659037272)"><g class="label" data-id="L_C_E_0" transform="translate(0, -10.5)"><g><rect class="background" style="" x="-45.3515625" y="-1" width="90.703125" height="23"/><text y="-10.1" text-anchor="middle" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">CCR</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> store</tspan></tspan></text></g></g></g></g><g class="nodes"><g class="node default" id="aphrodite-diagram-docs-guides-hermes-integration-1-flowchart-A-0" data-look="neo" transform="translate(88, 105.54999923706055)"><rect class="basic label-container" style="stroke-width: 2px;" x="-76" y="-21.5" width="152" height="43" rx="0" ry="0"/><g class="label" style="" transform="translate(0, -9.5)"><rect rx="0" ry="0" style="stroke-width: 2px;"/><g><rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0"/><text y="-10.1" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Hermes</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> Agent</tspan></tspan></text></g></g></g><g class="node default" id="aphrodite-diagram-docs-guides-hermes-integration-1-flowchart-B-1" data-look="neo" transform="translate(591.5546875, 64.29999923706055)"><rect class="basic label-container" style="stroke-width: 2px;" x="-160.5078125" y="-21.5" width="321.015625" height="43" rx="0" ry="0"/><g class="label" style="" transform="translate(0, -9.5)"><rect rx="0" ry="0" style="stroke-width: 2px;"/><g><rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0"/><text y="-10.1" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">aphrodite</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> plugin</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> -</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> pure</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> loader</tspan></tspan></text></g></g></g><g class="node default" id="aphrodite-diagram-docs-guides-hermes-integration-1-flowchart-C-2" data-look="neo" transform="translate(1194.0598958333333, 143.2166659037272)"><rect class="basic label-container" style="stroke-width: 2px;" x="-136.4140625" y="-21.5" width="272.828125" height="43" rx="0" ry="0"/><g class="label" style="" transform="translate(0, -9.5)"><rect rx="0" ry="0" style="stroke-width: 2px;"/><g><rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0"/><text y="-10.1" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">libaphrodite_hermes.dylib</tspan></tspan></text></g></g></g><g class="node default" id="aphrodite-diagram-docs-guides-hermes-integration-1-flowchart-D-3" data-look="neo" transform="translate(1213.328125, 33.5)"><rect class="basic label-container" style="stroke-width: 2px;" x="-194.21875" y="-21.5" width="388.4375" height="43" rx="0" ry="0"/><g class="label" style="" transform="translate(0, -9.5)"><rect rx="0" ry="0" style="stroke-width: 2px;"/><g><rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0"/><text y="-10.1" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">proxy</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> subprocesses</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> on</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> :9797</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> and</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> :9798</tspan></tspan></text></g></g></g><g class="node default" id="aphrodite-diagram-docs-guides-hermes-integration-1-flowchart-E-4" data-look="neo" transform="translate(1748.3828125, 143.2166659037272)"><rect class="basic label-container" style="stroke-width: 2px;" x="-170.1328125" y="-21.5" width="340.265625" height="43" rx="0" ry="0"/><g class="label" style="" transform="translate(0, -9.5)"><rect rx="0" ry="0" style="stroke-width: 2px;"/><g><rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0"/><text y="-10.1" style=""><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">~/.hermes/aphrodite</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> runtime</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> home</tspan></tspan></text></g></g></g></g></g></g><defs><filter id="aphrodite-diagram-docs-guides-hermes-integration-1-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><defs><filter id="aphrodite-diagram-docs-guides-hermes-integration-1-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs></svg>
+<svg id="aphrodite-diagram-docs-guides-hermes-integration-1" width="100%" xmlns="http://www.w3.org/2000/svg"
+	class="flowchart" viewBox="-194.11505126953125 -28 2152.6306762695312 251.11666870117188"
+	role="graphics-document document" aria-roledescription="flowchart-v2">
+	<style>
+		#aphrodite-diagram-docs-guides-hermes-integration-1 {
+			font-family: JetBrains Mono, ui-monospace, monospace;
+			font-size: 16px;
+			fill: #dedbd2;
+		}
+
+		@keyframes edge-animation-frame {
+			from {
+				stroke-dashoffset: 0;
+			}
+		}
+
+		@keyframes dash {
+			to {
+				stroke-dashoffset: 0;
+			}
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-animation-slow {
+			stroke-dasharray: 9, 5 !important;
+			stroke-dashoffset: 900;
+			animation: dash 50s linear infinite;
+			stroke-linecap: round;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-animation-fast {
+			stroke-dasharray: 9, 5 !important;
+			stroke-dashoffset: 900;
+			animation: dash 20s linear infinite;
+			stroke-linecap: round;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .error-icon {
+			fill: hsl(75, 11.1111111111%, 12.0588235294%);
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .error-text {
+			fill: rgb(222.5416666667, 220.8333333334, 227.6666666667);
+			stroke: rgb(222.5416666667, 220.8333333334, 227.6666666667);
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-thickness-normal {
+			stroke-width: 1px;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-thickness-thick {
+			stroke-width: 3.5px;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-pattern-solid {
+			stroke-dasharray: 0;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-thickness-invisible {
+			stroke-width: 0;
+			fill: none;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-pattern-dashed {
+			stroke-dasharray: 3;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edge-pattern-dotted {
+			stroke-dasharray: 2;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .marker {
+			fill: #3d040d;
+			stroke: #3d040d;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .marker.cross {
+			stroke: #3d040d;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 svg {
+			font-family: JetBrains Mono, ui-monospace, monospace;
+			font-size: 16px;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 p {
+			margin: 0;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .label {
+			font-family: JetBrains Mono, ui-monospace, monospace;
+			color: #dedbd2;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .cluster-label text {
+			fill: rgb(222.5416666667, 220.8333333334, 227.6666666667);
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .cluster-label span {
+			color: rgb(222.5416666667, 220.8333333334, 227.6666666667);
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .cluster-label span p {
+			background-color: transparent;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .label text,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 span {
+			fill: #dedbd2;
+			color: #dedbd2;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node rect,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node circle,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node ellipse,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node polygon,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node path {
+			fill: #111014;
+			stroke: #7a0a1e;
+			stroke-width: 1px;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .rough-node .label text,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node .label text,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .image-shape .label,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .icon-shape .label {
+			text-anchor: middle;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node .katex path {
+			fill: #000;
+			stroke: #000;
+			stroke-width: 1px;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .rough-node .label,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node .label,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .image-shape .label,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .icon-shape .label {
+			text-align: center;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node.clickable {
+			cursor: pointer;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .root .anchor path {
+			fill: #3d040d !important;
+			stroke-width: 0;
+			stroke: #3d040d;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .arrowheadPath {
+			fill: #0b0b0b;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edgePaths .path {
+			stroke: #3d040d;
+			stroke-width: 1px;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .flowchart-link {
+			stroke: #3d040d;
+			fill: none;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edgeLabel {
+			background-color: #111014;
+			text-align: center;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edgeLabel p {
+			background-color: #111014;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edgeLabel rect {
+			opacity: 0.5;
+			background-color: #111014;
+			fill: #111014;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .labelBkg {
+			background-color: rgba(17, 16, 20, 0.5);
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .cluster rect {
+			fill: transparent;
+			stroke: #7a0a1e;
+			stroke-width: 1px;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .cluster text {
+			fill: rgb(222.5416666667, 220.8333333334, 227.6666666667);
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .cluster span {
+			color: rgb(222.5416666667, 220.8333333334, 227.6666666667);
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node .collapsed-indicator {
+			fill: #7a0a1e;
+			stroke: none;
+			opacity: 0.6;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node .collapsed-separator {
+			stroke: #7a0a1e;
+			stroke-width: 0.75px;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 div.mermaidTooltip {
+			position: absolute;
+			text-align: center;
+			max-width: 200px;
+			padding: 2px;
+			font-family: JetBrains Mono, ui-monospace, monospace;
+			font-size: 12px;
+			background: hsl(75, 11.1111111111%, 12.0588235294%);
+			border: 1px solid hsl(75, 0%, 2.0588235294%);
+			border-radius: 2px;
+			pointer-events: none;
+			z-index: 100;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .flowchartTitleText {
+			text-anchor: middle;
+			font-size: 18px;
+			fill: #dedbd2;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 rect.text {
+			fill: none;
+			stroke-width: 0;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .icon-shape,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .image-shape {
+			background-color: #111014;
+			text-align: center;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .icon-shape p,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .image-shape p {
+			background-color: #111014;
+			padding: 2px;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .icon-shape .label rect,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .image-shape .label rect {
+			opacity: 0.5;
+			background-color: #111014;
+			fill: #111014;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .label-icon {
+			display: inline-block;
+			height: 1em;
+			overflow: visible;
+			vertical-align: -0.125em;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node .label-icon path {
+			fill: currentColor;
+			stroke: revert;
+			stroke-width: revert;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node .neo-node {
+			stroke: #7a0a1e;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node rect,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].cluster rect,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node polygon {
+			stroke: #7a0a1e;
+			filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].swimlane.cluster rect {
+			filter: none;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node path {
+			stroke: #7a0a1e;
+			stroke-width: 1px;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node .outer-path {
+			filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node .neo-line path {
+			stroke: #7a0a1e;
+			filter: none;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node circle {
+			stroke: #7a0a1e;
+			filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].node circle .state-start {
+			fill: #000000;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].icon-shape .icon {
+			fill: #7a0a1e;
+			filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 [data-look="neo"].icon-shape .icon-neo path {
+			stroke: #7a0a1e;
+			filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node rect,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node polygon,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node circle,
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .node path {
+			stroke-width: 2px;
+			rx: 0;
+			ry: 0;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 svg {
+			background-color: transparent;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .edgeLabel rect {
+			fill: rgb(17, 16, 20);
+			stroke: none;
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 .arrowheadPath {
+			fill: rgb(222, 219, 210);
+		}
+
+		#aphrodite-diagram-docs-guides-hermes-integration-1 :root {
+			--mermaid-font-family: "trebuchet ms", verdana, arial, sans-serif;
+		}
+	</style>
+	<g>
+		<marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd"
+			class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse"
+			markerWidth="8" markerHeight="8" orient="auto">
+			<path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointStart"
+			class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse"
+			markerWidth="8" markerHeight="8" orient="auto">
+			<path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd-margin"
+			class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse"
+			markerWidth="10.5" markerHeight="14" orient="auto">
+			<path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath"
+				style="stroke-width: 0; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointStart-margin"
+			class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse"
+			markerWidth="11.5" markerHeight="14" orient="auto">
+			<polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath"
+				style="stroke-width: 0; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-circleEnd"
+			class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse"
+			markerWidth="11" markerHeight="11" orient="auto">
+			<circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-circleStart"
+			class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse"
+			markerWidth="11" markerHeight="11" orient="auto">
+			<circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-circleEnd-margin"
+			class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse"
+			markerWidth="14" markerHeight="14" orient="auto">
+			<circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-circleStart-margin"
+			class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse"
+			markerWidth="14" markerHeight="14" orient="auto">
+			<circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-crossEnd"
+			class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse"
+			markerWidth="11" markerHeight="11" orient="auto">
+			<path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+				style="stroke-width: 2; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-crossStart"
+			class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse"
+			markerWidth="11" markerHeight="11" orient="auto">
+			<path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+				style="stroke-width: 2; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-crossEnd-margin"
+			class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse"
+			markerWidth="12" markerHeight="12" orient="auto">
+			<path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;" />
+		</marker>
+		<marker id="aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-crossStart-margin"
+			class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse"
+			markerWidth="12" markerHeight="12" orient="auto">
+			<path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath"
+				style="stroke-width: 2.5; stroke-dasharray: 1, 0;" />
+		</marker>
+		<g class="root">
+			<g class="clusters" />
+			<g class="edges edgePaths">
+				<path
+					d="M164,101.7166659037272L176.92893218813452,101.7166659037272Q184,101.7166659037272 184,94.64559809186173L184,71.37106704892602Q184,64.29999923706055 191.07106781186548,64.29999923706055L427.046875,64.29999923706055"
+					id="aphrodite-diagram-docs-guides-hermes-integration-1-L_A_B_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 291.13519287109375 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_A_B_0"
+					data-points="W3sieCI6MTY0LCJ5IjoxMDEuNzE2NjY1OTAzNzI3Mn0seyJ4IjoxODQsInkiOjEwMS43MTY2NjU5MDM3MjcyfSx7IngiOjE4NCwieSI6NjQuMjk5OTk5MjM3MDYwNTV9LHsieCI6NDMxLjA0Njg3NSwieSI6NjQuMjk5OTk5MjM3MDYwNTV9XQ=="
+					data-look="neo"
+					marker-end="url(#aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd-margin)" />
+				<path
+					d="M752.0625,68.13333257039389L764.9914321881345,68.13333257039389Q772.0625,68.13333257039389 772.0625,75.20440038225937L772.0625,96.81226475852839Q772.0625,103.88333257039386 779.1335678118655,103.88333257039386L992.0383071881345,103.88333257039386Q999.109375,103.88333257039386 999.109375,110.95440038225934L999.109375,132.31226475852839Q999.109375,139.38333257039386 1006.1804428118655,139.38333257039386L1053.6458333333333,139.38333257039386"
+					id="aphrodite-diagram-docs-guides-hermes-integration-1-L_B_C_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 358.1768493652344 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_B_C_0"
+					data-points="W3sieCI6NzUyLjA2MjUsInkiOjY4LjEzMzMzMjU3MDM5Mzg5fSx7IngiOjc3Mi4wNjI1LCJ5Ijo2OC4xMzMzMzI1NzAzOTM4OX0seyJ4Ijo3NzIuMDYyNSwieSI6MTAzLjg4MzMzMjU3MDM5Mzg2fSx7IngiOjk5OS4xMDkzNzUsInkiOjEwMy44ODMzMzI1NzAzOTM4Nn0seyJ4Ijo5OTkuMTA5Mzc1LCJ5IjoxMzkuMzgzMzMyNTcwMzkzODZ9LHsieCI6MTA1Ny42NDU4MzMzMzMzMzMzLCJ5IjoxMzkuMzgzMzMyNTcwMzkzODZ9XQ=="
+					data-look="neo"
+					marker-end="url(#aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd-margin)" />
+				<path
+					d="M752.0625,60.46666590372721L764.9914321881345,60.46666590372721Q772.0625,60.46666590372721 772.0625,53.395598091861736L772.0625,40.571067811865476Q772.0625,33.5 779.1335678118655,33.5L1015.109375,33.5"
+					id="aphrodite-diagram-docs-guides-hermes-integration-1-L_B_D_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 280.6852722167969 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_B_D_0"
+					data-points="W3sieCI6NzUyLjA2MjUsInkiOjYwLjQ2NjY2NTkwMzcyNzIxfSx7IngiOjc3Mi4wNjI1LCJ5Ijo2MC40NjY2NjU5MDM3MjcyMX0seyJ4Ijo3NzIuMDYyNSwieSI6MzMuNX0seyJ4IjoxMDE5LjEwOTM3NSwieSI6MzMuNX1d"
+					data-look="neo"
+					marker-end="url(#aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd-margin)" />
+				<path
+					d="M1057.6458333333333,147.04999923706055L1006.1804428118655,147.04999923706055Q999.109375,147.04999923706055 999.109375,154.12106704892602L999.109375,156.44559732892228Q999.109375,163.51666514078775 992.0383071881345,163.51666514078775L885.5859375,163.51666514078775L297.5234375,163.51666514078775L191.07106781186548,163.51666514078775Q184,163.51666514078775 184,156.44559732892228L184,116.45440038225937Q184,109.38333257039389 176.92893218813452,109.38333257039389L168,109.38333257039389"
+					id="aphrodite-diagram-docs-guides-hermes-integration-1-L_C_A_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 945.58935546875 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_C_A_0"
+					data-points="W3sieCI6MTA1Ny42NDU4MzMzMzMzMzMzLCJ5IjoxNDcuMDQ5OTk5MjM3MDYwNTV9LHsieCI6OTk5LjEwOTM3NSwieSI6MTQ3LjA0OTk5OTIzNzA2MDU1fSx7IngiOjk5OS4xMDkzNzUsInkiOjE2My41MTY2NjUxNDA3ODc3NX0seyJ4Ijo4ODUuNTg1OTM3NSwieSI6MTYzLjUxNjY2NTE0MDc4Nzc1fSx7IngiOjI5Ny41MjM0Mzc1LCJ5IjoxNjMuNTE2NjY1MTQwNzg3NzV9LHsieCI6MTg0LCJ5IjoxNjMuNTE2NjY1MTQwNzg3NzV9LHsieCI6MTg0LCJ5IjoxMDkuMzgzMzMyNTcwMzkzODl9LHsieCI6MTY0LCJ5IjoxMDkuMzgzMzMyNTcwMzkzODl9XQ=="
+					data-look="neo"
+					marker-end="url(#aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd-margin)" />
+				<path d="M1330.4739583333333,143.2166659037272L1574.25,143.2166659037272"
+					id="aphrodite-diagram-docs-guides-hermes-integration-1-L_C_E_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 239.7760009765625 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_C_E_0"
+					data-points="W3sieCI6MTMzMC40NzM5NTgzMzMzMzMzLCJ5IjoxNDMuMjE2NjY1OTAzNzI3Mn0seyJ4IjoxNTc4LjI1LCJ5IjoxNDMuMjE2NjY1OTAzNzI3Mn1d"
+					data-look="neo"
+					marker-end="url(#aphrodite-diagram-docs-guides-hermes-integration-1_flowchart-v2-pointEnd-margin)" />
+			</g>
+			<g class="edgeLabels">
+				<g class="edgeLabel" transform="translate(297.5234375, 63.599998474121094)">
+					<g class="label" data-id="L_A_B_0" transform="translate(0, -19.299999237060547)">
+						<g>
+							<rect class="background" style="" x="-93.5234375" y="-1" width="187.046875"
+								height="40.599998474121094" /><text y="-10.1" text-anchor="middle" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">loads
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> plugin
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> at</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">gateway
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> start
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="edgeLabel" transform="translate(885.5859375, 103.18333180745442)">
+					<g class="label" data-id="L_B_C_0" transform="translate(0, -19.299999237060547)">
+						<g>
+							<rect class="background" style="" x="-93.5234375" y="-1" width="187.046875"
+								height="40.599998474121094" /><text y="-10.1" text-anchor="middle" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">six</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> hooks,
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> thirteen
+									</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">tools
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="edgeLabel" transform="translate(885.5859375, 32.79999923706055)">
+					<g class="label" data-id="L_B_D_0" transform="translate(0, -19.299999237060547)">
+						<g>
+							<rect class="background" style="" x="-79.0703125" y="-1" width="158.140625"
+								height="40.599998474121094" /><text y="-10.1" text-anchor="middle" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">spawns
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> on</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> plugin
+									</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">load
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="edgeLabel" transform="translate(591.5546875, 162.8166643778483)">
+					<g class="label" data-id="L_C_A_0" transform="translate(0, -19.299999237060547)">
+						<g>
+							<rect class="background" style="" x="-93.515625" y="-1" width="187.03125"
+								height="40.599998474121094" /><text y="-10.1" text-anchor="middle" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">CCR</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> markers,
+									</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">directives,
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> catalog
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="edgeLabel" transform="translate(1492.8984375, 142.7166659037272)">
+					<g class="label" data-id="L_C_E_0" transform="translate(0, -10.5)">
+						<g>
+							<rect class="background" style="" x="-45.3515625" y="-1" width="90.703125" height="23" />
+							<text y="-10.1" text-anchor="middle" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">CCR</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> store
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+			</g>
+			<g class="nodes">
+				<g class="node default" id="aphrodite-diagram-docs-guides-hermes-integration-1-flowchart-A-0"
+					data-look="neo" transform="translate(88, 105.54999923706055)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-76" y="-21.5" width="152"
+						height="43" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Hermes
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> Agent
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-docs-guides-hermes-integration-1-flowchart-B-1"
+					data-look="neo" transform="translate(591.5546875, 64.29999923706055)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-160.5078125" y="-21.5"
+						width="321.015625" height="43" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">aphrodite
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> plugin
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> -</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> pure
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> loader
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-docs-guides-hermes-integration-1-flowchart-C-2"
+					data-look="neo" transform="translate(1194.0598958333333, 143.2166659037272)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-136.4140625" y="-21.5"
+						width="272.828125" height="43" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">
+										libaphrodite_hermes.dylib</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-docs-guides-hermes-integration-1-flowchart-D-3"
+					data-look="neo" transform="translate(1213.328125, 33.5)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-194.21875" y="-21.5"
+						width="388.4375" height="43" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">proxy
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">
+										 subprocesses</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> on</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> :9797
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> and
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> :9798
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-docs-guides-hermes-integration-1-flowchart-E-4"
+					data-look="neo" transform="translate(1748.3828125, 143.2166659037272)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-170.1328125" y="-21.5"
+						width="340.265625" height="43" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">
+										~/.hermes/aphrodite</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> runtime
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> home
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+	<defs>
+		<filter id="aphrodite-diagram-docs-guides-hermes-integration-1-drop-shadow" height="130%" width="130%">
+			<feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000" />
+		</filter>
+	</defs>
+	<defs>
+		<filter id="aphrodite-diagram-docs-guides-hermes-integration-1-drop-shadow-small" height="150%" width="150%">
+			<feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000" />
+		</filter>
+	</defs>
+</svg>

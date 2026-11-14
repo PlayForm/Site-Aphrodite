@@ -1,0 +1,1355 @@
+<!DOCTYPE html><html lang="en" class="no-js dark" dir="ltr"> <head data-capo=""><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Process Startup &amp; Dual-Proxy Launch - Aphrodite</title><script>if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js');
+}</script><link rel="stylesheet" href="/_astro/Base.Ct3S6nKO.css"><link rel="stylesheet" href="/_astro/_..CK49RjVt.css"><link rel="preload" href="/Font/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/Font/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/Font/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous"><script type="module" src="/_astro/page.Berq9T3r.js"></script><meta name="description" content="aphrodite startup splits into two halves."><meta name="theme-color" content="#09090b"><meta name="format-detection" content="telephone=no"><meta name="twitter:dnt" content="on"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Process Startup &amp; Dual-Proxy Launch - Aphrodite"><meta name="twitter:description" content="aphrodite startup splits into two halves."><meta name="twitter:image" content="https://aphrodite.playform.cloud/Brand/OG.png?v=2"><meta property="og:type" content="website"><meta property="og:title" content="Process Startup &amp; Dual-Proxy Launch - Aphrodite"><meta property="og:description" content="aphrodite startup splits into two halves."><meta property="og:image" content="https://aphrodite.playform.cloud/Brand/OG.png?v=2"><meta property="og:url" content="https://aphrodite.playform.cloud/docs/architecture/01-startup/"><link rel="canonical" href="https://aphrodite.playform.cloud/docs/architecture/01-startup/"><script crossorigin="anonymous" type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Aphrodite","applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Windows","softwareVersion":"1.8.1","url":"https://aphrodite.playform.cloud/","offers":{"@type":"Offer","price":"0"},"license":"https://spdx.org/licenses/CC0-1.0.html","description":"CCR compression proxy + absorptive preview pipeline for Hermes Agent."}</script><link rel="manifest" href="/Manifest.json" crossorigin="use-credentials"><link rel="icon" href="/Brand/aphrodite.svg" type="image/svg+xml" sizes="any"><link rel="icon" href="/Brand/aphrodite-32.png" type="image/png" sizes="32x32"><link rel="apple-touch-icon" href="/Brand/aphrodite-180.png"><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"></head> <body class="relative min-h-screen overflow-x-hidden"> <!-- SVG grunge noise filter (texture layer 3) --><svg aria-hidden="true" class="hidden"> <defs> <filter height="100%" id="grunge-noise" width="100%" x="0%" y="0%"> <feTurbulence baseFrequency="0.82" numOctaves="4" result="noise" stitchTiles="stitch" type="fractalNoise"></feTurbulence> <feColorMatrix result="coloredNoise" type="matrix" values="0 0 0 0 0.1   0 0 0 0 0.1   0 0 0 0 0.1   0 0 0 0.18 0"></feColorMatrix> <feBlend in="SourceGraphic" in2="coloredNoise" mode="multiply"></feBlend> </filter> </defs> </svg> <!-- Ambient photocopy screen, halftone screen and grunge overlays --> <div class="photocopy-grit pointer-events-none fixed inset-0 z-0 opacity-40"></div> <div class="halftone-screen pointer-events-none fixed inset-0 z-0 opacity-30"></div> <div class="pointer-events-none fixed inset-0 z-0 opacity-60 mix-blend-overlay" style="filter: url(#grunge-noise);"></div> <!-- Site header (synthesized, zine skin) --> <header class="sticky top-0 z-40 w-full border-b-2 border-oxblood-dark bg-soot-black/95"> <nav aria-label="Site" class="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-3 sm:px-8"> <a class="flex items-center gap-2" href="/"> <img class="h-5 w-5" src="/Brand/aphrodite.svg" alt="" width="20" height="20"> <span class="font-mono text-base font-bold tracking-widest text-bone-white">APHRODITE</span> </a> <nav aria-label="Primary" class="hidden items-center gap-3 lg:flex"> <a href="/" class="px-1 py-1 font-mono text-base tracking-widest text-zinc-dust hover:text-bone-white"> OVERVIEW </a><a href="/setup/" class="px-1 py-1 font-mono text-base tracking-widest text-zinc-dust hover:text-bone-white"> SETUP </a><a href="/docs/" aria-current="page" class="bg-raw-blood px-3 py-1 font-mono text-base font-bold tracking-widest text-bone-white"> DOCS </a><a href="/benchmarks/" class="px-1 py-1 font-mono text-base tracking-widest text-zinc-dust hover:text-bone-white"> BENCHMARKS </a><a href="/case-study/" class="px-1 py-1 font-mono text-base tracking-widest text-zinc-dust hover:text-bone-white"> CASE STUDY </a><a href="/showcase/" class="px-1 py-1 font-mono text-base tracking-widest text-zinc-dust hover:text-bone-white"> SHOWCASE </a> </nav> <button id="nav-toggle" class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-base font-bold tracking-widest text-bone-newsprint" aria-expanded="false" aria-controls="nav-menu">
+MENU
+</button> </nav> <div id="nav-menu" class="hidden border-t border-oxblood-dark bg-soot-black"> <!-- Tree menu: the registry read as two levels - the PRIMARY group
+				     (the bar entries) then MORE (the rest), each as a grid of
+				     cells so the order follows the registry. The group labels
+				     carry the tape-stamp skin. --><div class="flex flex-col gap-6 px-5 py-4"> <nav aria-label="Primary (mobile)" class="flex flex-col gap-2"> <p class="w-fit border border-black bg-raw-blood px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000] sm:-rotate-1">
+PRIMARY
+</p> <div class="grid grid-cols-2 gap-x-4"> <a href="/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> OVERVIEW </a><a href="/setup/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> SETUP </a><a href="/docs/" aria-current="page" class="border-b border-oxblood-dark/50 bg-raw-blood px-2 py-2 font-mono text-base font-bold tracking-widest text-bone-white"> DOCS </a><a href="/benchmarks/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> BENCHMARKS </a><a href="/case-study/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> CASE STUDY </a><a href="/showcase/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> SHOWCASE </a> </div> </nav> <!-- MORE: three labelled groups (Surface / Knobs / Record), not a
+					     flat ten-entry list. The grouping is the registry's `Group`
+					     field read through MenuGroups, so the MORE tree and the
+					     footer's columns cannot disagree. --> <nav aria-label="More" class="flex flex-col gap-4"> <p class="w-fit border border-black bg-stamped-canary px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000] sm:rotate-1">
+MORE
+</p> <div class="flex flex-col gap-2"> <p class="w-fit border border-black bg-raw-blood px-2 py-0.5 font-mono text-[13px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+THE SURFACE </p> <div class="grid grid-cols-2 gap-x-4"> <a href="/plugin/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> PLUGIN </a><a href="/tools/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> TOOLS </a><a href="/hermes/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> HERMES </a> </div> </div><div class="flex flex-col gap-2"> <p class="w-fit border border-black bg-raw-blood px-2 py-0.5 font-mono text-[13px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+THE KNOBS </p> <div class="grid grid-cols-2 gap-x-4"> <a href="/config/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> CONFIG </a><a href="/workbench/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> WORKBENCH </a><a href="/examples/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> EXAMPLES </a> </div> </div><div class="flex flex-col gap-2"> <p class="w-fit border border-black bg-raw-blood px-2 py-0.5 font-mono text-[13px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+THE RECORD </p> <div class="grid grid-cols-2 gap-x-4"> <a href="/versions/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> VERSIONS </a><a href="/presentation/" class="border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"> BRIEF </a> </div> </div> </nav> </div> </div> </header> <div class="relative z-10 flex grow flex-col">  <main class="relative z-10 mx-auto w-full max-w-[1440px] px-5 py-16 sm:px-8 lg:py-24" data-astro-cid-v5c56ei3> <!-- Mobile: the docs index opens as a full-screen drawer --><button id="docs-nav-toggle" class="mb-8 flex w-full items-center justify-between border-4 border-blood-crimson bg-carbon-void px-4 py-2.5 font-mono text-base font-black uppercase tracking-widest text-bone-newsprint shadow-[4px_4px_0px_#000] lg:hidden" aria-expanded="false" aria-controls="docs-drawer" data-astro-cid-v5c56ei3>
+DOCUMENTATION INDEX
+<span aria-hidden="true" data-astro-cid-v5c56ei3>+</span> </button> <nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-2 font-mono text-base" data-astro-cid-v5c56ei3> <a class="text-stamped-canary underline decoration-2 underline-offset-4 hover:text-bone-white" href="/docs/" data-astro-cid-v5c56ei3>
+DOCS
+</a> <span class="text-zinc-dust" aria-hidden="true" data-astro-cid-v5c56ei3>/</span> <span class="uppercase tracking-widest text-zinc-dust" data-astro-cid-v5c56ei3>Architecture</span>  <span class="text-zinc-dust" aria-hidden="true" data-astro-cid-v5c56ei3>
+/
+</span> <span class="uppercase tracking-widest text-bone-white" data-astro-cid-v5c56ei3>Process Startup &amp; Dual-Proxy Launch</span>  </nav> <!-- Three tracks once the outline has a home: the docs index, the
+		     reading column, and the page's own outline. Without an outline the
+		     third track is not reserved, so a short page keeps its full measure. --> <div class="mt-10 flex flex-col gap-16 lg:grid lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-x-20 xl:grid-cols-[17rem_minmax(0,1fr)_15rem] xl:gap-x-12" data-astro-cid-v5c56ei3> <!-- Desktop: sticky sidebar. The index only - the page's outline
+			     lives in the right rail (xl) and the disclosure (below xl), so
+			     no viewport ever shows the same list twice. --><aside class="hidden lg:block" data-astro-cid-v5c56ei3> <div class="sticky top-24" data-astro-cid-v5c56ei3> <nav aria-label="Documentation sections"> <div class="relative"> <!-- The tape stamp lives OUTSIDE the scroll container: overflow-y-auto
+	     clips absolutely-positioned children that cross its top edge, and
+	     z-index cannot undo a clip. The scroll applies to the entry box only. --><span class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+DOC INDEX
+</span> <div class="relative z-10 max-h-[calc(100vh-9rem)] overflow-y-auto border-4 border-blood-crimson bg-carbon-void p-5 zine-box-subtle">  <div class="flex flex-col gap-2"> <details class="group" data-docs-section="Overview"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Overview </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 2 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Aphrodite Documentation  </a>  </li><li> <a href="/docs/centers/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Centers - AI Conversation Memory Tokens <span class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black" title="Roadmap: partly unimplemented">
+WIP
+</span> </a>  </li> </ul> </details><details class="group" data-docs-section="API"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> API </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 4 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/api/ccr-endpoints/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  CCR Management Endpoints  </a>  </li><li> <a href="/docs/api/health/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Health Endpoint  </a>  </li><li> <a href="/docs/api/metrics-endpoint/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Metrics Endpoint  </a>  </li><li> <a href="/docs/api/retrieve/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Retrieve Endpoint  </a>  </li> </ul> </details><details class="group" open data-docs-section="Architecture" data-current-section="1"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-stamped-canary" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-bone-white"> Architecture </span> <span class="font-mono text-[13px] font-normal tracking-normal text-stamped-canary"> 12 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-stamped-canary" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/architecture/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Architecture  </a>  </li><li> <a href="/docs/architecture/01-startup/" aria-current="page" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors bg-raw-blood pl-2 text-bone-white"> <span class="mr-1.5 inline-block h-2 w-2 bg-stamped-canary align-middle" aria-hidden="true"></span> Process Startup &amp; Dual-Proxy Launch  </a>  </li><li> <a href="/docs/architecture/02-chat-compression/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Chat-Completion Compression  </a>  </li><li> <a href="/docs/architecture/03-retrieve/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Retrieve &amp; Recursive Marker Resolution  </a>  </li><li> <a href="/docs/architecture/04-hook-ffi/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Hermes Hook &amp; FFI Path  </a>  </li><li> <a href="/docs/architecture/05-ccr-lifecycle/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  CCR Entry Lifecycle &amp; EMA Threshold State  </a>  </li><li> <a href="/docs/architecture/06-sse-streaming/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  SSE Streaming Passthrough  </a>  </li><li> <a href="/docs/architecture/07-config-resolution/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Config Resolution Precedence  </a>  </li><li> <a href="/docs/architecture/08-dylib-loading/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Dylib Loading (load-once per process)  </a>  </li><li> <a href="/docs/architecture/09-release-ci/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Release &amp; Publish CI  </a>  </li><li> <a href="/docs/architecture/10-component/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Component Architecture  </a>  </li><li> <a href="/docs/architecture/11-data-model/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Core Data Model  </a>  </li> </ul> </details><details class="group" data-docs-section="CCR"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> CCR </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 6 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/ccr/backends/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  CCR Backends  </a> <ul class="mt-1 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/ccr/backends/in-memory/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  In-Memory CCR Backend  </a> </li><li> <a href="/docs/ccr/backends/inline/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Inline CCR  </a> </li><li> <a href="/docs/ccr/backends/sqlite/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  SQLite CCR Backend  </a> </li> </ul> </li><li> <a href="/docs/ccr/lifecycle/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  CCR Lifecycle  </a>  </li><li> <a href="/docs/ccr/marker-format/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  CCR Marker Format  </a>  </li> </ul> </details><details class="group" data-docs-section="Classification"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Classification </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 2 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/classification/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Classification  </a>  </li><li> <a href="/docs/classification/content-types/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Content Type Taxonomy  </a>  </li> </ul> </details><details class="group" data-docs-section="Config"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Config </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 2 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/config/aphrodite-toml/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  aphrodite.toml  </a>  </li><li> <a href="/docs/config/env-vars/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Environment Variables  </a>  </li> </ul> </details><details class="group" data-docs-section="Examples"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Examples </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 2 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/examples/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Examples  </a>  </li><li> <a href="/docs/examples/llm-view/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  CCR Examples - What the LLM Actually Sees  </a>  </li> </ul> </details><details class="group" data-docs-section="Guides"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Guides </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 3 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/guides/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Guides  </a>  </li><li> <a href="/docs/guides/hermes-integration/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Hermes Integration  </a>  </li><li> <a href="/docs/guides/hermes-tool-output-schemas/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Hermes Tool Output Schemas  </a>  </li> </ul> </details><details class="group" data-docs-section="Install"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Install </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 4 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/install/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Installing Aphrodite  </a>  </li><li> <a href="/docs/install/macos-linux/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  macOS / Linux: Install  </a>  </li><li> <a href="/docs/install/troubleshooting/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Install Troubleshooting  </a>  </li><li> <a href="/docs/install/windows/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Windows Install  </a>  </li> </ul> </details><details class="group" data-docs-section="Metrics"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Metrics </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 2 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/metrics/prometheus/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Prometheus Metrics  </a>  </li><li> <a href="/docs/metrics/queries/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Metrics Queries  </a>  </li> </ul> </details><details class="group" data-docs-section="Plugin"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Plugin </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 3 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/plugin/context-engine/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Context Engine  </a>  </li><li> <a href="/docs/plugin/directives/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Conversational Directives  </a>  </li><li> <a href="/docs/plugin/hooks/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Plugin Hooks  </a>  </li> </ul> </details><details class="group" data-docs-section="Proxy"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Proxy </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 4 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/proxy/architecture/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Proxy Architecture  </a>  </li><li> <a href="/docs/proxy/compression/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Compression Pipeline  </a>  </li><li> <a href="/docs/proxy/handlers/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Proxy Handlers  </a>  </li><li> <a href="/docs/proxy/retry/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Proxy Retry  </a>  </li> </ul> </details><details class="group" data-docs-section="Tool Relay"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Tool Relay </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 2 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/tool-relay/callbacks/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Callbacks  </a>  </li><li> <a href="/docs/tool-relay/tools/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Tool Relay Tools  </a>  </li> </ul> </details> </div> </div> </div> </nav> </div> </aside> <div class="min-w-0" data-astro-cid-v5c56ei3> <!-- Page header: the tape-stamp section tag above the crimson rule.
+			     pt-12 pushes the whole block clear of the breadcrumb row above -
+			     the section stamp's -top-7 rise previously reached the
+			     breadcrumb text at the mt-10 gap. --><header class="relative pt-12" data-astro-cid-v5c56ei3> <span class="absolute left-0 top-0 z-20 -rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]" data-astro-cid-v5c56ei3> Architecture </span>  <h1 class="border-b-4 border-blood-crimson pb-6 font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-4xl" data-astro-cid-v5c56ei3> Process Startup &amp; Dual-Proxy Launch </h1> </header> <figure class="relative z-10 mt-16 border border-oxblood-dark bg-soot-black p-4" data-diagram="ccr-pipeline" data-astro-cid-v5c56ei3> <div class="overflow-x-auto [&amp;_svg]:h-auto [&amp;_svg]:max-w-full" data-astro-cid-v5c56ei3><svg id="aphrodite-diagram-ccr-pipeline" width="100%" xmlns="http://www.w3.org/2000/svg" class="flowchart"
+	viewBox="-194.12986755371094 -28 3856.020492553711 436.2947692871094" role="graphics-document document"
+	aria-roledescription="flowchart-v2">
+	<style>
+		#aphrodite-diagram-ccr-pipeline {
+			font-family: JetBrains Mono, ui-monospace, monospace;
+			font-size: 16px;
+			fill: #dedbd2;
+		}
+
+		@keyframes edge-animation-frame {
+			from {
+				stroke-dashoffset: 0;
+			}
+		}
+
+		@keyframes dash {
+			to {
+				stroke-dashoffset: 0;
+			}
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edge-animation-slow {
+			stroke-dasharray: 9, 5 !important;
+			stroke-dashoffset: 900;
+			animation: dash 50s linear infinite;
+			stroke-linecap: round;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edge-animation-fast {
+			stroke-dasharray: 9, 5 !important;
+			stroke-dashoffset: 900;
+			animation: dash 20s linear infinite;
+			stroke-linecap: round;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .error-icon {
+			fill: hsl(75, 11.1111111111%, 12.0588235294%);
+		}
+
+		#aphrodite-diagram-ccr-pipeline .error-text {
+			fill: rgb(222.5416666667, 220.8333333334, 227.6666666667);
+			stroke: rgb(222.5416666667, 220.8333333334, 227.6666666667);
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edge-thickness-normal {
+			stroke-width: 1px;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edge-thickness-thick {
+			stroke-width: 3.5px;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edge-pattern-solid {
+			stroke-dasharray: 0;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edge-thickness-invisible {
+			stroke-width: 0;
+			fill: none;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edge-pattern-dashed {
+			stroke-dasharray: 3;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edge-pattern-dotted {
+			stroke-dasharray: 2;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .marker {
+			fill: #3d040d;
+			stroke: #3d040d;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .marker.cross {
+			stroke: #3d040d;
+		}
+
+		#aphrodite-diagram-ccr-pipeline svg {
+			font-family: JetBrains Mono, ui-monospace, monospace;
+			font-size: 16px;
+		}
+
+		#aphrodite-diagram-ccr-pipeline p {
+			margin: 0;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .label {
+			font-family: JetBrains Mono, ui-monospace, monospace;
+			color: #dedbd2;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .cluster-label text {
+			fill: rgb(222.5416666667, 220.8333333334, 227.6666666667);
+		}
+
+		#aphrodite-diagram-ccr-pipeline .cluster-label span {
+			color: rgb(222.5416666667, 220.8333333334, 227.6666666667);
+		}
+
+		#aphrodite-diagram-ccr-pipeline .cluster-label span p {
+			background-color: transparent;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .label text,
+		#aphrodite-diagram-ccr-pipeline span {
+			fill: #dedbd2;
+			color: #dedbd2;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .node rect,
+		#aphrodite-diagram-ccr-pipeline .node circle,
+		#aphrodite-diagram-ccr-pipeline .node ellipse,
+		#aphrodite-diagram-ccr-pipeline .node polygon,
+		#aphrodite-diagram-ccr-pipeline .node path {
+			fill: #111014;
+			stroke: #7a0a1e;
+			stroke-width: 1px;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .rough-node .label text,
+		#aphrodite-diagram-ccr-pipeline .node .label text,
+		#aphrodite-diagram-ccr-pipeline .image-shape .label,
+		#aphrodite-diagram-ccr-pipeline .icon-shape .label {
+			text-anchor: middle;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .node .katex path {
+			fill: #000;
+			stroke: #000;
+			stroke-width: 1px;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .rough-node .label,
+		#aphrodite-diagram-ccr-pipeline .node .label,
+		#aphrodite-diagram-ccr-pipeline .image-shape .label,
+		#aphrodite-diagram-ccr-pipeline .icon-shape .label {
+			text-align: center;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .node.clickable {
+			cursor: pointer;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .root .anchor path {
+			fill: #3d040d !important;
+			stroke-width: 0;
+			stroke: #3d040d;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .arrowheadPath {
+			fill: #0b0b0b;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edgePaths .path {
+			stroke: #3d040d;
+			stroke-width: 1px;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .flowchart-link {
+			stroke: #3d040d;
+			fill: none;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edgeLabel {
+			background-color: #111014;
+			text-align: center;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edgeLabel p {
+			background-color: #111014;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edgeLabel rect {
+			opacity: 0.5;
+			background-color: #111014;
+			fill: #111014;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .labelBkg {
+			background-color: rgba(17, 16, 20, 0.5);
+		}
+
+		#aphrodite-diagram-ccr-pipeline .cluster rect {
+			fill: transparent;
+			stroke: #7a0a1e;
+			stroke-width: 1px;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .cluster text {
+			fill: rgb(222.5416666667, 220.8333333334, 227.6666666667);
+		}
+
+		#aphrodite-diagram-ccr-pipeline .cluster span {
+			color: rgb(222.5416666667, 220.8333333334, 227.6666666667);
+		}
+
+		#aphrodite-diagram-ccr-pipeline .node .collapsed-indicator {
+			fill: #7a0a1e;
+			stroke: none;
+			opacity: 0.6;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .node .collapsed-separator {
+			stroke: #7a0a1e;
+			stroke-width: 0.75px;
+		}
+
+		#aphrodite-diagram-ccr-pipeline div.mermaidTooltip {
+			position: absolute;
+			text-align: center;
+			max-width: 200px;
+			padding: 2px;
+			font-family: JetBrains Mono, ui-monospace, monospace;
+			font-size: 12px;
+			background: hsl(75, 11.1111111111%, 12.0588235294%);
+			border: 1px solid hsl(75, 0%, 2.0588235294%);
+			border-radius: 2px;
+			pointer-events: none;
+			z-index: 100;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .flowchartTitleText {
+			text-anchor: middle;
+			font-size: 18px;
+			fill: #dedbd2;
+		}
+
+		#aphrodite-diagram-ccr-pipeline rect.text {
+			fill: none;
+			stroke-width: 0;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .icon-shape,
+		#aphrodite-diagram-ccr-pipeline .image-shape {
+			background-color: #111014;
+			text-align: center;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .icon-shape p,
+		#aphrodite-diagram-ccr-pipeline .image-shape p {
+			background-color: #111014;
+			padding: 2px;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .icon-shape .label rect,
+		#aphrodite-diagram-ccr-pipeline .image-shape .label rect {
+			opacity: 0.5;
+			background-color: #111014;
+			fill: #111014;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .label-icon {
+			display: inline-block;
+			height: 1em;
+			overflow: visible;
+			vertical-align: -0.125em;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .node .label-icon path {
+			fill: currentColor;
+			stroke: revert;
+			stroke-width: revert;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .node .neo-node {
+			stroke: #7a0a1e;
+		}
+
+		#aphrodite-diagram-ccr-pipeline [data-look="neo"].node rect,
+		#aphrodite-diagram-ccr-pipeline [data-look="neo"].cluster rect,
+		#aphrodite-diagram-ccr-pipeline [data-look="neo"].node polygon {
+			stroke: #7a0a1e;
+			filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));
+		}
+
+		#aphrodite-diagram-ccr-pipeline [data-look="neo"].swimlane.cluster rect {
+			filter: none;
+		}
+
+		#aphrodite-diagram-ccr-pipeline [data-look="neo"].node path {
+			stroke: #7a0a1e;
+			stroke-width: 1px;
+		}
+
+		#aphrodite-diagram-ccr-pipeline [data-look="neo"].node .outer-path {
+			filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));
+		}
+
+		#aphrodite-diagram-ccr-pipeline [data-look="neo"].node .neo-line path {
+			stroke: #7a0a1e;
+			filter: none;
+		}
+
+		#aphrodite-diagram-ccr-pipeline [data-look="neo"].node circle {
+			stroke: #7a0a1e;
+			filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));
+		}
+
+		#aphrodite-diagram-ccr-pipeline [data-look="neo"].node circle .state-start {
+			fill: #000000;
+		}
+
+		#aphrodite-diagram-ccr-pipeline [data-look="neo"].icon-shape .icon {
+			fill: #7a0a1e;
+			filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));
+		}
+
+		#aphrodite-diagram-ccr-pipeline [data-look="neo"].icon-shape .icon-neo path {
+			stroke: #7a0a1e;
+			filter: drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));
+		}
+
+		#aphrodite-diagram-ccr-pipeline .node rect,
+		#aphrodite-diagram-ccr-pipeline .node polygon,
+		#aphrodite-diagram-ccr-pipeline .node circle,
+		#aphrodite-diagram-ccr-pipeline .node path {
+			stroke-width: 2px;
+			rx: 0;
+			ry: 0;
+		}
+
+		#aphrodite-diagram-ccr-pipeline svg {
+			background-color: transparent;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .edgeLabel rect {
+			fill: rgb(17, 16, 20);
+			stroke: none;
+		}
+
+		#aphrodite-diagram-ccr-pipeline .arrowheadPath {
+			fill: rgb(222, 219, 210);
+		}
+
+		#aphrodite-diagram-ccr-pipeline :root {
+			--mermaid-font-family: "trebuchet ms", verdana, arial, sans-serif;
+		}
+	</style>
+	<g>
+		<marker id="aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd" class="marker flowchart-v2"
+			viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8"
+			orient="auto">
+			<path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-ccr-pipeline_flowchart-v2-pointStart" class="marker flowchart-v2"
+			viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8"
+			orient="auto">
+			<path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin" class="marker flowchart-v2"
+			viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14"
+			orient="auto">
+			<path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath"
+				style="stroke-width: 0; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-ccr-pipeline_flowchart-v2-pointStart-margin" class="marker flowchart-v2"
+			viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14"
+			orient="auto">
+			<polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath"
+				style="stroke-width: 0; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-ccr-pipeline_flowchart-v2-circleEnd" class="marker flowchart-v2"
+			viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+			orient="auto">
+			<circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-ccr-pipeline_flowchart-v2-circleStart" class="marker flowchart-v2"
+			viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+			orient="auto">
+			<circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-ccr-pipeline_flowchart-v2-circleEnd-margin" class="marker flowchart-v2"
+			viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14"
+			orient="auto">
+			<circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-ccr-pipeline_flowchart-v2-circleStart-margin" class="marker flowchart-v2"
+			viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14"
+			orient="auto">
+			<circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-ccr-pipeline_flowchart-v2-crossEnd" class="marker cross flowchart-v2"
+			viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+			orient="auto">
+			<path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+				style="stroke-width: 2; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-ccr-pipeline_flowchart-v2-crossStart" class="marker cross flowchart-v2"
+			viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11"
+			orient="auto">
+			<path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath"
+				style="stroke-width: 2; stroke-dasharray: 1, 0;" />
+		</marker>
+		<marker id="aphrodite-diagram-ccr-pipeline_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2"
+			viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12"
+			orient="auto">
+			<path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;" />
+		</marker>
+		<marker id="aphrodite-diagram-ccr-pipeline_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2"
+			viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12"
+			orient="auto">
+			<path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath"
+				style="stroke-width: 2.5; stroke-dasharray: 1, 0;" />
+		</marker>
+		<g class="root">
+			<g class="clusters" />
+			<g class="edges edgePaths">
+				<path
+					d="M333.015625,87.56406211853027L345.9445571881345,87.56406211853027Q353.015625,87.56406211853027 353.015625,94.63512993039575L353.015625,119.62632751284156Q353.015625,126.69739532470703 360.0866928118655,126.69739532470703L369.015625,126.69739532470703"
+					id="aphrodite-diagram-ccr-pipeline-L_ANY_CLASS_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 65.8050537109375 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_ANY_CLASS_0"
+					data-points="W3sieCI6MzMzLjAxNTYyNSwieSI6ODcuNTY0MDYyMTE4NTMwMjd9LHsieCI6MzUzLjAxNTYyNSwieSI6ODcuNTY0MDYyMTE4NTMwMjd9LHsieCI6MzUzLjAxNTYyNSwieSI6MTI2LjY5NzM5NTMyNDcwNzAzfSx7IngiOjM3My4wMTU2MjUsInkiOjEyNi42OTczOTUzMjQ3MDcwM31d"
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path d="M607.3125,133.46406173706055L643.3125,133.46406173706055"
+					id="aphrodite-diagram-ccr-pipeline-L_CLASS_THRESH_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge"
+					data-id="L_CLASS_THRESH_0"
+					data-points="W3sieCI6NjA3LjMxMjUsInkiOjEzMy40NjQwNjE3MzcwNjA1NX0seyJ4Ijo2NDcuMzEyNSwieSI6MTMzLjQ2NDA2MTczNzA2MDU1fV0="
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path
+					d="M844.0051969587803,98.12552007039389L879.34375,98.12552007039389L892.2726821881345,98.12552007039389Q899.34375,98.12552007039389 899.34375,91.05445225852841L899.34375,49.37106704892602Q899.34375,42.29999923706055 906.4148178118655,42.29999923706055L988.25,42.29999923706055"
+					id="aphrodite-diagram-ccr-pipeline-L_THRESH_INLINE_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 190.74205017089844 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_THRESH_INLINE_0"
+					data-points="W3sieCI6ODQ0LjAwNTE5Njk1ODc4MDMsInkiOjk4LjEyNTUyMDA3MDM5Mzg5fSx7IngiOjg3OS4zNDM3NSwieSI6OTguMTI1NTIwMDcwMzkzODl9LHsieCI6ODk5LjM0Mzc1LCJ5Ijo5OC4xMjU1MjAwNzAzOTM4OX0seyJ4Ijo4OTkuMzQzNzUsInkiOjQyLjI5OTk5OTIzNzA2MDU1fSx7IngiOjk5Mi4yNSwieSI6NDIuMjk5OTk5MjM3MDYwNTV9XQ=="
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path d="M1303.625,42.29999923706055L1339.625,42.29999923706055"
+					id="aphrodite-diagram-ccr-pipeline-L_INLINE_RAW_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge"
+					data-id="L_INLINE_RAW_0"
+					data-points="W3sieCI6MTMwMy42MjUsInkiOjQyLjI5OTk5OTIzNzA2MDU1fSx7IngiOjEzNDMuNjI1LCJ5Ijo0Mi4yOTk5OTkyMzcwNjA1NX1d"
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path
+					d="M844.0051969587803,168.80260340372723L879.34375,168.80260340372723L892.2726821881345,168.80260340372723Q899.34375,168.80260340372723 899.34375,175.8736712155927L899.34375,217.55705642519507Q899.34375,224.62812423706055 906.4148178118655,224.62812423706055L1002.703125,224.62812423706055"
+					id="aphrodite-diagram-ccr-pipeline-L_THRESH_HASH_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 205.1951904296875 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_THRESH_HASH_0"
+					data-points="W3sieCI6ODQ0LjAwNTE5Njk1ODc4MDMsInkiOjE2OC44MDI2MDM0MDM3MjcyM30seyJ4Ijo4NzkuMzQzNzUsInkiOjE2OC44MDI2MDM0MDM3MjcyM30seyJ4Ijo4OTkuMzQzNzUsInkiOjE2OC44MDI2MDM0MDM3MjcyM30seyJ4Ijo4OTkuMzQzNzUsInkiOjIyNC42MjgxMjQyMzcwNjA1NX0seyJ4IjoxMDA2LjcwMzEyNSwieSI6MjI0LjYyODEyNDIzNzA2MDU1fV0="
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path d="M1289.171875,224.62812423706055L1341.1354166666667,224.62812423706055"
+					id="aphrodite-diagram-ccr-pipeline-L_HASH_DEDUP_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 47.9635009765625 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_HASH_DEDUP_0"
+					data-points="W3sieCI6MTI4OS4xNzE4NzUsInkiOjIyNC42MjgxMjQyMzcwNjA1NX0seyJ4IjoxMzQ1LjEzNTQxNjY2NjY2NjcsInkiOjIyNC42MjgxMjQyMzcwNjA1NX1d"
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path
+					d="M1549.848941276471,187.68541590372723L1586.7916666666667,187.68541590372723L1600.4758071881345,187.68541590372723Q1607.546875,187.68541590372723 1607.546875,194.7564837155927L1607.546875,195.55705642519507Q1607.546875,202.62812423706055 1614.6179428118655,202.62812423706055L2028.640625,202.62812423706055L2139.4601821881347,202.62812423706055Q2146.53125,202.62812423706055 2146.53125,209.69919204892602L2146.53125,247.0903892499021Q2146.53125,254.16145706176758 2153.6023178118653,254.16145706176758L2162.53125,254.16145706176758"
+					id="aphrodite-diagram-ccr-pipeline-L_DEDUP_MARK_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 664.501953125 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_DEDUP_MARK_0"
+					data-points="W3sieCI6MTU0OS44NDg5NDEyNzY0NzEsInkiOjE4Ny42ODU0MTU5MDM3MjcyM30seyJ4IjoxNTg2Ljc5MTY2NjY2NjY2NjcsInkiOjE4Ny42ODU0MTU5MDM3MjcyM30seyJ4IjoxNjA3LjU0Njg3NSwieSI6MTg3LjY4NTQxNTkwMzcyNzIzfSx7IngiOjE2MDcuNTQ2ODc1LCJ5IjoyMDIuNjI4MTI0MjM3MDYwNTV9LHsieCI6MjAyOC42NDA2MjUsInkiOjIwMi42MjgxMjQyMzcwNjA1NX0seyJ4IjoyMTQ2LjUzMTI1LCJ5IjoyMDIuNjI4MTI0MjM3MDYwNTV9LHsieCI6MjE0Ni41MzEyNSwieSI6MjU0LjE2MTQ1NzA2MTc2NzU4fSx7IngiOjIxNjYuNTMxMjUsInkiOjI1NC4xNjE0NTcwNjE3Njc1OH1d"
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path
+					d="M1549.848941276471,261.57083257039386L1586.7916666666667,261.57083257039386L1604.6088542938232,261.57083257039386Q1607.546875,261.57083257039386 1607.546875,258.6328118642171L1607.546875,258.6328118642171Q1607.546875,255.69479115804037 1610.4848957061768,255.69479115804037L1903.6789321881345,255.69479115804037Q1910.75,255.69479115804037 1910.75,262.7658589699058L1910.75,280.08309745607886Q1910.75,287.15416526794434 1917.8210678118655,287.15416526794434L1926.75,287.15416526794434"
+					id="aphrodite-diagram-ccr-pipeline-L_DEDUP_STORE_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 402.6943359375 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_DEDUP_STORE_0"
+					data-points="W3sieCI6MTU0OS44NDg5NDEyNzY0NzEsInkiOjI2MS41NzA4MzI1NzAzOTM4Nn0seyJ4IjoxNTg2Ljc5MTY2NjY2NjY2NjcsInkiOjI2MS41NzA4MzI1NzAzOTM4Nn0seyJ4IjoxNjA3LjU0Njg3NSwieSI6MjYxLjU3MDgzMjU3MDM5Mzg2fSx7IngiOjE2MDcuNTQ2ODc1LCJ5IjoyNTUuNjk0NzkxMTU4MDQwMzd9LHsieCI6MTkxMC43NSwieSI6MjU1LjY5NDc5MTE1ODA0MDM3fSx7IngiOjE5MTAuNzUsInkiOjI4Ny4xNTQxNjUyNjc5NDQzNH0seyJ4IjoxOTMwLjc1LCJ5IjoyODcuMTU0MTY1MjY3OTQ0MzR9XQ=="
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path
+					d="M2126.53125,302.72083218892413L2139.4601821881347,302.72083218892413Q2146.53125,302.72083218892413 2146.53125,295.64976437705866L2146.53125,268.89919154029974Q2146.53125,261.82812372843426 2153.6023178118653,261.82812372843426L2162.53125,261.82812372843426"
+					id="aphrodite-diagram-ccr-pipeline-L_STORE_MARK_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 67.56448364257812 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_STORE_MARK_0"
+					data-points="W3sieCI6MjEyNi41MzEyNSwieSI6MzAyLjcyMDgzMjE4ODkyNDEzfSx7IngiOjIxNDYuNTMxMjUsInkiOjMwMi43MjA4MzIxODg5MjQxM30seyJ4IjoyMTQ2LjUzMTI1LCJ5IjoyNjEuODI4MTIzNzI4NDM0MjZ9LHsieCI6MjE2Ni41MzEyNSwieSI6MjYxLjgyODEyMzcyODQzNDI2fV0="
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path d="M2554.953125,257.99479039510095L2590.953125,257.99479039510095"
+					id="aphrodite-diagram-ccr-pipeline-L_MARK_DECIDE_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 32 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge"
+					data-id="L_MARK_DECIDE_0"
+					data-points="W3sieCI6MjU1NC45NTMxMjUsInkiOjI1Ny45OTQ3OTAzOTUxMDA5NX0seyJ4IjoyNTk0Ljk1MzEyNSwieSI6MjU3Ljk5NDc5MDM5NTEwMDk1fV0="
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path
+					d="M2743.4816919341683,232.28906122843426L2769.1875,232.28906122843426L2782.1164321881347,232.28906122843426Q2789.1875,232.28906122843426 2789.1875,225.2179934165688L2789.1875,219.16585858843612Q2789.1875,212.09479077657065 2796.2585678118653,212.09479077657065L2964.796875,212.09479077657065"
+					id="aphrodite-diagram-ccr-pipeline-L_DECIDE_SKIP_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 232.18141174316406 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_DECIDE_SKIP_0"
+					data-points="W3sieCI6Mjc0My40ODE2OTE5MzQxNjgzLCJ5IjoyMzIuMjg5MDYxMjI4NDM0MjZ9LHsieCI6Mjc2OS4xODc1LCJ5IjoyMzIuMjg5MDYxMjI4NDM0MjZ9LHsieCI6Mjc4OS4xODc1LCJ5IjoyMzIuMjg5MDYxMjI4NDM0MjZ9LHsieCI6Mjc4OS4xODc1LCJ5IjoyMTIuMDk0NzkwNzc2NTcwNjV9LHsieCI6Mjk2OC43OTY4NzUsInkiOjIxMi4wOTQ3OTA3NzY1NzA2NX1d"
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path
+					d="M2743.4816919341683,283.7005195617676L2769.1875,283.7005195617676L2782.1164321881347,283.7005195617676Q2789.1875,283.7005195617676 2789.1875,290.77158737363305L2789.1875,296.82372220176575Q2789.1875,303.8947900136312 2796.2585678118653,303.8947900136312L3022.6015625,303.8947900136312"
+					id="aphrodite-diagram-ccr-pipeline-L_DECIDE_RET_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 289.986083984375 4; stroke-dashoffset: 0;;" data-edge="true"
+					data-et="edge" data-id="L_DECIDE_RET_0"
+					data-points="W3sieCI6Mjc0My40ODE2OTE5MzQxNjgzLCJ5IjoyODMuNzAwNTE5NTYxNzY3Nn0seyJ4IjoyNzY5LjE4NzUsInkiOjI4My43MDA1MTk1NjE3Njc2fSx7IngiOjI3ODkuMTg3NSwieSI6MjgzLjcwMDUxOTU2MTc2NzZ9LHsieCI6Mjc4OS4xODc1LCJ5IjozMDMuODk0NzkwMDEzNjMxMn0seyJ4IjozMDI2LjYwMTU2MjUsInkiOjMwMy44OTQ3OTAwMTM2MzEyfV0="
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path d="M3231.9921875,303.8947900136312L3325.796875,303.8947900136312"
+					id="aphrodite-diagram-ccr-pipeline-L_RET_FULL_0"
+					class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 89.8046875 4; stroke-dashoffset: 0;;" data-edge="true" data-et="edge"
+					data-id="L_RET_FULL_0"
+					data-points="W3sieCI6MzIzMS45OTIxODc1LCJ5IjozMDMuODk0NzkwMDEzNjMxMn0seyJ4IjozMzI5Ljc5Njg3NSwieSI6MzAzLjg5NDc5MDAxMzYzMTJ9XQ=="
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path
+					d="M333.015625,179.36406135559082L345.9445571881345,179.36406135559082Q353.015625,179.36406135559082 353.015625,172.29299354372534L353.015625,147.30179596127954Q353.015625,140.23072814941406 360.0866928118655,140.23072814941406L369.015625,140.23072814941406"
+					id="aphrodite-diagram-ccr-pipeline-L_BYP_CLASS_0"
+					class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4; stroke-dashoffset: 0;;"
+					data-edge="true" data-et="edge" data-id="L_BYP_CLASS_0"
+					data-points="W3sieCI6MzMzLjAxNTYyNSwieSI6MTc5LjM2NDA2MTM1NTU5MDgyfSx7IngiOjM1My4wMTU2MjUsInkiOjE3OS4zNjQwNjEzNTU1OTA4Mn0seyJ4IjozNTMuMDE1NjI1LCJ5IjoxNDAuMjMwNzI4MTQ5NDE0MDZ9LHsieCI6MzczLjAxNTYyNSwieSI6MTQwLjIzMDcyODE0OTQxNDA2fV0="
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+				<path
+					d="M1890.75,337.99479039510095L1903.6789321881345,337.99479039510095Q1910.75,337.99479039510095 1910.75,330.9237225832355L1910.75,325.3585669217694Q1910.75,318.28749910990393 1917.8210678118655,318.28749910990393L1926.75,318.28749910990393"
+					id="aphrodite-diagram-ccr-pipeline-L_FAIL_STORE_0"
+					class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link"
+					style="stroke-dasharray: 0 0 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 4; stroke-dashoffset: 0;;"
+					data-edge="true" data-et="edge" data-id="L_FAIL_STORE_0"
+					data-points="W3sieCI6MTg5MC43NSwieSI6MzM3Ljk5NDc5MDM5NTEwMDk1fSx7IngiOjE5MTAuNzUsInkiOjMzNy45OTQ3OTAzOTUxMDA5NX0seyJ4IjoxOTEwLjc1LCJ5IjozMTguMjg3NDk5MTA5OTAzOTN9LHsieCI6MTkzMC43NSwieSI6MzE4LjI4NzQ5OTEwOTkwMzkzfV0="
+					data-look="neo" marker-end="url(#aphrodite-diagram-ccr-pipeline_flowchart-v2-pointEnd-margin)" />
+			</g>
+			<g class="edgeLabels">
+				<g class="edgeLabel" transform="translate(935.796875, 41.79999923706055)">
+					<g class="label" data-id="L_THRESH_INLINE_0" transform="translate(0, -10.5)">
+						<g>
+							<rect class="background" style="" x="-11.6328125" y="-1" width="23.265625" height="23" />
+							<text y="-10.1" text-anchor="middle" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">no</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="edgeLabel" transform="translate(935.796875, 224.12812423706055)">
+					<g class="label" data-id="L_THRESH_HASH_0" transform="translate(0, -10.5)">
+						<g>
+							<rect class="background" style="" x="-16.453125" y="-1" width="32.90625" height="23" /><text
+								y="-10.1" text-anchor="middle" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">yes</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="edgeLabel" transform="translate(1759.1484375, 202.12812423706055)">
+					<g class="label" data-id="L_DEDUP_MARK_0" transform="translate(0, -10.5)">
+						<g>
+							<rect class="background" style="" x="-16.453125" y="-1" width="32.90625" height="23" /><text
+								y="-10.1" text-anchor="middle" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">hit</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="edgeLabel" transform="translate(1759.1484375, 255.19479115804037)">
+					<g class="label" data-id="L_DEDUP_STORE_0" transform="translate(0, -10.5)">
+						<g>
+							<rect class="background" style="" x="-21.265625" y="-1" width="42.53125" height="23" /><text
+								y="-10.1" text-anchor="middle" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">miss
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="edgeLabel" transform="translate(2868.9921875, 211.59479077657065)">
+					<g class="label" data-id="L_DECIDE_SKIP_0" transform="translate(0, -10.5)">
+						<g>
+							<rect class="background" style="" x="-21.265625" y="-1" width="42.53125" height="23" /><text
+								y="-10.1" text-anchor="middle" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">skip
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="edgeLabel" transform="translate(2868.9921875, 303.3947900136312)">
+					<g class="label" data-id="L_DECIDE_RET_0" transform="translate(0, -10.5)">
+						<g>
+							<rect class="background" style="" x="-59.8046875" y="-1" width="119.609375" height="23" />
+							<text y="-10.1" text-anchor="middle" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">needs
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> detail
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+			</g>
+			<g class="nodes">
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-ANY-0" data-look="neo"
+					transform="translate(172.5078125, 87.56406211853027)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-160.5078125" y="-21.5"
+						width="321.015625" height="43" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">any</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> output
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> enters
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> pipeline
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-CLASS-1" data-look="neo"
+					transform="translate(490.1640625, 133.46406173706055)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-117.1484375"
+						y="-30.299999237060547" width="234.296875" height="60.599998474121094" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -18.299999237060547)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">classify
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> -</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> type-aware
+									</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">40-123
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> ns</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> per
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> blob
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-THRESH-2" data-look="neo"
+					transform="translate(763.328125, 133.46406173706055)">
+					<polygon points="116.015625,0 232.03125,-116.015625 116.015625,-232.03125 0,-116.015625"
+						class="label-container" transform="translate(-115.515625, 116.015625)" rx="0" ry="0"
+						style="stroke-width: 2px;" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">over
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> threshold?
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-INLINE-3" data-look="neo"
+					transform="translate(1147.9375, 42.29999923706055)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-155.6875" y="-30.299999237060547"
+						width="311.375" height="60.599998474121094" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -18.299999237060547)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">below
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> threshold:
+									</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">inline
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> cache
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> only
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> -</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> no</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> marker
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-RAW-4" data-look="neo"
+					transform="translate(1465.5859375, 42.29999923706055)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-121.9609375" y="-21.5"
+						width="243.921875" height="43" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">
+										pass-through</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> untouched
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-HASH-5" data-look="neo"
+					transform="translate(1147.9375, 224.62812423706055)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-141.234375" y="-21.5"
+						width="282.46875" height="43" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">BLAKE3
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> hash
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> of</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> content
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-DEDUP-6" data-look="neo"
+					transform="translate(1465.9635416666667, 224.62812423706055)">
+					<polygon points="120.828125,0 241.65625,-120.828125 120.828125,-241.65625 0,-120.828125"
+						class="label-container" transform="translate(-120.328125, 120.828125)" rx="0" ry="0"
+						style="stroke-width: 2px;" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">hash
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> already
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> stored?
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-STORE-7" data-look="neo"
+					transform="translate(2028.640625, 302.72083218892413)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-97.890625" y="-56.70000076293945"
+						width="195.78125" height="113.4000015258789" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -44.70000076293945)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">store
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> on</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> miss:
+									</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">inline
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> LRU
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> 1,024
+									</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="2.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">DashMap
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> over
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> 8</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> KB</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="3.2em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">SQLite
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> over
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> 1</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> KB</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="4.300000000000001em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">session
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> inline
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-MARK-8" data-look="neo"
+					transform="translate(2360.7421875, 257.99479039510095)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-194.2109375" y="-21.5"
+						width="388.421875" height="43" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">marker
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> +</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> preview
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> replaces
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> content
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-DECIDE-9" data-look="neo"
+					transform="translate(2682.0703125, 257.99479039510095)">
+					<polygon points="87.1171875,0 174.234375,-87.1171875 87.1171875,-174.234375 0,-87.1171875"
+						class="label-container" transform="translate(-86.6171875, 87.1171875)" rx="0" ry="0"
+						style="stroke-width: 2px;" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">agent
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> decides
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-SKIP-10" data-look="neo"
+					transform="translate(3129.296875, 212.09479077657065)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-160.5" y="-30.299999237060547"
+						width="321" height="60.599998474121094" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -18.299999237060547)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">preview
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> is</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> enough
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> -</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">skip
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> retrieval,
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> keep
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> reasoning
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-RET-11" data-look="neo"
+					transform="translate(3129.296875, 303.8947900136312)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-102.6953125" y="-21.5"
+						width="205.390625" height="43" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -9.5)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">
+										aphrodite_retrieve</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-FULL-12" data-look="neo"
+					transform="translate(3475.84375, 303.8947900136312)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-146.046875"
+						y="-47.900001525878906" width="292.09375" height="95.80000305175781" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -35.900001525878906)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">normalize
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> hash
+									</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">inline
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> first
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> -</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> then
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> backend
+									</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="2.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">404</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> on</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> a</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> miss
+									</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="3.2em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">
+										byte-identical</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> content
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-BYP-13" data-look="neo"
+					transform="translate(172.515625, 179.36406135559082)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-160.5" y="-30.299999237060547"
+						width="321" height="60.599998474121094" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -18.299999237060547)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">SSE</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> streams
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> bypass
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> -</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">tool_calls
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> args
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> never
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> targeted
+									</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+				<g class="node default" id="aphrodite-diagram-ccr-pipeline-flowchart-FAIL-14" data-look="neo"
+					transform="translate(1759.1484375, 337.99479039510095)">
+					<rect class="basic label-container" style="stroke-width: 2px;" x="-131.6015625"
+						y="-30.299999237060547" width="263.203125" height="60.599998474121094" rx="0" ry="0" />
+					<g class="label" style="" transform="translate(0, -18.299999237060547)">
+						<rect rx="0" ry="0" style="stroke-width: 2px;" />
+						<g>
+							<rect class="background" style="stroke: none; stroke-width: 2px;" rx="0" ry="0" /><text
+								y="-10.1" style="">
+								<tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">a</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> failed
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> store
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> leaves
+									</tspan>
+								</tspan>
+								<tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em">
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">the</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> content
+									</tspan>
+									<tspan font-style="normal" class="text-inner-tspan" font-weight="normal">
+										 uncompressed</tspan>
+								</tspan>
+							</text>
+						</g>
+					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+	<defs>
+		<filter id="aphrodite-diagram-ccr-pipeline-drop-shadow" height="130%" width="130%">
+			<feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000" />
+		</filter>
+	</defs>
+	<defs>
+		<filter id="aphrodite-diagram-ccr-pipeline-drop-shadow-small" height="150%" width="150%">
+			<feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000" />
+		</filter>
+	</defs>
+</svg>
+</div> <figcaption class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust" data-astro-cid-v5c56ei3> M1 // CCR PIPELINE </figcaption> </figure> <!-- Index pages: the zine index cards with one-line purposes -->  <!-- Narrow viewports: the page's outline as a disclosure. Same
+				     generated list as the right rail - the page derives it once
+				     and presents it twice, and only one is ever visible. --> <details class="group mt-16 border-4 border-blood-crimson bg-carbon-void xl:hidden" data-astro-cid-v5c56ei3> <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-3 font-mono text-base font-black uppercase tracking-widest text-stamped-canary [&amp;::-webkit-details-marker]:hidden" data-astro-cid-v5c56ei3>
+ON THIS PAGE
+<span aria-hidden="true" class="transition-transform group-open:rotate-45" data-astro-cid-v5c56ei3>
++
+</span> </summary> <ul class="flex flex-col gap-1 border-t border-oxblood-dark px-5 py-4" data-astro-cid-v5c56ei3> <li data-astro-cid-v5c56ei3> <a href="#startup-sequence" data-outline-link="startup-sequence" class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white" data-astro-cid-v5c56ei3> Startup sequence </a> </li><li data-astro-cid-v5c56ei3> <a href="#port-override-env-pierces-toml-per-mode" data-outline-link="port-override-env-pierces-toml-per-mode" class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white" data-astro-cid-v5c56ei3> Port override (env pierces TOML per mode) </a> </li><li data-astro-cid-v5c56ei3> <a href="#plugin-startup-register---the-hermes-side-half" data-outline-link="plugin-startup-register---the-hermes-side-half" class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white" data-astro-cid-v5c56ei3> Plugin startup (register() - the Hermes-side half) </a> </li><li data-astro-cid-v5c56ei3> <a href="#call-sites" data-outline-link="call-sites" class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white" data-astro-cid-v5c56ei3> Call sites </a> </li> </ul> </details> <!-- The reading column --> <article class="docs-prose mt-16 min-w-0" data-astro-cid-v5c56ei3> <h1 id="process-startup--dual-proxy-launch">Process Startup &amp; Dual-Proxy Launch</h1>
+<p><code>aphrodite</code> startup splits into two halves.</p>
+<p>The binary half resolves configuration (env &gt; TOML &gt; default), binds every listener
+before spawning any server, builds one <code>AppState</code> per listener with a CCR store backend,
+and arms a config-file reload watcher.</p>
+<p>The Hermes plugin half runs once per Hermes home inside <code>register()</code>: it loads
+and smoke-tests the dylib, checks the runtime layout (report-only),
+materializes the built-in directives, registers hooks and tools, and launches the proxy
+when it is not already healthy.</p>
+<h2 id="startup-sequence">Startup sequence</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="mermaid"><code><span class="line"><span style="color:#F97583">sequenceDiagram</span></span>
+<span class="line"><span style="color:#F97583">    autonumber</span></span>
+<span class="line"><span style="color:#F97583">    actor</span><span style="color:#FFAB70"> OS</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> OS / shell</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> main</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> main()</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> rt</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> tokio runtime</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> run</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> run()</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> cfg</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> MultiConfig</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> bind</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> bind loop</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> bs</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> proxy</span><span style="color:#E1E4E8">::build_state</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> ccr</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> CcrStore backend</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> watch</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> config watcher task</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> single</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> run_single</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFAB70">    OS</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">main</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> exec `aphrodite [args]`</span></span>
+<span class="line"><span style="color:#FFAB70">    main</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">main</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> --version / --help early-exit checks</span></span>
+<span class="line"><span style="color:#FFAB70">    main</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">main</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> `aphrodite setup` subcommand handled before the runtime</span></span>
+<span class="line"><span style="color:#FFAB70">    main</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">main</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> worker_threads = env APHRODITE_WORKER_THREADS&lt;br/&gt;or (cpus*4).max(32)</span></span>
+<span class="line"><span style="color:#FFAB70">    main</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">rt</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> Builder::new_multi_thread().worker_threads(n).enable_all()</span></span>
+<span class="line"><span style="color:#FFAB70">    rt</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">run</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> block_on(run())</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFAB70">    run</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">run</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> resolve config_path:&lt;br/&gt;APHRODITE_CONFIG_PATH → ./aphrodite.toml → ~/.hermes/aphrodite/aphrodite.toml</span></span>
+<span class="line"><span style="color:#F97583">    alt</span><span style="color:#9ECBFF"> config file exists (multi-proxy)</span></span>
+<span class="line"><span style="color:#FFAB70">        run</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">cfg</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> MultiConfig::load(path)</span></span>
+<span class="line"><span style="color:#FFAB70">        cfg</span><span style="color:#F97583">--&gt;&gt;</span><span style="color:#FFAB70">run</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> proxies[], [compression], [defaults]</span></span>
+<span class="line"><span style="color:#FFAB70">        run</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">cfg</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> for each proxy: config.resolve(p) → Cli</span></span>
+<span class="line"><span style="color:#F97583">        Note</span><span style="color:#B392F0"> over</span><span style="color:#FFAB70"> cfg</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> env &gt; TOML(proxy&gt;defaults) &gt; default&lt;br/&gt;API-key chain, per-mode port override,&lt;br/&gt;timeout clamp ≤600s, max_output&lt;max_context</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#9ECBFF"> no config (CLI fallback)</span></span>
+<span class="line"><span style="color:#FFAB70">        run</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">cfg</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> Cli::parse() (requires --api-key)</span></span>
+<span class="line"><span style="color:#F97583">    end</span></span>
+<span class="line"><span style="color:#FFAB70">    run</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">run</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> init tracing subscriber</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    loop</span><span style="color:#9ECBFF"> each (name, cli) in proxies</span></span>
+<span class="line"><span style="color:#FFAB70">        bind</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">bind</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> resolve relative ccr_db_path vs exe dir · mkdir -p parent</span></span>
+<span class="line"><span style="color:#FFAB70">        bind</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">bind</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> TcpListener::bind(cli.listen) - a bind failure aborts startup</span></span>
+<span class="line"><span style="color:#FFAB70">        bind</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">bs</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> build_state(&amp;cli, compression)</span></span>
+<span class="line"><span style="color:#FFAB70">        bs</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">bs</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> resolve_thresholds(compression)</span></span>
+<span class="line"><span style="color:#F97583">        alt</span><span style="color:#9ECBFF"> mode == Token &amp;&amp; !no_ccr_marker</span></span>
+<span class="line"><span style="color:#FFAB70">            bs</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">ccr</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> SqliteCcrStore::open(db_path, ccr_ttl_seconds)</span></span>
+<span class="line"><span style="color:#F97583">        else</span><span style="color:#9ECBFF"> mode == Cache</span></span>
+<span class="line"><span style="color:#FFAB70">            bs</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">ccr</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> InMemoryCcrStore::with_capacity_and_ttl(10_000, ttl)</span></span>
+<span class="line"><span style="color:#F97583">        else</span><span style="color:#9ECBFF"> Token &amp;&amp; no_ccr_marker</span></span>
+<span class="line"><span style="color:#FFAB70">            bs</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">ccr</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> None (no CCR backend)</span></span>
+<span class="line"><span style="color:#F97583">        end</span></span>
+<span class="line"><span style="color:#FFAB70">        bs</span><span style="color:#F97583">--&gt;&gt;</span><span style="color:#FFAB70">bind</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> Arc&lt;AppState&gt; (atomics seeded: ema=200, fill=9000, thresholds)</span></span>
+<span class="line"><span style="color:#FFAB70">        bind</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">bind</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> bound.push((name, cli, listener, state))</span></span>
+<span class="line"><span style="color:#F97583">    end</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFAB70">    run</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">watch</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> spawn notify watcher on aphrodite.toml dir</span></span>
+<span class="line"><span style="color:#F97583">    Note</span><span style="color:#B392F0"> over</span><span style="color:#FFAB70"> watch</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> on Modify(aphrodite.toml): debounce 500ms →&lt;br/&gt;MultiConfig::load → resolve_thresholds →&lt;br/&gt;store into every live AppState's 4 atomics</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    loop</span><span style="color:#9ECBFF"> each bound listener</span></span>
+<span class="line"><span style="color:#FFAB70">        run</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">single</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> spawn run_single(name, cli, listener, state, shutdown_rx)</span></span>
+<span class="line"><span style="color:#FFAB70">        single</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">single</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> warn if APHRODITE_MGMT_TOKEN unset</span></span>
+<span class="line"><span style="color:#FFAB70">        single</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">single</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> build restricted Router (/stats,/retrieve,/ccr/*,/reload,...)&lt;br/&gt;+ catch_all /{*path} → proxy_handler&lt;br/&gt;+ /health (public)</span></span>
+<span class="line"><span style="color:#FFAB70">        single</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">single</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> axum::serve(...).with_graceful_shutdown(shutdown_rx.changed())</span></span>
+<span class="line"><span style="color:#F97583">    end</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFAB70">    OS</span><span style="color:#F97583">--&gt;&gt;</span><span style="color:#FFAB70">main</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> SIGINT / SIGTERM</span></span>
+<span class="line"><span style="color:#FFAB70">    main</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">single</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> shutdown_tx.send(true) → all listeners drain</span></span>
+<span class="line"><span style="color:#FFAB70">    main</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">main</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> select: drain done | 5s timeout | 2nd Ctrl+C → abort remaining</span></span></code></pre>
+<h2 id="port-override-env-pierces-toml-per-mode">Port override (env pierces TOML per mode)</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="mermaid"><code><span class="line"><span style="color:#F97583">flowchart</span><span style="color:#B392F0"> TD</span></span>
+<span class="line"><span style="color:#FFAB70">    A</span><span style="color:#F97583">[</span><span style="color:#9ECBFF">"ProxyConfig (from aphrodite.toml)"</span><span style="color:#F97583">]</span><span style="color:#F97583"> --&gt;</span><span style="color:#FFAB70"> B</span><span style="color:#F97583">[</span><span style="color:#9ECBFF">"MultiConfig::resolve"</span><span style="color:#F97583">]</span></span>
+<span class="line"><span style="color:#FFAB70">    B </span><span style="color:#F97583">--&gt;</span><span style="color:#FFAB70"> C</span><span style="color:#F97583">{</span><span style="color:#9ECBFF">"cfg.listen set?"</span><span style="color:#F97583">}</span></span>
+<span class="line"><span style="color:#FFAB70">    C </span><span style="color:#F97583">--&gt;|</span><span style="color:#9ECBFF">Some s</span><span style="color:#F97583">|</span><span style="color:#FFAB70"> D</span><span style="color:#F97583">[</span><span style="color:#9ECBFF">"s.parse::&amp;lt;SocketAddr&amp;gt; (fail→error)"</span><span style="color:#F97583">]</span></span>
+<span class="line"><span style="color:#FFAB70">    C </span><span style="color:#F97583">--&gt;|</span><span style="color:#9ECBFF">None</span><span style="color:#F97583">|</span><span style="color:#FFAB70"> E</span><span style="color:#F97583">[</span><span style="color:#9ECBFF">"default 127.0.0.1:9797"</span><span style="color:#F97583">]</span></span>
+<span class="line"><span style="color:#FFAB70">    D </span><span style="color:#F97583">--&gt;</span><span style="color:#FFAB70"> F</span><span style="color:#F97583">{</span><span style="color:#9ECBFF">"mode / name"</span><span style="color:#F97583">}</span></span>
+<span class="line"><span style="color:#FFAB70">    E </span><span style="color:#F97583">--&gt;</span><span style="color:#FFAB70"> F</span></span>
+<span class="line"><span style="color:#FFAB70">    F </span><span style="color:#F97583">--&gt;|</span><span style="color:#9ECBFF">cache</span><span style="color:#F97583">|</span><span style="color:#FFAB70"> G</span><span style="color:#F97583">[</span><span style="color:#9ECBFF">"apply_port_override(listen, APHRODITE_CACHE_PORT)"</span><span style="color:#F97583">]</span></span>
+<span class="line"><span style="color:#FFAB70">    F </span><span style="color:#F97583">--&gt;|</span><span style="color:#9ECBFF">token</span><span style="color:#F97583">|</span><span style="color:#FFAB70"> H</span><span style="color:#F97583">[</span><span style="color:#9ECBFF">"apply_port_override(listen, APHRODITE_TOKEN_PORT)"</span><span style="color:#F97583">]</span></span>
+<span class="line"><span style="color:#FFAB70">    F </span><span style="color:#F97583">--&gt;|</span><span style="color:#9ECBFF">other</span><span style="color:#F97583">|</span><span style="color:#FFAB70"> I</span><span style="color:#F97583">[</span><span style="color:#9ECBFF">"listen unchanged"</span><span style="color:#F97583">]</span></span>
+<span class="line"><span style="color:#FFAB70">    G </span><span style="color:#F97583">--&gt;</span><span style="color:#FFAB70"> J</span><span style="color:#F97583">{</span><span style="color:#9ECBFF">"env var parses as u16?"</span><span style="color:#F97583">}</span></span>
+<span class="line"><span style="color:#FFAB70">    H </span><span style="color:#F97583">--&gt;</span><span style="color:#FFAB70"> J</span></span>
+<span class="line"><span style="color:#FFAB70">    J </span><span style="color:#F97583">--&gt;|</span><span style="color:#9ECBFF">Ok port</span><span style="color:#F97583">|</span><span style="color:#FFAB70"> K</span><span style="color:#F97583">[</span><span style="color:#9ECBFF">"addr.set_port(port) · info! log"</span><span style="color:#F97583">]</span></span>
+<span class="line"><span style="color:#FFAB70">    J </span><span style="color:#F97583">--&gt;|</span><span style="color:#9ECBFF">present, malformed</span><span style="color:#F97583">|</span><span style="color:#FFAB70"> L</span><span style="color:#F97583">[</span><span style="color:#9ECBFF">"warn! · keep listen"</span><span style="color:#F97583">]</span></span>
+<span class="line"><span style="color:#FFAB70">    J </span><span style="color:#F97583">--&gt;|</span><span style="color:#9ECBFF">absent</span><span style="color:#F97583">|</span><span style="color:#FFAB70"> I</span></span>
+<span class="line"><span style="color:#FFAB70">    K </span><span style="color:#F97583">--&gt;</span><span style="color:#FFAB70"> M</span><span style="color:#F97583">[</span><span style="color:#9ECBFF">"Cli.listen"</span><span style="color:#F97583">]</span></span>
+<span class="line"><span style="color:#FFAB70">    L </span><span style="color:#F97583">--&gt;</span><span style="color:#FFAB70"> M</span></span>
+<span class="line"><span style="color:#FFAB70">    I </span><span style="color:#F97583">--&gt;</span><span style="color:#FFAB70"> M</span></span></code></pre>
+<h2 id="plugin-startup-register---the-hermes-side-half">Plugin startup (register() - the Hermes-side half)</h2>
+<p><code>register()</code> runs once per Hermes home (one <code>PluginManager</code> per home) and is a <strong>pure loader</strong>:
+all logic lives in the dylib.</p>
+<p>Runtime artifacts (binary, dylib, <code>aphrodite.toml</code>, <code>ccr.db</code>, logs) live
+under the canonical runtime home <code>$HERMES_HOME/aphrodite</code> (else <code>~/.hermes/aphrodite</code>),
+never inside the plugin tree.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="mermaid"><code><span class="line"><span style="color:#F97583">sequenceDiagram</span></span>
+<span class="line"><span style="color:#F97583">    autonumber</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> H</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> Hermes host (PluginManager)</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> R</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> register()</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> DL</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> _load_dylib</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> PR</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> _probe_dylib (subprocess)</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> LH</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> layout_check.check_and_heal</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> MD</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> aphrodite_hermes_materialize_directives</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> GH</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> aphrodite_hermes_get_hooks / get_schemas</span></span>
+<span class="line"><span style="color:#F97583">    participant</span><span style="color:#FFAB70"> SP</span><span style="color:#F97583"> as</span><span style="color:#9ECBFF"> _start_proxy</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFAB70">    H</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">R</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> register(ctx)</span></span>
+<span class="line"><span style="color:#FFAB70">    R</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">DL</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> _load_dylib()</span></span>
+<span class="line"><span style="color:#FFAB70">    DL</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">DL</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> _ensure_binaries(): presence check - NEVER downloads&lt;br/&gt;missing → log explicit setup command (download.sh / aphrodite setup)&lt;br/&gt;legacy APHRODITE_AUTO_DOWNLOAD=1 opt-in runs download.sh</span></span>
+<span class="line"><span style="color:#FFAB70">    DL</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">PR</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> subprocess smoke-test (once per unique path)</span></span>
+<span class="line"><span style="color:#FFAB70">    PR</span><span style="color:#F97583">--&gt;&gt;</span><span style="color:#FFAB70">DL</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> rc==0 → CDLL on the resolved canonical path (once per process, no hot-reload)</span></span>
+<span class="line"><span style="color:#FFAB70">    DL</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">DL</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> _configure_ffi: _bindings.py bind_to → manual fallback →&lt;br/&gt;_REQUIRED_VOID_P assertion</span></span>
+<span class="line"><span style="color:#FFAB70">    R</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">LH</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> check_and_heal() (best-effort, never raises)</span></span>
+<span class="line"><span style="color:#F97583">    Note</span><span style="color:#B392F0"> over</span><span style="color:#FFAB70"> LH</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> canonical layout per layout_schema.json v2 (report-only):&lt;br/&gt;detect + log deviations, quarantine stale plugin-source copies&lt;br/&gt;never moves in a git checkout, never touches plugins/aphrodite (Hermes-owned)</span></span>
+<span class="line"><span style="color:#FFAB70">    R</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">MD</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> materialize_directives(home_dir=b"")</span></span>
+<span class="line"><span style="color:#FFAB70">    MD</span><span style="color:#F97583">--&gt;&gt;</span><span style="color:#FFAB70">R</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> {"status":"ok","written":[...],"skipped":[...],"warnings":[...]}</span></span>
+<span class="line"><span style="color:#F97583">    Note</span><span style="color:#B392F0"> over</span><span style="color:#FFAB70"> MD</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> embeds the built-in directives from the binary&lt;br/&gt;(include_str!) → writes ~/.hermes/aphrodite/directives/&lt;br/&gt;idempotent, never overwrites user-modified files</span></span>
+<span class="line"><span style="color:#FFAB70">    R</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">GH</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> hooks[] + schemas[]</span></span>
+<span class="line"><span style="color:#F97583">    loop</span><span style="color:#9ECBFF"> each hook (per-hook try/except - one failure never aborts)</span></span>
+<span class="line"><span style="color:#FFAB70">        R</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">R</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> ctx.register_hook(name, _hook_dispatch) (fresh dylib per call)</span></span>
+<span class="line"><span style="color:#F97583">    end</span></span>
+<span class="line"><span style="color:#F97583">    loop</span><span style="color:#9ECBFF"> each tool (per-tool try/except)</span></span>
+<span class="line"><span style="color:#FFAB70">        R</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">R</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> ctx.register_tool(name, "aphrodite", schema, _make_handler(name))</span></span>
+<span class="line"><span style="color:#F97583">    end</span></span>
+<span class="line"><span style="color:#F97583">    Note</span><span style="color:#B392F0"> over</span><span style="color:#FFAB70"> R</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> skills are not shipped - they live dev-side&lt;br/&gt;context engine is opt-in (APHRODITE_CONTEXT_ENGINE=1)</span></span>
+<span class="line"><span style="color:#FFAB70">    R</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">SP</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> _start_proxy()</span></span>
+<span class="line"><span style="color:#FFAB70">    SP</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">SP</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> pre-launch probe: GET /health on :9797/:9798&lt;br/&gt;(direct-only opener, confirmed "healthy" body) → reuse running instance?</span></span>
+<span class="line"><span style="color:#F97583">    alt</span><span style="color:#9ECBFF"> both healthy</span></span>
+<span class="line"><span style="color:#FFAB70">        SP</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">SP</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> skip launch</span></span>
+<span class="line"><span style="color:#F97583">    else</span><span style="color:#9ECBFF"> launch needed</span></span>
+<span class="line"><span style="color:#FFAB70">        SP</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">SP</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> Popen(aphrodite binary) · stderr → ~/.hermes/aphrodite/proxy-stderr.log</span></span>
+<span class="line"><span style="color:#FFAB70">        SP</span><span style="color:#F97583">-&gt;&gt;</span><span style="color:#FFAB70">SP</span><span style="color:#F97583">:</span><span style="color:#9ECBFF"> immediate-death check (stderr tail + API-key hint) ·&lt;br/&gt;poll both health endpoints ≤5s</span></span>
+<span class="line"><span style="color:#F97583">    end</span></span></code></pre>
+<p>The layout check and the directives materialize are best-effort by design:
+either failing degrades to a warning and the plugin still registers (never a raise).</p>
+<p>The dylib load itself is the one hard gate - if the smoke test
+or the FFI assertion fails, <code>register()</code> logs “plugin disabled” and returns.</p>
+<h2 id="call-sites">Call sites</h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Module</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Runtime + subcommand dispatch</td>
+<td><code>crates/aphrodite/src/main.rs</code></td>
+</tr>
+<tr>
+<td>Config path resolution + bind-before-spawn</td>
+<td><code>crates/aphrodite/src/main.rs</code></td>
+</tr>
+<tr>
+<td>Config reload watcher</td>
+<td><code>crates/aphrodite/src/main.rs</code></td>
+</tr>
+<tr>
+<td>Per-listener router + serve</td>
+<td><code>crates/aphrodite/src/main.rs</code></td>
+</tr>
+<tr>
+<td><code>MultiConfig::resolve</code> / <code>apply_port_override</code></td>
+<td><code>crates/aphrodite/src/config/</code></td>
+</tr>
+<tr>
+<td><code>proxy::build_state</code> (CCR backend selection)</td>
+<td><code>crates/aphrodite/src/proxy.rs</code></td>
+</tr>
+<tr>
+<td><code>resolve_thresholds</code></td>
+<td><code>crates/aphrodite/src/proxy.rs</code></td>
+</tr>
+<tr>
+<td><code>SqliteCcrStore</code> / <code>InMemoryCcrStore</code></td>
+<td><code>vendor/headroom/crates/headroom-core/src/ccr/backends/{sqlite,in_memory}.rs</code></td>
+</tr>
+<tr>
+<td>Plugin <code>register()</code> / <code>_load_dylib</code> / <code>_probe_dylib</code> / <code>_start_proxy</code></td>
+<td><code>plugins/aphrodite/__init__.py</code></td>
+</tr>
+<tr>
+<td>Layout check (report-only)</td>
+<td><code>plugins/aphrodite/layout_check.py</code> (+ <code>layout_schema.json</code>)</td>
+</tr>
+<tr>
+<td>Directives materialize FFI</td>
+<td><code>crates/aphrodite-hermes/src/lib.rs</code></td>
+</tr>
+</tbody>
+</table>
+ </article> <!-- Prev / next: the zine cards at the bottom of the reading column --> <nav aria-label="Docs pagination" class="mt-32 grid gap-16 border-t-4 border-dashed border-oxblood-dark pt-16 sm:grid-cols-2 sm:gap-8" data-astro-cid-v5c56ei3> <a href="/docs/architecture/" rel="prev" class="group relative border-4 border-blood-crimson bg-carbon-void p-6 zine-box-subtle transition-transform hover:-translate-y-1" data-astro-cid-v5c56ei3> <span class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]" data-astro-cid-v5c56ei3>
+PREV
+</span> <span class="mt-2 block font-mono text-base font-bold text-bone-white group-hover:text-stamped-canary" data-astro-cid-v5c56ei3> Architecture </span> <span class="mt-1 block font-mono text-base uppercase tracking-widest text-zinc-dust" data-astro-cid-v5c56ei3> /docs/architecture/ </span> </a> <a href="/docs/architecture/02-chat-compression/" rel="next" class="group relative border-4 border-blood-crimson bg-carbon-void p-6 text-right zine-box-subtle transition-transform hover:-translate-y-1" data-astro-cid-v5c56ei3> <span class="absolute -top-3.5 right-4 z-20 rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]" data-astro-cid-v5c56ei3>
+NEXT
+</span> <span class="mt-2 block font-mono text-base font-bold text-bone-white group-hover:text-stamped-canary" data-astro-cid-v5c56ei3> Chat-Completion Compression </span> <span class="mt-1 block font-mono text-base uppercase tracking-widest text-zinc-dust" data-astro-cid-v5c56ei3> /docs/architecture/02-chat-compression/ </span> </a> </nav> </div> <!-- Wide viewports: the in-page outline as a sticky right rail. The
+			     entries come from the page's own headings, so the rail can never
+			     drift from the anchors the renderer emitted. --> <aside class="hidden xl:block" data-astro-cid-v5c56ei3> <div class="sticky top-24" data-astro-cid-v5c56ei3> <nav aria-label="On this page" class="relative border-4 border-blood-crimson bg-carbon-void p-5 zine-box-subtle" data-astro-cid-v5c56ei3> <p class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary" data-astro-cid-v5c56ei3>
+ON THIS PAGE
+</p> <ul class="mt-3 flex max-h-[calc(100vh-16rem)] flex-col gap-1 overflow-y-auto border-l border-oxblood-dark pl-3" data-astro-cid-v5c56ei3> <li data-astro-cid-v5c56ei3> <a href="#startup-sequence" data-outline-link="startup-sequence" class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white" data-astro-cid-v5c56ei3> Startup sequence </a> </li><li data-astro-cid-v5c56ei3> <a href="#port-override-env-pierces-toml-per-mode" data-outline-link="port-override-env-pierces-toml-per-mode" class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white" data-astro-cid-v5c56ei3> Port override (env pierces TOML per mode) </a> </li><li data-astro-cid-v5c56ei3> <a href="#plugin-startup-register---the-hermes-side-half" data-outline-link="plugin-startup-register---the-hermes-side-half" class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white" data-astro-cid-v5c56ei3> Plugin startup (register() - the Hermes-side half) </a> </li><li data-astro-cid-v5c56ei3> <a href="#call-sites" data-outline-link="call-sites" class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white" data-astro-cid-v5c56ei3> Call sites </a> </li> </ul> </nav> </div> </aside> </div> </main>  <div id="docs-drawer" class="fixed inset-0 z-50 hidden lg:hidden" role="dialog" aria-modal="true" aria-label="Documentation index" data-astro-cid-v5c56ei3> <div class="absolute inset-0 bg-soot-black/90" data-drawer-close data-astro-cid-v5c56ei3></div> <div class="absolute inset-y-0 left-0 w-80 max-w-[85vw] overflow-y-auto border-r-4 border-blood-crimson bg-carbon-void p-6" data-astro-cid-v5c56ei3> <button data-drawer-close class="mb-8 border-2 border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]" data-astro-cid-v5c56ei3>
+CLOSE
+</button> <nav aria-label="Documentation sections (mobile)"> <div class="relative"> <!-- The tape stamp lives OUTSIDE the scroll container: overflow-y-auto
+	     clips absolutely-positioned children that cross its top edge, and
+	     z-index cannot undo a clip. The scroll applies to the entry box only. --><span class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+DOC INDEX
+</span> <div class="relative z-10 max-h-[calc(100vh-9rem)] overflow-y-auto border-4 border-blood-crimson bg-carbon-void p-5 zine-box-subtle">  <div class="flex flex-col gap-2"> <details class="group" data-docs-section="Overview"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Overview </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 2 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Aphrodite Documentation  </a>  </li><li> <a href="/docs/centers/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Centers - AI Conversation Memory Tokens <span class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black" title="Roadmap: partly unimplemented">
+WIP
+</span> </a>  </li> </ul> </details><details class="group" data-docs-section="API"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> API </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 4 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/api/ccr-endpoints/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  CCR Management Endpoints  </a>  </li><li> <a href="/docs/api/health/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Health Endpoint  </a>  </li><li> <a href="/docs/api/metrics-endpoint/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Metrics Endpoint  </a>  </li><li> <a href="/docs/api/retrieve/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Retrieve Endpoint  </a>  </li> </ul> </details><details class="group" open data-docs-section="Architecture" data-current-section="1"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-stamped-canary" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-bone-white"> Architecture </span> <span class="font-mono text-[13px] font-normal tracking-normal text-stamped-canary"> 12 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-stamped-canary" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/architecture/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Architecture  </a>  </li><li> <a href="/docs/architecture/01-startup/" aria-current="page" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors bg-raw-blood pl-2 text-bone-white"> <span class="mr-1.5 inline-block h-2 w-2 bg-stamped-canary align-middle" aria-hidden="true"></span> Process Startup &amp; Dual-Proxy Launch  </a>  </li><li> <a href="/docs/architecture/02-chat-compression/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Chat-Completion Compression  </a>  </li><li> <a href="/docs/architecture/03-retrieve/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Retrieve &amp; Recursive Marker Resolution  </a>  </li><li> <a href="/docs/architecture/04-hook-ffi/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Hermes Hook &amp; FFI Path  </a>  </li><li> <a href="/docs/architecture/05-ccr-lifecycle/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  CCR Entry Lifecycle &amp; EMA Threshold State  </a>  </li><li> <a href="/docs/architecture/06-sse-streaming/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  SSE Streaming Passthrough  </a>  </li><li> <a href="/docs/architecture/07-config-resolution/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Config Resolution Precedence  </a>  </li><li> <a href="/docs/architecture/08-dylib-loading/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Dylib Loading (load-once per process)  </a>  </li><li> <a href="/docs/architecture/09-release-ci/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Release &amp; Publish CI  </a>  </li><li> <a href="/docs/architecture/10-component/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Component Architecture  </a>  </li><li> <a href="/docs/architecture/11-data-model/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Core Data Model  </a>  </li> </ul> </details><details class="group" data-docs-section="CCR"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> CCR </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 6 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/ccr/backends/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  CCR Backends  </a> <ul class="mt-1 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/ccr/backends/in-memory/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  In-Memory CCR Backend  </a> </li><li> <a href="/docs/ccr/backends/inline/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Inline CCR  </a> </li><li> <a href="/docs/ccr/backends/sqlite/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  SQLite CCR Backend  </a> </li> </ul> </li><li> <a href="/docs/ccr/lifecycle/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  CCR Lifecycle  </a>  </li><li> <a href="/docs/ccr/marker-format/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  CCR Marker Format  </a>  </li> </ul> </details><details class="group" data-docs-section="Classification"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Classification </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 2 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/classification/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Classification  </a>  </li><li> <a href="/docs/classification/content-types/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Content Type Taxonomy  </a>  </li> </ul> </details><details class="group" data-docs-section="Config"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Config </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 2 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/config/aphrodite-toml/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  aphrodite.toml  </a>  </li><li> <a href="/docs/config/env-vars/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Environment Variables  </a>  </li> </ul> </details><details class="group" data-docs-section="Examples"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Examples </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 2 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/examples/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Examples  </a>  </li><li> <a href="/docs/examples/llm-view/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  CCR Examples - What the LLM Actually Sees  </a>  </li> </ul> </details><details class="group" data-docs-section="Guides"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Guides </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 3 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/guides/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Guides  </a>  </li><li> <a href="/docs/guides/hermes-integration/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Hermes Integration  </a>  </li><li> <a href="/docs/guides/hermes-tool-output-schemas/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Hermes Tool Output Schemas  </a>  </li> </ul> </details><details class="group" data-docs-section="Install"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Install </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 4 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/install/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Installing Aphrodite  </a>  </li><li> <a href="/docs/install/macos-linux/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  macOS / Linux: Install  </a>  </li><li> <a href="/docs/install/troubleshooting/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Install Troubleshooting  </a>  </li><li> <a href="/docs/install/windows/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Windows Install  </a>  </li> </ul> </details><details class="group" data-docs-section="Metrics"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Metrics </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 2 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/metrics/prometheus/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Prometheus Metrics  </a>  </li><li> <a href="/docs/metrics/queries/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Metrics Queries  </a>  </li> </ul> </details><details class="group" data-docs-section="Plugin"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Plugin </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 3 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/plugin/context-engine/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Context Engine  </a>  </li><li> <a href="/docs/plugin/directives/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Conversational Directives  </a>  </li><li> <a href="/docs/plugin/hooks/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Plugin Hooks  </a>  </li> </ul> </details><details class="group" data-docs-section="Proxy"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Proxy </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 4 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/proxy/architecture/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Proxy Architecture  </a>  </li><li> <a href="/docs/proxy/compression/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Compression Pipeline  </a>  </li><li> <a href="/docs/proxy/handlers/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Proxy Handlers  </a>  </li><li> <a href="/docs/proxy/retry/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Proxy Retry  </a>  </li> </ul> </details><details class="group" data-docs-section="Tool Relay"> <summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&amp;::-webkit-details-marker]:hidden"> <span class="inline-block h-3 w-1 shrink-0 bg-blood-crimson" aria-hidden="true"></span> <span class="min-w-0 flex-1 text-zinc-dust group-hover:text-bone-white"> Tool Relay </span> <span class="font-mono text-[13px] font-normal tracking-normal text-oxblood-dark"> 2 </span> <span class="inline-block font-mono text-[13px] transition-transform group-open:rotate-90 text-oxblood-dark" aria-hidden="true">
+▸
+</span> </summary> <ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3"> <li> <a href="/docs/tool-relay/callbacks/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Callbacks  </a>  </li><li> <a href="/docs/tool-relay/tools/" class="block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors pl-2 text-zinc-dust hover:text-bone-white">  Tool Relay Tools  </a>  </li> </ul> </details> </div> </div> </div> </nav> </div> </div> <script crossorigin="anonymous" type="module" src="/_astro/ZineDiagramNav.astro_astro_type_script_index_0_lang.UlLTdgzY.js"></script>  <!-- The colophon: the zine's closing page, not a web-app link list.
+			     Three bands, each with one job - the build-time status facts, the
+			     registry's destinations grouped into labelled landmarks, then the
+			     record (license, author, and the external canon). The facts are
+			     <span>s, never links, and the only things inside a <nav> are
+			     destinations, so "v1.8.1 BINARY" can never read as a route. --> <footer class="mt-auto border-t-4 border-blood-crimson"> <div class="mx-auto w-full max-w-[1440px] px-5 pb-10 pt-14 sm:px-8 lg:px-14"> <!-- 1. STATUS - the facts, as facts --><div class="flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-oxblood-dark pb-6"> <span class="flex items-center gap-2"> <img class="h-4 w-4" src="/Brand/aphrodite.svg" alt="" width="16" height="16"> <span class="font-mono text-base font-black uppercase tracking-widest text-bone-white">APHRODITE CCR CORE</span> </span> <span class="font-mono text-base text-zinc-dust">
+BINARY <span class="font-bold text-stamped-canary">v1.8.1</span> </span> <span class="font-mono text-base text-zinc-dust">
+PLUGIN <span class="font-bold text-stamped-canary">v2.3.2</span> </span> <a class="font-mono text-base text-zinc-dust transition-colors hover:text-bone-white" href="https://spdx.org/licenses/CC0-1.0.html" rel="license">CC0-1.0</a> </div> <!-- 2. THE COLUMNS - one landmark per registry group, 1 -> 2 -> 4 --> <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4"> <nav aria-label="Footer · Product"> <span class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">PRODUCT</span> <ul class="mt-4 flex flex-col gap-2"> <li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/"> OVERVIEW </a> </li><li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/setup/"> SETUP </a> </li><li> <a class="font-mono text-base font-bold tracking-widest text-bone-white" href="/docs/" aria-current="page"> DOCS </a> </li><li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/benchmarks/"> BENCHMARKS </a> </li><li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/case-study/"> CASE STUDY </a> </li><li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/showcase/"> SHOWCASE </a> </li> </ul> </nav><nav aria-label="Footer · Surface"> <span class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">SURFACE</span> <ul class="mt-4 flex flex-col gap-2"> <li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/plugin/"> PLUGIN </a> </li><li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/tools/"> TOOLS </a> </li><li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/hermes/"> HERMES </a> </li> </ul> </nav><nav aria-label="Footer · Knobs"> <span class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">KNOBS</span> <ul class="mt-4 flex flex-col gap-2"> <li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/config/"> CONFIG </a> </li><li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/workbench/"> WORKBENCH </a> </li><li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/examples/"> EXAMPLES </a> </li> </ul> </nav><nav aria-label="Footer · Record"> <span class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">RECORD</span> <ul class="mt-4 flex flex-col gap-2"> <li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/versions/"> VERSIONS </a> </li><li> <a class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white" href="/presentation/"> BRIEF </a> </li> </ul> </nav> </div> <!-- 3. THE RECORD - the license, the author, the external canon --> <div class="mt-12 flex flex-col gap-5 border-2 border-black bg-carbon-void p-6 shadow-[4px_4px_0px_#000] sm:flex-row sm:items-end sm:justify-between"> <div class="flex flex-col gap-3"> <p class="w-fit border border-black bg-raw-blood px-3 py-0.5 font-mono text-[13px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000] sm:-rotate-1">
+COLOPHON
+</p> <p class="font-mono text-base text-zinc-dust">
+CC0-1.0 · built in the open by
+<a class="text-bone-newsprint underline decoration-stamped-canary transition-colors hover:text-bone-white" href="https://PlayForm.Cloud">PlayForm</a> </p> </div> <nav aria-label="Footer · Elsewhere" class="flex flex-wrap gap-x-6 gap-y-2 font-mono text-base text-zinc-dust"> <a class="tracking-widest transition-colors hover:text-bone-white" href="https://github.com/PlayForm/Aphrodite">REPOSITORY</a> <a class="tracking-widest transition-colors hover:text-bone-white" href="https://github.com/PlayForm/Aphrodite/releases">RELEASES</a> <a class="tracking-widest transition-colors hover:text-bone-white" href="https://crates.io/crates/aphrodite">CRATES.IO</a> </nav> </div> </div> </footer> </div> <!-- Copy runtime: any [data-copy] element copies its value and shows the toast stamp --> <div id="copy-toast" role="status" aria-live="polite" class="pointer-events-none fixed bottom-4 right-4 z-50 hidden border-2 border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
+COPIED TO SPOOL
+</div><script crossorigin="anonymous" type="module">function t(){for(const t of document.querySelectorAll("[data-copy]"))t.dataset.copyBound||(t.dataset.copyBound="1",t.addEventListener("click",async()=>{await navigator.clipboard.writeText(t.dataset.copy??"");const e=document.getElementById("copy-toast");e&&(e.classList.remove("hidden"),setTimeout(()=>e.classList.add("hidden"),1500))}))}function e(){const t=document.getElementById("nav-toggle"),e=document.getElementById("nav-menu");t&&e&&!t.dataset.toggleBound&&(t.dataset.toggleBound="1",t.addEventListener("click",()=>{const d=e.classList.contains("hidden");e.classList.toggle("hidden"),t.setAttribute("aria-expanded",String(d))}),document.addEventListener("keydown",d=>{"Escape"!==d.key||e.classList.contains("hidden")||(e.classList.add("hidden"),t.setAttribute("aria-expanded","false"),t.focus())}))}t(),document.addEventListener("astro:page-load",t),e(),document.addEventListener("astro:page-load",e);</script> </body> </html><script crossorigin="anonymous" type="module">function e(){const e=document.getElementById("docs-nav-toggle"),t=document.getElementById("docs-drawer");if(!e||!t||e.dataset.drawerBound)return;e.dataset.drawerBound="1";const n=t.querySelector("button[data-drawer-close]"),o=o=>{t.classList.toggle("hidden",!o),e.setAttribute("aria-expanded",String(o)),document.documentElement.classList.toggle("overflow-hidden",o),o?n?.focus():e.focus({preventScroll:!0})};e.addEventListener("click",()=>o(t.classList.contains("hidden")));for(const d of t.querySelectorAll("[data-drawer-close]"))d.addEventListener("click",()=>o(!1));for(const d of t.querySelectorAll('a[href^="#"]'))d.addEventListener("click",()=>o(!1));document.addEventListener("keydown",e=>{"Escape"!==e.key||t.classList.contains("hidden")||o(!1)})}function t(){const e=Array.from(document.querySelectorAll("a[data-outline-link]"));if(0===e.length||"1"===e[0]?.dataset.outlineBound)return;const t=new Map;for(const l of e){const e=l.dataset.outlineLink??"";t.set(e,[...t.get(e)??[],l])}const n=[...t.keys()].map(e=>({Id:e,Element:document.getElementById(e)})).filter(e=>null!==e.Element);if(0===n.length)return;const o=n[0],d=n[n.length-1];e[0].dataset.outlineBound="1";let r="";const s=()=>{let e=o.Id;for(const{Id:t,Element:o}of n)o.getBoundingClientRect().top<=160&&(e=t);window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-4&&(e=d.Id),(e=>{if(e!==r){r=e;for(const[n,o]of t)for(const t of o)n===e==1?t.setAttribute("aria-current","location"):t.removeAttribute("aria-current")}})(e)};let c=!1;const a=()=>{!0!==c&&(c=!0,requestAnimationFrame(()=>{c=!1,s()}))};s(),document.addEventListener("scroll",a,{passive:!0}),window.addEventListener("resize",a)}e(),t(),document.addEventListener("astro:page-load",e),document.addEventListener("astro:page-load",t);</script>

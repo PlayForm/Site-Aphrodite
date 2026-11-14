@@ -115,7 +115,7 @@ const Sections = [
 		// rule as DocsSidebar, so prev/next and the rail are one sequence and a
 		// reader never steps backwards through the rail.
 		Entries: [...Entries].sort(
-			(A, B) => RankOf(A.Id) - RankOf(B.Id) || A.Id.localeCompare(B.Id),
+			(A, B) => RankOf(Name, A.Id) - RankOf(Name, B.Id) || A.Id.localeCompare(B.Id),
 		),
 		Name,
 	}));

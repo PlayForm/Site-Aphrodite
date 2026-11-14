@@ -75,7 +75,9 @@ def landscape_card():
     draw.rectangle([80, 115, w - 80, h - 90], fill=CARBON, outline=OXBLOOD, width=4)
     mark = brand_mark(165)
     plate_l, plate_t = w // 2 - 155, 160
-    canvas.paste(mark, (plate_l + (310 - mark.width) // 2, plate_t + (250 - mark.height) // 2), mark)
+    canvas.paste(
+        mark, (plate_l + (310 - mark.width) // 2, plate_t + (250 - mark.height) // 2), mark
+    )
     font = ImageFont.truetype(font_path(), 130)
     text = "APHRODITE"
     box = draw.textbbox((0, 0), text, font=font)
