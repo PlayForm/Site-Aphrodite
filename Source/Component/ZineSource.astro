@@ -1,0 +1,22 @@
+---
+/**
+ * ZineSource - D9 of the restructure plan. The citation footer shipped in two
+ * forms: `mt-12 ... pt-8` on four pages and `mt-8 ... pt-4` on three, for the
+ * same role. This component owns the larger rhythm, the one that matches the
+ * page's own section gap; the smaller form was drift.
+ *
+ * The citation is plain prose by law (site-modules §5): the CodeMentions pass
+ * links the paths in the BUILT tree, so the lines stay text here and no page
+ * hand-writes a `<code>` around a source path.
+ */
+interface Props {
+	/** Each "SRC: file:lines." citation on its own line. */
+	Lines: string[];
+}
+
+const { Lines } = Astro.props;
+---
+
+<div class="mt-12 space-y-1 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
+	{Lines.map((Line) => <p>{Line}</p>)}
+</div>

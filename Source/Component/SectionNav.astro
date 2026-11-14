@@ -1,0 +1,100 @@
+---
+/**
+ * SectionNav - the site's first fragment index. The pages with three or more
+ * content sections carried no anchors at all: `case-study` had eight `<h2>`s
+ * and not one `id`, so its five incidents started 81% down the page with no
+ * way to reach them, and `workbench` had one `<h2>` for four panes.
+ *
+ * It is not a registry: the page passes its own sections, which is what keeps
+ * the index truthful - a link can never name a section the page does not
+ * render. Each section gains `id={Section.Id}` on the page side.
+ *
+ * `aria-current` is set from an IntersectionObserver, because "which section am
+ * I reading" is a runtime fact, not a build-time one. The script is a module
+ * with no dependencies and no framework: it reads the nav's own links, so a
+ * page that renders no sections renders no observer.
+ */
+import ZineStamp from "./ZineStamp.astro";
+
+interface Props {
+	/** The page's own sections, in document order. */
+	Sections: { Id: string; Label: string }[];
+}
+
+const { Sections } = Astro.props;
+---
+
+<nav
+	aria-label="On this page"
+	data-section-nav
+	class="sticky top-0 z-30 -mx-5 flex w-full flex-col items-start gap-3 border-b border-oxblood-dark bg-carbon-void px-5 py-3 sm:-mx-8 sm:px-8 lg:-mx-14 lg:flex-row lg:items-center lg:gap-6 lg:px-14"
+>
+	<ZineStamp Label="ON THIS PAGE" Color="raw" />
+	<ul class="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-base font-bold uppercase tracking-widest">
+		{
+			Sections.map((Section) => (
+				<li>
+					<a
+						href={`#${Section.Id}`}
+						class="text-zinc-dust transition-colors hover:text-bone-white aria-[current=true]:text-stamped-canary"
+					>
+						{Section.Label}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</nav>
+
+<script>
+	// The section the reader is in is the last one whose top has passed the
+	// viewport's upper third. A plain IntersectionObserver with a bottom-heavy
+	// rootMargin answers the same question with less code, and degrades to "no
+	// aria-current" when the API or the sections are missing - never to an error.
+	const Navs = document.querySelectorAll<HTMLElement>("[data-section-nav]");
+
+	if ("IntersectionObserver" in window) {
+		for (const Nav of Navs) {
+			const Links = new Map<string, HTMLAnchorElement>();
+
+			for (const Link of Nav.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')) {
+				const Id = (Link.getAttribute("href") ?? "").slice(1);
+
+				if (Id !== "") {
+					Links.set(Id, Link);
+				}
+			}
+
+			const Targets = [...Links.keys()]
+				.map((Id) => document.getElementById(Id))
+				.filter((Target): Target is HTMLElement => Target !== null);
+
+			if (Targets.length === 0) {
+				continue;
+			}
+
+			const Observer = new IntersectionObserver(
+				(Entries) => {
+					for (const Entry of Entries) {
+						if (!Entry.isIntersecting) {
+							continue;
+						}
+
+						for (const [Id, Link] of Links) {
+							if (Id === Entry.target.id) {
+								Link.setAttribute("aria-current", "true");
+							} else {
+								Link.removeAttribute("aria-current");
+							}
+						}
+					}
+				},
+				{ rootMargin: "0px 0px -70% 0px", threshold: 0 },
+			);
+
+			for (const Target of Targets) {
+				Observer.observe(Target);
+			}
+		}
+	}
+</script>

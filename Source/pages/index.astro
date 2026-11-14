@@ -3,32 +3,29 @@ import Base from "@Layout/Base.astro";
 
 import Related from "@Component/Related.astro";
 
-import CodeFence from "@Component/CodeFence.astro";
-
-import StudyLedger from "@Component/StudyLedger.astro";
-
-import ZineKicker from "@Component/ZineKicker.astro";
-import ZinePreview from "@Component/ZinePreview.astro";
-import ZineStream from "@Component/ZineStream.astro";
-
-import { ExternalLinks } from "@Library/Links";
-import { Stamps, Versions } from "@Library/Versions";
+import PageShell from "@Component/PageShell.astro";
+import ZineSplit from "@Component/ZineSplit.astro";
+import ZineTape from "@Component/ZineTape.astro";
 
 // THE PAIR - the product's whole argument, drawn once. The left pane is the
 // raw stream the terminal keeps (the suppression opacities: dim 70, fade 40,
 // mute 25); the right pane is the one line the model actually reads, plus the
 // marker that addresses the original bytes. The lines are the build output the
 // showcase's traversal A narrates; the preview line is a corpus sample.
+//
+// ZineSplit takes the lines as strings and reads a leading "dim:", "fade:" or
+// "mute:" as the suppression tone, so the array is the same nine lines in the
+// same order with the tone carried in the text instead of a second field.
 const RawStream = [
-	{ Text: "$ cargo build --release -p aphrodite", Tone: "plain" },
-	{ Text: "   Compiling aphrodite-headroom-core v0.2.0", Tone: "dim" },
-	{ Text: "   Compiling aphrodite v1.8.0", Tone: "fade" },
-	{ Text: "warning: unused variable: `noise`", Tone: "mute" },
-	{ Text: "warning: 1 warning emitted", Tone: "mute" },
-	{ Text: "error[E0432]: unresolved import `crate::noise`", Tone: "canary" },
-	{ Text: "  --> crates/aphrodite/src/preview.rs:12:5", Tone: "mute" },
-	{ Text: "error: could not compile `aphrodite`", Tone: "canary" },
-	{ Text: "48,213 characters · 142 lines · the whole thing enters the context", Tone: "result" },
+	"$ cargo build --release -p aphrodite",
+	"dim:   Compiling aphrodite-headroom-core v0.2.0",
+	"fade:   Compiling aphrodite v1.8.0",
+	"mute: warning: unused variable: `noise`",
+	"mute: warning: 1 warning emitted",
+	"canary: error[E0432]: unresolved import `crate::noise`",
+	"mute:   --> crates/aphrodite/src/preview.rs:12:5",
+	"canary: error: could not compile `aphrodite`",
+	"result: 48,213 characters · 142 lines · the whole thing enters the context",
 ];
 ---
 
@@ -36,10 +33,13 @@ const RawStream = [
 	Title="APHRODITE // CCR COMPRESSION ENGINE"
 	Description="Context management for tool-using AI agents. Aphrodite turns verbose tool output - logs, diffs, files, searches, JSON, and browser snapshots - into compact, retrievable previews. Up to 610x compression on the standard corpus (132x overall), ~10 ms end-to-end."
 >
-	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 pb-32 pt-16 sm:px-8 lg:gap-40 lg:pb-56 lg:px-14 lg:pt-24"
-	>
+	<PageShell Rhythm="hero">
 		<!-- HERO SLAB -->
+		<!-- SHARED-SLOT NOTE: PageHeader (t_130e5ed4) is deliberately NOT used on
+		     this page. PageHeader renders its own <h1>; the landing's <h1> is the
+		     stamped wordmark below, which is the page's identity, so a swap would
+		     ship two h1s and shrink the wordmark from 144px to 48px. The lead below
+		     keeps PageHeader's rhythm - one sentence, one <p>. -->
 		<header class="relative flex w-full flex-col items-center justify-center pt-4 text-center">
 			<!-- Brand card: the red aphrodite.svg mark in the crimson module,
 			     oxblood offset underlay (user instruction: the red mark everywhere) -->
@@ -91,21 +91,20 @@ const RawStream = [
 			>
 				CONTEXT MANAGEMENT FOR TOOL-USING AI AGENTS
 			</div>
-			<!-- THE LEAD: one sentence states the product, the second states why it
-			     matters. Nothing here needs the docs to parse. -->
+			<!-- THE LEAD: one sentence states the product. The justification that
+			     used to follow it here is the pair's, and reads below it. -->
 			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
-				Aphrodite keeps noisy tool output out of your agent's context - it turns logs,
-				diffs, files, searches, JSON, and browser snapshots into compact previews the
-				agent can act on, with the original always one retrieval away.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				It is the reason tool-heavy agents keep working: the context window stops paying
-				for noise before the reasoning starts.
+				Aphrodite keeps noisy tool output out of your agent's context - it turns logs, diffs, files,
+				searches, JSON, and browser snapshots into compact previews the agent can act on,
+				with the original always one retrieval away.
 			</p>
 			<p class="mt-8 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 				One binary. Zero dependencies. Millions of tokens saved.
 			</p>
-			<!-- Rotated stat badges -->
+			<!-- Rotated stat badges: the hook, kept (plan 3.3). Their captions are
+			     gone - the version stamps and the README citations they cited live in
+			     the footer and on /versions/, and a landing page is not the place a
+			     reader meets a file:line. -->
 			<div class="mt-20 flex max-w-4xl flex-wrap items-center justify-center gap-3 sm:gap-4">
 				<span
 					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000] sm:text-base"
@@ -128,124 +127,63 @@ const RawStream = [
 					156M+ TOKENS SAVED
 				</span>
 			</div>
-			<!-- Raw technical stamps -->
-			<div class="mt-14 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-				<span
-					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base uppercase text-zinc-dust"
-				>
-					{Stamps.Binary()}
-				</span>
-				<a
-					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-base uppercase text-bone-newsprint transition-colors hover:bg-blood-crimson"
-					href={ExternalLinks.Crates}
-					target="_blank"
-					rel="noopener"
-				>
-					CRATES.IO
-				</a>
-				<a
-					class="border border-raw-blood bg-carbon-void px-3 py-1 font-mono text-base uppercase text-bone-newsprint transition-colors hover:bg-blood-crimson"
-					href={ExternalLinks.Repository}
-					target="_blank"
-					rel="noopener"
-				>
-					GITHUB
-				</a>
-				<span
-					class="border border-weathered-teal/40 bg-asphalt-panel px-3 py-1 font-mono text-base uppercase text-weathered-teal"
-				>
-					{Stamps.PluginSpec()}
-				</span>
-				<a
-					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base uppercase text-zinc-dust transition-colors hover:text-bone-white"
-					href="/hermes/"
-				>
-					HERMES
-				</a>
-				<span
-					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base uppercase text-zinc-dust"
-				>
-					RUST 1.88+
-				</span>
-				<span
-					class="border border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base uppercase text-zinc-dust"
-				>
-					CC0-1.0
-				</span>
-			</div>
-			<p class="mt-8 text-base text-zinc-dust">
-				SRC: README.md:12 (610&times;/132&times;, ~10&nbsp;ms) &middot; README.md:467-511 (the
-				200-session study) &middot; crates/aphrodite/Cargo.toml ({`v${Versions.Binary}`}) &middot;
-				plugins/aphrodite/plugin.yaml ({`v${Versions.Plugin}`})
-			</p>
 		</header>
 
-		<!-- THE PAIR // STREAM + PREVIEW -->
+		<!-- THE PAIR // STREAM + PREVIEW - the product's whole argument, and the
+		     second thing on the page. ZineSplit owns the plate and the two panes;
+		     the prose above it is the section's claim, the note below it the one
+		     caption. -->
 		<section class="relative w-full">
-			<div
-				class="mb-12 -rotate-1 w-fit border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				THE PAIR // STREAM + PREVIEW
+			<!-- The tape keeps its fitted width: ZineTape's section shape is in
+			     flow without `w-fit`, and the 103 hand-rolled section stamps this
+			     replaces were all fitted. -->
+			<div class="w-fit">
+				<ZineTape Variant="section" Label="THE PAIR // STREAM + PREVIEW" />
 			</div>
-			<div
-				class="zine-box-crimson relative w-full -rotate-[1deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
-				<h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-					The agent spends its budget reading noise
-				</h2>
-				<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Every file read, build, code search, or browser open floods the agent's context
-					with raw output - compilation logs, accessibility trees, JSON blobs.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The agent spends its budget reading noise instead of reasoning.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Aphrodite intercepts output before it reaches the LLM and replaces it with a
-					compact, structured preview - because the agent's reasoning budget is the
-					context budget, and raw noise spends both.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The agent sees ~15 tokens of metadata instead of hundreds - and retrieves the full
-					content only when it actually needs it.
-				</p>
-				<!-- The pair: what the terminal keeps, what the model reads. -->
-				<div class="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
-					<div>
-						<ZineKicker As="div" Tone="dust">RAW STREAM // WHAT THE TERMINAL KEEPS</ZineKicker>
-						<div class="mt-2">
-							<ZineStream Lines={RawStream} />
-						</div>
-					</div>
-					<div>
-						<ZineKicker As="div" Tone="canary">PREVIEW // WHAT THE MODEL READS</ZineKicker>
-						<div class="mt-2">
-							<ZinePreview
-								Label="ONE LINE, ONE MARKER"
-								Result="[build:0E 0W 1L]"
-								Hash="&lt;&lt;&lt;CCR:a1b2c3d4|build|12408&gt;&gt;&gt;"
-								Color="canary"
-							/>
-						</div>
-						<p class="mt-4 font-body text-base leading-relaxed text-zinc-dust">
-							The marker is the address of the original bytes. The agent pays for them only
-							when the preview fails to answer the question.
-						</p>
-					</div>
-				</div>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
-					SRC: docs/proxy/compression.md:228-241 (the preview shapes) &middot; docs/api/retrieve.md:184-212
-					(the byte-exact round-trip)
-				</p>
+			<h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+				The agent spends its budget reading noise
+			</h2>
+			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				Every file read, build, code search, or browser open floods the agent's context
+				with raw output - compilation logs, accessibility trees, JSON blobs.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				The agent spends its budget reading noise instead of reasoning.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				Aphrodite intercepts output before it reaches the LLM and replaces it with a compact,
+				structured preview - because the agent's reasoning budget is the context budget,
+				and raw noise spends both.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				The agent sees ~15 tokens of metadata instead of hundreds - and retrieves the full content
+				only when it actually needs it.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				It is the reason tool-heavy agents keep working: the context window stops paying for noise
+				before the reasoning starts.
+			</p>
+			<div class="mt-12">
+				<ZineSplit
+					Raw={RawStream}
+					Preview="[build:0E 0W 1L]"
+					Hash="&lt;&lt;&lt;CCR:a1b2c3d4|build|12408&gt;&gt;&gt;"
+					Label="ONE LINE, ONE MARKER"
+				/>
 			</div>
+			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
+				The marker is the address of the original bytes.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
+				The agent pays for them only when the preview fails to answer the question.
+			</p>
 		</section>
 
-		<!-- PIPELINE // 4-STAGE ABSORPTION -->
+		<!-- THE HOW // 4-STAGE ABSORPTION - below the pair, because the pair is
+		     the argument and this is the mechanism behind it. -->
 		<section class="relative w-full">
-			<div
-				class="mb-12 -rotate-1 z-10 relative w-fit border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				PIPELINE // 4-STAGE ABSORPTION
+			<div class="w-fit">
+				<ZineTape Variant="section" Label="PIPELINE // 4-STAGE ABSORPTION" />
 			</div>
 			<h2 class="mb-12 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 				Four steps, one decision
@@ -348,174 +286,24 @@ const RawStream = [
 					</div>
 				</div>
 			</div>
-			<p class="mt-10 text-base text-zinc-dust">
-				CLASSIFIER: 16 PIPELINE TYPES IN THE README (README.md:155-176); FULL REGISTRY OF 30
-				TYPES IN THE DOCS (docs/classification/content-types.md:118-151). TIMINGS: CLASSIFY
-				40-123 NS, WHOLE COMPRESS STEP SUB-MILLISECOND (README.md:133, 461).
-			</p>
 		</section>
 
-		<!-- TELEMETRY MODULE -->
-		<section class="relative my-6 w-full rotate-[0.6deg] transition-transform duration-300 hover:rotate-0">
-			<div
-				class="absolute -top-4 right-10 z-20 border border-black bg-stamped-canary px-4 py-1 text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
-			>
-				TELEMETRY // 200 RUN HARVEST
-			</div>
-			<div
-				class="zine-box-crimson relative overflow-hidden border-4 border-blood-crimson bg-carbon-void p-6 sm:p-10 lg:p-12"
-			>
-				<div
-					class="flex flex-col items-start justify-between gap-6 border-b-2 border-oxblood-dark pb-8 lg:flex-row lg:items-end"
-				>
-					<div>
-						<ZineKicker As="div" Tone="dust">EMPIRICAL LEDGER</ZineKicker>
-						<h2
-							class="mt-1 font-headline text-3xl font-black uppercase tracking-tight text-bone-white sm:text-4xl lg:text-5xl"
-						>
-							Aggregate deflection
-						</h2>
-					</div>
-					<div
-						class="zine-box-subtle w-full border-[3px] border-raw-blood bg-soot-black p-5 text-left sm:p-6 lg:w-auto lg:text-right"
-					>
-						<ZineKicker As="div" Tone="dust">TOKENS SAVED FROM INGESTION</ZineKicker>
-						<div
-							class="font-headline text-4xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-6xl lg:text-7xl"
-						>
-							156,342,817
-						</div>
-						<div class="mt-1 flex flex-wrap items-center gap-3 text-base font-bold lg:justify-end">
-							<span class="text-stamped-canary">26.9% TOTAL BUDGET DEFLECTED</span>
-							<span class="text-zinc-dust">&bull;</span>
-							<span class="text-weathered-teal">22,921 AVG PER CALL</span>
-						</div>
-					</div>
-				</div>
-				<div class="mt-8 space-y-4">
-					<div class="mb-2">
-						<ZineKicker As="div" Tone="dust">
-							RATIO BY OUTPUT CLASS (PER-TYPE COMPRESSION, LOG SCALE):
-						</ZineKicker>
-					</div>
-					<!-- Browser snapshot -->
-					<div>
-						<div class="mb-1 flex justify-between text-base font-bold">
-							<span class="text-bone-newsprint">BROWSER SNAPSHOT</span>
-							<span class="text-weathered-teal">416&times;</span>
-						</div>
-						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-weathered-teal" style="width: 100%;"></div>
-							<div class="h-full bg-raw-blood" style="width: 0%;"></div>
-						</div>
-					</div>
-					<!-- Build output -->
-					<div>
-						<div class="mb-1 flex justify-between text-base font-bold">
-							<span class="text-bone-newsprint">BUILD OUTPUT</span>
-							<span class="text-zinc-dust">140&times;</span>
-						</div>
-						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-raw-blood" style="width: 82%;"></div>
-							<div class="h-full bg-stamped-canary" style="width: 18%;"></div>
-						</div>
-					</div>
-					<!-- JSON -->
-					<div>
-						<div class="mb-1 flex justify-between text-base font-bold">
-							<span class="text-bone-newsprint">JSON</span>
-							<span class="text-stamped-canary">40&times;</span>
-						</div>
-						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-stamped-canary" style="width: 61%;"></div>
-							<div class="h-full bg-asphalt-panel" style="width: 39%;"></div>
-						</div>
-					</div>
-					<!-- Git diff -->
-					<div>
-						<div class="mb-1 flex justify-between text-base font-bold">
-							<span class="text-bone-newsprint">GIT DIFF</span>
-							<span class="text-zinc-dust">23&times;</span>
-						</div>
-						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-raw-blood" style="width: 52%;"></div>
-							<div class="h-full bg-asphalt-panel" style="width: 48%;"></div>
-						</div>
-					</div>
-					<!-- Terminal -->
-					<div>
-						<div class="mb-1 flex justify-between text-base font-bold">
-							<span class="text-bone-newsprint">TERMINAL</span>
-							<span class="text-stamped-canary">20&times;</span>
-						</div>
-						<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-							<div class="h-full bg-stamped-canary" style="width: 50%;"></div>
-							<div class="h-full bg-asphalt-panel" style="width: 50%;"></div>
-						</div>
-					</div>
-				</div>
-				<div class="mt-8">
-					<StudyLedger Scale="compact" />
-				</div>
-			</div>
-		</section>
-
-		<!-- INSTALL // RUNTIME HARNESS -->
-		<section class="relative w-full">
-			<div
-				class="mb-12 -rotate-1 relative z-10 w-fit border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				INSTALL // HERMES PLUGIN
-			</div>
-			<div
-				class="zine-box-crimson w-full -rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-8"
-			>
-				<div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-					<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-						Runtime harness
-					</h2>
-					<span class="text-base font-bold text-weathered-teal">
-						:9797 [CACHE] &bull; :9798 [TOKEN]
-					</span>
-				</div>
-				<div class="mb-4 space-y-1 border border-oxblood-dark bg-soot-black p-4 font-mono text-base text-bone-newsprint">
-					<CodeFence
-						Code={`$ git clone ${ExternalLinks.HermesRepository}.git
-$ cd Aphrodite-Hermes
-$ bash download.sh`}
-					/>
-					<div class="text-stamped-canary">[INIT] binary + dylib fetched from GitHub Releases</div>
-					<div class="text-weathered-teal">[INIT] SHA-256 verified into ~/.hermes/aphrodite/</div>
-					<CodeFence Code="$ hermes plugins enable aphrodite" />
-				</div>
-				<div
-					class="flex flex-col items-stretch justify-between gap-3 border-2 border-oxblood-dark bg-asphalt-panel p-4 sm:flex-row sm:items-center"
-				>
-					<div class="text-base font-bold text-zinc-dust">COPY THE FULL SETUP SEQUENCE:</div>
-					<button
-						class="border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-						type="button"
-						aria-label="Copy the full setup sequence to the clipboard"
-						data-copy={"git clone https://github.com/PlayForm/Aphrodite-Hermes.git\ncd Aphrodite-Hermes\nln -s \"$(pwd)\" ~/.hermes/plugins/aphrodite\nbash download.sh\ncd ..\nhermes plugins enable aphrodite\nhermes"}
-					>
-						COPY
-					</button>
-				</div>
-				<div class="mt-4 flex items-center justify-between border-t border-oxblood-dark pt-2 text-base text-zinc-dust">
-					<span>FULL INSTRUCTIONS ON THE</span>
-					<a class="font-bold text-stamped-canary" href="/setup/">SETUP PAGE</a>
-				</div>
-			</div>
-		</section>
+		<!-- ONWARD // one install line, then the routing block. The install
+		     harness that used to sit here is /setup/'s story (install-surfaces 1)
+		     and the telemetry module that used to sit above it is /benchmarks/'. -->
+		<p
+			class="w-full border-t border-oxblood-dark pt-8 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust"
+		>
+			FULL INSTRUCTIONS ON THE <a class="text-stamped-canary" href="/setup/">SETUP PAGE</a>
+		</p>
 
 		<!-- RELATED: the natural neighbors -->
 		<Related
 			Links={[
 				{ Href: "/setup/", Label: "SETUP" },
-				{ Href: "/plugin/", Label: "PLUGIN" },
-				{ Href: "/benchmarks/", Label: "BENCHMARKS" },
+				{ Href: "/showcase/", Label: "SHOWCASE" },
 				{ Href: "/docs/", Label: "DOCS" },
 			]}
 		/>
-	</main>
+	</PageShell>
 </Base>

@@ -100,13 +100,21 @@ export async function DocsTree(): Promise<DocsSection[]> {
 		Sections.set(Name, [...(Sections.get(Name) ?? []), Page]);
 	}
 
+	// The group's own page opens it - the docs root for Overview, the section
+	// index (install) for Install - and the rest keep id order, which is the
+	// docs tree's reading order.
+	const RankOf = (Name: string, Page: DocsPage) =>
+		Page.Id === "index" || Page.Id.toLowerCase() === Name.toLowerCase() ? 0 : 1;
+
 	return [...Sections.entries()]
 		.sort(([A], [B]) =>
 			A === "Overview" ? -1 : B === "Overview" ? 1 : A.localeCompare(B),
 		)
 		.map(([Name, Pages]) => ({
 			Name,
-			Pages,
+			Pages: [...Pages].sort(
+				(A, B) => RankOf(Name, A) - RankOf(Name, B) || A.Id.localeCompare(B.Id),
+			),
 			Count: Pages.reduce((Total, Page) => Total + 1 + Page.Children.length, 0),
 		}));
 }
@@ -134,14 +142,25 @@ export async function DocsTrail(Id: string): Promise<Crumb[]> {
 		);
 
 	for (const { Name, Pages } of Sections) {
+		// The section's own index page IS its section crumb: repeating the name
+		// as a link to the page you are on is a self-link, so it is dropped.
+		const IsSectionIndexPage = Name.toLowerCase() === Id;
+
 		const Trail: Crumb[] = [
 			{ Label: "DOCS", Href: "/docs/" },
-			{
-				Label: Name,
-				// A section names a destination only when it has its own index
-				// page (install -> docs/install); otherwise it is a label.
-				Href: SectionIndexOf(Name) ? HrefOf(Name.toLowerCase()) : undefined,
-			},
+			...(IsSectionIndexPage
+				? []
+				: [
+						{
+							Label: Name,
+							// A section names a destination only when it has its own
+							// index page (install -> docs/install); otherwise it is a
+							// label.
+							Href: SectionIndexOf(Name)
+								? HrefOf(Name.toLowerCase())
+								: undefined,
+						},
+					]),
 		];
 
 		for (const Page of Pages) {

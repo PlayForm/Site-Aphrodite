@@ -1,0 +1,54 @@
+---
+/**
+ * PageShell - D1 of the restructure plan. The `<main>` shell existed in six
+ * variants across seventeen routes: section gaps of 40, 24 and 28 with top
+ * padding 24, 32, 16 and 20, so the "huge vertical rhythm" law (grammar law 5)
+ * was not one rhythm but four. This component owns the three named rhythms and
+ * nothing else - a page picks one and stops writing padding.
+ *
+ * The page still writes the element: it writes `<PageShell>`, and the component
+ * emits the `<main>`. That is what keeps the HEAD CONTRACT's "every page's slot
+ * content is wrapped in `<main>` BY THE PAGE" true, since the page is the one
+ * that places it. The deep-HTML sweep greps the BUILT tree for `<main>`, so
+ * verify in `Target/`, never in the page file.
+ */
+import Breadcrumbs from "./Breadcrumbs.astro";
+
+interface Props {
+	/** The section gap + page padding pair. "wide" is the default page rhythm. */
+	Rhythm?: "wide" | "dense" | "hero";
+
+	/** Render `<Breadcrumbs />` as the first child. */
+	Crumbs?: boolean;
+
+	/**
+	 * Let the shell fill a non-scrolling viewport (`flex-1`). The workbench is
+	 * the only page that needs it: its panes are a viewport, not a document.
+	 */
+	Grow?: boolean;
+}
+
+const { Rhythm = "wide", Crumbs = false, Grow = false } = Astro.props;
+
+/**
+ * Byte-exact from the measured shells: wide is shell A (case-study, examples,
+ * hermes, plugin, tools and the rest), dense is shell B (benchmarks, setup,
+ * versions), hero is shell C (the landing page's asymmetric top).
+ */
+const RhythmClass = {
+	wide: "gap-40 py-24 lg:gap-64 lg:py-40",
+	dense: "gap-24 py-32 lg:gap-40 lg:py-56",
+	hero: "gap-24 pb-32 pt-16 lg:gap-40 lg:pb-56 lg:pt-24",
+}[Rhythm];
+---
+
+<main
+	class:list={[
+		"relative z-10 mx-auto flex w-full max-w-[1440px] flex-col px-5 sm:px-8 lg:px-14",
+		RhythmClass,
+		Grow && "flex-1",
+	]}
+>
+	{Crumbs && <Breadcrumbs />}
+	<slot />
+</main>

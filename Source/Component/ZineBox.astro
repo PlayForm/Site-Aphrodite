@@ -1,13 +1,54 @@
 ---
+/**
+ * ZineBox - D4 of the restructure plan. The crimson plate was hand-rolled 80
+ * times: the same `border-4 border-blood-crimson bg-carbon-void` boundary in
+ * two padding sizes and four hand-written rotations, 39 of them restating the
+ * `zine-box-crimson` shadow token that already draws the border's twin plane.
+ *
+ * Grammar law 1 is the border (4px crimson = the module boundary) and law 2 is
+ * the shadow (zero-blur, pasted down, radius 0); this component is those two
+ * laws plus the padding pair, so a plate is a component call and never a class
+ * string.
+ *
+ * `Rotate` is applied from the `sm` breakpoint up - law 3, "mobile flattens".
+ * The hand-rolled plates rotated on every viewport, which was the violation
+ * this component fixes: pass the unprefixed rotation (`-rotate-[1.2deg]`) and
+ * the component decides where it applies.
+ */
+import ZineTape from "./ZineTape.astro";
+
 interface Props {
 	/** Shadow tone: the zine-box class from Global.css. */
 	Tone?: "crimson" | "subtle" | "canary" | "teal";
 
-	/** Rotation applied from the sm breakpoint up; mobile is always flat. */
+	/** The plate's padding: md = p-6 sm:p-8, lg = p-8 sm:p-12. */
+	Size?: "md" | "lg";
+
+	/** Rotation from `sm` up; mobile is always flat. Pass the unprefixed class. */
 	Rotate?: string;
+
+	/** The corner tape rendered by ZineTape, if any. */
+	Tape?: string;
+
+	/** The corner tape's color. */
+	TapeColor?: "raw" | "canary" | "teal" | "bone";
+
+	/** The corner tape's side. */
+	TapeSide?: "left" | "right";
+
+	/** Extra classes for the plate itself. */
+	Class?: string;
 }
 
-const { Tone = "crimson", Rotate = "" } = Astro.props;
+const {
+	Tone = "crimson",
+	Size = "md",
+	Rotate = "",
+	Tape,
+	TapeColor = "raw",
+	TapeSide = "left",
+	Class = "",
+} = Astro.props;
 
 const Shadow = {
 	crimson: "zine-box-crimson",
@@ -15,8 +56,27 @@ const Shadow = {
 	canary: "zine-box-canary",
 	teal: "zine-box-teal",
 }[Tone];
+
+const Pad = {
+	md: "p-6 sm:p-8",
+	lg: "p-8 sm:p-12",
+}[Size];
+
+/** The tilt is composed as `rotate` + a mobile flatten, never as a `sm:` prefix:
+ * Tailwind's scanner only sees literal class text, so a composed `sm:-rotate-x`
+ * would never be generated and the plate would render flat. */
+const Tilt = Rotate === "" ? "max-sm:rotate-0" : `${Rotate} max-sm:rotate-0`;
 ---
 
-<div class={`relative border-4 border-blood-crimson bg-carbon-void p-6 sm:p-8 ${Shadow} ${Rotate} transition-transform duration-300 hover:rotate-0`}>
+<div
+	class:list={[
+		"relative border-4 border-blood-crimson bg-carbon-void transition-transform duration-300 hover:rotate-0",
+		Pad,
+		Shadow,
+		Tilt,
+		Class,
+	]}
+>
+	{Tape !== undefined && <ZineTape Variant="corner" Label={Tape} Color={TapeColor} Side={TapeSide} />}
 	<slot />
 </div>

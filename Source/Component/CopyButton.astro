@@ -69,7 +69,7 @@ const Metrics = {
 	class:list={[Base, Fill, Metrics, Class]}
 	data-copy={Payload}
 	type="button"
-	aria-label={`Copy ${Label} to the clipboard`}
+	aria-label={Label === "COPY" ? "Copy to the clipboard" : `Copy ${Label} to the clipboard`}
 >
 	<span aria-hidden="true">⧉</span>
 	<span>{Label}</span>

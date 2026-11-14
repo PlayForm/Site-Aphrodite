@@ -39,6 +39,11 @@ const Bank: {
 const SectionTape =
 	"mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]";
 
+// The traversals are the page's second pillar and wear the canary accent, the
+// one deliberate exception to the raw-blood label above.
+const SectionTapeAccent =
+	"mb-12 -rotate-1 border border-black bg-stamped-canary px-3 py-1 text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]";
+
 // ---- The gallery: ONE array of ONE record shape. Every entry below supplies
 // every field `ExampleCase` renders, so adding or removing an example is a
 // change to the bank (Source/Content/Showcase/Examples.json) and never a
@@ -231,130 +236,55 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 				<p class="mt-4 font-mono text-base tracking-widest text-zinc-dust" data-count>
 					SHOWING {Bank.examples.length} OF {Bank.examples.length}
 				</p>
-			</div>
+			</ZineBox>
 		</section>
 
-		<!-- THE EXAMPLE MODULES -->
-		<section class="relative flex w-full flex-col gap-28 lg:gap-36" data-examples>
+		<!-- THE EXAMPLES // ONE SHAPE EACH -->
+		<section class="relative flex w-full flex-col" data-examples>
 			<div class="w-full">
-				<div
-					class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-				>
-					THE EXAMPLES // ONE SHAPE EACH
-				</div>
+				<div class={SectionTape}>THE EXAMPLES // ONE SHAPE EACH</div>
 				<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					{Bank.examples.length} worked examples
 				</h2>
+				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					A teal tape marks a corpus-exact preview; a blood-red one marks a faithful
+					fragment.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Every retrieval answers the same way:
+				</p>
+				<p class="mt-3 max-w-3xl font-mono text-base leading-relaxed text-bone-newsprint">
+					→ {'{ found: true, source: "ccr", content: the original bytes, byte-for-byte }'}
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Reads are workspace-confined and capped at 10 MiB; a hash resolves
+					only by exact match - truncated hashes never resolve.
+				</p>
 			</div>
-			{Bank.examples.map((Example, Index) => {
-				const Parts = MarkerParts(Example.marker);
-				const Hash = Parts ? EscapeAngle(`<<<CCR:${Parts.Hash}|${Parts.Type}|${Parts.Size}>>>`) : null;
-				const Lines = RawLines(Example.raw);
-				const Rotate = Index % 2 === 0 ? "rotate-[0.5deg]" : "-rotate-[0.5deg]";
-				return (
-					<article
-						id={Example.id}
-						data-example
-						data-category={Example.category}
-						data-search={`${Example.title} ${Example.category} ${Example.preview ?? ""} ${Example.note}`.toLowerCase()}
-						class={`relative w-full scroll-mt-24 lg:w-11/12 ${Index % 2 === 0 ? "lg:self-start" : "lg:self-end"}`}
-					>
+			<div class="mt-24 flex w-full flex-col gap-28 lg:gap-36">
+				{
+					Cases.map((Scenario, Index) => (
 						<div
-							class={`zine-box-crimson relative w-full border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-10 ${Rotate}`}
+							data-example
+							data-category={Scenario.Label.toLowerCase()}
+							data-search={`${Scenario.Title} ${Scenario.Label} ${Scenario.Preview} ${Scenario.Claim.join(" ")}`.toLowerCase()}
+							class={`w-full lg:w-11/12 ${Index % 2 === 0 ? "lg:self-start" : "lg:self-end"}`}
 						>
-							<ZineTape
-								Label={`EX ${String(Index + 1).padStart(2, "0")} // ${Example.category.toUpperCase()}`}
-								Color={Example.corpus ? "teal" : "bone"}
-								Side={Index % 2 === 0 ? "left" : "right"}
-							/>
-							<div class="mt-4 flex flex-wrap items-baseline justify-between gap-3">
-								<h3 class="font-headline text-xl font-black uppercase text-bone-white sm:text-2xl">
-									{Example.title}
-								</h3>
-								<span
-									class={`border border-oxblood-dark px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest ${Example.corpus ? "text-weathered-teal" : "text-stamped-canary"}`}
-								>
-									{Example.corpus ? "CORPUS-EXACT PREVIEW" : "GENERIC FRAGMENT"}
-								</span>
-							</div>
-
-							<!-- RAW STREAM: the generic input, with the suppression fade -->
-							<div class="mt-8">
-								<div class="mb-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-									RAW STREAM // WHAT THE AGENT SENT
-								</div>
-								<div class="ccr-marker border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed">
-									{Lines.length === 0 ? (
-										<div class="opacity-70">(no raw stream - the block is generated, not captured)</div>
-									) : (
-										Lines.map(({ Text: Raw, Tone }) => (
-											<div class={Tone}>{Raw || "\u00a0"}</div>
-										))
-									)}
-								</div>
-							</div>
-
-							<!-- ENRICHED PREVIEW: the corpus-exact line + the teal CCR hash -->
-							<div class="mt-5">
-								<ZinePreview
-									Label="ENRICHED PREVIEW // WHAT THE AGENT SEES"
-									Result={Example.preview ?? "(stays raw - no preview line)"}
-									Hash={Hash ?? undefined}
-									Color="canary"
-								/>
-							</div>
-
-							<!-- RETRIEVAL: the byte-exact round-trip -->
-							{Example.retrieval && (
-								<div class="mt-5 border border-oxblood-dark bg-asphalt-panel p-3.5">
-									<div class="mb-2 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
-										RETRIEVAL // THE BYTE-EXACT ROUND-TRIP
-									</div>
-									<div class="font-mono text-base leading-relaxed text-bone-newsprint">
-										<div>
-											<span class="text-weathered-teal">{Example.retrieval.tool}</span>
-											<span class="text-zinc-dust">(hash: "</span>
-											<span class="text-stamped-canary">{Example.retrieval.args.hash}</span>
-											<span class="text-zinc-dust">")</span>
-										</div>
-										<div class="text-zinc-dust">
-											→ {'{ found: true, source: "ccr", content: the original bytes, byte-for-byte }'}
-										</div>
-										<div class="pt-1 text-zinc-dust">
-											Reads are workspace-confined and capped at 10 MiB; a hash resolves
-											only by exact match - truncated hashes never resolve.
-										</div>
-									</div>
-								</div>
-							)}
-
-							<!-- BEHAVIOR LESSON: the threshold decision -->
-							<div class="mt-6 border-l-4 border-raw-blood pl-4">
-								<div class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-									BEHAVIOR LESSON // THE THRESHOLD DECISION
-								</div>
-								<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
-									{Example.note}
-								</p>
-							</div>
+							<ExampleCase {...Scenario} />
 						</div>
-					</article>
-				);
-			})}
+					))
+				}
+			</div>
 		</section>
 
 		<!-- THE TRAVERSALS: the interactive flows, agent view vs system path -->
 		<section class="relative flex w-full flex-col gap-28 lg:gap-36">
 			<div class="w-full">
-				<div
-					class="mb-12 -rotate-1 border border-black bg-stamped-canary px-3 py-1 text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
-				>
-					THE TRAVERSALS // AGENT-VIEW vs SYSTEM-PATH, STEP BY STEP
-				</div>
-				<h2 class="mb-4 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+				<div class={SectionTapeAccent}>THE TRAVERSALS // AGENT-VIEW vs SYSTEM-PATH, STEP BY STEP</div>
+				<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
 					The traversals
 				</h2>
-				<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The five pipelines above are worked examples; these are the pipes they run
 					through.
 				</p>
@@ -758,14 +688,8 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 
 			<!-- The truthful context engine pane -->
 			<div class="w-full lg:w-10/12 lg:self-end">
-				<div
-					class="zine-box-crimson relative -rotate-[0.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-10"
-				>
-					<div
-						class="absolute -top-3.5 left-6 border border-black bg-weathered-teal px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
-					>
-						THE CONTEXT ENGINE // WHAT IT DOES NOT DO
-					</div>
+				<ZineBox Tone="crimson" Rotate="-rotate-[0.5deg]">
+					<ZineTape Label="THE CONTEXT ENGINE // WHAT IT DOES NOT DO" Color="teal" Side="left" />
 					<h3 class="mt-4 font-headline text-xl font-black uppercase text-bone-white sm:text-2xl">
 						Compress returns the transcript unchanged
 					</h3>
@@ -792,19 +716,13 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 					<div class="mt-6 font-mono text-base text-zinc-dust">
 						SRC: docs/plugin/context-engine.md:38-48
 					</div>
-				</div>
+				</ZineBox>
 			</div>
 
 			<!-- The prefetch refusal hero -->
 			<div class="w-full lg:w-10/12 lg:self-start">
-				<div
-					class="zine-box-crimson relative rotate-[0.5deg] border-4 border-blood-crimson bg-carbon-void p-6 transition-transform duration-300 hover:rotate-0 sm:p-10"
-				>
-					<div
-						class="absolute -top-3.5 right-6 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
-					>
-						THE PREFETCH REFUSAL // v1.6.6
-					</div>
+				<ZineBox Tone="crimson" Rotate="rotate-[0.5deg]">
+					<ZineTape Label="THE PREFETCH REFUSAL // v1.6.6" Color="raw" Side="right" />
 					<h3 class="mt-4 font-headline text-xl font-black uppercase text-bone-white sm:text-2xl">
 						Some paths are never read
 					</h3>
@@ -831,20 +749,14 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 					<div class="mt-6 font-mono text-base text-zinc-dust">
 						SRC: CHANGELOG.md:3-37 (v1.6.6) · the Aphrodite/v1.6.6 release note
 					</div>
-				</div>
+				</ZineBox>
 			</div>
 		</section>
 
 		<!-- CROSS-LINKS -->
 		<section class="relative w-full">
-			<div
-				class="mb-12 rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				GO DEEPER // THE SURFACES THESE EXAMPLES EXERCISE
-			</div>
-			<div
-				class="zine-box-crimson w-full rotate-[-0.8deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
+			<div class={SectionTape}>GO DEEPER // THE SURFACES THESE EXAMPLES EXERCISE</div>
+			<ZineBox Tone="crimson" Rotate="rotate-[-0.8deg]">
 				<ul class="grid gap-5 font-body text-base text-bone-newsprint sm:grid-cols-2">
 					<li class="border-l-4 border-weathered-teal pl-4">
 						<a class="font-bold text-bone-white underline decoration-raw-blood" href="/tools/"
@@ -871,7 +783,7 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 						- the shim and the dylib that make all of it run.
 					</li>
 				</ul>
-			</div>
+			</ZineBox>
 		</section>
 
 		<!-- RELATED: the natural neighbors -->

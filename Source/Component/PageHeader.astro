@@ -1,0 +1,59 @@
+---
+/**
+ * PageHeader - D2 of the restructure plan. The header block repeated verbatim
+ * in ten files: the same `<h1>` class string at all ten, the same wrapper, and
+ * a section tape above it that differed only in margin (`mb-12` vs `mb-5`)
+ * while the lead's top margin wandered between `mt-4`, `mt-6` and `mt-12`.
+ * This component owns the label, the one claim and the lead's rhythm.
+ *
+ * The lead is one sentence per array entry (PROSE BREAKDOWN item 1): the first
+ * entry opens at `mt-6`, every sibling at `mt-3`. That retires the nested
+ * `<span class="mt-1 block">` idiom the pages used for a second sentence - the
+ * split is structural, the words stay byte-identical.
+ *
+ * The tape renders through `ZineTape`'s `section` variant, so the `mb-12`/`mb-5`
+ * split disappears: one margin, one shape, one component.
+ */
+import ZineTape from "./ZineTape.astro";
+
+interface Props {
+	/** The tape label, e.g. "BENCHMARKS // MEASURED FIGURES". */
+	Tape: string;
+
+	/** The page's one claim, rendered as the `<h1>`. Plain text. */
+	Title: string;
+
+	/**
+	 * The lead, one sentence per array entry - each becomes its own `<p>`.
+	 * An entry may carry inline markup (`<code>`, `<em>`), because the pages'
+	 * leads name identifiers in the mono voice; it is rendered as HTML, so a
+	 * page passes markup, never user input.
+	 */
+	Lead: string[];
+
+	/** Tape tone; raw is the section default. */
+	Tone?: "raw" | "canary" | "teal";
+}
+
+const { Tape, Title, Lead, Tone = "raw" } = Astro.props;
+---
+
+<header class="relative flex w-full flex-col items-start">
+	<ZineTape Variant="section" Label={Tape} Color={Tone} />
+	<h1
+		class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
+	>
+		{Title}
+	</h1>
+	{
+		Lead.map((Sentence, Index) => (
+			<p
+				class:list={[
+					Index === 0 ? "mt-6" : "mt-3",
+					"max-w-3xl font-body text-base leading-relaxed text-bone-newsprint",
+				]}
+				set:html={Sentence}
+			/>
+		))
+	}
+</header>

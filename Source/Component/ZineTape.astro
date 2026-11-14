@@ -1,15 +1,52 @@
 ---
+/**
+ * ZineTape - D3 of the restructure plan. The tape stamp was hand-rolled 103
+ * times in four shapes across the pages, while this component could express
+ * exactly one of them (`absolute -top-7`, `-rotate-1`, `px-3 py-0.5`). That
+ * mismatch was the whole duplication engine: every page that needed a slightly
+ * different tape wrote its own instead of passing a variant.
+ *
+ * The variant set is closed on purpose. A tape is a grammar element - the
+ * module's label - so it has a finite number of shapes and a page picks one;
+ * six free-form knobs would let the grammar drift back.
+ *
+ *   corner   the module's top edge, absolutely placed (the default)
+ *   section  in flow above a section, the full `mb-12` rhythm
+ *   hero     the large stamp in the hero row
+ *   hash     the mono hash chip - fixed teal on carbon-void, the mechanical voice
+ *   tab      the index tab that hangs above a plate (`-mb-7`)
+ *   strip    the full-bleed file strip across a hero's top edge
+ *
+ * `corner` keeps the geometry the site ships today (`-top-7`, `-rotate-1`) so
+ * the pages that already import this component render unchanged; a caller that
+ * wants the hand-rolled sites' `-top-5` passes `Offset`.
+ *
+ * Grammar law 3 lives in the defaults: raw-blood is the section label,
+ * stamped-canary the highlight, weathered-teal the mechanical voice, and the
+ * tilt is 1-2 degrees.
+ */
 interface Props {
+	/** The tape's text. */
 	Label: string;
+
+	/** The shape: corner (default) | section | hero | hash | tab | strip. */
+	Variant?: "corner" | "section" | "hero" | "hash" | "tab" | "strip";
 
 	/** Stamp color: raw-blood (default), stamped-canary, weathered-teal, bone-newsprint. */
 	Color?: "raw" | "canary" | "teal" | "bone";
 
-	/** Side of the module the tape sits on. */
+	/** Side of the module the tape sits on. Corner variant only. */
 	Side?: "left" | "right" | "center";
+
+	/** Corner offset only; -top-7 is the corner default this component ships. */
+	Offset?: "-top-3.5" | "-top-4" | "-top-5" | "-top-7";
+
+	/** The tilt. Each variant has its own default, so pass one only to override it. */
+	Rotate?: "-rotate-1" | "rotate-1" | "-rotate-2";
 }
 
-const { Label, Color = "raw", Side = "left" } = Astro.props;
+const { Label, Variant = "corner", Color = "raw", Side = "left", Offset = "-top-7", Rotate } =
+	Astro.props;
 
 const Palette = {
 	raw: "bg-raw-blood text-bone-white",
@@ -23,10 +60,30 @@ const Position = {
 	right: "right-6",
 	center: "left-1/2 -translate-x-1/2",
 }[Side];
+
+/** The tilt each shape carries when the caller does not override it. */
+const DefaultTilt = {
+	corner: "-rotate-1",
+	section: "-rotate-1",
+	hero: "-rotate-2",
+	hash: "rotate-1",
+	tab: "-rotate-1",
+	strip: "-rotate-1",
+}[Variant];
+
+const Tilt = Rotate ?? DefaultTilt;
+
+const Shape = {
+	corner: `absolute ${Offset} ${Position} z-10 ${Tilt} border border-black px-3 py-0.5 text-base font-black uppercase tracking-widest shadow-[2px_2px_0px_#000] ${Palette}`,
+	section: `mb-12 ${Tilt} border border-black px-3 py-1 text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] ${Palette}`,
+	hero: `${Tilt} border-2 border-black px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest shadow-[4px_4px_0px_#000] ${Palette}`,
+	hash: "rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]",
+	tab: `relative z-10 -mb-7 ml-6 inline-block border border-black px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] ${Tilt} max-sm:rotate-0 ${Palette}`,
+	strip: `tape-strip absolute -top-6 left-0 z-10 ${Tilt} border-b border-t border-bone-newsprint/30 px-4 py-1 text-base font-black uppercase tracking-widest text-bone-newsprint`,
+}[Variant];
+
+/** The hash chip is the one inline shape: it sits inside a hero's flex row. */
+const Element = Variant === "hash" ? "span" : "div";
 ---
 
-<div
-	class={`absolute -top-7 ${Position} -rotate-1 border border-black px-3 py-0.5 text-base font-black uppercase tracking-widest shadow-[2px_2px_0px_#000] ${Palette}`}
->
-	{Label}
-</div>
+<Element class={Shape}>{Label}</Element>

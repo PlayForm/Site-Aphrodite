@@ -2,12 +2,10 @@
 import Base from "@Layout/Base.astro";
 
 import Related from "@Component/Related.astro";
-import CodeFence from "@Component/CodeFence.astro";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import ContextEngine from "../Content/Mermaid/context-engine.svg?raw";
 import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
-import { Stamps, Versions } from "@Library/Versions";
-import { ExternalLinks } from "@Library/Links";
+import { Versions } from "@Library/Versions";
 
 // THE SIX HOOKS - one turn, in order. The chain absorbed /hooks/ when that
 // route retired into this page (Restructure.md 2.2): the sequence pane, the
@@ -106,10 +104,11 @@ const Hooks = [
 	Title="PLUGIN // APHRODITE"
 	Description={`The Aphrodite Hermes plugin, v${Versions.Plugin}: a thin Python registration shim over a Rust dylib - 6 hooks, 13 tools, an opt-in context engine, and an explicit SHA-256-verified download flow.`}
 >
+	<!-- PENDING SHARED: PageShell (t_130e5ed4) - swap to <PageShell Rhythm="wide"> when it lands -->
 	<main
-		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-24 px-5 py-32 sm:px-8 lg:gap-40 lg:px-14 lg:py-56"
+		class="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-40 px-5 py-24 sm:px-8 lg:gap-64 lg:px-14 lg:py-40"
 	>
-		<!-- HERO -->
+		<!-- PENDING SHARED: PageHeader (t_130e5ed4) - swap to <PageHeader Tape Title Lead /> when it lands -->
 		<header class="relative flex w-full flex-col items-start">
 			<div
 				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
@@ -122,8 +121,8 @@ const Hooks = [
 				The plugin
 			</h1>
 			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Aphrodite ships as a Hermes Agent plugin: a thin Python registration shim over a
-				Rust dylib.
+				Aphrodite ships as a Hermes Agent plugin: a thin Python registration shim over a Rust
+				dylib.
 			</p>
 			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				Six hooks, thirteen tools, and an opt-in context engine - all declared in{" "}
@@ -133,43 +132,25 @@ const Hooks = [
 			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				This page documents the {`v${Versions.Plugin}`} plugin spec.
 			</p>
-			<div class="mt-16 flex max-w-4xl flex-wrap items-center gap-8">
-				<span
-					class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000]"
-				>
-					{Stamps.Plugin()} STANDALONE
-				</span>
-				<span
-					class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]"
-				>
-					6 HOOKS
-				</span>
-				<span
-					class="-rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]"
-				>
-					13 TOOLS
-				</span>
-				<span
-					class="rotate-2 border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[4px_4px_0px_#000]"
-				>
-					ZERO LOGIC IN PYTHON
-				</span>
-			</div>
 		</header>
 
-		<!-- PLUGIN.YAML FACTS -->
+		<!-- SLOT 3: one claim's evidence - the declared surface, the chain, the gates -->
 		<section class="relative w-full">
 			<div
 				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
 			>
 				plugin.yaml // THE DECLARED SURFACE
 			</div>
+			<!-- PENDING SHARED: ZineBox Size="lg" Rotate="sm:-rotate-[1deg]" (t_130e5ed4) -->
 			<div
-				class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
+				class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:-rotate-[1deg] sm:p-12"
 			>
-				<h2 class="mb-12 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-					What the manifest declares
-				</h2>
+				<h3
+					id="manifest"
+					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+				>
+					WHAT THE MANIFEST DECLARES
+				</h3>
 				<div class="grid grid-cols-1 gap-10 md:grid-cols-2">
 					<div class="space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-base">
 						<div><span class="text-zinc-dust">name:</span> <span class="text-bone-white">aphrodite</span></div>
@@ -206,21 +187,13 @@ const Hooks = [
 				<p class="mt-3 text-base leading-relaxed text-zinc-dust">
 					SKILLS ARE NOT SHIPPED WITH THE PLUGIN - THEY LIVE DEV-SIDE.
 				</p>
-			</div>
-		</section>
-		<!-- ARCHITECTURE -->
-		<section class="relative w-full lg:w-10/12 lg:self-end">
-			<div
-				class="zine-box-crimson relative rotate-[1.4deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
-				<div
-					class="absolute -top-5 left-6 z-10 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
+
+				<h3
+					id="architecture"
+					class="mt-20 mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
 				>
 					ARCHITECTURE // CALL CHAIN
-				</div>
-				<h2 class="mb-12 mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-					A thin shim, a Rust brain
-				</h2>
+				</h3>
 				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
 					<div class="text-bone-white">Hermes Agent (hooks + tool dispatch)</div>
 					<div class="pl-4 text-zinc-dust">│</div>
@@ -232,47 +205,38 @@ const Hooks = [
 					<div class="pl-4 text-zinc-dust">│</div>
 					<div class="pl-4 text-weathered-teal">CCR store - SQLite :9798 / in-memory :9797 / inline</div>
 				</div>
-				<p class="mt-12 font-body text-base leading-relaxed text-zinc-dust">
-					Registration is driven by the dylib: the shim asks the dylib for its hook names
-					and tool schemas and registers one callback per name.
+				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
+					Registration is driven by the dylib: the shim asks the dylib for its hook names and
+					tool schemas and registers one callback per name.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					It is the reason there is no hot-reload: the dylib is resolved once per process,
-					so to pick up a new build you restart the Hermes session.
+					It is the reason there is no hot-reload: the dylib is resolved once per process, so
+					to pick up a new build you restart the Hermes session.
 				</p>
-				<figure class="mt-20 border border-oxblood-dark bg-soot-black p-4" data-diagram="context-engine">
+				<figure class="mt-16 border border-oxblood-dark bg-soot-black p-4" data-diagram="context-engine">
 					<div class="overflow-x-auto" set:html={ContextEngine} />
 					<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 						M9 // CONTEXT ENGINE
 					</figcaption>
 				</figure>
-			</div>
-		</section>
 
-		<!-- THE SIX HOOKS // ONE TURN (absorbed from /hooks/) -->
-		<section class="relative w-full">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				HOOKS // THE CHAIN
-			</div>
-			<h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-				Six hooks, one turn
-			</h2>
-			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Every hook is a thin dispatch that forwards its arguments to the Rust dylib and
-				hands the JSON reply back to Hermes.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				It is the reason the shim registers one callback per name: on plugin load it asks
-				the dylib for its hook names, and the six below are always registered together.
-			</p>
-			<h3 class="mt-16 mb-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-				The turn, in order
-			</h3>
-			<div
-				class="zine-box-crimson w-full -rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
+				<h3
+					id="chain"
+					class="mt-20 mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+				>
+					HOOKS // THE CHAIN
+				</h3>
+				<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Every hook is a thin dispatch that forwards its arguments to the Rust dylib and
+					hands the JSON reply back to Hermes.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					It is the reason the shim registers one callback per name: on plugin load it asks
+					the dylib for its hook names, and the six below are always registered together.
+				</p>
+				<h4 class="mt-12 mb-6 font-headline text-lg font-black uppercase text-bone-white">
+					The turn, in order
+				</h4>
 				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-4 font-mono text-base leading-relaxed">
 					{
 						Sequence.map(({ Text: Line, Tone }) => (
@@ -282,78 +246,69 @@ const Hooks = [
 						))
 					}
 				</div>
-			</div>
-			<figure
-				class="mt-20 w-full border-4 border-blood-crimson bg-carbon-void p-4 shadow-[6px_6px_0px_#7a0a1e]"
-				data-diagram="hook-chain"
-			>
-				<div class="overflow-x-auto" set:html={HookChain} />
-				<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-					M3 // HOOK CHAIN
-				</figcaption>
-			</figure>
-		</section>
-		<!-- ONE CARD PER HOOK -->
-		<section class="relative w-full">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				THE SIX // ONE CARD EACH
-			</div>
-			<div class="isolate grid grid-cols-1 items-start gap-16 lg:grid-cols-2 lg:gap-24">
-				{
-					Hooks.map(({ N, Name, Tape, Tone, Rotate, Body }) => (
-						<div
-							class={`zine-box-${Tone} relative border-[3px] bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 ${Rotate} ${
-								Tone === "canary"
-									? "border-stamped-canary/40"
-									: Tone === "crimson"
-										? "border-raw-blood"
-										: N === "04"
-											? "border-zinc-dust/40"
-											: "border-oxblood-dark"
-							}`}
-						>
-							<h3
-								class={`absolute -top-5 left-4 z-10 border border-black px-2 py-0.5 text-base font-black uppercase ${
-									Tape === "canary"
-										? "bg-stamped-canary text-soot-black"
-										: Tape === "bone"
-											? "bg-bone-newsprint text-soot-black"
-											: "bg-raw-blood text-bone-white"
+				<figure
+					class="mt-16 border border-oxblood-dark bg-soot-black p-4"
+					data-diagram="hook-chain"
+				>
+					<div class="overflow-x-auto" set:html={HookChain} />
+					<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+						M3 // HOOK CHAIN
+					</figcaption>
+				</figure>
+
+				<h3
+					id="six"
+					class="mt-20 mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+				>
+					THE SIX // ONE CARD EACH
+				</h3>
+				<div class="isolate grid grid-cols-1 items-start gap-16 lg:grid-cols-2 lg:gap-24">
+					{
+						Hooks.map(({ N, Name, Tape, Tone, Rotate, Body }) => (
+							<div
+								class={`zine-box-${Tone} relative border-[3px] bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 ${Rotate} ${
+									Tone === "canary"
+										? "border-stamped-canary/40"
+										: Tone === "crimson"
+											? "border-raw-blood"
+											: N === "04"
+												? "border-zinc-dust/40"
+												: "border-oxblood-dark"
 								}`}
 							>
-								{N} // {Name}
-							</h3>
-							{Body.map((Paragraph, I) => (
-								<p
-									class={I === 0
-										? "mt-4 font-body text-base leading-relaxed text-bone-newsprint"
-										: "mt-3 font-body text-base leading-relaxed text-bone-newsprint"}
-									set:html={Paragraph}
-								/>
-							))}
-						</div>
-					))
-				}
-			</div>
-		</section>
-		<!-- BYPASS // THE ESSENTIAL-TOOL GATE -->
-		<section class="relative w-full lg:w-10/12 lg:self-end">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-stamped-canary px-3 py-1 text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
-			>
-				BYPASS // THE ESSENTIAL-TOOL GATE
-			</div>
-			<div
-				class="zine-box-crimson relative rotate-[1.2deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
-				<h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-					What never gets compressed
-				</h2>
+								<h4
+									class={`absolute -top-5 left-4 z-10 border border-black px-2 py-0.5 text-base font-black uppercase ${
+										Tape === "canary"
+											? "bg-stamped-canary text-soot-black"
+											: Tape === "bone"
+												? "bg-bone-newsprint text-soot-black"
+												: "bg-raw-blood text-bone-white"
+									}`}
+								>
+									{N} // {Name}
+								</h4>
+								{Body.map((Paragraph, I) => (
+									<p
+										class={I === 0
+											? "mt-4 font-body text-base leading-relaxed text-bone-newsprint"
+											: "mt-3 font-body text-base leading-relaxed text-bone-newsprint"}
+										set:html={Paragraph}
+									/>
+								))}
+							</div>
+						))
+					}
+				</div>
+
+				<h3
+					id="gate"
+					class="mt-20 mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+				>
+					BYPASS // THE ESSENTIAL-TOOL GATE
+				</h3>
 				<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
-					A result is left untouched when it is empty, below threshold, or from the
-					essential set - tools the agent needs raw:
+					A result is left untouched when it is empty, below threshold, or from the essential
+					set - tools the agent needs raw:
 				</p>
 				<div class="border border-oxblood-dark bg-soot-black p-4 font-mono text-base text-bone-newsprint">
 					skill_view · skills_list · skill_manage · memory · session_search · read_file ·
@@ -364,22 +319,13 @@ const Hooks = [
 					<span class="font-mono text-base text-weathered-teal">aphrodite_retrieve</span>
 					would just replace resolved content with another marker.
 				</p>
-			</div>
-		</section>
 
-		<!-- THRESHOLDS // GATES AND BYPASSES -->
-		<section class="relative w-full">
-			<div
-				class="mb-12 -rotate-1 border border-black bg-raw-blood px-3 py-1 text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-			>
-				THRESHOLDS // GATES AND BYPASSES
-			</div>
-			<div
-				class="zine-box-crimson w-full -rotate-[1deg] border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12"
-			>
-				<h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-					The numbers that decide
-				</h2>
+				<h3
+					id="thresholds"
+					class="mt-20 mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+				>
+					THRESHOLDS // GATES AND BYPASSES
+				</h3>
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse font-mono text-base">
 						<thead>
@@ -425,7 +371,15 @@ const Hooks = [
 				</p>
 			</div>
 		</section>
-		<!--NEXT-->
+
+		<!-- SLOT 4: exactly one onward link -->
+		<Related
+			Links={[
+				{ Href: "/hermes/", Label: "HERMES" },
+				{ Href: "/tools/", Label: "TOOLS" },
+				{ Href: "/setup/", Label: "SETUP" },
+			]}
+		/>
 	</main>
 	<ZineDiagramNav />
 </Base>

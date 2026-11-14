@@ -1,0 +1,72 @@
+---
+/**
+ * ZineSplit - D7 of the restructure plan. Grammar law 4 makes the
+ * stream/preview pair "the whole argument of the product", and the pair was
+ * hand-written wherever it appeared: the stream pane four times across three
+ * files, the preview pane six times across four. `ZineStream` and `ZinePreview`
+ * existed but were imported by one page each.
+ *
+ * This is the one component in the set that adds a shape rather than absorbing
+ * one: the two panes side by side inside one crimson plate, which is what the
+ * deck's `transform` beat draws and what the landing page needs immediately
+ * after its hero.
+ *
+ * Tones come in on the line, not as a second array: a leading `dim:`, `fade:`
+ * or `mute:` selects the suppression opacity (law 4's 70/40/25%), so a caller
+ * passes the terminal lines as strings and the pane stays a rendering detail.
+ */
+import ZineBox from "./ZineBox.astro";
+import ZineKicker from "./ZineKicker.astro";
+import ZineStream from "./ZineStream.astro";
+import ZinePreview from "./ZinePreview.astro";
+
+/** The tones `ZineStream` renders, reachable as a line prefix. */
+type LineTone = "plain" | "dim" | "fade" | "mute" | "result" | "canary" | "teal";
+
+interface Props {
+	/** The terminal lines; a leading "dim:", "fade:" or "mute:" selects the tone. */
+	Raw: string[];
+
+	/** The compressed line the LLM reads. */
+	Preview: string;
+
+	/** The CCR hash line, e.g. "a1b2c3d4... 416x". */
+	Hash: string;
+
+	/** The preview micro-label. */
+	Label?: string;
+}
+
+const { Raw, Preview, Hash, Label = "ONE LINE, ONE MARKER" } = Astro.props;
+
+/**
+ * A tone prefix is only a tone prefix when the word before the colon is one of
+ * the seven tone names; every other colon belongs to the line's own text.
+ */
+const Prefix = /^(plain|dim|fade|mute|result|canary|teal): ?([\s\S]*)$/;
+
+const Lines = Raw.map((Line) => {
+	const Match = Prefix.exec(Line);
+
+	return Match === null
+		? { Text: Line, Tone: "plain" as LineTone }
+		: { Text: Match[2], Tone: Match[1] as LineTone };
+});
+---
+
+<ZineBox Size="lg" Rotate="-rotate-[1deg]">
+	<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+		<div>
+			<ZineKicker As="div" Tone="dust">RAW STREAM // WHAT THE TERMINAL KEEPS</ZineKicker>
+			<div class="mt-2">
+				<ZineStream Lines={Lines} />
+			</div>
+		</div>
+		<div>
+			<ZineKicker As="div" Tone="canary">PREVIEW // WHAT THE MODEL READS</ZineKicker>
+			<div class="mt-2">
+				<ZinePreview Label={Label} Result={Preview} Hash={Hash} Color="canary" />
+			</div>
+		</div>
+	</div>
+</ZineBox>
