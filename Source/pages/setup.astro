@@ -201,7 +201,9 @@ $ cargo build --release -p aphrodite -p aphrodite-hermes`,
 			"Nothing self-heals: the plugin never downloads and never repairs an install, and <code class=\"font-mono text-base text-weathered-teal\">layout_check.py</code> is report-only.",
 		],
 		Verify: [
-			"Start <code class=\"font-mono text-base text-weathered-teal\">hermes</code>. The plugin should log that Aphrodite is enabled. If the binaries are missing, it logs the setup command and stays disabled until you run it.",
+			"Start <code class=\"font-mono text-base text-weathered-teal\">hermes</code>.",
+			"The plugin should log that Aphrodite is enabled.",
+			"If the binaries are missing, it logs the setup command and stays disabled until you run it.",
 		],
 	},
 ];
@@ -619,7 +621,7 @@ budget_chars = 2600 # hard cap per turn`;
 					Class="mt-8 border border-oxblood-dark"
 					Copy
 					CopyLabel="PROXY"
-					Code={`$ ./aphrodite --api-key «redacted:sk-…» --listen 127.0.0.1:9798
+					Code={`$ ./aphrodite --api-key «redacted:sk-...» --listen 127.0.0.1:9798
 $ curl http://127.0.0.1:9798/health
 {"status":"healthy","ccr":true,"mode":"token","version":"<current version>","fill_pct":...}`}
 				/>

@@ -208,7 +208,7 @@ const Cases: CaseRecord[] = [
 			{ Text: "&lt;&lt;&lt;CCR:f8a1d4c7...b0e3|build_output|210&gt;&gt;&gt;", Tone: "teal" },
 			{ Text: "&lt;&lt;&lt;CCR:a9b2c5d8...e1f4|test|188&gt;&gt;&gt;", Tone: "teal" },
 		],
-		Preview: "[chain:3 | build ...]",
+		Preview: "[build:2E 5W 210L | error[E0432]: ...]",
 		Marker: "&lt;&lt;&lt;CCR:e7c0f3a6...c1f4|terminal|398&gt;&gt;&gt;",
 		Note: [
 			'<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">OFF BY DEFAULT · </span>Without the split, the same compound command is one terminal blob with one marker; the build preview and the test preview never separate.',
@@ -452,7 +452,7 @@ const Sections = [
 								"· turn 0: no markers, no directives, no recall catalog in the transcript",
 							],
 							System: [
-								"on_session_start resets every piece of per-session state: turn counter, conversation index, recent markers, referenced files, tool-event telemetry,								ephemeral directives.",
+								"on_session_start resets every piece of per-session state: turn counter, conversation index, recent markers, referenced files, tool-event telemetry, ephemeral directives.",
 								"It injects nothing; the orientation renders on the first pre_llm_call",
 							],
 							Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
@@ -519,7 +519,7 @@ const Sections = [
 							],
 							System: [
 								"post_llm_call archives the last marker into the conversation index, advances the turn counter, purges expired nudges (after the counter advances, so a one-shot renders exactly once), and expires stale poll-worker tasks.",
-							"Then the next turn begins",
+								"Then the next turn begins",
 							],
 							Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
 							AnchorLabel: "hooks.md:81-86",
@@ -576,7 +576,7 @@ const Sections = [
 							],
 							System: [
 								"when the Hermes-home-derived home holds no install but the pre-2.2 ~/.hermes/aphrodite does, the legacy home is adopted with a one-line warning.",
-							"Adoption never fires for throwaway homes (probe scratch, temp homes), preserving the catalog probe's isolation",
+								"Adoption never fires for throwaway homes (probe scratch, temp homes), preserving the catalog probe's isolation",
 							],
 							Anchor: Link(OurRepo, "CHANGELOG.md"),
 							AnchorLabel: "CHANGELOG v1.6.3",
@@ -590,7 +590,7 @@ const Sections = [
 							System: [
 								"the startup log prints: runtime home: path (decided by ...).",
 							"Before v1.6.3, the shim read HERMES_HOME while the Rust half read HOME - the divergence that orphaned configs and disabled plugins whenever the two differed.",
-							"Fixed as one decision, shared",
+								"Fixed as one decision, shared",
 							],
 							Anchor: Link(OurRepo, "CHANGELOG.md"),
 							AnchorLabel: "CHANGELOG v1.6.3",

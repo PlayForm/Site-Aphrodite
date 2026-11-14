@@ -408,10 +408,16 @@ const Dispatch = [
 					<code class="font-mono text-base text-weathered-teal">
 						provides_context_engine: true
 					</code>
-					does not turn anything on. It tells Hermes that the dylib can answer the
-					engine's questions - which file is being read, what the turn's markers were, how
-					much context is left - so the host knows to ask. The engine's own thresholds are
-					the ones that decide whether a result is compressed at all.
+					does not turn anything on.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					It tells Hermes that the dylib can answer the engine's questions - which file is
+					being read, what the turn's markers were, how much context is left - so the host
+					knows to ask.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The engine's own thresholds are the ones that decide whether a result is
+					compressed at all.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The three threshold values are the whole tuning surface, and their polarity is
