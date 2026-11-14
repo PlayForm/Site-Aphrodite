@@ -23,6 +23,7 @@ import ConfigResolution from "../Content/Mermaid/config-resolution.svg?raw";
 const Sections = [
 	{ Id: "pipeline", Label: "PIPELINE" },
 	{ Id: "knobs", Label: "KNOBS" },
+	{ Id: "states", Label: "STATES" },
 	{ Id: "topology", Label: "TOPOLOGY" },
 	{ Id: "arc", Label: "THE ARC" },
 	{ Id: "boundary", Label: "BOUNDARY" },
@@ -40,6 +41,7 @@ const Knobs = [
 		Default: 256,
 		Unit: "B",
 		Note: "token proxy threshold (bytes)",
+		Line: "The token proxy measured every tool result against this limit: a result over it was compressed into a marker, a result under it stayed in the transcript as it arrived.",
 	},
 	{
 		Key: "tool_threshold_cache",
@@ -49,6 +51,7 @@ const Knobs = [
 		Default: 2048,
 		Unit: "B",
 		Note: "cache proxy threshold (bytes)",
+		Line: "The cache proxy answered on its own port with its own limit, which is what let one binary tune the two lanes independently.",
 	},
 	{
 		Key: "inline_threshold",
@@ -58,6 +61,7 @@ const Knobs = [
 		Default: 1024,
 		Unit: "B",
 		Note: "inline-vs-durable CCR storage cutoff",
+		Line: "This is a storage cutoff, not a compression one: under it a stored blob lived inline in the session, over it the blob went to durable CCR.",
 	},
 	{
 		Key: "code_multiplier",
@@ -67,6 +71,7 @@ const Knobs = [
 		Default: 1,
 		Unit: "x",
 		Note: "threshold multiplier for code_* types",
+		Line: "Code types multiplied the token limit by this factor, and the effect the config doc names is that code stayed inline while prose of the same size was compressed (docs/config/aphrodite-toml.md:159).",
 	},
 	{
 		Key: "engine_threshold_pct",
@@ -76,6 +81,43 @@ const Knobs = [
 		Default: 30,
 		Unit: "%",
 		Note: "100+ = engine-off escape hatch",
+		Line: "The context engine's fill percentage: middle turns were archived to CCR once the session passed it, 0 meant never, and 100+ switched the engine off (README.md:580).",
+	},
+] as const;
+
+// The three states the decision readout can name, restored verbatim from this
+// page's own baseline (820fae84) because they are the vocabulary the rest of
+// the site uses. Each record carries the label the readout prints, the
+// condition that produced it, what the agent ends up holding, and the line
+// that explains it - a label with no explanation is a state a reader cannot
+// act on.
+const States = [
+	{
+		Label: "below threshold, kept inline",
+		When: "bytes <= tool_threshold_token (x code_multiplier for code_* types)",
+		Holds: "the bytes themselves - nothing to resolve",
+		Note: [
+			"The sample never crossed the token limit, so the classifier typed it and the preview line was built, but nothing was hashed and no marker was minted.",
+			"The bytes stayed in the transcript, which is why this state costs the turn nothing: the agent already reads what it would otherwise have to retrieve.",
+		],
+	},
+	{
+		Label: "preview enough, marker stored",
+		When: "bytes > tool_threshold_token (x code_multiplier for code_* types)",
+		Holds: "the preview line, the address and the marker",
+		Note: [
+			"The sample crossed the limit, so the digest hashed the original bytes and the marker was stored under that hash.",
+			"The preview line answered the question, so the agent reasoned on the preview and left the marker as a receipt rather than a debt.",
+		],
+	},
+	{
+		Label: "engine OFF - the 100+ escape hatch, raw passes through",
+		When: "engine_threshold_pct >= 100",
+		Holds: "the raw bytes, unmarked",
+		Note: [
+			"Past 100 the context engine stood down: no middle turn was archived mid-session and nothing was marked by it.",
+			"The four proxy thresholds kept working on their own, so tool output was still compressed - the knob switches off one engine, not the pipeline.",
+		],
 	},
 ] as const;
 
@@ -140,8 +182,8 @@ const Arc = [
 ---
 
 <Base
-	Title="THE PIPELINE, LIVE // APHRODITE"
-	Description="The pipeline, live: paste any tool output and watch Aphrodite's four steps - classify, preview, store, decide - run in your browser, with the threshold knobs you can turn."
+	Title="Workbench - Aphrodite"
+	Description="The interactive preview workbench: paste any tool output and watch the Aphrodite preview line, the CCR marker and the threshold knobs work - live, client-side."
 >
 	<PageShell Rhythm="dense" Grow>
 		<!-- THE HEAD: the h1 opens the page, not the sample switchboard. -->
@@ -170,7 +212,7 @@ const Arc = [
 
 		<!-- THE FOUR STEPS: the rail, the pair, the readout. The component owns its
 		     own <section>, so the anchor the index links to is this wrapper. -->
-		<div id="pipeline">
+		<div id="pipeline" role="region" aria-label="Raw stream and enriched preview">
 			<ZinePipeline Mode="full" />
 		</div>
 
@@ -249,6 +291,9 @@ const Arc = [
 							<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
 								{Knob.Note}
 							</p>
+							<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+								{Knob.Line}
+							</p>
 						</div>
 					))
 				}
@@ -263,7 +308,57 @@ const Arc = [
 					The strip reports the decision for the sample loaded in the rail above: the token
 					mode, whether the store was inline or durable, and the ratio that produced it.
 				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Move a slider and the strip changes without a reload, because the four thresholds
+					are atomics the running engine swaps - the same sample is inline under a 4 KB
+					limit and stored under a 256 B one.
+				</p>
 			</div>
+		</section>
+
+		<!-- THE THREE STATES the decision readout can name: the vocabulary the
+		     readout prints, one card per state, each carrying the condition that
+		     produced it and the line explaining what the agent holds. -->
+		<section
+			id="states"
+			class="wb-skew border-4 border-weathered-teal bg-carbon-void p-8 shadow-[6px_6px_0px_#000]"
+			aria-label="Threshold states"
+		>
+			<ZineKicker Tone="teal">THRESHOLD STATES</ZineKicker>
+			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				Every run ends in one of three states, and the readout names it: the name is the
+				whole contract, because it says in one line whether the bytes stayed, whether a
+				marker was minted, and whether the engine was in the loop at all.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				The first two are decided by the token threshold alone; the third overrides both,
+				which is why the engine knob sits at the end of the slider row.
+			</p>
+			<div class="mt-12 grid gap-8 lg:grid-cols-3">
+				{
+					States.map((State) => (
+						<div class="border-2 border-weathered-teal/60 bg-soot-black p-6">
+							<p class="font-mono text-base font-black text-bone-white">{State.Label}</p>
+							<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
+								WHEN: {State.When}
+							</p>
+							{State.Note.map((Sentence) => (
+								<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+									{Sentence}
+								</p>
+							))}
+							<p class="mt-6 border-t-2 border-weathered-teal/40 pt-4 font-mono text-base text-weathered-teal">
+								HOLDS: {State.Holds}
+							</p>
+						</div>
+					))
+				}
+			</div>
+			<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				The compression decision strip in the knobs panel prints the inputs alongside the
+				name - token mode, cache mode and storage - so a run that reads as surprising can
+				be traced back to the threshold that produced it.
+			</p>
 		</section>
 
 		<!-- THE TOPOLOGY: the store and the config surface. -->

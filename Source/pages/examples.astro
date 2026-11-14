@@ -452,7 +452,8 @@ const Sections = [
 								"· turn 0: no markers, no directives, no recall catalog in the transcript",
 							],
 							System: [
-								"on_session_start resets every piece of per-session state: turn counter, conversation index, recent markers, referenced files, tool-event telemetry, ephemeral directives. It injects nothing; the orientation renders on the first pre_llm_call",
+								"on_session_start resets every piece of per-session state: turn counter, conversation index, recent markers, referenced files, tool-event telemetry,								ephemeral directives.",
+								"It injects nothing; the orientation renders on the first pre_llm_call",
 							],
 							Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
 							AnchorLabel: "hooks.md:22-27",
@@ -465,7 +466,8 @@ const Sections = [
 								"· long-running terminal/process calls may be auto-backgrounded (poll worker, default on); the rewrite is invisible in the transcript",
 							],
 							System: [
-								"pre_tool_call can auto-background long-running terminal/process calls (poll worker, default on) and split chained commands (chain split, off by default). If neither applies, the call passes through unchanged",
+								"pre_tool_call can auto-background long-running terminal/process calls (poll worker, default on) and split chained commands (chain split, off by default).",
+							"If neither applies, the call passes through unchanged",
 							],
 							Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
 							AnchorLabel: "hooks.md:29-42",
@@ -516,7 +518,8 @@ const Sections = [
 								"· the last marker seen in the transcript is archived into the conversation index",
 							],
 							System: [
-								"post_llm_call archives the last marker into the conversation index, advances the turn counter, purges expired nudges (after the counter advances, so a one-shot renders exactly once), and expires stale poll-worker tasks. Then the next turn begins",
+								"post_llm_call archives the last marker into the conversation index, advances the turn counter, purges expired nudges (after the counter advances, so a one-shot renders exactly once), and expires stale poll-worker tasks.",
+							"Then the next turn begins",
 							],
 							Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
 							AnchorLabel: "hooks.md:81-86",
@@ -572,7 +575,8 @@ const Sections = [
 								"· the legacy ~/.hermes/aphrodite home is adopted with a one-line warning",
 							],
 							System: [
-								"when the Hermes-home-derived home holds no install but the pre-2.2 ~/.hermes/aphrodite does, the legacy home is adopted with a one-line warning. Adoption never fires for throwaway homes (probe scratch, temp homes), preserving the catalog probe's isolation",
+								"when the Hermes-home-derived home holds no install but the pre-2.2 ~/.hermes/aphrodite does, the legacy home is adopted with a one-line warning.",
+							"Adoption never fires for throwaway homes (probe scratch, temp homes), preserving the catalog probe's isolation",
 							],
 							Anchor: Link(OurRepo, "CHANGELOG.md"),
 							AnchorLabel: "CHANGELOG v1.6.3",
@@ -584,7 +588,9 @@ const Sections = [
 								"» runtime home: path (decided by ...)",
 							],
 							System: [
-								"the startup log prints: runtime home: path (decided by ...). Before v1.6.3, the shim read HERMES_HOME while the Rust half read HOME - the divergence that orphaned configs and disabled plugins whenever the two differed. Fixed as one decision, shared",
+								"the startup log prints: runtime home: path (decided by ...).",
+							"Before v1.6.3, the shim read HERMES_HOME while the Rust half read HOME - the divergence that orphaned configs and disabled plugins whenever the two differed.",
+							"Fixed as one decision, shared",
 							],
 							Anchor: Link(OurRepo, "CHANGELOG.md"),
 							AnchorLabel: "CHANGELOG v1.6.3",

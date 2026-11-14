@@ -297,7 +297,7 @@ export function Digest(Text: string): string {
 	return Out.slice(0, 40);
 }
 
-function TokenLimit(Type: string, Table: Record<string, number>): number {
+function TokenLimitOf(Type: string, Table: Record<string, number>): number {
 	const Base = Table["tool_threshold_token"] ?? ThresholdDefaults["tool_threshold_token"]!;
 	const Tier = TierOf(Type);
 	const Multiplier = Type.startsWith("code")
@@ -321,7 +321,7 @@ export function Simulate(Input: SimulateInput): SimulateResult {
 	const Table = { ...Thresholds, ...(Input.Thresholds ?? {}) };
 	const ByteLen = new TextEncoder().encode(Text).length;
 	const Type = Input.Type ?? Classify(Text);
-	const Compressed = ByteLen > TokenLimit(Type, Table);
+	const Compressed = ByteLen > TokenLimitOf(Type, Table);
 	const EngineOn = (Table["engine_threshold_pct"] ?? 100) < 100;
 
 	return {
@@ -441,32 +441,41 @@ function BindFull(Node: HTMLElement): void {
 
 		const Result = Simulate({ Text });
 		const Table = CurrentThresholds();
-		const Limit = TokenLimit(Result.Type, Table);
-		const Compressed = Result.RawBytes > Limit;
-		const CacheCompressed = Result.RawBytes > (Table["tool_threshold_cache"] ?? 0);
-		const Inline = Result.RawBytes <= (Table["inline_threshold"] ?? 0);
+		const ByteLen = Result.RawBytes;
+		const TokenLimit = TokenLimitOf(Result.Type, Table);
+		const Compressed = ByteLen > TokenLimit;
+		const CacheCompressed = ByteLen > (Table["tool_threshold_cache"] ?? 0);
+		const Inline = ByteLen <= (Table["inline_threshold"] ?? 0);
 		const EngineOn = (Table["engine_threshold_pct"] ?? 100) < 100;
+		// The marker exists only when the proxy actually compressed the blob. In
+		// the kept-inline state nothing was hashed, so the pane says that instead
+		// of printing a marker the run never minted.
+		const Marked = Compressed;
 
-		LastMarker = Result.Marker;
+		LastMarker = Marked ? Result.Marker : "";
 
 		if (Preview) Preview.textContent = Result.Preview;
 		if (Marker) {
-			Marker.dataset["copy"] = Result.Marker;
-			Marker.textContent = Result.Marker;
+			Marker.dataset["copy"] = Marked ? Result.Marker : "";
+			Marker.textContent = Marked
+				? Result.Marker
+				: "no marker - the bytes stayed in the transcript";
 		}
 		if (Address) {
-			Address.textContent = `blake3 ${Result.Marker.slice(8, 20)}... · ${Result.RawBytes.toLocaleString("en-US")} B · ${Result.Type}`;
+			Address.textContent = Marked
+				? `blake3 ${Result.Marker.slice(8, 20)}... · ${ByteLen.toLocaleString("en-US")} B · ${Result.Type}`
+				: `not hashed · ${ByteLen.toLocaleString("en-US")} B · ${Result.Type}`;
 		}
 		if (TypeOut) TypeOut.textContent = Result.Type;
 		if (TierOut) TierOut.textContent = `×${TierOf(Result.Type)}`;
 		if (Decision) {
 			Decision.textContent = EngineOn
-				? `${Result.Decision === "preview-answers" ? "preview enough - skip retrieval, keep reasoning" : "below threshold - kept inline, no marker to resolve"} (classified ${Result.Type} in ~${Result.ClassifyNs} ns, simulated)`
-				: `engine OFF (engine_threshold_pct >= 100) - raw passes through, nothing is marked`;
+				? `${Result.Decision === "preview-answers" ? "preview enough, marker stored - skip retrieval, keep reasoning" : "below threshold, kept inline - no marker to resolve"} (classified ${Result.Type} in ~${Result.ClassifyNs} ns, simulated)`
+				: `engine OFF - the 100+ escape hatch, raw passes through (engine_threshold_pct >= 100 - the proxy thresholds still apply)`;
 		}
 		if (Verdict) {
 			Verdict.textContent = [
-				`token mode: ${Compressed ? `compressed (${Result.RawBytes}B > limit ${Math.round(Limit)}B)` : `inline (${Result.RawBytes}B <= limit ${Math.round(Limit)}B)`}`,
+				`token mode: ${Compressed ? `compressed (${ByteLen}B > limit ${Math.round(TokenLimit)}B)` : `inline (${ByteLen}B <= limit ${Math.round(TokenLimit)}B)`}`,
 				`cache mode: ${CacheCompressed ? "compressed" : "inline"}`,
 				`storage: ${Inline ? "inline CCR" : "durable CCR"}`,
 			].join(" - ");
