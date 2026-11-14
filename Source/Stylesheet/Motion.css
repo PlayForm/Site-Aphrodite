@@ -1,0 +1,27 @@
+/* Motion.css - the CSS half of the motion contract in Source/Library/Motion.ts.
+   Everything else about the motion language is JavaScript, because Web
+   Animations restart deterministically on re-entry and a CSS transition cannot
+   do that without a forced layout. Exactly one rule needs to exist before the
+   runtime runs. */
+
+/* The reveal pre-hide. A panel that [data-reveal] will rise must not paint and
+   then blink out, so it is held at opacity 0 from the first frame - but only
+   when all three of these are true, and each one is a promise:
+
+     html.js        Base.astro's head script sets this class before paint, so a
+                    reader without JavaScript never has content hidden from
+                    them. The runtime only releases the pre-hide, never sets it.
+     no-preference  a reader who asked for stillness reads the panel at once;
+                    the media query simply never applies.
+     :not(revealed) the runtime marks a panel [data-revealed] in the same tick
+                    it starts the rise, so the pre-hide can never outlive the
+                    animation and strand copy at opacity 0.
+
+   There is no will-change here on purpose: a Web Animation on transform and
+   opacity is promoted for its own duration, and a blanket will-change on every
+   revealable panel would spend layer memory on the whole page. */
+@media (prefers-reduced-motion: no-preference) {
+	html.js [data-reveal]:not([data-revealed]) {
+		opacity: 0;
+	}
+}

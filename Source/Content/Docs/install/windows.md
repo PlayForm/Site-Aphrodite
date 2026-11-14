@@ -62,8 +62,10 @@ cargo install aphrodite
 aphrodite setup --api-key sk-... --api-url https://api.deepseek.com --model deepseek-v4-pro
 ```
 
-The link step is a manual follow-up: either a directory junction (no admin rights needed
-on modern Windows) or a copy of the runtime home:
+The link step is a manual follow-up:
+
+- either a directory junction (no admin rights needed on modern Windows)
+- or a copy of the runtime home:
 
 ```powershell
 New-Item -ItemType Directory -Force "$env:USERPROFILE\.hermes\plugins" | Out-Null

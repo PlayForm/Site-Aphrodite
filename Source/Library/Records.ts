@@ -57,6 +57,14 @@ export interface ConfigKeyRecord {
 	Live: ConfigLive;
 	/** What the key does, in one sentence, in the page's voice. */
 	Effect: string;
+	/**
+	 * The schema doc's own one-line gloss for the key, printed under `Effect`.
+	 * It carries what the columns cannot: the hot-reload qualifier, the
+	 * load-once caveat, the LOAD-BEARING warning, the "the proxy never reads
+	 * it" scope note. Optional, because a key with nothing to add is better
+	 * silent than padded.
+	 */
+	Detail?: string;
 }
 
 /**

@@ -902,7 +902,13 @@ const Dispatch = [
 					<ZineLesson
 						Label="FAILS SAFE"
 						Color="raw"
-						Text="Every step above degrades in the same direction: a missing binary disables the plugin, a missing key stops the proxy, a missing config narrows it to one listener. None of them runs half-configured and calls it success."
+						Lines={[
+							"Every step above degrades in the same direction:",
+							"a missing binary disables the plugin",
+							"a missing key stops the proxy",
+							"a missing config narrows it to one listener.",
+							"None of them runs half-configured and calls it success.",
+						]}
 					/>
 				</div>
 			</ZineBox>

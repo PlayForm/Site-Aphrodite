@@ -350,10 +350,17 @@ const Holes = [0, 1, 2, 3, 4, 5];
 					</div>
 				</div>
 				<p class="mt-8 font-body text-base leading-relaxed text-bone-newsprint">
-					Two numbers, one release: the binary carries the proxy, the CCR store and the dylib
-					the shim loads; the plugin spec carries the hook names, the tool schemas and the
-					version floor the dylib needs from Hermes.
+					Two numbers, one release:
 				</p>
+				<ul class="mt-3 space-y-2 font-body text-base leading-relaxed text-bone-newsprint">
+					<li class="border-l-4 border-raw-blood pl-4">
+						the binary carries the proxy, the CCR store and the dylib the shim loads
+					</li>
+					<li class="border-l-4 border-raw-blood pl-4">
+						the plugin spec carries the hook names, the tool schemas and the version floor
+						the dylib needs from Hermes.
+					</li>
+				</ul>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
 					They are released as a pair on purpose. A plugin that loads a dylib older than its
 					own schemas registers tools that do not exist, so the two versions travel together
@@ -517,10 +524,15 @@ const Holes = [0, 1, 2, 3, 4, 5];
 					What this release changed
 				</h2>
 				<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The changelog is grouped by what a change is for, not by which file it touched: a
-					fix that closes an advisory, a fix that closes a class of drift, and the chores
-					that keep the tree honest about itself. Each group below carries its entries
-					verbatim and one line on why the group exists.
+					The changelog is grouped by what a change is for, not by which file it touched:
+				</p>
+				<ul class="mt-3 max-w-3xl space-y-2 font-body text-base leading-relaxed text-bone-newsprint">
+					<li class="border-l-4 border-raw-blood pl-4">a fix that closes an advisory</li>
+					<li class="border-l-4 border-raw-blood pl-4">a fix that closes a class of drift</li>
+					<li class="border-l-4 border-raw-blood pl-4">and the chores that keep the tree honest about itself.</li>
+				</ul>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					Each group below carries its entries verbatim and one line on why the group exists.
 				</p>
 				<div class="mt-10">
 					{
@@ -849,7 +861,12 @@ const Holes = [0, 1, 2, 3, 4, 5];
 				</div>
 				<p class="mt-3 text-base leading-relaxed text-zinc-dust">
 					Both bars share one scale: 610&times; is the ceiling on a single long
-					low-entropy document, 132&times; is the standard corpus overall (106 KB to 800 B).
+					low-entropy document.
+				</p>
+				<p class="mt-3 text-base leading-relaxed text-zinc-dust">
+					132&times; is the standard corpus overall (106 KB to 800 B).
+				</p>
+				<p class="mt-3 text-base leading-relaxed text-zinc-dust">
 					Quote the ceiling only with the corpus attached.
 				</p>
 				<div class="mt-8 flex flex-wrap items-center gap-3">

@@ -149,31 +149,31 @@ const Keys: ConfigKeyLadderRecord[] = [
 	{ Key: "max_output", Section: "[[proxies]]", Type: "int (tokens)", Default: "384,000", Reader: "proxy", Live: "startup", Effect: "Max output tokens; the proxy refuses to start when it is at or above max_context" },
 
 	// [compression] - one table, two consumers, which is what the READER column shows.
-	{ Key: "tool_threshold_token", Section: "[compression]", Type: "int (bytes)", Default: "1024 (example 256)", Env: "APHRODITE_TOOL_THRESHOLD_TOKEN", Reader: "proxy", Live: "hot", Effect: "Token-proxy compression threshold - the gate every tool result crosses" },
-	{ Key: "tool_threshold_cache", Section: "[compression]", Type: "int (bytes)", Default: "8192 (example 2048)", Env: "APHRODITE_TOOL_THRESHOLD_CACHE", Reader: "proxy", Live: "hot", Effect: "Cache-proxy compression threshold" },
-	{ Key: "inline_threshold", Section: "[compression]", Type: "int (bytes)", Default: "256 (example 1024)", Env: "APHRODITE_INLINE_THRESHOLD", Reader: "proxy", Live: "hot", Effect: "Inline zlib versus the durable CCR store" },
-	{ Key: "code_multiplier", Section: "[compression]", Type: "float", Default: "3.0 (example 1.0)", Env: "APHRODITE_CODE_MULTIPLIER", Reader: "proxy", Live: "hot", Effect: "Multiplies the threshold for code_* content types; 1.0 gives code no extra headroom" },
-	{ Key: "auto_expand", Section: "[compression]", Type: "bool", Default: "false (example true)", Env: "APHRODITE_AUTO_EXPAND", Reader: "both", Live: "hot", Effect: "Resolve just-stored content inline instead of emitting a marker, capped by auto_expand_limit" },
-	{ Key: "auto_expand_limit", Section: "[compression]", Type: "int (bytes)", Default: "102400", Env: "APHRODITE_AUTO_EXPAND_LIMIT", Reader: "both", Live: "hot", Effect: "Byte cap for auto-expanded content; 0 = unlimited" },
-	{ Key: "max_request_body_size", Section: "[compression]", Type: "int (bytes)", Default: "none - no cap", Env: "APHRODITE_MAX_REQUEST_BODY_SIZE", Reader: "proxy", Live: "startup", Effect: "Request-body cap; an over-size body is rejected with 413 while it is read" },
-	{ Key: "store_max_entries", Section: "[compression]", Type: "int (rows)", Default: "100000", Env: "APHRODITE_STORE_MAX_ENTRIES", Reader: "proxy", Live: "load", Effect: "Max live rows in the SQLite store; past it the least-recently-accessed rows are evicted; 0 = unlimited" },
-	{ Key: "store_max_bytes", Section: "[compression]", Type: "int (bytes)", Default: "536870912", Env: "APHRODITE_STORE_MAX_BYTES", Reader: "proxy", Live: "load", Effect: "Max stored payload bytes, SUM(LENGTH(original)); past it LRU rows are evicted; 0 = unlimited" },
-	{ Key: "terminal_threshold", Section: "[compression]", Type: "int (bytes)", Default: "1024 (example 256)", Env: "APHRODITE_TERMINAL_THRESHOLD", Reader: "dylib", Live: "load", Effect: "Terminal-output threshold gating transform_terminal_output" },
-	{ Key: "poll_worker", Section: "[compression]", Type: "bool", Default: "true", Env: "APHRODITE_POLL_WORKER", Reader: "dylib", Live: "load", Effect: "Auto-backgrounding of slow terminal and process calls in pre_tool_call" },
-	{ Key: "chain_split", Section: "[compression]", Type: "bool", Default: "false", Env: "APHRODITE_CHAIN_SPLIT", Reader: "dylib", Live: "load", Effect: "Opt-in command splitting into per-segment markers" },
-	{ Key: "chain_split_min_segments", Section: "[compression]", Type: "int", Default: "2", Env: "APHRODITE_CHAIN_SPLIT_MIN_SEGMENTS", Reader: "dylib", Live: "load", Effect: "Floor for the adaptive split threshold" },
-	{ Key: "chain_split_max_segments", Section: "[compression]", Type: "int", Default: "6", Env: "APHRODITE_CHAIN_SPLIT_MAX_SEGMENTS", Reader: "dylib", Live: "load", Effect: "Cap for the adaptive split threshold" },
-	{ Key: "context_engine", Section: "[compression]", Type: "bool", Default: "true", Env: "APHRODITE_CONTEXT_ENGINE", Reader: "dylib", Live: "load", Effect: "Enables the context engine; the standalone HTTP proxy never reads it" },
-	{ Key: "engine_threshold_pct", Section: "[compression]", Type: "int (%)", Default: "45 (example 30)", Env: "APHRODITE_ENGINE_THRESHOLD_PCT", Reader: "dylib", Live: "load", Effect: "Context-engine fill gate: middle turns are archived at or above this fill; 0 = never, 100+ = off" },
-	{ Key: "engine_protect_first", Section: "[compression]", Type: "int (turns)", Default: "2", Env: "APHRODITE_ENGINE_PROTECT_FIRST", Reader: "dylib", Live: "load", Effect: "Turns kept at the start of the index" },
-	{ Key: "engine_protect_last", Section: "[compression]", Type: "int (turns)", Default: "5", Env: "APHRODITE_ENGINE_PROTECT_LAST", Reader: "dylib", Live: "load", Effect: "Turns kept at the end of the index" },
-	{ Key: "engine_min_msgs", Section: "[compression]", Type: "int (turns)", Default: "8", Env: "APHRODITE_ENGINE_MIN_MSGS", Reader: "dylib", Live: "load", Effect: "Minimum archived turns before the engine may archive" },
-	{ Key: "live_container", Section: "[compression]", Type: "bool", Default: "false", Env: "APHRODITE_LIVE_CONTAINER", Reader: "dylib", Live: "load", Effect: "Instant CCR markers with the live type, for progressive retrieval" },
-	{ Key: "recursive_depth", Section: "[compression]", Type: "int", Default: "5", Env: "APHRODITE_RECURSIVE_DEPTH", Reader: "dylib", Live: "load", Effect: "Nested marker expansion cap" },
-	{ Key: "auto_reload", Section: "[compression]", Type: "bool", Default: "false (example true)", Env: "APHRODITE_AUTO_RELOAD", Reader: "dylib", Live: "load", Effect: "Watch aphrodite.toml and re-apply config fields on change" },
-	{ Key: "catalog_mode", Section: "[compression]", Type: "-", Default: "none", Reader: "none", Live: "unwired", Effect: "Parses; the catalog layout is compiled-in, so this is a silent no-op" },
-	{ Key: "classifier_poll", Section: "[compression]", Type: "-", Default: "none", Reader: "none", Live: "unwired", Effect: "Parses; nothing reads it back" },
-	{ Key: "prefetch", Section: "[compression]", Type: "-", Default: "none", Reader: "none", Live: "unwired", Effect: "Parses; the aphrodite_prefetch tool exists regardless of this key" },
+	{ Key: "tool_threshold_token", Section: "[compression]", Type: "int (bytes)", Default: "1024 (example 256)", Env: "APHRODITE_TOOL_THRESHOLD_TOKEN", Reader: "proxy", Live: "hot", Effect: "Token-proxy compression threshold - the gate every tool result crosses", Detail: "token proxy threshold (bytes) - hot-reloads" },
+	{ Key: "tool_threshold_cache", Section: "[compression]", Type: "int (bytes)", Default: "8192 (example 2048)", Env: "APHRODITE_TOOL_THRESHOLD_CACHE", Reader: "proxy", Live: "hot", Effect: "Cache-proxy compression threshold", Detail: "cache proxy threshold (bytes) - hot-reloads" },
+	{ Key: "inline_threshold", Section: "[compression]", Type: "int (bytes)", Default: "256 (example 1024)", Env: "APHRODITE_INLINE_THRESHOLD", Reader: "proxy", Live: "hot", Effect: "Inline zlib versus the durable CCR store", Detail: "inline-vs-durable cutoff (bytes) - hot-reloads" },
+	{ Key: "code_multiplier", Section: "[compression]", Type: "float", Default: "3.0 (example 1.0)", Env: "APHRODITE_CODE_MULTIPLIER", Reader: "proxy", Live: "hot", Effect: "Multiplies the threshold for code_* content types; 1.0 gives code no extra headroom", Detail: "multiplies the threshold for code_* types - hot-reloads" },
+	{ Key: "auto_expand", Section: "[compression]", Type: "bool", Default: "false (example true)", Env: "APHRODITE_AUTO_EXPAND", Reader: "both", Live: "hot", Effect: "Resolve just-stored content inline instead of emitting a marker, capped by auto_expand_limit", Detail: "resolve just-stored content inline instead of a marker - hot-reloads" },
+	{ Key: "auto_expand_limit", Section: "[compression]", Type: "int (bytes)", Default: "102400", Env: "APHRODITE_AUTO_EXPAND_LIMIT", Reader: "both", Live: "hot", Effect: "Byte cap for auto-expanded content; 0 = unlimited", Detail: "byte cap for auto-expanded content; 0 = unlimited" },
+	{ Key: "max_request_body_size", Section: "[compression]", Type: "int (bytes)", Default: "none - no cap", Env: "APHRODITE_MAX_REQUEST_BODY_SIZE", Reader: "proxy", Live: "startup", Effect: "Request-body cap; an over-size body is rejected with 413 while it is read", Detail: "the cap is applied while the body streams in, so an over-size request is refused before it is buffered whole" },
+	{ Key: "store_max_entries", Section: "[compression]", Type: "int (rows)", Default: "100000", Env: "APHRODITE_STORE_MAX_ENTRIES", Reader: "proxy", Live: "load", Effect: "Max live rows in the SQLite store; past it the least-recently-accessed rows are evicted; 0 = unlimited", Detail: "max live rows in the SQLite store - LRU evicts past it; read at store open, not hot-reloaded" },
+	{ Key: "store_max_bytes", Section: "[compression]", Type: "int (bytes)", Default: "536870912", Env: "APHRODITE_STORE_MAX_BYTES", Reader: "proxy", Live: "load", Effect: "Max stored payload bytes, SUM(LENGTH(original)); past it LRU rows are evicted; 0 = unlimited", Detail: "max stored payload bytes, SUM(LENGTH(original)) - LRU evicts past it; read at store open, not hot-reloaded" },
+	{ Key: "terminal_threshold", Section: "[compression]", Type: "int (bytes)", Default: "1024 (example 256)", Env: "APHRODITE_TERMINAL_THRESHOLD", Reader: "dylib", Live: "load", Effect: "Terminal-output threshold gating transform_terminal_output", Detail: "dylib terminal-output threshold" },
+	{ Key: "poll_worker", Section: "[compression]", Type: "bool", Default: "true", Env: "APHRODITE_POLL_WORKER", Reader: "dylib", Live: "load", Effect: "Auto-backgrounding of slow terminal and process calls in pre_tool_call", Detail: "the rewrite happens before the call runs, so the transcript never shows the backgrounding" },
+	{ Key: "chain_split", Section: "[compression]", Type: "bool", Default: "false", Env: "APHRODITE_CHAIN_SPLIT", Reader: "dylib", Live: "load", Effect: "Opt-in command splitting into per-segment markers", Detail: "off by default because invisible segment markers pollute redirected stdout" },
+	{ Key: "chain_split_min_segments", Section: "[compression]", Type: "int", Default: "2", Env: "APHRODITE_CHAIN_SPLIT_MIN_SEGMENTS", Reader: "dylib", Live: "load", Effect: "Floor for the adaptive split threshold", Detail: "below this many segments the command is left whole" },
+	{ Key: "chain_split_max_segments", Section: "[compression]", Type: "int", Default: "6", Env: "APHRODITE_CHAIN_SPLIT_MAX_SEGMENTS", Reader: "dylib", Live: "load", Effect: "Cap for the adaptive split threshold", Detail: "past this many segments the split stops, so one command cannot flood the transcript with markers" },
+	{ Key: "context_engine", Section: "[compression]", Type: "bool", Default: "true", Env: "APHRODITE_CONTEXT_ENGINE", Reader: "dylib", Live: "load", Effect: "Enables the context engine; the standalone HTTP proxy never reads it", Detail: "opt-in dylib status flag; the HTTP proxy never reads it" },
+	{ Key: "engine_threshold_pct", Section: "[compression]", Type: "int (%)", Default: "45 (example 30)", Env: "APHRODITE_ENGINE_THRESHOLD_PCT", Reader: "dylib", Live: "load", Effect: "Context-engine fill gate: middle turns are archived at or above this fill; 0 = never, 100+ = off", Detail: "LOAD-BEARING (dylib): middle-turn archiving + engine_offload prompt; 100+ = off" },
+	{ Key: "engine_protect_first", Section: "[compression]", Type: "int (turns)", Default: "2", Env: "APHRODITE_ENGINE_PROTECT_FIRST", Reader: "dylib", Live: "load", Effect: "Turns kept at the start of the index", Detail: "LOAD-BEARING (dylib): turns kept at the start of the index" },
+	{ Key: "engine_protect_last", Section: "[compression]", Type: "int (turns)", Default: "5", Env: "APHRODITE_ENGINE_PROTECT_LAST", Reader: "dylib", Live: "load", Effect: "Turns kept at the end of the index", Detail: "LOAD-BEARING (dylib): turns kept at the end of the index" },
+	{ Key: "engine_min_msgs", Section: "[compression]", Type: "int (turns)", Default: "8", Env: "APHRODITE_ENGINE_MIN_MSGS", Reader: "dylib", Live: "load", Effect: "Minimum archived turns before the engine may archive", Detail: "LOAD-BEARING (dylib): minimum messages before the engine activates" },
+	{ Key: "live_container", Section: "[compression]", Type: "bool", Default: "false", Env: "APHRODITE_LIVE_CONTAINER", Reader: "dylib", Live: "load", Effect: "Instant CCR markers with the live type, for progressive retrieval", Detail: "instant 'live' CCR markers for large tool results" },
+	{ Key: "recursive_depth", Section: "[compression]", Type: "int", Default: "5", Env: "APHRODITE_RECURSIVE_DEPTH", Reader: "dylib", Live: "load", Effect: "Nested marker expansion cap", Detail: "max nested marker expansion depth" },
+	{ Key: "auto_reload", Section: "[compression]", Type: "bool", Default: "false (example true)", Env: "APHRODITE_AUTO_RELOAD", Reader: "dylib", Live: "load", Effect: "Watch aphrodite.toml and re-apply config fields on change", Detail: "watch aphrodite.toml and re-apply config fields on change" },
+	{ Key: "catalog_mode", Section: "[compression]", Type: "-", Default: "none", Reader: "none", Live: "unwired", Effect: "Parses; the catalog layout is compiled-in, so this is a silent no-op", Detail: "a key that parsed and did nothing was worse than an undocumented one, so the ledger names it" },
+	{ Key: "classifier_poll", Section: "[compression]", Type: "-", Default: "none", Reader: "none", Live: "unwired", Effect: "Parses; nothing reads it back", Detail: "classification is per invocation, not polled, so there is no interval for this key to set" },
+	{ Key: "prefetch", Section: "[compression]", Type: "-", Default: "none", Reader: "none", Live: "unwired", Effect: "Parses; the aphrodite_prefetch tool exists regardless of this key", Detail: "the tool is registered unconditionally, so turning this off disables nothing" },
 
 	// [previews] and [prompts] - the render-side knobs.
 	{ Key: "preview_max_chars", Section: "[previews]", Type: "int (chars)", Default: "0 (unlimited)", Env: "APHRODITE_PREVIEW_MAX_CHARS", Reader: "both", Live: "hot", Effect: "Caps the whole rendered preview string, not per line; 0 = unlimited" },
@@ -269,6 +269,9 @@ const Sections = [
 	{ Id: "pick-chain", Label: "THE FILE" },
 	{ Id: "editor", Label: "EDITOR" },
 	{ Id: "keys", Label: "EVERY KEY" },
+	{ Id: "knobs", Label: "THE KNOBS" },
+	{ Id: "flow", Label: "PER-TURN" },
+	{ Id: "unwired", Label: "UNWIRED" },
 	{ Id: "classify", Label: "CLASSIFY" },
 	{ Id: "proxies", Label: "THE PAIR" },
 	{ Id: "parsers", Label: "TWO PARSERS" },
@@ -277,8 +280,8 @@ const Sections = [
 ---
 
 <Base
-	title="Configuration Playground"
-	description="The interactive aphrodite.toml explorer - every key in one table, the pick chain, the two parsers and the compression knobs, simulated client-side."
+	Title="CONFIG // APHRODITE"
+	Description="The interactive aphrodite.toml explorer - the pick chain, the two stacks, the [[proxies]] pair and the compression knobs, simulated client-side."
 >
 	<PageShell Crumbs>
 		<!-- Header -->
@@ -429,6 +432,170 @@ const Sections = [
 			</div>
 		</section>
 
+		<!-- THE COMPRESSION KNOBS: what the [compression] rows above actually do -->
+		<section id="knobs" class="relative w-full" aria-label="The compression knobs">
+			<ZineTape Label="the knobs" Color="canary" Side="right" />
+			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
+				The compression knobs
+			</h2>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The [compression] table is the one section a running proxy re-reads, and only part of it is
+				hot.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Four rows are the hot set: <code class="text-bone-newsprint">tool_threshold_token</code>,
+				<code class="text-bone-newsprint">tool_threshold_cache</code>,
+				<code class="text-bone-newsprint">inline_threshold</code> and
+				<code class="text-bone-newsprint">code_multiplier</code>.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				<code class="text-bone-newsprint">auto_expand</code> and
+				<code class="text-bone-newsprint">auto_expand_limit</code> are hot on the same terms, and so
+				are <code class="text-bone-newsprint">preview_max_chars</code>, the marker format and hint,
+				and <code class="text-bone-newsprint">ccr_marker_hint</code>.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Everything else in the section is fixed at startup or read once when the dylib loads, which
+				is what the LIVE column above records row by row.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				<code class="text-bone-newsprint">code_multiplier</code> is the only knob that is a
+				multiplier rather than a byte count: the code_* types get the base threshold times its
+				value, so 3.0 hands source three times the default patience and 1.0 hands it none.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				<code class="text-bone-newsprint">inline_threshold</code> decides where compressed content
+				lives: below it the bytes ride inline as zlib, above it they become a durable store entry
+				with a marker.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				<code class="text-bone-newsprint">engine_threshold_pct</code> is the context engine's fill
+				gate, and its two extremes are switches: 0 means never archive and 100 or more means the
+				engine is off.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The two store retention caps are the deliberate exception, because a store cannot resize
+				while it is serving.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				<code class="text-bone-newsprint">store_max_entries</code> and
+				<code class="text-bone-newsprint">store_max_bytes</code> are read when the SQLite store is
+				opened, so a change to either takes effect on the next proxy restart, not on save.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The dylib keys take a third route entirely: they ride
+				<code class="text-bone-newsprint">aphrodite_config_set</code> at runtime, so a session can
+				move them without a restart and without a file edit.
+			</p>
+		</section>
+
+		<!-- THE PER-TURN CONTEXT: [flow] / [directives] / [previews] -->
+		<section id="flow" class="relative w-full" aria-label="Flow, directives and previews">
+			<ZineTape Label="per-turn context" Color="teal" Side="left" />
+			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+				[FLOW] / [DIRECTIVES] / [PREVIEWS]
+			</h2>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Three sections decide what the model is handed each turn, and none of them touches
+				compression.
+			</p>
+			<div class="mt-8 grid gap-10 lg:grid-cols-3">
+				<ZineBox Tone="teal">
+					<ZineKicker As="h3" Tone="teal">[FLOW]</ZineKicker>
+					<p class="mt-3 text-base text-zinc-dust">
+						<code class="text-bone-newsprint">budget_chars = 2600</code> is the hard cap on ALL
+						per-turn injected context.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						The budget covers directives, nudges, the recall catalog and the retrieve hint
+						together, not each one separately.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						Sections drop bottom-up when the total goes over; directives and nudges never drop.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						Dylib only, overridable through
+						<code class="text-bone-newsprint">APHRODITE_FLOW_BUDGET_CHARS</code>.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						The compiled default is 4,000 characters, so the shipped example buys a leaner turn
+						than a bare binary does.
+					</p>
+				</ZineBox>
+				<ZineBox Tone="subtle">
+					<ZineKicker As="h3" Tone="newsprint">[DIRECTIVES]</ZineKicker>
+					<p class="mt-3 text-base text-zinc-dust">
+						<code class="text-bone-newsprint">active = ["lazy", "lazy-eval", "foresight"]</code>
+						names which loaded directives start active.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						Names that are not in the loaded set are silently filtered out, and an empty list seeds
+						focus, foresight and lazy instead.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						The set is runtime-mutable, so a conversation can swap directives mid-flight through
+						<code class="text-bone-newsprint">aphrodite_directive</code>.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						The built-in set is focus, foresight, ccr-handling, cleanup, explore, lazy and
+						lazy-eval - seven files baked into the binary.
+					</p>
+				</ZineBox>
+				<ZineBox Tone="subtle">
+					<ZineKicker As="h3" Tone="newsprint">[PREVIEWS]</ZineKicker>
+					<p class="mt-3 text-base text-zinc-dust">
+						<code class="text-bone-newsprint">preview_max_chars = 0</code> caps the whole rendered
+						preview string, not per line, and 0 means unlimited.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						<code class="text-bone-newsprint">model_family = "code_first"</code> selects the
+						<code>[templates.preview.&lt;family&gt;.*]</code> family when
+						<code>[templates]</code> is configured.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">
+						The env var <code>APHRODITE_PREVIEW_MAX_CHARS</code> outranks the file, and the file
+						outranks unlimited.
+					</p>
+					<p class="mt-3 text-base text-zinc-dust">Re-applied by POST /reload.</p>
+				</ZineBox>
+			</div>
+		</section>
+
+		<!-- DOCUMENTED BUT UNWIRED: the honest ledger -->
+		<section id="unwired" class="relative w-full" aria-label="Documented but unwired keys">
+			<ZineTape Label="honest ledger" Color="bone" Side="right" />
+			<h2 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+				DOCUMENTED BUT UNWIRED
+			</h2>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				Five keys parse and do nothing, and the table above marks every one of them UNWIRED rather
+				than quietly omitting them.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				<code class="text-bone-newsprint">catalog_mode</code> lost its reader when the catalog layout
+				became compiled-in, so setting it changes nothing.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				<code class="text-bone-newsprint">classifier_poll</code> describes a poll interval the
+				classifier never had: classification runs per invocation.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				<code class="text-bone-newsprint">prefetch</code> is dead because the
+				<code class="text-bone-newsprint">aphrodite_prefetch</code> tool is registered
+				unconditionally.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				<code class="text-bone-newsprint">code_structure_map</code> and
+				<code class="text-bone-newsprint">rust_preview_lines</code> are reserved: they describe a
+				code preview that includes signatures and a line budget for Rust source, and no builder
+				reads either one yet.
+			</p>
+			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+				The ledger exists because a key that parses and does nothing is worse than an undocumented
+				one: it looks like a lever and behaves like a wall.
+			</p>
+		</section>
+
 		<!-- THE CLASSIFY MATRIX: one type, one threshold -->
 		<section id="classify" class="relative w-full" aria-label="The classify matrix">
 			<ZineTape Label="classify" Color="canary" Side="left" />
@@ -553,9 +720,13 @@ const Sections = [
 					<p class="mt-3 text-base text-zinc-dust">
 						<code class="text-bone-newsprint">config/proxy.rs</code>, active whenever an
 						aphrodite.toml is found: it reads every row marked PROXY or BOTH, resolving each one as
-						env var, then the per-proxy entry, then <code>[defaults]</code>, then the compiled
-						default.
 					</p>
+					<ul class="mt-3 space-y-2 text-base text-zinc-dust">
+						<li class="border-l-2 border-oxblood-dark pl-3">env var</li>
+						<li class="border-l-2 border-oxblood-dark pl-3">then the per-proxy entry</li>
+						<li class="border-l-2 border-oxblood-dark pl-3">then <code>[defaults]</code></li>
+						<li class="border-l-2 border-oxblood-dark pl-3">then the compiled default.</li>
+					</ul>
 					<p class="mt-3 text-base text-zinc-dust">
 						Three rows are the exceptions, and the ladder marks them: the API key is TOML-first,
 						and the bind address and the mode are per-entry by construction.
@@ -789,9 +960,21 @@ const Sections = [
 		</div>`;
 	}
 
+	// The chain notes are constants, not templates, because each one is a claim
+	// about a specific chain rather than a phrase stitched from a key name: the
+	// ladder prints the claim.
+	const DefaultsChainNote = "env > per-proxy > defaults > compiled";
+	const TomlWinsHotNote = "TOML wins - one of the four hot-reload thresholds";
+	const TomlOnlyNote = "listen / mode (TOML-ONLY)";
+	const ApiKeyLabel = "api_key (TOML-FIRST EXCEPTION)";
+	const ApiKeyEnvChip = "env: APHRODITE_API_KEY (last, not first)";
+	const CacheAbsentChip = "cache proxy: absent";
+	const TokenAbsentChip = "token proxy: absent";
+	const DylibNote = "read once at dylib load; runtime changes ride aphrodite_config_set";
+
 	const ReaderNote = {
 		proxy: "read by the Rust HTTP proxy",
-		dylib: "read by the dylib session at load",
+		dylib: DylibNote,
 		both: "read by both stacks",
 	} as Record<string, string>;
 
@@ -813,12 +996,22 @@ const Sections = [
 				const Chips = Holders.length
 					? Holders.map((Proxy) => Chip(`proxy "${Proxy.name ?? "?"}": ${Proxy[Entry.Key]}`, "live"))
 					: [Chip("proxy: absent", "dim")];
+				// The pair is the point of this key, so name which listener is
+				// missing instead of saying that some proxy is.
+				if (Entry.Key === "listen" && !Holders.length) {
+					if (!Parsed.Proxies.some((Proxy) => Proxy.mode === "cache")) {
+						Chips.push(Chip(CacheAbsentChip, "dim"));
+					}
+					if (!Parsed.Proxies.some((Proxy) => Proxy.mode === "token")) {
+						Chips.push(Chip(TokenAbsentChip, "dim"));
+					}
+				}
 				Chips.push(Chip("no env override in multi-proxy mode", "dim"));
 				Parts.push(
 					Row(
 						`${Entry.Key} (TOML-ONLY)`,
 						Chips,
-						"a process-wide APHRODITE_MODE / APHRODITE_LISTEN would hit every proxy at once",
+						`${TomlOnlyNote} - a process-wide APHRODITE_MODE / APHRODITE_LISTEN would hit every proxy at once`,
 					),
 				);
 				continue;
@@ -831,11 +1024,11 @@ const Sections = [
 				const Chips = [
 					Proxy ? Chip(`proxy "${Proxy.name ?? "?"}": set`, "live") : Chip("proxy: absent", "dim"),
 					Default !== undefined ? Chip("defaults: set", "live") : Chip("defaults: absent", "dim"),
-					Chip(`env: ${Entry.Env ?? "none"} (last, not first)`, "dim"),
+					Chip(ApiKeyEnvChip, "dim"),
 				];
 				Parts.push(
 					Row(
-						`${Entry.Key} (TOML-FIRST EXCEPTION)`,
+						ApiKeyLabel,
 						Chips,
 						"the only chain where TOML outranks the env var; value never shown - env-var names only",
 					),
@@ -864,15 +1057,18 @@ const Sections = [
 			}
 			Chips.push(Chip(`compiled: ${Entry.Default}`, Winner ? "dim" : "fallback"));
 
-			Parts.push(
-				Row(
-					Entry.Key,
-					Chips,
-					Winner
-						? `${ReaderNote[Entry.Reader] ?? Entry.Reader} - TOML wins`
-						: `${ReaderNote[Entry.Reader] ?? Entry.Reader} - the compiled default wins`,
-				),
-			);
+			// The note names the ladder that decided, not just who won: a hot
+			// threshold, a per-proxy key and a dylib key are decided by three
+			// different chains.
+			const Note = !Winner
+				? `${ReaderNote[Entry.Reader] ?? Entry.Reader} - the compiled default wins`
+				: Entry.Live === "hot"
+					? TomlWinsHotNote
+					: Entry.From === "proxy"
+						? DefaultsChainNote
+						: `${ReaderNote[Entry.Reader] ?? Entry.Reader} - TOML wins`;
+
+			Parts.push(Row(Entry.Key, Chips, Note));
 		}
 
 		Ladder.innerHTML = Parts.join("");

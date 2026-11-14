@@ -24,11 +24,59 @@ import PreviewFlow from "../Content/Mermaid/preview-flow.svg?raw";
 // bands, the retrieval tax, the caveat - is the canonical StudyLedger module on
 // /benchmarks/, and this page does not carry a second copy of it.
 const Study = {
+	Sessions: "200",
 	Saved: "156,342,817",
 	SavedPct: "26.9%",
 	AvgPerCall: "22,921",
+	SessionsSaved: "183 / 200",
 	MedianRatio: "22.9%",
+	TaxCalls: "2,275",
+	TaxTokens: "2,011,583",
+	CharsPerTok: "3.0-4.5",
+	Band: "~24-33%",
+	BandCenter: "~27%",
 } as const;
+
+// The four secondary figures, as a labelled strip: the label is the claim and
+// the unit is the qualifier, so neither travels without the other.
+const Metrics = [
+	{ Label: "AVG SAVED / CALL", Value: Study.AvgPerCall, Unit: "TOKENS PER CALL", Accent: "text-weathered-teal" },
+	{ Label: "SESSIONS THAT SAVED", Value: Study.SessionsSaved, Unit: "OF THE 200 MEASURED", Accent: "text-bone-white" },
+	{ Label: "MEDIAN SESSION RATIO", Value: Study.MedianRatio, Unit: "SAVED OF THE BUDGET", Accent: "text-weathered-teal" },
+] as const;
+
+// Savings by session shape (README.md:497-499). The label carries the shape,
+// the range carries the measured band, and `Width` is the range read as a bar.
+const Bands = [
+	{ Label: "CHAT-ONLY SESSIONS", Range: "~0%", Width: "4%", Bar: "bg-zinc-dust" },
+	{ Label: "LIGHT DEVELOPER SESSION", Range: "~5%", Width: "10%", Bar: "bg-weathered-teal" },
+	{ Label: "LONG TOOL-HEAVY SESSIONS", Range: "20-25%", Width: "38%", Bar: "bg-stamped-canary" },
+	{ Label: "PURE-TOOL WORKLOADS", Range: "76-82%", Width: "92%", Bar: "bg-raw-blood" },
+] as const;
+
+// The three claims the page argues, in the order the sections prove them. Each
+// is one stamp, one subject, one verb and one sentence - the page's thesis in
+// three lines, before the evidence starts.
+const Claims = [
+	{
+		Stamp: "bg-raw-blood text-bone-white",
+		Subject: "THE MARKER",
+		Verb: "IS THE CONTRACT",
+		Body: "<<<CCR:hash|type|size>>> - the address, the kind, and the cost of going back, in one string both the agent and every retrieval entry point understand.",
+	},
+	{
+		Stamp: "bg-stamped-canary text-soot-black",
+		Subject: "THE CLASSIFIER",
+		Verb: "IS THE GATE",
+		Body: "Nothing moves until the type is named - because the type is what decides whether content earns visibility or a squeeze.",
+	},
+	{
+		Stamp: "bg-weathered-teal text-bone-white",
+		Subject: "THE THRESHOLDS",
+		Verb: "ARE THE KNOBS",
+		Body: "A handful of per-type multipliers and a fill threshold - each mapped to one question the agent asks, each tuned by what sessions prove.",
+	},
+] as const;
 
 // Real-world per-output compression, orig tokens -> ~33-tok marker (README.md:485-495).
 // `Percent` is the ratio read as a bar width: the column is a comparison of
@@ -98,6 +146,7 @@ const Flood = [
 // The page's own section list - SectionNav's only input, which is what keeps
 // the index truthful: a link can never name a section this page does not render.
 const Sections = [
+	{ Id: "claims", Label: "THE CLAIMS" },
 	{ Id: "problem", Label: "PROBLEM" },
 	{ Id: "gate", Label: "GATE" },
 	{ Id: "contract", Label: "CONTRACT" },
@@ -328,7 +377,7 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					detail.
 				</p>
 				<!-- Monument stat: the hook. The study's full ledger lives on /benchmarks/. -->
-				<div class="zine-box-subtle mt-24 w-full max-w-2xl border-[3px] border-raw-blood bg-soot-black p-8 sm:p-10">
+				<div class="zine-box-subtle mt-24 w-full max-w-4xl border-[3px] border-raw-blood bg-soot-black p-8 sm:p-10">
 					<ZineKicker Tone="dust">CONTEXT TOKENS SAVED · 200 REAL SESSIONS</ZineKicker>
 					<div
 						class="mt-6 font-headline text-5xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-7xl"
@@ -337,15 +386,59 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					</div>
 					<div class="mt-6 flex flex-wrap items-center gap-8 font-mono text-base font-bold">
 						<span class="text-stamped-canary">{Study.SavedPct} OF THE TOTAL BUDGET</span>
-						<span class="text-zinc-dust">·</span>
-						<span class="text-weathered-teal">{Study.AvgPerCall} TOK AVG / CALL</span>
-						<span class="text-zinc-dust">·</span>
-						<span class="text-zinc-dust">{Study.MedianRatio} MEDIAN SESSION</span>
+					</div>
+					<div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
+						{
+							Metrics.map(({ Label, Value, Unit, Accent }) => (
+								<div class="border-t border-oxblood-dark pt-4">
+									<div class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+										{Label}
+									</div>
+									<div class={`mt-2 font-headline text-2xl font-black tracking-tight ${Accent}`}>
+										{Value}
+									</div>
+									<div class="mt-1 font-mono text-base text-zinc-dust">{Unit}</div>
+								</div>
+							))
+						}
 					</div>
 					<ZineSource Lines={["SRC: README.md:467-511."]} />
 				</div>
 			</ZineBox>
 		</header>
+
+		<!-- ============ THE THREE CLAIMS ============ -->
+		<section id="claims" class="relative w-full">
+			<ZineTape Variant="tab" Label="THE THREE CLAIMS" Color="raw" />
+			<p class="mt-16 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				The whole argument fits in three lines, and every section below is the evidence for one of
+				them.
+			</p>
+			<div class="mt-16 isolate grid grid-cols-1 gap-16 lg:grid-cols-3">
+				{
+					Claims.map(({ Stamp, Subject, Verb, Body }) => (
+						<div class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-6 pt-9 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg] sm:hover:rotate-0">
+							<div
+								class={`inline-block px-3 py-1 font-mono text-base font-black uppercase tracking-widest ${Stamp}`}
+							>
+								{Subject}
+							</div>
+							<h2 class="mt-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white">
+								{Verb}
+							</h2>
+							<p class="mt-6 font-body text-base leading-relaxed text-bone-newsprint">{Body}</p>
+						</div>
+					))
+				}
+			</div>
+			<p class="mt-16 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				That is the whole architecture.
+			</p>
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				The agent keeps its budget for reasoning, and pays for detail only when detail is the
+				answer.
+			</p>
+		</section>
 
 		<SectionNav Sections={Sections} />
 
@@ -359,6 +452,9 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Every file read, build, code search, or browser open floods the agent's
 					context with raw output - compilation logs, accessibility trees, JSON blobs.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					The agent spends its budget reading noise instead of reasoning.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The structural failure is that raw output arrives{" "}
@@ -436,6 +532,10 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					test); ordinary prose is never mis-tagged.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					This is the "secret sauce" made plain:{" "}
+					<strong class="text-bone-white">the classifier is the gate</strong>.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Nothing is compressed, stored, or marked until the gate has named it - and
 					the name is what everything downstream keys on.
 				</p>
@@ -447,18 +547,31 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 				</figcaption>
 				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Read the figure left to right: every blob is classified first, then routed into
-					one of five threshold groups - error ×8, code ×3.0, tracked ×2, default ×1, and
-					the noisy base group.
+					one of five threshold groups:
 				</p>
+				<ul class="mt-3 max-w-3xl space-y-2 font-body text-base leading-relaxed text-bone-newsprint">
+					<li class="border-l-4 border-raw-blood pl-4">error ×8</li>
+					<li class="border-l-4 border-raw-blood pl-4">code ×3.0</li>
+					<li class="border-l-4 border-raw-blood pl-4">tracked ×2</li>
+					<li class="border-l-4 border-raw-blood pl-4">default ×1</li>
+					<li class="border-l-4 border-raw-blood pl-4">and the noisy base group.</li>
+				</ul>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The noisy group is pinned - linter, build_output and log are never halved and
 					never tuned.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					On top of the tier sits the EMA auto-tune: a type whose measured ratio stays
-					above 20 doubles its patience, a type under 3 halves it, and the budget header
-					scales the result between ×0.5 and ×1.0.
+					On top of the tier sits the EMA auto-tune:
 				</p>
+				<ul class="mt-3 max-w-3xl space-y-2 font-body text-base leading-relaxed text-bone-newsprint">
+					<li class="border-l-4 border-raw-blood pl-4">
+						a type whose measured ratio stays above 20 doubles its patience
+					</li>
+					<li class="border-l-4 border-raw-blood pl-4">a type under 3 halves it</li>
+					<li class="border-l-4 border-raw-blood pl-4">
+						and the budget header scales the result between ×0.5 and ×1.0.
+					</li>
+				</ul>
 			</figure>
 		</section>
 
@@ -713,9 +826,71 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 						</ZineKicker>
 					</div>
 				</div>
+				<!-- THE RETRIEVAL TAX AND THE CONFIDENCE NOTE -->
+				<div class="mt-24 grid grid-cols-1 gap-16 lg:grid-cols-2">
+					<div class="border-l-4 border-weathered-teal pl-6">
+						<ZineKicker Tone="teal" As="div">RETRIEVAL TAX</ZineKicker>
+						<p class="mt-6 font-body text-base leading-relaxed text-bone-newsprint">
+							Retrieval re-entry cost {Study.TaxCalls} calls and {Study.TaxTokens} tokens
+							across the study - the price of going back for detail.
+						</p>
+						<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+							It is the reason the design pushes previews so hard: the tax only gets paid
+							when the preview fails to answer the question, so the preview is engineered
+							to answer most of them.
+						</p>
+					</div>
+					<div
+						class="border border-oxblood-dark bg-asphalt-panel p-5 font-body text-base leading-relaxed text-bone-newsprint"
+					>
+						<p>
+							<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
+								CONFIDENCE ·{" "}
+							</span>The causal result - CCR removes context pressure for large repeated tool
+							outputs, and tool-heavy usage benefits far more than chat - is high.
+						</p>
+						<p class="mt-3">
+							The exact percentage is a band: the marker's byte size is the only trace of
+							the original content (the inline store is session-scoped), so savings were
+							estimated with a calibrated chars/tok ratio; sensitivity across{" "}
+							{Study.CharsPerTok} chars/tok spans {Study.Band}, centered {Study.BandCenter}.
+						</p>
+					</div>
+				</div>
+				<!-- SAVINGS BY SESSION SHAPE -->
+				<div class="mt-24">
+					<ZineKicker Tone="dust" As="div">SAVINGS BY SESSION SHAPE</ZineKicker>
+					<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+						The same engine saves nothing in a chat and almost everything in a tool-heavy run,
+						because the ratio tracks how much raw output the session produces at all.
+					</p>
+					<div class="mt-8 flex flex-col gap-6">
+						{
+							Bands.map(({ Label, Range, Width, Bar }) => (
+								<div>
+									<div class="flex flex-wrap items-baseline justify-between gap-4 font-mono text-base">
+										<span class="font-black uppercase tracking-widest text-bone-white">{Label}</span>
+										<span class="text-stamped-canary">{Range}</span>
+									</div>
+									<div class="mt-2 h-3 w-full border border-oxblood-dark bg-soot-black">
+										<div class={`h-full ${Bar}`} style={`width: ${Width}`} />
+									</div>
+								</div>
+							))
+						}
+					</div>
+					<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+						A pure-tool workload is the ceiling case and a chat-only session is the floor, which is
+						why the study reports a median beside the mean.
+					</p>
+					<div class="mt-6 font-mono text-base leading-relaxed text-zinc-dust">
+						SAVINGS SCALE WITH TOOL-OUTPUT VOLUME AND SESSION LENGTH - THE SAME ENGINE, FOUR
+						DIFFERENT PAYOFFS, ALL FROM THE SAME KNOBS.
+					</div>
+				</div>
 				<ZineSource
 					Lines={[
-						"SRC: README.md:467-511 (the per-output compression) · README.md:444-465 (the per-type table and the round trips).",
+						"SRC: README.md:467-511 (the per-output compression) · README.md:444-465 (the per-type table and the round trips) · README.md:497-499 (the session-shape bands).",
 					]}
 				/>
 			</ZineBox>

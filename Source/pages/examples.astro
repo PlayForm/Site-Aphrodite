@@ -57,6 +57,26 @@ const Doors = [
 	{ Surface: "STORAGE CUTOFF (1024)", Verdict: "INLINE", Why: "had it compressed: 1000 < 1024 stays inline zlib" },
 ] as const;
 
+// The SAME walkthrough at the second coherent setting the repo documents
+// (docs/examples/README.md:21, and the bench configs under bench/ that ship
+// tool_threshold_token = 512): token 512, cache 4096, code_multiplier 3.0 and
+// inline 2048. Two settings, two answers to the same 1,000 bytes - which is the
+// point of a knob, so the page shows both rather than picking one and calling
+// it the default.
+const BenchThresholds = [
+	{ Key: "tool_threshold_token", Value: "512", Gate: "TOKEN PROXY", Effect: "tool results above 512 bytes compress" },
+	{ Key: "tool_threshold_cache", Value: "4096", Gate: "CACHE PROXY", Effect: "tool results above 4096 bytes compress" },
+	{ Key: "inline_threshold", Value: "2048", Gate: "STORAGE CUTOFF", Effect: "above 2048, store instead of inline zlib" },
+	{ Key: "code_multiplier", Value: "3.0", Gate: "CODE TIER", Effect: "code_* types get base threshold x 3" },
+] as const;
+
+const BenchDoors = [
+	{ Surface: "TOKEN PROXY (512)", Verdict: "MARKER", Why: "1000 > 512 - compressed, preview + marker" },
+	{ Surface: "CACHE PROXY (4096)", Verdict: "RAW", Why: "1000 < 4096 - passes through untouched" },
+	{ Surface: "AS SOURCE CODE (1536)", Verdict: "RAW", Why: "512 x 3.0 = 1536 headroom; 1000 < 1536" },
+	{ Surface: "STORAGE CUTOFF (2048)", Verdict: "INLINE", Why: "had it compressed: below 2048 stays inline zlib" },
+] as const;
+
 // The annotated artifacts of one worked session (CHANGELOG.md:613-616).
 const Artifacts = [
 	{ Line: "git status", Shape: "[git:2M 2A 1D 3?? | src/x.rs src/y.rs +5 more]", Reads: "2 modified, 2 added, 1 deleted, 3 untracked; first files named" },
@@ -101,6 +121,8 @@ const Cases: CaseRecord[] = [
 			"Everything else about a proxy is fixed at startup.",
 			'The mechanics of the hot path: the config-file watcher reacts to <code class="font-mono text-base">Modify</code> events on <code class="font-mono text-base">aphrodite.toml</code> with a 500 ms debounce, reloads the file, and stores the four resolved thresholds into every live <code class="font-mono text-base">AppState</code>\'s atomics - nothing else is updated live (docs/architecture/07-config-resolution.md:71).',
 			'The dylib session is a different story: it re-applies config fields on change only when <code class="font-mono text-base">auto_reload = true</code> (README.md:390-391).',
+			"Two coherent settings exist in the repo and the panels below walk both: the shipped example (256 / 2048 / 1.0 / 1024) and the docs/examples values (512 / 4096 / 3.0 / 2048).",
+			"The arithmetic is the teaching - the same 1,000 bytes land differently at each setting, and neither column is rounded.",
 		],
 		Command: { Lang: "text", Code: "POST /reload" },
 		Output: [
@@ -129,9 +151,28 @@ const Cases: CaseRecord[] = [
 					TagTone: Verdict === "MARKER" ? "canary" : Verdict === "RAW" ? "teal" : "newsprint",
 				})),
 			},
+			{
+				Kind: "rows",
+				Label: "THE SAME FOUR KNOBS AT THE DOCS/EXAMPLES VALUES // 512 / 4096 / 3.0 / 2048",
+				Rows: BenchThresholds.map(({ Key, Value, Gate, Effect }) => ({
+					Left: Key,
+					Right: `${Gate} · ${Effect}`,
+					Tag: Value,
+				})),
+			},
+			{
+				Kind: "rows",
+				Label: "THE WALKTHROUGH AT THOSE VALUES // THE SAME 1,000 BYTES, FOUR DOORS",
+				Rows: BenchDoors.map(({ Surface, Verdict, Why }) => ({
+					Left: Surface,
+					Right: Why,
+					Tag: Verdict,
+					TagTone: Verdict === "MARKER" ? "canary" : Verdict === "RAW" ? "teal" : "newsprint",
+				})),
+			},
 		],
 		Diagram: { Html: ConfigResolution, Caption: "THE HOT PATH // EDIT-SAVE - 500 MS DEBOUNCE - FOUR ATOMICS" },
-		Src: "SRC: README.md:389-407,584-588 · docs/architecture/07-config-resolution.md:66-71 · docs/config/aphrodite-toml.md:121-131,204 · aphrodite.toml.example:95-123",
+		Src: "SRC: README.md:389-407,584-588 · docs/architecture/07-config-resolution.md:66-71 · docs/config/aphrodite-toml.md:121-131,204 · aphrodite.toml.example:95-123 · docs/examples/README.md:21",
 	},
 	{
 		Id: "retrieval",
@@ -212,6 +253,8 @@ const Cases: CaseRecord[] = [
 		Marker: "&lt;&lt;&lt;CCR:e7c0f3a6...c1f4|terminal|398&gt;&gt;&gt;",
 		Note: [
 			'<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">OFF BY DEFAULT · </span>Without the split, the same compound command is one terminal blob with one marker; the build preview and the test preview never separate.',
+			'The command itself is the case the split exists for: <code class="font-mono text-base">cd project && cargo build --release && cargo test 2&gt;&amp;1</code> - one call, two tools, redirected stdout.',
+			"Marked output is compressed before the threshold gate, so a split segment never leaks raw even when it is small enough to have passed through whole.",
 		],
 		Src: "SRC: docs/proxy/compression.md:366-379 · docs/plugin/hooks.md:59-65,102-106 · README.md:411-413",
 	},
@@ -290,7 +333,8 @@ const Cases: CaseRecord[] = [
 		Preview: "compact metadata: hash, type, size, marker",
 		Marker: "none - a relay result stays raw through the hook pipeline.",
 		Note: [
-			"Compressing an <code class=\"font-mono text-base\">aphrodite_retrieve</code> result would replace resolved content with another marker, which is why the result itself is compact metadata and never absorbed.",
+			'<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">THE RESULT ITSELF · </span>is compact metadata (hash, type, size, marker) - so it stays raw through the hook pipeline.',
+			'Compressing an <code class="font-mono text-base">aphrodite_retrieve</code> result would replace resolved content with another marker, which is why it is never absorbed.',
 		],
 		Diagram: { Html: ToolRelay, Caption: "M4 // TOOL RELAY" },
 		Src: "SRC: docs/tool-relay/callbacks.md:27-111,139-144 · docs/plugin/hooks.md:76-83",
@@ -317,7 +361,9 @@ const Cases: CaseRecord[] = [
 			{ Text: "01 EMPTY · nothing to compress", Tone: "result" },
 			{ Text: "02 ESSENTIAL SET · the agent needs raw output", Tone: "result" },
 			{ Text: "03 SELF TOOLS · already compact metadata", Tone: "result" },
-			{ Text: "04 SIZE GATE · 1,024 bytes on the token lane, 8,192 on the cache lane; 0 disables the gate", Tone: "result" },
+			{ Text: "04 SIZE GATE · 1,024 bytes on the token lane, 8,192 on the cache lane", Tone: "result" },
+			{ Text: "04 SIZE GATE // THE DYLIB LANE", Tone: "dim" },
+			{ Text: "4,096 chars default; 0 disables the gate", Tone: "dim" },
 		],
 		Preview: "the raw bytes, unchanged",
 		Marker: "none - this is the gate that refuses the machine.",

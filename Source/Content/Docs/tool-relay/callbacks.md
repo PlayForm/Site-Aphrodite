@@ -5,9 +5,11 @@ section: "Tool Relay"
 
 # Callbacks
 
-Two distinct callback surfaces exist around the tool relay: the Hermes-side hooks that fire
-when a tool result comes back, and the proxy-side HTTP deliveries (`callback_url`
-on the relay, `notify_url` on CCR creation).
+Two distinct callback surfaces exist around the tool relay:
+
+- the Hermes-side hooks that fire when a tool result comes back
+- and the proxy-side HTTP deliveries (`callback_url` on the relay, `notify_url` on CCR
+  creation).
 
 Both are described below.
 

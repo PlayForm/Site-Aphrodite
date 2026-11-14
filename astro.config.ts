@@ -3,6 +3,8 @@ import { fileURLToPath } from "url";
 
 import { defineConfig } from "astro/config";
 
+import { ZineTheme } from "./Source/Library/ShikiTheme.ts";
+
 export const On = process.env["NODE_ENV"] === "development";
 
 export const Here = dirname(fileURLToPath(import.meta.url));
@@ -28,13 +30,16 @@ export default defineConfig({
 	site: "https://Aphrodite.PlayForm.Cloud",
 	compressHTML: true,
 	// The markdown code fences render through shiki (bundled with Astro) with
-	// the dark github-dark theme: the site is dark-only (soot-black panes), so
-	// the pinned dark theme keeps the token colors visible on every code pane.
+	// the site's OWN theme: the palette lives in Source/Library/ShikiTheme.ts,
+	// imported by this config and by Component/CodeFence.astro so a docs fence
+	// and a hand-written fence can never drift. A named third-party theme
+	// (github-dark) cannot be re-coloured from CSS - shiki writes the colours
+	// as inline styles - so the palette is handed to shiki instead of fought.
 	// Highlighting only applies when the fence carries a language tag
 	// (```rust, ```json, ...); untagged fences render as plain text.
 	markdown: {
 		shikiConfig: {
-			theme: "github-dark",
+			theme: ZineTheme,
 		},
 	},
 	prefetch: {

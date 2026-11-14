@@ -1,5 +1,6 @@
 ---
 import "@Stylesheet/Base.css";
+import "@Stylesheet/Motion.css";
 
 import { Head } from "astro-capo";
 import { ClientRouter } from "astro:transitions";
@@ -36,7 +37,7 @@ interface Props {
 <!doctype html>
 <html lang="en" class="no-js dark" dir="ltr">
 	<Head>
-		<script>
+		<script is:inline>
 			document.documentElement.classList.remove("no-js");
 			document.documentElement.classList.add("js");
 		</script>
@@ -374,6 +375,12 @@ interface Props {
 			COPIED TO SPOOL
 		</div>
 		<script>
+			// The runtimes below share one rebind pattern: a data-*-bound guard
+			// on each element, mounted now and again on every astro:page-load,
+			// with the observer-backed one torn down on astro:before-swap so a
+			// discarded page leaves nothing running.
+			import Mount, { Teardown } from "@Library/Motion";
+
 			function BindCopy() {
 				for (const Element of document.querySelectorAll("[data-copy]")) {
 					if (Element.dataset.copyBound) {
@@ -394,8 +401,16 @@ interface Props {
 				}
 			}
 
-			BindCopy();
-			document.addEventListener("astro:page-load", BindCopy);
+			// The code plates are built BEFORE the copy binding: the chip they
+			// add carries `data-copy`, and BindCopy is the one runtime that
+			// binds it - so both run in the same pass, in that order.
+			const BindRuntime = (): void => {
+				BindPlates();
+				BindCopy();
+			};
+
+			BindRuntime();
+			document.addEventListener("astro:page-load", BindRuntime);
 
 			// The hamburger: same rebind pattern as the copy runtime - the
 			// view-transitions router swaps the body, so the binding re-runs on
@@ -429,6 +444,13 @@ interface Props {
 
 			BindToggle();
 			document.addEventListener("astro:page-load", BindToggle);
+
+			// The motion runtime: one mount for the whole document, re-run on
+			// each page-load (the per-element bound guard makes that
+			// idempotent), torn down before the router swaps the body.
+			Mount();
+			document.addEventListener("astro:page-load", Mount);
+			document.addEventListener("astro:before-swap", Teardown);
 		</script>
 	</body>
 </html>

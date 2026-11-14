@@ -1,0 +1,490 @@
+{
+	"_Generated": {
+		"By": "Scripts/Prepare.ts",
+		"From": [
+			"Module/Aphrodite/aphrodite.toml.example",
+			"Module/Aphrodite/crates/aphrodite/templates/aphrodite.toml"
+		],
+		"Transform": [
+			"Facts"
+		],
+		"Note": "Generated. Change the source in PlayForm/Aphrodite, push it, then advance the Module/Aphrodite pin - never this file."
+	},
+	"Example": {
+		"Sections": [
+			"proxies",
+			"defaults",
+			"compression",
+			"previews",
+			"prompts",
+			"templates",
+			"directives",
+			"flow"
+		],
+		"Keys": [
+			{
+				"Section": "proxies",
+				"Key": "name",
+				"Value": "\"cache\""
+			},
+			{
+				"Section": "proxies",
+				"Key": "listen",
+				"Value": "\"127.0.0.1:9797\""
+			},
+			{
+				"Section": "proxies",
+				"Key": "mode",
+				"Value": "\"cache\""
+			},
+			{
+				"Section": "proxies",
+				"Key": "tool_relay",
+				"Value": "true"
+			},
+			{
+				"Section": "proxies",
+				"Key": "timeout",
+				"Value": "120"
+			},
+			{
+				"Section": "proxies",
+				"Key": "name",
+				"Value": "\"token\""
+			},
+			{
+				"Section": "proxies",
+				"Key": "listen",
+				"Value": "\"127.0.0.1:9798\""
+			},
+			{
+				"Section": "proxies",
+				"Key": "mode",
+				"Value": "\"token\""
+			},
+			{
+				"Section": "proxies",
+				"Key": "tool_relay",
+				"Value": "true"
+			},
+			{
+				"Section": "proxies",
+				"Key": "timeout",
+				"Value": "300"
+			},
+			{
+				"Section": "defaults",
+				"Key": "api_url",
+				"Value": "\"https://api.openai.com\""
+			},
+			{
+				"Section": "defaults",
+				"Key": "model",
+				"Value": "\"default-model\""
+			},
+			{
+				"Section": "defaults",
+				"Key": "ccr_ttl_seconds",
+				"Value": "3600"
+			},
+			{
+				"Section": "compression",
+				"Key": "engine_threshold_pct",
+				"Value": "30"
+			},
+			{
+				"Section": "compression",
+				"Key": "engine_protect_first",
+				"Value": "2"
+			},
+			{
+				"Section": "compression",
+				"Key": "engine_protect_last",
+				"Value": "5"
+			},
+			{
+				"Section": "compression",
+				"Key": "engine_min_msgs",
+				"Value": "8"
+			},
+			{
+				"Section": "compression",
+				"Key": "tool_threshold_token",
+				"Value": "256"
+			},
+			{
+				"Section": "compression",
+				"Key": "tool_threshold_cache",
+				"Value": "2048"
+			},
+			{
+				"Section": "compression",
+				"Key": "terminal_threshold",
+				"Value": "256"
+			},
+			{
+				"Section": "compression",
+				"Key": "inline_threshold",
+				"Value": "1024"
+			},
+			{
+				"Section": "compression",
+				"Key": "auto_expand",
+				"Value": "true"
+			},
+			{
+				"Section": "compression",
+				"Key": "auto_expand_limit",
+				"Value": "102400"
+			},
+			{
+				"Section": "compression",
+				"Key": "live_container",
+				"Value": "false"
+			},
+			{
+				"Section": "compression",
+				"Key": "recursive_depth",
+				"Value": "5"
+			},
+			{
+				"Section": "compression",
+				"Key": "store_max_entries",
+				"Value": "100000"
+			},
+			{
+				"Section": "compression",
+				"Key": "store_max_bytes",
+				"Value": "536870912"
+			},
+			{
+				"Section": "compression",
+				"Key": "catalog_mode",
+				"Value": "\"tool\"       # DOCUMENTED BUT UNWIRED: parsed (echoed by POST /reload), no consumer - catalog layout is compiled-in"
+			},
+			{
+				"Section": "compression",
+				"Key": "classifier_poll",
+				"Value": "true"
+			},
+			{
+				"Section": "compression",
+				"Key": "code_multiplier",
+				"Value": "1.0"
+			},
+			{
+				"Section": "compression",
+				"Key": "context_engine",
+				"Value": "true"
+			},
+			{
+				"Section": "compression",
+				"Key": "poll_worker",
+				"Value": "true"
+			},
+			{
+				"Section": "compression",
+				"Key": "auto_reload",
+				"Value": "true"
+			},
+			{
+				"Section": "compression",
+				"Key": "chain_split",
+				"Value": "false"
+			},
+			{
+				"Section": "compression",
+				"Key": "chain_split_min_segments",
+				"Value": "2"
+			},
+			{
+				"Section": "compression",
+				"Key": "chain_split_max_segments",
+				"Value": "6"
+			},
+			{
+				"Section": "previews",
+				"Key": "model_family",
+				"Value": "\"code_first\" # WIRED as the [templates.preview] family selector (default \"code_first\"); only matters when [templates] is configured - absent templates fall back to hardcoded builders"
+			},
+			{
+				"Section": "previews",
+				"Key": "code_structure_map",
+				"Value": "true"
+			},
+			{
+				"Section": "previews",
+				"Key": "preview_max_chars",
+				"Value": "0"
+			},
+			{
+				"Section": "prompts",
+				"Key": "retrieve_guidance",
+				"Value": "\"minimal\" # WIRED: prompt knob - how the system instructs the LLM about CCR retrieval"
+			},
+			{
+				"Section": "prompts",
+				"Key": "ccr_marker_hint",
+				"Value": "false"
+			},
+			{
+				"Section": "prompts",
+				"Key": "catalog_intent_hints",
+				"Value": "false"
+			},
+			{
+				"Section": "prompts",
+				"Key": "session_inject",
+				"Value": "\"\"\""
+			},
+			{
+				"Section": "directives",
+				"Key": "active",
+				"Value": "[\"lazy\", \"lazy-eval\", \"foresight\"]"
+			},
+			{
+				"Section": "flow",
+				"Key": "budget_chars",
+				"Value": "2600"
+			}
+		]
+	},
+	"Template": {
+		"Sections": [
+			"proxies",
+			"defaults",
+			"compression",
+			"previews",
+			"prompts",
+			"directives",
+			"flow"
+		],
+		"Keys": [
+			{
+				"Section": "proxies",
+				"Key": "name",
+				"Value": "\"cache\""
+			},
+			{
+				"Section": "proxies",
+				"Key": "listen",
+				"Value": "\"127.0.0.1:{cache_port}\""
+			},
+			{
+				"Section": "proxies",
+				"Key": "mode",
+				"Value": "\"cache\""
+			},
+			{
+				"Section": "proxies",
+				"Key": "tool_relay",
+				"Value": "true"
+			},
+			{
+				"Section": "proxies",
+				"Key": "timeout",
+				"Value": "120"
+			},
+			{
+				"Section": "proxies",
+				"Key": "name",
+				"Value": "\"token\""
+			},
+			{
+				"Section": "proxies",
+				"Key": "listen",
+				"Value": "\"127.0.0.1:{token_port}\""
+			},
+			{
+				"Section": "proxies",
+				"Key": "mode",
+				"Value": "\"token\""
+			},
+			{
+				"Section": "proxies",
+				"Key": "tool_relay",
+				"Value": "true"
+			},
+			{
+				"Section": "proxies",
+				"Key": "timeout",
+				"Value": "300"
+			},
+			{
+				"Section": "defaults",
+				"Key": "api_url",
+				"Value": "\"https://api.openai.com\""
+			},
+			{
+				"Section": "defaults",
+				"Key": "model",
+				"Value": "\"default-model\""
+			},
+			{
+				"Section": "defaults",
+				"Key": "ccr_ttl_seconds",
+				"Value": "3600"
+			},
+			{
+				"Section": "compression",
+				"Key": "engine_threshold_pct",
+				"Value": "30"
+			},
+			{
+				"Section": "compression",
+				"Key": "engine_protect_first",
+				"Value": "2"
+			},
+			{
+				"Section": "compression",
+				"Key": "engine_protect_last",
+				"Value": "5"
+			},
+			{
+				"Section": "compression",
+				"Key": "engine_min_msgs",
+				"Value": "8"
+			},
+			{
+				"Section": "compression",
+				"Key": "tool_threshold_token",
+				"Value": "256"
+			},
+			{
+				"Section": "compression",
+				"Key": "tool_threshold_cache",
+				"Value": "2048"
+			},
+			{
+				"Section": "compression",
+				"Key": "terminal_threshold",
+				"Value": "256"
+			},
+			{
+				"Section": "compression",
+				"Key": "inline_threshold",
+				"Value": "1024"
+			},
+			{
+				"Section": "compression",
+				"Key": "auto_expand",
+				"Value": "true"
+			},
+			{
+				"Section": "compression",
+				"Key": "auto_expand_limit",
+				"Value": "102400"
+			},
+			{
+				"Section": "compression",
+				"Key": "live_container",
+				"Value": "false"
+			},
+			{
+				"Section": "compression",
+				"Key": "recursive_depth",
+				"Value": "5"
+			},
+			{
+				"Section": "compression",
+				"Key": "store_max_entries",
+				"Value": "100000"
+			},
+			{
+				"Section": "compression",
+				"Key": "store_max_bytes",
+				"Value": "536870912"
+			},
+			{
+				"Section": "compression",
+				"Key": "catalog_mode",
+				"Value": "\"tool\"       # DOCUMENTED BUT UNWIRED: parsed (echoed by POST /reload), no consumer - catalog layout is compiled-in"
+			},
+			{
+				"Section": "compression",
+				"Key": "classifier_poll",
+				"Value": "true"
+			},
+			{
+				"Section": "compression",
+				"Key": "code_multiplier",
+				"Value": "1.0"
+			},
+			{
+				"Section": "compression",
+				"Key": "context_engine",
+				"Value": "true"
+			},
+			{
+				"Section": "compression",
+				"Key": "poll_worker",
+				"Value": "true"
+			},
+			{
+				"Section": "compression",
+				"Key": "auto_reload",
+				"Value": "true"
+			},
+			{
+				"Section": "compression",
+				"Key": "chain_split",
+				"Value": "false"
+			},
+			{
+				"Section": "compression",
+				"Key": "chain_split_min_segments",
+				"Value": "2"
+			},
+			{
+				"Section": "compression",
+				"Key": "chain_split_max_segments",
+				"Value": "6"
+			},
+			{
+				"Section": "previews",
+				"Key": "model_family",
+				"Value": "\"code_first\" # WIRED as the [templates.preview] family selector (default \"code_first\"); only matters when [templates] is configured - absent templates fall back to hardcoded builders"
+			},
+			{
+				"Section": "previews",
+				"Key": "code_structure_map",
+				"Value": "true"
+			},
+			{
+				"Section": "previews",
+				"Key": "preview_max_chars",
+				"Value": "0"
+			},
+			{
+				"Section": "prompts",
+				"Key": "retrieve_guidance",
+				"Value": "\"minimal\" # WIRED: prompt knob - how the system instructs the LLM about CCR retrieval"
+			},
+			{
+				"Section": "prompts",
+				"Key": "ccr_marker_hint",
+				"Value": "false"
+			},
+			{
+				"Section": "prompts",
+				"Key": "catalog_intent_hints",
+				"Value": "false"
+			},
+			{
+				"Section": "prompts",
+				"Key": "session_inject",
+				"Value": "\"\"\""
+			},
+			{
+				"Section": "directives",
+				"Key": "active",
+				"Value": "[\"focus\", \"foresight\"]"
+			},
+			{
+				"Section": "flow",
+				"Key": "budget_chars",
+				"Value": "2600"
+			}
+		]
+	}
+}

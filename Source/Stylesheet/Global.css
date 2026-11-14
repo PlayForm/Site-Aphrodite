@@ -256,3 +256,192 @@ a.code-link:hover code {
 		transition: none;
 	}
 }
+
+/* ---- CODE PLATES (appended; the tokens above are untouched) ----
+
+   Every Shiki fence is a PLATE: pasted-down print, not a floating editor
+   widget. The COLOURS are not here - they are emitted by the theme itself
+   (Source/Library/ShikiTheme.ts) because Shiki writes them as inline
+   `style="color:#..."` attributes on every token span, and an inline style
+   outranks every stylesheet rule short of `!important`. A stylesheet that
+   re-colours `github-dark` output is a fight it cannot win; the palette is
+   set where it is emitted instead.
+
+   What the stylesheet owns is the PRINT GRAMMAR: the frame, the padding, the
+   rhythm, the hover lift and the scroll cue.
+
+   The `figure.zine-plate` wrapper is added by Source/Script/CodePlate.ts, so
+   the language tag and the copy chip can sit OUTSIDE the scroll container
+   (an absolutely positioned child of a scroll container scrolls away with
+   the content). Every rule below also matches a bare `<pre class="astro-code">`
+   so a block is framed and padded before - and without - JavaScript.
+
+   Specificity note: `body pre.astro-code` (0,1,2) deliberately outranks the
+   docs reading column's own `pre` rule (0,1,1) without `!important`, so one
+   definition of the plate holds on every page. */
+
+body pre.astro-code,
+.zine-plate > pre.astro-code {
+	position: relative;
+	max-width: 100%;
+	margin: 1.75rem 0;
+	padding: 1.6rem 1.35rem 1.25rem;
+	border: 1px solid var(--oxblood-dark);
+	border-left: 3px solid var(--blood-crimson);
+	border-radius: 0;
+	background-color: var(--carbon-void);
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.9375rem;
+	line-height: 1.75;
+	tab-size: 2;
+	/* Long commands scroll INSIDE the plate - a fence may never widen the page. */
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	/* A styled scrollbar is a non-overlay scrollbar: on macOS the default one
+	   fades out, so this is what makes the overflow cue persist. */
+	scrollbar-width: thin;
+	scrollbar-color: var(--blood-crimson) var(--asphalt-panel-dark);
+	transition:
+		border-color 0.12s steps(2),
+		box-shadow 0.12s steps(2);
+}
+
+body pre.astro-code::-webkit-scrollbar {
+	height: 8px;
+}
+
+body pre.astro-code::-webkit-scrollbar-track {
+	border-top: 1px solid var(--outline-oxblood);
+	background: var(--asphalt-panel-dark);
+}
+
+body pre.astro-code::-webkit-scrollbar-thumb {
+	border: 1px solid var(--outline-oxblood);
+	background: var(--blood-crimson);
+}
+
+body pre.astro-code:hover::-webkit-scrollbar-thumb {
+	background: var(--raw-blood);
+}
+
+/* The inner <code> must inherit the plate's colour: the docs column paints
+   `pre code` zinc-dust, which would grey out the 86 tokenless `text`/
+   `plaintext` fences that carry no spans to colour. */
+body pre.astro-code > code {
+	padding: 0;
+	border: 0;
+	background: none;
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	color: inherit;
+}
+
+/* Hover: the plate lifts off the page. The background lift rides
+   `background-image` on purpose - Shiki's inline style only sets
+   `background-color`, so a gradient over it is the one wash a stylesheet can
+   apply without `!important`. */
+body pre.astro-code:hover,
+.zine-plate:hover > pre.astro-code,
+.zine-plate:focus-within > pre.astro-code {
+	border-color: var(--raw-blood);
+	border-left-color: var(--stamped-canary);
+	box-shadow: 3px 3px 0 var(--outline-oxblood);
+	background-image: linear-gradient(rgba(147, 17, 40, 0.08), rgba(147, 17, 40, 0.08));
+}
+
+.zine-plate {
+	position: relative;
+	min-width: 0;
+	max-width: 100%;
+	margin: 1.75rem 0;
+}
+
+.zine-plate > pre.astro-code {
+	margin: 0;
+}
+
+/* The chip cluster: language tag + copy, floated in the plate's top padding
+   band so revealing it moves nothing. Hidden at rest (the plate is clean
+   print), revealed on hover or keyboard focus; always shown where hover does
+   not exist, because a hidden control with no way to reveal it is a dead
+   control. */
+.zine-plate-bar {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.55rem;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	opacity: 0;
+	transition: opacity 0.12s steps(2);
+}
+
+.zine-plate:hover .zine-plate-bar,
+.zine-plate:focus-within .zine-plate-bar {
+	opacity: 1;
+}
+
+@media (hover: none) {
+	.zine-plate-bar {
+		opacity: 1;
+	}
+}
+
+.zine-plate-lang,
+.zine-plate-copy {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 0.1rem 0.45rem;
+	border: 1px solid var(--outline-oxblood);
+	border-radius: 0;
+	background: var(--soot-black);
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.625rem;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	line-height: 1.6;
+	text-transform: uppercase;
+}
+
+.zine-plate-lang {
+	color: var(--zinc-dust);
+}
+
+/* The overflow mark: the scrollbar is the persistent cue, this is the explicit
+   one - it only exists when the block actually scrolls. */
+.zine-plate--scroll .zine-plate-lang::after {
+	content: " ⇥";
+	color: var(--stamped-canary);
+}
+
+.zine-plate-copy {
+	border-color: var(--oxblood-dark);
+	color: var(--bone-newsprint);
+	cursor: pointer;
+	transition:
+		color 0.12s steps(2),
+		border-color 0.12s steps(2),
+		background-color 0.12s steps(2);
+}
+
+.zine-plate-copy:hover {
+	border-color: var(--stamped-canary);
+	background: var(--carbon-void);
+	color: var(--stamped-canary);
+}
+
+/* The annotations Source/Script/CodePlate.ts wraps: a class rule on the
+   wrapper outranks the INHERITED inline colour of the token span around it,
+   which is how these two stay distinct without `!important`. */
+.zine-prompt {
+	color: var(--stamped-canary);
+	font-weight: 700;
+}
+
+.zine-comment {
+	color: var(--zinc-dust);
+	font-style: italic;
+}

@@ -3,14 +3,17 @@ interface Props {
 	/** The lesson headline, stamped. */
 	Label: string;
 
-	/** The lesson text. */
-	Text: string;
+	/** The lesson text - a single line, or a tight group. */
+	Text?: string;
+
+	/** One entry per line: use when the lesson enumerates options a reader picks between. */
+	Lines?: string[];
 
 	/** Stamp color of the headline: canary (default), raw, teal. */
 	Color?: "canary" | "raw" | "teal";
 }
 
-const { Label, Text, Color = "canary" } = Astro.props;
+const { Label, Text, Lines, Color = "canary" } = Astro.props;
 
 const Palette = {
 	canary: "bg-stamped-canary text-soot-black",
@@ -23,5 +26,15 @@ const Palette = {
 	<span class={`shrink-0 -rotate-1 self-start border-2 border-black px-3 py-1 font-mono text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] sm:-rotate-2 ${Palette}`}>
 		{Label}
 	</span>
-	<p class="font-body text-base leading-relaxed text-bone-newsprint">{Text}</p>
+	{
+		Lines && Lines.length > 0 ? (
+			<ul class="flex flex-col gap-2 font-body text-base leading-relaxed text-bone-newsprint">
+				{Lines.map((Line) => (
+					<li class="border-l-2 border-oxblood-dark pl-3">{Line}</li>
+				))}
+			</ul>
+		) : (
+			<p class="font-body text-base leading-relaxed text-bone-newsprint">{Text}</p>
+		)
+	}
 </aside>

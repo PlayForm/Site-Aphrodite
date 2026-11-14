@@ -149,10 +149,15 @@ const ProxyRows = [
 						session-scoped), and call the tool relay to retrieve or create CCR entries.
 					</p>
 					<p>
-						THE LIMIT IS REAL TOO: the proxy only sees HTTP traffic - no tool-output
-						interception, no terminal compression, no directives, no context engine, and SSE
-						streams pass through uncompressed.
+						THE LIMIT IS REAL TOO: the proxy only sees HTTP traffic.
 					</p>
+					<ul class="mt-2 flex flex-col gap-1">
+						<li>no tool-output interception</li>
+						<li>no terminal compression</li>
+						<li>no directives</li>
+						<li>no context engine</li>
+						<li>and SSE streams pass through uncompressed.</li>
+					</ul>
 					<p>
 						Because of that the proxy extends the stack to other callers; it does not replace
 						the hooks inside Hermes.

@@ -255,10 +255,14 @@ const Needs = [
 				}
 			</div>
 			<p class="mt-14 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Read the four together and the shape of the product is in them: a ceiling that
-				belongs to one long document, a band for the round-trip, a floor for the step
-				that runs on every call, and a median for the ordinary case.
+				Read the four together and the shape of the product is in them:
 			</p>
+			<ul class="mt-3 max-w-3xl space-y-2 font-body text-base leading-relaxed text-bone-newsprint">
+				<li class="border-l-4 border-raw-blood pl-4">a ceiling that belongs to one long document</li>
+				<li class="border-l-4 border-raw-blood pl-4">a band for the round-trip</li>
+				<li class="border-l-4 border-raw-blood pl-4">a floor for the step that runs on every call</li>
+				<li class="border-l-4 border-raw-blood pl-4">and a median for the ordinary case.</li>
+			</ul>
 			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
 				The ceiling is the number quoted in the repository's first line; the median is the
 				one to plan against.
@@ -338,9 +342,16 @@ const Needs = [
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
 					Classification is 40-123 ns and is timed on its own because it runs on every
-					call; the compress path stays under 1 ms; 8-40 ms is what a client waits once the
-					HTTP round-trip is included, and the ~10 ms headline sits near the fast end of
-					that band.
+					call.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					The compress path stays under 1 ms.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					8-40 ms is what a client waits once the HTTP round-trip is included.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					And the ~10 ms headline sits near the fast end of that band.
 				</p>
 
 				<ZineTape Variant="section" Label="TWO HALVES // TWO CONFIDENCE LEVELS" Color="teal" />
@@ -497,9 +508,17 @@ const Needs = [
 					Savings track tool-output volume, not session count.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					A chat-only session has nothing to compress, so it saves ~0%; a light developer
-					session saves ~5%; a tool-heavy session lands in the 20-25% band; and a simulated
-					pure-tool loop - a diff, an ls, a build and a search on repeat - reaches 76-82%.
+					A chat-only session has nothing to compress, so it saves ~0%.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					A light developer session saves ~5%.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					A tool-heavy session lands in the 20-25% band.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					And a simulated pure-tool loop - a diff, an ls, a build and a search on repeat -
+					reaches 76-82%.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
 					That last figure is a stress test, not real usage, and the bars above label it as

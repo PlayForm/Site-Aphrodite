@@ -1,0 +1,38 @@
+{
+	"_Generated": {
+		"By": "Scripts/Prepare.ts",
+		"From": [
+			"Module/Aphrodite/crates/aphrodite/Cargo.toml",
+			"Module/Aphrodite/crates/aphrodite-hermes/Cargo.toml",
+			"Module/Aphrodite/plugins/aphrodite/plugin.yaml",
+			"Module/Aphrodite/plugins/aphrodite/BINARY_VERSION",
+			"Module/Aphrodite/vendor/headroom/crates/headroom-core/Cargo.toml",
+			"Module/Aphrodite/CHANGELOG.md"
+		],
+		"Transform": [
+			"Facts"
+		],
+		"Note": "Generated. Change the source in PlayForm/Aphrodite, push it, then advance the Module/Aphrodite pin - never this file."
+	},
+	"Binary": {
+		"Version": "1.8.1"
+	},
+	"Hermes": {
+		"Version": "1.8.1"
+	},
+	"Plugin": {
+		"Version": "2.3.2"
+	},
+	"BinaryVersionFile": {
+		"Version": "1.8.1"
+	},
+	"Headroom": {
+		"Version": "0.2.1"
+	},
+	"Changelog": {
+		"Version": "1.8.1",
+		"Date": "2026-11-14",
+		"Title": "Docs catch up to the engine, ASCII ellipsis markers, compile-time debug gate",
+		"Pairing": "Binary `1.7.0 →\n1.8.0`, plugin `2.3.0 → 2.3.1`"
+	}
+}

@@ -1,0 +1,44 @@
+{
+	"_Generated": {
+		"By": "Scripts/Prepare.ts",
+		"From": [
+			"Module/Aphrodite/plugins/aphrodite/plugin.yaml"
+		],
+		"Transform": [
+			"Facts"
+		],
+		"Note": "Generated. Change the source in PlayForm/Aphrodite, push it, then advance the Module/Aphrodite pin - never this file."
+	},
+	"Manifest": {
+		"Name": "aphrodite",
+		"Version": "2.3.2",
+		"Kind": "standalone",
+		"RequiresHermes": ">=0.20.2",
+		"RequiresHooks": true,
+		"ContextEngine": true,
+		"Hooks": [
+			"on_session_start",
+			"transform_tool_result",
+			"pre_llm_call",
+			"transform_terminal_output",
+			"post_llm_call",
+			"pre_tool_call"
+		],
+		"Tools": [
+			"aphrodite_retrieve",
+			"aphrodite_compress",
+			"aphrodite_stats",
+			"aphrodite_rebuild",
+			"aphrodite_files",
+			"aphrodite_diff",
+			"aphrodite_search",
+			"aphrodite_directive",
+			"aphrodite_test",
+			"aphrodite_catalog",
+			"aphrodite_reclassify",
+			"aphrodite_prefetch",
+			"aphrodite_prefetch_status"
+		],
+		"InstallMessage": "aphrodite v2.3.2 - CCR compression plugin for Hermes Agent (Rust-powered).\nAll logic in libaphrodite_hermes.dylib - __init__.py is a thin registration shim.\nProxies: token (:9798, SQLite, >1KB), cache (:9797, in-memory, >8KB).\nEngine: default-on context engine - compresses overflowing middle turns once context fills past engine_threshold_pct (default 30; 100+ disables). Guard the conversation edges with engine_protect_first / engine_protect_last / engine_min_msgs.\nFeatures: TOML [templates] (preview/marker/prompts/reverse format strings), auto-expand (inline marker resolution; auto_expand / auto_expand_limit), live containers (instant 'live' markers; APHRODITE_LIVE_CONTAINER or live_container=true), prompt knobs (retrieve_guidance / ccr_marker_hint / catalog_intent_hints), caps (APHRODITE_RECURSIVE_DEPTH default 5; APHRODITE_MAX_REQUEST_BODY_SIZE optional), optional Rhai scripting ('scripting' Cargo feature, rhai pinned 1.27.0).\nPriced retrieval: a marker's size is its retrieval cost - previews answer structural questions (succeeded? which files? how many?); deferral is safe, batch the retrievals you need into one turn.\nDownload: bash download.sh (fetches prebuilt binary + dylib from GitHub Releases).\nLLM API key: REQUIRED - set APHRODITE_API_KEY (or 'aphrodite setup' / api_key in ~/.hermes/aphrodite/aphrodite.toml). Hermes' provider config is NOT reused - see README 'LLM provider configuration'.\nTools: retrieve, compress, stats, rebuild, files, diff, search, directive, test, catalog, reclassify, prefetch, prefetch_status"
+	}
+}
