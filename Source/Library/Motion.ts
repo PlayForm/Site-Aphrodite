@@ -351,7 +351,10 @@ const Compose = (Root: ParentNode, Defer: boolean): void => {
 /**
  * A reveal has arrived. Releasing the CSS pre-hide, the rise and everything the
  * panel owns happen in one tick, so the panel never shows a frame of its
- * pre-hidden state. A [data-enter] nested inside waits for this moment too.
+ * pre-hidden state. A [data-enter] nested inside waits for this moment too -
+ * and so does a [data-run]: the mount pass defers a terminal that sits inside a
+ * reveal, so without this loop the hero's stream was deferred at mount and then
+ * never started by anything, leaving it frozen on its settled frame.
  */
 const Fire = (Target: HTMLElement): void => {
 	Target.dataset.revealed = "1";
@@ -360,6 +363,12 @@ const Fire = (Target: HTMLElement): void => {
 	for (const Inner of Target.querySelectorAll<HTMLElement>("[data-enter]")) {
 		if (Take(Inner)) {
 			Rise(Inner, Number(Inner.dataset.enter) || 0);
+		}
+	}
+
+	for (const Inner of Target.querySelectorAll<HTMLElement>("[data-run]")) {
+		if (Take(Inner)) {
+			Run(Inner);
 		}
 	}
 
