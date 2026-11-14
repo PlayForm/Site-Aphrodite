@@ -43,12 +43,10 @@ in the repo root.
 For every field except the two noted below, the resolution order is **env var → TOML (proxy entry
 → `[defaults]`) → compiled-in default**:
 
-- an env var wins if set
-- and parses;
-  otherwise the proxy entry's value wins
+- an env var wins if set and parses
+- otherwise the proxy entry's value wins
 - otherwise `[defaults]`
-- otherwise the default compiled
-  into the binary.
+- otherwise the default compiled into the binary.
 
 A present-but-malformed env value (e.g. `APHRODITE_CCR_TTL=abc`) is never treated
 as absent - it logs a warning and falls through to the next level.

@@ -51,12 +51,12 @@ Fires when a Hermes session starts.
 
 It resets every piece of per-session state to a clean baseline:
 
-- the turn counter,
-  the conversation index
+- the turn counter
+- the conversation index
 - recent markers
 - referenced files
-- tool-event telemetry,
-  ephemeral directives
+- tool-event telemetry
+- ephemeral directives
 - and the manual directive latch.
 
 It injects nothing.
@@ -80,14 +80,10 @@ both driven by the poll worker and chain-split features:
 - **Auto-backgrounding.** When the poll worker is enabled
   (`APHRODITE_POLL_WORKER`, default on), the hook rewrites a `terminal` or
   `process` call whose command matches the long-running patterns to run in the
-  background:
-
-- it returns a modify action with `background: true` and
-    `notify_on_complete: true`
-- and Hermes runs the tool asynchronously. The
-    agent observes completion through its normal poll flow. `process` calls
-    with `action: poll` are never backgrounded - they are checks
-- not work.
+  background: it returns a modify action with `background: true` and
+  `notify_on_complete: true`, and Hermes runs the tool asynchronously. The
+  agent observes completion through its normal poll flow. `process` calls
+  with `action: poll` are never backgrounded - they are checks, not work.
 - **Chain splitting.** When chain splitting is enabled
   (`APHRODITE_CHAIN_SPLIT=1` or `[compression] chain_split = true`, default
   off), the hook rewrites a chained terminal command (`cd x && cargo build &&

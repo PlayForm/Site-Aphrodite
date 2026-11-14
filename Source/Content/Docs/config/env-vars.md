@@ -19,10 +19,9 @@ but currently inactive" - setting those is a silent no-op.
 
 Precedence rule: where it says "env > TOML > default",
 
-- the env var wins if set
-- and parses;
-  otherwise the matching `aphrodite.toml` key wins if present;
-  otherwise the compiled-in default applies.
+- the env var wins if set and parses
+- otherwise the matching `aphrodite.toml` key wins if present
+- otherwise the compiled-in default applies.
 
 A present-but-malformed value (e.g. `APHRODITE_CCR_TTL=abc`) is never silently treated
 as absent - it logs a warning and falls through to the next precedence level.

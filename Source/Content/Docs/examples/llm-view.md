@@ -231,7 +231,6 @@ Ratios are byte compression of the relayed result; actual token savings depend o
 
 The rule of thumb holds across all five:
 
-- the model sees the shape
-- and the summary
+- the model sees the shape and the summary
   of the content
 - and pays full price only when it asks for the details.

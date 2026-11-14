@@ -17,8 +17,7 @@ The Hermes plugin half runs once per Hermes home inside `register()`:
   and smoke-tests the dylib
 - checks the runtime layout (report-only),
   materializes the built-in directives
-- registers hooks
-- and tools
+- registers hooks and tools
 - and launches the proxy
   when it is not already healthy.
 

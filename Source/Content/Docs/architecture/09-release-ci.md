@@ -12,12 +12,9 @@ that attaches per-platform assets, and a `Finalize` job that fails loudly
 if the matrix came out incomplete (12 assets: 4 targets x binary + dylib + SHA256SUMS).
 
 `Publish.yml` runs tests plus a packaging guard, then a 3-stage crates.io chain:
-
-- on a plain tag push the `aphrodite`
-- and `aphrodite-hermes` publish steps do fire,
-  while `aphrodite-headroom-core` (the vendored dependency published
-  under our own namespace) publishes only via explicit `workflow_dispatch` with
-  `publish_crates=true`.
+on a plain tag push the `aphrodite` and `aphrodite-hermes` publish steps do fire,
+while `aphrodite-headroom-core` (the vendored dependency published
+under our own namespace) publishes only via explicit `workflow_dispatch` with `publish_crates=true`.
 
 ## Build.yml - tag push → release + 4-target matrix
 

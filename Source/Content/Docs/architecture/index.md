@@ -7,10 +7,8 @@ section: "Architecture"
 
 Flow traces of every runtime path in Aphrodite:
 
-- the CCR compression proxy
-  with its dual loopback listeners
-- the Hermes plugin (Python shim → C-ABI dylib → shared core
-  crate)
+- the CCR compression proxy with its dual loopback listeners
+- the Hermes plugin (Python shim → C-ABI dylib → shared core crate)
 - the CI/release pipeline
 - and the data model underneath.
 

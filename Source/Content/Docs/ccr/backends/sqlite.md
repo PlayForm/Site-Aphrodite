@@ -69,13 +69,9 @@ Both forms are equivalent at whole-second resolution.
 
 ## Retention: Space Caps
 
-The TTL bounds the store in _time_ only:
-
-- a burst of compression inside one TTL window is
-  unbounded in rows
-- and bytes
-- and a hot entry's idle clock keeps restarting. Two caps bound it
-  in _space_:
+The TTL bounds the store in _time_ only: a burst of compression inside one TTL window is
+unbounded in rows and bytes, and a hot entry's idle clock keeps restarting. Two caps bound it
+in _space_:
 
 | Cap           | Unit                                   | Config key          | Env override                  | Shipped value |
 | ------------- | -------------------------------------- | ------------------- | ----------------------------- | ------------- |
@@ -122,13 +118,11 @@ that arrangement.
 
 Purge is lazy and debounced:
 
-- a sweep runs from `get`
-- and `put`
+- a sweep runs from `get` and `put`
 - but
   at most once every 60 seconds (`PURGE_DEBOUNCE_SECS`)
 - so a compress-heavy,
-  retrieve-light workload cannot accumulate expired rows
-- and concurrent writes do
+  retrieve-light workload cannot accumulate expired rows and concurrent writes do
   not re-execute the same DELETE.
 
 `force_purge_now()` runs a sweep on demand for diagnostics.

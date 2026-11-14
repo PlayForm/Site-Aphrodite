@@ -51,6 +51,52 @@ no shortcut, and editing a generated file is not one of them.
 
 ---
 
+## The other direction: site to repository
+
+The loop runs both ways. When a passage on the site is better than its
+counterpart in the repository - a richer explanation, a page the repository
+lacks, a clearer example, a corrected figure - that passage is pushed **up**
+into `PlayForm/Aphrodite`. The site's improvement lands in the repository; it is
+never discarded to make convergence easier.
+
+The chain is the same eight steps with a different starting point: the change is
+authored from the site passage, applied to `docs/` in `Development`, ported to
+`Aphrodite-Release`, pushed, `git ls-remote`-verified, and the
+`Module/Aphrodite` pin advanced. Then the site regenerates the page from the
+module instead of hand-carrying it.
+
+- **Union, never intersection.** Where the two ends differ in depth, the union
+  wins, and the union is written by hand where it has to be. Convergence means
+  the best content at both ends, not the smallest set both ends already share.
+- **Nothing is truncated in either direction.** No page is retired because the
+  module lacks it, no rich doc is overwritten by a thinner generated one, and no
+  section is dropped to make a diff smaller.
+- **A site-only page is declared, not deleted.** A passage that exists only on
+  the site is either pushed up or marked site-only with the reason - never
+  silently removed by a regeneration.
+- **Regeneration is the test.** After the pin advance,
+  `DOCS_SOURCE="$PWD/Module/Aphrodite/docs" pnpm run Docs` must reproduce the
+  site's docs tree from the module alone. A diff that survives regeneration is
+  content that still lives only on the site, and it belongs upstream.
+- **Both SHAs are recorded.** A loop that is not written down with its commits
+  is a claim, not a proof.
+
+### Worked references
+
+- **Down** - the repository's plugin badge read `v2.3.1` while
+  `plugins/aphrodite/plugin.yaml` in the same tree said `2.3.2`. Fixed in
+  `Development` (`72a8702b`), ported to `Current` (`e6800070`), pin advanced;
+  `Source/Generated/Primary/README.md` now carries `v2.3.2` from the module.
+- **Up** - two passages that existed only on the site's `/hooks/` page (why the
+  skip gate keeps retrieval cheap, and why the reset seam exists) were added to
+  `docs/plugin/hooks.md` in `Development` (`be7eb539`) and `Current`
+  (`c699ea76`); the same round carried the site's enumerated run-ons back into
+  `docs/` (`01f91a2c` in `Development`, `661dfb8b` in `Current`). The pin
+  advanced to `661dfb8b`, and the regenerated page renders both passages from
+  the module.
+
+---
+
 ## Build
 
 The site is Astro 7 with Tailwind, PostCSS, and the `@playform/{build,compress,inline}`

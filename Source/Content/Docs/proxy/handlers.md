@@ -14,7 +14,7 @@ the routing table, auth model, and middleware are in
 
 Every management handler below (everything except `proxy_handler` and `health_check`)
 additionally requires `Authorization: Bearer <token>` once `APHRODITE_MGMT_TOKEN` is set -
-see [Architecture: Management-Route Authentication](https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/architecture.md#management-route-authentication).
+see [Architecture: Management-Route Authentication](https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/architecture.md).
 
 ## proxy_handler
 
@@ -350,11 +350,9 @@ Does not call the upstream - see `/health/upstream` for that.
 `version` reports the compiled `CARGO_PKG_VERSION`.
 
 `fill_pct` is a **compression-headroom** number, not store occupancy:
-
-- it is `100 - compression_ratio_ema/20` clamped to `[1, 99]`,
-  so a fresh process reports exactly `90.0` **with an empty store**
-- and drifts toward `99`
-  as the ratio approaches `1.0` (i.e. when little is being compressed).
+it is `100 - compression_ratio_ema/20` clamped to `[1, 99]`,
+so a fresh process reports exactly `90.0` **with an empty store** and drifts toward `99`
+as the ratio approaches `1.0` (i.e. when little is being compressed).
 
 `fill_pct_kind` states that explicitly so the field cannot be misread as a capacity gauge.
 

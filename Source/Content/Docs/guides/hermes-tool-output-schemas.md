@@ -40,7 +40,7 @@ for classification and preview.
 
 A caller-supplied type hint always wins.
 
-See [Content Type Taxonomy](/docs/classification/content-types/#classification-pipeline)
+See [Content Type Taxonomy](/docs/classification/content-types/)
 for the full detection order and signals.
 
 ## Threshold Groups
@@ -60,7 +60,7 @@ The base itself is auto-tuned from the historical compression-ratio EMA (ratio a
 ×2.0, below 3 → ×0.5); the noisy group is exempt so build, lint,
 and log output stays readable during a coding session.
 
-See [Content Type Taxonomy](/docs/classification/content-types/#threshold-groups)
+See [Content Type Taxonomy](/docs/classification/content-types/)
 for the full registry.
 
 ## Tool-by-Tool Reference

@@ -13,12 +13,9 @@ The context engine is the dylib session's middle-turn archiver:
 - so the model sees a short history (head + marker +
   tail) instead of a growing list of archived turns.
 
-The archive is **in-place but recoverable**:
-
-- the middle turns are removed
-  from Aphrodite's own conversation index
-- and stored (BLAKE3-keyed) in the inline/CCR store,
-  where `aphrodite_retrieve` can restore them.
+The archive is **in-place but recoverable**: the middle turns are removed
+from Aphrodite's own conversation index and stored (BLAKE3-keyed) in the inline/CCR store,
+where `aphrodite_retrieve` can restore them.
 
 The engine never touches Hermes' message store - Hermes holds the raw conversation;
 the engine compacts Aphrodite's archived-turn index only.
@@ -99,8 +96,7 @@ Threshold semantics: `0` = never archive,
 
 - `>= 100` = engine off (escape hatch)
 - anything
-  between = the fill percentage of the conversation index (`total * 100 / 50`) at
-- or above
+  between = the fill percentage of the conversation index (`total * 100 / 50`) at or above
   which archiving triggers.
 
 Environment overrides TOML, which overrides the default.

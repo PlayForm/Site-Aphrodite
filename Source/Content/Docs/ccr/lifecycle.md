@@ -184,12 +184,9 @@ budget_mult = clamp(0.50 + (budget% / 100) * 0.50, 0.50, 1.0)
 
 ## Session Catalog Emission
 
-Per-turn catalog summaries were emitted delta-only:
-
-- the renderer
-  remembers `last_emitted_marker_count`
-- and `last_emitted_file_count`
-  and reports `+N new compressions this turn` / `+N new files` only when new items arrived,
-  with a stable "no change" line otherwise.
+Per-turn catalog summaries were emitted delta-only: the renderer
+remembers `last_emitted_marker_count` and `last_emitted_file_count`
+and reports `+N new compressions this turn` / `+N new files` only when new items arrived,
+with a stable "no change" line otherwise.
 
 Counters reset on session start.

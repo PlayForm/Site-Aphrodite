@@ -150,7 +150,15 @@ are deliberately excluded so their raw-JSON previews survive.
 ### Headroom Classifier
 
 The hook/FFI pipeline classifies via `headroom_core::transforms`,
-which yields exactly one of: `json_array`, `source_code`, `search`, `build`, `diff`, `html`, `text`.
+which yields exactly one of:
+
+- `json_array`
+- `source_code`
+- `search`
+- `build`
+- `diff`
+- `html`
+- `text`.
 
 These strings are what appear as the `type` field in hook-pipeline markers.
 
@@ -166,8 +174,7 @@ They carry decision-relevant facts rather than generic counts:
   the first real error message is surfaced
 - diffs name the changed files,
   test output shows pass/fail/ignored tallies
-- and JSON previews show item
-- or key counts.
+- and JSON previews show item or key counts.
 
 ### Preview Length Cap
 

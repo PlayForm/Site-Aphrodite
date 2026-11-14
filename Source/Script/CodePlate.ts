@@ -152,7 +152,15 @@ const BuildPlate = (Pre: HTMLPreElement): void => {
 	// CopyButton). It is MOVED into the chip cluster rather than duplicated:
 	// one block, one copy control, one truth - and the cluster is the only
 	// thing that knows where the plate's top-right corner is.
-	const Existing = Host?.querySelector<HTMLElement>("[data-copy]") ?? null;
+	//
+	// The control only counts as THIS block's when the host holds this one
+	// fence. A markdown fence's host is the whole reading column, so a looser
+	// test adopts an unrelated CTA from elsewhere on the page and empties the
+	// block's own cluster.
+	const Existing =
+		Host && Host.querySelectorAll("pre.astro-code").length === 1
+			? Host.querySelector<HTMLElement>("[data-copy]")
+			: null;
 	const Holder = Existing?.parentElement ?? null;
 
 	const Figure = document.createElement("figure");

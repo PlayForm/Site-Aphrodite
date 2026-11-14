@@ -17,8 +17,7 @@ are kept verbatim, not codec-compressed.
 Two sources update the compression-ratio EMA:
 
 - the Chat Completions path (using the rendered
-  marker length)
-- and the direct `/ccr/create` endpoint (using a trigram-uniqueness heuristic
+  marker length) and the direct `/ccr/create` endpoint (using a trigram-uniqueness heuristic
   for the compressed-size estimate)
 - so `/stats` reflects the compressibility
   of everything flowing through the proxy.

@@ -69,7 +69,7 @@ export default async (): Promise<void> => {
 		const { Title, Section } = Meta(Content, Path);
 
 		const Linked = Links(
-			Breakdown(Content),
+			Content,
 			dirname(Path),
 			Routes,
 			(Link) => Stale.push(`${Path}: ${Link}`),

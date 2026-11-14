@@ -52,11 +52,9 @@ of killing the gateway).
 
 Registration is driven by the dylib:
 
-- the shim asks the dylib for its hook names
-- and tool schemas
+- the shim asks the dylib for its hook names and tool schemas
   and registers one callback per name
-- so the hook set
-- and tool set are always registered together
+- so the hook set and tool set are always registered together
   and a broken callback is isolated without failing the others.
 
 `plugin.yaml` declares the same six hooks and thirteen tools for Hermes' manifest.
@@ -155,10 +153,8 @@ The plugin directory stays a pure loader.
 
 Two proxies launch when the plugin loads:
 
-- a cache proxy on `:9797` (in-memory backend,
-  compresses payloads above 8 KB)
-- and a token proxy on `:9798` (SQLite backend,
-  compresses above 1 KB).
+- a cache proxy on `:9797` (in-memory backend, compresses payloads above 8 KB)
+- and a token proxy on `:9798` (SQLite backend, compresses above 1 KB).
 
 The plugin guards the launch - it probes both health endpoints first and skips launching
 when a healthy proxy already owns the ports, and `APHRODITE_NO_AUTO_LAUNCH` disables

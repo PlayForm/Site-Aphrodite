@@ -69,6 +69,6 @@ Both live in the plugin, auto-detect the version and your platform, and fetch th
 
 | Guide                                 | Covers                                                                                                 |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| [Windows install](/docs/install/windows/)         | Fast path with `download.ps1`, plus the fully manual walkthrough                                       |
-| [macOS/Linux install](/docs/install/macos-linux/) | `download.sh`, `aphrodite setup`, building from source                                                 |
-| [Troubleshooting](/docs/install/troubleshooting/) | Proxy not auto-launching, verifying the proxy without a full Hermes session, the two-config-files trap |
+| [Windows install](/docs/install/windows/#option-2-cargo-install--aphrodite-setup)         | Fast path with `download.ps1`, plus the fully manual walkthrough                                       |
+| [macOS/Linux install](/docs/install/macos-linux/#option-2-cargo-install--aphrodite-setup) | `download.sh`, `aphrodite setup`, building from source                                                 |
+| [Troubleshooting](/docs/install/troubleshooting/#two-separate-config-files) | Proxy not auto-launching, verifying the proxy without a full Hermes session, the two-config-files trap |

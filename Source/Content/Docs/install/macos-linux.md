@@ -90,13 +90,13 @@ What `aphrodite setup` does, in order:
 | 7    | Writes the `BINARY_VERSION` pin into the runtime home                                                                                                                                                                                                                                                                                                     |
 | 8    | Runs `hermes plugins enable aphrodite` - a failed registration prints a warning, it does not abort                                                                                                                                                                                                                                                        |
 
-Useful flags: `--cache-port`/`--token-port` (run multiple concurrent Hermes Agents
-on one machine, each pointed at its own port pair),
+Useful flags:
 
-- `--no-launch` (skip auto-starting the
-  proxy after setup)
-- `--force` (rewrite an existing `aphrodite.toml`; the binary, dylibs, loader,
-  and version pin are always refreshed on re-run regardless).
+- `--cache-port`/`--token-port` (run multiple concurrent Hermes Agents on one machine, each
+  pointed at its own port pair)
+- `--no-launch` (skip auto-starting the proxy after setup)
+- `--force` (rewrite an existing `aphrodite.toml`; the binary, dylibs, loader, and version pin
+  are always refreshed on re-run regardless).
 
 ### macOS Gatekeeper handling
 
@@ -105,8 +105,8 @@ and the `target/release` dev-build fallback) goes through one Gatekeeper-safe pa
 
 - `ditto` (metadata-preserving copy)
 - falling back to `fs::copy` + `xattr -c` (clear quarantine),
-  then `install_name_tool -id @rpath/<name>`
-- and an explicit ad-hoc `codesign -f -s -` re-sign
+  then `install_name_tool -id @rpath/<name>` and an explicit ad-hoc `codesign -f -s -`
+  re-sign
   for dylibs.
 
 Every step that fails prints a specific warning instead
@@ -164,7 +164,7 @@ because `aphrodite setup` produced them.
 
 Two proxy processes come up on `:9797` (cache) and `:9798` (token)
 once Hermes launches the plugin (or once you launch `aphrodite` yourself -
-see [Troubleshooting](/docs/install/troubleshooting/#verify-the-proxy-without-hermes)).
+see [Troubleshooting](/docs/install/troubleshooting/#proxy-doesnt-auto-launch)).
 
 ## Uninstall
 

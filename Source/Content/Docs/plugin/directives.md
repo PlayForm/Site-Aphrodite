@@ -140,8 +140,7 @@ for its place in the full 13-tool reference):
 
 - unlike `add` (which is silent when the name is unknown
   or already active)
-- `load` returns a distinct `{loaded, active}` shape
-- and **errors**
+- `load` returns a distinct `{loaded, active}` shape and **errors**
   on an unknown name
 - so a lazy-load typo surfaces instead of being swallowed.
 
@@ -165,6 +164,6 @@ The active set persists across a session reset - it is per-process state, not pe
 ## See also
 
 - [Plugin Hooks](https://github.com/PlayForm/Aphrodite/tree/Current/docs/plugin/hooks.md) - the `pre_llm_call` lifecycle this feature rides
-- [Tool Relay: Tools](https://github.com/PlayForm/Aphrodite/tree/Current/docs/tool-relay/tools.md) - full tool reference
-- [aphrodite.toml Configuration](https://github.com/PlayForm/Aphrodite/tree/Current/docs/config/aphrodite-toml.md) - the `[directives]` section in context
+- [Tool Relay: Tools](https://github.com/PlayForm/Aphrodite/tree/Current/docs/tool-relay/tools.md#7-aphrodite_directive) - full tool reference
+- [aphrodite.toml Configuration](https://github.com/PlayForm/Aphrodite/tree/Current/docs/config/aphrodite-toml.md#directives) - the `[directives]` section in context
 - [Environment Variables](https://github.com/PlayForm/Aphrodite/tree/Current/docs/config/env-vars.md) - the separate config path that feeds the dylib session

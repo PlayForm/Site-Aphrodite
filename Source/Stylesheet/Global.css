@@ -281,7 +281,7 @@ a.code-link:hover code {
    definition of the plate holds on every page. */
 
 body pre.astro-code,
-.zine-plate > pre.astro-code {
+body .zine-plate > pre.astro-code {
 	position: relative;
 	max-width: 100%;
 	margin: 1.75rem 0;
@@ -342,8 +342,8 @@ body pre.astro-code > code {
    `background-color`, so a gradient over it is the one wash a stylesheet can
    apply without `!important`. */
 body pre.astro-code:hover,
-.zine-plate:hover > pre.astro-code,
-.zine-plate:focus-within > pre.astro-code {
+body .zine-plate:hover > pre.astro-code,
+body .zine-plate:focus-within > pre.astro-code {
 	border-color: var(--raw-blood);
 	border-left-color: var(--stamped-canary);
 	box-shadow: 3px 3px 0 var(--outline-oxblood);

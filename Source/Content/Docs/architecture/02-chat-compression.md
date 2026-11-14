@@ -22,8 +22,7 @@ always passes through untouched.
 The HTTP proxy path is a separate pipeline from the Hermes FFI hook path:
 
 - it classifies
-  via `proxy_detect_content_type`
-- and builds previews via `proxy_build_preview`
+  via `proxy_detect_content_type` and builds previews via `proxy_build_preview`
 - and
   never calls the staged transform pipeline (`transforms::detect`,
   `stage2::compress_stage2`, `struct_extract::extract_code_structure`) - those run only

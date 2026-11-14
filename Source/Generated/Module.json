@@ -12,8 +12,8 @@
 	"Module": {
 		"Name": "@playform/aphrodite",
 		"Version": "1.8.1",
-		"Commit": "c699ea76452efc506a39793cb46ce333dc0bb2df",
-		"Branch": "HEAD",
+		"Commit": "661dfb8b0f6e070c05a4539c002c87d470b2f031",
+		"Branch": "Current",
 		"Nested": [
 			{
 				"Path": "plugins/aphrodite",
