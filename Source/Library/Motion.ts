@@ -337,15 +337,25 @@ const Fire = (Target: HTMLElement): void => {
  * panel starts its entrance when it is a tenth of the viewport in rather than
  * the instant its first pixel clips the fold, so the rise happens where the
  * reader is already looking.
+ *
+ * The root is extended far above the viewport and left at -10% below it. The
+ * bottom margin is the deferral: nothing enters from underneath until it is a
+ * tenth in. The top extension is the rescue: an element the reader SKIPPED -
+ * a trackpad flick, a Page Down, an anchor jump on a 36,000px page - goes from
+ * below the fold to above it between two frames, and its intersection ratio
+ * never leaves zero, so no callback would ever fire for it and the CSS
+ * pre-hide would strand its copy at opacity 0 for good. With the root reaching
+ * up, "above the viewport" is intersecting, so the crossing is reported and the
+ * panel is released behind the reader. Content wins over motion.
  */
 const Watch = (): IntersectionObserver => {
 	Watcher ??= new IntersectionObserver(
 		(Entries) => {
 			for (const Entry of Entries) {
-				// The negative margin holds an entrance back until the panel is a
-				// tenth of the viewport in, so the rise happens where the reader
-				// is already looking. An element that can never reach that line -
-				// the last short block of a page, a page that cannot scroll
+				// The negative bottom margin holds an entrance back until the panel
+				// is a tenth of the viewport in, so the rise happens where the
+				// reader is already looking. An element that can never reach that
+				// line - the last short block of a page, a page that cannot scroll
 				// further - would then stay hidden forever, so anything already
 				// inside the viewport is released here instead. The comparison is
 				// against the viewport, not Entry.rootBounds: rootBounds is the
@@ -362,7 +372,7 @@ const Watch = (): IntersectionObserver => {
 				Fire(Entry.target as HTMLElement);
 			}
 		},
-		{ rootMargin: "0px 0px -10% 0px" },
+		{ rootMargin: "100000px 0px -10% 0px" },
 	);
 
 	return Watcher;

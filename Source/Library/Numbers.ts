@@ -114,7 +114,7 @@ export const Benchmark = Complete(
 export const Narrative = Complete(
 	Require(NarrativeJson.Narrative, "Facts/Narrative.json -> Narrative"),
 	"Narrative",
-	["CatalogTypes", "Tiers", "CodeMultiplier", "CodeMultiplierKey", "From"],
+	["CatalogTypes", "Tiers", "CodeMultiplier", "CodeMultiplierKey", "PreviewTokens", "MarkerTokens", "CompressStep", "From"],
 );
 
 /** The classification registry's size, from the docs tree. */

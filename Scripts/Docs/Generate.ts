@@ -118,6 +118,20 @@ export default (Module: string, Site: string): Result => {
 		}
 	}
 
+	// A module doc no row reaches is a page the site does not have, so the table
+	// is checked BEFORE anything is written: a partial write from an incomplete
+	// table is worse than no write at all.
+	const Reached = new Set(Docs.map((Row) => Row.Source));
+
+	const Gaps = Walk(Root)
+		.map((Path) => `docs/${relative(Root, Path).replaceAll("\\", "/")}`)
+		.filter((Path) => !Reached.has(Path))
+		.filter((Path) => !Internal.some(({ Source: Prefix }) => Path.startsWith(Prefix)));
+
+	if (Gaps.length > 0) {
+		return { Written: [], Gaps, Orphans: [], Stale: [], Hermetic: false };
+	}
+
 	const Written: string[] = [];
 	const Stale: string[] = [];
 
@@ -157,14 +171,6 @@ export default (Module: string, Site: string): Result => {
 
 		Written.push(Row.Destination);
 	}
-
-	// A module doc no row reaches is a page the site does not have.
-	const Reached = new Set(Docs.map((Row) => Row.Source));
-
-	const Gaps = Walk(Root)
-		.map((Path) => `docs/${relative(Root, Path).replaceAll("\\", "/")}`)
-		.filter((Path) => !Reached.has(Path))
-		.filter((Path) => !Internal.some(({ Source: Prefix }) => Path.startsWith(Prefix)));
 
 	// A site page no row writes and no `SiteOnly` row declares survives, and is
 	// reported: deleting it would be the one way this generator could reduce the

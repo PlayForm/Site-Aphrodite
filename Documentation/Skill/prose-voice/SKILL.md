@@ -81,9 +81,15 @@ system as a whole. Ground every actor in the cited doc before using it.
 
 ## 5. The source-side mirror
 
-docs prose is edited in the SOURCE tree (`../docs/`, next to the Site), then
-mirrored with `pnpm run Docs` (48 pages into `Source/Content/Docs/`). Never
-edit the generated copies alone - the next sync would clobber the change.
+docs prose is edited in the SOURCE tree - `Module/Aphrodite/docs/`, the pinned
+submodule - then mirrored with `pnpm run Docs` (48 pages into
+`Source/Content/Docs/`). Never edit the generated copies alone: the next sync
+clobbers the change, and the site's copy is not the source of anything.
+
+A page the site carries that the module does not is not deleted to converge.
+Push it UP into `PlayForm/Aphrodite` so it gains a source, or declare it under
+`SiteOnly` in `Scripts/Prepare/Docs.ts` with the reason it exists. Generation
+reports an undeclared page as an orphan and leaves it in place.
 
 ## 6. The arbiters
 

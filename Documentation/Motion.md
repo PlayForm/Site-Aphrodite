@@ -40,8 +40,9 @@ No autoplay, ever. There is no timer in this file: every animation is triggered 
 ### `[data-reveal]`
 
 - **Effect** - the *same* entrance as `[data-enter]`, fired by scroll instead of by mount. Identical distance, duration and easing, so the two read as one language.
-- **Trigger** - `IntersectionObserver`, `rootMargin: 0px 0px -10% 0px`: the panel starts when it is a tenth of the viewport in, not the instant its first pixel clips the fold. Fires **once** per element, then unobserves it.
+- **Trigger** - `IntersectionObserver`, `rootMargin: 100000px 0px -10% 0px`: the panel starts when it is a tenth of the viewport in, not the instant its first pixel clips the fold. Fires **once** per element, then unobserves it.
 - **The release** - an element that can never reach that line (the last short block of a page, a page that cannot scroll any further) would stay hidden forever, so any panel already inside the viewport is released on the observer's first entry. Content wins over motion: the margin only defers what is genuinely below the fold.
+- **The skipped panel** - the root is extended far ABOVE the viewport for the other half of the same problem. A reader who jumps - a trackpad flick, a Page Down, an anchor link on a page tens of thousands of pixels long - can carry a panel from below the fold to above it between two frames. Its intersection ratio then never leaves zero, no callback fires at all, and the pre-hide would strand its copy at `opacity: 0` for good. With the root reaching up, "above the viewport" counts as intersecting, so the crossing is reported and the panel is released behind the reader. The `-10%` bottom margin is untouched, so nothing enters from underneath any earlier than before.
 - **Delay** - same attribute value as a delay in milliseconds: `data-reveal="120"`.
 - **This is the site-wide default entrance** for a static page's sections. Reach for `[data-enter]` only when the sequencing is the point.
 - **Reduced motion** - the pre-hide in `Motion.css` lives inside `@media (prefers-reduced-motion: no-preference)`, so it never applies; the panel is already visible and the 1ms rise is a no-op.

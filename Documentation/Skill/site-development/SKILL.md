@@ -83,14 +83,21 @@ short-line structure:
    transcript/data-array strings, ledger quotes), `<code>` contents, SRC
    citation lines, table rows, mermaid diagram lines - byte-exact, FLAG
    instead.
-5. The docs mirror: edit `../docs/*.md` in the SOURCE tree (hard-wrap the
-   long prose lines, sentence per line, blank lines only between
-   paragraphs), then `pnpm run Docs` to regenerate `Source/Content/Docs/`.
-   A Markdown blank line splits a paragraph - do not add one inside a
-   sentence group. The generator skips `docs/research/`: an explorer report
-   written against a live Hermes runtime home carries local paths and
-   captured session state, so it stays repository-internal instead of
-   becoming a `/docs/research/` page.
+5. The docs mirror: edit the module's docs (`Module/Aphrodite/docs/*.md`, the
+   pinned submodule) - hard-wrap the long prose lines, sentence per line,
+   blank lines only between paragraphs - then `pnpm run Docs` to regenerate
+   `Source/Content/Docs/`. A Markdown blank line splits a paragraph - do not
+   add one inside a sentence group. `Source/Content/Docs/` is a DESTINATION:
+   an edit made there is gone on the next run, so a page that reads better on
+   the site is pushed up into `PlayForm/Aphrodite` first, never patched in the
+   generated copy. The page set is `Scripts/Prepare/Docs.ts`, one row per
+   file: a module doc with no row fails the build (a doc nobody can reach is a
+   page the site lost), a site page with no row is reported as an orphan and
+   LEFT IN PLACE (deleting it is the one way generation could reduce the
+   site), and `docs/research/` is declared `Internal` - an explorer report
+   written against a live Hermes runtime home carries local paths and captured
+   session state, so it stays repository-internal instead of becoming a
+   `/docs/research/` page.
 6. The arbiters: `pnpm run Prepare` (regenerates `Source/Generated/` from
    `Module/Aphrodite` and names the pin it read) after every file; the
    whitespace check is zero space-indented lines (tabs only, tabWidth 4)

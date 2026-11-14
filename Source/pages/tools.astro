@@ -7,24 +7,24 @@ import PageHeader from "@Component/PageHeader.astro";
 import ZineTape from "@Component/ZineTape.astro";
 import ZineBox from "@Component/ZineBox.astro";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
+import { Assert, ToolNames, Tools as Roster, Undeclared } from "@Library/Roster";
+import { ToolProse } from "@Library/Prose/Tools";
+import type { ToolRecord } from "@Library/Records";
 import ToolRelay from "../Content/Mermaid/tool-relay.svg?raw";
 import MarkerFormat from "../Content/Mermaid/marker-format.svg?raw";
 
-const Tools = [
-	{ N: "01", Name: "aphrodite_retrieve", What: "Expand a CCR marker, or read a file, to full content" },
-	{ N: "02", Name: "aphrodite_compress", What: "Store content in CCR and get a marker back" },
-	{ N: "03", Name: "aphrodite_stats", What: "Session and proxy health counters for the CCR engine" },
-	{ N: "04", Name: "aphrodite_files", What: "List file paths touched this session" },
-	{ N: "05", Name: "aphrodite_diff", What: "Per-turn history of what was compressed" },
-	{ N: "06", Name: "aphrodite_search", What: "Find already-compressed entries by keyword or type" },
-	{ N: "07", Name: "aphrodite_directive", What: "Inspect or change the active behavioral directives" },
-	{ N: "08", Name: "aphrodite_test", What: "Smoke-test the compress and retrieve round trip" },
-	{ N: "09", Name: "aphrodite_catalog", What: "List every CCR entry recorded this session" },
-	{ N: "10", Name: "aphrodite_reclassify", What: "Re-detect type and preview for stored entries" },
-	{ N: "11", Name: "aphrodite_prefetch", What: "Read files now and store them as CCR markers" },
-	{ N: "12", Name: "aphrodite_prefetch_status", What: "Live prefetch schedule - what is loaded and ready" },
-	{ N: "13", Name: "aphrodite_rebuild", What: "Report binary and proxy state (never rebuilds)" },
-];
+// THE THIRTEEN - never typed here. `plugin.yaml` decides which tools exist and
+// in what order; `schemas.rs` supplies each one's description and every
+// argument. A tool added upstream appears in this table with no edit to this
+// page, and `Assert` fails the build if the page's prose names one the plugin
+// does not register.
+Assert("Source/Library/Prose/Tools.ts", ToolProse, ToolNames);
+
+const Tools: (ToolRecord & { N: string; Note?: string })[] = Roster.map((Tool, Index) => ({
+	...Tool,
+	N: String(Index + 1).padStart(2, "0"),
+	Note: ToolProse[Tool.Name]?.Note,
+}));
 ---
 
 <Base
@@ -52,7 +52,12 @@ const Tools = [
 								<tr class={I < Tools.length - 1 ? "border-b border-oxblood-dark" : ""}>
 									<td class="py-3 pr-4 align-top text-base font-black text-zinc-dust">{Tool.N}</td>
 									<td class="py-3 pr-6 align-top whitespace-nowrap text-weathered-teal">{Tool.Name}</td>
-									<td class="py-3 align-top text-bone-newsprint">{Tool.What}</td>
+									<td class="py-3 align-top text-bone-newsprint">
+										{Tool.Summary}
+										{Tool.Note ? (
+											<span class="mt-1 block text-zinc-dust">{Tool.Note}</span>
+										) : null}
+									</td>
 								</tr>
 							))}
 						</tbody>
@@ -61,6 +66,13 @@ const Tools = [
 				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
 					THERE IS AN INTERNAL 14TH REGISTRY ENTRY, context_engine_pre_llm - THE CONTEXT
 					ENGINE'S OWN PRE-LLM HOOK, NOT A TOOL AN AGENT CALLS DIRECTLY.
+					{Undeclared.length > 0 ? (
+						<span class="mt-3 block">
+							{Undeclared.map((Tool) => Tool.Name).join(", ")} is compiled in under
+							<code class="font-mono text-base text-weathered-teal">debug_assertions</code> only:
+							a real schema, not a registered tool, so it is named here rather than counted above.
+						</span>
+					) : null}
 				</p>
 
 				<figure
@@ -118,48 +130,49 @@ const Tools = [
 					</figcaption>
 				</figure>
 
+				<ZineTape Variant="section" Label="SCHEMAS // EVERY ARGUMENT" />
 				<h3
 					id="schemas"
 					class="mt-20 mb-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
 				>
-					SCHEMAS // TWO EXEMPLARS
+					SCHEMAS // EVERY TOOL
 				</h3>
+				<p class="mb-12 font-body text-base leading-relaxed text-bone-newsprint">
+					Each panel below is the schema the agent is handed: the description it reads, then every
+					argument with its type and its own sentence. None of it is retyped here - the panels render
+					<code class="font-mono text-base text-weathered-teal">schemas.rs</code> directly, so an
+					argument added to a tool appears on this page without an edit.
+				</p>
 				<div class="grid grid-cols-1 gap-12 lg:grid-cols-2">
-					<div>
-						<h4 class="mb-6 font-headline text-lg font-black uppercase text-bone-white">
-							aphrodite_compress
-						</h4>
-						<div class="mb-6 space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
-							<div><span class="text-zinc-dust">"content":</span> <span class="text-bone-newsprint">{'{ string, minLength 1, required }'}</span></div>
-							<div><span class="text-zinc-dust">"type":</span> <span class="text-bone-newsprint">{'{ enum: code | log | diff | error | json | build_output | text }'}</span></div>
-							<div><span class="text-zinc-dust">"_ccr_center":</span> <span class="text-bone-newsprint">{'{ string, optional label echoed by aphrodite_catalog }'}</span></div>
-							<div class="pt-4 text-zinc-dust">→ returns {'{ hash, type, size, preview, marker }'}</div>
-						</div>
-						<p class="font-body text-base leading-relaxed text-zinc-dust">
-							Hashes the content, classifies it (or trusts the type hint), keeps it in the
-							session store, and hands back a resolvable marker - park bulky text here instead
-							of carrying it in context.
-						</p>
-					</div>
-					<div>
-						<h4 class="mb-6 font-headline text-lg font-black uppercase text-bone-white">
-							aphrodite_retrieve
-						</h4>
-						<div class="mb-6 space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
-							<div><span class="text-zinc-dust">"hash":</span> <span class="text-bone-newsprint">{'{ pattern: ^[0-9a-fA-F]{8,64}$ }'}</span></div>
-							<div><span class="text-zinc-dust">"query":</span> <span class="text-bone-newsprint">{'{ string, case-insensitive line filter }'}</span></div>
-							<div><span class="text-zinc-dust">"path":</span> <span class="text-bone-newsprint">{'{ string, direct workspace read, bypassing CCR }'}</span></div>
-							<div class="pt-4 text-zinc-dust">→ {'{ found: true, source: "ccr"|"path", hash|path, content }'}</div>
-							<div class="text-zinc-dust">→ {'{ found: false, error }'}</div>
-						</div>
-						<p class="font-body text-base leading-relaxed text-zinc-dust">
-							Give hash or path - if both are present, path wins.
-						</p>
-						<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-							The query parameter is the cheap way to poke at a large entry without pulling
-							all of it into context.
-						</p>
-					</div>
+					{
+						Tools.map((Tool) => (
+							<div id={Tool.Name} class="scroll-mt-24">
+								<h4 class="mb-6 font-headline text-lg font-black uppercase text-bone-white">
+									<span class="mr-3 text-zinc-dust">{Tool.N}</span>
+									{Tool.Name}
+								</h4>
+								<div class="mb-6 space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
+									{Tool.Parameters.length === 0 ? (
+										<div class="text-zinc-dust">takes no arguments</div>
+									) : (
+										Tool.Parameters.map((Parameter) => (
+											<div class="mb-3">
+												<div>
+													<span class="text-zinc-dust">"{Parameter.Name}":</span>{" "}
+													<span class="text-bone-newsprint">{`{ ${Parameter.Type}${Parameter.Required ? " · required" : " · optional"} }`}</span>
+												</div>
+												<div class="pl-4 text-zinc-dust">{Parameter.Description}</div>
+											</div>
+										))
+									)}
+								</div>
+								<p class="font-body text-base leading-relaxed text-zinc-dust">{Tool.Description}</p>
+								{(ToolProse[Tool.Name]?.Paragraph ?? []).map((Line) => (
+									<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">{Line}</p>
+								))}
+							</div>
+						))
+					}
 				</div>
 
 				<ZineTape Variant="section" Label="RULE // META-TOOLS" />

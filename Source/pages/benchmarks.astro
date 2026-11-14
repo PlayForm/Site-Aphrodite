@@ -15,7 +15,7 @@ import ZineReveal from "@Component/ZineReveal.astro";
 import StudyLedger from "@Component/StudyLedger.astro";
 import CodeFence from "@Component/CodeFence.astro";
 
-import { Benchmark, Cite, Study } from "@Library/Numbers";
+import { Benchmark, Cite, Narrative, Provenance, Study } from "@Library/Numbers";
 
 // THE FOUR HEADLINE PLATES - one figure each, and every plate carries the
 // sentence that keeps it honest. A ratio without its corpus is a poster: the
@@ -134,7 +134,7 @@ const Plates: Plate[] = [
 		Figure: Benchmark.Classify,
 		Caption: "THE FLOOR",
 		Body: [
-			"The compress path itself stays under 1 ms.",
+			`The whole compress step is ${Narrative.CompressStep}.`,
 			"Classification is the step before it: naming the content type costs nanoseconds, and it runs on every call.",
 		],
 		Src: `SRC: ${Cite(Benchmark.From)}`,
@@ -206,6 +206,39 @@ const Needs = [
 		Text: "Every figure above is a release run - the commands below pass --release - and a debug build is not comparable to the plates.",
 	},
 ];
+
+// THE PROVENANCE TABLE - the chain behind every figure, in the order a reader
+// meets the figures on the page. The paths are the generator's own record of
+// what it read, so the table cannot name a file the build did not open.
+const ProvenanceRows = [
+	{
+		Fact: "the measured study",
+		From: Provenance.Study,
+		Feeds: "the session ledger, the session-shape bands, the retrieval tax",
+	},
+	{
+		Fact: "the benchmark corpus",
+		From: Provenance.Benchmark,
+		Feeds: "the four plates and the per-type chart",
+	},
+	{
+		Fact: "the classification surface",
+		From: Provenance.Narrative,
+		Feeds: "the catalog count and the threshold tiers",
+	},
+	{
+		Fact: "the classification registry",
+		From: Provenance.Registry,
+		Feeds: "the registry size the catalog footnote quotes",
+	},
+	{
+		Fact: "the release history",
+		From: Provenance.Releases,
+		Feeds: "the release register on /versions/",
+	},
+].map(({ Fact, From, Feeds }) => ({
+	Cells: [{ Text: Fact }, { Text: From }, { Text: Feeds }],
+}));
 ---
 
 <Base
@@ -364,7 +397,7 @@ const Needs = [
 					call.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					The compress path stays under 1 ms.
+					The whole compress step is {Narrative.CompressStep}.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
 					{Benchmark.Latency} is what a client waits once the HTTP round-trip is included.
@@ -568,6 +601,50 @@ const Needs = [
 			/>
 		</section>
 
+		<!-- PROVENANCE: where every figure on this page comes from. A page that
+		     can silently keep an old number is a page that cannot be cited, so the
+		     build reads these files on every run and stops when one stops carrying
+		     the figure the page prints. -->
+		<section class="relative w-full">
+			<ZineTape Variant="section" Label="PROVENANCE // WHERE THESE NUMBERS COME FROM" Color="bone" />
+			<ZineBox Size="lg" Rotate="rotate-[0.4deg]">
+				<h2
+					id="provenance"
+					class="mb-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
+				>
+					Nothing on this page is typed
+				</h2>
+				<p class="font-body text-base leading-relaxed text-bone-newsprint">
+					Every figure above is extracted from the repository on the build that produced this
+					page - not copied into a template once and trusted afterwards.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					The generator reads the README and the docs tree, writes the numbers into a
+					generated record, and the page renders that record. A figure the repository stops
+					carrying stops the build; it never survives as a stale plate.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+					The table below is the whole chain: the fact, the file it is read from, and the
+					part of this page it feeds.
+				</p>
+				<div class="mt-8">
+					<ZineLedger
+						Headers={["FACT", "READ FROM", "WHAT IT FEEDS"]}
+						Rows={ProvenanceRows}
+					/>
+				</div>
+				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
+					A wrong figure is fixed in the repository and the pin advances - never in the
+					generated record, which the next build overwrites.
+				</p>
+				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					That is what makes the SRC line under each plate an address rather than a
+					formality: the line numbers beside it come from the same pass that produced the
+					number above it.
+				</p>
+			</ZineBox>
+		</section>
+
 		<!-- THE HARNESS: how a reader runs it, and what each example proves -->
 		<section class="relative w-full" data-reveal>
 			<ZineTape Variant="section" Label="REPRODUCE // BENCH HARNESS" Color="teal" />
@@ -695,7 +772,7 @@ $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
 					A compression proxy earns its place on the ordinary turn - a diff, a build log, a
-					terminal dump - where the ratio is 20× to 140× and the model keeps working from
+					terminal dump - where the ratio is {Floor.Ratio} to {RunnerUp.Ratio} and the model keeps working from
 					the preview.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">

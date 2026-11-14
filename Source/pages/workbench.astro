@@ -232,7 +232,12 @@ const Arc: readonly {
 		<SectionNav Sections={Sections} />
 
 		<!-- THE FOUR STEPS: the rail, the pair, the readout. The component owns its
-		     own <section>, so the anchor the index links to is this wrapper. -->
+		     own <section>, so the anchor the index links to is this wrapper.
+		     This page has no [data-stream]: its raw pane is a textarea the reader
+		     fills, so there is no fixed set of lines to print one at a time. The
+		     stagger belongs on a captured stream - the landing page's build log,
+		     the case study's flood, the showcase's twenty outputs - and putting
+		     it here would animate an empty box. -->
 		<div
 			id="pipeline"
 			role="region"

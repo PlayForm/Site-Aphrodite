@@ -21,6 +21,7 @@ import {
 	Cite,
 	Narrative,
 	Registry,
+	Release,
 	Study as StudyFacts,
 } from "@Library/Numbers";
 
@@ -167,7 +168,7 @@ const Classifier = { PipelineTypes: Narrative.CatalogTypes, RegistryTypes: Regis
 // the rest are the layer's names, not numbers.
 const Layers = [
 	{ N: "01", Name: "CLASSIFY", Figure: Benchmark.Classify, Tone: "raw", Note: "the gate: one type per invocation, first match wins" },
-	{ N: "02", Name: "PREVIEW", Figure: "~15 tok", Tone: "canary", Note: "the answer to 'do I care?' without the content" },
+	{ N: "02", Name: "PREVIEW", Figure: Narrative.PreviewTokens, Tone: "canary", Note: "the answer to 'do I care?' without the content" },
 	{ N: "03", Name: "STORE", Figure: "BLAKE3", Tone: "teal", Note: "SQLite / in-memory, the marker is the receipt" },
 	{ N: "04", Name: "DECIDE", Figure: "RETRIEVE?", Tone: "raw", Note: "the agent, not the engine, spends the budget" },
 ] as const;
@@ -381,6 +382,14 @@ const Arcs = [
 	},
 ] as const;
 
+// Every version an arc's span names must exist in the CHANGELOG. The history
+// spine is the one place this page asserts that a release happened, so this is
+// where a citation of a release the repository never cut stops the build -
+// `Release` throws with the version it could not find.
+for (const Arc of Arcs) {
+	for (const Version of Arc.Span.match(/v[\d.]+/g) ?? []) Release(Version);
+}
+
 // The arcs with their three beats normalized: `[Beat].flat()` turns a
 // single-sentence beat into a one-entry array and leaves a multi-sentence beat
 // as it is, so the template has exactly one shape to render.
@@ -538,8 +547,8 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					inside the prompt.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Aphrodite replaces the output with a compact, structured preview - ~15
-					tokens of metadata instead of hundreds - and keeps the full content
+					Aphrodite replaces the output with a compact, structured preview - {Narrative.PreviewTokens}
+					of metadata instead of hundreds - and keeps the full content
 					retrievable.
 				</p>
 			</ZineBox>
@@ -579,7 +588,7 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					A single compression policy cannot serve both.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					So the type-aware classifier runs first - 40 to 123 nanoseconds, first
+					So the type-aware classifier runs first - {Benchmark.Classify}, first
 					match wins - and each content type carries its own compression threshold
 					tier.
 				</p>
@@ -875,7 +884,7 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					<!-- Real-world per-output compression -->
 					<div class="flex flex-col gap-8">
 						<ZineKicker Tone="dust" As="div">
-							REAL-WORLD PER-OUTPUT COMPRESSION (ORIG → ~33-TOK MARKER)
+							REAL-WORLD PER-OUTPUT COMPRESSION (ORIG → {Narrative.MarkerTokens.toUpperCase()} MARKER)
 						</ZineKicker>
 						{
 							RealWorld.map(({ Type, Ratio, Percent }) => (

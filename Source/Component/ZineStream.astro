@@ -31,5 +31,19 @@ const Tone = {
 	class="ccr-marker border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust"
 	data-stream={Stream ? "" : undefined}
 >
-	{Lines.map(({ Text, Tone: LineTone = "plain" }) => <div class={Tone[LineTone]} set:html={Text} />)}
+	{
+		/*
+		 * The tone lives on an INNER span, never on the line itself. The stream
+		 * animation runs on the line and fills `opacity: 1` for good, which would
+		 * flatten the suppression law (dim 70 / fade 40 / mute 25) the moment the
+		 * log finished printing - the pane would lose the one thing it is there to
+		 * show. One wrapper div per line, one span inside it: the line animates,
+		 * the span keeps its tone, and the two opacities multiply.
+		 */
+		Lines.map(({ Text, Tone: LineTone = "plain" }) => (
+			<div>
+				<span class={Tone[LineTone]} set:html={Text} />
+			</div>
+		))
+	}
 </div>

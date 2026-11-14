@@ -129,12 +129,14 @@ generated surface; the other three shape what it renders.
   missing, fails with the remedy rather than a stack trace when they are
   unreachable, and emits into `Source/Generated/`. It never writes into the
   module and never deletes a destination.
-- **Docs** - `pnpm run Docs` regenerates `Source/Content/Docs/` from the docs
-  tree: every markdown file becomes one `/docs/<slug>/` page, relative links
-  between docs files are rewritten to site routes, and repository deep-links are
-  recomposed through `Source/Library/Links.ts` at the canonical branch. Without
-  the monorepo (a standalone deploy checkout) the committed generated content is
-  used as-is.
+- **Docs** - `pnpm run Docs` regenerates `Source/Content/Docs/` from
+  `Module/Aphrodite/docs`: every markdown file becomes one `/docs/<slug>/` page,
+  relative links between docs files are rewritten to site routes, repository
+  deep-links are recomposed through `Source/Library/Links.ts` at the canonical
+  branch, and each page's frontmatter names the module file it came from. The
+  page set is `Scripts/Prepare/Docs.ts` - one row per file, so a module doc with
+  no row fails the build instead of disappearing. Without the module (a
+  standalone deploy checkout) the committed generated content is used as-is.
 - **Diagrams** - `pnpm run Diagrams` extracts every `mermaid` fence, renders it
   to SVG, and writes the placement manifest the pages read.
 - **Redirects** - `pnpm run Redirects` regenerates `Public/_redirects` from the

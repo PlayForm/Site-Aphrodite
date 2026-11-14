@@ -129,72 +129,35 @@ const Example = [
 // doc's own columns (docs/config/aphrodite-toml.md); Reader says which of the
 // two parsers reads it; Live says when a change takes effect; Chain and From
 // are what the resolution ladder needs to walk the value. The shape itself is
-// Records.ts - this array fills it, it does not declare it.
-const Keys: ConfigKeyLadderRecord[] = [
-	// [[proxies]] - one entry per listener; [defaults] repeats four of these keys.
-	{ Key: "name", Section: "[[proxies]]", Type: "string", Default: "the listen address", Reader: "proxy", Live: "startup", Effect: "Proxy label; the port overrides (APHRODITE_CACHE_PORT / APHRODITE_TOKEN_PORT) match on it" },
-	{ Key: "listen", Section: "[[proxies]]", Type: '"addr:port"', Default: "127.0.0.1:9797", Env: "port only: APHRODITE_CACHE_PORT / APHRODITE_TOKEN_PORT", Reader: "proxy", Live: "startup", Effect: "Bind address; loopback by default, and non-loopback peers are rejected on every route except /health", Chain: "toml-only", From: "proxy" },
-	{ Key: "mode", Section: "[[proxies]]", Type: '"cache" | "token"', Default: '"token"', Reader: "proxy", Live: "startup", Effect: "Backend and compiled threshold: token = SQLite above 1 KB, cache = in-memory above 8 KB", Chain: "toml-only", From: "proxy" },
-	{ Key: "api_key", Section: "[[proxies]]", Type: "string", Default: "none - the proxy refuses to start", Env: "APHRODITE_API_KEY (last, not first)", Reader: "proxy", Live: "startup", Effect: "Upstream key; the one chain where TOML outranks the env var", Chain: "toml-first", From: "proxy" },
-	{ Key: "api_url", Section: "[[proxies]]", Type: "url", Default: "https://api.openai.com", Env: "APHRODITE_API_URL", Reader: "proxy", Live: "startup", Effect: "Upstream API base URL", From: "proxy" },
-	{ Key: "model", Section: "[[proxies]]", Type: "string", Default: '"default-model"', Env: "APHRODITE_MODEL", Reader: "proxy", Live: "startup", Effect: "Model name to forward", From: "proxy" },
-	{ Key: "tool_relay", Section: "[[proxies]]", Type: "bool", Default: "false", Reader: "proxy", Live: "startup", Effect: "Enables the /tool/relay endpoint", From: "proxy" },
-	{ Key: "dev", Section: "[[proxies]]", Type: "bool", Default: "false", Reader: "proxy", Live: "startup", Effect: "Verbose request and response logging" },
-	{ Key: "ccr_ttl_seconds", Section: "[[proxies]]", Type: "int (seconds)", Default: "3600", Env: "APHRODITE_CCR_TTL", Reader: "proxy", Live: "startup", Effect: "CCR entry time-to-live", From: "proxy" },
-	{ Key: "ccr_db_path", Section: "[[proxies]]", Type: "path", Default: "~/.hermes/aphrodite/ccr.db", Env: "APHRODITE_DB", Reader: "proxy", Live: "startup", Effect: "SQLite path for the token proxy; a relative path resolves against the binary's directory", From: "proxy" },
-	{ Key: "notify_url", Section: "[[proxies]]", Type: "url", Default: "none", Env: "APHRODITE_NOTIFY_URL", Reader: "proxy", Live: "startup", Effect: "Hermes callback URL for CCR-create notifications" },
-	{ Key: "notify_key", Section: "[[proxies]]", Type: "string", Default: "none", Env: "APHRODITE_NOTIFY_KEY", Reader: "proxy", Live: "startup", Effect: "Bearer token sent with notify_url" },
-	{ Key: "timeout", Section: "[[proxies]]", Type: "int (seconds)", Default: "300", Reader: "proxy", Live: "startup", Effect: "Upstream request timeout, clamped to 600 with a warning" },
-	{ Key: "max_context", Section: "[[proxies]]", Type: "int (tokens)", Default: "1,000,000", Reader: "proxy", Live: "startup", Effect: "Max context tokens" },
-	{ Key: "max_output", Section: "[[proxies]]", Type: "int (tokens)", Default: "384,000", Reader: "proxy", Live: "startup", Effect: "Max output tokens; the proxy refuses to start when it is at or above max_context" },
+// Records.ts, and the rows are generated - see the roster below.
+import { Assert, ConfigKeys as GeneratedKeys, ConfigNames } from "@Library/Roster";
+import { ConfigProse } from "@Library/Prose/Config";
+// THE KEY ROSTER - generated, never typed here.
+//
+// `Source/Generated/Facts/Config.json` is built from
+// `docs/config/aphrodite-toml.md` joined to `aphrodite.toml.example`, so a key
+// the module declares appears on this page with no edit to it, and a key this
+// page invents cannot survive `Assert`. The page's own sentences live in
+// `@Library/Prose/Config` and may only deepen a row: which keys exist, their
+// section, default, env override and reader all come from the module.
+const Keys: ConfigKeyLadderRecord[] = GeneratedKeys.map((Key) => {
+	const { DefaultNote, ...Prose } = ConfigProse[Key.Key] ?? {};
 
-	// [compression] - one table, two consumers, which is what the READER column shows.
-	{ Key: "tool_threshold_token", Section: "[compression]", Type: "int (bytes)", Default: "1024 (example 256)", Env: "APHRODITE_TOOL_THRESHOLD_TOKEN", Reader: "proxy", Live: "hot", Effect: "Token-proxy compression threshold - the gate every tool result crosses", Detail: "token proxy threshold (bytes) - hot-reloads" },
-	{ Key: "tool_threshold_cache", Section: "[compression]", Type: "int (bytes)", Default: "8192 (example 2048)", Env: "APHRODITE_TOOL_THRESHOLD_CACHE", Reader: "proxy", Live: "hot", Effect: "Cache-proxy compression threshold", Detail: "cache proxy threshold (bytes) - hot-reloads" },
-	{ Key: "inline_threshold", Section: "[compression]", Type: "int (bytes)", Default: "256 (example 1024)", Env: "APHRODITE_INLINE_THRESHOLD", Reader: "proxy", Live: "hot", Effect: "Inline zlib versus the durable CCR store", Detail: "inline-vs-durable cutoff (bytes) - hot-reloads" },
-	{ Key: "code_multiplier", Section: "[compression]", Type: "float", Default: "3.0 (example 1.0)", Env: "APHRODITE_CODE_MULTIPLIER", Reader: "proxy", Live: "hot", Effect: "Multiplies the threshold for code_* content types; 1.0 gives code no extra headroom", Detail: "multiplies the threshold for code_* types - hot-reloads" },
-	{ Key: "auto_expand", Section: "[compression]", Type: "bool", Default: "false (example true)", Env: "APHRODITE_AUTO_EXPAND", Reader: "both", Live: "hot", Effect: "Resolve just-stored content inline instead of emitting a marker, capped by auto_expand_limit", Detail: "resolve just-stored content inline instead of a marker - hot-reloads" },
-	{ Key: "auto_expand_limit", Section: "[compression]", Type: "int (bytes)", Default: "102400", Env: "APHRODITE_AUTO_EXPAND_LIMIT", Reader: "both", Live: "hot", Effect: "Byte cap for auto-expanded content; 0 = unlimited", Detail: "byte cap for auto-expanded content; 0 = unlimited" },
-	{ Key: "max_request_body_size", Section: "[compression]", Type: "int (bytes)", Default: "none - no cap", Env: "APHRODITE_MAX_REQUEST_BODY_SIZE", Reader: "proxy", Live: "startup", Effect: "Request-body cap; an over-size body is rejected with 413 while it is read", Detail: "the cap is applied while the body streams in, so an over-size request is refused before it is buffered whole" },
-	{ Key: "store_max_entries", Section: "[compression]", Type: "int (rows)", Default: "100000", Env: "APHRODITE_STORE_MAX_ENTRIES", Reader: "proxy", Live: "load", Effect: "Max live rows in the SQLite store; past it the least-recently-accessed rows are evicted; 0 = unlimited", Detail: "max live rows in the SQLite store - LRU evicts past it; read at store open, not hot-reloaded" },
-	{ Key: "store_max_bytes", Section: "[compression]", Type: "int (bytes)", Default: "536870912", Env: "APHRODITE_STORE_MAX_BYTES", Reader: "proxy", Live: "load", Effect: "Max stored payload bytes, SUM(LENGTH(original)); past it LRU rows are evicted; 0 = unlimited", Detail: "max stored payload bytes, SUM(LENGTH(original)) - LRU evicts past it; read at store open, not hot-reloaded" },
-	{ Key: "terminal_threshold", Section: "[compression]", Type: "int (bytes)", Default: "1024 (example 256)", Env: "APHRODITE_TERMINAL_THRESHOLD", Reader: "dylib", Live: "load", Effect: "Terminal-output threshold gating transform_terminal_output", Detail: "dylib terminal-output threshold" },
-	{ Key: "poll_worker", Section: "[compression]", Type: "bool", Default: "true", Env: "APHRODITE_POLL_WORKER", Reader: "dylib", Live: "load", Effect: "Auto-backgrounding of slow terminal and process calls in pre_tool_call", Detail: "the rewrite happens before the call runs, so the transcript never shows the backgrounding" },
-	{ Key: "chain_split", Section: "[compression]", Type: "bool", Default: "false", Env: "APHRODITE_CHAIN_SPLIT", Reader: "dylib", Live: "load", Effect: "Opt-in command splitting into per-segment markers", Detail: "off by default because invisible segment markers pollute redirected stdout" },
-	{ Key: "chain_split_min_segments", Section: "[compression]", Type: "int", Default: "2", Env: "APHRODITE_CHAIN_SPLIT_MIN_SEGMENTS", Reader: "dylib", Live: "load", Effect: "Floor for the adaptive split threshold", Detail: "below this many segments the command is left whole" },
-	{ Key: "chain_split_max_segments", Section: "[compression]", Type: "int", Default: "6", Env: "APHRODITE_CHAIN_SPLIT_MAX_SEGMENTS", Reader: "dylib", Live: "load", Effect: "Cap for the adaptive split threshold", Detail: "past this many segments the split stops, so one command cannot flood the transcript with markers" },
-	{ Key: "context_engine", Section: "[compression]", Type: "bool", Default: "true", Env: "APHRODITE_CONTEXT_ENGINE", Reader: "dylib", Live: "load", Effect: "Enables the context engine; the standalone HTTP proxy never reads it", Detail: "opt-in dylib status flag; the HTTP proxy never reads it" },
-	{ Key: "engine_threshold_pct", Section: "[compression]", Type: "int (%)", Default: "45 (example 30)", Env: "APHRODITE_ENGINE_THRESHOLD_PCT", Reader: "dylib", Live: "load", Effect: "Context-engine fill gate: middle turns are archived at or above this fill; 0 = never, 100+ = off", Detail: "LOAD-BEARING (dylib): middle-turn archiving + engine_offload prompt; 100+ = off" },
-	{ Key: "engine_protect_first", Section: "[compression]", Type: "int (turns)", Default: "2", Env: "APHRODITE_ENGINE_PROTECT_FIRST", Reader: "dylib", Live: "load", Effect: "Turns kept at the start of the index", Detail: "LOAD-BEARING (dylib): turns kept at the start of the index" },
-	{ Key: "engine_protect_last", Section: "[compression]", Type: "int (turns)", Default: "5", Env: "APHRODITE_ENGINE_PROTECT_LAST", Reader: "dylib", Live: "load", Effect: "Turns kept at the end of the index", Detail: "LOAD-BEARING (dylib): turns kept at the end of the index" },
-	{ Key: "engine_min_msgs", Section: "[compression]", Type: "int (turns)", Default: "8", Env: "APHRODITE_ENGINE_MIN_MSGS", Reader: "dylib", Live: "load", Effect: "Minimum archived turns before the engine may archive", Detail: "LOAD-BEARING (dylib): minimum messages before the engine activates" },
-	{ Key: "live_container", Section: "[compression]", Type: "bool", Default: "false", Env: "APHRODITE_LIVE_CONTAINER", Reader: "dylib", Live: "load", Effect: "Instant CCR markers with the live type, for progressive retrieval", Detail: "instant 'live' CCR markers for large tool results" },
-	{ Key: "recursive_depth", Section: "[compression]", Type: "int", Default: "5", Env: "APHRODITE_RECURSIVE_DEPTH", Reader: "dylib", Live: "load", Effect: "Nested marker expansion cap", Detail: "max nested marker expansion depth" },
-	{ Key: "auto_reload", Section: "[compression]", Type: "bool", Default: "false (example true)", Env: "APHRODITE_AUTO_RELOAD", Reader: "dylib", Live: "load", Effect: "Watch aphrodite.toml and re-apply config fields on change", Detail: "watch aphrodite.toml and re-apply config fields on change" },
-	{ Key: "catalog_mode", Section: "[compression]", Type: "-", Default: "none", Reader: "none", Live: "unwired", Effect: "Parses; the catalog layout is compiled-in, so this is a silent no-op", Detail: "a key that parsed and did nothing was worse than an undocumented one, so the ledger names it" },
-	{ Key: "classifier_poll", Section: "[compression]", Type: "-", Default: "none", Reader: "none", Live: "unwired", Effect: "Parses; nothing reads it back", Detail: "classification is per invocation, not polled, so there is no interval for this key to set" },
-	{ Key: "prefetch", Section: "[compression]", Type: "-", Default: "none", Reader: "none", Live: "unwired", Effect: "Parses; the aphrodite_prefetch tool exists regardless of this key", Detail: "the tool is registered unconditionally, so turning this off disables nothing" },
+	// Three sentences can describe one key and each says something the others
+	// do not: the module's own annotation, the page's gloss, and the page's
+	// wording for a default the module states more tersely. None is dropped.
+	const Detail = [Key.Detail, Prose.Detail, DefaultNote].filter(Boolean).join(" \u00b7 ");
 
-	// [previews] and [prompts] - the render-side knobs.
-	{ Key: "preview_max_chars", Section: "[previews]", Type: "int (chars)", Default: "0 (unlimited)", Env: "APHRODITE_PREVIEW_MAX_CHARS", Reader: "both", Live: "hot", Effect: "Caps the whole rendered preview string, not per line; 0 = unlimited" },
-	{ Key: "model_family", Section: "[previews]", Type: '"compact" | "code_first" | "balance"', Default: '"code_first"', Reader: "both", Live: "load", Effect: "Selects the [templates.preview.<family>.*] family when templates are configured" },
-	{ Key: "code_structure_map", Section: "[previews]", Type: "bool", Default: "none", Reader: "none", Live: "unwired", Effect: "Reserved: include function, struct and class signatures in code previews" },
-	{ Key: "rust_preview_lines", Section: "[previews]", Type: "int", Default: "none", Reader: "none", Live: "unwired", Effect: "Reserved: lines of Rust source to include in previews" },
-	{ Key: "session_inject", Section: "[prompts]", Type: "string", Default: "the shipped builtin", Env: "APHRODITE_SESSION_INJECT", Reader: "dylib", Live: "load", Effect: 'First-turn orientation text injected on turn 0; "" disables it' },
-	{ Key: "retrieve_guidance", Section: "[prompts]", Type: '"minimal" | "standard" | "verbose"', Default: '"minimal"', Env: "APHRODITE_RETRIEVE_GUIDANCE", Reader: "dylib", Live: "load", Effect: "How much retrieval guidance the per-turn assembler renders as the [retrieval: ...] line" },
-	{ Key: "ccr_marker_hint", Section: "[prompts]", Type: "bool", Default: "false", Env: "APHRODITE_CCR_MARKER_HINT", Reader: "dylib", Live: "hot", Effect: "Append a retrieval hint after markers - it fills the marker template's {hint}" },
-	{ Key: "catalog_intent_hints", Section: "[prompts]", Type: "bool", Default: "false", Env: "APHRODITE_CATALOG_INTENT_HINTS", Reader: "dylib", Live: "load", Effect: "Intent hints alongside the hashes in catalog output" },
+	return {
+		...Key,
+		...Prose,
+		Type: Prose.Type ?? Key.Type,
+		Effect: Prose.Effect ?? Key.Effect,
+		...(Detail === "" ? {} : { Detail }),
+	};
+});
+Assert("Source/Library/Prose/Config.ts", ConfigProse, ConfigNames);
 
-	// [directives] and [flow] - the per-turn context knobs.
-	{ Key: "active", Section: "[directives]", Type: "array of strings", Default: "an empty list seeds focus, foresight and lazy", Reader: "dylib", Live: "load", Effect: "Which loaded directives start active; unknown names are filtered out, and the set is runtime-mutable through aphrodite_directive" },
-	{ Key: "budget_chars", Section: "[flow]", Type: "int (chars)", Default: "4000 (example 2600)", Env: "APHRODITE_FLOW_BUDGET_CHARS", Reader: "dylib", Live: "load", Effect: "Hard cap on ALL per-turn injected context; sections drop bottom-up, and directives and nudges never drop" },
-
-	// [templates] - live format strings, absent means the hardcoded builder.
-	{ Key: "preview.<family>.<ctype>", Section: "[templates]", Type: "format string", Default: "the hardcoded builder", Reader: "both", Live: "load", Effect: "Preview format per content type; resolution is family[ctype], then reverse[ctype], then family[_default], then the hardcoded builder" },
-	{ Key: "marker.format / marker.hint", Section: "[templates]", Type: "format string", Default: "the shipped default", Reader: "both", Live: "hot", Effect: "Marker block layout, and the retrieval hint appended after markers" },
-	{ Key: "prompts.<name>", Section: "[templates]", Type: "format string", Default: "the shipped default", Reader: "dylib", Live: "load", Effect: "Named prompt templates rendered into the per-turn context: session_inject, engine_offload, auto_expand_guidance, catalog_context_warn" },
-	{ Key: "reverse.<ctype>", Section: "[templates]", Type: "string", Default: "none", Reader: "both", Live: "load", Effect: "ctype -> key remap: lets a content type borrow another type's format string" },
-];
 
 // A sentence under the sections that need one - the table cannot say these.
 const SectionNotes: Record<string, string> = {

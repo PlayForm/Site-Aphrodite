@@ -46,6 +46,9 @@
 		],
 		"CodeMultiplier": "×1.0",
 		"CodeMultiplierKey": "code_multiplier",
+		"PreviewTokens": "~15 tok",
+		"MarkerTokens": "~33 tok",
+		"CompressStep": "sub-millisecond",
 		"From": "Module/Aphrodite/README.md:305-371"
 	},
 	"Registry": {

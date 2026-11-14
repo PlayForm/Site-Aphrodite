@@ -9,6 +9,7 @@ import ZineBox from "@Component/ZineBox.astro";
 import ZineSource from "@Component/ZineSource.astro";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import SessionLifecycle from "../Content/Mermaid/session-lifecycle.svg?raw";
+import { ToolNames } from "@Library/Roster";
 
 const Previews = [
 	"[build:1E 1W 142L | error[E0432]: unresolved import ...]",
@@ -40,7 +41,7 @@ const ProxyRows = [
 	{ F: "Auto-launch", Plugin: "proxies spawn at plugin load", Proxy: "manual aphrodite command" },
 	{
 		F: "aphrodite_* tools",
-		Plugin: "13 tools in agent namespace",
+		Plugin: `${ToolNames.length} tools in agent namespace`,
 		Proxy: "agent doesn't know about them",
 	},
 	{ F: "Prompt injection", Plugin: "directives, nudges, catalog", Proxy: "unavailable" },

@@ -7,6 +7,7 @@ import PageHeader from "@Component/PageHeader.astro";
 import ZineTape from "@Component/ZineTape.astro";
 import ZineBox from "@Component/ZineBox.astro";
 import ZineSource from "@Component/ZineSource.astro";
+import { HookNames, ToolNames } from "@Library/Roster";
 
 // THE THREE HOSTS - the table is the page's claim in one shape: what each
 // flavor is, what it can see inside the agent, and where it stands today.
@@ -112,8 +113,8 @@ const Hosts = [
 					This is the flavor this site documents.
 				</p>
 				<div class="mt-8 flex flex-wrap gap-6">
-					<span class="border border-oxblood-dark bg-soot-black px-3 py-1 font-mono text-base uppercase text-bone-newsprint">6 HOOKS</span>
-					<span class="border border-oxblood-dark bg-soot-black px-3 py-1 font-mono text-base uppercase text-bone-newsprint">13 TOOLS</span>
+					<span class="border border-oxblood-dark bg-soot-black px-3 py-1 font-mono text-base uppercase text-bone-newsprint">{HookNames.length} HOOKS</span>
+					<span class="border border-oxblood-dark bg-soot-black px-3 py-1 font-mono text-base uppercase text-bone-newsprint">{ToolNames.length} TOOLS</span>
 					<span class="border border-oxblood-dark bg-soot-black px-3 py-1 font-mono text-base uppercase text-bone-newsprint">CONTEXT ENGINE</span>
 					<span class="border border-oxblood-dark bg-soot-black px-3 py-1 font-mono text-base uppercase text-bone-newsprint">DIRECTIVES</span>
 				</div>

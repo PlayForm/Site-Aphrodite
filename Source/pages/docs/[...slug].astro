@@ -2,6 +2,7 @@
 import Base from "@Layout/Base.astro";
 import DocsSidebar from "../../Component/DocsSidebar.astro";
 import ZineDiagramNav from "../../Component/ZineDiagramNav.astro";
+import { Link as RepoLink, OurRepo } from "../../Library/Links.ts";
 
 import CcrPipeline from "../../Content/Mermaid/ccr-pipeline.svg?raw";
 import ConfigResolution from "../../Content/Mermaid/config-resolution.svg?raw";
@@ -295,6 +296,27 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 						{Doc.data.title}
 					</h1>
 				</header>
+
+				<!-- Provenance: the page IS a module file, generated on every build.
+				     Naming the source here is the whole point of the extraction - a
+				     reader can check the claim, and the next editor knows that a
+				     change belongs in the repository, not in this page. -->
+				{
+					Doc.data.source && (
+						<p class="mt-6 border-l-2 border-oxblood-dark pl-4 font-mono text-base text-zinc-dust">
+							<span class="uppercase tracking-widest">Generated from</span>{" "}
+							<a
+								class="text-stamped-canary underline decoration-2 underline-offset-4 hover:text-bone-white"
+								href={RepoLink(OurRepo, Doc.data.source)}
+							>
+								{Doc.data.source}
+							</a>{" "}
+							<span class="uppercase tracking-widest">
+								in the Aphrodite repository - edit it there, never here
+							</span>
+						</p>
+					)
+				}
 
 				{
 					Diagram && (

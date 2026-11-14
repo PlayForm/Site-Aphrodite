@@ -772,12 +772,19 @@ function ReadmeNarrative({ Text, Source }: Input): Fragment {
 	}
 
 	const Code = Tiers.find((Entry) => Entry.Tier === "CODE");
+	const Flat = Flatten(Text);
 
 	return {
 		CatalogTypes,
 		Tiers,
 		CodeMultiplier: Code?.Multiplier ?? null,
 		CodeMultiplierKey: "code_multiplier",
+		// The three costs the pages state in prose: what the agent reads instead
+		// of the output, what the marker itself costs, and what the compress step
+		// is allowed to spend.
+		PreviewTokens: `${Need(/The agent sees (~\d+) tokens of metadata/, Flat, "the preview's token cost", Source)[1]!} tok`,
+		MarkerTokens: `${Need(/orig tokens -> (~\d+)-tok marker/, Flat, "the marker's token cost", Source)[1]!} tok`,
+		CompressStep: Need(/whole compress step (sub-millisecond)/, Flat, "the compress step's budget", Source)[1]!,
 		From: `Module/Aphrodite/${Catalog.From}`,
 	};
 }
