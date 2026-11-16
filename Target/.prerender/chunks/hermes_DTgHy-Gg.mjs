@@ -1,0 +1,329 @@
+import { t as __exportAll } from "./rolldown-runtime_D8jQpDG7.mjs";
+import { E as unescapeHTML, _ as renderTemplate, u as renderComponent, v as maybeRenderHead, w as addAttribute } from "./server_DdG-dV1Z.mjs";
+import { _ as createComponent, n as $$ZineKicker, t as $$Base } from "./Base_Bs2-mKm9.mjs";
+import { a as $$Related } from "./DocsSidebar_DymFAMH3.mjs";
+import { n as $$PageShell } from "./ZineTape_BXk9fOqY.mjs";
+import { t as $$PageHeader } from "./PageHeader_CFtxK5wU.mjs";
+import { t as $$ZineBox } from "./ZineBox_CVeWVZDC.mjs";
+import { t as $$ZineSource } from "./ZineSource_DoCsU3-s.mjs";
+import { t as $$ZineDiagramNav } from "./ZineDiagramNav_1LSOKumC.mjs";
+import { t as session_lifecycle_default } from "./session-lifecycle_DbtfiSbV.mjs";
+import { l as ToolNames, s as HookNames } from "./Roster_DWXQuOMb.mjs";
+// Source/pages/hermes.astro
+var hermes_exports = /* @__PURE__ */ __exportAll({
+	default: () => $$Hermes,
+	file: () => $$file,
+	url: () => $$url
+});
+var $$Hermes = createComponent(($$result, $$props, $$slots) => {
+	const Previews = [
+		"[build:1E 1W 142L | error[E0432]: unresolved import ...]",
+		"[diff:4F +7/-3 12L | src/main.rs Cargo.toml +2 more]",
+		"[git:2M 2A 1D 3?? | src/x.rs src/y.rs +6 more]",
+		"[gitlog:2 commits | abc1234 fix... → def5678 feat...]",
+		"[ls:3 files 2 dirs | .rs×2 .md×1]",
+		"[test:220 pass 0 fail 1 ignored | 0.31s]",
+		"[grep:4 hits in 3 files | src/preview.rs:12 ...]",
+		"[code:3fns|2structs fn main() 414L]",
+		"[search:4 hits in 3 files | src/x.rs:12 ...]",
+		"[json:5items 3L]",
+		"[terminal:14L exit code: 0]",
+		"[text:3L 50B | some unrecognizable prose here]"
+	];
+	const ProxyRows = [
+		{
+			F: "Tool output compression",
+			Plugin: "transform_tool_result intercepts",
+			Proxy: "proxy only sees HTTP traffic"
+		},
+		{
+			F: "Terminal compression",
+			Plugin: "transform_terminal_output",
+			Proxy: "no visibility"
+		},
+		{
+			F: "Context engine",
+			Plugin: "opt-in; catalog injected via pre_llm_call",
+			Proxy: "unavailable"
+		},
+		{
+			F: "Auto-launch",
+			Plugin: "proxies spawn at plugin load",
+			Proxy: "manual aphrodite command"
+		},
+		{
+			F: "aphrodite_* tools",
+			Plugin: `${ToolNames.length} tools in agent namespace`,
+			Proxy: "agent doesn't know about them"
+		},
+		{
+			F: "Prompt injection",
+			Plugin: "directives, nudges, catalog",
+			Proxy: "unavailable"
+		},
+		{
+			F: "CCR storage",
+			Plugin: "token + cache proxy",
+			Proxy: "token + cache proxy"
+		}
+	];
+	const Lanes = [{
+		Id: "plugin",
+		Tape: "THE PLUGIN LANE",
+		TapeColor: "teal",
+		Accent: "teal",
+		Rotate: "-rotate-[0.8deg]",
+		Tags: ["INSIDE THE TURN", "HOOK-LEVEL"],
+		TagTone: "telemetry-tag--teal"
+	}, {
+		Id: "proxy",
+		Tape: "THE PROXY LANE",
+		TapeColor: "canary",
+		Accent: "canary",
+		Rotate: "rotate-[0.6deg]",
+		Tags: ["BESIDE THE TURN", "HTTP ONLY"],
+		TagTone: "telemetry-tag--canary"
+	}];
+	const SurfaceCount = {
+		Hooks: String(HookNames.length),
+		Tools: String(ToolNames.length)
+	};
+	const Surface = [
+		{
+			Index: "01 // HOOKS",
+			Value: SurfaceCount.Hooks,
+			Unit: "hooks",
+			Accent: "bg-weathered-teal",
+			Note: "Around every turn: pre_tool_call → transforms → pre_llm_call → post_llm_call."
+		},
+		{
+			Index: "02 // TOOLS",
+			Value: SurfaceCount.Tools,
+			Unit: "tools",
+			Accent: "bg-stamped-canary",
+			Note: "In agent namespace - through the proxy the agent doesn't know about them."
+		},
+		{
+			Index: "03 // PROXIES",
+			Value: "2",
+			Unit: "proxies",
+			Accent: "bg-raw-blood",
+			Note: "Two proxy processes still run alongside as subprocesses."
+		},
+		{
+			Index: "04 // ENGINE",
+			Value: "1",
+			Unit: "engine",
+			Accent: "bg-bone-newsprint",
+			Note: "Optional third integration point: APHRODITE_CONTEXT_ENGINE=1 turns it on."
+		}
+	];
+	const Ribbon = "flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[color:var(--tier-shell-edge)] px-4 py-3 sm:px-5";
+	return renderTemplate`${renderComponent($$result, "Base", $$Base, {
+		"Title": "HERMES // APHRODITE",
+		"Description": "How Hermes loads the Aphrodite plugin: the hook chain around a turn, the session lifecycle, the dual proxies on :9797 and :9798, and what the agent actually sees - type-aware previews instead of raw output."
+	}, { "default": ($$result) => renderTemplate` ${renderComponent($$result, "PageShell", $$PageShell, { "Rhythm": "wide" }, { "default": ($$result) => renderTemplate` ${renderComponent($$result, "PageHeader", $$PageHeader, {
+		"Tape": "HERMES // THE INTEGRATION",
+		"Title": "Living inside Hermes",
+		"Lead": [
+			`A tool call's output becomes part of the model's context, and the model reads and pays for every line of it.`,
+			`Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a client at.`,
+			`It is the reason the interception lives inside the turn: tool output never hits a wire, so only hook-level registration can catch it before it becomes message history - six hooks, thirteen tools, and an optional context engine, every call forwarded into the Rust dylib.`,
+			`Two proxy processes still run alongside as subprocesses, and a canonical runtime home under <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code> holds the binaries, config, CCR database, directives, and logs.`
+		]
+	})}  ${maybeRenderHead($$result)}<section id="baseline" class="blueprint-section" data-reveal> <p class="section-index">01 // THE BASELINE // HERMES ALONE</p> <h2 class="mt-3 type-section text-bone-white">What a raw turn costs</h2>  <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start"> ${renderComponent($$result, "ZineBox", $$ZineBox, {
+		"Size": "md",
+		"Accent": "none",
+		"Surface": "shell",
+		"Tape": "NO INTERCEPTION",
+		"TapeColor": "bone"
+	}, { "default": ($$result) => renderTemplate` <div class="prose-flow"> <p class="type-body text-bone-newsprint"> <span class="font-bold text-bone-white">HERMES ALONE -</span> nothing
+							stands between a tool and the model.
+</p> <p class="type-body text-bone-newsprint">
+That is the baseline cost the other two configurations exist to remove.
+</p> </div> ` })} <div class="well p-6 sm:p-8"> <p class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
+WHAT ENTERS THE HISTORY
+</p> <p class="mt-4 type-body text-bone-newsprint">
+Every file read, build log, and JSON blob enters the message history raw,
+						because nothing intercepts it - the agent spends its token budget reading
+						noise instead of reasoning.
+</p> </div> </div> </section>  <section id="surface" class="blueprint-section" data-reveal> <p class="section-index">02 // THE SURFACE // CAPABILITY BY LANE</p> <h2 class="mt-3 type-section text-bone-white">
+The integration surface, capability by capability
+</h2>  <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"> ${Surface.map((Cell) => renderTemplate`<div class="grunge shell-card flex flex-col" data-grunge> <div${addAttribute(["h-[2px] w-full", Cell.Accent], "class:list")}></div> <div class="flex flex-1 flex-col px-5 py-5"> <p class="section-index">${Cell.Index}</p> <div class="metric mt-4"> ${Cell.Value} <span class="metric__unit">${Cell.Unit}</span> </div> <p class="mt-4 type-body text-bone-newsprint">${Cell.Note}</p> </div> </div>`)} </div>  <dl class="well mt-10 grid gap-y-6 p-4 sm:p-5"> <div> <dt class="type-meta font-bold uppercase text-zinc-dust">
+HOOKS // ${SurfaceCount.Hooks} </dt> <dd class="mt-2 flex flex-wrap gap-2"> ${HookNames.map((Name) => renderTemplate`<span class="telemetry-tag telemetry-tag--canary">${Name}</span>`)} </dd> </div> <div> <dt class="type-meta font-bold uppercase text-zinc-dust">
+TOOLS // ${SurfaceCount.Tools} </dt> <dd class="mt-2 flex flex-wrap gap-2"> ${ToolNames.map((Name) => renderTemplate`<span class="telemetry-tag">${Name}</span>`)} </dd> </div> </dl>  <div class="grunge shell-card mt-12" data-grunge data-grunge-mode="edge"> <div${addAttribute(Ribbon, "class")}> <span class="telemetry-tag telemetry-tag--canary">
+COMPARISON // WHY NOT JUST A PROXY
+</span> <span class="telemetry-tag">CAPABILITY × LANE</span> <span class="telemetry-tag ml-auto">${ProxyRows.length} CAPABILITIES</span> </div> <div class="overflow-x-auto p-4 sm:p-6"> <table class="w-full border-collapse font-mono text-base"> <thead> <tr class="border-b-2 border-oxblood-dark text-left"> <th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+CAPABILITY
+</th> <th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+NATIVE HERMES PLUGIN
+</th> <th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">
+GENERIC PROXY
+</th> </tr> </thead> <tbody> ${ProxyRows.map((Row, I) => renderTemplate`<tr${addAttribute(I < ProxyRows.length - 1 ? "border-b border-oxblood-dark" : "", "class")}> <td class="py-3 pr-4 align-top text-bone-white">${Row.F}</td> <td class="py-3 pr-4 align-top text-weathered-teal"> ${Row.Plugin} </td> <td class="py-3 align-top text-zinc-dust line-through decoration-raw-blood/60"> ${Row.Proxy} </td> </tr>`)} </tbody> </table> </div> </div> </section>  <section id="lanes" class="blueprint-section" data-reveal> <p class="section-index">03 // TWO LANES // THE PLUGIN AND THE PROXY</p> <h2 class="mt-3 type-section text-bone-white">
+The lane inside Hermes, and the lane beside it
+</h2> <div class="mt-10 grid grid-cols-1 gap-12 lg:grid-cols-2"> ${Lanes.map((Lane) => renderTemplate`${renderComponent($$result, "ZineBox", $$ZineBox, {
+		"Size": "lg",
+		"Accent": Lane.Accent,
+		"Grunge": true,
+		"Rotate": Lane.Rotate,
+		"Tape": Lane.Tape,
+		"TapeColor": Lane.TapeColor
+	}, { "default": ($$result) => renderTemplate` <div class="mb-5 flex flex-wrap gap-2"> ${Lane.Tags.map((Tag, I) => renderTemplate`<span${addAttribute(["telemetry-tag", I === 0 ? Lane.TagTone : ""], "class:list")}> ${Tag} </span>`)} </div> ${Lane.Id === "plugin" ? renderTemplate`<div class="prose-flow"> <p class="type-body text-bone-newsprint"> <span class="font-bold text-weathered-teal">
+HERMES + APHRODITE -
+</span>${" "}
+the plugin lane intercepts output before it becomes message
+									history.
+</p> <p class="type-body text-bone-newsprint">
+The hooks classify, store, and replace raw output with a
+									type-aware marker of ~15 tokens instead of hundreds, the agent
+									retrieves the full content only when it actually needs it, and
+									the injection assembler adds directives, nudges, and the recall
+									catalog to every turn under a hard byte budget.
+</p> </div>` : renderTemplate`<div class="prose-flow"> <p class="type-body text-bone-newsprint"> <span class="font-bold text-stamped-canary">
+HERMES + APHRODITE + THE PROXY -
+</span>${" "}
+the plugin already spawns both listeners, so the third
+									configuration is running without extra setup: point${" "} <code class="font-mono text-base text-weathered-teal">
+base_url
+</code>${" "}
+at${" "} <code class="font-mono text-base text-weathered-teal">
+:9798
+</code>${" "}
+and any OpenAI-compatible client gets the same CCR compression
+									over plain HTTP.
+</p> <p class="type-body text-bone-newsprint">
+That is the agent-to-agent path - a second agent, a script, or
+									an external tool can converse through the same compressed
+									channel, share the persistent SQLite store (which survives a
+									restart; the plugin lane's inline store is session-scoped), and
+									call the tool relay to retrieve or create CCR entries.
+</p> <p class="type-body text-bone-newsprint"> <span class="font-bold text-bone-white">
+THE LIMIT IS REAL TOO:
+</span>${" "}
+the proxy only sees HTTP traffic.
+</p> <ul class="mt-4 flex flex-col gap-2"> <li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
+no tool-output interception
+</li> <li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
+no terminal compression
+</li> <li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
+no directives
+</li> <li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
+no context engine
+</li> <li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
+and SSE streams pass through uncompressed.
+</li> </ul> <p class="type-body text-bone-newsprint">
+Because of that the proxy extends the stack to other callers; it
+									does not replace the hooks inside Hermes.
+</p> </div>`}` })}`)} </div> </section>  <section id="result" class="blueprint-section" data-reveal> <p class="section-index">04 // THE RESULT // SAVED AND PAID FOR</p> <h2 class="mt-3 type-section text-bone-white">What it saved, and what it costs</h2>  <aside class="tier-inverted grunge grunge--oxblood zine-box-subtle relative mt-10 border-[3px] border-raw-blood p-8 sm:p-10" style="--tier-inverted: var(--bone-newsprint)" data-grunge data-grunge-mode="edge"> ${renderComponent($$result, "ZineKicker", $$ZineKicker, { "Tone": "ink" }, { "default": ($$result) => renderTemplate`MEASURED OVER 200 REAL HERMES SESSIONS` })} <div class="metric mt-6 !text-soot-black drop-shadow-[3px_3px_0px_#520612]">
+26.9<span class="metric__unit !text-carbon-void">% deflected</span> </div> <p class="mt-6 max-w-3xl type-body text-carbon-void">
+Measured over 200 real Hermes sessions: 26.9% of all context tokens deflected, a
+					median session saved ratio of 22.9%, and ~22,921 tokens saved per API call.
+</p> <div class="mt-8 flex flex-wrap items-start gap-4 border-t border-raw-blood/40 pt-6"> <span class="telemetry-tag telemetry-tag--crimson">
+THE TRADE-OFF IS STATED PLAINLY
+</span> <p class="max-w-2xl type-body text-carbon-void">
+the hooks are Hermes' contract - no other client can register them, so this
+						lane works with Hermes only.
+</p> </div> </aside>  <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3"> <div class="well p-5"> <p class="font-mono text-2xl font-bold text-stamped-canary">22.9%</p> <p class="mt-2 type-meta text-zinc-dust">MEDIAN SESSION SAVED RATIO</p> </div> <div class="well p-5"> <p class="font-mono text-2xl font-bold text-weathered-teal">~22,921</p> <p class="mt-2 type-meta text-zinc-dust">TOKENS SAVED PER API CALL</p> </div> <div class="well p-5"> <p class="font-mono text-2xl font-bold text-bone-white">200</p> <p class="mt-2 type-meta text-zinc-dust">REAL HERMES SESSIONS</p> </div> </div> </section>  <section id="lifecycle" class="blueprint-section" data-reveal> <p class="section-index">05 // LIFECYCLE // SESSION TO SESSION</p> <h2 class="mt-3 type-section text-bone-white">What happens when you launch Hermes</h2>  <div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge"> <div${addAttribute(Ribbon, "class")}> <span class="telemetry-tag telemetry-tag--bone">hermes starts</span> <span class="telemetry-tag">ONCE PER PROCESS</span> <span class="telemetry-tag ml-auto">BOOT SEQUENCE</span> </div> <div class="well p-4 font-mono text-base leading-relaxed sm:p-5"> <div class="pl-4 text-bone-newsprint">
+→ plugin loads · dylib resolved once per process, smoke-tested in a
+						subprocess
+</div> <div class="pl-4 text-bone-newsprint">
+→ a faulting image degrades to "plugin disabled" instead of killing the
+						gateway
+</div> <div class="pl-4 text-bone-newsprint">
+→ two proxies spawn - a healthy pair is reused, never duplicated
+</div> <div class="pl-4 text-stamped-canary">
+→ on_session_start resets all per-session state
+</div> <div class="pl-4 text-weathered-teal">
+→ turn loop: pre_tool_call → transforms → pre_llm_call → post_llm_call
+</div> <div class="pl-4 text-zinc-dust">
+→ session ends · markers do not survive a restart - a new session starts a
+						fresh store
+</div> </div> </div>  <p class="mt-10 type-meta font-bold uppercase tracking-widest text-zinc-dust">
+THE DUAL PROXIES
+</p> <div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2"> <div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge"> <div${addAttribute(Ribbon, "class")}> <span class="telemetry-tag telemetry-tag--canary">TOKEN</span> <span class="telemetry-tag">:9798</span> <span class="telemetry-tag ml-auto">1 KB</span> </div> <div class="well flex-1 p-4 font-mono text-base leading-relaxed text-bone-newsprint sm:p-5">
+SQLite. Persistent. Compresses above 1 KB.
+</div> </div> <div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge"> <div${addAttribute(Ribbon, "class")}> <span class="telemetry-tag telemetry-tag--teal">CACHE</span> <span class="telemetry-tag">:9797</span> <span class="telemetry-tag ml-auto">8 KB</span> </div> <div class="well flex-1 p-4 font-mono text-base leading-relaxed text-bone-newsprint sm:p-5">
+In-memory. Compresses above 8 KB.
+</div> </div> </div> <div class="mt-8 flex flex-wrap items-start gap-4"> <span class="telemetry-tag telemetry-tag--crimson">NO HOT-RELOAD</span> <p class="type-body text-zinc-dust">RESTART THE SESSION TO PICK UP A NEW BUILD.</p> </div> <figure class="well mt-16 p-4 sm:p-5" data-diagram="session-lifecycle"> <div class="overflow-x-auto">${unescapeHTML(session_lifecycle_default)}</div> <figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+M8 // SESSION LIFECYCLE
+</figcaption> </figure> </section>  <section id="previews" class="blueprint-section" data-reveal> <p class="section-index">06 // EVIDENCE // WHAT THE AGENT SEES</p> <h2 class="mt-3 type-section text-bone-white">The twelve preview shapes</h2> <div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge"> <div${addAttribute(Ribbon, "class")}> <span class="telemetry-tag telemetry-tag--canary">PREVIEW SHAPES</span> <span class="telemetry-tag">${Previews.length} ARMS</span> <span class="telemetry-tag ml-auto">REPRESENTATIVE NUMBERS</span> </div> <div class="well p-4 font-mono text-base leading-relaxed sm:p-5"> ${Previews.map((Line) => renderTemplate`<div class="text-bone-newsprint"> <span class="text-stamped-canary"> ${Line.slice(0, Line.indexOf(":") + 1)} </span> ${Line.slice(Line.indexOf(":") + 1)} </div>`)} </div> </div> <div class="prose-flow mt-8"> <p class="type-body text-bone-newsprint">
+Each line is the format string its own arm prints, character for character: the
+					tallies come first, then whatever the arm could add about them. The extension
+					counts in an <code class="font-mono text-base text-weathered-teal">ls</code>${" "}
+line are joined with${" "} <code class="font-mono text-base text-weathered-teal">×</code>
+rather than a letter x, a JSON item count is set tight against the word it
+					counts (<code class="font-mono text-base text-weathered-teal">5items</code>), a
+					code map joins its structure parts with a pipe, and a search line reports hits,
+					distinct files and the first match location. The numbers are representative; the
+					shapes are the code's, which is what makes them checkable against
+<code class="font-mono text-base text-weathered-teal">
+preview/builders/*.rs
+</code>
+rather than taken on trust.
+</p> </div>  <div class="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2"> <div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge"> <div${addAttribute(Ribbon, "class")}> <span class="telemetry-tag">WITHOUT APHRODITE</span> <span class="telemetry-tag telemetry-tag--crimson">500 TOKENS</span> <span class="telemetry-tag ml-auto">≈ 2,000 CHARS</span> </div> <div class="well flex-1 p-4 font-mono text-base leading-relaxed text-zinc-dust sm:p-5">
+500 tokens of build output... scrolling... error? no... warning? no... ok it
+						passed. That was 500 tokens I'll never get back.
+</div> </div> <div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge"> <div${addAttribute(Ribbon, "class")}> <span class="telemetry-tag telemetry-tag--teal">
+WITH NATIVE INTEGRATION
+</span> <span class="telemetry-tag telemetry-tag--canary">A FEW TOKENS</span> <span class="telemetry-tag ml-auto">44 LINES</span> </div> <div class="well flex-1 p-4 font-mono text-base leading-relaxed sm:p-5"> <span class="text-bone-white">[build:0E 0W 44L]</span> <span class="text-zinc-dust"> ${" "}
+← a few tokens. The agent knows: build passed. The line count is the
+							same log that costs 500 tokens raw: five hundred tokens is about two
+							thousand characters, which is what forty-four lines of compiler output
+							measure.
+</span> </div> </div> </div> <div class="prose-flow mt-12 border-t border-oxblood-dark pt-8"> <div class="flex flex-wrap items-start gap-4"> <span class="telemetry-tag telemetry-tag--bone">SANITIZED · GENERALIZED</span> <p class="type-body uppercase text-zinc-dust">
+SANITIZED, GENERALIZED SHAPES - REPRESENTATIVE PREVIEW FORMS FROM THE PUBLIC
+						DOCS, NOT SESSION CONTENT.
+</p> </div> <div class="flex flex-wrap items-start gap-4"> <span class="telemetry-tag telemetry-tag--teal">RETRIEVAL ON DEMAND</span> <p class="type-body uppercase text-zinc-dust">
+THE AGENT RETRIEVES FULL OUTPUT WITH aphrodite_retrieve(hash) ONLY WHEN IT
+						ACTUALLY NEEDS IT.
+</p> </div> </div> </section>  <section id="context-engine" class="blueprint-section" data-reveal> <p class="section-index">07 // OPT-IN // CONTEXT ENGINE</p> <h2 class="mt-3 type-section text-bone-white">The optional third integration point</h2> <div class="prose-flow mt-8"> <p class="type-body text-bone-newsprint">
+Enable with${" "} <code class="font-mono text-base text-weathered-teal">
+APHRODITE_CONTEXT_ENGINE=1
+</code>
+.
+</p> <p class="type-body text-bone-newsprint">
+The engine is the session's middle-turn archiver: when the conversation index
+					fills past${" "} <code class="font-mono text-base text-weathered-teal">
+engine_threshold_pct
+</code>
+, it packs the middle turns (keeping
+<code class="font-mono text-base text-weathered-teal">
+engine_protect_first
+</code>
+at the start and
+<code class="font-mono text-base text-weathered-teal">engine_protect_last</code>
+at the end, once
+<code class="font-mono text-base text-weathered-teal">engine_min_msgs</code>
+turns exist) into one compact CCR entry and replaces them with a single marker,
+					so the model sees a short head + marker + tail history.
+</p> <p class="type-body text-bone-newsprint">
+The archive is in-place but recoverable via
+<code class="font-mono text-base text-weathered-teal">aphrodite_retrieve</code>.
+</p> </div>  <div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge"> <div${addAttribute(Ribbon, "class")}> <span class="telemetry-tag telemetry-tag--teal">ENGINE KEYS</span> <span class="telemetry-tag">4 DEFAULTS</span> <span class="telemetry-tag ml-auto">aphrodite.toml</span> </div> <dl class="well grid gap-y-4 p-4 font-mono text-base text-bone-newsprint sm:p-5"> <div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4"> <dt class="text-zinc-dust">engine_threshold_pct</dt> <dd class="text-stamped-canary">30</dd> <dd class="col-span-2 text-zinc-dust">
+# archive middle turns at % context fill
+</dd> </div> <div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4"> <dt class="text-zinc-dust">engine_protect_first</dt> <dd class="text-stamped-canary">2</dd> <dd class="col-span-2 text-zinc-dust"># messages kept at the start</dd> </div> <div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4"> <dt class="text-zinc-dust">engine_protect_last</dt> <dd class="text-stamped-canary">5</dd> <dd class="col-span-2 text-zinc-dust"># messages kept at the end</dd> </div> <div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4"> <dt class="text-zinc-dust">engine_min_msgs</dt> <dd class="text-stamped-canary">8</dd> <dd class="col-span-2 text-zinc-dust">
+# minimum messages before activating
+</dd> </div> </dl> </div> ${renderComponent($$result, "ZineSource", $$ZineSource, { "Lines": ["SRC: README.md:91-99, 219-299, 467-482; docs/guides/hermes-integration.md:115-141; docs/proxy/architecture.md:12-31; docs/tool-relay/callbacks.md:89-92.", "SRC: README.md:298-299; docs/guides/hermes-integration.md:107-108."] })} </section>  ${renderComponent($$result, "Related", $$Related, { "Links": [
+		{
+			Href: "/plugin/",
+			Label: "PLUGIN"
+		},
+		{
+			Href: "/tools/",
+			Label: "TOOLS"
+		},
+		{
+			Href: "/flavors/",
+			Label: "FLAVORS"
+		},
+		{
+			Href: "/setup/",
+			Label: "SETUP"
+		}
+	] })} ` })} ${renderComponent($$result, "ZineDiagramNav", $$ZineDiagramNav, {})} ` })}`;
+}, "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/pages/hermes.astro", void 0);
+var $$file = "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/pages/hermes.astro";
+var $$url = "/hermes";
+// \0virtual:astro:page:Source/pages/hermes@_@astro
+var page = () => hermes_exports;
+export { page };

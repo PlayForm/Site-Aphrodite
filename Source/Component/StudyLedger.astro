@@ -165,70 +165,37 @@ const KindTag = {
 		     second edge paints beside it), separated by hairlines, every figure
 		     tabular so the digits line up down the column. The scroll container
 		     is the inner box: the plate's frame stays put, the rows move. -->
-		<div class="tier-well overflow-x-auto border-t border-[color:var(--tier-well-edge)]">
-			<table class="w-full min-w-[46rem] border-collapse font-mono text-base">
-				<thead class="bg-asphalt-panel">
-					<tr class="border-b border-[color:var(--tier-well-edge)]">
-						<th
-							scope="col"
-							class:list={["type-meta text-left !font-black text-zinc-dust", Cell]}
-						>
+		<div class="tier-well ledger__scroll border-t border-[color:var(--tier-well-edge)]">
+			<table class="ledger" style="--ledger-min: 46rem">
+				<thead class="ledger__band">
+					<tr class="ledger__bandrow">
+						<th scope="col" class="ledger__head ledger__head--wrap type-meta">
 							MEASURE
 						</th>
-						<th
-							scope="col"
-							class:list={[
-								"type-meta whitespace-nowrap text-right !font-black text-zinc-dust",
-								Cell,
-							]}
-						>
+						<th scope="col" class="ledger__head ledger__head--right type-meta">
 							VALUE
 						</th>
-						<th
-							scope="col"
-							class:list={[
-								"type-meta whitespace-nowrap text-left !font-black text-zinc-dust",
-								Cell,
-							]}
-						>
-							UNIT
-						</th>
-						<th
-							scope="col"
-							class:list={[
-								"type-meta whitespace-nowrap text-left !font-black text-zinc-dust",
-								Cell,
-							]}
-						>
-							KIND
-						</th>
-						<th
-							scope="col"
-							class:list={["type-meta text-left !font-black text-zinc-dust", Cell]}
-						>
+						<th scope="col" class="ledger__head type-meta">UNIT</th>
+						<th scope="col" class="ledger__head type-meta">KIND</th>
+						<th scope="col" class="ledger__head ledger__head--wrap type-meta">
 							SCOPE
 						</th>
 					</tr>
 				</thead>
 				<tbody>
 					{Rows.map(({ Label, Fact }) => (
-						<tr class="border-b border-oxblood-dark/60 align-top last:border-b-0 hover:bg-[color-mix(in_srgb,var(--raw-blood)_10%,transparent)]">
-							<td class:list={["leading-tight text-bone-newsprint", Cell]}>{Label}</td>
-							<td
-								class:list={[
-									"whitespace-nowrap text-right font-black tabular-nums text-bone-white",
-									Cell,
-								]}
-							>
+						<tr class="ledger__row">
+							<td class="ledger__cell leading-tight">{Label}</td>
+							<td class="ledger__cell ledger__value ledger__value--strong">
 								{Fact.Value}
 							</td>
-							<td class:list={["type-meta whitespace-nowrap text-zinc-dust", Cell]}>
+							<td class="ledger__cell type-meta whitespace-nowrap text-zinc-dust">
 								{Fact.Unit}
 							</td>
-							<td class:list={["whitespace-nowrap", Cell]}>
+							<td class="ledger__cell whitespace-nowrap">
 								<span class={KindTag[Fact.Kind].Class}>{KindTag[Fact.Kind].Tag}</span>
 							</td>
-							<td class:list={["type-body text-zinc-dust", Cell]}>{Fact.Scope}</td>
+							<td class="ledger__cell type-body text-zinc-dust">{Fact.Scope}</td>
 						</tr>
 					))}
 				</tbody>
