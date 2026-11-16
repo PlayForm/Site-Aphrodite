@@ -181,6 +181,64 @@
 	}
 }
 
+/* ---- GRUNGE // noise-drawn ink, the asymmetric layer -------------------
+
+   `splat-frame` above was a displaced rectangle: it read as a duplicate that
+   had slipped a few pixels, because a warped box is still a box. Ink does not
+   behave that way - it leaves a body, throws spikes, and drops satellites - so
+   this layer is DRAWN, not displaced. `Scripts/Splats.mjs` builds the geometry
+   from simplex noise (body outline riding the noise field, tapered spikes,
+   power-curve droplets) and writes one SVG per GROUP of five splats, each with
+   its own seed, scale and rotation.
+
+   The SVG is black on transparent and used as a MASK, so the ink is a token:
+   oxblood behind a dark plate, bone behind a crimson band, whatever the region
+   needs. Six groups ship; a region picks one and the page varies them, which is
+   what stops every section wearing the same brush. */
+
+.grunge {
+	position: relative;
+	isolation: isolate;
+}
+
+.grunge::before {
+	content: "";
+	position: absolute;
+	inset: var(--grunge-inset, -7% -11% -9% -8%);
+	background: var(--grunge-ink, rgba(147, 17, 40, 0.55));
+	-webkit-mask-image: var(--grunge-mask);
+	mask-image: var(--grunge-mask);
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	transform: rotate(var(--grunge-turn, -1.1deg));
+	opacity: var(--grunge-opacity, 0.6);
+	z-index: -1;
+	pointer-events: none;
+}
+
+/* Six groups, six slightly different registrations. The inset and turn differ
+   per group as well as the drawing, so two sections never bleed identically. */
+.grunge--1 { --grunge-mask: url("/Brand/Splat/group-01.svg"); --grunge-inset: -7% -11% -9% -8%; --grunge-turn: -1.1deg; }
+.grunge--2 { --grunge-mask: url("/Brand/Splat/group-02.svg"); --grunge-inset: -10% -6% -7% -12%; --grunge-turn: 1.4deg; }
+.grunge--3 { --grunge-mask: url("/Brand/Splat/group-03.svg"); --grunge-inset: -6% -13% -11% -6%; --grunge-turn: -0.7deg; }
+.grunge--4 { --grunge-mask: url("/Brand/Splat/group-04.svg"); --grunge-inset: -11% -7% -6% -10%; --grunge-turn: 1.9deg; }
+.grunge--5 { --grunge-mask: url("/Brand/Splat/group-05.svg"); --grunge-inset: -8% -9% -12% -7%; --grunge-turn: -1.7deg; }
+.grunge--6 { --grunge-mask: url("/Brand/Splat/group-06.svg"); --grunge-inset: -9% -8% -8% -11%; --grunge-turn: 0.9deg; }
+
+/* Ink by region, not by habit: the same drawing reads as a dark stain on the
+   page ground and as a light bloom on a crimson band. */
+.grunge--oxblood { --grunge-ink: rgba(147, 17, 40, 0.55); }
+.grunge--bone { --grunge-ink: rgba(236, 233, 224, 0.14); }
+.grunge--faint { --grunge-opacity: 0.35; }
+
+@media (prefers-reduced-motion: reduce) {
+	.grunge::before {
+		transform: none;
+	}
+}
+
 .tape-staple {
 	position: relative;
 }
