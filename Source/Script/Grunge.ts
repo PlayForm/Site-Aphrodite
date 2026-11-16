@@ -44,6 +44,9 @@ const Random = (Seed: number): (() => number) => {
 };
 
 const Size = 900;
+/** Padding around the drawing. Arms and droplets are thrown past the plate edge;
+ *  a viewBox of exactly 0..Size clipped them off. */
+const Pad = 320;
 
 /**
  * The shared field. Seeded once per page load: every splat on the page reads
@@ -52,8 +55,9 @@ const Size = 900;
  */
 const Field = createNoise2D(Random((Math.random() * 0x7fffffff) | 0));
 
-/** Per-layer weights. One grey ink, four greys in the eye. */
-const LayerOpacity = [0.9, 0.75, 0.55, 0.35];
+/** Per-layer weights. One ink, four weights: the faintest layer still has to
+ * read as deposit, not as glow, so it is 0.42 rather than 0.35. */
+const LayerOpacity = [0.9, 0.72, 0.55, 0.42];
 
 /**
  * One splat: a noise-modulated body, tapered spikes thrown outward, and
@@ -76,20 +80,33 @@ const Splat = (Seed: number, Cx: number, Cy: number, Radius: number, Opacity: nu
 	}
 	Parts.push(`<polygon points="${Points.join(" ")}"/>`);
 
-	// 7-9 arms: enough to read as a throw, few enough that every arm is seen.
-	const Spikes = 5 + Math.floor(Next() * 3);
-	for (let Index = 0; Index < Spikes; Index += 1) {
-		const Angle = (Index / Spikes) * Math.PI * 2 + Next() * 0.35;
-		const Reach = Radius * (1.05 + Field(Angle * 2, Seed * 0.01) * 0.55 + Next() * 0.45);
-		const Width = Radius * (0.05 + Next() * 0.05);
-		const TipX = Cx + Math.cos(Angle) * Reach;
-		const TipY = Cy + Math.sin(Angle) * Reach;
-		const BaseX = Cx + Math.cos(Angle) * Radius * 0.55;
-		const BaseY = Cy + Math.sin(Angle) * Radius * 0.55;
-		const Nx = Math.cos(Angle + Math.PI / 2) * Width;
-		const Ny = Math.sin(Angle + Math.PI / 2) * Width;
+	// GRAIN. A solid body with a soft edge reads as an airbrushed bloom; toner is
+	// granular right up to its boundary. Speckles are scattered inside the body
+	// radius at power-curve sizes, so the interior breaks up while the silhouette
+	// stays hard.
+	const Grains = 26 + Math.floor(Next() * 20);
+	for (let Index = 0; Index < Grains; Index += 1) {
+		const Angle = Next() * Math.PI * 2;
+		const Spread = Math.sqrt(Next()) * Radius * 0.92;
+		const Gx = Cx + Math.cos(Angle) * Spread;
+		const Gy = Cy + Math.sin(Angle) * Spread;
+		const Gr = 0.9 + Math.pow(Next(), 2) * Radius * 0.045;
+		Parts.push(`<ellipse cx="${Gx.toFixed(1)}" cy="${Gy.toFixed(1)}" rx="${Gr.toFixed(1)}" ry="${(Gr * (0.6 + Next() * 0.7)).toFixed(1)}"/>`);
+	}
+
+	// LOBES, not spikes: long tapered arms give a starburst/gear silhouette, which
+	// is a shape ink never makes. Short rounded ellipses overlapping the body read
+	// as liquid spread - the mass bulges, it does not radiate.
+	const Lobes = 5 + Math.floor(Next() * 3);
+	for (let Index = 0; Index < Lobes; Index += 1) {
+		const Angle = (Index / Lobes) * Math.PI * 2 + Next() * 0.45;
+		const Reach = Radius * (0.5 + Field(Angle * 2, Seed * 0.01) * 0.3 + Next() * 0.2);
+		const Width = Radius * (0.2 + Next() * 0.18);
+		const LobeX = Cx + Math.cos(Angle) * Reach * 0.55;
+		const LobeY = Cy + Math.sin(Angle) * Reach * 0.55;
+		const Tilt = ((Angle * 180) / Math.PI).toFixed(1);
 		Parts.push(
-			`<polygon points="${(BaseX + Nx).toFixed(1)},${(BaseY + Ny).toFixed(1)} ${TipX.toFixed(1)},${TipY.toFixed(1)} ${(BaseX - Nx).toFixed(1)},${(BaseY - Ny).toFixed(1)}"/>`,
+			`<ellipse cx="${LobeX.toFixed(1)}" cy="${LobeY.toFixed(1)}" rx="${(Reach * 0.62).toFixed(1)}" ry="${Width.toFixed(1)}" transform="rotate(${Tilt} ${LobeX.toFixed(1)} ${LobeY.toFixed(1)})"/>`,
 		);
 	}
 
@@ -97,9 +114,16 @@ const Splat = (Seed: number, Cx: number, Cy: number, Radius: number, Opacity: nu
 	for (let Index = 0; Index < Drops; Index += 1) {
 		const Angle = Next() * Math.PI * 2;
 		const Distance = Radius * (0.85 + Next() * 2.0);
-		const R = Radius * Math.pow(Next(), 3) * 0.15 + 1.2;
+		const R = Radius * Math.pow(Next(), 3) * 0.12 + 1.1;
+		// ELLIPSES, not discs: a field of perfect circles reads as bokeh or dust,
+		// which is the one thing ink never looks like. Each droplet is squashed
+		// along a noise-chosen axis, so it reads as a directional flick.
+		const Squash = 0.35 + Ride(Index * 0.37, Seed * 0.01) * 1.3;
+		const Tilt = ((Ride(Seed * 0.02, Index * 0.29) - 0.5) * 180).toFixed(1);
+		const DropX = Cx + Math.cos(Angle) * Distance;
+		const DropY = Cy + Math.sin(Angle) * Distance;
 		Parts.push(
-			`<circle cx="${(Cx + Math.cos(Angle) * Distance).toFixed(1)}" cy="${(Cy + Math.sin(Angle) * Distance).toFixed(1)}" r="${R.toFixed(1)}"/>`,
+			`<ellipse cx="${DropX.toFixed(1)}" cy="${DropY.toFixed(1)}" rx="${(R * Squash).toFixed(1)}" ry="${(R / Squash).toFixed(1)}" transform="rotate(${Tilt} ${DropX.toFixed(1)} ${DropY.toFixed(1)})"/>`,
 		);
 	}
 
@@ -120,16 +144,19 @@ const LayersPerGroup = 5;
 /** Noise sample mapped to 0..1. */
 const Ride = (X: number, Y: number): number => (Field(X, Y) + 1) / 2;
 
-/** One group: five layers of one family around a noise-chosen anchor. */
+/** One group: five layers of one family, anchored in a noise-chosen corner. */
 const Group = (Seed: number, GroupIndex: number): string => {
 	const Parts: string[] = [];
 	const Phase = Seed * 0.001 + GroupIndex * 0.61;
-	const AnchorX = Ride(Phase, 0.25);
-	const AnchorY = Ride(Phase, 0.75);
+	// The corner is chosen by noise, so the five groups on one plate land in
+	// different places instead of stacking into a single blob.
+	const Corner = Math.floor(Ride(Phase, 0.5) * 4);
+	const AnchorX = (Corner === 1 || Corner === 2 ? 0.86 : 0.14) + (Ride(Phase, 0.25) - 0.5) * 0.14;
+	const AnchorY = (Corner >= 2 ? 0.86 : 0.14) + (Ride(Phase, 0.75) - 0.5) * 0.14;
 
 	for (let Layer = 0; Layer < LayersPerGroup; Layer += 1) {
-		const DriftX = (Ride(Layer * 0.43, GroupIndex * 0.19) - 0.5) * 0.18;
-		const DriftY = (Ride(GroupIndex * 0.23, Layer * 0.43) - 0.5) * 0.18;
+		const DriftX = (Ride(Layer * 0.43, GroupIndex * 0.19) - 0.5) * 0.1;
+		const DriftY = (Ride(GroupIndex * 0.23, Layer * 0.43) - 0.5) * 0.1;
 		const Cx = Size * (0.02 + AnchorX * 0.96 + DriftX);
 		const Cy = Size * (0.02 + AnchorY * 0.96 + DriftY);
 		const Radius = Size * (0.045 + Ride(Layer * 0.71, GroupIndex * 0.37) * 0.115);
@@ -148,27 +175,61 @@ const Group = (Seed: number, GroupIndex: number): string => {
 };
 
 /**
- * Paint every `[data-grunge]` element on the current document. Idempotent per
- * element per mount, so a view transition repaints the new page and leaves the
- * old one alone. Each call re-seeds, so a revisit is a different stain.
+ * Paint every `[data-grunge]` element on the current document.
+ *
+ * ONE SVG PER GROUP. Stacking all five groups inside a single drawing tied them
+ * to one registration - one corner, one scale - which is not what a splatter
+ * does. Each group is now its own element with its own position, size, rotation
+ * and ink weight, placed by noise across the whole box, so a plate can carry a
+ * cluster at one corner, a second low right, a third bleeding off the top, and
+ * so on. Permutations are the point; separation is the rule.
+ *
+ * Idempotent per element per mount, and re-seeded per page load, so a revisit is
+ * a different arrangement from the same family.
  */
 export const PaintGrunge = (): void => {
 	for (const Element of document.querySelectorAll<HTMLElement>("[data-grunge]")) {
 		if (Element.dataset.grungePainted === "1") continue;
 		try {
 			const Seed = (Math.random() * 0x7fffffff) | 0;
-			const Groups: string[] = [];
+
 			for (let GroupIndex = 0; GroupIndex < GroupsPerCard; GroupIndex += 1) {
-				Groups.push(Group(Seed, GroupIndex));
+				// Noise, not a counter: each group reads a different passage of the
+				// shared field, so its placement and size are its own.
+				const Phase = Seed * 0.0001 + GroupIndex * 0.37;
+				const Mode = Element.dataset.grungeMode ?? "scatter";
+				// `edge` rings the plate - used where the ink IS the border of an
+				// unbordered box. `scatter` puts groups anywhere in the box, which is
+				// what a thrown splatter does.
+				const Angle = Ride(Phase, 0.31) * Math.PI * 2;
+				const Ring = 0.34 + Ride(Phase, 0.71) * 0.18;
+				const CentreX = Mode === "edge" ? 0.5 + Math.cos(Angle) * Ring : Ride(Phase, 0.11);
+				const CentreY = Mode === "edge" ? 0.5 + Math.sin(Angle) * Ring : Ride(Phase, 0.57);
+				const Width = 0.3 + Ride(GroupIndex * 0.53, Phase) * 0.5;
+				const Height = Width * (0.75 + Ride(Phase, 0.83) * 0.55);
+				const Turn = (Ride(GroupIndex * 0.21, 0.33) - 0.5) * 16;
+
+				const Svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+				Svg.setAttribute("viewBox", `${-Pad} ${-Pad} ${Size + Pad * 2} ${Size + Pad * 2}`);
+				Svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
+				Svg.setAttribute("aria-hidden", "true");
+				Svg.setAttribute("class", "grunge__ink");
+				Svg.innerHTML = Group(Seed, GroupIndex);
+				Svg.style.setProperty("--grunge-x", `${(CentreX * 100 - Width * 50).toFixed(1)}%`);
+				Svg.style.setProperty("--grunge-y", `${(CentreY * 100 - Height * 50).toFixed(1)}%`);
+				Svg.style.setProperty("--grunge-w", `${(Width * 100).toFixed(1)}%`);
+				Svg.style.setProperty("--grunge-h", `${(Height * 100).toFixed(1)}%`);
+				Svg.style.setProperty("--grunge-rot", `${Turn.toFixed(1)}deg`);
+				// Depth is part of the arrangement: some groups sit BEHIND the plate,
+				// some inside it (above its fill, under its text). Which is which is
+				// noise, so a row of plates does not stack the same way twice.
+				Svg.style.setProperty("--grunge-z", Ride(GroupIndex * 0.77, Phase) > 0.55 ? "0" : "-1");
+				// Per-group weight. The floor is 0.16, not 0.10: on a near-black page
+				// a 0.10 deposit reads as haze rather than ink.
+				Svg.style.setProperty("--grunge-opacity", (0.16 + Ride(GroupIndex * 0.91, Phase) * 0.14).toFixed(3));
+				Element.prepend(Svg);
 			}
-			const Svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${Size} ${Size}" fill="#000">${Groups.join("")}</svg>`;
-			Element.style.setProperty("--grunge-mask", `url("data:image/svg+xml,${encodeURIComponent(Svg)}")`);
-			// Registration varies a little, never a lot: +/-1.2deg, 4-10% bleed.
-			Element.style.setProperty("--grunge-turn", `${(Math.random() * 2.4 - 1.2).toFixed(2)}deg`);
-			Element.style.setProperty(
-				"--grunge-inset",
-				`-${(4 + Math.random() * 4).toFixed(1)}% -${(5 + Math.random() * 5).toFixed(1)}% -${(4 + Math.random() * 4).toFixed(1)}% -${(5 + Math.random() * 4).toFixed(1)}%`,
-			);
+
 			Element.dataset.grungePainted = "1";
 		} catch (Error) {
 			// A decoration must never take the page down with it.

@@ -201,36 +201,38 @@
 	isolation: isolate;
 }
 
-.grunge::before {
-	content: "";
+/* The ink is a REAL SVG element in the document, not a mask over a pseudo-element.
+   A mask is rasterised to the element's box, so anything the drawing puts outside
+   that box - arms and droplets thrown past the plate edge - was clipped off. An
+   inline SVG with a padded viewBox renders the whole splat, can be inspected in
+   the DOM, and takes its colour from `color`, so one drawing serves every ink. */
+.grunge__ink {
 	position: absolute;
-	inset: var(--grunge-inset, -7% -11% -9% -8%);
-	/* ONE grey ink for the whole family; the per-layer weight lives in the
-	   drawing's fill-opacity, not in a second colour. */
-	background: var(--grunge-ink, rgba(158, 158, 165, 0.55));
-	-webkit-mask-image: var(--grunge-mask);
-	mask-image: var(--grunge-mask);
-	-webkit-mask-size: 100% 100%;
-	mask-size: 100% 100%;
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
-	transform: rotate(var(--grunge-turn, -1.1deg));
-	opacity: var(--grunge-opacity, 0.6);
-	z-index: -1;
+	left: var(--grunge-x, -10%);
+	top: var(--grunge-y, -10%);
+	width: var(--grunge-w, 70%);
+	height: var(--grunge-h, 70%);
+	z-index: var(--grunge-z, -1);
 	pointer-events: none;
+	color: var(--grunge-ink-color, rgb(214, 205, 190));
+	fill: currentColor;
+	opacity: var(--grunge-opacity, 0.16);
+	transform: rotate(var(--grunge-rot, 0deg));
+	overflow: visible;
 }
 
 /* Six groups, six slightly different registrations. The inset and turn differ
    per group as well as the drawing, so two sections never bleed identically. */
 
 /* Ink by region, not by habit: the same drawing reads as a dark stain on the
-   page ground and as a light bloom on a crimson band. */
-.grunge--oxblood { --grunge-ink: rgba(147, 17, 40, 0.55); }
-.grunge--bone { --grunge-ink: rgba(236, 233, 224, 0.14); }
-.grunge--faint { --grunge-opacity: 0.35; }
+   page ground and as a light bloom on a crimson band. Colour and weight are two
+   knobs, so a plate can be tinted without redrawing it. */
+.grunge--oxblood { --grunge-ink-color: rgb(147, 17, 40); --grunge-opacity: 0.5; }
+.grunge--bone { --grunge-ink-color: rgb(236, 233, 224); --grunge-opacity: 0.18; }
+.grunge--faint { --grunge-opacity: 0.1; }
 
 @media (prefers-reduced-motion: reduce) {
-	.grunge::before {
+	.grunge__ink {
 		transform: none;
 	}
 }

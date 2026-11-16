@@ -94,6 +94,14 @@ interface Props {
 	 * as broken, not as calm. Pass `false` for a plate that must stay static
 	 * (a dense reading column, or a tilted plate inside another tilted frame). */
 	Hover?: boolean;
+
+	/** Ink splats behind the plate. Default follows the frame: a plate WITH a
+	 *  coloured border stays clean (the border is its edge), a plate with no
+	 *  border gets the ink AS its edge. `true`/`false` overrides either way. */
+	Grunge?: boolean;
+
+	/** Force the splat corner for a plate whose copy fills its body. */
+	GrungeCorner?: "tl" | "tr" | "bl" | "br";
 }
 
 const {
@@ -107,9 +115,15 @@ const {
 	Wipe = false,
 	Surface = "plain",
 	Emphasis = "standard",
-	Accent = "crimson",
+	// The frame follows the tier: `featured` keeps its crimson border (and stays
+	// clean), `standard` and `quiet` are borderless, and `standard` takes the ink
+	// as its edge. That is the mix the language wants - some plates ruled, some
+	// printed.
+	Accent = Emphasis === "featured" ? "crimson" : "none",
 	Tilt,
 	Hover = true,
+	Grunge = Accent === "none" && Emphasis !== "quiet",
+	GrungeCorner,
 } = Astro.props;
 
 const Pad = {
@@ -186,7 +200,21 @@ const Frame =
 			];
 ---
 
-<div class:list={["relative", ...Frame, Pad, Wipe && "motion-wipe-host", Class]} data-emphasis={Emphasis}>
+<div
+	class:list={[
+		"relative",
+		...Frame,
+		Pad,
+		Wipe && "motion-wipe-host",
+		Grunge && "grunge",
+		Grunge && Surface === "paper" && "grunge--faint",
+		Class,
+	]}
+	data-emphasis={Emphasis}
+	data-grunge={Grunge ? "" : undefined}
+	data-grunge-corner={Grunge ? GrungeCorner : undefined}
+	data-grunge-mode={Grunge ? (Accent === "none" ? "edge" : "scatter") : undefined}
+>
 	{Wipe && <span class="motion-wipe" data-wipe aria-hidden="true" />}
 	{Tape !== undefined && <ZineTape Variant="corner" Label={Tape} Color={TapeColor} Side={TapeSide} />}
 	<slot />
