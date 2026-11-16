@@ -297,12 +297,11 @@ const InstallRoutes: InstallRoute[] = [
 			"Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256 verified, plugin enabled.",
 		Writes: `The catalog checkout only - ${Code("plugin.yaml")} plus the ${Code("__init__.py")} shim, in ${Code("~/.hermes/plugins/aphrodite")}. ${Code("download.sh")} then fetches the binary and the dylib into ${Code("~/.hermes/aphrodite/binaries/")}, never into the plugin directory, validated against the in-tree ${Code("SHA256SUMS.txt")} and magic-byte checked.`,
 		Verify: [
-			"Start <code class=\"font-mono text-base text-weathered-teal\">hermes</code>.",
+			'Start <code class="font-mono text-base text-weathered-teal">hermes</code>.',
 			"The plugin should log that Aphrodite is enabled.",
 			"If the binaries are missing, it logs the setup command and stays disabled until you run it.",
 		],
-		Expect:
-			"A log line saying Aphrodite is enabled, then two proxy listeners on :9797 (cache) and :9798 (token).",
+		Expect: "A log line saying Aphrodite is enabled, then two proxy listeners on :9797 (cache) and :9798 (token).",
 		Guide: true,
 		Warning: {
 			Label: "THE CATALOG RULE",
@@ -332,7 +331,8 @@ const InstallRoutes: InstallRoute[] = [
 					Command: `git clone ${ExternalLinks.HermesRepository}.git`,
 					Explanation:
 						"The plugin is a pure loader - it does not bundle the binary or the dylib - so the clone is small.",
-					Expected: "An <code class=\"font-mono text-base text-weathered-teal\">Aphrodite-Hermes</code> directory beside where you ran the command.",
+					Expected:
+						'An <code class="font-mono text-base text-weathered-teal">Aphrodite-Hermes</code> directory beside where you ran the command.',
 				},
 				{
 					Title: "Enter the clone",
@@ -344,9 +344,9 @@ const InstallRoutes: InstallRoute[] = [
 					Title: "Link the clone into Hermes's plugin directory",
 					Command: `ln -s "$(pwd)" ~/.hermes/plugins/aphrodite`,
 					Explanation:
-						"Hermes discovers plugins from <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/plugins/&lt;name&gt;</code>, so the link is what makes the clone a plugin. A symlink (not a copy) means edits to your checkout are picked up without recopying.",
+						'Hermes discovers plugins from <code class="font-mono text-base text-weathered-teal">~/.hermes/plugins/&lt;name&gt;</code>, so the link is what makes the clone a plugin. A symlink (not a copy) means edits to your checkout are picked up without recopying.',
 					Prerequisite:
-						"No existing <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/plugins/aphrodite</code> entry.",
+						'No existing <code class="font-mono text-base text-weathered-teal">~/.hermes/plugins/aphrodite</code> entry.',
 					Troubleshooting: [
 						`<code class="font-mono text-base text-weathered-teal">ln -s</code> onto an existing <code class="font-mono text-base text-weathered-teal">~/.hermes/plugins/aphrodite</code> directory: the link lands inside it instead of replacing it. Remove the directory first.`,
 					],
@@ -386,7 +386,8 @@ const InstallRoutes: InstallRoute[] = [
 					Command: `git clone ${ExternalLinks.HermesRepository}.git`,
 					Explanation:
 						"The plugin is a pure loader - it does not bundle the binary or the dylib - so the clone is small.",
-					Expected: "An <code class=\"font-mono text-base text-weathered-teal\">Aphrodite-Hermes</code> directory beside where you ran the command.",
+					Expected:
+						'An <code class="font-mono text-base text-weathered-teal">Aphrodite-Hermes</code> directory beside where you ran the command.',
 				},
 				{
 					Title: "Enter the clone",
@@ -405,9 +406,9 @@ const InstallRoutes: InstallRoute[] = [
 					Explanation:
 						"A directory junction is the Windows equivalent of the POSIX symlink and needs no admin rights on modern Windows, unlike a real symlink - so edits to your clone are picked up without recopying.",
 					Prerequisite:
-						"No existing <code class=\"font-mono text-base text-weathered-teal\">aphrodite</code> entry in that directory.",
+						'No existing <code class="font-mono text-base text-weathered-teal">aphrodite</code> entry in that directory.',
 					Troubleshooting: [
-						"Some locked-down environments still restrict junctions: copy instead - <code class=\"font-mono text-base text-weathered-teal\">Copy-Item -Recurse</code> - and remember you will need to re-copy after every plugin update.",
+						'Some locked-down environments still restrict junctions: copy instead - <code class="font-mono text-base text-weathered-teal">Copy-Item -Recurse</code> - and remember you will need to re-copy after every plugin update.',
 					],
 				},
 				{
@@ -448,12 +449,11 @@ const InstallRoutes: InstallRoute[] = [
 			"Binary + native library (dylib) fetched from GitHub Releases, SHA-256 verified, plugin enabled.",
 		Writes: `${Code("download.sh")} resolves the version from the bundled ${Code("BINARY_VERSION")}, the monorepo's own ${Code("Cargo.toml")}, or the latest published release, detects your platform, and installs ${Code("aphrodite")} + ${Code("libaphrodite_hermes")} into ${Code("~/.hermes/aphrodite/binaries/")}. Nothing is written inside the plugin tree.`,
 		Verify: [
-			"Start <code class=\"font-mono text-base text-weathered-teal\">hermes</code>.",
+			'Start <code class="font-mono text-base text-weathered-teal">hermes</code>.',
 			"The plugin should log that Aphrodite is enabled.",
 			"If the binaries are missing, it logs the setup command and stays disabled until you run it.",
 		],
-		Expect:
-			"A log line saying Aphrodite is enabled, then two proxy listeners on :9797 (cache) and :9798 (token).",
+		Expect: "A log line saying Aphrodite is enabled, then two proxy listeners on :9797 (cache) and :9798 (token).",
 	},
 	{
 		ID: "cargo",
@@ -512,7 +512,8 @@ const InstallRoutes: InstallRoute[] = [
 					Command: "aphrodite setup",
 					Explanation: `Provisions ${Code("%USERPROFILE%\\.hermes\\aphrodite\\")} - the binary, the dylibs, ${Code("aphrodite.toml")} from the embedded template and the ${Code("BINARY_VERSION")} pin - and registers the plugin with Hermes. It ends by starting the proxy and printing the one manual step left on Windows: linking the plugin into Hermes, which is the next two steps.`,
 					Prerequisite: `${Code("hermes")} on ${Code("PATH")}; Rust 1.88+.`,
-					Expected: "The runtime home provisioned, the plugin registered, the remaining link step named.",
+					Expected:
+						"The runtime home provisioned, the plugin registered, the remaining link step named.",
 					Troubleshooting: [
 						`No ${Code("hermes")} on ${Code("PATH")}: step one runs ${Code("hermes --version")} and fails fast with a clear error, before anything is written.`,
 						`A missing ${Code("libaphrodite_hermes")} aborts setup; a missing core ${Code("libaphrodite")} only warns - the plugin loads the Hermes dylib, not the core one.`,
@@ -548,8 +549,7 @@ const InstallRoutes: InstallRoute[] = [
 			`Option 3 does not install the full plugin tree by itself - after ${Code("aphrodite setup")} writes the loader, start ${Code("hermes")}.`,
 			"The plugin should log that Aphrodite is enabled; if the binaries are missing, it logs the setup command and stays disabled until you run it.",
 		],
-		Expect:
-			"A log line saying Aphrodite is enabled, then two proxy listeners on :9797 (cache) and :9798 (token).",
+		Expect: "A log line saying Aphrodite is enabled, then two proxy listeners on :9797 (cache) and :9798 (token).",
 		Lesson: {
 			Label: "MACOS GATEKEEPER",
 			Text: "Every artifact copy in aphrodite setup goes through one Gatekeeper-safe path: ditto (metadata-preserving), falling back to fs::copy + xattr -c to clear quarantine, then install_name_tool -id @rpath/<name> and an explicit ad-hoc codesign -f -s - for dylibs. A machine missing Xcode Command Line Tools used to get a SIGKILLed binary with zero diagnostic; every step now prints a specific warning instead.",
@@ -638,12 +638,11 @@ const InstallRoutes: InstallRoute[] = [
 			"A release build in target/release/ that you point the plugin at, or copy into the runtime home's binaries/ - no installer script, no download.",
 		Writes: `Nothing outside your checkout: ${Code("cargo build --release")} writes ${Code("target/release/aphrodite")} and ${Code("target/release/libaphrodite_hermes.dylib")} (${Code(".so")} on Linux). The plugin reads ${Code("APHRODITE_BINARY_PATH")} / ${Code("APHRODITE_HERMES_DYLIB_PATH")}, or you copy the pair into ${Code("~/.hermes/aphrodite/binaries/")}.`,
 		Verify: [
-			"Start <code class=\"font-mono text-base text-weathered-teal\">hermes</code>.",
+			'Start <code class="font-mono text-base text-weathered-teal">hermes</code>.',
 			"The plugin should log that Aphrodite is enabled.",
 			"If the binaries are missing, it logs the setup command and stays disabled until you run it.",
 		],
-		Expect:
-			"A log line saying Aphrodite is enabled, then two proxy listeners on :9797 (cache) and :9798 (token).",
+		Expect: "A log line saying Aphrodite is enabled, then two proxy listeners on :9797 (cache) and :9798 (token).",
 	},
 ];
 
@@ -790,8 +789,11 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 					The full host map, including the flavors still planned, is laid out on
 					<a
 						class="text-weathered-teal underline transition-colors hover:text-bone-white"
-						href={Routes.Flavors}>FLAVORS</a
-					>.
+						href={Routes.Flavors}
+					>
+						FLAVORS
+					</a>
+					.
 				</p>
 				<p class="type-body text-zinc-dust">
 					The four routes follow in full, command by command.
@@ -807,11 +809,14 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 			<p class="section-index">02 // DECISION MATRIX</p>
 			<div class="mt-3 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
 				<h2 class="type-section text-bone-white">Four routes, side by side</h2>
-				<div class="metric">{InstallRoutes.length}<span class="metric__unit">routes</span></div>
+				<div class="metric">
+					{InstallRoutes.length}
+					<span class="metric__unit">routes</span>
+				</div>
 			</div>
 			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
-				Every card states the same three facts - what it installs, whether it needs Rust, and
-				the situation it fits. The catalog is the card the page recommends.
+				Every card states the same three facts - what it installs, whether it needs Rust,
+				and the situation it fits. The catalog is the card the page recommends.
 			</p>
 
 			<!-- THE DOMINANT CARD. One expressive assembly per section, and this is
@@ -838,23 +843,27 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 							</div>
 							<h3 class="mt-4 type-section text-bone-white">{Primary.Title}</h3>
 							<div class="mt-5 flex flex-wrap gap-2">
-								{
-									Primary.Lanes.map((Lane) => (
-										<span class="telemetry-tag">
-											{Lane.Shell.toUpperCase()} - {Lane.Platform} // {Lane.Steps.length} STEPS
-										</span>
-									))
-								}
+								{Primary.Lanes.map((Lane) => (
+									<span class="telemetry-tag">
+										{Lane.Shell.toUpperCase()} - {Lane.Platform} //{" "}
+										{Lane.Steps.length} STEPS
+									</span>
+								))}
 							</div>
 							<p class="mt-5 font-mono text-base text-zinc-dust">
 								<a
 									class="text-weathered-teal underline transition-colors hover:text-bone-white"
-									href="#transcript">Take the catalog sequence</a
-								> - it is the one selected in the workflow below.
+									href="#transcript"
+								>
+									Take the catalog sequence
+								</a>{" "}
+								- it is the one selected in the workflow below.
 							</p>
 						</div>
 						<dl class="grid grid-cols-[auto_1fr] items-baseline gap-x-4 gap-y-3">
-							<dt class="type-meta font-bold uppercase text-zinc-dust">WHAT IT INSTALLS</dt>
+							<dt class="type-meta font-bold uppercase text-zinc-dust">
+								WHAT IT INSTALLS
+							</dt>
 							<dd class="font-mono text-base leading-relaxed text-bone-newsprint">
 								{Primary.Installs}
 							</dd>
@@ -862,12 +871,16 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 							<dd
 								class:list={[
 									"font-mono text-base leading-relaxed",
-									Primary.NeedsRust === "no" ? "text-weathered-teal" : "text-stamped-canary",
+									Primary.NeedsRust === "no"
+										? "text-weathered-teal"
+										: "text-stamped-canary",
 								]}
 							>
 								{Primary.NeedsRust}
 							</dd>
-							<dt class="type-meta font-bold uppercase text-zinc-dust">USE IT WHEN</dt>
+							<dt class="type-meta font-bold uppercase text-zinc-dust">
+								USE IT WHEN
+							</dt>
 							<dd class="font-mono text-base leading-relaxed text-bone-newsprint">
 								{Primary.UseWhen}
 							</dd>
@@ -882,56 +895,63 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 			<div class="mt-10 max-w-[46rem] border-t border-[color:var(--tier-shell-edge)] pt-6">
 				<h3 class="section-kicker">The other three routes</h3>
 				<p class="mt-2 type-body text-zinc-dust">
-					Same engine, different owner of the files. Each is an anchored
-					section, so a link can point at the route a reader needs.
+					Same engine, different owner of the files. Each is an anchored section, so a
+					link can point at the route a reader needs.
 				</p>
 			</div>
 
 			<!-- THE THREE ALTERNATIVES. Quiet surfaces: the ink is their edge, so
 			     they read as printed sheets beside the one plate that leans. -->
 			<div class="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-3">
-				{
-					Alternatives.map((Route) => (
-						<article
-							id={Route.ID}
-							class="grunge shell-card flex flex-col p-5 sm:p-6"
-							data-grunge
-							data-grunge-mode="edge"
-						>
-							<div class="flex flex-wrap items-center gap-2">
-								<span class:list={["telemetry-tag", TagTone[Route.BadgeColor]]}>{Route.Badge}</span>
-							</div>
-							<h3 class="mt-3 type-sub text-bone-white">{Route.Title}</h3>
-							<p class="mt-1 type-caption text-zinc-dust">{Route.Label}</p>
-							<dl class="mt-4 grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-2">
-								<dt class="type-meta font-bold uppercase text-zinc-dust">WHAT IT INSTALLS</dt>
-								<dd class="font-mono text-base leading-relaxed text-bone-newsprint">
-									{Route.Installs}
-								</dd>
-								<dt class="type-meta font-bold uppercase text-zinc-dust">NEEDS RUST</dt>
-								<dd
-									class:list={[
-										"font-mono text-base leading-relaxed",
-										Route.NeedsRust === "no" ? "text-weathered-teal" : "text-stamped-canary",
-									]}
-								>
-									{Route.NeedsRust}
-								</dd>
-								<dt class="type-meta font-bold uppercase text-zinc-dust">USE IT WHEN</dt>
-								<dd class="font-mono text-base leading-relaxed text-bone-newsprint">
-									{Route.UseWhen}
-								</dd>
-							</dl>
-							<div class="mt-auto flex flex-wrap gap-2 pt-5">
-								{Route.Lanes.map((Lane) => (
-									<span class="telemetry-tag">
-										{Lane.Shell.toUpperCase()} - {Lane.Platform} // {Lane.Steps.length} STEPS
-									</span>
-								))}
-							</div>
-						</article>
-					))
-				}
+				{Alternatives.map((Route) => (
+					<article
+						id={Route.ID}
+						class="grunge shell-card flex flex-col p-5 sm:p-6"
+						data-grunge
+						data-grunge-mode="edge"
+					>
+						<div class="flex flex-wrap items-center gap-2">
+							<span class:list={["telemetry-tag", TagTone[Route.BadgeColor]]}>
+								{Route.Badge}
+							</span>
+						</div>
+						<h3 class="mt-3 type-sub text-bone-white">{Route.Title}</h3>
+						<p class="mt-1 type-caption text-zinc-dust">{Route.Label}</p>
+						<dl class="mt-4 grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-2">
+							<dt class="type-meta font-bold uppercase text-zinc-dust">
+								WHAT IT INSTALLS
+							</dt>
+							<dd class="font-mono text-base leading-relaxed text-bone-newsprint">
+								{Route.Installs}
+							</dd>
+							<dt class="type-meta font-bold uppercase text-zinc-dust">NEEDS RUST</dt>
+							<dd
+								class:list={[
+									"font-mono text-base leading-relaxed",
+									Route.NeedsRust === "no"
+										? "text-weathered-teal"
+										: "text-stamped-canary",
+								]}
+							>
+								{Route.NeedsRust}
+							</dd>
+							<dt class="type-meta font-bold uppercase text-zinc-dust">
+								USE IT WHEN
+							</dt>
+							<dd class="font-mono text-base leading-relaxed text-bone-newsprint">
+								{Route.UseWhen}
+							</dd>
+						</dl>
+						<div class="mt-auto flex flex-wrap gap-2 pt-5">
+							{Route.Lanes.map((Lane) => (
+								<span class="telemetry-tag">
+									{Lane.Shell.toUpperCase()} - {Lane.Platform} //{" "}
+									{Lane.Steps.length} STEPS
+								</span>
+							))}
+						</div>
+					</article>
+				))}
 			</div>
 
 			<div class="mt-12">
@@ -953,32 +973,37 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 		     outcome, warning, lesson and verification) is the same surface's lower
 		     half, so a reader never has to hold two places in the page at once. -->
 		<section class="blueprint-section relative w-full" data-reveal>
-			<p class="section-index">03 // OPERATIONAL WORKFLOW // THE TRANSCRIPT // ROUTE BY ROUTE</p>
+			<p class="section-index">
+				03 // OPERATIONAL WORKFLOW // THE TRANSCRIPT // ROUTE BY ROUTE
+			</p>
 			<h2 id="transcript" class="mt-3 type-section text-bone-white">
 				Four installs, one at a time
 			</h2>
 			<div class="prose-flow mt-6 max-w-[46rem]">
 				<p class="type-body text-bone-newsprint">
 					Each route is self-contained: the commands, what they leave on disk, what makes
-					them fail, and the one check that says the install is live. The recommended path is
-					selected first; the other three are one pill away, in the same container.
+					them fail, and the one check that says the install is live. The recommended path
+					is selected first; the other three are one pill away, in the same container.
 				</p>
 				<p class="type-body text-bone-newsprint">
 					Platform is an input, not a footnote. Every route ships two complete lanes -
-					directory creation, discovery and linking, download, enable, verification - and every
-					command block carries the shell it is written for. A Windows lane contains no POSIX
-					command, and a macOS / Linux lane contains no PowerShell.
+					directory creation, discovery and linking, download, enable, verification - and
+					every command block carries the shell it is written for. A Windows lane contains
+					no POSIX command, and a macOS / Linux lane contains no PowerShell.
 				</p>
 				<p class="type-body text-zinc-dust">
 					WINDOWS: use PowerShell and run
 					<code class="font-mono text-base text-weathered-teal">pwsh ./download.ps1</code>
 					instead of
-					<code class="font-mono text-base text-weathered-teal">bash download.sh</code>
-					- the full Windows walkthrough is on
+					<code class="font-mono text-base text-weathered-teal">bash download.sh</code>-
+					the full Windows walkthrough is on
 					<a
 						class="text-weathered-teal underline transition-colors hover:text-bone-white"
-						href={DocsRoute("install/windows")}>/docs/install/windows/</a
-					>.
+						href={DocsRoute("install/windows")}
+					>
+						/docs/install/windows/
+					</a>
+					.
 				</p>
 			</div>
 
@@ -997,177 +1022,221 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 								id="platform-posix"
 								checked
 							/>
-							<label class="workflow__pill" for="platform-posix">BASH - macOS / Linux</label>
+							<label class="workflow__pill" for="platform-posix">
+								BASH - macOS / Linux
+							</label>
 							<input
 								class="workflow__radio"
 								type="radio"
 								name="setup-platform"
 								id="platform-windows"
 							/>
-							<label class="workflow__pill" for="platform-windows">POWERSHELL - Windows</label>
+							<label class="workflow__pill" for="platform-windows">
+								POWERSHELL - Windows
+							</label>
 						</div>
 					</fieldset>
 					<fieldset class="workflow__group workflow__group--route">
 						<legend class="workflow__legend">ROUTE //</legend>
 						<div class="workflow__pills">
-							{
-								InstallRoutes.map((Route) => (
-									<>
-										<input
-											class="workflow__radio"
-											type="radio"
-											name="setup-route"
-											id={`route-${Route.ID}`}
-											checked={Route.Recommended}
-										/>
-										<label
-											class="workflow__pill"
-											for={`route-${Route.ID}`}
-											style={`--pill-accent: ${PillAccent[Route.BadgeColor]}`}
-										>
-											{Route.Badge}
-										</label>
-									</>
-								))
-							}
+							{InstallRoutes.map((Route) => (
+								<>
+									<input
+										class="workflow__radio"
+										type="radio"
+										name="setup-route"
+										id={`route-${Route.ID}`}
+										checked={Route.Recommended}
+									/>
+									<label
+										class="workflow__pill"
+										for={`route-${Route.ID}`}
+										style={`--pill-accent: ${PillAccent[Route.BadgeColor]}`}
+									>
+										{Route.Badge}
+									</label>
+								</>
+							))}
 						</div>
 					</fieldset>
 				</div>
 
 				<!-- THE CONTAINER. One terminal, eight lanes, four records - all in
 				     the document, one of each shown. -->
-				<div class="workflow__terminal grunge shell-card" data-grunge data-grunge-mode="edge">
-					{
-						InstallRoutes.map((Route) => (
-							<div class="workflow__route" data-route={Route.ID}>
-								{Route.Lanes.map((Lane) => (
-									<div class="workflow__lane" data-os={Platform(Lane)}>
-										<div class="workflow__bar">
-											<span class:list={["telemetry-tag", TagTone[Route.BadgeColor]]}>
-												{Route.Badge}
-											</span>
-											<h3 class="type-sub text-bone-white">{Route.Title}</h3>
-											<span class="telemetry-tag">
-												{Lane.Shell.toUpperCase()} - {Lane.Platform}
-											</span>
-											<span class="font-mono text-base text-zinc-dust">
-												{Lane.Steps.length} STEPS
-											</span>
-											<CopyButton
-												Class="ml-auto"
-												Label={`COPY ALL ${Lane.Steps.length}`}
-												Payload={Executable(Lane.Steps)}
-												Tone="teal"
-												Size="sm"
-											/>
-										</div>
-
-										<ol class="workflow__steps list-none px-4 pb-6 pt-2 sm:px-5">
-											{Lane.Steps.map((Step, StepIndex) => (
-												<li class="mt-6 border-l-2 border-[color:var(--tier-well-edge)] pl-4 sm:pl-5">
-													<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-														<span class="font-mono text-base font-black tracking-widest text-stamped-canary">
-															{String(StepIndex + 1).padStart(2, "0")}
-														</span>
-														<h4 class="type-sub text-bone-white">{Step.Title}</h4>
-													</div>
-													{Step.Prerequisite !== undefined && (
-														<p class="mt-2 type-body text-zinc-dust">
-															<span class="telemetry-tag">BEFORE</span>{" "}
-															<span set:html={Step.Prerequisite} />
-														</p>
-													)}
-													<CodeFence Class="mt-3" Copy Lang={Lane.Lang} Code={Step.Command} />
-													{Step.Explanation !== undefined && (
-														<p class="mt-3 type-body text-bone-newsprint" set:html={Step.Explanation} />
-													)}
-													{Step.Expected !== undefined && (
-														<p class="mt-2 type-body text-zinc-dust">
-															<span class="telemetry-tag">EXPECT</span>{" "}
-															<span set:html={Step.Expected} />
-														</p>
-													)}
-													{Step.Troubleshooting?.map((Note) => (
-														<p
-															class="mt-2 border-l-2 border-raw-blood pl-3 type-body text-bone-newsprint"
-															set:html={Note}
-														/>
-													))}
-												</li>
-											))}
-										</ol>
+				<div
+					class="workflow__terminal grunge shell-card"
+					data-grunge
+					data-grunge-mode="edge"
+				>
+					{InstallRoutes.map((Route) => (
+						<div class="workflow__route" data-route={Route.ID}>
+							{Route.Lanes.map((Lane) => (
+								<div class="workflow__lane" data-os={Platform(Lane)}>
+									<div class="workflow__bar">
+										<span
+											class:list={[
+												"telemetry-tag",
+												TagTone[Route.BadgeColor],
+											]}
+										>
+											{Route.Badge}
+										</span>
+										<h3 class="type-sub text-bone-white">{Route.Title}</h3>
+										<span class="telemetry-tag">
+											{Lane.Shell.toUpperCase()} - {Lane.Platform}
+										</span>
+										<span class="font-mono text-base text-zinc-dust">
+											{Lane.Steps.length} STEPS
+										</span>
+										<CopyButton
+											Class="ml-auto"
+											Label={`COPY ALL ${Lane.Steps.length}`}
+											Payload={Executable(Lane.Steps)}
+											Tone="teal"
+											Size="sm"
+										/>
 									</div>
+
+									<ol class="workflow__steps list-none px-4 pb-6 pt-2 sm:px-5">
+										{Lane.Steps.map((Step, StepIndex) => (
+											<li class="mt-6 border-l-2 border-[color:var(--tier-well-edge)] pl-4 sm:pl-5">
+												<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+													<span class="font-mono text-base font-black tracking-widest text-stamped-canary">
+														{String(StepIndex + 1).padStart(2, "0")}
+													</span>
+													<h4 class="type-sub text-bone-white">
+														{Step.Title}
+													</h4>
+												</div>
+												{Step.Prerequisite !== undefined && (
+													<p class="mt-2 type-body text-zinc-dust">
+														<span class="telemetry-tag">BEFORE</span>{" "}
+														<span set:html={Step.Prerequisite} />
+													</p>
+												)}
+												<CodeFence
+													Class="mt-3"
+													Copy
+													Lang={Lane.Lang}
+													Code={Step.Command}
+												/>
+												{Step.Explanation !== undefined && (
+													<p
+														class="mt-3 type-body text-bone-newsprint"
+														set:html={Step.Explanation}
+													/>
+												)}
+												{Step.Expected !== undefined && (
+													<p class="mt-2 type-body text-zinc-dust">
+														<span class="telemetry-tag">EXPECT</span>{" "}
+														<span set:html={Step.Expected} />
+													</p>
+												)}
+												{Step.Troubleshooting?.map((Note) => (
+													<p
+														class="mt-2 border-l-2 border-raw-blood pl-3 type-body text-bone-newsprint"
+														set:html={Note}
+													/>
+												))}
+											</li>
+										))}
+									</ol>
+								</div>
+							))}
+
+							<!-- THE RECORD for this route: the `//` notes, the outcome, the one
+								     destructive warning, the aside, and the verification. -->
+							<div class="workflow__dossier border-t border-[color:var(--tier-shell-edge)] px-4 pb-6 pt-5 sm:px-5">
+								{Route.Notes?.map((Note) => (
+									<p class="mb-4 type-body text-zinc-dust" set:html={Note} />
 								))}
 
-								<!-- THE RECORD for this route: the `//` notes, the outcome, the one
-								     destructive warning, the aside, and the verification. -->
-								<div class="workflow__dossier border-t border-[color:var(--tier-shell-edge)] px-4 pb-6 pt-5 sm:px-5">
-									{Route.Notes?.map((Note) => (
-										<p class="mb-4 type-body text-zinc-dust" set:html={Note} />
-									))}
-
-									<div class="border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-well)] p-4">
-										<ZineKicker Tone="canary" As="div">{Route.OutcomeTag}</ZineKicker>
-										<p class="mt-2 border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-canvas)] p-3 font-mono text-base font-bold leading-relaxed text-bone-white">
-											{Route.Outcome}
+								<div class="border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-well)] p-4">
+									<ZineKicker Tone="canary" As="div">
+										{Route.OutcomeTag}
+									</ZineKicker>
+									<p class="mt-2 border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-canvas)] p-3 font-mono text-base font-bold leading-relaxed text-bone-white">
+										{Route.Outcome}
+									</p>
+									{Route.Guide === true && (
+										<p class="mt-2 font-mono text-base text-zinc-dust">
+											SRC:{" "}
+											<a
+												class="text-weathered-teal underline transition-colors hover:text-bone-white"
+												href={ExternalLinks.HermesGuide}
+											>
+												the Hermes plugin guide
+											</a>{" "}
+											- Installing from the catalog.
 										</p>
-										{Route.Guide === true && (
-											<p class="mt-2 font-mono text-base text-zinc-dust">
-												SRC:{" "}
-												<a
-													class="text-weathered-teal underline transition-colors hover:text-bone-white"
-													href={ExternalLinks.HermesGuide}
-												>
-													the Hermes plugin guide
-												</a>{" "}
-												- Installing from the catalog.
-											</p>
-										)}
+									)}
+								</div>
+
+								{Route.Warning !== undefined && (
+									<div class="mt-6 border-l-4 border-stamped-canary bg-[color:var(--tier-canvas)] p-4">
+										<ZineKicker Tone="canary" As="div">
+											{Route.Warning.Label}
+										</ZineKicker>
+										{Route.Warning.Lines.map((Line) => (
+											<p
+												class="mt-2 type-body text-bone-newsprint"
+												set:html={Line}
+											/>
+										))}
 									</div>
+								)}
 
-									{Route.Warning !== undefined && (
-										<div class="mt-6 border-l-4 border-stamped-canary bg-[color:var(--tier-canvas)] p-4">
-											<ZineKicker Tone="canary" As="div">{Route.Warning.Label}</ZineKicker>
-											{Route.Warning.Lines.map((Line) => (
-												<p class="mt-2 type-body text-bone-newsprint" set:html={Line} />
-											))}
-										</div>
-									)}
+								{Route.Lesson !== undefined && (
+									<div class="mt-6">
+										<ZineLesson
+											Label={Route.Lesson.Label}
+											Text={Route.Lesson.Text}
+											Color="teal"
+										/>
+									</div>
+								)}
 
-									{Route.Lesson !== undefined && (
-										<div class="mt-6">
-											<ZineLesson Label={Route.Lesson.Label} Text={Route.Lesson.Text} Color="teal" />
-										</div>
-									)}
-
-									<div class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-5">
-										<div class="border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-well)] p-4 xl:col-span-3">
-											<ZineKicker Tone="teal" As="div">WHAT IT WRITES</ZineKicker>
-											<p class="mt-2 type-body text-bone-newsprint" set:html={Route.Writes} />
-										</div>
-										<div class="border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-well)] p-4 xl:col-span-2">
-											<ZineKicker As="div">VERIFY IT WORKS</ZineKicker>
-											{Route.Verify.map((Line) => (
-												<p class="mt-2 type-body text-bone-newsprint" set:html={Line} />
-											))}
-											<p class="mt-3 border-t border-[color:var(--tier-well-edge)] pt-2 type-body text-zinc-dust">
-												<span class="telemetry-tag telemetry-tag--canary">EXPECT</span>{" "}
-												{Route.Expect}
-											</p>
-										</div>
+								<div class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-5">
+									<div class="border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-well)] p-4 xl:col-span-3">
+										<ZineKicker Tone="teal" As="div">
+											WHAT IT WRITES
+										</ZineKicker>
+										<p
+											class="mt-2 type-body text-bone-newsprint"
+											set:html={Route.Writes}
+										/>
+									</div>
+									<div class="border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-well)] p-4 xl:col-span-2">
+										<ZineKicker As="div">VERIFY IT WORKS</ZineKicker>
+										{Route.Verify.map((Line) => (
+											<p
+												class="mt-2 type-body text-bone-newsprint"
+												set:html={Line}
+											/>
+										))}
+										<p class="mt-3 border-t border-[color:var(--tier-well-edge)] pt-2 type-body text-zinc-dust">
+											<span class="telemetry-tag telemetry-tag--canary">
+												EXPECT
+											</span>{" "}
+											{Route.Expect}
+										</p>
 									</div>
 								</div>
 							</div>
-						))
-					}
+						</div>
+					))}
 				</div>
 			</div>
 
 			<p class="mt-8 font-mono text-base text-zinc-dust">
 				All four routes converge on the same two directories -
-				<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="#layout"
-					>what changes on disk</a
-				>.
+				<a
+					class="text-weathered-teal underline transition-colors hover:text-bone-white"
+					href="#layout"
+				>
+					what changes on disk
+				</a>
+				.
 			</p>
 			<ZineSource
 				Lines={[
@@ -1180,22 +1249,32 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 		<!-- 04 // PERSISTENCE ARCHITECTURE - the canonical layout every route
 		     converges on, and the eight steps that produce it. -->
 		<section class="blueprint-section relative w-full" data-reveal>
-			<p class="section-index">04 // PERSISTENCE ARCHITECTURE // AFTER ANY ROUTE // THE LAYOUT</p>
+			<p class="section-index">
+				04 // PERSISTENCE ARCHITECTURE // AFTER ANY ROUTE // THE LAYOUT
+			</p>
 			<h2 id="layout" class="mt-3 type-section text-bone-white">
 				What changes on disk
 			</h2>
 			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
-				All four routes converge on the same two directories. Nothing else moves: no
-				PATH edit, no shell profile, no system-wide install.
+				All four routes converge on the same two directories. Nothing else moves: no PATH
+				edit, no shell profile, no system-wide install.
 			</p>
 
 			<div class="mt-10">
-				<ZineBox Size="lg" Tone="subtle" Rotate="-rotate-[1deg]" Tape="THE LAYOUT" TapeColor="teal">
+				<ZineBox
+					Size="lg"
+					Tone="subtle"
+					Rotate="-rotate-[1deg]"
+					Tape="THE LAYOUT"
+					TapeColor="teal"
+				>
 					<CodeFence Lang="text" Code={Layout} />
 					<div class="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
 						<div class="well p-4">
 							<div class="flex flex-wrap items-center justify-between gap-2">
-								<ZineKicker Tone="teal" As="div">THE PLUGIN DIRECTORY</ZineKicker>
+								<ZineKicker Tone="teal" As="div">
+									THE PLUGIN DIRECTORY
+								</ZineKicker>
 								<ZineCopyChip
 									Label="COPY PATH"
 									Copy="~/.hermes/plugins/aphrodite"
@@ -1205,15 +1284,22 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 							</div>
 							<p class="mt-2 type-body text-bone-newsprint">
 								The plugin directory stays hooks-only: it carries just
-								<code class="font-mono text-base text-weathered-teal">plugin.yaml</code> and the
-								<code class="font-mono text-base text-weathered-teal">__init__.py</code> loader
-								that registers hooks and tools, and the plugin never writes, downloads or
-								modifies anything inside it.
+								<code class="font-mono text-base text-weathered-teal">
+									plugin.yaml
+								</code>{" "}
+								and the
+								<code class="font-mono text-base text-weathered-teal">
+									__init__.py
+								</code>{" "}
+								loader that registers hooks and tools, and the plugin never writes,
+								downloads or modifies anything inside it.
 							</p>
 						</div>
 						<div class="well p-4">
 							<div class="flex flex-wrap items-center justify-between gap-2">
-								<ZineKicker Tone="teal" As="div">THE RUNTIME HOME</ZineKicker>
+								<ZineKicker Tone="teal" As="div">
+									THE RUNTIME HOME
+								</ZineKicker>
 								<ZineCopyChip
 									Label="COPY PATH"
 									Copy="~/.hermes/aphrodite"
@@ -1223,21 +1309,32 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 							</div>
 							<p class="mt-2 type-body text-bone-newsprint">
 								Every runtime artifact lives in
-								<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>:
-								binaries, config, directives, the CCR database and logs. That split is what lets
-								the catalog own the checkout while the binaries live somewhere else entirely.
+								<code class="font-mono text-base text-weathered-teal">
+									~/.hermes/aphrodite/
+								</code>
+								: binaries, config, directives, the CCR database and logs. That
+								split is what lets the catalog own the checkout while the binaries
+								live somewhere else entirely.
 							</p>
 						</div>
 					</div>
 					<p class="mt-6 type-body text-zinc-dust">
 						On plugin startup
-						<code class="font-mono text-base text-weathered-teal">layout_check.py</code> checks
-						toward this schema; installed layouts are already canonical, because
-						<code class="font-mono text-base text-weathered-teal">aphrodite setup</code> produced
-						them.
+						<code class="font-mono text-base text-weathered-teal">
+							layout_check.py
+						</code>{" "}
+						checks toward this schema; installed layouts are already canonical, because
+						<code class="font-mono text-base text-weathered-teal">
+							aphrodite setup
+						</code>{" "}
+						produced them.
 					</p>
 					<div class="mt-10">
-						<ZineFold Label="WHAT APHRODITE SETUP DOES, IN ORDER" Tag="8 STEPS" Body={SetupSteps} />
+						<ZineFold
+							Label="WHAT APHRODITE SETUP DOES, IN ORDER"
+							Tag="8 STEPS"
+							Body={SetupSteps}
+						/>
 					</div>
 				</ZineBox>
 			</div>
@@ -1259,67 +1356,105 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 				Two files matter and they share no keys:
 				<code class="font-mono text-base text-weathered-teal">aphrodite.toml</code> for
 				everything that tunes how Aphrodite compresses, and Hermes's own
-				<code class="font-mono text-base text-weathered-teal">config.yaml</code> for enabling
-				the plugin.
+				<code class="font-mono text-base text-weathered-teal">config.yaml</code> for
+				enabling the plugin.
 			</p>
 
 			<div class="grunge shell-card mt-8 p-5 sm:p-8" data-grunge data-grunge-mode="edge">
 				<CodeFence Lang="toml" Code={Config} />
-				<div
-					class="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[color:var(--tier-shell-edge)] pt-3 text-base text-zinc-dust"
-				>
+				<div class="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[color:var(--tier-shell-edge)] pt-3 text-base text-zinc-dust">
 					<span>TEMPLATES IN THE REPO:</span>
-					<span class="font-bold text-stamped-canary">aphrodite.toml.example + the embedded template</span>
+					<span class="font-bold text-stamped-canary">
+						aphrodite.toml.example + the embedded template
+					</span>
 				</div>
 				<div class="prose-flow mt-2 max-w-[46rem]">
 					<p class="type-body text-zinc-dust">
-						Two shipped files stay in sync: aphrodite.toml.example (the annotated reference) and
-						the embedded template the binary ships with.
+						Two shipped files stay in sync: aphrodite.toml.example (the annotated
+						reference) and the embedded template the binary ships with.
 					</p>
 					<p class="type-body text-zinc-dust">
-						Keys not yet wired into the runtime are annotated DOCUMENTED BUT UNWIRED in the
-						example - it is the source of truth for the documented surface.
+						Keys not yet wired into the runtime are annotated DOCUMENTED BUT UNWIRED in
+						the example - it is the source of truth for the documented surface.
 					</p>
 				</div>
 				<div class="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
 					<div class="well p-4">
-						<ZineKicker Tone="teal" As="div">TWO PARSERS, ONE FILE</ZineKicker>
+						<ZineKicker Tone="teal" As="div">
+							TWO PARSERS, ONE FILE
+						</ZineKicker>
 						<p class="mt-2 type-body text-bone-newsprint">
-							The Rust HTTP proxy (<code class="font-mono text-base text-weathered-teal">config/proxy.rs</code>)
-							reads <code class="font-mono text-base text-weathered-teal">[[proxies]]</code>,
-							<code class="font-mono text-base text-weathered-teal">[defaults]</code>, the four
-							hot-reload thresholds plus auto_expand / auto_expand_limit /
-							max_request_body_size, and preview_max_chars. The Hermes dylib session
-							(<code class="font-mono text-base text-weathered-teal">config_loader.rs</code>)
-							reads the <code class="font-mono text-base text-weathered-teal">[compression]</code>
-							engine keys, <code class="font-mono text-base text-weathered-teal">[defaults]</code>
-							model/api_url, <code class="font-mono text-base text-weathered-teal">[flow]</code>,
-							<code class="font-mono text-base text-weathered-teal">[directives]</code>,
-							<code class="font-mono text-base text-weathered-teal">[prompts]</code> and
-							<code class="font-mono text-base text-weathered-teal">[templates]</code>.
+							The Rust HTTP proxy (
+							<code class="font-mono text-base text-weathered-teal">
+								config/proxy.rs
+							</code>
+							) reads{" "}
+							<code class="font-mono text-base text-weathered-teal">[[proxies]]</code>
+							,<code class="font-mono text-base text-weathered-teal">[defaults]</code>
+							, the four hot-reload thresholds plus auto_expand / auto_expand_limit /
+							max_request_body_size, and preview_max_chars. The Hermes dylib session (
+							<code class="font-mono text-base text-weathered-teal">
+								config_loader.rs
+							</code>
+							) reads the{" "}
+							<code class="font-mono text-base text-weathered-teal">
+								[compression]
+							</code>
+							engine keys,{" "}
+							<code class="font-mono text-base text-weathered-teal">[defaults]</code>
+							model/api_url,{" "}
+							<code class="font-mono text-base text-weathered-teal">[flow]</code>,
+							<code class="font-mono text-base text-weathered-teal">
+								[directives]
+							</code>
+							,<code class="font-mono text-base text-weathered-teal">[prompts]</code>{" "}
+							and
+							<code class="font-mono text-base text-weathered-teal">[templates]</code>
+							.
 						</p>
 					</div>
 					<div class="well p-4">
-						<ZineKicker Tone="teal" As="div">NOT HERMES'S CONFIG.YAML</ZineKicker>
+						<ZineKicker Tone="teal" As="div">
+							NOT HERMES'S CONFIG.YAML
+						</ZineKicker>
 						<p class="mt-2 type-body text-bone-newsprint">
 							The only Aphrodite-relevant keys in
-							<code class="font-mono text-base text-weathered-teal">config.yaml</code> are
-							<code class="font-mono text-base text-weathered-teal">plugins.enabled: [aphrodite]</code>,
-							added by <code class="font-mono text-base text-weathered-teal">hermes plugins enable</code>,
-							and optionally <code class="font-mono text-base text-weathered-teal">context.engine: aphrodite</code>
-							with its threshold. Ports, thresholds, preview style and prompt wording all
-							belong in the toml.
+							<code class="font-mono text-base text-weathered-teal">
+								config.yaml
+							</code>{" "}
+							are
+							<code class="font-mono text-base text-weathered-teal">
+								plugins.enabled: [aphrodite]
+							</code>
+							, added by{" "}
+							<code class="font-mono text-base text-weathered-teal">
+								hermes plugins enable
+							</code>
+							, and optionally{" "}
+							<code class="font-mono text-base text-weathered-teal">
+								context.engine: aphrodite
+							</code>
+							with its threshold. Ports, thresholds, preview style and prompt wording
+							all belong in the toml.
 						</p>
 					</div>
 				</div>
 				<p class="mt-8 type-body text-zinc-dust">
 					Every knob the file exposes is explorable on
-					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={Routes.Config}>/config/</a>,
-					and the complete schema is
 					<a
 						class="text-weathered-teal underline transition-colors hover:text-bone-white"
-						href={DocsRoute("config/aphrodite-toml")}>/docs/config/aphrodite-toml/</a
-					>.
+						href={Routes.Config}
+					>
+						/config/
+					</a>
+					, and the complete schema is
+					<a
+						class="text-weathered-teal underline transition-colors hover:text-bone-white"
+						href={DocsRoute("config/aphrodite-toml")}
+					>
+						/docs/config/aphrodite-toml/
+					</a>
+					.
 				</p>
 			</div>
 			<ZineSource
@@ -1337,9 +1472,11 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 				When it does not come up
 			</h2>
 			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
-				Every install failure announces itself in one of six ways. The proxy's
-				own stderr goes to
-				<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/proxy-stderr.log</code>
+				Every install failure announces itself in one of six ways. The proxy's own stderr
+				goes to
+				<code class="font-mono text-base text-weathered-teal">
+					~/.hermes/aphrodite/proxy-stderr.log
+				</code>
 				- read that file before anything else.
 			</p>
 
@@ -1361,34 +1498,69 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 						</thead>
 						<tbody class="text-bone-newsprint">
 							<tr class="border-b border-[color:var(--tier-shell-edge)]">
-								<td class="px-4 py-3 text-bone-white sm:px-5">the plugin logs the setup command and stays disabled</td>
-								<td class="px-4 py-3 text-zinc-dust sm:px-5">binaries missing from ~/.hermes/aphrodite/binaries/</td>
-								<td class="px-4 py-3 sm:px-5">bash download.sh (or pwsh ./download.ps1) in the plugin folder</td>
+								<td class="px-4 py-3 text-bone-white sm:px-5">
+									the plugin logs the setup command and stays disabled
+								</td>
+								<td class="px-4 py-3 text-zinc-dust sm:px-5">
+									binaries missing from ~/.hermes/aphrodite/binaries/
+								</td>
+								<td class="px-4 py-3 sm:px-5">
+									bash download.sh (or pwsh ./download.ps1) in the plugin folder
+								</td>
 							</tr>
 							<tr class="border-b border-[color:var(--tier-shell-edge)]">
-								<td class="px-4 py-3 text-bone-white sm:px-5">download.sh stops at the verify step</td>
-								<td class="px-4 py-3 text-zinc-dust sm:px-5">checksum does not match SHA256SUMS.txt</td>
-								<td class="px-4 py-3 sm:px-5">re-run the script; check network access to GitHub Releases</td>
+								<td class="px-4 py-3 text-bone-white sm:px-5">
+									download.sh stops at the verify step
+								</td>
+								<td class="px-4 py-3 text-zinc-dust sm:px-5">
+									checksum does not match SHA256SUMS.txt
+								</td>
+								<td class="px-4 py-3 sm:px-5">
+									re-run the script; check network access to GitHub Releases
+								</td>
 							</tr>
 							<tr class="border-b border-[color:var(--tier-shell-edge)]">
-								<td class="px-4 py-3 text-bone-white sm:px-5">no API key configured</td>
-								<td class="px-4 py-3 text-zinc-dust sm:px-5">no aphrodite.toml in the working directory</td>
+								<td class="px-4 py-3 text-bone-white sm:px-5">
+									no API key configured
+								</td>
+								<td class="px-4 py-3 text-zinc-dust sm:px-5">
+									no aphrodite.toml in the working directory
+								</td>
 								<td class="px-4 py-3 sm:px-5">--api-key or APHRODITE_API_KEY</td>
 							</tr>
 							<tr class="border-b border-[color:var(--tier-shell-edge)]">
-								<td class="px-4 py-3 text-bone-white sm:px-5">port already in use</td>
-								<td class="px-4 py-3 text-zinc-dust sm:px-5">another proxy already bound to 9797/9798</td>
-								<td class="px-4 py-3 sm:px-5">tail proxy-stderr.log; APHRODITE_CACHE_PORT / APHRODITE_TOKEN_PORT</td>
+								<td class="px-4 py-3 text-bone-white sm:px-5">
+									port already in use
+								</td>
+								<td class="px-4 py-3 text-zinc-dust sm:px-5">
+									another proxy already bound to 9797/9798
+								</td>
+								<td class="px-4 py-3 sm:px-5">
+									tail proxy-stderr.log; APHRODITE_CACHE_PORT /
+									APHRODITE_TOKEN_PORT
+								</td>
 							</tr>
 							<tr class="border-b border-[color:var(--tier-shell-edge)]">
-								<td class="px-4 py-3 text-bone-white sm:px-5">the binary is SIGKILLed on launch (macOS)</td>
-								<td class="px-4 py-3 text-zinc-dust sm:px-5">quarantine, or no Xcode Command Line Tools</td>
-								<td class="px-4 py-3 sm:px-5">re-run aphrodite setup - ditto, xattr -c, ad-hoc codesign</td>
+								<td class="px-4 py-3 text-bone-white sm:px-5">
+									the binary is SIGKILLed on launch (macOS)
+								</td>
+								<td class="px-4 py-3 text-zinc-dust sm:px-5">
+									quarantine, or no Xcode Command Line Tools
+								</td>
+								<td class="px-4 py-3 sm:px-5">
+									re-run aphrodite setup - ditto, xattr -c, ad-hoc codesign
+								</td>
 							</tr>
 							<tr>
-								<td class="px-4 py-3 text-bone-white sm:px-5">a health-poll warning after launch</td>
-								<td class="px-4 py-3 text-zinc-dust sm:px-5">a port did not answer within 5 seconds</td>
-								<td class="px-4 py-3 sm:px-5">the warning names the port; check proxy-stderr.log</td>
+								<td class="px-4 py-3 text-bone-white sm:px-5">
+									a health-poll warning after launch
+								</td>
+								<td class="px-4 py-3 text-zinc-dust sm:px-5">
+									a port did not answer within 5 seconds
+								</td>
+								<td class="px-4 py-3 sm:px-5">
+									the warning names the port; check proxy-stderr.log
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -1396,10 +1568,10 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 			</div>
 
 			<p class="mt-8 max-w-[46rem] type-body text-zinc-dust">
-				Before launching, the plugin probes both ports' /health endpoints and skips the launch
-				when another process already answers a confirmed Aphrodite health body - so a second
-				Hermes session does not start a second proxy pair. A failed registration is a warning,
-				never an abort.
+				Before launching, the plugin probes both ports' /health endpoints and skips the
+				launch when another process already answers a confirmed Aphrodite health body - so a
+				second Hermes session does not start a second proxy pair. A failed registration is a
+				warning, never an abort.
 			</p>
 			<ZineSource
 				Lines={[
@@ -1421,17 +1593,20 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 					The same compression engine runs as a standalone proxy: point any
 					OpenAI-compatible client's
 					<code class="font-mono text-base text-weathered-teal">base_url</code> at
-					<code class="font-mono text-base text-weathered-teal">http://localhost:9798</code>
+					<code class="font-mono text-base text-weathered-teal">
+						http://localhost:9798
+					</code>
 					(token) or <code class="font-mono text-base text-weathered-teal">:9797</code>
 					(cache), and responses compress over plain HTTP.
 				</p>
 				<p class="type-body text-bone-newsprint">
 					Invoked without an
 					<code class="font-mono text-base text-weathered-teal">aphrodite.toml</code>, the
-					binary needs <code class="font-mono text-base text-weathered-teal">--api-key</code> or
-					<code class="font-mono text-base text-weathered-teal">APHRODITE_API_KEY</code>. That
-					is a startup requirement, not an upstream call - a placeholder is enough to prove
-					the binary serves.
+					binary needs{" "}
+					<code class="font-mono text-base text-weathered-teal">--api-key</code> or
+					<code class="font-mono text-base text-weathered-teal">APHRODITE_API_KEY</code>.
+					That is a startup requirement, not an upstream call - a placeholder is enough to
+					prove the binary serves.
 				</p>
 			</div>
 
@@ -1455,12 +1630,16 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 							<tr class="border-b border-[color:var(--tier-shell-edge)]">
 								<td class="px-4 py-3 text-bone-white sm:px-5">9797</td>
 								<td class="px-4 py-3 text-weathered-teal sm:px-5">cache</td>
-								<td class="px-4 py-3 sm:px-5">the cache proxy - threshold 2048 bytes by default</td>
+								<td class="px-4 py-3 sm:px-5">
+									the cache proxy - threshold 2048 bytes by default
+								</td>
 							</tr>
 							<tr>
 								<td class="px-4 py-3 text-bone-white sm:px-5">9798</td>
 								<td class="px-4 py-3 text-weathered-teal sm:px-5">token</td>
-								<td class="px-4 py-3 sm:px-5">the token proxy - threshold 256 bytes by default</td>
+								<td class="px-4 py-3 sm:px-5">
+									the token proxy - threshold 256 bytes by default
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -1475,8 +1654,8 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 					Code={`./aphrodite --api-key «redacted:sk-...» --listen 127.0.0.1:9798`}
 				/>
 				<p class="mt-2 type-body text-zinc-dust">
-					The key is redacted here on purpose: a placeholder is enough, because the flag is a
-					startup requirement rather than a credential the binary verifies.
+					The key is redacted here on purpose: a placeholder is enough, because the flag
+					is a startup requirement rather than a credential the binary verifies.
 				</p>
 				<p class="mt-6 font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 					CHECK // the health endpoint
@@ -1499,21 +1678,49 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 				</div>
 				<div class="prose-flow mt-6 max-w-[46rem]">
 					<p class="type-body text-zinc-dust">
-						You do not need a real Hermes session, a real Hermes install or a real upstream API
-						key to confirm the binary itself works: starting the proxy and hitting
-						<code class="font-mono text-base text-weathered-teal">/health</code> never calls
-						upstream. Set
-						<code class="font-mono text-base text-weathered-teal">APHRODITE_NO_AUTO_LAUNCH=1</code>
-						if you launch it yourself and do not want the plugin to start a second pair - there
-						is no <code class="font-mono text-base text-weathered-teal">auto_start</code> key in
-						either config file.
+						You do not need a real Hermes session, a real Hermes install or a real
+						upstream API key to confirm the binary itself works: starting the proxy and
+						hitting
+						<code class="font-mono text-base text-weathered-teal">/health</code> never
+						calls upstream. Set
+						<code class="font-mono text-base text-weathered-teal">
+							APHRODITE_NO_AUTO_LAUNCH=1
+						</code>
+						if you launch it yourself and do not want the plugin to start a second pair
+						- there is no{" "}
+						<code class="font-mono text-base text-weathered-teal">auto_start</code> key
+						in either config file.
 					</p>
 					<p class="type-body text-zinc-dust">
 						The full surface is documented on the proxy pages:
-						<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={DocsRoute("proxy/architecture")}>architecture</a>,
-						<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={DocsRoute("proxy/compression")}>compression</a>,
-						<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={DocsRoute("proxy/handlers")}>handlers</a>,
-						<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={DocsRoute("proxy/retry")}>retry</a>.
+						<a
+							class="text-weathered-teal underline transition-colors hover:text-bone-white"
+							href={DocsRoute("proxy/architecture")}
+						>
+							architecture
+						</a>
+						,
+						<a
+							class="text-weathered-teal underline transition-colors hover:text-bone-white"
+							href={DocsRoute("proxy/compression")}
+						>
+							compression
+						</a>
+						,
+						<a
+							class="text-weathered-teal underline transition-colors hover:text-bone-white"
+							href={DocsRoute("proxy/handlers")}
+						>
+							handlers
+						</a>
+						,
+						<a
+							class="text-weathered-teal underline transition-colors hover:text-bone-white"
+							href={DocsRoute("proxy/retry")}
+						>
+							retry
+						</a>
+						.
 					</p>
 				</div>
 			</div>
@@ -1533,8 +1740,8 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 			</h2>
 			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
 				Disable the plugin, remove the loader, then stop anything still running. Every
-				command is its own copy control, so a reader never pastes the sentence about
-				the command.
+				command is its own copy control, so a reader never pastes the sentence about the
+				command.
 			</p>
 
 			<div class="grunge shell-card mt-8 p-5 sm:p-8" data-grunge data-grunge-mode="edge">
@@ -1558,7 +1765,9 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 											</span>
 										</div>
 										<div class="mt-1 flex flex-wrap items-center gap-2">
-											<code class="type-code break-token text-bone-newsprint">{Step.Command}</code>
+											<code class="type-code break-token text-bone-newsprint">
+												{Step.Command}
+											</code>
 											<ZineCopyChip
 												Label="COPY"
 												Copy={Step.Command}
@@ -1573,15 +1782,27 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 					))}
 				</div>
 				<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
-					Remove <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code> as well to clean up the binaries, config, CCR database and logs the download scripts or <code class="font-mono text-base text-weathered-teal">aphrodite setup</code> wrote.
+					Remove{" "}
+					<code class="font-mono text-base text-weathered-teal">
+						~/.hermes/aphrodite/
+					</code>{" "}
+					as well to clean up the binaries, config, CCR database and logs the download
+					scripts or{" "}
+					<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>{" "}
+					wrote.
 				</p>
 				<p class="mt-2 max-w-[46rem] type-body text-zinc-dust">
 					On Windows the runtime home is
-					<code class="font-mono text-base text-weathered-teal">%USERPROFILE%\.hermes\aphrodite\</code>.
+					<code class="font-mono text-base text-weathered-teal">
+						%USERPROFILE%\.hermes\aphrodite\
+					</code>
+					.
 				</p>
 			</div>
 			<ZineSource
-				Lines={["SRC: docs/install/macos-linux.md (uninstall); docs/install/windows.md (uninstall)"]}
+				Lines={[
+					"SRC: docs/install/macos-linux.md (uninstall); docs/install/windows.md (uninstall)",
+				]}
 			/>
 		</section>
 
@@ -1602,23 +1823,23 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 <style is:global>
 	/* ---- THE WORKFLOW SWITCH -------------------------------------------------
 
-   One instrument, two inputs, one output. A reader picks a PLATFORM and a ROUTE
-   and the container below shows exactly that lane, plus the record for that
-   route. Nothing here is a script: the switch is a pair of radio groups and
-   `:has()`, so it works with JavaScript off and the pills are real form
-   controls a keyboard can reach.
+	   One instrument, two inputs, one output. A reader picks a PLATFORM and a ROUTE
+	   and the container below shows exactly that lane, plus the record for that
+	   route. Nothing here is a script: the switch is a pair of radio groups and
+	   `:has()`, so it works with JavaScript off and the pills are real form
+	   controls a keyboard can reach.
 
-   WHY `is:global`. The show/hide rules are `:has()` on a checked radio, and
-   Astro's scoped-CSS pass rewrites compound selectors inside a page's style
-   block; a scoped `:has()` chain is not a shape it can rewrite reliably. Every
-   selector below is namespaced `workflow`, and no other page in the tree uses
-   that word, so global here means global-to-this-page in practice.
+	   WHY `is:global`. The show/hide rules are `:has()` on a checked radio, and
+	   Astro's scoped-CSS pass rewrites compound selectors inside a page's style
+	   block; a scoped `:has()` chain is not a shape it can rewrite reliably. Every
+	   selector below is namespaced `workflow`, and no other page in the tree uses
+	   that word, so global here means global-to-this-page in practice.
 
-   THE ID CONTRACT. `route-catalog|clone|cargo|source` and
-   `platform-posix|windows` are the ids the radios carry and the ids these rules
-   name. They are generated from `Route.ID` and from the lane's shell, so a
-   renamed route ID must be renamed here too - otherwise the controls render,
-   every panel stays hidden, and nothing reports an error. */
+	   THE ID CONTRACT. `route-catalog|clone|cargo|source` and
+	   `platform-posix|windows` are the ids the radios carry and the ids these rules
+	   name. They are generated from `Route.ID` and from the lane's shell, so a
+	   renamed route ID must be renamed here too - otherwise the controls render,
+	   every panel stays hidden, and nothing reports an error. */
 
 	.workflow {
 		position: relative;

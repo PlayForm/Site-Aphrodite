@@ -61,8 +61,7 @@ const Pages = await getCollection("Docs");
 // siblings. An entry opens a group when it sits inside the folder
 // (ccr/backends/sqlite) or when it IS the folder's index page (ccr/backends) -
 // the index page is the one whose title names the group.
-const IsFolderIndex = (Id: string) =>
-	Pages.some((Page) => Page.id.startsWith(`${Id}/`));
+const IsFolderIndex = (Id: string) => Pages.some((Page) => Page.id.startsWith(`${Id}/`));
 
 const GroupKeyOf = (Id: string) => {
 	const Segments = Id.split("/");
@@ -126,27 +125,21 @@ const RankOf = (Name: string, Id: string) =>
 
 const Sections = [
 	...Pages.sort((A, B) => A.id.localeCompare(B.id))
-		.reduce(
-			(Groups, Page) => {
-				const Key = GroupKeyOf(Page.id);
+		.reduce((Groups, Page) => {
+			const Key = GroupKeyOf(Page.id);
 
-				Groups.set(Page.data.section, [
-					...(Groups.get(Page.data.section) ?? []),
-					{
-						Id: Page.id,
-						Title: Page.data.title,
-						Wip: WipDocs.has(Page.id),
-						Group: Key === undefined ? undefined : (GroupLabels.get(Key) ?? Key),
-					},
-				]);
+			Groups.set(Page.data.section, [
+				...(Groups.get(Page.data.section) ?? []),
+				{
+					Id: Page.id,
+					Title: Page.data.title,
+					Wip: WipDocs.has(Page.id),
+					Group: Key === undefined ? undefined : (GroupLabels.get(Key) ?? Key),
+				},
+			]);
 
-				return Groups;
-			},
-			new Map<
-				string,
-				{ Id: string; Title: string; Wip: boolean; Group?: string }[]
-			>(),
-		)
+			return Groups;
+		}, new Map<string, { Id: string; Title: string; Wip: boolean; Group?: string }[]>())
 		.entries(),
 ]
 	// The editorial order, not Overview-then-alphabetical: the rail, the
@@ -190,7 +183,9 @@ const MermaidSvgs = import.meta.glob("../../Content/Mermaid/*.svg", {
 	eager: true,
 }) as Record<string, string>;
 
-const PageDiagrams = (MermaidManifest as { Id: string; File: string; Index: number; Label: string }[])
+const PageDiagrams = (
+	MermaidManifest as { Id: string; File: string; Index: number; Label: string }[]
+)
 	.filter((Entry) => Entry.File === Doc.id)
 	.sort((A, B) => A.Index - B.Index)
 	.map((Entry) => ({
@@ -213,9 +208,11 @@ const IndexEntries = IsSectionIndex
 				Name: Doc.data.section,
 				// The card grid always consumes { Name, Entries } groups; on the
 				// section-index routes the group is this section's own page list.
-				Entries: (Sections.find(
-					({ Name }) => Name.toLowerCase() === Doc.data.section.toLowerCase(),
-				)?.Entries ?? []).filter((Entry) => Entry.Id !== Doc.id),
+				Entries: (
+					Sections.find(
+						({ Name }) => Name.toLowerCase() === Doc.data.section.toLowerCase(),
+					)?.Entries ?? []
+				).filter((Entry) => Entry.Id !== Doc.id),
 			},
 		]
 	: Sections.filter(({ Name }) => Name !== "Overview");
@@ -237,13 +234,13 @@ const IndexEntries = IsSectionIndex
 const Summaries: Record<string, string> = {
 	"api/ccr-endpoints":
 		"The loopback-only CCR endpoints that let external tools and scripts create, list and resolve stored entries.",
-	"api/health": "GET /health - the public liveness check for load balancers and monitoring systems.",
+	"api/health":
+		"GET /health - the public liveness check for load balancers and monitoring systems.",
 	"api/metrics-endpoint":
 		"GET /metrics - the proxy's counters, gauges and latency histogram, as Prometheus metrics.",
 	"api/retrieve":
 		"POST /retrieve resolves a CCR hash back to its original content, with optional line filtering.",
-	"architecture/01-startup":
-		"The two halves of the Aphrodite startup path, traced end to end.",
+	"architecture/01-startup": "The two halves of the Aphrodite startup path, traced end to end.",
 	"architecture/02-chat-compression":
 		"The token and cache proxies' central flow, from the upstream response to the compressed reply.",
 	"architecture/03-retrieve":
@@ -287,18 +284,16 @@ const Summaries: Record<string, string> = {
 		"The single TOML file that configures Aphrodite's proxy listeners and compression engine.",
 	"config/env-vars":
 		"The APHRODITE_ environment variables (plus a few non-prefixed ones) that override the TOML.",
-	examples:
-		"Real tool results captured from live sessions against the Aphrodite 1.4.6 binary.",
+	examples: "Real tool results captured from live sessions against the Aphrodite 1.4.6 binary.",
 	"examples/llm-view":
 		"The LLM's view of the captured examples: what the model receives once compression has run.",
 	"guides/hermes-integration":
 		"Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a client at.",
 	"guides/hermes-tool-output-schemas":
 		"Every Hermes tool returns output with its own shape - diffs, JSON envelopes and the rest - and this is how each one is classified.",
-	guides:
-		"Walkthrough-style pages that connect the parts of Aphrodite the way you actually use them.",
+	guides: "Walkthrough-style pages that connect the parts of Aphrodite the way you actually use them.",
 	index: "Aphrodite compresses context before it hits the LLM.",
-	install: "Four correct answers to \"how do I install this\", one per platform.",
+	install: 'Four correct answers to "how do I install this", one per platform.',
 	"install/macos-linux":
 		"The macOS and Linux install path - and everything that also works on Windows under Git Bash or WSL.",
 	"install/troubleshooting":
@@ -309,8 +304,7 @@ const Summaries: Record<string, string> = {
 		"Every proxy operation exposed as counters, gauges and histograms at GET /metrics.",
 	"metrics/queries":
 		"PromQL reference for monitoring and alerting on the Aphrodite proxy metrics.",
-	"plugin/context-engine":
-		"The context engine - the dylib session's middle-turn archiver.",
+	"plugin/context-engine": "The context engine - the dylib session's middle-turn archiver.",
 	"plugin/directives":
 		"Directives - short behavioural instruction files, one .md each - and what each one changes.",
 	"plugin/hooks": "The six hooks the plugin registers with Hermes, and what each one is for.",
@@ -318,8 +312,7 @@ const Summaries: Record<string, string> = {
 		"The local reverse proxy that sits between any OpenAI-compatible client and the upstream API.",
 	"proxy/compression":
 		"How the proxy decides whether to compress each piece of Chat Completions response content.",
-	"proxy/handlers":
-		"The HTTP handlers the proxy exposes for LLM requests, CCR entries and more.",
+	"proxy/handlers": "The HTTP handlers the proxy exposes for LLM requests, CCR entries and more.",
 	"proxy/retry":
 		"Transient upstream failures do not fail the request; this is how the retry path works.",
 	"tool-relay/callbacks": "The two distinct callback surfaces around the tool relay.",
@@ -357,8 +350,7 @@ const Purpose = (Body?: string) => {
 			continue;
 		}
 
-		const Text = Trimmed
-			.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+		const Text = Trimmed.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
 			.replace(/[*`_[\]]/g, "")
 			.replace(/\s+/g, " ")
 			.trim();
@@ -371,9 +363,7 @@ const Purpose = (Body?: string) => {
 };
 
 // One description per page: authored first, `Purpose()` where none was written.
-const Purposes = new Map(
-	Pages.map((Page) => [Page.id, Summaries[Page.id] ?? Purpose(Page.body)]),
-);
+const Purposes = new Map(Pages.map((Page) => [Page.id, Summaries[Page.id] ?? Purpose(Page.body)]));
 
 // This page's own one-line purpose - the unique per-page meta description.
 // The section template stays as the fallback for entries without prose.
@@ -480,9 +470,7 @@ const NextSteps = (() => {
 
 <Base
 	Title={`${Doc.data.title} - Aphrodite`}
-	Description={
-		SelfPurpose || `Aphrodite documentation - ${Doc.data.section}.`
-	}
+	Description={SelfPurpose || `Aphrodite documentation - ${Doc.data.section}.`}
 >
 	<main class="relative z-10 mx-auto w-full max-w-[1440px] px-5 py-16 sm:px-8 lg:py-24">
 		<!-- Mobile: the docs index opens as a full-screen drawer -->
@@ -503,18 +491,18 @@ const NextSteps = (() => {
 			>
 				DOCS
 			</a>
-			<span class="text-zinc-dust" aria-hidden="true">/</span>
+			<span class="text-zinc-dust" aria-hidden="true">
+				/
+			</span>
 			<span class="uppercase tracking-widest text-zinc-dust">{Doc.data.section}</span>
-			{
-				!IsIndex && (
-					<>
-						<span class="text-zinc-dust" aria-hidden="true">
-							/
-						</span>
-						<span class="uppercase tracking-widest text-bone-white">{Doc.data.title}</span>
-					</>
-				)
-			}
+			{!IsIndex && (
+				<>
+					<span class="text-zinc-dust" aria-hidden="true">
+						/
+					</span>
+					<span class="uppercase tracking-widest text-bone-white">{Doc.data.title}</span>
+				</>
+			)}
 		</nav>
 
 		<!-- Two tracks from xl (the docs index and the reading column), three
@@ -549,75 +537,70 @@ const NextSteps = (() => {
 			     the section stamp's -top-7 rise previously reached the
 			     breadcrumb text at the mt-10 gap. -->
 				<header class="relative pt-12">
-					<span
-						class="absolute left-0 top-0 z-20 -rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]"
-					>
+					<span class="absolute left-0 top-0 z-20 -rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]">
 						{Doc.data.section}
 					</span>
-					{
-						WipDocs.has(Doc.id) && (
-							<span
-								class="absolute right-0 top-0 z-20 rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
-								title="Roadmap: partly unimplemented"
-							>
-								WIP
-							</span>
-						)
-					}
-					<h1
-						class="border-b-4 border-blood-crimson pb-6 font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-4xl"
-					>
+					{WipDocs.has(Doc.id) && (
+						<span
+							class="absolute right-0 top-0 z-20 rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+							title="Roadmap: partly unimplemented"
+						>
+							WIP
+						</span>
+					)}
+					<h1 class="border-b-4 border-blood-crimson pb-6 font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-4xl">
 						{Doc.data.title}
 					</h1>
 				</header>
 
-				{
-					PageDiagrams.map((Figure) => (
-						<figure
-							class="grunge grunge--faint tier-shell relative z-10 mt-16 border border-oxblood-dark p-4"
-							data-diagram={Figure.Id}
-							data-grunge
-							data-grunge-mode="edge"
-							data-reveal
-						>
-							<div class="overflow-x-auto [&_svg]:h-auto [&_svg]:max-w-full" set:html={Figure.Svg} />
-							<figcaption class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-								{Figure.Label}
-							</figcaption>
-						</figure>
-					))
-				}
+				{PageDiagrams.map((Figure) => (
+					<figure
+						class="grunge grunge--faint tier-shell relative z-10 mt-16 border border-oxblood-dark p-4"
+						data-diagram={Figure.Id}
+						data-grunge
+						data-grunge-mode="edge"
+						data-reveal
+					>
+						<div
+							class="overflow-x-auto [&_svg]:h-auto [&_svg]:max-w-full"
+							set:html={Figure.Svg}
+						/>
+						<figcaption class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+							{Figure.Label}
+						</figcaption>
+					</figure>
+				))}
 
 				<!-- Index pages: the zine index cards with one-line purposes -->
-				{
-					IsIndex && (
-						<section
-							aria-label="Section index"
-							class="blueprint-section relative mt-16"
-							data-reveal
-						>
-							<p class="section-index">00 // INDEX</p>
-							<h2
-								class="mt-2 font-mono text-2xl font-black uppercase tracking-widest text-zinc-dust"
-							>
-								{IsSectionIndex ? "IN THIS SECTION" : "THE SECTIONS"}
-							</h2>
-							<p class="mt-4 max-w-[62ch] type-body text-bone-newsprint">
-								Aphrodite works on one thing: the output a tool call appends to the
-								model's context. Every section documents a part of that work.
-							</p>
-							<div class="mt-8 grid gap-10 sm:grid-cols-2 sm:gap-x-12">
-								{IndexEntries.map(({ Name, Entries }) => (
-									<div class="border-l-2 border-oxblood-dark pl-5">
-										<h3 class="font-mono text-xl font-bold tracking-normal text-bone-white">
-											{Name}
-										</h3>
-										<ul class="mt-3 flex flex-col gap-4">
-											{Entries.filter((Entry) => Entry.Id !== Doc.id).map((Entry) => (
+				{IsIndex && (
+					<section
+						aria-label="Section index"
+						class="blueprint-section relative mt-16"
+						data-reveal
+					>
+						<p class="section-index">00 // INDEX</p>
+						<h2 class="mt-2 font-mono text-2xl font-black uppercase tracking-widest text-zinc-dust">
+							{IsSectionIndex ? "IN THIS SECTION" : "THE SECTIONS"}
+						</h2>
+						<p class="mt-4 max-w-[62ch] type-body text-bone-newsprint">
+							Aphrodite works on one thing: the output a tool call appends to the
+							model's context. Every section documents a part of that work.
+						</p>
+						<div class="mt-8 grid gap-10 sm:grid-cols-2 sm:gap-x-12">
+							{IndexEntries.map(({ Name, Entries }) => (
+								<div class="border-l-2 border-oxblood-dark pl-5">
+									<h3 class="font-mono text-xl font-bold tracking-normal text-bone-white">
+										{Name}
+									</h3>
+									<ul class="mt-3 flex flex-col gap-4">
+										{Entries.filter((Entry) => Entry.Id !== Doc.id).map(
+											(Entry) => (
 												<li class="flex flex-col gap-1">
 													<a
 														href={Href(Entry.Id)}
-														aria-current={Entry.Id === Doc.id ? "page" : undefined}
+														aria-current={
+															Entry.Id === Doc.id ? "page" : undefined
+														}
 														class={`font-mono text-base font-bold tracking-wide ${
 															Entry.Id === Doc.id
 																? "text-stamped-canary underline decoration-2 underline-offset-4"
@@ -640,58 +623,59 @@ const NextSteps = (() => {
 														</p>
 													)}
 												</li>
-											))}
-										</ul>
-									</div>
-								))}
-							</div>
-						</section>
-					)
-				}
+											),
+										)}
+									</ul>
+								</div>
+							))}
+						</div>
+					</section>
+				)}
 
 				<!-- Narrow viewports: the page's outline as a disclosure. Same
 				     generated list as the right rail - the page derives it once
 				     and presents it twice, and only one is ever visible. -->
-				{
-					HasToc && (
-						<details class="group mt-16 border border-oxblood-dark bg-carbon-void 2xl:hidden">
-							<summary
-								aria-describedby="docs-outline-note"
-								class="flex cursor-pointer list-none items-center justify-between px-5 py-3 font-mono text-base font-black uppercase tracking-widest text-stamped-canary [&::-webkit-details-marker]:hidden"
+				{HasToc && (
+					<details class="group mt-16 border border-oxblood-dark bg-carbon-void 2xl:hidden">
+						<summary
+							aria-describedby="docs-outline-note"
+							class="flex cursor-pointer list-none items-center justify-between px-5 py-3 font-mono text-base font-black uppercase tracking-widest text-stamped-canary [&::-webkit-details-marker]:hidden"
+						>
+							IN THIS DOCUMENT
+							<span
+								aria-hidden="true"
+								class="transition-transform group-open:rotate-45"
 							>
-								IN THIS DOCUMENT
-								<span aria-hidden="true" class="transition-transform group-open:rotate-45">
-									+
-								</span>
-							</summary>
-							<p
-								id="docs-outline-note"
-								class="type-body border-t border-oxblood-dark px-5 pb-1 pt-3 text-zinc-dust"
-							>
-								Crimson marks the heading currently in view; every entry is one of the
-								document's own headings.
-							</p>
-							<ul class="flex flex-col gap-1 px-5 py-4">
-								{Toc.map(({ Chapter, Depth, Id, Label }) => (
-									<li class={Depth === 3 ? "pl-4" : undefined}>
-										<a
-											href={`#${Id}`}
-											data-outline-link={Id}
-											class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white"
-										>
-											{Chapter !== undefined && (
-												<span class="mr-1.5 inline-block text-[11px] font-bold tracking-[0.08em] text-zinc-dust">
-													{String(Chapter).padStart(2, "0")}
-												</span>
-											)}
-											{Label}
-										</a>
-									</li>
-								))}
-							</ul>
-						</details>
-					)
-				}
+								+
+							</span>
+						</summary>
+						<p
+							id="docs-outline-note"
+							class="type-body border-t border-oxblood-dark px-5 pb-1 pt-3 text-zinc-dust"
+						>
+							Crimson marks the heading currently in view; every entry is one of the
+							document's own headings.
+						</p>
+						<ul class="flex flex-col gap-1 px-5 py-4">
+							{Toc.map(({ Chapter, Depth, Id, Label }) => (
+								<li class={Depth === 3 ? "pl-4" : undefined}>
+									<a
+										href={`#${Id}`}
+										data-outline-link={Id}
+										class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white"
+									>
+										{Chapter !== undefined && (
+											<span class="mr-1.5 inline-block text-[11px] font-bold tracking-[0.08em] text-zinc-dust">
+												{String(Chapter).padStart(2, "0")}
+											</span>
+										)}
+										{Label}
+									</a>
+								</li>
+							))}
+						</ul>
+					</details>
+				)}
 
 				<!-- The reading column. One entrance for the whole column: the
 				     generated markdown cannot carry attributes of its own, so the
@@ -715,53 +699,51 @@ const NextSteps = (() => {
 				</div>
 
 				<!-- Prev / next: the zine cards at the bottom of the reading column -->
-				{
-					(Previous || Next) && (
-						<nav
-							aria-label="Docs pagination"
-							class="mt-32 grid gap-16 border-t-4 border-dashed border-oxblood-dark pt-16 sm:grid-cols-2 sm:gap-8"
-						>
-							{Previous ? (
-								<a
-									href={Href(Previous.Id)}
-									rel="prev"
-									class="group relative border-4 border-blood-crimson bg-carbon-void p-6 zine-box-subtle transition-transform hover:-translate-y-1"
-								>
-									<span class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
-										PREV
-									</span>
-									<span class="mt-2 block font-mono text-base font-bold text-bone-white group-hover:text-stamped-canary">
-										{Previous.Title}
-									</span>
-									<span class="mt-1 block font-mono text-base uppercase tracking-widest text-zinc-dust">
-										{Href(Previous.Id)}
-									</span>
-								</a>
-							) : (
-								<span aria-hidden="true" />
-							)}
-							{Next ? (
-								<a
-									href={Href(Next.Id)}
-									rel="next"
-									class="group relative border-4 border-blood-crimson bg-carbon-void p-6 text-right zine-box-subtle transition-transform hover:-translate-y-1"
-								>
-									<span class="absolute -top-3.5 right-4 z-20 rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]">
-										NEXT
-									</span>
-									<span class="mt-2 block font-mono text-base font-bold text-bone-white group-hover:text-stamped-canary">
-										{Next.Title}
-									</span>
-									<span class="mt-1 block font-mono text-base uppercase tracking-widest text-zinc-dust">
-										{Href(Next.Id)}
-									</span>
-								</a>
-							) : (
-								<span aria-hidden="true" />
-							)}
-						</nav>
-					)
-				}
+				{(Previous || Next) && (
+					<nav
+						aria-label="Docs pagination"
+						class="mt-32 grid gap-16 border-t-4 border-dashed border-oxblood-dark pt-16 sm:grid-cols-2 sm:gap-8"
+					>
+						{Previous ? (
+							<a
+								href={Href(Previous.Id)}
+								rel="prev"
+								class="group relative border-4 border-blood-crimson bg-carbon-void p-6 zine-box-subtle transition-transform hover:-translate-y-1"
+							>
+								<span class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+									PREV
+								</span>
+								<span class="mt-2 block font-mono text-base font-bold text-bone-white group-hover:text-stamped-canary">
+									{Previous.Title}
+								</span>
+								<span class="mt-1 block font-mono text-base uppercase tracking-widest text-zinc-dust">
+									{Href(Previous.Id)}
+								</span>
+							</a>
+						) : (
+							<span aria-hidden="true" />
+						)}
+						{Next ? (
+							<a
+								href={Href(Next.Id)}
+								rel="next"
+								class="group relative border-4 border-blood-crimson bg-carbon-void p-6 text-right zine-box-subtle transition-transform hover:-translate-y-1"
+							>
+								<span class="absolute -top-3.5 right-4 z-20 rotate-1 border border-black bg-stamped-canary px-3 py-0.5 text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000]">
+									NEXT
+								</span>
+								<span class="mt-2 block font-mono text-base font-bold text-bone-white group-hover:text-stamped-canary">
+									{Next.Title}
+								</span>
+								<span class="mt-1 block font-mono text-base uppercase tracking-widest text-zinc-dust">
+									{Href(Next.Id)}
+								</span>
+							</a>
+						) : (
+							<span aria-hidden="true" />
+						)}
+					</nav>
+				)}
 
 				<!-- Provenance, demoted to a "suggest an edit" block at the foot of
 				     the page. The words are unchanged and the source is still one
@@ -771,77 +753,73 @@ const NextSteps = (() => {
 				     changed is the volume - an instruction about the site's own
 				     construction sat above the article, where it competed with the
 				     page's own lead. -->
-				{
-					Doc.data.source && (
-						<aside
-							aria-label="Suggest an edit"
-							class="mt-24 border-t border-oxblood-dark pt-6"
-						>
-							<p class="type-meta uppercase tracking-widest text-zinc-dust">
-								Suggest an edit
-							</p>
-							<p class="type-body mt-2 max-w-[62ch] text-zinc-dust">
-								<span class="uppercase tracking-widest type-meta">Generated from</span>{" "}
-								<a
-									class="text-stamped-canary underline decoration-2 underline-offset-4 hover:text-bone-white"
-									href={RepoLink(OurRepo, Doc.data.source)}
-								>
-									{Doc.data.source}
-								</a>{" "}
-								<span class="uppercase tracking-widest">
-									in the Aphrodite repository - edit it there, not the generated copy
-								</span>
-							</p>
-						</aside>
-					)
-				}
+				{Doc.data.source && (
+					<aside
+						aria-label="Suggest an edit"
+						class="mt-24 border-t border-oxblood-dark pt-6"
+					>
+						<p class="type-meta uppercase tracking-widest text-zinc-dust">
+							Suggest an edit
+						</p>
+						<p class="type-body mt-2 max-w-[62ch] text-zinc-dust">
+							<span class="uppercase tracking-widest type-meta">Generated from</span>{" "}
+							<a
+								class="text-stamped-canary underline decoration-2 underline-offset-4 hover:text-bone-white"
+								href={RepoLink(OurRepo, Doc.data.source)}
+							>
+								{Doc.data.source}
+							</a>{" "}
+							<span class="uppercase tracking-widest">
+								in the Aphrodite repository - edit it there, not the generated copy
+							</span>
+						</p>
+					</aside>
+				)}
 			</div>
 
 			<!-- Wide viewports: the in-page outline as a sticky right rail. The
 			     entries come from the page's own headings, so the rail can never
 			     drift from the anchors the renderer emitted. -->
-			{
-				HasToc && (
-					<aside class="hidden 2xl:block">
-						<div class="sticky top-24">
-							<nav
-								aria-label="In this document"
-								aria-describedby="docs-rail-note"
-								class="border-l border-oxblood-dark pl-4"
+			{HasToc && (
+				<aside class="hidden 2xl:block">
+					<div class="sticky top-24">
+						<nav
+							aria-label="In this document"
+							aria-describedby="docs-rail-note"
+							class="border-l border-oxblood-dark pl-4"
+						>
+							<p class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+								IN THIS DOCUMENT
+							</p>
+							<p
+								id="docs-rail-note"
+								class="type-body mt-2 border-b border-oxblood-dark pb-3 text-zinc-dust"
 							>
-								<p class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-									IN THIS DOCUMENT
-								</p>
-								<p
-									id="docs-rail-note"
-									class="type-body mt-2 border-b border-oxblood-dark pb-3 text-zinc-dust"
-								>
-									The section being read is marked in crimson; the rail follows the
-									document's own headings.
-								</p>
-								<ul class="mt-3 flex max-h-[calc(100vh-16rem)] flex-col gap-1 overflow-y-auto">
-									{Toc.map(({ Chapter, Depth, Id, Label }) => (
-										<li class={Depth === 3 ? "pl-3" : undefined}>
-											<a
-												href={`#${Id}`}
-												data-outline-link={Id}
-												class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white"
-											>
-												{Chapter !== undefined && (
-													<span class="mr-1.5 inline-block text-[11px] font-bold tracking-[0.08em] text-zinc-dust">
-														{String(Chapter).padStart(2, "0")}
-													</span>
-												)}
-												{Label}
-											</a>
-										</li>
-									))}
-								</ul>
-							</nav>
-						</div>
-					</aside>
-				)
-			}
+								The section being read is marked in crimson; the rail follows the
+								document's own headings.
+							</p>
+							<ul class="mt-3 flex max-h-[calc(100vh-16rem)] flex-col gap-1 overflow-y-auto">
+								{Toc.map(({ Chapter, Depth, Id, Label }) => (
+									<li class={Depth === 3 ? "pl-3" : undefined}>
+										<a
+											href={`#${Id}`}
+											data-outline-link={Id}
+											class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white"
+										>
+											{Chapter !== undefined && (
+												<span class="mr-1.5 inline-block text-[11px] font-bold tracking-[0.08em] text-zinc-dust">
+													{String(Chapter).padStart(2, "0")}
+												</span>
+											)}
+											{Label}
+										</a>
+									</li>
+								))}
+							</ul>
+						</nav>
+					</div>
+				</aside>
+			)}
 		</div>
 	</main>
 
@@ -854,9 +832,7 @@ const NextSteps = (() => {
 		aria-label="Documentation index"
 	>
 		<div class="absolute inset-0 bg-soot-black/90" data-drawer-close></div>
-		<div
-			class="absolute inset-y-0 left-0 w-80 max-w-[85vw] overflow-y-auto border-r-4 border-blood-crimson bg-carbon-void p-6"
-		>
+		<div class="absolute inset-y-0 left-0 w-80 max-w-[85vw] overflow-y-auto border-r-4 border-blood-crimson bg-carbon-void p-6">
 			<button
 				data-drawer-close
 				class="mb-8 border-2 border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
@@ -1006,7 +982,9 @@ const NextSteps = (() => {
 	   underline on hover, the raw-blood focus ring. */
 	.docs-prose :global(a.code-link) {
 		text-decoration: none;
-		transition: background-color 0.15s ease, color 0.15s ease;
+		transition:
+			background-color 0.15s ease,
+			color 0.15s ease;
 	}
 
 	.docs-prose :global(a.code-link:hover) {
@@ -1204,8 +1182,7 @@ const NextSteps = (() => {
 		border: 0;
 	}
 
-	.docs-prose
-		:global(table:has(td:nth-child(2)):not(:has(td:nth-child(3))) td:first-child) {
+	.docs-prose :global(table:has(td:nth-child(2)):not(:has(td:nth-child(3))) td:first-child) {
 		width: 24ch;
 		border-top: 0;
 		font-family: "JetBrains Mono", monospace;
@@ -1223,7 +1200,8 @@ const NextSteps = (() => {
 		background-color: color-mix(in srgb, var(--asphalt-panel) 55%, transparent);
 	}
 
-	.docs-prose :global(table:has(td:nth-child(2)):not(:has(td:nth-child(3))) tr:nth-child(even) td) {
+	.docs-prose
+		:global(table:has(td:nth-child(2)):not(:has(td:nth-child(3))) tr:nth-child(even) td) {
 		background-color: transparent;
 	}
 
@@ -1361,26 +1339,26 @@ const NextSteps = (() => {
 			return;
 		}
 
-	// Focus management: opening moves focus into the drawer (the CLOSE button),
-	// closing hands it back to the toggle that opened it.
-	Toggle.dataset.drawerBound = "1";
+		// Focus management: opening moves focus into the drawer (the CLOSE button),
+		// closing hands it back to the toggle that opened it.
+		Toggle.dataset.drawerBound = "1";
 
-	const Closer = Drawer.querySelector<HTMLButtonElement>("button[data-drawer-close]");
+		const Closer = Drawer.querySelector<HTMLButtonElement>("button[data-drawer-close]");
 
-	const Set = (Open: boolean) => {
-		Drawer.classList.toggle("hidden", !Open);
-		Toggle.setAttribute("aria-expanded", String(Open));
-		document.documentElement.classList.toggle("overflow-hidden", Open);
+		const Set = (Open: boolean) => {
+			Drawer.classList.toggle("hidden", !Open);
+			Toggle.setAttribute("aria-expanded", String(Open));
+			document.documentElement.classList.toggle("overflow-hidden", Open);
 
-		if (Open) {
-			Closer?.focus();
-		} else {
-			// preventScroll: a TOC link inside the drawer is about to jump to an
-			// anchor further down the page - handing focus back must not drag the
-			// viewport up to the toggle.
-			Toggle.focus({ preventScroll: true });
-		}
-	};
+			if (Open) {
+				Closer?.focus();
+			} else {
+				// preventScroll: a TOC link inside the drawer is about to jump to an
+				// anchor further down the page - handing focus back must not drag the
+				// viewport up to the toggle.
+				Toggle.focus({ preventScroll: true });
+			}
+		};
 
 		Toggle.addEventListener("click", () => Set(Drawer.classList.contains("hidden")));
 
@@ -1430,8 +1408,7 @@ const NextSteps = (() => {
 		const Targets = [...ById.keys()]
 			.map((Id) => ({ Id, Element: document.getElementById(Id) }))
 			.filter(
-				(Target): Target is { Id: string; Element: HTMLElement } =>
-					Target.Element !== null,
+				(Target): Target is { Id: string; Element: HTMLElement } => Target.Element !== null,
 			);
 
 		if (Targets.length === 0) {
@@ -1536,9 +1513,7 @@ const NextSteps = (() => {
 	// column, so a one-shot wrap would freeze the pre-font answer and leave a
 	// wide table silently clipped.
 	function BindTables() {
-		const Tables = Array.from(
-			document.querySelectorAll<HTMLTableElement>(".docs-prose table"),
-		);
+		const Tables = Array.from(document.querySelectorAll<HTMLTableElement>(".docs-prose table"));
 
 		for (const Table of Tables) {
 			if (Table.dataset["tableBound"] === "1") {

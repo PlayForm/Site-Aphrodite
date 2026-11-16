@@ -81,9 +81,7 @@ export const CodeLinks: Record<string, Entry> = {
 	aphrodite_hermes_call_hook: Ours("crates/aphrodite-hermes/src/lib.rs"),
 	aphrodite_hermes_get_hooks: Ours("crates/aphrodite-hermes/src/lib.rs"),
 	aphrodite_hermes_proxy_health: Ours("crates/aphrodite-hermes/src/lib.rs"),
-	aphrodite_hermes_materialize_directives: Ours(
-		"crates/aphrodite-hermes/src/lib.rs",
-	),
+	aphrodite_hermes_materialize_directives: Ours("crates/aphrodite-hermes/src/lib.rs"),
 	aphrodite_hermes_version: Ours("crates/aphrodite-hermes/src/lib.rs"),
 
 	// ── The plugin files (canonical home: the Aphrodite-Hermes repository).

@@ -31,8 +31,7 @@ import { ResolveCode, ResolveFile, SourceLink } from "./SourceLinks";
 
 /** Decode the five entities the inline code text can carry for matching. */
 const Decode = (Text: string): string =>
-	Text
-		.replaceAll("&lt;", "<")
+	Text.replaceAll("&lt;", "<")
 		.replaceAll("&gt;", ">")
 		.replaceAll("&quot;", '"')
 		.replaceAll("&#39;", "'")
@@ -141,15 +140,10 @@ const WrapProseToken = (Text: string): string => {
 	const Local = `${Root}/${LocalPath(Entry)}`;
 	const Raw = readFileSync(Local, "utf8").split("\n");
 	const Lines = Raw[Raw.length - 1] === "" ? Raw.length - 1 : Raw.length;
-	const Valid = From !== undefined && To !== undefined
-		? To <= Lines
-		: From === undefined || From <= Lines;
+	const Valid =
+		From !== undefined && To !== undefined ? To <= Lines : From === undefined || From <= Lines;
 	const Fragment =
-		From === undefined || !Valid
-			? ""
-			: To === undefined
-			? `#L${From}`
-			: `#L${From}-L${To}`;
+		From === undefined || !Valid ? "" : To === undefined ? `#L${From}` : `#L${From}-L${To}`;
 	const Url = `${SourceLink(Entry)}${Fragment}`;
 
 	return `<a class="code-link" href="${Url}" title="Source: ${Url}">${Text}</a>`;
@@ -179,9 +173,9 @@ const WrapProse = (Html: string): string => {
 			case true: {
 				const Closing = Token[1] === "/";
 				const Name =
-					(Closing ? Token.slice(2) : Token.slice(1)).match(
-						/^[a-zA-Z0-9-]+/,
-					)?.[0]?.toLowerCase() ?? "";
+					(Closing ? Token.slice(2) : Token.slice(1))
+						.match(/^[a-zA-Z0-9-]+/)?.[0]
+						?.toLowerCase() ?? "";
 				const SelfClosing = Token.endsWith("/>");
 
 				switch (Closing) {
@@ -218,25 +212,29 @@ const WrapProse = (Html: string): string => {
 };
 
 export const Rewrite = (Html: string): string =>
-	Html.split(PreSplit).map((Segment) =>
-		Segment.startsWith("<pre")
-			? Segment
-			: Segment.split(AnchorSplit).map((Inner) =>
-					Inner.startsWith("<a")
-						? Inner
-						: WrapProse(
-								Inner.replace(
-									CodeElement,
-									(Element, Attrs: string, Text: string) =>
-										Wrap(`<code${Attrs}>`, Text, "code"),
-								).replace(
-									MonoSpan,
-									(Element, Attrs: string, Text: string) =>
-										Wrap(`<span${Attrs}>`, Text, "span"),
-								),
-							),
-				).join(""),
-	).join("");
+	Html.split(PreSplit)
+		.map((Segment) =>
+			Segment.startsWith("<pre")
+				? Segment
+				: Segment.split(AnchorSplit)
+						.map((Inner) =>
+							Inner.startsWith("<a")
+								? Inner
+								: WrapProse(
+										Inner.replace(
+											CodeElement,
+											(Element, Attrs: string, Text: string) =>
+												Wrap(`<code${Attrs}>`, Text, "code"),
+										).replace(
+											MonoSpan,
+											(Element, Attrs: string, Text: string) =>
+												Wrap(`<span${Attrs}>`, Text, "span"),
+										),
+									),
+						)
+						.join(""),
+		)
+		.join("");
 
 // The root of the Aphrodite checkout - the existence oracle for the
 // path-like code spans (Site/Source/Library is three levels down).
@@ -254,8 +252,8 @@ const LocalPath = ({ Path, Repo }: { Path: string; Repo: unknown }): string =>
 	Repo === HermesRepo
 		? `plugins/aphrodite/${Path}`
 		: Repo === HeadroomRepo
-		? `vendor/headroom/${Path}`
-		: Path;
+			? `vendor/headroom/${Path}`
+			: Path;
 
 /**
  * The integration: rewrite every built HTML page through Rewrite(). The
@@ -267,7 +265,10 @@ export default () => ({
 	name: "code-mentions",
 
 	hooks: {
-		"astro:build:done": async ({ dir, pages }: {
+		"astro:build:done": async ({
+			dir,
+			pages,
+		}: {
 			dir: URL;
 
 			pages: { pathname?: string; paths?: string[] }[];
@@ -301,11 +302,12 @@ export default () => ({
 			};
 
 			for (const Page of pages) {
-				const Files = Array.isArray(Page.paths) && Page.paths.length > 0
-					? Page.paths
-					: Page.pathname
-					? [join(dir.pathname, Page.pathname, "index.html")]
-					: [];
+				const Files =
+					Array.isArray(Page.paths) && Page.paths.length > 0
+						? Page.paths
+						: Page.pathname
+							? [join(dir.pathname, Page.pathname, "index.html")]
+							: [];
 
 				for (const File of Files) {
 					await Visit(File);

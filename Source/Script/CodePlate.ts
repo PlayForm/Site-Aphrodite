@@ -277,7 +277,9 @@ const BuildPlate = (Pre: HTMLPreElement): void => {
 		// which of the two they are getting.
 		Button.setAttribute(
 			"aria-label",
-			Command ? "Copy this block's command to the clipboard" : "Copy this code block to the clipboard",
+			Command
+				? "Copy this block's command to the clipboard"
+				: "Copy this code block to the clipboard",
 		);
 		Button.innerHTML = `<span aria-hidden="true">⧉</span><span>${Command ? "Copy command" : "Copy"}</span>`;
 		Bar.appendChild(Button);

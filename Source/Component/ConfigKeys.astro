@@ -45,63 +45,65 @@ const LiveTone = {
 const Sections = [...new Set(Rows.map((Row) => Row.Section))];
 ---
 
-{
-	Sections.map((Section) => (
-		<div class="mt-16 first:mt-0" data-key-group>
-			<div class="flex flex-wrap items-baseline justify-between gap-4">
-				<h3 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
-					{Section}
-				</h3>
-				<span class="font-mono text-base uppercase tracking-widest text-zinc-dust">
-					{Rows.filter((Row) => Row.Section === Section).length} keys
-				</span>
-			</div>
-			{Notes[Section] && (
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					{Notes[Section]}
-				</p>
-			)}
-			<div class="mt-6 overflow-x-auto border-4 border-blood-crimson bg-carbon-void">
-				<table class="w-full min-w-[64rem] text-left text-base">
-					<thead>
-						<tr class="border-b-2 border-blood-crimson bg-soot-black font-mono text-base uppercase tracking-widest text-zinc-dust">
-							<th class="px-5 py-3">Key</th>
-							<th class="px-5 py-3">Type</th>
-							<th class="px-5 py-3">Default</th>
-							<th class="px-5 py-3">Env override</th>
-							<th class="px-5 py-3">Reader</th>
-							<th class="px-5 py-3">Live</th>
-							<th class="px-5 py-3">Effect</th>
-						</tr>
-					</thead>
-					<tbody class="divide-y divide-oxblood-dark/50">
-						{Rows.filter((Row) => Row.Section === Section).map((Row) => (
-							<tr class="align-top text-zinc-dust" data-key-row={Row.Key}>
-								<td class="px-5 py-3 font-mono text-base text-bone-newsprint">{Row.Key}</td>
-								<td class="px-5 py-3 font-mono text-base">{Row.Type}</td>
-								<td class="px-5 py-3 font-mono text-base text-stamped-canary">{Row.Default}</td>
-								<td class="px-5 py-3 font-mono text-base">{Row.Env ?? "-"}</td>
-								<td class="px-5 py-3 font-mono text-base">{ReaderLabel[Row.Reader]}</td>
-								<td class="px-5 py-3">
-									<span
-										class={`inline-block border px-2 py-0.5 font-mono text-base uppercase tracking-widest ${LiveTone[Row.Live]}`}
-									>
-										{LiveLabel[Row.Live]}
-									</span>
-								</td>
-								<td class="px-5 py-3">
-									{Row.Effect}
-									{Row.Detail && (
-										<div class="mt-2 border-t border-oxblood-dark pt-2 font-mono text-base leading-relaxed text-zinc-dust">
-											{Row.Detail}
-										</div>
-									)}
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
+{Sections.map((Section) => (
+	<div class="mt-16 first:mt-0" data-key-group>
+		<div class="flex flex-wrap items-baseline justify-between gap-4">
+			<h3 class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+				{Section}
+			</h3>
+			<span class="font-mono text-base uppercase tracking-widest text-zinc-dust">
+				{Rows.filter((Row) => Row.Section === Section).length} keys
+			</span>
 		</div>
-	))
-}
+		{Notes[Section] && (
+			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				{Notes[Section]}
+			</p>
+		)}
+		<div class="mt-6 overflow-x-auto border-4 border-blood-crimson bg-carbon-void">
+			<table class="w-full min-w-[64rem] text-left text-base">
+				<thead>
+					<tr class="border-b-2 border-blood-crimson bg-soot-black font-mono text-base uppercase tracking-widest text-zinc-dust">
+						<th class="px-5 py-3">Key</th>
+						<th class="px-5 py-3">Type</th>
+						<th class="px-5 py-3">Default</th>
+						<th class="px-5 py-3">Env override</th>
+						<th class="px-5 py-3">Reader</th>
+						<th class="px-5 py-3">Live</th>
+						<th class="px-5 py-3">Effect</th>
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-oxblood-dark/50">
+					{Rows.filter((Row) => Row.Section === Section).map((Row) => (
+						<tr class="align-top text-zinc-dust" data-key-row={Row.Key}>
+							<td class="px-5 py-3 font-mono text-base text-bone-newsprint">
+								{Row.Key}
+							</td>
+							<td class="px-5 py-3 font-mono text-base">{Row.Type}</td>
+							<td class="px-5 py-3 font-mono text-base text-stamped-canary">
+								{Row.Default}
+							</td>
+							<td class="px-5 py-3 font-mono text-base">{Row.Env ?? "-"}</td>
+							<td class="px-5 py-3 font-mono text-base">{ReaderLabel[Row.Reader]}</td>
+							<td class="px-5 py-3">
+								<span
+									class={`inline-block border px-2 py-0.5 font-mono text-base uppercase tracking-widest ${LiveTone[Row.Live]}`}
+								>
+									{LiveLabel[Row.Live]}
+								</span>
+							</td>
+							<td class="px-5 py-3">
+								{Row.Effect}
+								{Row.Detail && (
+									<div class="mt-2 border-t border-oxblood-dark pt-2 font-mono text-base leading-relaxed text-zinc-dust">
+										{Row.Detail}
+									</div>
+								)}
+							</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
+	</div>
+))}

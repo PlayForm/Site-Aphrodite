@@ -53,9 +53,7 @@ export async function DocsTree(): Promise<DocsSection[]> {
 
 		const Parent = ById.get(Segments.slice(0, -1).join("/"));
 
-		return Parent !== undefined && Parent.Section === Entry.Section
-			? Parent.Id
-			: undefined;
+		return Parent !== undefined && Parent.Section === Entry.Section ? Parent.Id : undefined;
 	};
 
 	const Pages = new Map(
@@ -105,9 +103,7 @@ export async function DocsTree(): Promise<DocsSection[]> {
 		Page.Id === "index" || Page.Id.toLowerCase() === Name.toLowerCase() ? 0 : 1;
 
 	return [...Sections.entries()]
-		.sort(([A], [B]) =>
-			A === "Overview" ? -1 : B === "Overview" ? 1 : A.localeCompare(B),
-		)
+		.sort(([A], [B]) => (A === "Overview" ? -1 : B === "Overview" ? 1 : A.localeCompare(B)))
 		.map(([Name, Pages]) => ({
 			Name,
 			Pages: [...Pages].sort(
@@ -120,8 +116,7 @@ export async function DocsTree(): Promise<DocsSection[]> {
 /** The breadcrumb trail for one collection id, read from the same tree.
     The last crumb is the page itself and carries no href. */
 export async function DocsTrail(Id: string): Promise<Crumb[]> {
-	const HrefOf = (Target: string) =>
-		Target === "index" ? "/docs/" : `/docs/${Target}/`;
+	const HrefOf = (Target: string) => (Target === "index" ? "/docs/" : `/docs/${Target}/`);
 
 	const Sections = await DocsTree();
 
@@ -154,9 +149,7 @@ export async function DocsTrail(Id: string): Promise<Crumb[]> {
 							// A section names a destination only when it has its own
 							// index page (install -> docs/install); otherwise it is a
 							// label.
-							Href: SectionIndexOf(Name)
-								? HrefOf(Name.toLowerCase())
-								: undefined,
+							Href: SectionIndexOf(Name) ? HrefOf(Name.toLowerCase()) : undefined,
 						},
 					]),
 		];
@@ -204,12 +197,7 @@ interface Props {
 	Order?: readonly string[];
 }
 
-const {
-	Sections: Registry,
-	CurrentId,
-	Label = "Documentation sections",
-	Order = [],
-} = Astro.props;
+const { Sections: Registry, CurrentId, Label = "Documentation sections", Order = [] } = Astro.props;
 
 // "/docs/ccr/backends/sqlite/" -> "ccr/backends/sqlite"; "/docs/" -> "index".
 const IdFromUrl = () => {
@@ -236,9 +224,7 @@ const RankOf = (Name: string) => {
 const Sections =
 	Order.length === 0
 		? Tree
-		: [...Tree].sort(
-				(A, B) => RankOf(A.Name) - RankOf(B.Name) || A.Name.localeCompare(B.Name),
-			);
+		: [...Tree].sort((A, B) => RankOf(A.Name) - RankOf(B.Name) || A.Name.localeCompare(B.Name));
 
 const WipIds = new Set(
 	(Registry ?? []).flatMap(({ Entries }) =>
@@ -247,10 +233,7 @@ const WipIds = new Set(
 );
 
 const HoldsCurrent = ({ Pages }: DocsSection) =>
-	Pages.some(
-		(Page) =>
-			Page.Id === Current || Page.Children.some(({ Id }) => Id === Current),
-	);
+	Pages.some((Page) => Page.Id === Current || Page.Children.some(({ Id }) => Id === Current));
 ---
 
 {/* The index is a QUIET surface. It carries one hairline boundary, sentence-
@@ -267,122 +250,120 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
     channel read as recessed rather than as a second sheet laid on top. The
     groups inside it are divided by the same hairline, so the rail reads as one
     indexed column instead of a stack of collapsible boxes. No words changed and
-    no page, section or WIP flag was dropped. */} 
+    no page, section or WIP flag was dropped. */}
 <nav aria-label={Label} class="docs-index">
-	<p class="docs-index__eyebrow type-meta uppercase tracking-widest text-zinc-dust">
-		Doc index
-	</p>
+	<p class="docs-index__eyebrow type-meta uppercase tracking-widest text-zinc-dust">Doc index</p>
 	<div class="docs-index__panel mt-2 max-h-[calc(100vh-9rem)] overflow-y-auto p-5">
 		{/* The in-page outline is the docs route's own (pages/docs/[...slug].astro):
 		    the rail names where a reader can go, not where they are inside a page. */}
 		<div class="flex flex-col gap-3">
-			{
-				Sections.map((Section) => {
-					const IsCurrent = HoldsCurrent(Section);
+			{Sections.map((Section) => {
+				const IsCurrent = HoldsCurrent(Section);
 
-					return (
-						<details
-							class="group docs-index__group"
-							open={IsCurrent}
-							data-docs-section={Section.Name}
-							data-current-section={IsCurrent ? "1" : undefined}
-						>
-							<summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base tracking-normal transition-colors [&::-webkit-details-marker]:hidden">
-								<span
-									class={`inline-block h-3 w-1 shrink-0 ${
-										IsCurrent ? "bg-stamped-canary" : "bg-oxblood-dark"
-									}`}
-									aria-hidden="true"
-								/>
-								<span
-									class={`min-w-0 flex-1 ${
-										IsCurrent
-											? "text-bone-white"
-											: "text-bone-newsprint group-hover:text-bone-white"
-									}`}
-								>
-									{Section.Name}
-								</span>
-								<span class="font-mono text-[13px] tracking-normal text-zinc-dust">
-									{Section.Count}
-								</span>
-								<span
-									class="inline-block font-mono text-[13px] text-zinc-dust transition-transform group-open:rotate-90"
-									aria-hidden="true"
-								>
-									▸
-								</span>
-							</summary>
-							<ul class="docs-index__branch mt-2 flex flex-col gap-1 border-l pl-3">
-								{Section.Pages.map((Page) => (
-									<li>
-										<a
-											href={Page.Href}
-											aria-current={Page.Id === Current ? "page" : undefined}
-											class={`block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors ${
-												Page.Id === Current
-													? "pl-2 text-bone-white"
-													: "pl-2 text-zinc-dust hover:text-bone-white"
-											}`}
-										>
-											{Page.Id === Current && (
-												<span
-													class="mr-1.5 inline-block h-3.5 w-0.5 bg-stamped-canary align-middle"
-													aria-hidden="true"
-												/>
-											)}
-											{Page.Title}
-											{WipIds.has(Page.Id) && (
-												<span
-													class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black"
-													title="Roadmap: partly unimplemented"
-												>
-													WIP
-												</span>
-											)}
-										</a>
-										{Page.Children.length > 0 && (
-											<ul class="docs-index__branch mt-1 flex flex-col gap-1 border-l pl-3">
-												{Page.Children.map((Child) => (
-													<li>
-														<a
-															href={Child.Href}
-															aria-current={
-																Child.Id === Current ? "page" : undefined
-															}
-															class={`block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors ${
-																Child.Id === Current
-																	? "pl-2 text-bone-white"
-																	: "pl-2 text-zinc-dust hover:text-bone-white"
-															}`}
-														>
-															{Child.Id === Current && (
-																<span
-																	class="mr-1.5 inline-block h-3.5 w-0.5 bg-stamped-canary align-middle"
-																	aria-hidden="true"
-																/>
-															)}
-															{Child.Title}
-															{WipIds.has(Child.Id) && (
-																<span
-																	class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black"
-																	title="Roadmap: partly unimplemented"
-																>
-																	WIP
-																</span>
-															)}
-														</a>
-													</li>
-												))}
-											</ul>
+				return (
+					<details
+						class="group docs-index__group"
+						open={IsCurrent}
+						data-docs-section={Section.Name}
+						data-current-section={IsCurrent ? "1" : undefined}
+					>
+						<summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base tracking-normal transition-colors [&::-webkit-details-marker]:hidden">
+							<span
+								class={`inline-block h-3 w-1 shrink-0 ${
+									IsCurrent ? "bg-stamped-canary" : "bg-oxblood-dark"
+								}`}
+								aria-hidden="true"
+							/>
+							<span
+								class={`min-w-0 flex-1 ${
+									IsCurrent
+										? "text-bone-white"
+										: "text-bone-newsprint group-hover:text-bone-white"
+								}`}
+							>
+								{Section.Name}
+							</span>
+							<span class="font-mono text-[13px] tracking-normal text-zinc-dust">
+								{Section.Count}
+							</span>
+							<span
+								class="inline-block font-mono text-[13px] text-zinc-dust transition-transform group-open:rotate-90"
+								aria-hidden="true"
+							>
+								▸
+							</span>
+						</summary>
+						<ul class="docs-index__branch mt-2 flex flex-col gap-1 border-l pl-3">
+							{Section.Pages.map((Page) => (
+								<li>
+									<a
+										href={Page.Href}
+										aria-current={Page.Id === Current ? "page" : undefined}
+										class={`block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors ${
+											Page.Id === Current
+												? "pl-2 text-bone-white"
+												: "pl-2 text-zinc-dust hover:text-bone-white"
+										}`}
+									>
+										{Page.Id === Current && (
+											<span
+												class="mr-1.5 inline-block h-3.5 w-0.5 bg-stamped-canary align-middle"
+												aria-hidden="true"
+											/>
 										)}
-									</li>
-								))}
-							</ul>
-						</details>
-					);
-				})
-			}
+										{Page.Title}
+										{WipIds.has(Page.Id) && (
+											<span
+												class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black"
+												title="Roadmap: partly unimplemented"
+											>
+												WIP
+											</span>
+										)}
+									</a>
+									{Page.Children.length > 0 && (
+										<ul class="docs-index__branch mt-1 flex flex-col gap-1 border-l pl-3">
+											{Page.Children.map((Child) => (
+												<li>
+													<a
+														href={Child.Href}
+														aria-current={
+															Child.Id === Current
+																? "page"
+																: undefined
+														}
+														class={`block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors ${
+															Child.Id === Current
+																? "pl-2 text-bone-white"
+																: "pl-2 text-zinc-dust hover:text-bone-white"
+														}`}
+													>
+														{Child.Id === Current && (
+															<span
+																class="mr-1.5 inline-block h-3.5 w-0.5 bg-stamped-canary align-middle"
+																aria-hidden="true"
+															/>
+														)}
+														{Child.Title}
+														{WipIds.has(Child.Id) && (
+															<span
+																class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black"
+																title="Roadmap: partly unimplemented"
+															>
+																WIP
+															</span>
+														)}
+													</a>
+												</li>
+											))}
+										</ul>
+									)}
+								</li>
+							))}
+						</ul>
+					</details>
+				);
+			})}
 		</div>
 	</div>
 </nav>

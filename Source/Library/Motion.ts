@@ -284,8 +284,7 @@ const Count = (Target: HTMLElement): void => {
  * its subtree out with data-motion="off".
  */
 const Exempt = (Target: HTMLElement): boolean =>
-	Target.closest('[data-motion="off"]') !== null ||
-	Target.closest("[data-deck]") !== null;
+	Target.closest('[data-motion="off"]') !== null || Target.closest("[data-deck]") !== null;
 
 /**
  * The bind guard. The client router mounts this module once per page, so an
@@ -585,8 +584,7 @@ export const RunTone: Record<LineKind, string> = {
 };
 
 /** Rust's `.chars().take(n)`. */
-const Clip = (Text: string, Count: number): string =>
-	Array.from(Text).slice(0, Count).join("");
+const Clip = (Text: string, Count: number): string => Array.from(Text).slice(0, Count).join("");
 
 /** Rust's `is_error_line` (preview/line/error.rs). */
 const IsErrorLine = (Line: string): boolean => {
@@ -714,7 +712,9 @@ const NumBefore = (Line: string, Keyword: string): number => {
 		return 0;
 	}
 
-	const Runs = Line.slice(0, At).trimEnd().split(/[^0-9]+/);
+	const Runs = Line.slice(0, At)
+		.trimEnd()
+		.split(/[^0-9]+/);
 
 	for (let Index = Runs.length - 1; Index >= 0; Index -= 1) {
 		if (Runs[Index] !== "") {
@@ -903,8 +903,9 @@ const LsPreview = (Lines: readonly string[]): string => {
 	}
 
 	const Top = [...Extensions.entries()]
-		.sort(([Left, LeftCount], [Right, RightCount]) =>
-			RightCount - LeftCount || (Left < Right ? -1 : Left > Right ? 1 : 0),
+		.sort(
+			([Left, LeftCount], [Right, RightCount]) =>
+				RightCount - LeftCount || (Left < Right ? -1 : Left > Right ? 1 : 0),
 		)
 		.slice(0, 3)
 		.map(([Extension, Count]) => `${Extension}×${Count}`);
@@ -1232,7 +1233,12 @@ const Run = (Root: HTMLElement): (() => void) => {
 		).toLocaleString("en-US")} bytes`;
 	};
 
-	const Delay = (Pace: RunPace, Kind: LineKind, Previous: LineKind | null, Nth: number): number => {
+	const Delay = (
+		Pace: RunPace,
+		Kind: LineKind,
+		Previous: LineKind | null,
+		Nth: number,
+	): number => {
 		let Wait = Pace.Beat + Math.round((Jitter() * 2 - 1) * Pace.Jitter);
 
 		if (Pace.Every > 0 && Nth > 0 && Nth % Pace.Every === 0) {
@@ -1372,10 +1378,7 @@ const Run = (Root: HTMLElement): (() => void) => {
 	// written down here. A hardcoded height has to guess the font's line box,
 	// and a guess that is wrong is a layout shift on the one element the reader
 	// is already looking at. One read at mount, then never again.
-	const Window = Math.max(
-		Timing.Run.Floor,
-		Math.ceil(Track.getBoundingClientRect().height),
-	);
+	const Window = Math.max(Timing.Run.Floor, Math.ceil(Track.getBoundingClientRect().height));
 
 	Viewport.style.position = "relative";
 	Viewport.style.height = `${Window}px`;

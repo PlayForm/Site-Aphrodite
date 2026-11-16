@@ -43,20 +43,20 @@ const Palette = {
 	class="grunge grunge--faint flex flex-col gap-3 border-l-4 border-blood-crimson bg-asphalt-panel p-4 sm:flex-row sm:items-start sm:gap-5"
 	data-grunge
 >
-	<span class={`shrink-0 -rotate-1 self-start border-2 border-black px-3 py-1 font-mono text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] sm:-rotate-2 ${Palette}`}>
+	<span
+		class={`shrink-0 -rotate-1 self-start border-2 border-black px-3 py-1 font-mono text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] sm:-rotate-2 ${Palette}`}
+	>
 		{Label}
 	</span>
 	<div class="well min-w-0 grow p-3">
-		{
-			Lines && Lines.length > 0 ? (
-				<ul class="flex flex-col gap-2 font-body text-base leading-relaxed text-bone-newsprint">
-					{Lines.map((Line) => (
-						<li class="border-l-2 border-oxblood-dark pl-3">{Line}</li>
-					))}
-				</ul>
-			) : (
-				<p class="font-body text-base leading-relaxed text-bone-newsprint">{Text}</p>
-			)
-		}
+		{Lines && Lines.length > 0 ? (
+			<ul class="flex flex-col gap-2 font-body text-base leading-relaxed text-bone-newsprint">
+				{Lines.map((Line) => (
+					<li class="border-l-2 border-oxblood-dark pl-3">{Line}</li>
+				))}
+			</ul>
+		) : (
+			<p class="font-body text-base leading-relaxed text-bone-newsprint">{Text}</p>
+		)}
 	</div>
 </aside>

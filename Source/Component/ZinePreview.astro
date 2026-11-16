@@ -82,23 +82,24 @@ const EnterAttr = Delay === undefined ? {} : { "data-enter": Delay };
 	<div class="border border-oxblood-dark bg-soot-black p-3 font-mono text-body font-bold text-bone-white">
 		{Result}
 	</div>
-	{
-		Hash && (
-			<details class="group mt-3 border-t border-oxblood-dark pt-2">
-				<summary class="flex cursor-pointer list-none items-center justify-between gap-3 font-mono text-caption text-zinc-dust transition-colors hover:text-bone-white">
-					<span>Original retained</span>
-					<span class="shrink-0 group-open:hidden" aria-hidden="true">
-						+
-					</span>
-					<span class="hidden shrink-0 group-open:inline" aria-hidden="true">
-						−
-					</span>
-				</summary>
-				<div class="mt-2 flex items-start gap-3">
-					<div class="ccr-marker grow font-mono text-caption font-bold text-weathered-teal" set:html={Hash} />
-					<ZineCopyChip Label="MARKER" Copy={Payload} />
-				</div>
-			</details>
-		)
-	}
+	{Hash && (
+		<details class="group mt-3 border-t border-oxblood-dark pt-2">
+			<summary class="flex cursor-pointer list-none items-center justify-between gap-3 font-mono text-caption text-zinc-dust transition-colors hover:text-bone-white">
+				<span>Original retained</span>
+				<span class="shrink-0 group-open:hidden" aria-hidden="true">
+					+
+				</span>
+				<span class="hidden shrink-0 group-open:inline" aria-hidden="true">
+					−
+				</span>
+			</summary>
+			<div class="mt-2 flex items-start gap-3">
+				<div
+					class="ccr-marker grow font-mono text-caption font-bold text-weathered-teal"
+					set:html={Hash}
+				/>
+				<ZineCopyChip Label="MARKER" Copy={Payload} />
+			</div>
+		</details>
+	)}
 </div>

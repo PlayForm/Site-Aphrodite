@@ -93,15 +93,35 @@ export const ZineTheme: ThemeRegistration = {
 			settings: { foreground: Palette.Teal },
 		},
 		{
-			scope: ["variable", "variable.other", "variable.parameter", "meta.object-literal.key", "entity.name.tag.yaml", "support.type.property-name"],
+			scope: [
+				"variable",
+				"variable.other",
+				"variable.parameter",
+				"meta.object-literal.key",
+				"entity.name.tag.yaml",
+				"support.type.property-name",
+			],
 			settings: { foreground: Palette.BoneNewsprint },
 		},
 		{
-			scope: ["keyword", "keyword.control", "storage", "storage.modifier", "storage.type.function", "keyword.other"],
+			scope: [
+				"keyword",
+				"keyword.control",
+				"storage",
+				"storage.modifier",
+				"storage.type.function",
+				"keyword.other",
+			],
 			settings: { foreground: Palette.Canary },
 		},
 		{
-			scope: ["constant", "constant.numeric", "constant.language", "constant.language.boolean", "variable.other.constant"],
+			scope: [
+				"constant",
+				"constant.numeric",
+				"constant.language",
+				"constant.language.boolean",
+				"variable.other.constant",
+			],
 			settings: { foreground: Palette.Canary },
 		},
 		{
@@ -118,7 +138,10 @@ export const ZineTheme: ThemeRegistration = {
 			scope: ["markup.heading", "markup.bold", "entity.name.section"],
 			settings: { foreground: Palette.BoneWhite, fontStyle: "bold" },
 		},
-		{ scope: ["markup.italic"], settings: { foreground: Palette.BoneNewsprint, fontStyle: "italic" } },
+		{
+			scope: ["markup.italic"],
+			settings: { foreground: Palette.BoneNewsprint, fontStyle: "italic" },
+		},
 		{ scope: ["markup.inserted"], settings: { foreground: Palette.Teal } },
 		{ scope: ["markup.deleted"], settings: { foreground: Palette.Canary } },
 		{

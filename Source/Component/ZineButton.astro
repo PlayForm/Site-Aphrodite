@@ -82,14 +82,12 @@ const Shape = {
 const Classes = [Base, Shape, Class];
 ---
 
-{
-	Href ? (
-		<a class:list={Classes} href={Href}>
-			{Label}
-		</a>
-	) : (
-		<button class:list={Classes} data-copy={Copy} type="button">
-			{Label}
-		</button>
-	)
-}
+{Href ? (
+	<a class:list={Classes} href={Href}>
+		{Label}
+	</a>
+) : (
+	<button class:list={Classes} data-copy={Copy} type="button">
+		{Label}
+	</button>
+)}

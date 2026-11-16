@@ -60,26 +60,22 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 >
 	<main class="deck" data-deck data-ui="hidden">
 		<div class="deck-frame" data-frame>
-			{
-				Scenes.map((Scene, Index) => (
-					<div class="deck-beat" id={Scene.Identifier}>
-						<DeckScene Scene={Scene} Index={Index} Total={Total} />
-					</div>
-				))
-			}
+			{Scenes.map((Scene, Index) => (
+				<div class="deck-beat" id={Scene.Identifier}>
+					<DeckScene Scene={Scene} Index={Index} Total={Total} />
+				</div>
+			))}
 
 			<div class="deck-progress" aria-hidden="true">
 				<div class="deck-progress-fill" data-progress-fill></div>
-				{
-					Timeline.Starts.map((Start, Index) =>
-						Index === 0 ? null : (
-							<span
-								class="deck-progress-tick"
-								style={`left:${((Start / Timeline.Total) * 100).toFixed(3)}%`}
-							/>
-						),
-					)
-				}
+				{Timeline.Starts.map((Start, Index) =>
+					Index === 0 ? null : (
+						<span
+							class="deck-progress-tick"
+							style={`left:${((Start / Timeline.Total) * 100).toFixed(3)}%`}
+						/>
+					),
+				)}
 			</div>
 
 			<p class="sr-only" role="status" data-live></p>
@@ -96,34 +92,32 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 						</p>
 						<nav aria-label="Beats">
 							<ol class="deck-beats-matrix">
-								{
-									Scenes.map((Scene, Index) => (
-										<li class="deck-beats-cell">
-											<a
-												class="deck-beats-link"
-												href={`#${Scene.Identifier}`}
-												data-beat={Index}
-												aria-current={Index === 0 ? "true" : undefined}
-											>
-												<span class="deck-beats-head">
-													<span class="deck-beats-ordinal">
-														{String(Index + 1).padStart(2, "0")}
-													</span>
-													<span class="deck-beats-span">
-														{`${Scene.Duration.toFixed(1)}s`}
-													</span>
+								{Scenes.map((Scene, Index) => (
+									<li class="deck-beats-cell">
+										<a
+											class="deck-beats-link"
+											href={`#${Scene.Identifier}`}
+											data-beat={Index}
+											aria-current={Index === 0 ? "true" : undefined}
+										>
+											<span class="deck-beats-head">
+												<span class="deck-beats-ordinal">
+													{String(Index + 1).padStart(2, "0")}
 												</span>
-												<span class="deck-beats-name">{Scene.Title}</span>
-												<span class="deck-beats-exit">{Scene.Exit.Label}</span>
-											</a>
-										</li>
-									))
-								}
+												<span class="deck-beats-span">
+													{`${Scene.Duration.toFixed(1)}s`}
+												</span>
+											</span>
+											<span class="deck-beats-name">{Scene.Title}</span>
+											<span class="deck-beats-exit">{Scene.Exit.Label}</span>
+										</a>
+									</li>
+								))}
 							</ol>
 						</nav>
 						<p class="deck-beats-keys">
-							SPACE PLAY/PAUSE · LEFT/RIGHT BEAT · HOME/END FIRST/LAST · R
-							RESTART · F FULLSCREEN · H HIDE CONTROLS
+							SPACE PLAY/PAUSE · LEFT/RIGHT BEAT · HOME/END FIRST/LAST · R RESTART · F
+							FULLSCREEN · H HIDE CONTROLS
 						</p>
 					</div>
 				</details>
@@ -138,13 +132,7 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 				>
 					PREV
 				</button>
-				<button
-					class="deck-ui-button"
-					type="button"
-					data-toggle
-					data-control
-					data-js-only
-				>
+				<button class="deck-ui-button" type="button" data-toggle data-control data-js-only>
 					PLAY
 				</button>
 				<button
@@ -159,8 +147,13 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 				</button>
 
 				<span class="deck-ui-clock" data-clock>{`00:00.0 / ${Span}`}</span>
-				<span class="deck-ui-status" data-status>PAUSED</span>
-				<span class="deck-ui-beat" data-beat-label>{`01 / ${String(Total).padStart(2, "0")}`}</span>
+				<span class="deck-ui-status" data-status>
+					PAUSED
+				</span>
+				<span
+					class="deck-ui-beat"
+					data-beat-label
+				>{`01 / ${String(Total).padStart(2, "0")}`}</span>
 
 				<input
 					class="deck-scrub"
@@ -182,7 +175,9 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 					aria-label={`Read on: ${Opening.Label}`}
 				>
 					<span>READ ON</span>
-					<span class="deck-ui-exit-label" data-exit-label>{Opening.Label}</span>
+					<span class="deck-ui-exit-label" data-exit-label>
+						{Opening.Label}
+					</span>
 					<span aria-hidden="true">→</span>
 				</a>
 			</div>

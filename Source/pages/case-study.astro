@@ -78,7 +78,11 @@ const Metrics = [
 // travels with that kind, because a stress test is not a fourth observation.
 const Shape = [
 	{ Id: "study.band.chat-only", Label: "CHAT-ONLY SESSIONS", Bar: "bg-zinc-dust" },
-	{ Id: "study.band.light-developer", Label: "LIGHT DEVELOPER SESSION", Bar: "bg-weathered-teal" },
+	{
+		Id: "study.band.light-developer",
+		Label: "LIGHT DEVELOPER SESSION",
+		Bar: "bg-weathered-teal",
+	},
 	{ Id: "study.band.tool-heavy", Label: "LONG TOOL-HEAVY SESSIONS", Bar: "bg-stamped-canary" },
 	{ Id: "study.band.pure-tool", Label: "PURE-TOOL WORKLOADS", Bar: "bg-raw-blood" },
 ];
@@ -152,16 +156,43 @@ const Tiers = TierNotes.map(({ Tier: Name, Note }) => ({ ...Tier(Name), Note }))
 // The classifier's visible surface: the types the README's catalog renders,
 // backed by the full registry in the docs tree. Both counts are generated, so
 // the footnote cannot outlive the table it describes.
-const Classifier = { PipelineTypes: Narrative.CatalogTypes, RegistryTypes: Registry.Types } as const;
+const Classifier = {
+	PipelineTypes: Narrative.CatalogTypes,
+	RegistryTypes: Registry.Types,
+} as const;
 
 // The four pipeline layers (README.md, "Performance" and "How It Works"). The
 // one measured figure among them - the classifier's own cost - is generated;
 // the rest are the layer's names, not numbers.
 const Layers = [
-	{ N: "01", Name: "CLASSIFY", Figure: Benchmark.Classify, Tone: "teal", Note: "the gate: one type per invocation, first match wins" },
-	{ N: "02", Name: "PREVIEW", Figure: Narrative.PreviewTokens, Tone: "canary", Note: "the answer to 'do I care?' without the content" },
-	{ N: "03", Name: "STORE", Figure: "BLAKE3", Tone: "raw", Note: "SQLite / in-memory, the marker is the receipt" },
-	{ N: "04", Name: "DECIDE", Figure: "RETRIEVE?", Tone: "bone", Note: "the agent, not the engine, spends the budget" },
+	{
+		N: "01",
+		Name: "CLASSIFY",
+		Figure: Benchmark.Classify,
+		Tone: "teal",
+		Note: "the gate: one type per invocation, first match wins",
+	},
+	{
+		N: "02",
+		Name: "PREVIEW",
+		Figure: Narrative.PreviewTokens,
+		Tone: "canary",
+		Note: "the answer to 'do I care?' without the content",
+	},
+	{
+		N: "03",
+		Name: "STORE",
+		Figure: "BLAKE3",
+		Tone: "raw",
+		Note: "SQLite / in-memory, the marker is the receipt",
+	},
+	{
+		N: "04",
+		Name: "DECIDE",
+		Figure: "RETRIEVE?",
+		Tone: "bone",
+		Note: "the agent, not the engine, spends the budget",
+	},
 ] as const;
 
 // The layer's own colour, in the one place the blueprint grammar reads it: the
@@ -225,13 +256,13 @@ const Arcs = [
 		Incident: [
 			[
 				"Compressing a Hermes wrapper stored the <em>extracted</em> content under",
-				"<code class=\"font-mono text-base\">hash(extracted)</code> and discarded the original.",
+				'<code class="font-mono text-base">hash(extracted)</code> and discarded the original.',
 			].join(" "),
 			[
-				"A failed command's <code class=\"font-mono text-base\">exit_code</code> and",
-				"<code class=\"font-mono text-base\">error</code> fields were unrecoverable after",
+				'A failed command\'s <code class="font-mono text-base">exit_code</code> and',
+				'<code class="font-mono text-base">error</code> fields were unrecoverable after',
 				"compression, and caller JSON that merely matched a wrapper shape - e.g.",
-				"<code class=\"font-mono text-base\">{\"content\":\"hi\",\"id\":42}</code> - got",
+				'<code class="font-mono text-base">{"content":"hi","id":42}</code> - got',
 				"permanently collapsed to one field.",
 			].join(" "),
 		],
@@ -242,10 +273,10 @@ const Arcs = [
 		Today: [
 			"Retrieval is byte-exact by construction - backends store and return content",
 			"verbatim as UTF-8 strings, no zstd on the path - and a full-document retrieval",
-			"(<code class=\"font-mono text-base\">limit: 0</code>) returns the exact original",
+			'(<code class="font-mono text-base">limit: 0</code>) returns the exact original',
 			"bytes, hashing back to the marker's own hash.",
 		].join(" "),
-		Src: "SRC: CHANGELOG.md:683-706 · docs/api/retrieve.md (\"byte-exact by construction\")",
+		Src: 'SRC: CHANGELOG.md:683-706 · docs/api/retrieve.md ("byte-exact by construction")',
 	},
 	{
 		N: "ARC 2",
@@ -257,28 +288,28 @@ const Arcs = [
 		Incident: [
 			[
 				"v1.3.8 published to crates.io but was <em>uninstallable</em>:",
-				"<code class=\"font-mono text-base\">Cargo.toml</code> had",
-				"<code class=\"font-mono text-base\">exclude = [..., \"*.md\", ...]</code>, and cargo",
-				"applies <code class=\"font-mono text-base\">exclude</code> at publish time -",
+				'<code class="font-mono text-base">Cargo.toml</code> had',
+				'<code class="font-mono text-base">exclude = [..., "*.md", ...]</code>, and cargo',
+				'applies <code class="font-mono text-base">exclude</code> at publish time -',
 				"recursively.",
 			].join(" "),
 			[
-				"The six <code class=\"font-mono text-base\">builtin_directives/*.md</code>",
-				"files embedded via <code class=\"font-mono text-base\">include_str!</code> were",
+				'The six <code class="font-mono text-base">builtin_directives/*.md</code>',
+				'files embedded via <code class="font-mono text-base">include_str!</code> were',
 				"stripped from the tarball, so the local checkout built fine and CI's Test job",
-				"passed - but <code class=\"font-mono text-base\">cargo install aphrodite</code>",
+				'passed - but <code class="font-mono text-base">cargo install aphrodite</code>',
 				"failed at compile time.",
 			].join(" "),
 		],
 		Fix: [
-			"Drop the recursive <code class=\"font-mono text-base\">*.md</code> exclusion (and",
-			"never combine <code class=\"font-mono text-base\">include</code> with",
-			"<code class=\"font-mono text-base\">exclude</code> - cargo would ignore",
-			"<code class=\"font-mono text-base\">exclude</code> and drop the targets), add a",
-			"<code class=\"font-mono text-base\">cargo package --list</code> packaging guard to",
+			'Drop the recursive <code class="font-mono text-base">*.md</code> exclusion (and',
+			'never combine <code class="font-mono text-base">include</code> with',
+			'<code class="font-mono text-base">exclude</code> - cargo would ignore',
+			'<code class="font-mono text-base">exclude</code> and drop the targets), add a',
+			'<code class="font-mono text-base">cargo package --list</code> packaging guard to',
 			"CI, and a durable in-crate regression test that fails when",
-			"<code class=\"font-mono text-base\">*.md</code> returns to",
-			"<code class=\"font-mono text-base\">exclude</code>.",
+			'<code class="font-mono text-base">*.md</code> returns to',
+			'<code class="font-mono text-base">exclude</code>.',
 		].join(" "),
 		Today: [
 			"crates.io versions are immutable - v1.3.8 stays broken forever, superseded as",
@@ -297,8 +328,8 @@ const Arcs = [
 		Incident: [
 			[
 				"Issue #40: the plugin's Python shim resolved the runtime home from",
-				"<code class=\"font-mono text-base\">$HERMES_HOME</code> while the Rust half",
-				"resolved it from <code class=\"font-mono text-base\">$HOME</code>.",
+				'<code class="font-mono text-base">$HERMES_HOME</code> while the Rust half',
+				'resolved it from <code class="font-mono text-base">$HOME</code>.',
 			].join(" "),
 			[
 				"Whenever they diverged - the shipped Docker image, profile gateways - the shim",
@@ -309,17 +340,17 @@ const Arcs = [
 		Fix: [
 			[
 				"The shim resolves the runtime home once",
-				"(<code class=\"font-mono text-base\">$APHRODITE_HOME</code> override, then",
-				"<code class=\"font-mono text-base\">&lt;hermes-home&gt;/aphrodite</code>, then",
-				"<code class=\"font-mono text-base\">~/.hermes/aphrodite</code>) and exports it to",
-				"the Rust half through <code class=\"font-mono text-base\">APHRODITE_HOME</code>, so",
+				'(<code class="font-mono text-base">$APHRODITE_HOME</code> override, then',
+				'<code class="font-mono text-base">&lt;hermes-home&gt;/aphrodite</code>, then',
+				'<code class="font-mono text-base">~/.hermes/aphrodite</code>) and exports it to',
+				'the Rust half through <code class="font-mono text-base">APHRODITE_HOME</code>, so',
 				"the dylib and the spawned proxy agree by construction.",
 			].join(" "),
 			"Legacy installs are adopted with a one-line warning, never migrated.",
 		],
 		Today: [
 			"Per-Hermes-home isolation extends to the whole stack, and the startup log names",
-			"the decision: <code class=\"font-mono text-base\">runtime home: &lt;path&gt; (decided by ...)</code>.",
+			'the decision: <code class="font-mono text-base">runtime home: &lt;path&gt; (decided by ...)</code>.',
 		].join(" "),
 		Src: "SRC: CHANGELOG.md:104-154",
 	},
@@ -340,16 +371,16 @@ const Arcs = [
 		],
 		Fix: [
 			[
-				"The pinned tree's <code class=\"font-mono text-base\">SHA256SUMS.txt</code> became",
+				'The pinned tree\'s <code class="font-mono text-base">SHA256SUMS.txt</code> became',
 				"the only checksum source of truth: a missing file, a",
-				"<code class=\"font-mono text-base\">BINARY_VERSION</code> mismatch, a missing",
+				'<code class="font-mono text-base">BINARY_VERSION</code> mismatch, a missing',
 				"target block, or a missing asset entry is a hard refusal (exit 1), and a missing",
-				"<code class=\"font-mono text-base\">shasum</code>/<code class=\"font-mono text-base\">sha256sum</code>",
+				'<code class="font-mono text-base">shasum</code>/<code class="font-mono text-base">sha256sum</code>',
 				"tool is a hard refusal rather than a skipped check.",
 			].join(" "),
 			[
 				"The legacy",
-				"<code class=\"font-mono text-base\">~/.hermes/aphrodite</code> home adoption in the",
+				'<code class="font-mono text-base">~/.hermes/aphrodite</code> home adoption in the',
 				"runtime lookup is also gone.",
 			].join(" "),
 		],
@@ -372,18 +403,18 @@ const Arcs = [
 			"secrets - environment files, auth tokens, SSH keys, or the Hermes home itself.",
 		].join(" "),
 		Fix: [
-			"<code class=\"font-mono text-base\">aphrodite_prefetch</code> refuses",
-			"<code class=\"font-mono text-base\">.env</code>,",
-			"<code class=\"font-mono text-base\">auth.json</code>,",
-			"<code class=\"font-mono text-base\">~/.ssh</code>, the Hermes home, and non-file",
+			'<code class="font-mono text-base">aphrodite_prefetch</code> refuses',
+			'<code class="font-mono text-base">.env</code>,',
+			'<code class="font-mono text-base">auth.json</code>,',
+			'<code class="font-mono text-base">~/.ssh</code>, the Hermes home, and non-file',
 			"paths outright, answering with",
-			"<code class=\"font-mono text-base\">ReadOutcome::Refused</code> plus a",
-			"<code class=\"font-mono text-base\">refuse_reason</code> instead of reading them.",
+			'<code class="font-mono text-base">ReadOutcome::Refused</code> plus a',
+			'<code class="font-mono text-base">refuse_reason</code> instead of reading them.',
 		].join(" "),
 		Today: [
 			"Setup is hardened the same way: the Hermes-home plugin directory is report-only -",
 			"no writes, no deletes - and the same release re-described the context engine as",
-			"opt-in with a <code class=\"font-mono text-base\">requires_hermes &gt;= 0.20.2</code>",
+			'opt-in with a <code class="font-mono text-base">requires_hermes &gt;= 0.20.2</code>',
 			"floor.",
 		].join(" "),
 		Src: "SRC: CHANGELOG.md:3-37 · the Aphrodite/v1.6.6 release note",
@@ -450,10 +481,10 @@ const TokenGroups = Study.TokensSaved.split(",");
 			<ZineTape Variant="strip" Label="CASE FILE // APHRODITE-CCR · SEP 2026 · MEASURED" />
 			<ZineBox Tone="crimson" Size="lg" Class="w-full lg:p-16">
 				<ZineKicker Tone="dust">THE CASE STUDY // WHY, NOT HOW</ZineKicker>
-				<h1
-					class="mt-8 font-headline text-5xl font-black uppercase leading-[0.9] tracking-tighter text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-7xl lg:text-8xl"
-				>
-					Why Aphrodite<br />is shaped <span class="text-stamped-canary">this way</span>
+				<h1 class="mt-8 font-headline text-5xl font-black uppercase leading-[0.9] tracking-tighter text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-7xl lg:text-8xl">
+					Why Aphrodite
+					<br />
+					is shaped <span class="text-stamped-canary">this way</span>
 				</h1>
 				<p class="mt-16 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Not a tour of the code - an argument about the shape.
@@ -492,31 +523,33 @@ const TokenGroups = Study.TokensSaved.split(",");
 						<span set:html={TokenGroups.join(",<wbr>")} />
 					</div>
 					<div class="mt-6 flex flex-wrap items-center gap-4">
-						<span class="telemetry-tag telemetry-tag--canary"
-							>{Study.SavedPct.replace("%", "")}% OF THE TOTAL BUDGET</span
-						>
+						<span class="telemetry-tag telemetry-tag--canary">
+							{Study.SavedPct.replace("%", "")}% OF THE TOTAL BUDGET
+						</span>
 					</div>
 					<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-carbon-void">
-						The percentage is the honest way to read the number: {Study.TokensSaved} tokens is
-						only impressive once you know what it was a share of. {Study.SessionsUnsaved} of
-						the {Study.Sessions} sessions saved nothing at all, and the mean is pulled up by
-						the long tool-heavy runs - which is why the median sits beside it.
+						The percentage is the honest way to read the number: {Study.TokensSaved}{" "}
+						tokens is only impressive once you know what it was a share of.{" "}
+						{Study.SessionsUnsaved} of the {Study.Sessions} sessions saved nothing at
+						all, and the mean is pulled up by the long tool-heavy runs - which is why
+						the median sits beside it.
 					</p>
 					<div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
-						{
-							Metrics.map(({ Label, Fact, Unit, Accent }) => (
-								<div class="well p-4 sm:p-5">
-									<div class="type-meta font-black text-zinc-dust">{Label}</div>
-									<div class={`mt-2 font-headline text-2xl font-black tracking-tight ${Accent}`}>
-										{Fact.Value}
-									</div>
-									<div class="mt-1 type-caption text-zinc-dust">{Unit}</div>
-									<div class="mt-1 type-body text-zinc-dust">
-										<span class="type-meta">{Fact.Kind.toUpperCase()}</span>{" "}&bull; {Fact.Scope}
-									</div>
+						{Metrics.map(({ Label, Fact, Unit, Accent }) => (
+							<div class="well p-4 sm:p-5">
+								<div class="type-meta font-black text-zinc-dust">{Label}</div>
+								<div
+									class={`mt-2 font-headline text-2xl font-black tracking-tight ${Accent}`}
+								>
+									{Fact.Value}
 								</div>
-							))
-						}
+								<div class="mt-1 type-caption text-zinc-dust">{Unit}</div>
+								<div class="mt-1 type-body text-zinc-dust">
+									<span class="type-meta">{Fact.Kind.toUpperCase()}</span> &bull;{" "}
+									{Fact.Scope}
+								</div>
+							</div>
+						))}
 					</div>
 				</aside>
 				<!-- The study's citation stays on the plate's own ground, just below the
@@ -530,38 +563,35 @@ const TokenGroups = Study.TokensSaved.split(",");
 		<section id="claims" class="blueprint-section relative w-full" data-reveal>
 			<p class="section-index !text-raw-blood">01 // THE CLAIMS // THREE LINES</p>
 			<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The whole argument fits in three lines, and every section that follows is the evidence for one of
-				them.
+				The whole argument fits in three lines, and every section that follows is the
+				evidence for one of them.
 			</p>
 			<!-- The three claims arrive as one plate on a delay of their own: they
 			     are a single argument stated three ways, so staggering them one by
 			     one would make them read as three separate points. -->
-			<div
-				class="mt-16 isolate grid grid-cols-1 gap-16 lg:grid-cols-3"
-				data-enter="180"
-			>
-				{
-					Claims.map(({ Stamp, Subject, Verb, Body }) => (
-						<div class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-6 pt-9 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg] sm:hover:rotate-0">
-							<div
-								class={`inline-block px-3 py-1 font-mono text-base font-black uppercase tracking-widest ${Stamp}`}
-							>
-								{Subject}
-							</div>
-							<h2 class="mt-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white">
-								{Verb}
-							</h2>
-							<p class="mt-6 font-body text-base leading-relaxed text-bone-newsprint">{Body}</p>
+			<div class="mt-16 isolate grid grid-cols-1 gap-16 lg:grid-cols-3" data-enter="180">
+				{Claims.map(({ Stamp, Subject, Verb, Body }) => (
+					<div class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-6 pt-9 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg] sm:hover:rotate-0">
+						<div
+							class={`inline-block px-3 py-1 font-mono text-base font-black uppercase tracking-widest ${Stamp}`}
+						>
+							{Subject}
 						</div>
-					))
-				}
+						<h2 class="mt-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white">
+							{Verb}
+						</h2>
+						<p class="mt-6 font-body text-base leading-relaxed text-bone-newsprint">
+							{Body}
+						</p>
+					</div>
+				))}
 			</div>
 			<p class="mt-16 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				That is the whole architecture.
 			</p>
 			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The agent keeps its budget for reasoning, and pays for detail only when detail is the
-				answer.
+				The agent keeps its budget for reasoning, and pays for detail only when detail is
+				the answer.
 			</p>
 		</section>
 
@@ -575,33 +605,31 @@ const TokenGroups = Study.TokensSaved.split(",");
 					The flood is not the data's fault
 				</h2>
 				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Every file read, build, code search, or browser open floods the agent's
-					context with raw output - compilation logs, accessibility trees, JSON blobs.
+					Every file read, build, code search, or browser open floods the agent's context
+					with raw output - compilation logs, accessibility trees, JSON blobs.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The agent spends its budget reading noise instead of reasoning.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The structural failure is that raw output arrives{" "}
-					<em>before any decision</em>: the context pays the full price for content
-					the agent may never use.
+					The structural failure is that raw output arrives <em>before any decision</em>:
+					the context pays the full price for content the agent may never use.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Compression applied after the fact cannot refund a turn that already
-					happened.
+					Compression applied after the fact cannot refund a turn that already happened.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					So the intervention point has to be{" "}
 					<strong class="text-bone-white">before the LLM sees anything</strong>.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					That is the first design commitment: intercept at the tool boundary, not
-					inside the prompt.
+					That is the first design commitment: intercept at the tool boundary, not inside
+					the prompt.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Aphrodite replaces the output with a compact, structured preview - {Narrative.PreviewTokens}
-					of metadata instead of hundreds - and keeps the full content
-					retrievable.
+					Aphrodite replaces the output with a compact, structured preview -{" "}
+					{Narrative.PreviewTokens}
+					of metadata instead of hundreds - and keeps the full content retrievable.
 				</p>
 			</ZineBox>
 			<!-- THE PAIR: the terminal keeps the flood, the model reads one line. -->
@@ -633,50 +661,45 @@ const TokenGroups = Study.TokensSaved.split(",");
 					Because "compress everything equally" destroyed signal.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					A compiler error and a verbose build log are both output - but one must
-					stay visible and the other should never have been shown in full.
+					A compiler error and a verbose build log are both output - but one must stay
+					visible and the other should never have been shown in full.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					A single compression policy cannot serve both.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					So the type-aware classifier runs first - {Benchmark.Classify}, first
-					match wins - and each content type carries its own compression threshold
-					tier.
+					So the type-aware classifier runs first - {Benchmark.Classify}, first match wins
+					- and each content type carries its own compression threshold tier.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The README's pipeline renders {Classifier.PipelineTypes} types in its
-					catalog, from <code class="font-mono text-base">build</code> to{" "}
-					<code class="font-mono text-base">text</code>; the full classification
-					registry backing it is {Classifier.RegistryTypes} types
+					The README's pipeline renders {Classifier.PipelineTypes} types in its catalog,
+					from <code class="font-mono text-base">build</code> to{" "}
+					<code class="font-mono text-base">text</code>; the full classification registry
+					backing it is {Classifier.RegistryTypes} types
 					(docs/classification/content-types.md).
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					When the classifier only reaches a generic bucket, a conservative semantic
-					detector upgrades it to the high-signal shapes (git, gitlog, grep, ls,
-					test); ordinary prose is never mis-tagged.
+					detector upgrades it to the high-signal shapes (git, gitlog, grep, ls, test);
+					ordinary prose is never mis-tagged.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					This is the "secret sauce" made plain:{" "}
 					<strong class="text-bone-white">the classifier is the gate</strong>.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Nothing is compressed, stored, or marked until the gate has named it - and
-					the name is what everything downstream keys on.
+					Nothing is compressed, stored, or marked until the gate has named it - and the
+					name is what everything downstream keys on.
 				</p>
 			</ZineBox>
-			<figure
-				class="well mt-24 p-4 sm:p-5"
-				data-diagram="preview-flow"
-				data-enter="220"
-			>
+			<figure class="well mt-24 p-4 sm:p-5" data-diagram="preview-flow" data-enter="220">
 				<div class="overflow-x-auto" set:html={PreviewFlow} />
 				<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 					M2 // PREVIEW FLOW
 				</figcaption>
 				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The figure runs in one direction: every blob is classified first, then routed into
-					one of five threshold groups:
+					The figure runs in one direction: every blob is classified first, then routed
+					into one of five threshold groups:
 				</p>
 				<ul class="mt-3 max-w-3xl space-y-2 font-body text-base leading-relaxed text-bone-newsprint">
 					<li class="border-l-4 border-raw-blood pl-4">error ×8</li>
@@ -766,17 +789,18 @@ const TokenGroups = Study.TokensSaved.split(",");
 					</div>
 				</div>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Three fields are all an agent needs to decide whether retrieval is worth it
-					- which is exactly why the marker, not a tool call, is the contract: every
-					retrieval entry point (<code class="font-mono text-base">aphrodite_retrieve</code>,
+					Three fields are all an agent needs to decide whether retrieval is worth it -
+					which is exactly why the marker, not a tool call, is the contract: every
+					retrieval entry point (
+					<code class="font-mono text-base">aphrodite_retrieve</code>,
 					<code class="font-mono text-base">/retrieve</code>,
 					<code class="font-mono text-base">resolve</code>) accepts the marker body
 					directly, suffix or no suffix.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The marker carries no content of its own - three fields and no payload - so it can
-					be printed, copied and passed around without spending the budget it was minted to
-					save.
+					The marker carries no content of its own - three fields and no payload - so it
+					can be printed, copied and passed around without spending the budget it was
+					minted to save.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The store behind it is deliberately boring: BLAKE3 → SQLite (persistent, the
@@ -786,8 +810,7 @@ const TokenGroups = Study.TokensSaved.split(",");
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Storage is not the interesting problem; the interesting problem is that the
-					agent's decision needs a stable address - and that is all the marker has to
-					be.
+					agent's decision needs a stable address - and that is all the marker has to be.
 				</p>
 			</ZineBox>
 		</section>
@@ -803,7 +826,8 @@ const TokenGroups = Study.TokensSaved.split(",");
 					The pipeline is short on purpose: classify, preview, store, decide.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The whole compress step is sub-millisecond - end-to-end latency is {Bench.Latency}
+					The whole compress step is sub-millisecond - end-to-end latency is{" "}
+					{Bench.Latency}
 					including the HTTP round-trip - because the design spends its complexity budget
 					on the decision, not the transform.
 				</p>
@@ -813,33 +837,32 @@ const TokenGroups = Study.TokensSaved.split(",");
 					class="mt-16 isolate grid grid-cols-1 items-start gap-16 sm:grid-cols-2 xl:grid-cols-4"
 					data-enter="200"
 				>
-					{
-						LayerCards.map(({ N, Name, Figure, Ink, Note }) => (
-							<div class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.2deg] sm:hover:rotate-0">
-								<p class:list={["section-index", Ink]}>LAYER // {N}</p>
-								<div class="mt-4 font-headline text-2xl font-black tracking-tight text-bone-white">
-									{Figure}
-								</div>
-								<ZineKicker Tone="canary" As="div">
-									{Name}
-								</ZineKicker>
-								<div class="mt-8 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
-									{Note}
-								</div>
+					{LayerCards.map(({ N, Name, Figure, Ink, Note }) => (
+						<div class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.2deg] sm:hover:rotate-0">
+							<p class:list={["section-index", Ink]}>LAYER // {N}</p>
+							<div class="mt-4 font-headline text-2xl font-black tracking-tight text-bone-white">
+								{Figure}
 							</div>
-						))
-					}
+							<ZineKicker Tone="canary" As="div">
+								{Name}
+							</ZineKicker>
+							<div class="mt-8 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
+								{Note}
+							</div>
+						</div>
+					))}
 				</div>
 				<div class="shell-card mt-16 p-5 font-body text-base leading-relaxed text-bone-newsprint">
 					<p>
-						And the engine stays polite about it: compression is opt-in and non-destructive
-						- everything the agent ever saw stays retrievable unchanged.
+						And the engine stays polite about it: compression is opt-in and
+						non-destructive - everything the agent ever saw stays retrievable unchanged.
 					</p>
 					<p class="mt-3">
-						What the <code class="font-mono text-base">pre_llm_call</code> hook adds each
-						turn is an injection assembler, not a rewrite: directives are never dropped,
-						nudges are capped at 2, background status and recall are the first things to
-						yield, and the whole injection lives inside a 4,000-character budget.
+						What the <code class="font-mono text-base">pre_llm_call</code> hook adds
+						each turn is an injection assembler, not a rewrite: directives are never
+						dropped, nudges are capped at 2, background status and recall are the first
+						things to yield, and the whole injection lives inside a 4,000-character
+						budget.
 					</p>
 					<p class="mt-3">
 						Two modes cover every entry point -
@@ -877,15 +900,16 @@ const TokenGroups = Study.TokensSaved.split(",");
 							The thresholds are the knobs
 						</h2>
 						<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							A compression policy that cannot be tuned is a policy that will be fought.
+							A compression policy that cannot be tuned is a policy that will be
+							fought.
 						</p>
 						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 							Aphrodite's tunables are deliberately few and deliberately at the layer
 							where they matter: the threshold multipliers per type (from
 							<code class="font-mono text-base">aphrodite.toml</code>'s{" "}
 							<code class="font-mono text-base">[compression]</code>), the{" "}
-							<code class="font-mono text-base">preview_max_chars</code> preview budget,
-							and the context engine's fill threshold (
+							<code class="font-mono text-base">preview_max_chars</code> preview
+							budget, and the context engine's fill threshold (
 							<code class="font-mono text-base">engine_threshold_pct</code>).
 						</p>
 						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
@@ -897,14 +921,15 @@ const TokenGroups = Study.TokensSaved.split(",");
 						</p>
 						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 							The adaptive layer answers it statistically -{" "}
-							<code class="font-mono text-base">post_llm_call</code> captures savings and
-							updates EMA state per type - so the defaults move toward what the sessions
-							themselves prove useful, and the config only has to set the priors.
+							<code class="font-mono text-base">post_llm_call</code> captures savings
+							and updates EMA state per type - so the defaults move toward what the
+							sessions themselves prove useful, and the config only has to set the
+							priors.
 						</p>
 						<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							The savings those priors produce across 200 real sessions - the ledger, the
-							session-shape bands, the retrieval tax - are on the benchmarks page, which owns
-							the study.
+							The savings those priors produce across 200 real sessions - the ledger,
+							the session-shape bands, the retrieval tax - are on the benchmarks page,
+							which owns the study.
 						</p>
 					</div>
 					<!-- THRESHOLD TIERS: the multiplier each content type carries. One
@@ -914,35 +939,39 @@ const TokenGroups = Study.TokensSaved.split(",");
 					<div class="flex flex-col gap-6">
 						<ZineKicker Tone="dust">THRESHOLD TIERS</ZineKicker>
 						<div class="shell-card">
-							{
-								Tiers.map(({ Tier, Types, Multiplier, Note }) => (
-									<div class="flex items-center justify-between gap-8 border-b border-oxblood-dark px-4 py-3 last:border-b-0">
-										<div class="min-w-0">
-											<div class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
-												{Tier}
-												<span class="ml-2 text-stamped-canary">{Multiplier}</span>
-											</div>
-											<div class="truncate font-mono text-base text-zinc-dust">{Types}</div>
+							{Tiers.map(({ Tier, Types, Multiplier, Note }) => (
+								<div class="flex items-center justify-between gap-8 border-b border-oxblood-dark px-4 py-3 last:border-b-0">
+									<div class="min-w-0">
+										<div class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+											{Tier}
+											<span class="ml-2 text-stamped-canary">
+												{Multiplier}
+											</span>
 										</div>
-										{/* The note column must be allowed to shrink. `shrink-0` kept it
+										<div class="truncate font-mono text-base text-zinc-dust">
+											{Types}
+										</div>
+									</div>
+									{/* The note column must be allowed to shrink. `shrink-0` kept it
 										    at its max-content width (634px) inside a 549px row, so it
 										    painted 136px past the panel and the `truncate` column
 										    beside it collapsed to zero width - the type list for that
 										    tier rendered as nothing at all, with no ellipsis to show
 										    it had been cut. min-w-0 + the default shrink lets the note
 										    wrap onto its own second line instead. */}
-										<div class="hidden min-w-0 text-right font-mono text-base text-weathered-teal sm:block">
-											{Note}
-										</div>
+									<div class="hidden min-w-0 text-right font-mono text-base text-weathered-teal sm:block">
+										{Note}
 									</div>
-								))
-							}
+								</div>
+							))}
 						</div>
 						<div class="font-mono text-base leading-relaxed text-zinc-dust">
 							HIGHER MULTIPLIER = LONGER THE CONTENT STAYS VISIBLE BEFORE COMPRESSION
 						</div>
 						<div class="font-mono text-base leading-relaxed text-zinc-dust">
-							CODE {Narrative.CodeMultiplier} IS THE SHIPPED DEFAULT ({Narrative.CodeMultiplierKey.toUpperCase()}) - SOURCE SITS AT THE BASE THRESHOLD UNTIL AN OPERATOR RAISES IT
+							CODE {Narrative.CodeMultiplier} IS THE SHIPPED DEFAULT (
+							{Narrative.CodeMultiplierKey.toUpperCase()}) - SOURCE SITS AT THE BASE
+							THRESHOLD UNTIL AN OPERATOR RAISES IT
 						</div>
 						<ZineSource Lines={[`SRC: ${Cite(Narrative.From)}.`]} />
 					</div>
@@ -952,7 +981,9 @@ const TokenGroups = Study.TokensSaved.split(",");
 
 		<!-- ============ VI. THE EVIDENCE // TWO PLATES ============ -->
 		<section id="evidence" class="blueprint-section relative w-full" data-reveal>
-			<p class="section-index !text-weathered-teal">07 // THE EVIDENCE // WHAT ONE OUTPUT COSTS</p>
+			<p class="section-index !text-weathered-teal">
+				07 // THE EVIDENCE // WHAT ONE OUTPUT COSTS
+			</p>
 			<ZineBox Tone="teal" Size="lg" Rotate="-rotate-[0.4deg]" Class="mt-8 w-full" Wipe>
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					What one output costs
@@ -978,24 +1009,31 @@ const TokenGroups = Study.TokensSaved.split(",");
 					<!-- Real-world per-output compression -->
 					<div class="shell-card flex flex-col gap-8 p-5 sm:p-6">
 						<ZineKicker Tone="dust" As="div">
-							REAL-WORLD PER-OUTPUT COMPRESSION (ORIG → {Narrative.MarkerTokens.toUpperCase()} MARKER) &bull; ESTIMATED
+							REAL-WORLD PER-OUTPUT COMPRESSION (ORIG →{" "}
+							{Narrative.MarkerTokens.toUpperCase()} MARKER) &bull; ESTIMATED
 						</ZineKicker>
-						{
-							RealWorld.map(({ Type, Ratio, Percent }) => (
-								<ZineStatBar Label={Type} Ratio={Ratio} Percent={Percent} Color="canary" />
-							))
-						}
+						{RealWorld.map(({ Type, Ratio, Percent }) => (
+							<ZineStatBar
+								Label={Type}
+								Ratio={Ratio}
+								Percent={Percent}
+								Color="canary"
+							/>
+						))}
 					</div>
 					<!-- Per-type standard-corpus bars -->
 					<div class="shell-card flex flex-col gap-8 p-5 sm:p-6">
 						<ZineKicker Tone="dust" As="div">
 							PER-TYPE COMPRESSION (STANDARD CORPUS) &bull; MEASURED
 						</ZineKicker>
-						{
-							BenchTypes.map(({ Type, Pair, Savings, Width }) => (
-								<ZineStatBar Label={`${Type} · ${Pair}`} Ratio={Savings} Percent={Width} Color="teal" />
-							))
-						}
+						{BenchTypes.map(({ Type, Pair, Savings, Width }) => (
+							<ZineStatBar
+								Label={`${Type} · ${Pair}`}
+								Ratio={Savings}
+								Percent={Width}
+								Color="teal"
+							/>
+						))}
 						<ZineKicker Tone="canary" As="div">
 							20/20 COMPRESSED · 20/20 RETRIEVE OK
 						</ZineKicker>
@@ -1004,86 +1042,93 @@ const TokenGroups = Study.TokensSaved.split(",");
 				<!-- THE RETRIEVAL TAX AND THE CONFIDENCE NOTE -->
 				<div class="mt-24 grid grid-cols-1 gap-16 lg:grid-cols-2" data-enter="320">
 					<div class="border-l-4 border-weathered-teal pl-6">
-						<ZineKicker Tone="teal" As="div">RETRIEVAL TAX</ZineKicker>
+						<ZineKicker Tone="teal" As="div">
+							RETRIEVAL TAX
+						</ZineKicker>
 						<p class="mt-6 font-body text-base leading-relaxed text-bone-newsprint">
-							Retrieval re-entry cost <span class="text-stamped-canary">{Study.TaxCalls}</span> calls
-							and <span class="text-stamped-canary">{Study.TaxTokens}</span> tokens across the
-							study - the price of going back for detail.
+							Retrieval re-entry cost{" "}
+							<span class="text-stamped-canary">{Study.TaxCalls}</span> calls and{" "}
+							<span class="text-stamped-canary">{Study.TaxTokens}</span> tokens across
+							the study - the price of going back for detail.
 						</p>
 						<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-							It is the reason the design pushes previews so hard: the tax only gets paid
-							when the preview fails to answer the question, so the preview is engineered
-							to answer most of them.
+							It is the reason the design pushes previews so hard: the tax only gets
+							paid when the preview fails to answer the question, so the preview is
+							engineered to answer most of them.
 						</p>
 						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Read against the ledger, that is about {Study.TaxPct} of the tokens the study saved:
-							the whole cost of going back, paid only on the turns a preview did not
-							answer. Paying the full output again instead would have cost roughly {Study.TaxFactor}
+							Read against the ledger, that is about {Study.TaxPct} of the tokens the
+							study saved: the whole cost of going back, paid only on the turns a
+							preview did not answer. Paying the full output again instead would have
+							cost roughly {Study.TaxFactor}
 							times as much.
 						</p>
 					</div>
-					<div
-						class="shell-card p-5 font-body text-base leading-relaxed text-bone-newsprint"
-					>
+					<div class="shell-card p-5 font-body text-base leading-relaxed text-bone-newsprint">
 						<p>
 							<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 								CONFIDENCE ·{" "}
-							</span>The causal result - CCR removes context pressure for large repeated tool
+							</span>
+							The causal result - CCR removes context pressure for large repeated tool
 							outputs, and tool-heavy usage benefits far more than chat - is high.
 						</p>
 						<p class="mt-3">
-							The exact percentage is a band: the marker's byte size is the only trace of
-							the original content (the inline store is session-scoped), so savings were
-							estimated with a calibrated chars/tok ratio; sensitivity across{" "}
-							{Study.CharsPerTok} chars/tok spans {Study.Band}, centered {Study.BandCenter}.
+							The exact percentage is a band: the marker's byte size is the only trace
+							of the original content (the inline store is session-scoped), so savings
+							were estimated with a calibrated chars/tok ratio; sensitivity across{" "}
+							{Study.CharsPerTok} chars/tok spans {Study.Band}, centered{" "}
+							{Study.BandCenter}.
 						</p>
 						<p class="mt-3">
-							And the study is an author-run reconstruction, not a randomised comparison: it establishes
-							neither better task success nor universal cost savings. What it measures is how much context
-							the markers replaced in these sessions, and what that reconstruction cost in tokens.
+							And the study is an author-run reconstruction, not a randomised
+							comparison: it establishes neither better task success nor universal
+							cost savings. What it measures is how much context the markers replaced
+							in these sessions, and what that reconstruction cost in tokens.
 						</p>
 					</div>
 				</div>
 				<!-- SAVINGS BY SESSION SHAPE -->
 				<div class="mt-24" data-enter="440">
-					<ZineKicker Tone="dust" As="div">SAVINGS BY SESSION SHAPE</ZineKicker>
+					<ZineKicker Tone="dust" As="div">
+						SAVINGS BY SESSION SHAPE
+					</ZineKicker>
 					<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						The same engine saves nothing in a chat and almost everything in a tool-heavy run,
-						because the ratio tracks how much raw output the session produces at all.
+						The same engine saves nothing in a chat and almost everything in a
+						tool-heavy run, because the ratio tracks how much raw output the session
+						produces at all.
 					</p>
 					<div class="mt-8 flex flex-col gap-6">
-						{
-							Bands.map(({ Label, Range, Percent, Bar, Kind }) => (
-								<div>
-									<div class="flex flex-wrap items-baseline justify-between gap-4 font-mono text-base">
-										<span class="font-black uppercase tracking-widest text-bone-white">{Label}</span>
-										<span class="flex items-baseline gap-3">
-											{
-												Kind === "simulated" && (
-													<span class="border border-raw-blood px-1.5 py-0.5 type-meta font-black text-stamped-canary">
-														SIMULATED
-													</span>
-												)
-											}
-											<span class="text-stamped-canary">{Range}</span>
-										</span>
-									</div>
-									<div class="mt-2 h-3 w-full border border-oxblood-dark bg-soot-black">
-										<div class={`h-full ${Bar}`} style={`width: ${Percent}%`} />
-									</div>
+						{Bands.map(({ Label, Range, Percent, Bar, Kind }) => (
+							<div>
+								<div class="flex flex-wrap items-baseline justify-between gap-4 font-mono text-base">
+									<span class="font-black uppercase tracking-widest text-bone-white">
+										{Label}
+									</span>
+									<span class="flex items-baseline gap-3">
+										{Kind === "simulated" && (
+											<span class="border border-raw-blood px-1.5 py-0.5 type-meta font-black text-stamped-canary">
+												SIMULATED
+											</span>
+										)}
+										<span class="text-stamped-canary">{Range}</span>
+									</span>
 								</div>
-							))
-						}
+								<div class="mt-2 h-3 w-full border border-oxblood-dark bg-soot-black">
+									<div class={`h-full ${Bar}`} style={`width: ${Percent}%`} />
+								</div>
+							</div>
+						))}
 					</div>
 					<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						A pure-tool workload is the ceiling case and a chat-only session is the floor, which is
-						why the study reports a median beside the mean. The fourth bar is a simulated loop, not a
-						recorded session: it is marked as one because a stress test read as a fourth observation would
-						be the page's own over-claim.
+						A pure-tool workload is the ceiling case and a chat-only session is the
+						floor, which is why the study reports a median beside the mean. The fourth
+						bar is a simulated loop, not a recorded session: it is marked as one because
+						a stress test read as a fourth observation would be the page's own
+						over-claim.
 					</p>
 					<div class="mt-6 font-mono text-base leading-relaxed text-zinc-dust">
-						SAVINGS SCALE WITH TOOL-OUTPUT VOLUME AND SESSION LENGTH - THE SAME ENGINE, FOUR
-						DIFFERENT PAYOFFS, ALL FROM THE SAME KNOBS.
+						SAVINGS SCALE WITH TOOL-OUTPUT VOLUME AND SESSION LENGTH - THE SAME ENGINE,
+						FOUR DIFFERENT PAYOFFS, ALL FROM THE SAME KNOBS.
 					</div>
 				</div>
 				<ZineSource
@@ -1106,63 +1151,66 @@ const TokenGroups = Study.TokensSaved.split(",");
 						Every rule in the engine was paid for once.
 					</p>
 					<p class="font-body text-base leading-relaxed text-bone-newsprint">
-						Each arc runs the same three beats: the incident, the fix, and the
-						mechanic that still stands today.
+						Each arc runs the same three beats: the incident, the fix, and the mechanic
+						that still stands today.
 					</p>
 					<p class="font-body text-base leading-relaxed text-bone-newsprint">
 						All of it is public record - the CHANGELOG entries and the release notes.
 					</p>
 				</div>
 				<div class="mt-24 flex flex-col gap-32">
-					{
-						ArcsWithBeats.map(({ N, Span, Law, Border, Title, Beats, Src, Rule, Ink }) => (
-							<article
-								class:list={["blueprint-section", "border-l-4", Border, "pl-6 sm:pl-10"]}
-								style={`--blueprint-rule: ${Rule}`}
-								data-reveal
-							>
-								{/* THE NUMBERED SECTION. `ARC 1 · v1.3.0 -> v1.3.2 · THE LOSSLESSNESS
+					{ArcsWithBeats.map(({ N, Span, Law, Border, Title, Beats, Src, Rule, Ink }) => (
+						<article
+							class:list={[
+								"blueprint-section",
+								"border-l-4",
+								Border,
+								"pl-6 sm:pl-10",
+							]}
+							style={`--blueprint-rule: ${Rule}`}
+							data-reveal
+						>
+							{/* THE NUMBERED SECTION. `ARC 1 · v1.3.0 -> v1.3.2 · THE LOSSLESSNESS
 								    LAW` becomes the blueprint's index tag, so the arc opens the way
 								    every chapter on the page does - a rule, then a number, then the
 								    subject - and the arc's own colour travels in `Ink` (identity)
 								    rather than in the tag's default dust (volume). */}
-								<p class:list={["section-index", Ink]}>{`${N} · ${Span} · ${Law}`}</p>
-								<h3 class="mt-4 font-headline text-xl font-black uppercase tracking-tight text-bone-white sm:text-2xl">
-									{Title}
-								</h3>
-								{/* THE BLUEPRINT ROW: the arc's three beats side by side, one column
+							<p class:list={["section-index", Ink]}>{`${N} · ${Span} · ${Law}`}</p>
+							<h3 class="mt-4 font-headline text-xl font-black uppercase tracking-tight text-bone-white sm:text-2xl">
+								{Title}
+							</h3>
+							{/* THE BLUEPRINT ROW: the arc's three beats side by side, one column
 								    each, divided by the drawing's own hairlines instead of by three
 								    separate cards. A ruled row is the blueprint reading, and it keeps
 								    the arc's colour in ONE left rule rather than repeating a frame
 								    three times. Each beat's label moves from the head of its first
 								    paragraph to the column head, where it names the column - the
 								    sentences themselves are untouched, in their original order. */}
-								<div class="mt-8 grid grid-cols-1 divide-y divide-oxblood-dark border-y border-oxblood-dark sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-									{
-										Beats.map((Beat) => (
-											<div class="flex flex-col py-6 sm:px-6 sm:first:pl-0 sm:last:pr-0">
-												<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-													<span class:list={["section-index", Ink]}>{Beat.N}</span>
-													<strong class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
-														{Beat.Label}
-													</strong>
-												</div>
-												<div class="prose-flow mt-4">
-													{Beat.Sentences.map((Sentence) => (
-														<p
-															class="font-body text-base leading-relaxed text-bone-newsprint"
-															set:html={Sentence}
-														/>
-													))}
-												</div>
-											</div>
-										))
-									}
-								</div>
-								<ZineSource Lines={[Src]} />
-							</article>
-						))
-					}
+							<div class="mt-8 grid grid-cols-1 divide-y divide-oxblood-dark border-y border-oxblood-dark sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+								{Beats.map((Beat) => (
+									<div class="flex flex-col py-6 sm:px-6 sm:first:pl-0 sm:last:pr-0">
+										<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+											<span class:list={["section-index", Ink]}>
+												{Beat.N}
+											</span>
+											<strong class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+												{Beat.Label}
+											</strong>
+										</div>
+										<div class="prose-flow mt-4">
+											{Beat.Sentences.map((Sentence) => (
+												<p
+													class="font-body text-base leading-relaxed text-bone-newsprint"
+													set:html={Sentence}
+												/>
+											))}
+										</div>
+									</div>
+								))}
+							</div>
+							<ZineSource Lines={[Src]} />
+						</article>
+					))}
 				</div>
 			</ZineBox>
 		</section>

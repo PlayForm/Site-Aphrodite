@@ -83,8 +83,7 @@ export function Cite(From: string): string {
 
 /** A stable ID segment from a README label: "Browser snapshot (342 el)" -> "browser-snapshot". */
 function Slug(Label: string): string {
-	return Label
-		.replace(/\s*\(.*?\)\s*/g, " ")
+	return Label.replace(/\s*\(.*?\)\s*/g, " ")
 		.trim()
 		.toLowerCase()
 		.replace(/[^a-z0-9]+/g, "-")
@@ -144,7 +143,16 @@ export const Benchmark = Complete(
 export const Narrative = Complete(
 	Require(NarrativeJson.Narrative, "Facts/Narrative.json -> Narrative"),
 	"Narrative",
-	["CatalogTypes", "Tiers", "CodeMultiplier", "CodeMultiplierKey", "PreviewTokens", "MarkerTokens", "CompressStep", "From"],
+	[
+		"CatalogTypes",
+		"Tiers",
+		"CodeMultiplier",
+		"CodeMultiplierKey",
+		"PreviewTokens",
+		"MarkerTokens",
+		"CompressStep",
+		"From",
+	],
 );
 
 /** The classification registry's size, from the docs tree. */
@@ -176,13 +184,20 @@ export const Provenance = {
  * where its figures came from states this, because "generated" without a
  * revision is a claim a reader cannot check.
  */
-const Pin = Complete(Require(ModuleJson.Module, "Module.json -> Module"), "Module", ["Commit", "Branch"]);
+const Pin = Complete(Require(ModuleJson.Module, "Module.json -> Module"), "Module", [
+	"Commit",
+	"Branch",
+]);
 
 /** `Current@a03481bc7` - the branch and the short commit, in one token. */
 export const SourceCommit = `${Pin.Branch}@${Pin.Commit.slice(0, 9)}`;
 
 /** The full commit, for a page that prints the address rather than the shorthand. */
-export const SourceRevision = { Branch: Pin.Branch, Commit: Pin.Commit, Short: Pin.Commit.slice(0, 9) } as const;
+export const SourceRevision = {
+	Branch: Pin.Branch,
+	Commit: Pin.Commit,
+	Short: Pin.Commit.slice(0, 9),
+} as const;
 
 /** How a figure came to exist. Two figures of different kinds are not peers. */
 export type FigureKind = "measured" | "estimated" | "simulated" | "derived";
@@ -230,7 +245,9 @@ function Evidence(Entry: Omit<Figure, "SourceCommit"> & { SourceCommit?: string 
 	}
 
 	if (Register.has(Full.Id)) {
-		throw new Error(`[Numbers] two figures are registered as "${Full.Id}". A page joins by ID, so the second one would silently win.`);
+		throw new Error(
+			`[Numbers] two figures are registered as "${Full.Id}". A page joins by ID, so the second one would silently win.`,
+		);
 	}
 
 	Register.set(Full.Id, Full);
@@ -248,7 +265,8 @@ export function RealWorldId(Type: string): string {
 	return `benchmark.realworld.${Slug(Type.replace(/_/g, " "))}`;
 }
 
-const CorpusMethod = "one payload counted twice: the tokens the tool produced over the tokens the model actually reads, on a fixed corpus";
+const CorpusMethod =
+	"one payload counted twice: the tokens the tool produced over the tokens the model actually reads, on a fixed corpus";
 
 const StudyMethod =
 	"reconstructed payload-by-payload from the session transcripts, with every marker expanded and counted through a calibrated chars/token ratio";
@@ -560,7 +578,9 @@ export function Band(Id: string): { Id: string; Kind: FigureKind; Range: string;
 	const Spec = BandSpecs.find((Candidate) => Candidate.Id === Id);
 
 	if (Spec === undefined) {
-		throw new Error(`[Numbers] no session-shape band is registered as "${Id}". The IDs live in Source/Library/Numbers.ts.`);
+		throw new Error(
+			`[Numbers] no session-shape band is registered as "${Id}". The IDs live in Source/Library/Numbers.ts.`,
+		);
 	}
 
 	const Row = Study.Bands.find((Candidate) => Candidate.Range === Spec.Expected);

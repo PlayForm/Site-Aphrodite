@@ -47,13 +47,16 @@ const { Label, Busy = "RUNNING...", Delay = 420 } = Astro.props;
 				Button.textContent = Button.dataset["execBusy"] ?? "RUNNING...";
 				Button.dispatchEvent(new CustomEvent("zine:exec", { bubbles: true }));
 
-				setTimeout(() => {
-					Button.classList.remove("zine-exec-spin");
-					Button.textContent = Idle;
-					Button.setAttribute("aria-pressed", "false");
-					Button.disabled = false;
-					Button.dispatchEvent(new CustomEvent("zine:exec-done", { bubbles: true }));
-				}, Number(Button.dataset["execDelay"] ?? 420));
+				setTimeout(
+					() => {
+						Button.classList.remove("zine-exec-spin");
+						Button.textContent = Idle;
+						Button.setAttribute("aria-pressed", "false");
+						Button.disabled = false;
+						Button.dispatchEvent(new CustomEvent("zine:exec-done", { bubbles: true }));
+					},
+					Number(Button.dataset["execDelay"] ?? 420),
+				);
 			});
 		}
 	}

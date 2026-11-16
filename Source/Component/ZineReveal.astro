@@ -44,35 +44,33 @@ interface Props {
 const { Cover, Tag = "SUPPRESSED", Raw, Flow = false } = Astro.props;
 ---
 
-{
-	Flow ? (
-		<div class="well" data-zine-reveal-flow>
-			<div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
-				<span class="min-w-0 font-mono text-base text-zinc-dust">{Cover}</span>
-				<span class="telemetry-tag shrink-0">{Tag}</span>
-			</div>
-			<div class="p-3 font-mono text-base font-bold text-bone-white" set:html={Raw} />
+{Flow ? (
+	<div class="well" data-zine-reveal-flow>
+		<div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
+			<span class="min-w-0 font-mono text-base text-zinc-dust">{Cover}</span>
+			<span class="telemetry-tag shrink-0">{Tag}</span>
 		</div>
-	) : (
-		<div
-			class="group relative cursor-crosshair"
-			data-zine-reveal
-			tabindex="0"
-			aria-label={`${Tag}: hover or focus to reveal the raw content`}
-		>
-			<div class="well flex items-center justify-between gap-3 p-3 font-mono text-base text-zinc-dust transition-opacity duration-150 group-hover:opacity-10 group-focus:opacity-10 group-[.revealed]:opacity-10">
-				<span class="truncate">{Cover}</span>
-				<span class="telemetry-tag shrink-0">{Tag}</span>
-			</div>
-			<div class="pointer-events-none absolute inset-0 flex items-center p-3 font-mono text-base font-bold text-bone-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100 group-[.revealed]:opacity-100">
-				<div class="w-full" set:html={Raw} />
-			</div>
-			<div class="pointer-events-none absolute bottom-1.5 right-2 type-meta text-zinc-dust opacity-0 transition-opacity group-hover:opacity-70 group-focus:opacity-70 group-[.revealed]:opacity-70">
-				REVEALED
-			</div>
+		<div class="p-3 font-mono text-base font-bold text-bone-white" set:html={Raw} />
+	</div>
+) : (
+	<div
+		class="group relative cursor-crosshair"
+		data-zine-reveal
+		tabindex="0"
+		aria-label={`${Tag}: hover or focus to reveal the raw content`}
+	>
+		<div class="well flex items-center justify-between gap-3 p-3 font-mono text-base text-zinc-dust transition-opacity duration-150 group-hover:opacity-10 group-focus:opacity-10 group-[.revealed]:opacity-10">
+			<span class="truncate">{Cover}</span>
+			<span class="telemetry-tag shrink-0">{Tag}</span>
 		</div>
-	)
-}
+		<div class="pointer-events-none absolute inset-0 flex items-center p-3 font-mono text-base font-bold text-bone-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100 group-[.revealed]:opacity-100">
+			<div class="w-full" set:html={Raw} />
+		</div>
+		<div class="pointer-events-none absolute bottom-1.5 right-2 type-meta text-zinc-dust opacity-0 transition-opacity group-hover:opacity-70 group-focus:opacity-70 group-[.revealed]:opacity-70">
+			REVEALED
+		</div>
+	</div>
+)}
 
 <script>
 	// Mobile flattens: no hover exists there, so tap flips the reveal. Only the

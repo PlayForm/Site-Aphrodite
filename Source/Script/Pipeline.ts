@@ -183,7 +183,8 @@ export function Classify(Text: string): string {
 	if (Trimmed.startsWith("{") || Trimmed.startsWith("[")) {
 		const Parsed = TryParseJson(Trimmed);
 		if (Parsed !== ParseFailed) {
-			if (IsRecord(Parsed) && ("exit_code" in Parsed || "status" in Parsed)) return "tool_output";
+			if (IsRecord(Parsed) && ("exit_code" in Parsed || "status" in Parsed))
+				return "tool_output";
 			return "json";
 		}
 	}
@@ -287,7 +288,8 @@ export function PreviewLine(Type: string, Text: string, Hint: number): string {
 		case "code_js":
 		case "code": {
 			const Fns = CodeCounts(/\bfn\b|\bdef\b|\bfunc\b|function|const \w+ = \(/g, "fns");
-			const Structs = Type === "code_rust" ? `|${CodeCounts(/\bstruct\b/g, "structs")} ` : " ";
+			const Structs =
+				Type === "code_rust" ? `|${CodeCounts(/\bstruct\b/g, "structs")} ` : " ";
 			const Signature = Ellipsis(
 				Lines.find((Line) => /^(fn|def|func|function) |^(pub )?fn /.test(Line.trim())) ??
 					"",
@@ -465,7 +467,9 @@ export function Simulate(Input: SimulateInput): SimulateResult {
 			RawBytes <= (Table["inline_threshold"] ?? ThresholdDefaults["inline_threshold"]!)
 				? "inline"
 				: "durable",
-		CacheCompressed: RawBytes > (Table["tool_threshold_cache"] ?? ThresholdDefaults["tool_threshold_cache"]!),
+		CacheCompressed:
+			RawBytes >
+			(Table["tool_threshold_cache"] ?? ThresholdDefaults["tool_threshold_cache"]!),
 		Outcome: Marked ? "preview-and-marker" : "pass-through",
 	};
 }
@@ -520,7 +524,10 @@ function BindDecide(Node: HTMLElement): void {
 		Button.addEventListener("click", () => Show(Button.dataset["branch"] ?? "preview-answers"));
 	}
 
-	Show(Buttons.find((Button) => Button.hasAttribute("data-active"))?.dataset["branch"] ?? "preview-answers");
+	Show(
+		Buttons.find((Button) => Button.hasAttribute("data-active"))?.dataset["branch"] ??
+			"preview-answers",
+	);
 }
 
 function BindFull(Node: HTMLElement): void {
@@ -597,7 +604,8 @@ function BindFull(Node: HTMLElement): void {
 		}
 		if (TypeOut) TypeOut.textContent = Result.Type;
 		if (TierOut) TierOut.textContent = `×${TierOf(Result.Type)}`;
-		if (ThresholdOut) ThresholdOut.textContent = `limit ${Math.round(Result.ThresholdBytes).toLocaleString("en-US")} B`;
+		if (ThresholdOut)
+			ThresholdOut.textContent = `limit ${Math.round(Result.ThresholdBytes).toLocaleString("en-US")} B`;
 		// The mechanical outcome only. Whether the preview answers the agent's
 		// question is the agent's call, and retrieval is the visitor's action -
 		// a simulator that has never been given a task cannot know either.

@@ -49,34 +49,34 @@ const Delta = {
 	rows move. Same pattern as every hand-written table on the site. -->
 <div class="zine-box-subtle well overflow-x-auto">
 	<table class="w-full border-collapse font-mono text-base">
-		{
-			Headers && (
-				<thead>
-					<tr class="border-b border-[var(--tier-well-edge)]">
-						{Headers.map((Header) => (
-							<th class="px-3 py-2 text-left type-meta !font-black uppercase tracking-widest text-zinc-dust">
-								{Header}
-							</th>
-						))}
-					</tr>
-				</thead>
-			)
-		}
+		{Headers && (
+			<thead>
+				<tr class="border-b border-[var(--tier-well-edge)]">
+					{Headers.map((Header) => (
+						<th class="px-3 py-2 text-left type-meta !font-black uppercase tracking-widest text-zinc-dust">
+							{Header}
+						</th>
+					))}
+				</tr>
+			</thead>
+		)}
 		<tbody>
-			{
-				Rows.map((Row) => (
-					<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
-						{Row.Cells.map((Cell) => (
-							<td
-								class={`px-3 py-2 tabular-nums ${Cell.Delta ? Delta[Cell.Delta] : "text-bone-newsprint"} ${Cell.Align === "right" ? "text-right" : "text-left"}`}
-							>
-								{Cell.Delta && <span class="mr-1 font-black">{Cell.Delta === "up" ? "▲" : "▼"}</span>}
-								{Cell.Text}
-							</td>
-						))}
-					</tr>
-				))
-			}
+			{Rows.map((Row) => (
+				<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
+					{Row.Cells.map((Cell) => (
+						<td
+							class={`px-3 py-2 tabular-nums ${Cell.Delta ? Delta[Cell.Delta] : "text-bone-newsprint"} ${Cell.Align === "right" ? "text-right" : "text-left"}`}
+						>
+							{Cell.Delta && (
+								<span class="mr-1 font-black">
+									{Cell.Delta === "up" ? "▲" : "▼"}
+								</span>
+							)}
+							{Cell.Text}
+						</td>
+					))}
+				</tr>
+			))}
 		</tbody>
 	</table>
 </div>

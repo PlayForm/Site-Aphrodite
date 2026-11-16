@@ -180,37 +180,43 @@ export const PrimaryLinks: InternalLink[] = [
 		Href: Routes.Home,
 		Label: "OVERVIEW",
 		Group: "Start",
-		Promise: "What Aphrodite is in one page: the compression pipeline, the previews it writes, and the numbers that pay for it.",
+		Promise:
+			"What Aphrodite is in one page: the compression pipeline, the previews it writes, and the numbers that pay for it.",
 	},
 	{
 		Href: Routes.Setup,
 		Label: "SETUP",
 		Group: "Start",
-		Promise: "The installation contract: one command, two proxy listeners, the plugin enabled, and a check that proves it.",
+		Promise:
+			"The installation contract: one command, two proxy listeners, the plugin enabled, and a check that proves it.",
 	},
 	{
 		Href: Routes.Docs,
 		Label: "DOCS",
 		Group: "Reference",
-		Promise: "The documentation tree - proxy, plugin, hooks, the CCR engine - written to be read in order.",
+		Promise:
+			"The documentation tree - proxy, plugin, hooks, the CCR engine - written to be read in order.",
 	},
 	{
 		Href: Routes.Benchmarks,
 		Label: "BENCHMARKS",
 		Group: "Evidence",
-		Promise: "The measured figures, each with the method that produced it, so a number can be checked instead of believed.",
+		Promise:
+			"The measured figures, each with the method that produced it, so a number can be checked instead of believed.",
 	},
 	{
 		Href: Routes.CaseStudy,
 		Label: "CASE STUDY",
 		Group: "Evidence",
-		Promise: "One session followed end to end - why the pipeline is shaped this way, argued from what it did to that session.",
+		Promise:
+			"One session followed end to end - why the pipeline is shaped this way, argued from what it did to that session.",
 	},
 	{
 		Href: Routes.Showcase,
 		Label: "SHOWCASE",
 		Group: "Explore",
-		Promise: "The gallery: filterable previews of what the output looks like after the pipeline, defaults in view. Not the mechanics - see Examples for those.",
+		Promise:
+			"The gallery: filterable previews of what the output looks like after the pipeline, defaults in view. Not the mechanics - see Examples for those.",
 	},
 ];
 
@@ -230,49 +236,57 @@ export const MenuLinks: InternalLink[] = [
 		Href: Routes.Examples,
 		Label: "EXAMPLES",
 		Group: "Explore",
-		Promise: "The mechanics, worked: seven scenarios step by step - compress, marker, retrieve - and the two flows that close the loop.",
+		Promise:
+			"The mechanics, worked: seven scenarios step by step - compress, marker, retrieve - and the two flows that close the loop.",
 	},
 	{
 		Href: Routes.Workbench,
 		Label: "WORKBENCH",
 		Group: "Explore",
-		Promise: "The simulator: paste any tool output, turn the threshold knobs yourself, and watch the preview and the marker appear.",
+		Promise:
+			"The simulator: paste any tool output, turn the threshold knobs yourself, and watch the preview and the marker appear.",
 	},
 	{
 		Href: Routes.Plugin,
 		Label: "PLUGIN",
 		Group: "Reference",
-		Promise: "The plugin itself: the thin registration shim, the hook chain, the file layout, and the download that verifies its own hash.",
+		Promise:
+			"The plugin itself: the thin registration shim, the hook chain, the file layout, and the download that verifies its own hash.",
 	},
 	{
 		Href: Routes.Hermes,
 		Label: "HERMES",
 		Group: "Reference",
-		Promise: "The integration: how Hermes loads the plugin, the turn's hook chain, and what the agent sees inside it. Not the plugin's own spec - see Plugin.",
+		Promise:
+			"The integration: how Hermes loads the plugin, the turn's hook chain, and what the agent sees inside it. Not the plugin's own spec - see Plugin.",
 	},
 	{
 		Href: Routes.Tools,
 		Label: "TOOLS",
 		Group: "Reference",
-		Promise: "The thirteen tools the agent calls - names, arguments, and what each returns, including the marker retrieval round-trip.",
+		Promise:
+			"The thirteen tools the agent calls - names, arguments, and what each returns, including the marker retrieval round-trip.",
 	},
 	{
 		Href: Routes.Config,
 		Label: "CONFIG",
 		Group: "Reference",
-		Promise: "Every key in aphrodite.toml - the pick chain, the proxy pair, the compression knobs - with its default and whether it hot-reloads.",
+		Promise:
+			"Every key in aphrodite.toml - the pick chain, the proxy pair, the compression knobs - with its default and whether it hot-reloads.",
 	},
 	{
 		Href: Routes.Versions,
 		Label: "VERSIONS",
 		Group: "Project",
-		Promise: "The release log: binary and plugin versions side by side, with the notes that shipped against each.",
+		Promise:
+			"The release log: binary and plugin versions side by side, with the notes that shipped against each.",
 	},
 	{
 		Href: Routes.Brief,
 		Label: "BRIEF",
 		Group: "Project",
-		Promise: "The 64-second presentation: the raw log, the split, and the four steps - the whole product in one sitting.",
+		Promise:
+			"The 64-second presentation: the raw log, the split, and the four steps - the whole product in one sitting.",
 	},
 ];
 
@@ -366,9 +380,7 @@ export const ExternalLinks = {
  * matches only itself; every other route matches by prefix).
  */
 export function IsActive(Path: string, Link: InternalLink): boolean {
-	return Link.Href === Routes.Home
-		? Path === Routes.Home
-		: Path.startsWith(Link.Href);
+	return Link.Href === Routes.Home ? Path === Routes.Home : Path.startsWith(Link.Href);
 }
 
 /** A repository entry: the bare clone URL plus the branch segment links compose with. */

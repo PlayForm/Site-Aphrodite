@@ -235,6 +235,8 @@ const Frame =
 	data-grunge-mode={Grunge ? (Accent === "none" ? "edge" : "scatter") : undefined}
 >
 	{Wipe && <span class="motion-wipe" data-wipe aria-hidden="true" />}
-	{Tape !== undefined && <ZineTape Variant="corner" Label={Tape} Color={TapeColor} Side={TapeSide} />}
+	{Tape !== undefined && (
+		<ZineTape Variant="corner" Label={Tape} Color={TapeColor} Side={TapeSide} />
+	)}
 	<slot />
 </div>

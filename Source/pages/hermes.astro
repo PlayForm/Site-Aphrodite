@@ -169,11 +169,17 @@ const Ribbon =
 			    side by side, so the second column is read as the consequence of
 			    the first rather than as a third paragraph of the same thought. */}
 			<div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
-				<ZineBox Size="md" Accent="none" Surface="shell" Tape="NO INTERCEPTION" TapeColor="bone">
+				<ZineBox
+					Size="md"
+					Accent="none"
+					Surface="shell"
+					Tape="NO INTERCEPTION"
+					TapeColor="bone"
+				>
 					<div class="prose-flow">
 						<p class="type-body text-bone-newsprint">
-							<span class="font-bold text-bone-white">HERMES ALONE -</span> nothing stands
-							between a tool and the model.
+							<span class="font-bold text-bone-white">HERMES ALONE -</span> nothing
+							stands between a tool and the model.
 						</p>
 						<p class="type-body text-bone-newsprint">
 							That is the baseline cost the other two configurations exist to remove.
@@ -187,8 +193,8 @@ const Ribbon =
 					</p>
 					<p class="mt-4 type-body text-bone-newsprint">
 						Every file read, build log, and JSON blob enters the message history raw,
-						because nothing intercepts it - the agent spends its token budget reading noise
-						instead of reasoning.
+						because nothing intercepts it - the agent spends its token budget reading
+						noise instead of reasoning.
 					</p>
 				</div>
 			</div>
@@ -204,21 +210,19 @@ const Ribbon =
 			{/* THE STAGE ROW - the surface counted before it is decided about. Four
 			    cards, four stage accents, the count as the anchor in each. */}
 			<div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-				{
-					Surface.map((Cell) => (
-						<div class="grunge shell-card flex flex-col" data-grunge>
-							<div class:list={["h-[2px] w-full", Cell.Accent]} />
-							<div class="flex flex-1 flex-col px-5 py-5">
-								<p class="section-index">{Cell.Index}</p>
-								<div class="metric mt-4">
-									{Cell.Value}
-									<span class="metric__unit">{Cell.Unit}</span>
-								</div>
-								<p class="mt-4 type-body text-bone-newsprint">{Cell.Note}</p>
+				{Surface.map((Cell) => (
+					<div class="grunge shell-card flex flex-col" data-grunge>
+						<div class:list={["h-[2px] w-full", Cell.Accent]} />
+						<div class="flex flex-1 flex-col px-5 py-5">
+							<p class="section-index">{Cell.Index}</p>
+							<div class="metric mt-4">
+								{Cell.Value}
+								<span class="metric__unit">{Cell.Unit}</span>
 							</div>
+							<p class="mt-4 type-body text-bone-newsprint">{Cell.Note}</p>
 						</div>
-					))
-				}
+					</div>
+				))}
 			</div>
 
 			{/* THE INVENTORY - the manifest's own names, so the matrix below is read
@@ -230,11 +234,9 @@ const Ribbon =
 						HOOKS // {SurfaceCount.Hooks}
 					</dt>
 					<dd class="mt-2 flex flex-wrap gap-2">
-						{
-							HookNames.map((Name) => (
-								<span class="telemetry-tag telemetry-tag--canary">{Name}</span>
-							))
-						}
+						{HookNames.map((Name) => (
+							<span class="telemetry-tag telemetry-tag--canary">{Name}</span>
+						))}
 					</dd>
 				</div>
 				<div>
@@ -242,11 +244,9 @@ const Ribbon =
 						TOOLS // {SurfaceCount.Tools}
 					</dt>
 					<dd class="mt-2 flex flex-wrap gap-2">
-						{
-							ToolNames.map((Name) => (
-								<span class="telemetry-tag">{Name}</span>
-							))
-						}
+						{ToolNames.map((Name) => (
+							<span class="telemetry-tag">{Name}</span>
+						))}
 					</dd>
 				</div>
 			</dl>
@@ -309,98 +309,96 @@ const Ribbon =
 			</h2>
 
 			<div class="mt-10 grid grid-cols-1 gap-12 lg:grid-cols-2">
-				{
-					Lanes.map((Lane) => (
-						<ZineBox
-							Size="lg"
-							Accent={Lane.Accent}
-							Grunge={true}
-							Rotate={Lane.Rotate}
-							Tape={Lane.Tape}
-							TapeColor={Lane.TapeColor}
-						>
-							<div class="mb-5 flex flex-wrap gap-2">
-								{Lane.Tags.map((Tag, I) => (
-									<span class:list={["telemetry-tag", I === 0 ? Lane.TagTone : ""]}>
-										{Tag}
-									</span>
-								))}
-							</div>
+				{Lanes.map((Lane) => (
+					<ZineBox
+						Size="lg"
+						Accent={Lane.Accent}
+						Grunge={true}
+						Rotate={Lane.Rotate}
+						Tape={Lane.Tape}
+						TapeColor={Lane.TapeColor}
+					>
+						<div class="mb-5 flex flex-wrap gap-2">
+							{Lane.Tags.map((Tag, I) => (
+								<span class:list={["telemetry-tag", I === 0 ? Lane.TagTone : ""]}>
+									{Tag}
+								</span>
+							))}
+						</div>
 
-							{Lane.Id === "plugin" ? (
-								<div class="prose-flow">
-									<p class="type-body text-bone-newsprint">
-										<span class="font-bold text-weathered-teal">
-											HERMES + APHRODITE -
-										</span>{" "}
-										the plugin lane intercepts output before it becomes message
-										history.
-									</p>
-									<p class="type-body text-bone-newsprint">
-										The hooks classify, store, and replace raw output with a
-										type-aware marker of ~15 tokens instead of hundreds, the agent
-										retrieves the full content only when it actually needs it, and
-										the injection assembler adds directives, nudges, and the recall
-										catalog to every turn under a hard byte budget.
-									</p>
-								</div>
-							) : (
-								<div class="prose-flow">
-									<p class="type-body text-bone-newsprint">
-										<span class="font-bold text-stamped-canary">
-											HERMES + APHRODITE + THE PROXY -
-										</span>{" "}
-										the plugin already spawns both listeners, so the third
-										configuration is running without extra setup: point{" "}
-										<code class="font-mono text-base text-weathered-teal">
-											base_url
-										</code>{" "}
-										at{" "}
-										<code class="font-mono text-base text-weathered-teal">
-											:9798
-										</code>{" "}
-										and any OpenAI-compatible client gets the same CCR compression
-										over plain HTTP.
-									</p>
-									<p class="type-body text-bone-newsprint">
-										That is the agent-to-agent path - a second agent, a script, or an
-										external tool can converse through the same compressed channel,
-										share the persistent SQLite store (which survives a restart; the
-										plugin lane's inline store is session-scoped), and call the tool
-										relay to retrieve or create CCR entries.
-									</p>
-									<p class="type-body text-bone-newsprint">
-										<span class="font-bold text-bone-white">
-											THE LIMIT IS REAL TOO:
-										</span>{" "}
-										the proxy only sees HTTP traffic.
-									</p>
-									<ul class="mt-4 flex flex-col gap-2">
-										<li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
-											no tool-output interception
-										</li>
-										<li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
-											no terminal compression
-										</li>
-										<li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
-											no directives
-										</li>
-										<li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
-											no context engine
-										</li>
-										<li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
-											and SSE streams pass through uncompressed.
-										</li>
-									</ul>
-									<p class="type-body text-bone-newsprint">
-										Because of that the proxy extends the stack to other callers; it
-										does not replace the hooks inside Hermes.
-									</p>
-								</div>
-							)}
-						</ZineBox>
-					))
-				}
+						{Lane.Id === "plugin" ? (
+							<div class="prose-flow">
+								<p class="type-body text-bone-newsprint">
+									<span class="font-bold text-weathered-teal">
+										HERMES + APHRODITE -
+									</span>{" "}
+									the plugin lane intercepts output before it becomes message
+									history.
+								</p>
+								<p class="type-body text-bone-newsprint">
+									The hooks classify, store, and replace raw output with a
+									type-aware marker of ~15 tokens instead of hundreds, the agent
+									retrieves the full content only when it actually needs it, and
+									the injection assembler adds directives, nudges, and the recall
+									catalog to every turn under a hard byte budget.
+								</p>
+							</div>
+						) : (
+							<div class="prose-flow">
+								<p class="type-body text-bone-newsprint">
+									<span class="font-bold text-stamped-canary">
+										HERMES + APHRODITE + THE PROXY -
+									</span>{" "}
+									the plugin already spawns both listeners, so the third
+									configuration is running without extra setup: point{" "}
+									<code class="font-mono text-base text-weathered-teal">
+										base_url
+									</code>{" "}
+									at{" "}
+									<code class="font-mono text-base text-weathered-teal">
+										:9798
+									</code>{" "}
+									and any OpenAI-compatible client gets the same CCR compression
+									over plain HTTP.
+								</p>
+								<p class="type-body text-bone-newsprint">
+									That is the agent-to-agent path - a second agent, a script, or
+									an external tool can converse through the same compressed
+									channel, share the persistent SQLite store (which survives a
+									restart; the plugin lane's inline store is session-scoped), and
+									call the tool relay to retrieve or create CCR entries.
+								</p>
+								<p class="type-body text-bone-newsprint">
+									<span class="font-bold text-bone-white">
+										THE LIMIT IS REAL TOO:
+									</span>{" "}
+									the proxy only sees HTTP traffic.
+								</p>
+								<ul class="mt-4 flex flex-col gap-2">
+									<li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
+										no tool-output interception
+									</li>
+									<li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
+										no terminal compression
+									</li>
+									<li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
+										no directives
+									</li>
+									<li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
+										no context engine
+									</li>
+									<li class="type-body border-l-4 border-raw-blood pl-4 text-zinc-dust">
+										and SSE streams pass through uncompressed.
+									</li>
+								</ul>
+								<p class="type-body text-bone-newsprint">
+									Because of that the proxy extends the stack to other callers; it
+									does not replace the hooks inside Hermes.
+								</p>
+							</div>
+						)}
+					</ZineBox>
+				))}
 			</div>
 		</section>
 
@@ -430,7 +428,9 @@ const Ribbon =
 					median session saved ratio of 22.9%, and ~22,921 tokens saved per API call.
 				</p>
 				<div class="mt-8 flex flex-wrap items-start gap-4 border-t border-raw-blood/40 pt-6">
-					<span class="telemetry-tag telemetry-tag--crimson">THE TRADE-OFF IS STATED PLAINLY</span>
+					<span class="telemetry-tag telemetry-tag--crimson">
+						THE TRADE-OFF IS STATED PLAINLY
+					</span>
 					<p class="max-w-2xl type-body text-carbon-void">
 						the hooks are Hermes' contract - no other client can register them, so this
 						lane works with Hermes only.
@@ -461,9 +461,7 @@ const Ribbon =
 		<!-- 05 // LIFECYCLE - launch, proxies, and a store that does not survive it -->
 		<section id="lifecycle" class="blueprint-section" data-reveal>
 			<p class="section-index">05 // LIFECYCLE // SESSION TO SESSION</p>
-			<h2 class="mt-3 type-section text-bone-white">
-				What happens when you launch Hermes
-			</h2>
+			<h2 class="mt-3 type-section text-bone-white">What happens when you launch Hermes</h2>
 
 			{/* THE BOOT SEQUENCE - a ribbon carrying the head of the ladder, then the
 			    five lines it produces in a recessed channel. The stage accents in
@@ -477,10 +475,12 @@ const Ribbon =
 				</div>
 				<div class="well p-4 font-mono text-base leading-relaxed sm:p-5">
 					<div class="pl-4 text-bone-newsprint">
-						→ plugin loads · dylib resolved once per process, smoke-tested in a subprocess
+						→ plugin loads · dylib resolved once per process, smoke-tested in a
+						subprocess
 					</div>
 					<div class="pl-4 text-bone-newsprint">
-						→ a faulting image degrades to "plugin disabled" instead of killing the gateway
+						→ a faulting image degrades to "plugin disabled" instead of killing the
+						gateway
 					</div>
 					<div class="pl-4 text-bone-newsprint">
 						→ two proxies spawn - a healthy pair is reused, never duplicated
@@ -529,9 +529,7 @@ const Ribbon =
 
 			<div class="mt-8 flex flex-wrap items-start gap-4">
 				<span class="telemetry-tag telemetry-tag--crimson">NO HOT-RELOAD</span>
-				<p class="type-body text-zinc-dust">
-					RESTART THE SESSION TO PICK UP A NEW BUILD.
-				</p>
+				<p class="type-body text-zinc-dust">RESTART THE SESSION TO PICK UP A NEW BUILD.</p>
 			</div>
 
 			<figure class="well mt-16 p-4 sm:p-5" data-diagram="session-lifecycle">
@@ -569,14 +567,17 @@ const Ribbon =
 				<p class="type-body text-bone-newsprint">
 					Each line is the format string its own arm prints, character for character: the
 					tallies come first, then whatever the arm could add about them. The extension
-					counts in an <code class="font-mono text-base text-weathered-teal">ls</code> line
-					are joined with <code class="font-mono text-base text-weathered-teal">×</code>
-					rather than a letter x, a JSON item count is set tight against the word it counts
-					(<code class="font-mono text-base text-weathered-teal">5items</code>), a code map
-					joins its structure parts with a pipe, and a search line reports hits, distinct
-					files and the first match location. The numbers are representative; the shapes
-					are the code's, which is what makes them checkable against
-					<code class="font-mono text-base text-weathered-teal">preview/builders/*.rs</code>
+					counts in an <code class="font-mono text-base text-weathered-teal">ls</code>{" "}
+					line are joined with{" "}
+					<code class="font-mono text-base text-weathered-teal">×</code>
+					rather than a letter x, a JSON item count is set tight against the word it
+					counts (<code class="font-mono text-base text-weathered-teal">5items</code>), a
+					code map joins its structure parts with a pipe, and a search line reports hits,
+					distinct files and the first match location. The numbers are representative; the
+					shapes are the code's, which is what makes them checkable against
+					<code class="font-mono text-base text-weathered-teal">
+						preview/builders/*.rs
+					</code>
 					rather than taken on trust.
 				</p>
 			</div>
@@ -599,7 +600,9 @@ const Ribbon =
 				</div>
 				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
 					<div class={Ribbon}>
-						<span class="telemetry-tag telemetry-tag--teal">WITH NATIVE INTEGRATION</span>
+						<span class="telemetry-tag telemetry-tag--teal">
+							WITH NATIVE INTEGRATION
+						</span>
 						<span class="telemetry-tag telemetry-tag--canary">A FEW TOKENS</span>
 						<span class="telemetry-tag ml-auto">44 LINES</span>
 					</div>
@@ -607,9 +610,10 @@ const Ribbon =
 						<span class="text-bone-white">[build:0E 0W 44L]</span>
 						<span class="text-zinc-dust">
 							{" "}
-							← a few tokens. The agent knows: build passed. The line count is the same
-							log that costs 500 tokens raw: five hundred tokens is about two thousand
-							characters, which is what forty-four lines of compiler output measure.
+							← a few tokens. The agent knows: build passed. The line count is the
+							same log that costs 500 tokens raw: five hundred tokens is about two
+							thousand characters, which is what forty-four lines of compiler output
+							measure.
 						</span>
 					</div>
 				</div>
@@ -643,20 +647,25 @@ const Ribbon =
 					Enable with{" "}
 					<code class="font-mono text-base text-weathered-teal">
 						APHRODITE_CONTEXT_ENGINE=1
-					</code>.
+					</code>
+					.
 				</p>
 				<p class="type-body text-bone-newsprint">
 					The engine is the session's middle-turn archiver: when the conversation index
 					fills past{" "}
-					<code class="font-mono text-base text-weathered-teal">engine_threshold_pct</code>,
-					it packs the middle turns (keeping
-					<code class="font-mono text-base text-weathered-teal">engine_protect_first</code>
+					<code class="font-mono text-base text-weathered-teal">
+						engine_threshold_pct
+					</code>
+					, it packs the middle turns (keeping
+					<code class="font-mono text-base text-weathered-teal">
+						engine_protect_first
+					</code>
 					at the start and
 					<code class="font-mono text-base text-weathered-teal">engine_protect_last</code>
 					at the end, once
 					<code class="font-mono text-base text-weathered-teal">engine_min_msgs</code>
-					turns exist) into one compact CCR entry and replaces them with a single marker, so
-					the model sees a short head + marker + tail history.
+					turns exist) into one compact CCR entry and replaces them with a single marker,
+					so the model sees a short head + marker + tail history.
 				</p>
 				<p class="type-body text-bone-newsprint">
 					The archive is in-place but recoverable via
@@ -676,7 +685,9 @@ const Ribbon =
 					<div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4">
 						<dt class="text-zinc-dust">engine_threshold_pct</dt>
 						<dd class="text-stamped-canary">30</dd>
-						<dd class="col-span-2 text-zinc-dust"># archive middle turns at % context fill</dd>
+						<dd class="col-span-2 text-zinc-dust">
+							# archive middle turns at % context fill
+						</dd>
 					</div>
 					<div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4">
 						<dt class="text-zinc-dust">engine_protect_first</dt>
@@ -691,7 +702,9 @@ const Ribbon =
 					<div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4">
 						<dt class="text-zinc-dust">engine_min_msgs</dt>
 						<dd class="text-stamped-canary">8</dd>
-						<dd class="col-span-2 text-zinc-dust"># minimum messages before activating</dd>
+						<dd class="col-span-2 text-zinc-dust">
+							# minimum messages before activating
+						</dd>
 					</div>
 				</dl>
 			</div>

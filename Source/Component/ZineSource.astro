@@ -84,37 +84,40 @@ const Rows = [
 ].filter((Row) => Row.Values.length > 0);
 ---
 
-{
-	Variant === "methodology" ? (
-		<section class="mt-12 border-t border-oxblood-dark pt-8" data-zine-source="methodology">
-			{Title && <h3 class="section-kicker">{Title}</h3>}
-			{Lines.length > 0 && (
-				<div class="break-token mt-3 space-y-1 font-mono text-caption leading-relaxed text-zinc-dust">
-					{Lines.map((Line) => (
-						<p>{Line}</p>
-					))}
-				</div>
-			)}
-			{Rows.length > 0 && (
-				<dl class="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-[9rem_1fr]">
-					{Rows.map((Row) => (
-						<>
-							<dt class="type-meta text-zinc-dust">{Row.Key}</dt>
-							<dd class:list={[Voice[Row.Voice], "space-y-1 leading-relaxed text-bone-newsprint"]}>
-								{Row.Values.map((Value) => (
-									<p class={Row.Voice === "mono" ? "break-token" : ""}>{Value}</p>
-								))}
-							</dd>
-						</>
-					))}
-				</dl>
-			)}
-		</section>
-	) : (
-		<div class="break-token mt-12 space-y-1 border-t border-oxblood-dark pt-8 font-mono text-caption leading-relaxed text-zinc-dust">
-			{Lines.map((Line) => (
-				<p>{Line}</p>
-			))}
-		</div>
-	)
-}
+{Variant === "methodology" ? (
+	<section class="mt-12 border-t border-oxblood-dark pt-8" data-zine-source="methodology">
+		{Title && <h3 class="section-kicker">{Title}</h3>}
+		{Lines.length > 0 && (
+			<div class="break-token mt-3 space-y-1 font-mono text-caption leading-relaxed text-zinc-dust">
+				{Lines.map((Line) => (
+					<p>{Line}</p>
+				))}
+			</div>
+		)}
+		{Rows.length > 0 && (
+			<dl class="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-[9rem_1fr]">
+				{Rows.map((Row) => (
+					<>
+						<dt class="type-meta text-zinc-dust">{Row.Key}</dt>
+						<dd
+							class:list={[
+								Voice[Row.Voice],
+								"space-y-1 leading-relaxed text-bone-newsprint",
+							]}
+						>
+							{Row.Values.map((Value) => (
+								<p class={Row.Voice === "mono" ? "break-token" : ""}>{Value}</p>
+							))}
+						</dd>
+					</>
+				))}
+			</dl>
+		)}
+	</section>
+) : (
+	<div class="break-token mt-12 space-y-1 border-t border-oxblood-dark pt-8 font-mono text-caption leading-relaxed text-zinc-dust">
+		{Lines.map((Line) => (
+			<p>{Line}</p>
+		))}
+	</div>
+)}

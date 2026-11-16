@@ -70,9 +70,7 @@ const SegmentNumber = (Lower) => {
 		case /(?:ses|xes|zes|ches|shes)$/.test(Lower):
 			Forms.add(Lower.slice(0, -2));
 			break;
-		case Lower.endsWith("s") &&
-			!/(?:ss|us|is)$/.test(Lower) &&
-			Lower.length > 2:
+		case Lower.endsWith("s") && !/(?:ss|us|is)$/.test(Lower) && Lower.length > 2:
 			Forms.add(Lower.slice(0, -1));
 			break;
 		default:
@@ -96,12 +94,7 @@ const SegmentCompound = (Segment) => {
 		default: {
 			const Lower = Words.map((Word) => Word.toLowerCase());
 
-			return [
-				Lower.join("-"),
-				Lower.join("_"),
-				Lower.join(""),
-				Lower.join("."),
-			];
+			return [Lower.join("-"), Lower.join("_"), Lower.join(""), Lower.join(".")];
 		}
 	}
 };
@@ -220,9 +213,7 @@ export const BuildRedirects = (CanonicalPaths) => {
 		}
 	}
 
-	const Sorted = [...Variants.entries()].sort(([A], [B]) =>
-		A.localeCompare(B),
-	);
+	const Sorted = [...Variants.entries()].sort(([A], [B]) => A.localeCompare(B));
 	const SortedCanonicals = [...CanonicalPaths].sort();
 
 	const Lines = [];
@@ -230,9 +221,7 @@ export const BuildRedirects = (CanonicalPaths) => {
 	Lines.push("# Cloudflare Pages - full route map (auto-generated)");
 	Lines.push("#");
 	Lines.push("# All rules use 200 (rewrite) to serve content directly.");
-	Lines.push(
-		"# This prevents the service worker from breaking on redirect chains.",
-	);
+	Lines.push("# This prevents the service worker from breaking on redirect chains.");
 	Lines.push("# Regenerated on every build by Source/Library/Redirects.ts.");
 	Lines.push("");
 
@@ -279,10 +268,7 @@ export const BuildRedirects = (CanonicalPaths) => {
 
 /** Write the generated content to both deploy and source locations. */
 export const WriteRedirects = async (Content, OutputDirectory, Root) => {
-	const Targets = [
-		join(OutputDirectory, "_redirects"),
-		join(Root, "Public", "_redirects"),
-	];
+	const Targets = [join(OutputDirectory, "_redirects"), join(Root, "Public", "_redirects")];
 
 	for (const Target of Targets) {
 		await mkdir(dirname(Target), { recursive: true });
@@ -299,7 +285,11 @@ export const WriteRedirects = async (Content, OutputDirectory, Root) => {
 export default () => ({
 	name: "redirects",
 	hooks: {
-		"astro:build:done": async ({ dir, pages, logger }: {
+		"astro:build:done": async ({
+			dir,
+			pages,
+			logger,
+		}: {
 			dir: URL;
 			pages: { pathname: string }[];
 			logger: { info: (Message: string) => void };

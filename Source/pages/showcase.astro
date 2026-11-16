@@ -60,7 +60,9 @@ const Bank: {
 /** `builders/terminal.rs`'s summary: the last exit-code or `Error:` line, clipped to 60. */
 const TerminalSummary = (Lines: readonly string[]): string =>
 	(
-		[...Lines].reverse().find((Line) => Line.includes("exit code:") || Line.includes("Error:")) ??
+		[...Lines]
+			.reverse()
+			.find((Line) => Line.includes("exit code:") || Line.includes("Error:")) ??
 		Lines[0] ??
 		""
 	)
@@ -200,10 +202,7 @@ function CommandCode(Retrieval: { tool: string; args: { hash: string } } | null)
  * so a marker-first test would file the callback exchange under `compressed`
  * and lose the two deliveries that make it a different mechanism.
  */
-function OutcomeOf(Example: {
-	category: string;
-	marker: string | null;
-}): ExampleOutcome {
+function OutcomeOf(Example: { category: string; marker: string | null }): ExampleOutcome {
 	if (Example.category === "tool-relay") {
 		return "callback";
 	}
@@ -424,7 +423,9 @@ const Cases: ExampleRecord[] = Bank.examples.map((Example, Index): ExampleRecord
 });
 
 // One search key per record, computed beside it so the two cannot drift.
-const Searches: string[] = Bank.examples.map((Example, Index) => SearchIndex(Example, Cases[Index]));
+const Searches: string[] = Bank.examples.map((Example, Index) =>
+	SearchIndex(Example, Cases[Index]),
+);
 
 // The category registry for the filter bar, in first-appearance order, read off
 // the records the gallery renders so the buttons cannot list a category no
@@ -509,37 +510,44 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 		     word - the fold holds the account, the one quiet line above holds the
 		     claim, and the first example is now the first thing below the fold. -->
 		<details class="group w-full border-2 border-oxblood-dark bg-carbon-void">
-			<summary
-				class="flex cursor-pointer list-none flex-wrap items-center gap-3 border-b border-transparent bg-soot-black px-4 py-3 font-mono text-base text-bone-newsprint transition-colors group-open:border-oxblood-dark hover:text-bone-white"
-			>
+			<summary class="flex cursor-pointer list-none flex-wrap items-center gap-3 border-b border-transparent bg-soot-black px-4 py-3 font-mono text-base text-bone-newsprint transition-colors group-open:border-oxblood-dark hover:text-bone-white">
 				<span class="telemetry-tag telemetry-tag--crimson shadow-[2px_2px_0px_#000]">
 					HOW THESE EXAMPLES WERE PRODUCED
 				</span>
 				<span class="grow font-normal text-zinc-dust">
 					provenance · what the corpus lines are checked against · the four labels
 				</span>
-				<span class="type-meta font-bold text-stamped-canary group-open:hidden" aria-hidden="true"
-					>OPEN +</span
+				<span
+					class="type-meta font-bold text-stamped-canary group-open:hidden"
+					aria-hidden="true"
 				>
-				<span class="type-meta hidden font-bold text-zinc-dust group-open:inline" aria-hidden="true"
-					>CLOSE −</span
+					OPEN +
+				</span>
+				<span
+					class="type-meta hidden font-bold text-zinc-dust group-open:inline"
+					aria-hidden="true"
 				>
+					CLOSE −
+				</span>
 			</summary>
 			<div class="prose-flow p-4 sm:p-6">
 				<p class="type-body max-w-3xl text-bone-newsprint">
-					Every example is a real behavior of the pipeline dressed in generic content: what
-					the agent sends (the raw stream), what it sees back (the enriched preview), how the bytes
-					come home (the retrieval round-trip), and why the thresholds made that decision.
+					Every example is a real behavior of the pipeline dressed in generic content:
+					what the agent sends (the raw stream), what it sees back (the enriched preview),
+					how the bytes come home (the retrieval round-trip), and why the thresholds made
+					that decision.
 				</p>
 				<p class="type-body max-w-3xl text-bone-newsprint">
-					All previews marked as corpus lines are byte-identical to the docs catalog; the rest are
-					faithful fragments.
+					All previews marked as corpus lines are byte-identical to the docs catalog; the
+					rest are faithful fragments.
 				</p>
 				<p class="type-body max-w-3xl text-bone-newsprint">
 					That catalog is the enriched-preview table in
-					<code class="type-code text-weathered-teal">docs/proxy/compression.md</code> together with
-					the preview-form table in the repository README - both are public, so every corpus line can
-					be checked against them, character for character.
+					<code class="type-code text-weathered-teal">
+						docs/proxy/compression.md
+					</code>{" "}
+					together with the preview-form table in the repository README - both are public,
+					so every corpus line can be checked against them, character for character.
 				</p>
 				<p class="type-body max-w-3xl text-bone-newsprint">
 					Anonymized throughout - no names, no secrets, no real sessions.
@@ -550,47 +558,48 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 						THE FOUR PROVENANCE LABELS
 					</p>
 					<p class="type-body mt-3 max-w-3xl text-bone-newsprint">
-						"Anonymized" and "illustrative" are not the same claim, so every entry names its own
-						provenance in text beside its title. Colour reinforces the label; it never carries the
-						distinction on its own.
+						"Anonymized" and "illustrative" are not the same claim, so every entry names
+						its own provenance in text beside its title. Colour reinforces the label; it
+						never carries the distinction on its own.
 					</p>
 					<ul class="mt-5 flex flex-col gap-3">
 						<li class="border-l-2 border-weathered-teal pl-4">
-							<span class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal"
-								>Catalog-exact</span
-							>
-							<span class="type-body block text-bone-newsprint"
-								>- the preview line is byte-identical to the documented enriched-preview catalog,
-								so it can be checked character for character.</span
-							>
+							<span class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
+								Catalog-exact
+							</span>
+							<span class="type-body block text-bone-newsprint">
+								- the preview line is byte-identical to the documented
+								enriched-preview catalog, so it can be checked character for
+								character.
+							</span>
 						</li>
 						<li class="border-l-2 border-zinc-dust pl-4">
-							<span class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
-								>Illustrative</span
-							>
-							<span class="type-body block text-bone-newsprint"
-								>- authored: a faithful fragment of the shape with varied generic numbers, not a
-								capture and not a catalog line.</span
-							>
+							<span class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+								Illustrative
+							</span>
+							<span class="type-body block text-bone-newsprint">
+								- authored: a faithful fragment of the shape with varied generic
+								numbers, not a capture and not a catalog line.
+							</span>
 						</li>
 						<li class="border-l-2 border-stamped-canary pl-4">
-							<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary"
-								>Captured</span
-							>
-							<span class="type-body block text-bone-newsprint"
-								>- recorded from a real run and then anonymized. No entry claims it
-								today; the label exists so a real capture can be published without being called
-								illustrative.</span
-							>
+							<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+								Captured
+							</span>
+							<span class="type-body block text-bone-newsprint">
+								- recorded from a real run and then anonymized. No entry claims it
+								today; the label exists so a real capture can be published without
+								being called illustrative.
+							</span>
 						</li>
 						<li class="border-l-2 border-bone-white pl-4">
-							<span class="font-mono text-base font-black uppercase tracking-widest text-bone-white"
-								>Engine-verified</span
-							>
-							<span class="type-body block text-bone-newsprint"
-								>- checked against a named engine version, so the behavior is pinned to a release
-								rather than to a reading of the code.</span
-							>
+							<span class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+								Engine-verified
+							</span>
+							<span class="type-body block text-bone-newsprint">
+								- checked against a named engine version, so the behavior is pinned
+								to a release rather than to a reading of the code.
+							</span>
 						</li>
 					</ul>
 				</div>
@@ -600,46 +609,46 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 						THE FOUR OUTCOMES
 					</p>
 					<p class="type-body mt-3 max-w-3xl text-bone-newsprint">
-						An example says how its bytes reached the transcript, because four different mechanisms
-						that render identically are four mechanisms a reader cannot tell apart. The counts are
-						read off the bank.
+						An example says how its bytes reached the transcript, because four different
+						mechanisms that render identically are four mechanisms a reader cannot tell
+						apart. The counts are read off the bank.
 					</p>
 					<ul class="mt-5 flex flex-col gap-3">
 						<li class="border-l-2 border-stamped-canary pl-4">
-							<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary"
-								>Compressed · {OutcomeCount.compressed ?? 0}</span
-							>
-							<span class="type-body block text-bone-newsprint"
-								>- the output crossed the surface's threshold: hashed, stored, and replaced by a
-								preview line plus a marker.</span
-							>
+							<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+								Compressed · {OutcomeCount.compressed ?? 0}
+							</span>
+							<span class="type-body block text-bone-newsprint">
+								- the output crossed the surface's threshold: hashed, stored, and
+								replaced by a preview line plus a marker.
+							</span>
 						</li>
 						<li class="border-l-2 border-weathered-teal pl-4">
-							<span class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal"
-								>Passed through · {OutcomeCount.passthrough ?? 0}</span
-							>
-							<span class="type-body block text-bone-newsprint"
-								>- under the threshold, or stopped by a skip gate: the bytes reach the transcript
-								unchanged and nothing is stored.</span
-							>
+							<span class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
+								Passed through · {OutcomeCount.passthrough ?? 0}
+							</span>
+							<span class="type-body block text-bone-newsprint">
+								- under the threshold, or stopped by a skip gate: the bytes reach
+								the transcript unchanged and nothing is stored.
+							</span>
 						</li>
 						<li class="border-l-2 border-bone-newsprint pl-4">
-							<span class="font-mono text-base font-black uppercase tracking-widest text-bone-newsprint"
-								>Injected · {OutcomeCount.injected ?? 0}</span
-							>
-							<span class="type-body block text-bone-newsprint"
-								>- never a tool result: behavioural text assembled in a fixed order and placed into
-								the prompt.</span
-							>
+							<span class="font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
+								Injected · {OutcomeCount.injected ?? 0}
+							</span>
+							<span class="type-body block text-bone-newsprint">
+								- never a tool result: behavioural text assembled in a fixed order
+								and placed into the prompt.
+							</span>
 						</li>
 						<li class="border-l-2 border-raw-blood pl-4">
-							<span class="font-mono text-base font-black uppercase tracking-widest text-bone-white"
-								>Callback · {OutcomeCount.callback ?? 0}</span
-							>
-							<span class="type-body block text-bone-newsprint"
-								>- a relay call that answers immediately and delivers the real result later, at a
-								callback URL.</span
-							>
+							<span class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+								Callback · {OutcomeCount.callback ?? 0}
+							</span>
+							<span class="type-body block text-bone-newsprint">
+								- a relay call that answers immediately and delivers the real result
+								later, at a callback URL.
+							</span>
 						</li>
 					</ul>
 				</div>
@@ -668,11 +677,13 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 			data-reveal
 		>
 			<p class="section-index">01 // THE EXAMPLES // ONE RECORD SHAPE, FOUR MECHANISMS</p>
-			<h2 class="mt-3 type-section text-bone-white">{Bank.examples.length} worked examples</h2>
+			<h2 class="mt-3 type-section text-bone-white">
+				{Bank.examples.length} worked examples
+			</h2>
 			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
 				Each entry names the mechanism that carried its bytes - compressed, passed through,
-				injected or delivered by callback - and each one opens to the full output, the retrieval
-				call and answer, the threshold decision and its source.
+				injected or delivered by callback - and each one opens to the full output, the
+				retrieval call and answer, the threshold decision and its source.
 			</p>
 
 			<!-- THE DECISION MATRIX // three axes, named once, then printed in the
@@ -680,15 +691,13 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 			     matrix the reader walks, and a matrix is only readable if its
 			     columns are declared before the first row. -->
 			<div class="shell-card mt-10">
-				<div
-					class="flex flex-wrap items-center gap-3 border-b border-[var(--tier-shell-edge)] bg-soot-black px-4 py-3 sm:px-5"
-				>
+				<div class="flex flex-wrap items-center gap-3 border-b border-[var(--tier-shell-edge)] bg-soot-black px-4 py-3 sm:px-5">
 					<span class="telemetry-tag telemetry-tag--crimson shadow-[2px_2px_0px_#000]">
 						THE DECISION MATRIX
 					</span>
 					<span class="grow font-mono text-base leading-relaxed text-zinc-dust">
-						three axes · one row per example · the same three, in the same order, on every
-						card's ribbon
+						three axes · one row per example · the same three, in the same order, on
+						every card's ribbon
 					</span>
 				</div>
 				<dl class="grid grid-cols-1 gap-x-10 gap-y-6 p-4 sm:grid-cols-3 sm:p-5">
@@ -697,8 +706,9 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 							TYPE
 						</dt>
 						<dd class="mt-2 font-mono text-base leading-relaxed text-bone-newsprint">
-							The category an entry is filed under, read off the entry's own record. The bank
-							files {Categories.length} of them: {CategoryList.toLowerCase()}.
+							The category an entry is filed under, read off the entry's own record.
+							The bank files {Categories.length} of them: {CategoryList.toLowerCase()}
+							.
 						</dd>
 					</div>
 					<div class="border-l-2 border-weathered-teal pl-4">
@@ -706,10 +716,10 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 							OUTCOME
 						</dt>
 						<dd class="mt-2 font-mono text-base leading-relaxed text-bone-newsprint">
-							How its bytes reached the transcript - compressed, passed through, injected or
-							delivered by callback - computed from the record rather than typed per example,
-							because four mechanisms that render identically are four mechanisms a reader
-							cannot tell apart.
+							How its bytes reached the transcript - compressed, passed through,
+							injected or delivered by callback - computed from the record rather than
+							typed per example, because four mechanisms that render identically are
+							four mechanisms a reader cannot tell apart.
 						</dd>
 					</div>
 					<div class="border-l-2 border-bone-newsprint pl-4">
@@ -717,9 +727,9 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 							PROVENANCE
 						</dt>
 						<dd class="mt-2 font-mono text-base leading-relaxed text-bone-newsprint">
-							What its words are checked against - catalog-exact, illustrative, captured or
-							engine-verified - printed in text beside the title, because colour reinforces a
-							label and never carries the distinction on its own.
+							What its words are checked against - catalog-exact, illustrative,
+							captured or engine-verified - printed in text beside the title, because
+							colour reinforces a label and never carries the distinction on its own.
 						</dd>
 					</div>
 				</dl>
@@ -740,10 +750,10 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 			<p class="section-index">02 // THE REGISTRY // FILTER BY CATEGORY, SEARCH BY KEYWORD</p>
 			<h2 class="mt-3 type-section text-bone-white">The gallery</h2>
 			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
-				Every entry is the same record shape, so the filter is a query over the three axes the
-				matrix names: a chip narrows the bank to one category, and the field searches the full
-				text of every row - the raw stream, the preview, the retrieval call and the error codes
-				included.
+				Every entry is the same record shape, so the filter is a query over the three axes
+				the matrix names: a chip narrows the bank to one category, and the field searches
+				the full text of every row - the raw stream, the preview, the retrieval call and the
+				error codes included.
 			</p>
 
 			<!-- THE SECTION'S ONE EXPRESSIVE ASSEMBLY: the plate leans, it wipes,
@@ -784,9 +794,12 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 					data-search
 					class="well mt-5 w-full px-4 py-2 font-mono text-base tracking-widest text-bone-white placeholder:text-zinc-dust focus:border-weathered-teal focus:outline-none"
 				/>
-				<p id="registry-scope" class="mt-3 font-mono text-base leading-relaxed text-zinc-dust">
-					SEARCH READS: TITLE · CATEGORY · CLAIM · PREVIEW · RAW OUTPUT · RETRIEVAL CALL · ERROR
-					CODES · TOOL NAMES · CONFIGURATION KEYS · FILE EXTENSIONS
+				<p
+					id="registry-scope"
+					class="mt-3 font-mono text-base leading-relaxed text-zinc-dust"
+				>
+					SEARCH READS: TITLE · CATEGORY · CLAIM · PREVIEW · RAW OUTPUT · RETRIEVAL CALL ·
+					ERROR CODES · TOOL NAMES · CONFIGURATION KEYS · FILE EXTENSIONS
 				</p>
 				<p
 					role="status"
@@ -803,11 +816,13 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 				<div data-empty class="well mt-6 hidden p-5">
 					<p class="telemetry-tag telemetry-tag--canary">NOTHING MATCHES</p>
 					<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
-						No example in the bank matches <span class="text-bone-white" data-empty-query
-							>this filter</span
-						>. The bank holds {Bank.examples.length} entries across {Categories.length}
-						categories - {CategoryList} - so a narrower word is usually the problem, not a missing
-						example.
+						No example in the bank matches{" "}
+						<span class="text-bone-white" data-empty-query>
+							this filter
+						</span>
+						. The bank holds {Bank.examples.length} entries across {Categories.length}
+						categories - {CategoryList} - so a narrower word is usually the problem, not
+						a missing example.
 					</p>
 					<button
 						type="button"
@@ -821,93 +836,106 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 
 			<!-- THE GALLERY // ONE SHELL CARD PER ROW, EACH WITH ITS HEADER RIBBON -->
 			<div class="mt-14 flex w-full flex-col gap-12 lg:gap-16">
-				{
-					Cases.map((Scenario, Index) => (
-						<article
-							data-example
-							data-category={Scenario.Label.toLowerCase()}
-							data-outcome={Scenario.Outcome}
-							data-provenance={Scenario.Provenance}
-							data-search={Searches[Index]}
-							class={`shell-card w-full lg:w-11/12 ${Index % 2 === 0 ? "lg:self-start" : "lg:self-end"}`}
-						>
-							{/* THE HEADER RIBBON // type, outcome, provenance - the matrix's
+				{Cases.map((Scenario, Index) => (
+					<article
+						data-example
+						data-category={Scenario.Label.toLowerCase()}
+						data-outcome={Scenario.Outcome}
+						data-provenance={Scenario.Provenance}
+						data-search={Searches[Index]}
+						class={`shell-card w-full lg:w-11/12 ${Index % 2 === 0 ? "lg:self-start" : "lg:self-end"}`}
+					>
+						{/* THE HEADER RIBBON // type, outcome, provenance - the matrix's
 							    three axes, in the matrix's order, read off this entry's own
 							    record. It is the row's key; the plate under it is the row. */}
-							<header
-								class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--tier-shell-edge)] bg-soot-black px-4 py-3 sm:px-5"
+						<header class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[var(--tier-shell-edge)] bg-soot-black px-4 py-3 sm:px-5">
+							<span class="type-meta font-black tabular-nums text-zinc-dust">
+								{Scenario.N}
+							</span>
+							<span class="telemetry-tag shadow-[2px_2px_0px_#000]">
+								{Scenario.Label}
+							</span>
+							<span
+								class:list={[
+									"telemetry-tag shadow-[2px_2px_0px_#000]",
+									OutcomeTag[Scenario.Outcome ?? "compressed"],
+								]}
 							>
-								<span class="type-meta font-black tabular-nums text-zinc-dust">
-									{Scenario.N}
-								</span>
-								<span class="telemetry-tag shadow-[2px_2px_0px_#000]">
-									{Scenario.Label}
-								</span>
-								<span
-									class:list={[
-										"telemetry-tag shadow-[2px_2px_0px_#000]",
-										OutcomeTag[Scenario.Outcome ?? "compressed"],
-									]}
-								>
-									{OutcomeLabel[Scenario.Outcome ?? "compressed"]}
-								</span>
-								<span
-									class:list={[
-										"telemetry-tag shadow-[2px_2px_0px_#000]",
-										ProvenanceTag[Scenario.Provenance ?? "Illustrative"],
-									]}
-								>
-									{Scenario.Provenance}
-								</span>
-							</header>
-							{/* The plate keeps its own corner tape, which hangs 28px above
+								{OutcomeLabel[Scenario.Outcome ?? "compressed"]}
+							</span>
+							<span
+								class:list={[
+									"telemetry-tag shadow-[2px_2px_0px_#000]",
+									ProvenanceTag[Scenario.Provenance ?? "Illustrative"],
+								]}
+							>
+								{Scenario.Provenance}
+							</span>
+						</header>
+						{/* The plate keeps its own corner tape, which hangs 28px above
 							    its top edge - so the body opens with enough room for it
 							    rather than clipping the tape against the ribbon. */}
-							<div class="px-3 pb-3 pt-10 sm:px-5 sm:pb-5 sm:pt-12">
-								<ExampleCase {...Scenario} Reveal Stream Library Defaults={Bank.defaults} />
-							</div>
-						</article>
-					))
-				}
+						<div class="px-3 pb-3 pt-10 sm:px-5 sm:pb-5 sm:pt-12">
+							<ExampleCase
+								{...Scenario}
+								Reveal
+								Stream
+								Library
+								Defaults={Bank.defaults}
+							/>
+						</div>
+					</article>
+				))}
 			</div>
 
 			<!-- ============ THE METHODOLOGY // AFTER THE ROWS, WORD FOR WORD ============
 			     A reader needs the key after they have met the thing it explains, so
 			     this fold follows the gallery rather than preceding it. -->
 			<details class="group mt-16 w-full border-2 border-oxblood-dark bg-carbon-void">
-				<summary
-					class="flex cursor-pointer list-none flex-wrap items-center gap-3 border-b border-transparent bg-soot-black px-4 py-3 font-mono text-base text-bone-newsprint transition-colors group-open:border-oxblood-dark hover:text-bone-white"
-				>
+				<summary class="flex cursor-pointer list-none flex-wrap items-center gap-3 border-b border-transparent bg-soot-black px-4 py-3 font-mono text-base text-bone-newsprint transition-colors group-open:border-oxblood-dark hover:text-bone-white">
 					<span class="telemetry-tag telemetry-tag--crimson shadow-[2px_2px_0px_#000]">
 						HOW TO READ THESE EXAMPLES
 					</span>
 					<span class="grow font-normal text-zinc-dust">
-						the tape colours · the one answer every retrieval gives · the read rules · what the two
-						views hold
+						the tape colours · the one answer every retrieval gives · the read rules ·
+						what the two views hold
 					</span>
-					<span class="type-meta font-bold text-stamped-canary group-open:hidden" aria-hidden="true"
-						>OPEN +</span
+					<span
+						class="type-meta font-bold text-stamped-canary group-open:hidden"
+						aria-hidden="true"
 					>
-					<span class="type-meta hidden font-bold text-zinc-dust group-open:inline" aria-hidden="true"
-						>CLOSE −</span
+						OPEN +
+					</span>
+					<span
+						class="type-meta hidden font-bold text-zinc-dust group-open:inline"
+						aria-hidden="true"
 					>
+						CLOSE −
+					</span>
 				</summary>
 				<div class="prose-flow p-4 sm:p-6">
 					<p class="type-body max-w-3xl text-bone-newsprint">
-						A teal tape marks a corpus-exact preview; a blood-red one marks a faithful fragment.
+						A teal tape marks a corpus-exact preview; a blood-red one marks a faithful
+						fragment.
 					</p>
-					<p class="type-body max-w-3xl text-bone-newsprint">Every retrieval answers the same way:</p>
+					<p class="type-body max-w-3xl text-bone-newsprint">
+						Every retrieval answers the same way:
+					</p>
 					<p class="type-code max-w-3xl text-bone-newsprint">
-						→ {'{ found: true, source: "ccr", content: the original bytes, byte-for-byte }'}
+						→{" "}
+						{
+							'{ found: true, source: "ccr", content: the original bytes, byte-for-byte }'
+						}
 					</p>
 					<p class="type-body max-w-3xl text-bone-newsprint">
-						Reads are workspace-confined and capped at 10 MiB; a hash resolves only by exact match -
-						truncated hashes never resolve.
+						Reads are workspace-confined and capped at 10 MiB; a hash resolves only by
+						exact match - truncated hashes never resolve.
 					</p>
 					<p class="type-body max-w-3xl text-bone-newsprint">
-						Every entry is the same argument in a different costume: the raw output arrives line
-						by line, the preview is computed once the last line has finished, and the marker
-						underneath it is the address of everything the raw stream did not have to buy.
+						Every entry is the same argument in a different costume: the raw output
+						arrives line by line, the preview is computed once the last line has
+						finished, and the marker underneath it is the address of everything the raw
+						stream did not have to buy.
 					</p>
 				</div>
 			</details>
@@ -921,27 +949,32 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 			<p class="section-index">03 // THE DEFAULTS // APHRODITE.TOML</p>
 			<h2 class="mt-3 type-section text-bone-white">The defaults every decision reads</h2>
 			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
-				Every decision in the bank is a byte count compared against one of seven numbers, read from
-				<code class="type-code text-weathered-teal">aphrodite.toml</code> and overridable from the
-				environment. Nothing in the gallery is a judgment call, so nothing in it needs a reader's
-				interpretation either.
+				Every decision in the bank is a byte count compared against one of seven numbers,
+				read from
+				<code class="type-code text-weathered-teal">aphrodite.toml</code> and overridable
+				from the environment. Nothing in the gallery is a judgment call, so nothing in it
+				needs a reader's interpretation either.
 			</p>
 			<details class="group mt-8 w-full border-2 border-oxblood-dark bg-carbon-void">
-				<summary
-					class="flex cursor-pointer list-none flex-wrap items-center gap-3 border-b border-transparent bg-soot-black px-4 py-3 font-mono text-base text-bone-newsprint transition-colors group-open:border-oxblood-dark hover:text-bone-white"
-				>
+				<summary class="flex cursor-pointer list-none flex-wrap items-center gap-3 border-b border-transparent bg-soot-black px-4 py-3 font-mono text-base text-bone-newsprint transition-colors group-open:border-oxblood-dark hover:text-bone-white">
 					<span class="telemetry-tag telemetry-tag--crimson shadow-[2px_2px_0px_#000]">
 						THE DEFAULTS // APHRODITE.TOML
 					</span>
 					<span class="grow font-normal text-zinc-dust">
 						the seven numbers every decision was made against
 					</span>
-					<span class="type-meta font-bold text-stamped-canary group-open:hidden" aria-hidden="true"
-						>OPEN +</span
+					<span
+						class="type-meta font-bold text-stamped-canary group-open:hidden"
+						aria-hidden="true"
 					>
-					<span class="type-meta hidden font-bold text-zinc-dust group-open:inline" aria-hidden="true"
-						>CLOSE −</span
+						OPEN +
+					</span>
+					<span
+						class="type-meta hidden font-bold text-zinc-dust group-open:inline"
+						aria-hidden="true"
 					>
+						CLOSE −
+					</span>
 				</summary>
 				<div class="p-4 sm:p-6">
 					<p class="well p-4 font-mono text-base leading-loose text-bone-newsprint">
@@ -957,8 +990,8 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 							These seven numbers decide every example that precedes them.
 						</p>
 						<p class="type-body text-bone-newsprint">
-							It is the reason compression is never a judgment call: it is a byte count against the
-							surface's threshold, and the essential tools plus the
+							It is the reason compression is never a judgment call: it is a byte
+							count against the surface's threshold, and the essential tools plus the
 							<code class="type-code text-weathered-teal">aphrodite_*</code>
 							tools themselves are always raw regardless of size.
 						</p>
@@ -974,16 +1007,19 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 			data-reveal
 		>
 			<div class="w-full">
-				<p class="section-index">04 // THE TRAVERSALS // AGENT-VIEW vs SYSTEM-PATH, STEP BY STEP</p>
+				<p class="section-index">
+					04 // THE TRAVERSALS // AGENT-VIEW vs SYSTEM-PATH, STEP BY STEP
+				</p>
 				<h2 class="mt-3 type-section text-bone-white">The traversals</h2>
 				<div class="prose-flow mt-6 max-w-3xl">
 					<p class="type-body text-bone-newsprint">
-						The five pipelines are worked examples; these are the pipes they run through.
+						The five pipelines are worked examples; these are the pipes they run
+						through.
 					</p>
 					<p class="type-body text-bone-newsprint">
-						Each traversal steps through its hook or endpoint in two synchronized views -
-						what the agent sees, what the system does - and every step carries its source
-						anchor.
+						Each traversal steps through its hook or endpoint in two synchronized views
+						- what the agent sees, what the system does - and every step carries its
+						source anchor.
 					</p>
 					<p class="type-body text-bone-newsprint">
 						PLAY steps one run through both views, one step at a time.
@@ -1090,8 +1126,8 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 							Title: "DECIDE / RETRIEVE",
 							Agent: [
 								"the agent - not the engine - spends the budget: call aphrodite_retrieve only if the preview did not answer the question",
-								"» aphrodite_retrieve(hash: \"abc12345...\")",
-								"→ { found: true, source: \"ccr\", content: the original bytes, truncated: false }",
+								'» aphrodite_retrieve(hash: "abc12345...")',
+								'→ { found: true, source: "ccr", content: the original bytes, truncated: false }',
 							],
 							System: [
 								"retrieval returns the exact original bytes, byte-exact by construction; the loop closes with nothing lost",
@@ -1185,7 +1221,7 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 							Title: "THE CALL",
 							Agent: [
 								"the agent hands back the marker it kept - or just the hash",
-								"» aphrodite_retrieve(hash: \"abc12345...\")",
+								'» aphrodite_retrieve(hash: "abc12345...")',
 								"· truncated hashes never resolve - exact match only",
 							],
 							System: [
@@ -1199,7 +1235,7 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 							Title: "LOOKUP",
 							Agent: [
 								"one answer either way: found or not",
-								"→ { found: true, source: \"ccr\", content: \"original content...\", truncated: false }",
+								'→ { found: true, source: "ccr", content: "original content...", truncated: false }',
 							],
 							System: [
 								"the inline session store is checked first (inline_ccr.get); on a miss, ccr_get on the CCR backend (SQLite/In-memory via a blocking thread)",
@@ -1264,9 +1300,7 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 								"the request is forwarded unchanged",
 								"· the response comes back with headers and body",
 							],
-							System: [
-								"forwarded with at most 3 connection retries",
-							],
+							System: ["forwarded with at most 3 connection retries"],
 							Anchor: Link(OurRepo, "docs/architecture/02-chat-compression.md"),
 							AnchorLabel: "02-chat-compression.md",
 						},
@@ -1386,30 +1420,38 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 			<!-- The truthful context engine pane -->
 			<div class="w-full lg:w-10/12 lg:self-end" data-reveal>
 				<ZineBox Tone="crimson" Wipe>
-					<ZineTape Label="THE CONTEXT ENGINE // WHAT IT DOES NOT DO" Color="teal" Side="left" />
+					<ZineTape
+						Label="THE CONTEXT ENGINE // WHAT IT DOES NOT DO"
+						Color="teal"
+						Side="left"
+					/>
 					<h3 class="mt-4 type-sub uppercase text-bone-white">
 						Compress returns the transcript unchanged
 					</h3>
 					<div class="prose-flow mt-6 max-w-3xl">
 						<p class="type-body text-bone-newsprint">
-							The registered engine is opt-in (<code class="type-code text-weathered-teal">APHRODITE_CONTEXT_ENGINE=1</code>;
-							the TOML key defaults true) and requires Hermes &gt;= 0.20.2 - the first
-							release with <code class="type-code text-weathered-teal">pre_tool_call</code> modify.
+							The registered engine is opt-in (
+							<code class="type-code text-weathered-teal">
+								APHRODITE_CONTEXT_ENGINE=1
+							</code>
+							; the TOML key defaults true) and requires Hermes &gt;= 0.20.2 - the
+							first release with{" "}
+							<code class="type-code text-weathered-teal">pre_tool_call</code> modify.
 						</p>
 						<p class="type-body text-bone-newsprint">
 							What it does: records token usage from each response.
 						</p>
 						<p class="type-body text-bone-newsprint">
 							What it never does:
-							<code class="type-code text-weathered-teal">should_compress</code> always
-							returns false (it defers to Hermes' own accounting), and
+							<code class="type-code text-weathered-teal">should_compress</code>{" "}
+							always returns false (it defers to Hermes' own accounting), and
 							<code class="type-code text-weathered-teal">compress</code> returns the
-							transcript unchanged - non-destructive, because the transform hooks already
-							shrank the tool output.
+							transcript unchanged - non-destructive, because the transform hooks
+							already shrank the tool output.
 						</p>
 						<p class="type-body text-bone-newsprint">
-							It never forces a compaction, never rewrites messages, and never touches the
-							inline store.
+							It never forces a compaction, never rewrites messages, and never touches
+							the inline store.
 						</p>
 					</div>
 					<div class="mt-6 font-mono text-base text-zinc-dust">
@@ -1428,8 +1470,8 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 					<div class="prose-flow mt-6">
 						<p class="type-body text-bone-newsprint">
 							<code class="type-code text-weathered-teal">aphrodite_prefetch</code>
-							would happily warm the store from any path - so the guard names the paths
-							that must never be read and refuses them outright:
+							would happily warm the store from any path - so the guard names the
+							paths that must never be read and refuses them outright:
 						</p>
 					</div>
 					<div class="mt-8 max-w-2xl">
@@ -1438,15 +1480,20 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 							Right="THE ANSWER"
 							LeftLabel="WHAT THE AGENT ASKS FOR"
 							RightLabel="WHAT THE SYSTEM RETURNS"
-							LeftPane={".env<br />auth.json<br />~/.ssh<br />the Hermes home<br />any non-file path"}
-							RightPane={"ReadOutcome::Refused<br />refuse_reason: &quot;...&quot;<br /><br />the file is not opened, not hashed,<br />not stored - the prefetch returns<br />a refusal instead of the content"}
+							LeftPane={
+								".env<br />auth.json<br />~/.ssh<br />the Hermes home<br />any non-file path"
+							}
+							RightPane={
+								"ReadOutcome::Refused<br />refuse_reason: &quot;...&quot;<br /><br />the file is not opened, not hashed,<br />not stored - the prefetch returns<br />a refusal instead of the content"
+							}
 						/>
 					</div>
 					<div class="prose-flow mt-8 max-w-3xl">
 						<p class="type-body text-bone-newsprint">
 							The same release hardened setup the same way: the Hermes-home plugin
-							directory is report-only - no symlink removal, no writes, no deletes - and
-							the dylib arm refuses installs when the in-tree checksums are missing.
+							directory is report-only - no symlink removal, no writes, no deletes -
+							and the dylib arm refuses installs when the in-tree checksums are
+							missing.
 						</p>
 					</div>
 					<div class="mt-6 font-mono text-base text-zinc-dust">
@@ -1470,27 +1517,39 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 			>
 				<ul class="grid gap-5 type-body text-bone-newsprint sm:grid-cols-2">
 					<li class="border-l-4 border-weathered-teal pl-4">
-						<a class="font-bold text-bone-white underline decoration-raw-blood" href={Routes.Tools}
-							>THE THIRTEEN TOOLS</a
+						<a
+							class="font-bold text-bone-white underline decoration-raw-blood"
+							href={Routes.Tools}
 						>
+							THE THIRTEEN TOOLS
+						</a>
 						- the registry behind every retrieval chip.
 					</li>
 					<li class="border-l-4 border-weathered-teal pl-4">
-						<a class="font-bold text-bone-white underline decoration-raw-blood" href={Routes.Workbench}
-							>THE WORKBENCH</a
+						<a
+							class="font-bold text-bone-white underline decoration-raw-blood"
+							href={Routes.Workbench}
 						>
+							THE WORKBENCH
+						</a>
 						- run any tool output through the preview pipeline yourself.
 					</li>
 					<li class="border-l-4 border-weathered-teal pl-4">
-						<a class="font-bold text-bone-white underline decoration-raw-blood" href={Routes.Plugin}
-							>THE HOOK CHAIN</a
+						<a
+							class="font-bold text-bone-white underline decoration-raw-blood"
+							href={Routes.Plugin}
 						>
+							THE HOOK CHAIN
+						</a>
 						- where in the turn each raw stream was classified.
 					</li>
 					<li class="border-l-4 border-weathered-teal pl-4">
-						<a class="font-bold text-bone-white underline decoration-raw-blood" href={Routes.Plugin}
-							>THE PLUGIN</a
+						<a
+							class="font-bold text-bone-white underline decoration-raw-blood"
+							href={Routes.Plugin}
 						>
+							THE PLUGIN
+						</a>
 						- the shim and the dylib that make all of it run.
 					</li>
 				</ul>

@@ -76,7 +76,9 @@ const Splat = (Seed: number, Cx: number, Cy: number, Radius: number, Opacity: nu
 		const High = Field(Math.cos(Angle) * 3.4 + 11, Math.sin(Angle) * 3.4 + 7) * 0.28;
 		const Ride = Math.max(0.42, 1 + Low * 0.34 + High);
 		const Reach = Radius * Ride;
-		Points.push(`${(Cx + Math.cos(Angle) * Reach).toFixed(1)},${(Cy + Math.sin(Angle) * Reach).toFixed(1)}`);
+		Points.push(
+			`${(Cx + Math.cos(Angle) * Reach).toFixed(1)},${(Cy + Math.sin(Angle) * Reach).toFixed(1)}`,
+		);
 	}
 	Parts.push(`<polygon points="${Points.join(" ")}"/>`);
 
@@ -91,7 +93,9 @@ const Splat = (Seed: number, Cx: number, Cy: number, Radius: number, Opacity: nu
 		const Gx = Cx + Math.cos(Angle) * Spread;
 		const Gy = Cy + Math.sin(Angle) * Spread;
 		const Gr = 0.9 + Math.pow(Next(), 2) * Radius * 0.045;
-		Parts.push(`<ellipse cx="${Gx.toFixed(1)}" cy="${Gy.toFixed(1)}" rx="${Gr.toFixed(1)}" ry="${(Gr * (0.6 + Next() * 0.7)).toFixed(1)}"/>`);
+		Parts.push(
+			`<ellipse cx="${Gx.toFixed(1)}" cy="${Gy.toFixed(1)}" rx="${Gr.toFixed(1)}" ry="${(Gr * (0.6 + Next() * 0.7)).toFixed(1)}"/>`,
+		);
 	}
 
 	// LOBES, not spikes: long tapered arms give a starburst/gear silhouette, which
@@ -194,7 +198,8 @@ export const PaintGrunge = (): void => {
 			// A plate carrying a code fence keeps the ink, but faint and strictly
 			// behind: a command block must read sharp, and the texture is there to
 			// edge the sheet, not to sit under the type at full weight.
-			if (Element.querySelector("pre, figure.zine-plate, .zine-plate")) Element.classList.add("grunge--faint");
+			if (Element.querySelector("pre, figure.zine-plate, .zine-plate"))
+				Element.classList.add("grunge--faint");
 			const Faint = Element.classList.contains("grunge--faint") ? 0.5 : 1;
 			const Seed = (Math.random() * 0x7fffffff) | 0;
 
@@ -231,7 +236,10 @@ export const PaintGrunge = (): void => {
 				Svg.style.setProperty("--grunge-z", "-1");
 				// Per-group weight. The floor is 0.16, not 0.10: on a near-black page
 				// a 0.10 deposit reads as haze rather than ink.
-				Svg.style.setProperty("--grunge-opacity", ((0.16 + Ride(GroupIndex * 0.91, Phase) * 0.14) * Faint).toFixed(3));
+				Svg.style.setProperty(
+					"--grunge-opacity",
+					((0.16 + Ride(GroupIndex * 0.91, Phase) * 0.14) * Faint).toFixed(3),
+				);
 				Element.prepend(Svg);
 			}
 

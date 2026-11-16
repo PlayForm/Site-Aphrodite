@@ -42,7 +42,14 @@ interface Props {
 	RightLabel?: string;
 }
 
-const { Left = "BEFORE", Right = "AFTER", LeftPane, RightPane, LeftLabel, RightLabel } = Astro.props;
+const {
+	Left = "BEFORE",
+	Right = "AFTER",
+	LeftPane,
+	RightPane,
+	LeftLabel,
+	RightLabel,
+} = Astro.props;
 ---
 
 <div
@@ -73,23 +80,22 @@ const { Left = "BEFORE", Right = "AFTER", LeftPane, RightPane, LeftLabel, RightL
 		</button>
 	</div>
 	<div class="zine-toggle-pane flex flex-col shell-card" data-toggle-pane="left">
-		{
-			LeftLabel && (
-				<div class="border-b border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-					{LeftLabel}
-				</div>
-			)
-		}
-		<div class="tier-well p-3 font-mono text-base leading-relaxed text-zinc-dust" set:html={LeftPane} />
+		{LeftLabel && (
+			<div class="border-b border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+				{LeftLabel}
+			</div>
+		)}
+		<div
+			class="tier-well p-3 font-mono text-base leading-relaxed text-zinc-dust"
+			set:html={LeftPane}
+		/>
 	</div>
 	<div class="zine-toggle-pane mt-4 flex flex-col shell-card" data-toggle-pane="right">
-		{
-			RightLabel && (
-				<div class="border-b border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
-					{RightLabel}
-				</div>
-			)
-		}
+		{RightLabel && (
+			<div class="border-b border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
+				{RightLabel}
+			</div>
+		)}
 		<div
 			class="tier-well p-3 font-mono text-base font-bold leading-relaxed text-bone-white"
 			set:html={RightPane}

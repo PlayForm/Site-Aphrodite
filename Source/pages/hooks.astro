@@ -162,48 +162,46 @@ const Loop = Sequence.map((Entry) => {
 
 			<div class="well mt-8 p-4 sm:p-5">
 				<ol class="flex flex-col">
-					{
-						Loop.map(({ Text: Line, Tone, Ordinal }) => (
-							<li
+					{Loop.map(({ Text: Line, Tone, Ordinal }) => (
+						<li
+							class:list={[
+								"grid grid-cols-[2.5rem_1fr] items-baseline gap-x-3",
+								Tone === "mute" ? "py-0.5" : "py-1.5",
+							]}
+						>
+							<span
+								class="type-meta font-bold tabular-nums text-zinc-dust"
+								aria-hidden="true"
+							>
+								{Ordinal}
+							</span>
+							<span
 								class:list={[
-									"grid grid-cols-[2.5rem_1fr] items-baseline gap-x-3",
-									Tone === "mute" ? "py-0.5" : "py-1.5",
+									"font-mono text-base leading-relaxed",
+									Tone === "canary"
+										? "text-stamped-canary"
+										: Tone === "mute"
+											? "text-zinc-dust"
+											: Tone === "result"
+												? "text-bone-white"
+												: "text-bone-newsprint",
 								]}
 							>
-								<span
-									class="type-meta font-bold tabular-nums text-zinc-dust"
-									aria-hidden="true"
-								>
-									{Ordinal}
-								</span>
-								<span
-									class:list={[
-										"font-mono text-base leading-relaxed",
-										Tone === "canary"
-											? "text-stamped-canary"
-											: Tone === "mute"
-												? "text-zinc-dust"
-												: Tone === "result"
-													? "text-bone-white"
-													: "text-bone-newsprint",
-									]}
-								>
-									{Line}
-								</span>
-							</li>
-						))
-					}
+								{Line}
+							</span>
+						</li>
+					))}
 				</ol>
 			</div>
 
 			<div class="prose-flow mt-8">
 				<p class="type-body text-bone-newsprint">
-					The loop closes on itself, so the state a turn leaves behind is the state the next
-					turn reads.
+					The loop closes on itself, so the state a turn leaves behind is the state the
+					next turn reads.
 				</p>
 				<p class="type-body text-bone-newsprint">
-					That is why the reset seam exists: a new session starts from a clean baseline instead
-					of inheriting the previous session's counters and markers.
+					That is why the reset seam exists: a new session starts from a clean baseline
+					instead of inheriting the previous session's counters and markers.
 				</p>
 			</div>
 
@@ -221,76 +219,75 @@ const Loop = Sequence.map((Entry) => {
 			<h2 class="mt-3 type-section text-bone-white">What each seam does</h2>
 
 			<ol class="mt-8 flex flex-col border-t border-oxblood-dark">
-				{
-					Hooks.map(({ N, Name, Role, Tag }) => (
-						<li class="border-b border-oxblood-dark">
-							<a
-								href={`#seam-${N}`}
-								class="group flex flex-wrap items-baseline gap-x-4 gap-y-2 py-4 transition-colors hover:bg-asphalt-panel focus-visible:bg-asphalt-panel"
+				{Hooks.map(({ N, Name, Role, Tag }) => (
+					<li class="border-b border-oxblood-dark">
+						<a
+							href={`#seam-${N}`}
+							class="group flex flex-wrap items-baseline gap-x-4 gap-y-2 py-4 transition-colors hover:bg-asphalt-panel focus-visible:bg-asphalt-panel"
+						>
+							<span class="type-meta font-bold tabular-nums text-zinc-dust">{N}</span>
+							<span class="font-mono text-base font-bold text-bone-white group-hover:text-stamped-canary">
+								{Name}
+							</span>
+							<span class:list={["telemetry-tag", `telemetry-tag--${Tag}`]}>
+								{Role}
+							</span>
+							<span
+								class="ml-auto font-mono text-base text-zinc-dust"
+								aria-hidden="true"
 							>
-								<span class="type-meta font-bold tabular-nums text-zinc-dust">{N}</span>
-								<span class="font-mono text-base font-bold text-bone-white group-hover:text-stamped-canary">
-									{Name}
-								</span>
-								<span class:list={["telemetry-tag", `telemetry-tag--${Tag}`]}>
-									{Role}
-								</span>
-								<span class="ml-auto font-mono text-base text-zinc-dust" aria-hidden="true">
-									→
-								</span>
-							</a>
-						</li>
-					))
-				}
+								→
+							</span>
+						</a>
+					</li>
+				))}
 			</ol>
 		</section>
 
 		<!-- 03-08 // ONE CHAPTER PER SEAM: the signature well, then the card -->
-		{
-			Hooks.map(({ N, Chapter, Name, Headline, Role, TapeColor, Accent, Rotate, Body }) => (
-				<section id={`seam-${N}`} class="blueprint-section" data-reveal>
-					<p class="section-index">
-						{Chapter} // {Name.toUpperCase()}
-					</p>
-					<h2 class="mt-3 type-section text-bone-white">{Headline}</h2>
+		{Hooks.map(({ N, Chapter, Name, Headline, Role, TapeColor, Accent, Rotate, Body }) => (
+			<section id={`seam-${N}`} class="blueprint-section" data-reveal>
+				<p class="section-index">
+					{Chapter} // {Name.toUpperCase()}
+				</p>
+				<h2 class="mt-3 type-section text-bone-white">{Headline}</h2>
 
-					{/* THE SIGNATURE WELL - the seam as machinery: its place in the
+				{/* THE SIGNATURE WELL - the seam as machinery: its place in the
 					    chain, and the dispatch every hook in the shim shares. Recessed
 					    into the page rather than framed, because it is the hook's
 					    identity card and not a claim of its own. */}
-					<dl class="well mt-8 grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-3 p-4 sm:p-5">
-						<dt class="type-meta font-bold uppercase text-zinc-dust">ORDER</dt>
-						<dd class="font-mono text-base tabular-nums text-bone-newsprint">
-							{N} / {Total}
-						</dd>
-						<dt class="type-meta font-bold uppercase text-zinc-dust">DISPATCH</dt>
-						<dd class="font-mono text-base leading-relaxed text-bone-newsprint">
-							args → <span class="text-weathered-teal">libaphrodite_hermes.dylib</span> → JSON
-							reply
-						</dd>
-						<dt class="type-meta font-bold uppercase text-zinc-dust">REGISTERED</dt>
-						<dd class="font-mono text-base leading-relaxed text-bone-newsprint">
-							provides_hooks · plugin.yaml
-						</dd>
-					</dl>
+				<dl class="well mt-8 grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-3 p-4 sm:p-5">
+					<dt class="type-meta font-bold uppercase text-zinc-dust">ORDER</dt>
+					<dd class="font-mono text-base tabular-nums text-bone-newsprint">
+						{N} / {Total}
+					</dd>
+					<dt class="type-meta font-bold uppercase text-zinc-dust">DISPATCH</dt>
+					<dd class="font-mono text-base leading-relaxed text-bone-newsprint">
+						args → <span class="text-weathered-teal">libaphrodite_hermes.dylib</span> →
+						JSON reply
+					</dd>
+					<dt class="type-meta font-bold uppercase text-zinc-dust">REGISTERED</dt>
+					<dd class="font-mono text-base leading-relaxed text-bone-newsprint">
+						provides_hooks · plugin.yaml
+					</dd>
+				</dl>
 
-					<ZineBox
-						Class="mt-8"
-						Size="md"
-						Rotate={Rotate}
-						Accent={Accent}
-						Tape={Role}
-						TapeColor={TapeColor}
-					>
-						<div class="prose-flow">
-							{Body.map((Paragraph) => (
-								<p class="type-body text-bone-newsprint" set:html={Paragraph} />
-							))}
-						</div>
-					</ZineBox>
-				</section>
-			))
-		}
+				<ZineBox
+					Class="mt-8"
+					Size="md"
+					Rotate={Rotate}
+					Accent={Accent}
+					Tape={Role}
+					TapeColor={TapeColor}
+				>
+					<div class="prose-flow">
+						{Body.map((Paragraph) => (
+							<p class="type-body text-bone-newsprint" set:html={Paragraph} />
+						))}
+					</div>
+				</ZineBox>
+			</section>
+		))}
 
 		<!-- THE BYPASS GATE - what the transforms refuse to touch -->
 		<section id="gate" class="blueprint-section" data-reveal>
@@ -299,8 +296,8 @@ const Loop = Sequence.map((Entry) => {
 
 			<div class="prose-flow mt-8">
 				<p class="type-body text-bone-newsprint">
-					A result is left untouched when it is empty, below threshold, or from the essential
-					set - tools the agent needs raw:
+					A result is left untouched when it is empty, below threshold, or from the
+					essential set - tools the agent needs raw:
 				</p>
 			</div>
 
@@ -316,17 +313,15 @@ const Loop = Sequence.map((Entry) => {
 					would just replace resolved content with another marker.
 				</p>
 				<p class="type-body text-zinc-dust">
-					The gate is the reason retrieval stays cheap: a marker the model resolves comes back
-					whole, because nothing downstream of the gate rewrites it a second time.
+					The gate is the reason retrieval stays cheap: a marker the model resolves comes
+					back whole, because nothing downstream of the gate rewrites it a second time.
 				</p>
 			</div>
 		</section>
 
 		<!-- THE NUMBERS - thresholds, defaults and the precedence that resolves them -->
 		<section id="thresholds" class="blueprint-section" data-reveal>
-			<p class="section-index">
-				{ChapterOfThresholds} // THRESHOLDS // GATES AND BYPASSES
-			</p>
+			<p class="section-index">{ChapterOfThresholds} // THRESHOLDS // GATES AND BYPASSES</p>
 			<h2 class="mt-3 type-section text-bone-white">The numbers that decide</h2>
 
 			<div class="mt-8 overflow-x-auto">
@@ -385,9 +380,8 @@ const Loop = Sequence.map((Entry) => {
 			</div>
 
 			<p class="well mt-12 p-4 sm:p-5 font-mono text-base leading-relaxed text-zinc-dust">
-				PRECEDENCE: ENVIRONMENT &gt; TOML &gt; DEFAULT
-				(APHRODITE_TOOL_THRESHOLD_TOKEN · APHRODITE_TERMINAL_THRESHOLD ·
-				APHRODITE_FLOW_BUDGET_CHARS · APHRODITE_CHAIN_SPLIT).
+				PRECEDENCE: ENVIRONMENT &gt; TOML &gt; DEFAULT (APHRODITE_TOOL_THRESHOLD_TOKEN ·
+				APHRODITE_TERMINAL_THRESHOLD · APHRODITE_FLOW_BUDGET_CHARS · APHRODITE_CHAIN_SPLIT).
 			</p>
 
 			<ZineSource

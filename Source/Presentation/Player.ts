@@ -335,22 +335,14 @@ export default (): void => {
 			Clock.textContent = NextClock;
 		}
 
-		const NextStatus = Playing
-			? "PLAYING"
-			: Elapsed >= Timeline.Total
-				? "ENDED"
-				: "PAUSED";
+		const NextStatus = Playing ? "PLAYING" : Elapsed >= Timeline.Total ? "ENDED" : "PAUSED";
 
 		if (Status && NextStatus !== StatusText) {
 			StatusText = NextStatus;
 			Status.textContent = NextStatus;
 		}
 
-		const NextToggle = Playing
-			? "PAUSE"
-			: Elapsed >= Timeline.Total
-				? "REPLAY"
-				: "PLAY";
+		const NextToggle = Playing ? "PAUSE" : Elapsed >= Timeline.Total ? "REPLAY" : "PLAY";
 
 		if (Toggle && NextToggle !== ToggleText) {
 			ToggleText = NextToggle;
@@ -498,7 +490,10 @@ export default (): void => {
 		// would double-apply every press.
 		const Target = Event.target;
 
-		if (Target instanceof Element && Target.closest("input, button, summary, a, select, textarea")) {
+		if (
+			Target instanceof Element &&
+			Target.closest("input, button, summary, a, select, textarea")
+		) {
 			return;
 		}
 

@@ -194,342 +194,354 @@ const Sliding = [
 	aria-label={`Beat ${Ordinal}: ${Scene.Title}`}
 	inert={Index !== 0}
 >
-	{
-		Scene.Visual === "opening" && (
-			<div class="deck-open" data-enter>
-				<div class="deck-open-plate">
-					<div class="deck-open-mark">
-						<img
-							src="/Brand/aphrodite.svg"
-							alt="Aphrodite brand mark"
-							width="160"
-							height="160"
-						/>
-					</div>
-					<span class="deck-open-tape">CCR CORE // STENCIL</span>
+	{Scene.Visual === "opening" && (
+		<div class="deck-open" data-enter>
+			<div class="deck-open-plate">
+				<div class="deck-open-mark">
+					<img
+						src="/Brand/aphrodite.svg"
+						alt="Aphrodite brand mark"
+						width="160"
+						height="160"
+					/>
 				</div>
-				<div class="deck-open-copy">
-					<span class="deck-kicker">{Scene.Beat}</span>
-					<h1 class="deck-open-title">{Scene.Title}</h1>
-					<p class="deck-open-body">{Scene.Body}</p>
-					<div class="deck-chips">
-						<span class="deck-chip">aphrodite.playform.cloud</span>
-						<span class="deck-chip" data-tone="canary">{`plugin v${Versions.Plugin}`}</span>
-						<span class="deck-chip" data-tone="teal">{`binary v${Versions.Binary}`}</span>
-					</div>
-				</div>
+				<span class="deck-open-tape">CCR CORE // STENCIL</span>
 			</div>
-		)
-	}
-
-	{
-		Scene.Visual === "closing" && (
-			<div class="deck-close" data-enter>
+			<div class="deck-open-copy">
 				<span class="deck-kicker">{Scene.Beat}</span>
-				<h2 class="deck-close-title">{Scene.Title}</h2>
-				<p class="deck-close-body">{Scene.Body}</p>
-				<div class="deck-commands">
-					<div class="deck-command">
-						<span class="deck-command-prompt">$</span>
-						{" hermes plugins install aphrodite"}
-					</div>
-					<div class="deck-command">
-						<span class="deck-command-prompt">$</span>
-						{" cd ~/.hermes/plugins/aphrodite && bash download.sh"}
-					</div>
-				</div>
-				<div class="deck-close-foot">
-					<span class="deck-url">aphrodite.playform.cloud</span>
-					<span class="deck-chip">one binary</span>
-					<span class="deck-chip">six hooks</span>
-					<span class="deck-chip">thirteen tools</span>
+				<h1 class="deck-open-title">{Scene.Title}</h1>
+				<p class="deck-open-body">{Scene.Body}</p>
+				<div class="deck-chips">
+					<span class="deck-chip">aphrodite.playform.cloud</span>
+					<span class="deck-chip" data-tone="canary">{`plugin v${Versions.Plugin}`}</span>
+					<span class="deck-chip" data-tone="teal">{`binary v${Versions.Binary}`}</span>
 				</div>
 			</div>
-		)
-	}
+		</div>
+	)}
 
-	{
-		Sliding.includes(Scene.Visual) && (
-			<div class="deck-slide" data-enter>
-				<div class="deck-head">
-					<span class="deck-kicker">{Scene.Beat}</span>
-					<span class="deck-count">
-						{Ordinal} / {Count}
-					</span>
+	{Scene.Visual === "closing" && (
+		<div class="deck-close" data-enter>
+			<span class="deck-kicker">{Scene.Beat}</span>
+			<h2 class="deck-close-title">{Scene.Title}</h2>
+			<p class="deck-close-body">{Scene.Body}</p>
+			<div class="deck-commands">
+				<div class="deck-command">
+					<span class="deck-command-prompt">$</span>
+					{" hermes plugins install aphrodite"}
 				</div>
-				<h2 class="deck-title">{Scene.Title}</h2>
-				<p class="deck-body">{Scene.Body}</p>
-				<div class="deck-visual">
-					{Scene.Visual === "default" && (
-						<div class="deck-default">
-							<div class="deck-terminal">
-								<div class="deck-terminal-bar">
-									<span class="deck-state" data-state="default">by default</span>
-									<span>raw tool output</span>
-									<span class="deck-terminal-metric">streaming</span>
-								</div>
-								<div class="deck-scroll">
-									<div class="deck-scroll-track">
-										{Scroll.map((Line) => (
-											<div class="deck-line" data-tier={Line.Tier}>
-												{Line.Text}
-											</div>
-										))}
-									</div>
-								</div>
-							</div>
-							<div class="deck-default-stat">
-								<span class="deck-default-value" data-count="1400">1,400</span>
-								<span class="deck-default-label">tokens per build</span>
-								<p class="deck-default-note">
-									Every line enters the context. Every later turn pays for it again.
-								</p>
-								<div class="deck-badges">
-									<span class="deck-badge">142 lines</span>
-									<span class="deck-badge">1 error</span>
-									<span class="deck-badge" data-tone="teal">no marker</span>
-								</div>
-							</div>
-						</div>
-					)}
+				<div class="deck-command">
+					<span class="deck-command-prompt">$</span>
+					{" cd ~/.hermes/plugins/aphrodite && bash download.sh"}
+				</div>
+			</div>
+			<div class="deck-close-foot">
+				<span class="deck-url">aphrodite.playform.cloud</span>
+				<span class="deck-chip">one binary</span>
+				<span class="deck-chip">six hooks</span>
+				<span class="deck-chip">thirteen tools</span>
+			</div>
+		</div>
+	)}
 
-					{Scene.Visual === "transform" && (
-						<div class="deck-split">
-							<div class="deck-split-side" data-side="user" data-enter>
-								<div class="deck-split-head">
-									<span class="deck-state" data-state="default">by default</span>
-									<span>user // terminal</span>
-									<span class="deck-split-metric">streaming</span>
-								</div>
-								<div class="deck-split-log" data-stream>
-									{StreamLog.map((Line) => (
+	{Sliding.includes(Scene.Visual) && (
+		<div class="deck-slide" data-enter>
+			<div class="deck-head">
+				<span class="deck-kicker">{Scene.Beat}</span>
+				<span class="deck-count">
+					{Ordinal} / {Count}
+				</span>
+			</div>
+			<h2 class="deck-title">{Scene.Title}</h2>
+			<p class="deck-body">{Scene.Body}</p>
+			<div class="deck-visual">
+				{Scene.Visual === "default" && (
+					<div class="deck-default">
+						<div class="deck-terminal">
+							<div class="deck-terminal-bar">
+								<span class="deck-state" data-state="default">
+									by default
+								</span>
+								<span>raw tool output</span>
+								<span class="deck-terminal-metric">streaming</span>
+							</div>
+							<div class="deck-scroll">
+								<div class="deck-scroll-track">
+									{Scroll.map((Line) => (
 										<div class="deck-line" data-tier={Line.Tier}>
 											{Line.Text}
 										</div>
 									))}
 								</div>
-								<span class="deck-split-foot">
-									<span data-count="1400">1,400</span>
-									{" tokens, still on screen"}
+							</div>
+						</div>
+						<div class="deck-default-stat">
+							<span class="deck-default-value" data-count="1400">
+								1,400
+							</span>
+							<span class="deck-default-label">tokens per build</span>
+							<p class="deck-default-note">
+								Every line enters the context. Every later turn pays for it again.
+							</p>
+							<div class="deck-badges">
+								<span class="deck-badge">142 lines</span>
+								<span class="deck-badge">1 error</span>
+								<span class="deck-badge" data-tone="teal">
+									no marker
 								</span>
 							</div>
-							<div class="deck-split-mid" data-enter="980">
-								<span class="deck-type-pill">build</span>
-								<span class="deck-split-arrow">→</span>
-								<span class="deck-split-steps">classify · preview · store</span>
-							</div>
-							<div class="deck-split-side" data-side="agent" data-enter="1080">
-								<div class="deck-split-head">
-									<span class="deck-state" data-state="active">with aphrodite</span>
-									<span>agent // context</span>
-									<span class="deck-split-metric">~15 tokens</span>
-								</div>
-								<div class="deck-preview-line">
-									{"[build:1E 1W 142L | error[E0432]: unresolved import ...]"}
-								</div>
-								<div class="deck-marker-line">
-									{"<<<CCR:0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e|build|1420>>>"}
-								</div>
-								<span class="deck-split-foot">the original is one call away</span>
-							</div>
-							<span class="deck-wipe" data-wipe="980" />
 						</div>
-					)}
+					</div>
+				)}
 
-					{Scene.Visual === "overview" && (
-						<div class="deck-overview">
-							<div class="deck-stages">
-								{Stages.map((Stage) => (
-									<div class="deck-stage" data-stage={Stage.Index}>
-										<span class="deck-stage-index">{Stage.Index} // STAGE</span>
-										<span class="deck-stage-name">{Stage.Name}</span>
-										<span class="deck-stage-metric">{Stage.Metric}</span>
-										<span class="deck-stage-note">{Stage.Note}</span>
+				{Scene.Visual === "transform" && (
+					<div class="deck-split">
+						<div class="deck-split-side" data-side="user" data-enter>
+							<div class="deck-split-head">
+								<span class="deck-state" data-state="default">
+									by default
+								</span>
+								<span>user // terminal</span>
+								<span class="deck-split-metric">streaming</span>
+							</div>
+							<div class="deck-split-log" data-stream>
+								{StreamLog.map((Line) => (
+									<div class="deck-line" data-tier={Line.Tier}>
+										{Line.Text}
 									</div>
 								))}
 							</div>
-							<div class="deck-badges">
-								<span class="deck-badge">one output</span>
-								<span class="deck-badge" data-tone="teal">one marker</span>
-								<span class="deck-badge">sub-millisecond compress</span>
-								<span class="deck-badge">no API round-trip</span>
-							</div>
+							<span class="deck-split-foot">
+								<span data-count="1400">1,400</span>
+								{" tokens, still on screen"}
+							</span>
 						</div>
-					)}
-
-					{Scene.Visual === "classify" && (
-						<div class="deck-classify">
-							<div class="deck-panel">
-								<div class="deck-panel-head">
-									<span>what it names</span>
-									<span>first match wins</span>
-								</div>
-								<div class="deck-type-grid">
-									{Types.map((Type) => (
-										<span class="deck-type">{Type}</span>
-									))}
-								</div>
-							</div>
-							<div class="deck-panel">
-								<div class="deck-panel-head">
-									<span>threshold tiers</span>
-									<span>higher = stays visible</span>
-								</div>
-								<div class="deck-tiers">
-									{Tiers.map((Tier) => (
-										<div class="deck-tier">
-											<span class="deck-tier-name">{Tier.Name}</span>
-											<span class="deck-tier-mult">{Tier.Multiplier}</span>
-											<span class="deck-tier-note">{Tier.Note}</span>
-										</div>
-									))}
-								</div>
-							</div>
+						<div class="deck-split-mid" data-enter="980">
+							<span class="deck-type-pill">build</span>
+							<span class="deck-split-arrow">→</span>
+							<span class="deck-split-steps">classify · preview · store</span>
 						</div>
-					)}
+						<div class="deck-split-side" data-side="agent" data-enter="1080">
+							<div class="deck-split-head">
+								<span class="deck-state" data-state="active">
+									with aphrodite
+								</span>
+								<span>agent // context</span>
+								<span class="deck-split-metric">~15 tokens</span>
+							</div>
+							<div class="deck-preview-line">
+								{"[build:1E 1W 142L | error[E0432]: unresolved import ...]"}
+							</div>
+							<div class="deck-marker-line">
+								{"<<<CCR:0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e|build|1420>>>"}
+							</div>
+							<span class="deck-split-foot">the original is one call away</span>
+						</div>
+						<span class="deck-wipe" data-wipe="980" />
+					</div>
+				)}
 
-					{Scene.Visual === "preview" && (
-						<div class="deck-shapes">
-							{Shapes.map((Shape) => (
-								<div class="deck-shape">
-									<span class="deck-shape-type">{Shape.Type}</span>
-									<code class="deck-shape-line">{Shape.Line}</code>
+				{Scene.Visual === "overview" && (
+					<div class="deck-overview">
+						<div class="deck-stages">
+							{Stages.map((Stage) => (
+								<div class="deck-stage" data-stage={Stage.Index}>
+									<span class="deck-stage-index">{Stage.Index} // STAGE</span>
+									<span class="deck-stage-name">{Stage.Name}</span>
+									<span class="deck-stage-metric">{Stage.Metric}</span>
+									<span class="deck-stage-note">{Stage.Note}</span>
 								</div>
 							))}
 						</div>
-					)}
+						<div class="deck-badges">
+							<span class="deck-badge">one output</span>
+							<span class="deck-badge" data-tone="teal">
+								one marker
+							</span>
+							<span class="deck-badge">sub-millisecond compress</span>
+							<span class="deck-badge">no API round-trip</span>
+						</div>
+					</div>
+				)}
 
-					{Scene.Visual === "store" && (
-						<div class="deck-store">
-							<div class="deck-marker-map">
-								<div class="deck-marker-field" data-field="hash">
-									<span class="deck-marker-field-label">hash // 40 hex</span>
-									<code>0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e</code>
-								</div>
-								<div class="deck-marker-field" data-field="type">
-									<span class="deck-marker-field-label">type</span>
-									<code>build</code>
-								</div>
-								<div class="deck-marker-field" data-field="size">
-									<span class="deck-marker-field-label">size</span>
-									<code>1420</code>
-								</div>
+				{Scene.Visual === "classify" && (
+					<div class="deck-classify">
+						<div class="deck-panel">
+							<div class="deck-panel-head">
+								<span>what it names</span>
+								<span>first match wins</span>
 							</div>
-							<div class="deck-marker-full">
-								{"<<<CCR:0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e|build|1420>>>"}
-							</div>
-							<div class="deck-store-grid">
-								<div class="deck-store-card">
-									<span class="deck-store-name">Cache :9797</span>
-									<span class="deck-store-note">
-										in-memory DashMap, 10K entries, compresses above 8 KB
-									</span>
-								</div>
-								<div class="deck-store-card">
-									<span class="deck-store-name">Token :9798</span>
-									<span class="deck-store-note">
-										SQLite, persistent, compresses above 1 KB, tool relay
-									</span>
-								</div>
+							<div class="deck-type-grid">
+								{Types.map((Type) => (
+									<span class="deck-type">{Type}</span>
+								))}
 							</div>
 						</div>
-					)}
-
-					{Scene.Visual === "decide" && (
-						<div class="deck-decide">
-							<div class="deck-decide-flow">
-								<div class="deck-decide-node">
-									<span class="deck-decide-label">preview</span>
-									<span class="deck-decide-value">~15 tokens</span>
-								</div>
-								<span class="deck-decide-arrow">→</span>
-								<div class="deck-decide-node" data-node="question">
-									<span class="deck-decide-label">enough?</span>
-									<span class="deck-decide-value">the agent decides</span>
-								</div>
-								<span class="deck-decide-arrow">→</span>
-								<div class="deck-decide-branches">
-									<div class="deck-decide-branch" data-branch="skip">
-										<span class="deck-decide-label">yes // skip</span>
-										<span class="deck-decide-value">keep reasoning</span>
-									</div>
-									<div class="deck-decide-branch" data-branch="retrieve">
-										<span class="deck-decide-label">
-											no // aphrodite_retrieve(hash)
-										</span>
-										<span class="deck-decide-value">1,420 B, unchanged</span>
-									</div>
-								</div>
+						<div class="deck-panel">
+							<div class="deck-panel-head">
+								<span>threshold tiers</span>
+								<span>higher = stays visible</span>
 							</div>
-							<div class="deck-badges">
-								<span class="deck-badge">retrieval tax 1.3%</span>
-								<span class="deck-badge">2,275 calls in 200 sessions</span>
-								<span class="deck-badge" data-tone="teal">recursive resolve</span>
-								<span class="deck-badge">compression is reversible</span>
-							</div>
-						</div>
-					)}
-
-					{Scene.Visual === "hooks" && (
-						<div class="deck-hooks">
-							<div class="deck-hook-grid">
-								{Hooks.map((Hook) => (
-									<div class="deck-hook" data-hot={String(Hook.Hot)}>
-										<span class="deck-hook-chip">{Hook.Chip}</span>
-										<span class="deck-hook-name">{Hook.Name}</span>
-										<span class="deck-hook-role">{Hook.Role}</span>
+							<div class="deck-tiers">
+								{Tiers.map((Tier) => (
+									<div class="deck-tier">
+										<span class="deck-tier-name">{Tier.Name}</span>
+										<span class="deck-tier-mult">{Tier.Multiplier}</span>
+										<span class="deck-tier-note">{Tier.Note}</span>
 									</div>
 								))}
 							</div>
-							<div class="deck-hook-foot">
-								<span class="deck-badge">6 hooks registered</span>
-								<span class="deck-badge">13 tools in namespace</span>
-								<span class="deck-badge" data-tone="teal">ctypes shim -&gt; rust dylib</span>
-								<span class="deck-badge">4,096 / 1,024 char gates</span>
+						</div>
+					</div>
+				)}
+
+				{Scene.Visual === "preview" && (
+					<div class="deck-shapes">
+						{Shapes.map((Shape) => (
+							<div class="deck-shape">
+								<span class="deck-shape-type">{Shape.Type}</span>
+								<code class="deck-shape-line">{Shape.Line}</code>
+							</div>
+						))}
+					</div>
+				)}
+
+				{Scene.Visual === "store" && (
+					<div class="deck-store">
+						<div class="deck-marker-map">
+							<div class="deck-marker-field" data-field="hash">
+								<span class="deck-marker-field-label">hash // 40 hex</span>
+								<code>0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e</code>
+							</div>
+							<div class="deck-marker-field" data-field="type">
+								<span class="deck-marker-field-label">type</span>
+								<code>build</code>
+							</div>
+							<div class="deck-marker-field" data-field="size">
+								<span class="deck-marker-field-label">size</span>
+								<code>1420</code>
 							</div>
 						</div>
-					)}
+						<div class="deck-marker-full">
+							{"<<<CCR:0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e|build|1420>>>"}
+						</div>
+						<div class="deck-store-grid">
+							<div class="deck-store-card">
+								<span class="deck-store-name">Cache :9797</span>
+								<span class="deck-store-note">
+									in-memory DashMap, 10K entries, compresses above 8 KB
+								</span>
+							</div>
+							<div class="deck-store-card">
+								<span class="deck-store-name">Token :9798</span>
+								<span class="deck-store-note">
+									SQLite, persistent, compresses above 1 KB, tool relay
+								</span>
+							</div>
+						</div>
+					</div>
+				)}
 
-					{Scene.Visual === "ledger" && (
-						<div class="deck-ledger">
-							<div class="deck-compare">
-								{Comparison.map((Side) => (
-									<div class="deck-side" data-side={Side.Side}>
-										<span class="deck-side-head">
+				{Scene.Visual === "decide" && (
+					<div class="deck-decide">
+						<div class="deck-decide-flow">
+							<div class="deck-decide-node">
+								<span class="deck-decide-label">preview</span>
+								<span class="deck-decide-value">~15 tokens</span>
+							</div>
+							<span class="deck-decide-arrow">→</span>
+							<div class="deck-decide-node" data-node="question">
+								<span class="deck-decide-label">enough?</span>
+								<span class="deck-decide-value">the agent decides</span>
+							</div>
+							<span class="deck-decide-arrow">→</span>
+							<div class="deck-decide-branches">
+								<div class="deck-decide-branch" data-branch="skip">
+									<span class="deck-decide-label">yes // skip</span>
+									<span class="deck-decide-value">keep reasoning</span>
+								</div>
+								<div class="deck-decide-branch" data-branch="retrieve">
+									<span class="deck-decide-label">
+										no // aphrodite_retrieve(hash)
+									</span>
+									<span class="deck-decide-value">1,420 B, unchanged</span>
+								</div>
+							</div>
+						</div>
+						<div class="deck-badges">
+							<span class="deck-badge">retrieval tax 1.3%</span>
+							<span class="deck-badge">2,275 calls in 200 sessions</span>
+							<span class="deck-badge" data-tone="teal">
+								recursive resolve
+							</span>
+							<span class="deck-badge">compression is reversible</span>
+						</div>
+					</div>
+				)}
+
+				{Scene.Visual === "hooks" && (
+					<div class="deck-hooks">
+						<div class="deck-hook-grid">
+							{Hooks.map((Hook) => (
+								<div class="deck-hook" data-hot={String(Hook.Hot)}>
+									<span class="deck-hook-chip">{Hook.Chip}</span>
+									<span class="deck-hook-name">{Hook.Name}</span>
+									<span class="deck-hook-role">{Hook.Role}</span>
+								</div>
+							))}
+						</div>
+						<div class="deck-hook-foot">
+							<span class="deck-badge">6 hooks registered</span>
+							<span class="deck-badge">13 tools in namespace</span>
+							<span class="deck-badge" data-tone="teal">
+								ctypes shim -&gt; rust dylib
+							</span>
+							<span class="deck-badge">4,096 / 1,024 char gates</span>
+						</div>
+					</div>
+				)}
+
+				{Scene.Visual === "ledger" && (
+					<div class="deck-ledger">
+						<div class="deck-compare">
+							{Comparison.map((Side) => (
+								<div class="deck-side" data-side={Side.Side}>
+									<span class="deck-side-head">
+										<span
+											class="deck-state"
+											data-state={
+												Side.Side === "proxy" ? "default" : "active"
+											}
+										>
+											{Side.State}
+										</span>
+										<span>{Side.Head}</span>
+									</span>
+									{Side.Rows.map((Row) => (
+										<div class="deck-side-row">
 											<span
-												class="deck-state"
-												data-state={Side.Side === "proxy" ? "default" : "active"}
+												class="deck-mark"
+												data-mark={Side.Side === "proxy" ? "no" : "yes"}
 											>
-												{Side.State}
+												{Side.Side === "proxy" ? "×" : "✓"}
 											</span>
-											<span>{Side.Head}</span>
-										</span>
-										{Side.Rows.map((Row) => (
-											<div class="deck-side-row">
-												<span
-													class="deck-mark"
-													data-mark={Side.Side === "proxy" ? "no" : "yes"}
-												>
-													{Side.Side === "proxy" ? "×" : "✓"}
-												</span>
-												<span>{Row}</span>
-											</div>
-										))}
-									</div>
-								))}
-							</div>
-							<div class="deck-numbers">
-								{Numbers.map((Entry) => (
-									<div class="deck-number">
-										<span class="deck-number-value">{Entry.Value}</span>
-										<span class="deck-number-label">{Entry.Label}</span>
-									</div>
-								))}
-							</div>
+											<span>{Row}</span>
+										</div>
+									))}
+								</div>
+							))}
 						</div>
-					)}
-				</div>
+						<div class="deck-numbers">
+							{Numbers.map((Entry) => (
+								<div class="deck-number">
+									<span class="deck-number-value">{Entry.Value}</span>
+									<span class="deck-number-label">{Entry.Label}</span>
+								</div>
+							))}
+						</div>
+					</div>
+				)}
 			</div>
-		)
-	}
+		</div>
+	)}
 </section>

@@ -35,7 +35,9 @@ const Manifest: {
 
 const Svg = new Map(
 	await Promise.all(
-		Manifest.map(async ({ Id }) => [Id, await readFile(join(Mermaid, `${Id}.svg`), "utf8")] as const),
+		Manifest.map(
+			async ({ Id }) => [Id, await readFile(join(Mermaid, `${Id}.svg`), "utf8")] as const,
+		),
 	),
 );
 
@@ -54,7 +56,10 @@ const Pane = /<pre[^>]*data-language=["']?mermaid["']?[^>]*>[\s\S]*?<\/pre>/g;
 
 /** Escape the caption text for element use. */
 const Escape = (Text: string): string =>
-	Text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+	Text.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;");
 
 const Figure = (Id: string, Label: string): string =>
 	`<figure class="relative z-10 mt-16 border border-oxblood-dark bg-soot-black p-4" data-diagram="${Escape(Id)}">` +
@@ -88,22 +93,29 @@ export default () => ({
 	name: "diagram-panels",
 
 	hooks: {
-		"astro:build:done": async ({ dir, pages }: {
+		"astro:build:done": async ({
+			dir,
+			pages,
+		}: {
 			dir: URL;
 
 			pages: { pathname?: string; paths?: string[] }[];
 		}) => {
 			for (const Page of pages) {
-				const Files = Array.isArray(Page.paths) && Page.paths.length > 0
-					? Page.paths
-					: Page.pathname
-					? [join(dir.pathname, Page.pathname, "index.html")]
-					: [];
+				const Files =
+					Array.isArray(Page.paths) && Page.paths.length > 0
+						? Page.paths
+						: Page.pathname
+							? [join(dir.pathname, Page.pathname, "index.html")]
+							: [];
 
 				for (const File of Files) {
 					const Html = await readFile(File, "utf8");
 
-					switch (Html.includes("data-language=mermaid") || Html.includes('data-language="mermaid"')) {
+					switch (
+						Html.includes("data-language=mermaid") ||
+						Html.includes('data-language="mermaid"')
+					) {
 						case false:
 							continue;
 

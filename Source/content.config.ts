@@ -9,8 +9,7 @@ const Docs = defineCollection({
 	loader: glob({
 		pattern: "**/*.md",
 		base: new URL("./Content/Docs", import.meta.url),
-		generateId: ({ entry }) =>
-			entry.replace(/\.md$/, "").replace(/\/index$/, ""),
+		generateId: ({ entry }) => entry.replace(/\.md$/, "").replace(/\/index$/, ""),
 	}),
 	schema: z.object({
 		section: z.string(),

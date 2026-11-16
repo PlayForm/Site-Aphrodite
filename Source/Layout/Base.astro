@@ -5,7 +5,14 @@ import "@Stylesheet/Motion.css";
 import { Head } from "astro-capo";
 import { ClientRouter } from "astro:transitions";
 
-import { ExternalLinks, FooterGroups, IsActive, MenuGroups, PrimaryLinks, Routes } from "@Library/Links";
+import {
+	ExternalLinks,
+	FooterGroups,
+	IsActive,
+	MenuGroups,
+	PrimaryLinks,
+	Routes,
+} from "@Library/Links";
 import { Stamps, Versions } from "@Library/Versions";
 
 import ZineKicker from "@Component/ZineKicker.astro";
@@ -35,8 +42,7 @@ const Escaped = (Value: string): string =>
 // unset the paths stay relative rather than resolving to a wrong origin.
 const Origin = Astro.site?.origin;
 
-const Absolute = (Path: string): string =>
-	Origin ? new URL(Path, Origin).href : Path;
+const Absolute = (Path: string): string => (Origin ? new URL(Path, Origin).href : Path);
 
 interface Props {
 	Title?: string;
@@ -115,13 +121,17 @@ interface Props {
 		<meta name="twitter:dnt" content="on" />
 		<meta name="twitter:card" content="summary_large_image" />
 		<Fragment set:html={`<meta name="twitter:title" content="${Escaped(Title)}" />`} />
-		<Fragment set:html={`<meta name="twitter:description" content="${Escaped(DescriptionText)}" />`} />
+		<Fragment
+			set:html={`<meta name="twitter:description" content="${Escaped(DescriptionText)}" />`}
+		/>
 		<meta name="twitter:image" content={Absolute("/Brand/OG.png?v=2")} />
 
 		<!-- Open Graph -->
 		<meta property="og:type" content="website" />
 		<Fragment set:html={`<meta property="og:title" content="${Escaped(Title)}" />`} />
-		<Fragment set:html={`<meta property="og:description" content="${Escaped(DescriptionText)}" />`} />
+		<Fragment
+			set:html={`<meta property="og:description" content="${Escaped(DescriptionText)}" />`}
+		/>
 		<meta property="og:image" content={Absolute("/Brand/OG.png?v=2")} />
 		<meta property="og:url" content={Absolute(Astro.url.pathname)} />
 		<link rel="canonical" href={Absolute(Astro.url.pathname)} />
@@ -145,7 +155,6 @@ interface Props {
 					"CCR compression proxy + absorptive preview pipeline for Hermes Agent.",
 			})}
 		/>
-
 		<!-- Links -->
 		<link
 			rel="preload"
@@ -161,7 +170,13 @@ interface Props {
 			type="font/woff2"
 			crossorigin
 		/>
-		<link rel="preload" href="/Font/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+		<link
+			rel="preload"
+			href="/Font/dm-sans-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
 		<link rel="manifest" href="/Manifest.json" crossorigin="use-credentials" />
 
 		<style is:global>
@@ -186,11 +201,13 @@ interface Props {
 						numOctaves="4"
 						result="noise"
 						stitchTiles="stitch"
-						type="fractalNoise"></feTurbulence>
+						type="fractalNoise"
+					></feTurbulence>
 					<feColorMatrix
 						result="coloredNoise"
 						type="matrix"
-						values="0 0 0 0 0.1   0 0 0 0 0.1   0 0 0 0 0.1   0 0 0 0.18 0"></feColorMatrix>
+						values="0 0 0 0 0.1   0 0 0 0 0.1   0 0 0 0 0.1   0 0 0 0.18 0"
+					></feColorMatrix>
 					<feBlend in="SourceGraphic" in2="coloredNoise" mode="multiply"></feBlend>
 				</filter>
 			</defs>
@@ -202,8 +219,7 @@ interface Props {
 		<div
 			class="pointer-events-none fixed inset-0 z-0 opacity-60 mix-blend-overlay"
 			style="filter: url(#grunge-noise);"
-		>
-		</div>
+		></div>
 
 		<!-- Site header (synthesized, zine skin). The bar's HEIGHT is built from
 		     `--site-header-height`, the same token the sticky section index
@@ -213,32 +229,33 @@ interface Props {
 		     inside `py-3` plus the 2px rule), which put the index's first 4px
 		     behind the header. -->
 		<header class="sticky top-0 z-40 w-full border-b-2 border-oxblood-dark bg-soot-black/95">
-			<nav aria-label="Site" class="site-bar mx-auto flex max-w-[1440px] items-center justify-between px-5 sm:px-8">
+			<nav
+				aria-label="Site"
+				class="site-bar mx-auto flex max-w-[1440px] items-center justify-between px-5 sm:px-8"
+			>
 				<a class="flex items-center gap-2" href={Routes.Home}>
 					<img class="h-5 w-5" src="/Brand/aphrodite.svg" alt="" width="20" height="20" />
-					<span class="font-mono text-base font-bold tracking-widest text-bone-white"
-						>APHRODITE</span
-					>
+					<span class="font-mono text-base font-bold tracking-widest text-bone-white">
+						APHRODITE
+					</span>
 				</a>
 				<nav aria-label="Primary" class="hidden items-center gap-3 lg:flex">
-					{
-						PrimaryLinks.map((Link) => {
-							const Active = IsActive(Astro.url.pathname, Link);
-							return (
-								<a
-									href={Link.Href}
-									aria-current={Active ? "page" : undefined}
-									class={
-										Active
-											? "bg-raw-blood px-3 py-1 font-mono text-base font-bold tracking-widest text-bone-white"
-											: "px-1 py-1 font-mono text-base tracking-widest text-zinc-dust hover:text-bone-white"
-									}
-								>
-									{Link.Label}
-								</a>
-							);
-						})
-					}
+					{PrimaryLinks.map((Link) => {
+						const Active = IsActive(Astro.url.pathname, Link);
+						return (
+							<a
+								href={Link.Href}
+								aria-current={Active ? "page" : undefined}
+								class={
+									Active
+										? "bg-raw-blood px-3 py-1 font-mono text-base font-bold tracking-widest text-bone-white"
+										: "px-1 py-1 font-mono text-base tracking-widest text-zinc-dust hover:text-bone-white"
+								}
+							>
+								{Link.Label}
+							</a>
+						);
+					})}
 				</nav>
 				<button
 					id="nav-toggle"
@@ -256,30 +273,26 @@ interface Props {
 				     carry the tape-stamp skin. -->
 				<div class="flex flex-col gap-6 px-5 py-4">
 					<nav aria-label="Primary (mobile)" class="flex flex-col gap-2">
-						<p
-							class="w-fit border border-black bg-raw-blood px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000] sm:-rotate-1"
-						>
+						<p class="w-fit border border-black bg-raw-blood px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000] sm:-rotate-1">
 							PRIMARY
 						</p>
 						<div class="grid grid-cols-2 gap-x-4">
-							{
-								PrimaryLinks.map((Link) => {
-									const Active = IsActive(Astro.url.pathname, Link);
-									return (
-										<a
-											href={Link.Href}
-											aria-current={Active ? "page" : undefined}
-											class={
-												Active
-													? "border-b border-oxblood-dark/50 bg-raw-blood px-2 py-2 font-mono text-base font-bold tracking-widest text-bone-white"
-													: "border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"
-											}
-										>
-											{Link.Label}
-										</a>
-									);
-								})
-							}
+							{PrimaryLinks.map((Link) => {
+								const Active = IsActive(Astro.url.pathname, Link);
+								return (
+									<a
+										href={Link.Href}
+										aria-current={Active ? "page" : undefined}
+										class={
+											Active
+												? "border-b border-oxblood-dark/50 bg-raw-blood px-2 py-2 font-mono text-base font-bold tracking-widest text-bone-white"
+												: "border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"
+										}
+									>
+										{Link.Label}
+									</a>
+								);
+							})}
 						</div>
 					</nav>
 					<!-- MORE: one labelled group per registry `Group`, not a flat
@@ -291,38 +304,34 @@ interface Props {
 					     only as each group's `Note`, where it explains the
 					     product instead of asking the reader to learn it. -->
 					<nav aria-label="More" class="flex flex-col gap-4">
-						<p
-							class="w-fit border border-black bg-stamped-canary px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000] sm:rotate-1"
-						>
+						<p class="w-fit border border-black bg-stamped-canary px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000] sm:rotate-1">
 							MORE
 						</p>
-						{
-							MenuGroups.map(({ Label, Links }) => (
-								<div class="flex flex-col gap-2">
-									<p class="w-fit border border-black bg-raw-blood px-2 py-0.5 font-mono text-[13px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
-										{Label.toUpperCase()}
-									</p>
-									<div class="grid grid-cols-2 gap-x-4">
-										{Links.map((Link) => {
-											const Active = IsActive(Astro.url.pathname, Link);
-											return (
-												<a
-													href={Link.Href}
-													aria-current={Active ? "page" : undefined}
-													class={
-														Active
-															? "border-b border-oxblood-dark/50 bg-raw-blood px-2 py-2 font-mono text-base font-bold tracking-widest text-bone-white"
-															: "border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"
-													}
-												>
-													{Link.Label}
-												</a>
-											);
-										})}
-									</div>
+						{MenuGroups.map(({ Label, Links }) => (
+							<div class="flex flex-col gap-2">
+								<p class="w-fit border border-black bg-raw-blood px-2 py-0.5 font-mono text-[13px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+									{Label.toUpperCase()}
+								</p>
+								<div class="grid grid-cols-2 gap-x-4">
+									{Links.map((Link) => {
+										const Active = IsActive(Astro.url.pathname, Link);
+										return (
+											<a
+												href={Link.Href}
+												aria-current={Active ? "page" : undefined}
+												class={
+													Active
+														? "border-b border-oxblood-dark/50 bg-raw-blood px-2 py-2 font-mono text-base font-bold tracking-widest text-bone-white"
+														: "border-b border-oxblood-dark/50 px-2 py-2 font-mono text-base tracking-widest text-bone-newsprint"
+												}
+											>
+												{Link.Label}
+											</a>
+										);
+									})}
 								</div>
-							))
-						}
+							</div>
+						))}
 					</nav>
 				</div>
 			</div>
@@ -376,9 +385,7 @@ interface Props {
 			<footer class="mt-auto border-t-4 border-blood-crimson">
 				<div class="mx-auto w-full max-w-[1440px] px-5 pb-10 pt-14 sm:px-8 lg:px-14">
 					<!-- 1. STATUS - the facts, as facts -->
-					<div
-						class="flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-oxblood-dark pb-6"
-					>
+					<div class="flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-oxblood-dark pb-6">
 						<span class="flex items-center gap-2">
 							<img
 								class="h-4 w-4"
@@ -390,65 +397,65 @@ interface Props {
 							<ZineKicker Tone="white">APHRODITE CCR CORE</ZineKicker>
 						</span>
 						<span class="font-mono text-base text-zinc-dust">
-							BINARY <span class="font-bold text-stamped-canary">{Stamps.Binary()}</span>
+							BINARY{" "}
+							<span class="font-bold text-stamped-canary">{Stamps.Binary()}</span>
 						</span>
 						<span class="font-mono text-base text-zinc-dust">
-							PLUGIN <span class="font-bold text-stamped-canary">{Stamps.Plugin()}</span>
+							PLUGIN{" "}
+							<span class="font-bold text-stamped-canary">{Stamps.Plugin()}</span>
 						</span>
 						<a
 							class="font-mono text-base text-zinc-dust transition-colors hover:text-bone-white"
 							href="https://spdx.org/licenses/CC0-1.0.html"
-							rel="license">CC0-1.0</a
+							rel="license"
 						>
+							CC0-1.0
+						</a>
 					</div>
 
 					<!-- 2. THE COLUMNS - one landmark per registry group, 1 -> 2 -> 4 -->
 					<div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-						{
-							FooterGroups.map(({ Group, Links }) => (
-								<nav aria-label={`Footer · ${Group}`}>
-									<ZineKicker Tone="dust">{Group.toUpperCase()}</ZineKicker>
-									<ul class="mt-4 flex flex-col gap-2">
-										{Links.map((Link) => {
-											const Active = IsActive(Astro.url.pathname, Link);
-											return (
-												<li>
-													<a
-														class={
-															Active
-																? "font-mono text-base font-bold tracking-widest text-bone-white"
-																: "font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white"
-														}
-														href={Link.Href}
-														aria-current={Active ? "page" : undefined}
-													>
-														{Link.Label}
-													</a>
-												</li>
-											);
-										})}
-									</ul>
-								</nav>
-							))
-						}
+						{FooterGroups.map(({ Group, Links }) => (
+							<nav aria-label={`Footer · ${Group}`}>
+								<ZineKicker Tone="dust">{Group.toUpperCase()}</ZineKicker>
+								<ul class="mt-4 flex flex-col gap-2">
+									{Links.map((Link) => {
+										const Active = IsActive(Astro.url.pathname, Link);
+										return (
+											<li>
+												<a
+													class={
+														Active
+															? "font-mono text-base font-bold tracking-widest text-bone-white"
+															: "font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white"
+													}
+													href={Link.Href}
+													aria-current={Active ? "page" : undefined}
+												>
+													{Link.Label}
+												</a>
+											</li>
+										);
+									})}
+								</ul>
+							</nav>
+						))}
 					</div>
 
 					<!-- 3. THE RECORD - the license, the author, the external canon -->
-					<div
-						class="mt-12 flex flex-col gap-5 border-2 border-black bg-carbon-void p-6 shadow-[4px_4px_0px_#000] sm:flex-row sm:items-end sm:justify-between"
-					>
+					<div class="mt-12 flex flex-col gap-5 border-2 border-black bg-carbon-void p-6 shadow-[4px_4px_0px_#000] sm:flex-row sm:items-end sm:justify-between">
 						<div class="flex flex-col gap-3">
-							<p
-								class="w-fit border border-black bg-raw-blood px-3 py-0.5 font-mono text-[13px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000] sm:-rotate-1"
-							>
+							<p class="w-fit border border-black bg-raw-blood px-3 py-0.5 font-mono text-[13px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000] sm:-rotate-1">
 								COLOPHON
 							</p>
 							<p class="font-mono text-base text-zinc-dust">
 								CC0-1.0 · built in the open by
 								<a
 									class="text-bone-newsprint underline decoration-stamped-canary transition-colors hover:text-bone-white"
-									href={ExternalLinks.PlayForm}>PlayForm</a
+									href={ExternalLinks.PlayForm}
 								>
+									PlayForm
+								</a>
 							</p>
 						</div>
 						<nav
@@ -457,16 +464,22 @@ interface Props {
 						>
 							<a
 								class="tracking-widest transition-colors hover:text-bone-white"
-								href={ExternalLinks.Repository}>REPOSITORY</a
+								href={ExternalLinks.Repository}
 							>
+								REPOSITORY
+							</a>
 							<a
 								class="tracking-widest transition-colors hover:text-bone-white"
-								href={ExternalLinks.Releases}>RELEASES</a
+								href={ExternalLinks.Releases}
 							>
+								RELEASES
+							</a>
 							<a
 								class="tracking-widest transition-colors hover:text-bone-white"
-								href={ExternalLinks.Crates}>CRATES.IO</a
+								href={ExternalLinks.Crates}
 							>
+								CRATES.IO
+							</a>
 						</nav>
 					</div>
 				</div>
@@ -539,7 +552,10 @@ interface Props {
 
 							Toast.classList.remove("hidden");
 							window.clearTimeout(ToastTimer);
-							ToastTimer = window.setTimeout(() => Toast.classList.add("hidden"), 1500);
+							ToastTimer = window.setTimeout(
+								() => Toast.classList.add("hidden"),
+								1500,
+							);
 						},
 						{ signal: Signal },
 					);
@@ -641,8 +657,21 @@ interface Props {
 		     instead of a fourth square border. -->
 		<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
 			<filter id="splat-edge" x="-30%" y="-30%" width="160%" height="160%">
-				<feTurbulence type="fractalNoise" baseFrequency="0.085" numOctaves="2" seed="7" result="noise" />
-				<feDisplacementMap in="SourceGraphic" in2="noise" scale="20" xChannelSelector="R" yChannelSelector="G" result="warped" />
+				<feTurbulence
+					type="fractalNoise"
+					baseFrequency="0.085"
+					numOctaves="2"
+					seed="7"
+					result="noise"
+				/>
+				<feDisplacementMap
+					in="SourceGraphic"
+					in2="noise"
+					scale="20"
+					xChannelSelector="R"
+					yChannelSelector="G"
+					result="warped"
+				/>
 				<!-- Threshold the alpha so the contour BITES instead of undulating:
 				     a smooth warp reads as a misaligned duplicate, a hard step reads
 				     as a broken edge. Two steps is deliberate - more looks like noise. -->

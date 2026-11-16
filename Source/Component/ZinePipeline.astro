@@ -185,271 +185,300 @@ const Exhibit = {
 } as const;
 ---
 
-{
-	Mode === "full" ? (
-		<section
-			data-pipeline="full"
-			class="relative w-full"
-			aria-label="The pipeline, live"
-		>
-			<ZineTape Label="THE PIPELINE // LIVE" Color="raw" Side="left" />
-			<h2 class="zp-title">Four steps, one decision</h2>
+{Mode === "full" ? (
+	<section data-pipeline="full" class="relative w-full" aria-label="The pipeline, live">
+		<ZineTape Label="THE PIPELINE // LIVE" Color="raw" Side="left" />
+		<h2 class="zp-title">Four steps, one decision</h2>
 
-			<!-- THE RAIL: the four steps the page actually runs. -->
-			<ol class="zp-rail" aria-label="The four steps, in order">
-				{Steps.map(({ N, Name, Figure, Tone }) => (
-					<li data-rail-step={Name} class={`zp-step zp-step-${Tone}`}>
-						<span class="zp-step-n">{N}</span>
-						<span class="zp-step-name">{Name}</span>
-						<span class="zp-step-figure">{Figure}</span>
-					</li>
-				))}
-			</ol>
+		<!-- THE RAIL: the four steps the page actually runs. -->
+		<ol class="zp-rail" aria-label="The four steps, in order">
+			{Steps.map(({ N, Name, Figure, Tone }) => (
+				<li data-rail-step={Name} class={`zp-step zp-step-${Tone}`}>
+					<span class="zp-step-n">{N}</span>
+					<span class="zp-step-name">{Name}</span>
+					<span class="zp-step-figure">{Figure}</span>
+				</li>
+			))}
+		</ol>
 
-			<!-- THE SWITCHBOARD: load a sample, or paste your own. -->
-			<div class="zp-switch" aria-label="Sample outputs">
-				<span class="zp-kicker">LOAD SAMPLE:</span>
-				{Samples.map((Sample, Index) => (
-					<button
-						type="button"
-						class="zp-pill"
-						data-sample={Sample.Id}
-						data-active={Index === 0 ? "" : undefined}
-						aria-pressed={Index === 0}
-					>
-						{Sample.Label}
-					</button>
-				))}
-				<button type="button" class="zp-pill zp-exec" data-action="exec" aria-pressed="false">
-					RUN PIPELINE
+		<!-- THE SWITCHBOARD: load a sample, or paste your own. -->
+		<div class="zp-switch" aria-label="Sample outputs">
+			<span class="zp-kicker">LOAD SAMPLE:</span>
+			{Samples.map((Sample, Index) => (
+				<button
+					type="button"
+					class="zp-pill"
+					data-sample={Sample.Id}
+					data-active={Index === 0 ? "" : undefined}
+					aria-pressed={Index === 0}
+				>
+					{Sample.Label}
 				</button>
-			</div>
+			))}
+			<button type="button" class="zp-pill zp-exec" data-action="exec" aria-pressed="false">
+				RUN PIPELINE
+			</button>
+		</div>
 
-			<!-- THE PAIR: two pods. Each pod is a HEADER RIBBON over an inset well
+		<!-- THE PAIR: two pods. Each pod is a HEADER RIBBON over an inset well
 			     - the console grammar - so the pair reads as two instruments on one
 			     bench rather than two boxes that happen to sit together. The ribbon
 			     carries what produced the bytes and how many there are; the well
 			     holds them. -->
-			<div class="grid gap-10 lg:grid-cols-2">
-				<!-- POD ONE: INPUT + CLASSIFIED. The ribbon is the command side of
+		<div class="grid gap-10 lg:grid-cols-2">
+			<!-- POD ONE: INPUT + CLASSIFIED. The ribbon is the command side of
 				     the console: the pod's name on the left, the byte count of what
 				     has arrived on the right. -->
-				<div class="zp-pane">
-					<div class="zp-pane-head">
-						<h3 class="zp-h3">INPUT</h3>
-						<span class="telemetry-tag" data-stat="raw-bytes">0 B</span>
-					</div>
-					<div class="tier-well relative">
-						<label class="sr-only" for="zp-input">Tool output to classify</label>
-						<textarea
-							id="zp-input"
-							data-input
-							spellcheck="false"
-							class="zp-terminal h-72 w-full resize-y bg-transparent p-5 text-bone-newsprint"
-							placeholder="paste any output here - or load a sample"></textarea>
-						<!-- The opacity-fade suppression overlay: the tail of the
+			<div class="zp-pane">
+				<div class="zp-pane-head">
+					<h3 class="zp-h3">INPUT</h3>
+					<span class="telemetry-tag" data-stat="raw-bytes">
+						0 B
+					</span>
+				</div>
+				<div class="tier-well relative">
+					<label class="sr-only" for="zp-input">
+						Tool output to classify
+					</label>
+					<textarea
+						id="zp-input"
+						data-input
+						spellcheck="false"
+						class="zp-terminal h-72 w-full resize-y bg-transparent p-5 text-bone-newsprint"
+						placeholder="paste any output here - or load a sample"
+					></textarea>
+					<!-- The opacity-fade suppression overlay: the tail of the
 						     raw feed dims toward the bottom of the well. -->
-						<div
-							aria-hidden="true"
-							class="pointer-events-none absolute inset-x-0 bottom-0 h-16"
-							style="background: linear-gradient(to bottom, transparent, var(--tier-well));"
-						>
-						</div>
-					</div>
-					<div class="zp-pane-foot">
-						<h3 class="zp-h3">CLASSIFIED</h3>
-						<p class="zp-classified">
-							<span class="zp-type" data-type>not run yet</span>
-							<span class="zp-dot">·</span>
-							<span class="zp-tier" data-tier>×1</span>
-							<span class="zp-dot">·</span>
-							<!-- The effective token limit replaced the nanosecond
+					<div
+						aria-hidden="true"
+						class="pointer-events-none absolute inset-x-0 bottom-0 h-16"
+						style="background: linear-gradient(to bottom, transparent, var(--tier-well));"
+					></div>
+				</div>
+				<div class="zp-pane-foot">
+					<h3 class="zp-h3">CLASSIFIED</h3>
+					<p class="zp-classified">
+						<span class="zp-type" data-type>
+							not run yet
+						</span>
+						<span class="zp-dot">·</span>
+						<span class="zp-tier" data-tier>
+							×1
+						</span>
+						<span class="zp-dot">·</span>
+						<!-- The effective token limit replaced the nanosecond
 							     readout: a threshold is a fact of the run, a
 							     latency here was generated. -->
-							<span class="zp-note" data-stat="threshold">limit -</span>
-						</p>
-					</div>
-				</div>
-
-				<!-- POD TWO: PREVIEW + MARKER + DECISION. The ribbon names the pod and
-				     says what it is: the line the LLM reads. -->
-				<div class="zp-pane">
-					<div class="zp-pane-head">
-						<h3 class="zp-h3 zp-h3-teal">PREVIEW + MARKER</h3>
-						<span class="telemetry-tag telemetry-tag--teal">the line the LLM reads</span>
-					</div>
-					<div class="zp-preview-body">
-						<!-- The preview line, inset bone-white result. -->
-						<div class="zp-result">
-							<p class="zp-kicker zp-kicker-ink">PREVIEW LINE</p>
-							<p class="zp-line mt-4 break-all" data-preview>[press RUN PIPELINE]</p>
-						</div>
-
-						<!-- The store address: an illustrative marker, then the
-						     marker itself. The engine's address is a BLAKE3
-						     digest; this page computes a deterministic stand-in,
-						     so the label says what was actually computed. -->
-						<div>
-							<p class="zp-kicker zp-kicker-teal">ILLUSTRATIVE MARKER // NOT ENGINE-RESOLVABLE</p>
-							<p class="zp-address mt-2" data-address>illustrative marker - · 0 B · not run yet</p>
-							<button
-								type="button"
-								class="zp-chip ccr-marker mt-4 w-full border-2 border-weathered-teal bg-soot-black p-2 text-left"
-								data-copy=""
-								data-marker
-							>
-								&lt;&lt;&lt;CCR:...&gt;&gt;&gt;
-							</button>
-							<p class="zp-note-block mt-4">
-								The engine's address is a BLAKE3 digest of the original bytes. This
-								browser example computes a deterministic stand-in instead, so its marker
-								is illustrative: no engine can resolve it, and nothing here is stored
-								server-side.
-							</p>
-						</div>
-
-						<!-- The decision the agent makes, not the engine. The readout
-						     names a MECHANICAL outcome; whether the preview answers
-						     the agent's question is the agent's judgement, and this
-						     page was never given a task to judge against. -->
-						<div class="zp-decision">
-							<h3 class="zp-h3">DECISION</h3>
-							<p class="zp-note-block mt-4" data-decision>
-								no run yet - a run names the mechanical
-								outcome: pass-through, or preview + marker
-							</p>
-							<p class="zp-note-block mt-4">
-								The agent decides whether to retrieve. The engine has never been given a
-								task, so it cannot know whether a preview answers one: it reports what the
-								pipeline did with the bytes, and the retrieval that would follow belongs to
-								whoever is driving the agent - the engine never retrieves on its own.
-							</p>
-						</div>
-
-						<!-- The per-turn injection assembler (docs/plugin/hooks.md:114-136):
-						     the pre_llm_call order under the 4,000-char budget - NOT an
-						     auto-compaction pass (the engine is opt-in, non-destructive). -->
-						<div class="zp-inject">
-							<p class="zp-kicker zp-kicker-newsprint">INJECTION ASSEMBLER (PRE_LLM_CALL)</p>
-							<p class="zp-note-block mt-4">
-								<span class="text-stamped-canary">[directives:]</span> →
-								<span class="text-stamped-canary">[nudge:]</span> →
-								<span class="text-weathered-teal">[recall]</span>- assembled per turn,
-								under the 4,000-char budget
-							</p>
-						</div>
-					</div>
+						<span class="zp-note" data-stat="threshold">
+							limit -
+						</span>
+					</p>
 				</div>
 			</div>
 
-			<!-- THE READOUT: what THIS ONE RUN did, recomputed from the current
+			<!-- POD TWO: PREVIEW + MARKER + DECISION. The ribbon names the pod and
+				     says what it is: the line the LLM reads. -->
+			<div class="zp-pane">
+				<div class="zp-pane-head">
+					<h3 class="zp-h3 zp-h3-teal">PREVIEW + MARKER</h3>
+					<span class="telemetry-tag telemetry-tag--teal">the line the LLM reads</span>
+				</div>
+				<div class="zp-preview-body">
+					<!-- The preview line, inset bone-white result. -->
+					<div class="zp-result">
+						<p class="zp-kicker zp-kicker-ink">PREVIEW LINE</p>
+						<p class="zp-line mt-4 break-all" data-preview>
+							[press RUN PIPELINE]
+						</p>
+					</div>
+
+					<!-- The store address: an illustrative marker, then the
+						     marker itself. The engine's address is a BLAKE3
+						     digest; this page computes a deterministic stand-in,
+						     so the label says what was actually computed. -->
+					<div>
+						<p class="zp-kicker zp-kicker-teal">
+							ILLUSTRATIVE MARKER // NOT ENGINE-RESOLVABLE
+						</p>
+						<p class="zp-address mt-2" data-address>
+							illustrative marker - · 0 B · not run yet
+						</p>
+						<button
+							type="button"
+							class="zp-chip ccr-marker mt-4 w-full border-2 border-weathered-teal bg-soot-black p-2 text-left"
+							data-copy=""
+							data-marker
+						>
+							&lt;&lt;&lt;CCR:...&gt;&gt;&gt;
+						</button>
+						<p class="zp-note-block mt-4">
+							The engine's address is a BLAKE3 digest of the original bytes. This
+							browser example computes a deterministic stand-in instead, so its marker
+							is illustrative: no engine can resolve it, and nothing here is stored
+							server-side.
+						</p>
+					</div>
+
+					<!-- The decision the agent makes, not the engine. The readout
+						     names a MECHANICAL outcome; whether the preview answers
+						     the agent's question is the agent's judgement, and this
+						     page was never given a task to judge against. -->
+					<div class="zp-decision">
+						<h3 class="zp-h3">DECISION</h3>
+						<p class="zp-note-block mt-4" data-decision>
+							no run yet - a run names the mechanical outcome: pass-through, or
+							preview + marker
+						</p>
+						<p class="zp-note-block mt-4">
+							The agent decides whether to retrieve. The engine has never been given a
+							task, so it cannot know whether a preview answers one: it reports what
+							the pipeline did with the bytes, and the retrieval that would follow
+							belongs to whoever is driving the agent - the engine never retrieves on
+							its own.
+						</p>
+					</div>
+
+					<!-- The per-turn injection assembler (docs/plugin/hooks.md:114-136):
+						     the pre_llm_call order under the 4,000-char budget - NOT an
+						     auto-compaction pass (the engine is opt-in, non-destructive). -->
+					<div class="zp-inject">
+						<p class="zp-kicker zp-kicker-newsprint">
+							INJECTION ASSEMBLER (PRE_LLM_CALL)
+						</p>
+						<p class="zp-note-block mt-4">
+							<span class="text-stamped-canary">[directives:]</span> →
+							<span class="text-stamped-canary">[nudge:]</span> →
+							<span class="text-weathered-teal">[recall]</span>- assembled per turn,
+							under the 4,000-char budget
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- THE READOUT: what THIS ONE RUN did, recomputed from the current
 			     input and the current thresholds. Nothing accumulates - typing a
 			     character, loading a sample and dragging a slider all report the
 			     same single run, so a figure here can always be traced back to
 			     the bytes and the limit printed beside it. A session simulator
 			     (turns, cumulative savings) would be a separate mode with
 			     explicit actions, never a side effect of typing. -->
-			<div class="mt-20" role="group" aria-label="This run, in figures">
-				<p class="zp-kicker">THIS RUN, IN FIGURES</p>
-				<p class="zp-note-block mt-4 max-w-3xl">
-					Every figure is measured from the bytes of the input and the limits in force:
-					input bytes, the type the classifier chose, the token limit that type resolved
-					to, the replacement the agent would receive (preview plus marker), whether a
-					marker was emitted, and the byte reduction those two numbers produce. There is
-					no running total, because a total would count keystrokes rather
-					than the pipeline's work.
-				</p>
-				<div class="mt-8 grid gap-6 md:grid-cols-3">
-					{[
-						{ Key: "type", Label: "DETECTED TYPE" },
-						{ Key: "raw-bytes", Label: "INPUT BYTES" },
-						{ Key: "threshold", Label: "EFFECTIVE THRESHOLD" },
-						{ Key: "replacement", Label: "REPLACEMENT SIZE" },
-						{ Key: "marker", Label: "MARKER" },
-						{ Key: "reduction", Label: "BYTE REDUCTION FOR THIS EXAMPLE" },
-					].map((Stat) => (
-						<div class="shell-card p-6">
-							<p class="telemetry-tag">{Stat.Label}</p>
-							<p class="zp-stat" data-fact={Stat.Key}>
-								not run yet
-							</p>
-							{Stat.Key === "reduction" && (
-								<div class="zp-stat-track mt-6">
-									<div class="zp-stat-fill" data-fact-bar="reduction" style="width:0%" />
-								</div>
-							)}
-						</div>
-					))}
-				</div>
+		<div class="mt-20" role="group" aria-label="This run, in figures">
+			<p class="zp-kicker">THIS RUN, IN FIGURES</p>
+			<p class="zp-note-block mt-4 max-w-3xl">
+				Every figure is measured from the bytes of the input and the limits in force: input
+				bytes, the type the classifier chose, the token limit that type resolved to, the
+				replacement the agent would receive (preview plus marker), whether a marker was
+				emitted, and the byte reduction those two numbers produce. There is no running
+				total, because a total would count keystrokes rather than the pipeline's work.
+			</p>
+			<div class="mt-8 grid gap-6 md:grid-cols-3">
+				{[
+					{ Key: "type", Label: "DETECTED TYPE" },
+					{ Key: "raw-bytes", Label: "INPUT BYTES" },
+					{ Key: "threshold", Label: "EFFECTIVE THRESHOLD" },
+					{ Key: "replacement", Label: "REPLACEMENT SIZE" },
+					{ Key: "marker", Label: "MARKER" },
+					{ Key: "reduction", Label: "BYTE REDUCTION FOR THIS EXAMPLE" },
+				].map((Stat) => (
+					<div class="shell-card p-6">
+						<p class="telemetry-tag">{Stat.Label}</p>
+						<p class="zp-stat" data-fact={Stat.Key}>
+							not run yet
+						</p>
+						{Stat.Key === "reduction" && (
+							<div class="zp-stat-track mt-6">
+								<div
+									class="zp-stat-fill"
+									data-fact-bar="reduction"
+									style="width:0%"
+								/>
+							</div>
+						)}
+					</div>
+				))}
 			</div>
+		</div>
 
-			<!-- The samples as data: frontmatter constants are not in scope inside
+		<!-- The samples as data: frontmatter constants are not in scope inside
 			     an Astro <script> module, so the engine reads this island. It lives
 			     INSIDE the pipeline root - the binding looks it up from there. -->
-			<script type="application/json" data-samples-json set:html={JSON.stringify(Samples)} />
-		</section>
-	) : (
-		<section data-pipeline="decide" class="relative w-full" aria-label="The decide branch">
-			<div class="grid gap-10 lg:grid-cols-2">
-				<!-- What the agent already holds. -->
-				<div class="zp-pane">
-					<div class="zp-pane-head">
-						<h3 class="zp-h3">WHAT THE AGENT HOLDS</h3>
-						<span class="telemetry-tag telemetry-tag--canary">ONE PREVIEW + ONE MARKER</span>
-					</div>
-					<div class="tier-well p-5">
-						<div class="zp-result">
-							<p class="zp-line break-all">{Exhibit.Preview}</p>
-							{/* `.zp-result` is a bone-white plate, and teal on bone-white is
+		<script type="application/json" data-samples-json set:html={JSON.stringify(Samples)} />
+	</section>
+) : (
+	<section data-pipeline="decide" class="relative w-full" aria-label="The decide branch">
+		<div class="grid gap-10 lg:grid-cols-2">
+			<!-- What the agent already holds. -->
+			<div class="zp-pane">
+				<div class="zp-pane-head">
+					<h3 class="zp-h3">WHAT THE AGENT HOLDS</h3>
+					<span class="telemetry-tag telemetry-tag--canary">
+						ONE PREVIEW + ONE MARKER
+					</span>
+				</div>
+				<div class="tier-well p-5">
+					<div class="zp-result">
+						<p class="zp-line break-all">{Exhibit.Preview}</p>
+						{/* `.zp-result` is a bone-white plate, and teal on bone-white is
 							    3.06:1 - the marker was the least readable line on the one
 							    surface that is printed rather than projected. A marker on a
 							    light ground takes the ink of a printed receipt. */}
-							<p class="ccr-marker mt-4 text-soot-black">{Exhibit.Marker}</p>
-						</div>
-						<p class="zp-note-block mt-4">
-							Three fields and a preview line. Retrieval is a choice, not a step.
+						<p class="ccr-marker mt-4 text-soot-black">{Exhibit.Marker}</p>
+					</div>
+					<p class="zp-note-block mt-4">
+						Three fields and a preview line. Retrieval is a choice, not a step.
+					</p>
+				</div>
+			</div>
+
+			<!-- The two branches the choice opens. -->
+			<div class="flex flex-col gap-6">
+				<div class="flex flex-wrap gap-4">
+					<button
+						type="button"
+						class="zp-pill"
+						data-branch="preview-answers"
+						data-active
+						aria-pressed="true"
+					>
+						PREVIEW ANSWERS IT
+					</button>
+					<button
+						type="button"
+						class="zp-pill"
+						data-branch="needs-bytes"
+						aria-pressed="false"
+					>
+						NEEDS THE BYTES
+					</button>
+				</div>
+				<div class="zp-pane" data-branch-panel="preview-answers">
+					<div class="zp-pane-head">
+						<h3 class="zp-h3">NOTHING IS RETRIEVED</h3>
+					</div>
+					<div class="tier-well p-5">
+						<p class="zp-note-block">
+							The marker stayed a receipt. The agent reasoned from the type, the size
+							and the one error the preview carried - and the store was never touched.
 						</p>
 					</div>
 				</div>
-
-				<!-- The two branches the choice opens. -->
-				<div class="flex flex-col gap-6">
-					<div class="flex flex-wrap gap-4">
-						<button type="button" class="zp-pill" data-branch="preview-answers" data-active aria-pressed="true">
-							PREVIEW ANSWERS IT
-						</button>
-						<button type="button" class="zp-pill" data-branch="needs-bytes" aria-pressed="false">
-							NEEDS THE BYTES
-						</button>
+				<div class="zp-pane" data-branch-panel="needs-bytes" hidden>
+					<div class="zp-pane-head">
+						<h3 class="zp-h3 zp-h3-teal">THE MARKER RESOLVES</h3>
 					</div>
-					<div class="zp-pane" data-branch-panel="preview-answers">
-						<div class="zp-pane-head">
-							<h3 class="zp-h3">NOTHING IS RETRIEVED</h3>
-						</div>
-						<div class="tier-well p-5">
-							<p class="zp-note-block">
-								The marker stayed a receipt. The agent reasoned from the type, the size
-								and the one error the preview carried - and the store was never touched.
-							</p>
-						</div>
-					</div>
-					<div class="zp-pane" data-branch-panel="needs-bytes" hidden>
-						<div class="zp-pane-head">
-							<h3 class="zp-h3 zp-h3-teal">THE MARKER RESOLVES</h3>
-						</div>
-						<div class="tier-well p-5">
-							<p class="zp-note-block">{Exhibit.Bytes}</p>
-							<p class="zp-note-block mt-4">
-								Recursive resolution - nested markers are handled, so a retrieved blob
-								that itself carries a marker resolves in the same call.
-							</p>
-						</div>
+					<div class="tier-well p-5">
+						<p class="zp-note-block">{Exhibit.Bytes}</p>
+						<p class="zp-note-block mt-4">
+							Recursive resolution - nested markers are handled, so a retrieved blob
+							that itself carries a marker resolves in the same call.
+						</p>
 					</div>
 				</div>
 			</div>
-		</section>
-	)
-}
+		</div>
+	</section>
+)}
 
 <script>
 	import { BindPipeline } from "@Script/Pipeline";

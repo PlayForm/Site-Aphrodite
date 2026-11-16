@@ -62,8 +62,8 @@ to be a real provider key unless you go on to send a completion request through 
 Once the plugin is registered with a live Hermes session,
 two more paths exist entirely inside the agent, no CLI needed:
 
-| Tool              | What it checks                                                                                                                                                          |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tool              | What it checks                                                                                                                                                           |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `aphrodite_stats` | Proxy health + engine status - see [aphrodite_stats](/docs/tool-relay/tools/#3-aphrodite_stats)                                                                          |
 | `aphrodite_test`  | An in-process compress/retrieve smoke test that doesn't depend on the HTTP proxy being reachable at all - see [aphrodite_test](/docs/tool-relay/tools/#8-aphrodite_test) |
 
@@ -71,10 +71,10 @@ two more paths exist entirely inside the agent, no CLI needed:
 
 Aphrodite touches two config files with no shared keys:
 
-| File             | Read by                              | Example keys                                                                                                                                                            |
-| ---------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| File             | Read by                              | Example keys                                                                                                                                                             |
+| ---------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `aphrodite.toml` | The `aphrodite` proxy binary / dylib | `[[proxies]]`, `[compression]`, `[previews]`, `[prompts]`, `[directives]`, `[templates.*]` - full schema in [aphrodite.toml Configuration](/docs/config/aphrodite-toml/) |
-| `config.yaml`    | Hermes Agent itself                  | `providers.*`, `plugins.enabled`, `context.engine`, `model.*`, and hundreds more unrelated to Aphrodite                                                                 |
+| `config.yaml`    | Hermes Agent itself                  | `providers.*`, `plugins.enabled`, `context.engine`, `model.*`, and hundreds more unrelated to Aphrodite                                                                  |
 
 Conflating the two is an easy mistake: `cache_port`, `token_port`,
 `compression_threshold`, `classifier_poll`, `context_engine`, and `previews` belong

@@ -94,7 +94,7 @@ const Chain = [
 				"Two workspace crates plus the vendored Headroom fork that carries the content transforms.",
 				`It is the reason the fork stays separate: Aphrodite adds the preview pipeline, CCR storage, Hermes integration, and dual-proxy architecture on top of Headroom, instead of rewriting the transforms.`,
 				`The binary links the fork's <code class="font-mono text-base text-weathered-teal">headroom-core</code> library only, published as <code class="font-mono text-base text-weathered-teal">aphrodite-headroom-core v${Versions.Headroom}</code>: upstream's proxy surface does not ship in Aphrodite.`,
-				"Every crate is installable on its own; the table says which one an install actually needs.",
+				"Every crate is installable on its own; which one an install actually needs follows from the dependency chain.",
 			]}
 		/>
 
@@ -106,10 +106,10 @@ const Chain = [
 			</h2>
 			<p class="mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
 				{Crates.length} names leave this workspace, and none of them is typed by hand: the
-				workspace <code class="font-mono text-base text-weathered-teal">Cargo.toml</code> decides
-				which crates exist, and every entry is read from that crate's own manifest - its name, its
-				version, its description. A crate added to the workspace appears in the roster with no
-				edit anywhere, and a crate removed from it leaves the same way.
+				workspace <code class="font-mono text-base text-weathered-teal">Cargo.toml</code>{" "}
+				decides which crates exist, and every entry is read from that crate's own manifest -
+				its name, its version, its description. A crate added to the workspace appears in
+				the roster with no edit anywhere, and a crate removed from it leaves the same way.
 			</p>
 
 			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
@@ -144,29 +144,30 @@ const Chain = [
 							</tr>
 						</thead>
 						<tbody>
-							{
-								Crates.map(({ Name, Role, Ships, Version, Chip }) => (
-									<tr class="border-b border-[color:var(--tier-shell-edge)] align-top last:border-b-0">
-										<th scope="row" class="whitespace-nowrap px-4 py-4 text-left sm:px-5">
-											<a
-												class="font-mono text-code font-bold text-weathered-teal underline decoration-transparent decoration-2 underline-offset-4 transition-colors hover:decoration-stamped-canary"
-												href={`#${Name}`}
-											>
-												{Name}
-											</a>
-										</th>
-										<td class="max-w-[26rem] px-4 py-4 font-body text-body leading-relaxed text-zinc-dust sm:px-5">
-											{Role}
-										</td>
-										<td class="max-w-[20rem] px-4 py-4 font-body text-body leading-relaxed text-bone-newsprint sm:px-5">
-											{Ships}
-										</td>
-										<td class="px-4 py-4 sm:px-5">
-											<span class:list={["telemetry-tag", Chip]}>{Version}</span>
-										</td>
-									</tr>
-								))
-							}
+							{Crates.map(({ Name, Role, Ships, Version, Chip }) => (
+								<tr class="border-b border-[color:var(--tier-shell-edge)] align-top last:border-b-0">
+									<th
+										scope="row"
+										class="whitespace-nowrap px-4 py-4 text-left sm:px-5"
+									>
+										<a
+											class="font-mono text-code font-bold text-weathered-teal underline decoration-transparent decoration-2 underline-offset-4 transition-colors hover:decoration-stamped-canary"
+											href={`#${Name}`}
+										>
+											{Name}
+										</a>
+									</th>
+									<td class="max-w-[26rem] px-4 py-4 font-body text-body leading-relaxed text-zinc-dust sm:px-5">
+										{Role}
+									</td>
+									<td class="max-w-[20rem] px-4 py-4 font-body text-body leading-relaxed text-bone-newsprint sm:px-5">
+										{Ships}
+									</td>
+									<td class="px-4 py-4 sm:px-5">
+										<span class:list={["telemetry-tag", Chip]}>{Version}</span>
+									</td>
+								</tr>
+							))}
 						</tbody>
 					</table>
 				</div>
@@ -187,90 +188,95 @@ const Chain = [
 				Each crate, one card
 			</h2>
 			<p class="mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
-				Each name declares itself once, in its own manifest: the version is that file's version and
-				the role is that file's description, so the roster cannot drift from the crates it
-				describes. What each one puts on disk is the difference that matters before an install - a
-				<code class="font-mono text-base text-weathered-teal">cargo install</code> for the two
-				workspace crates, and for the vendored fork the dependency line that pulls it in, because a
-				library has no binary to place. Colour is the crate's kind and not its rank: canary is a
-				workspace crate a reader installs, teal is the vendored fork that arrives as a dependency.
+				Each name declares itself once, in its own manifest: the version is that file's
+				version and the role is that file's description, so the roster cannot drift from the
+				crates it describes. What each one puts on disk is the difference that matters
+				before an install - a
+				<code class="font-mono text-base text-weathered-teal">cargo install</code> for the
+				two workspace crates, and for the vendored fork the dependency line that pulls it
+				in, because a library has no binary to place. Colour is the crate's kind and not its
+				rank: canary is a workspace crate a reader installs, teal is the vendored fork that
+				arrives as a dependency.
 			</p>
 
 			<div class="mt-10 grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
-				{
-					Crates.map((Crate) => (
-						<article
-							id={Crate.Name}
-							class="grunge shell-card flex scroll-mt-24 flex-col"
-							data-grunge
-							data-grunge-mode="edge"
-						>
-							<header class="border-b border-[color:var(--tier-shell-edge)] px-5 py-4">
-								<div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-									<span class="type-meta uppercase text-zinc-dust">{`CASE #${Crate.N}`}</span>
-									<h3 class="font-mono text-code font-bold text-bone-white">{Crate.Name}</h3>
-									<span class:list={["telemetry-tag ml-auto", Crate.Chip]}>
-										{Crate.Version}
-									</span>
-								</div>
-								<p class="mt-3 font-body text-body leading-relaxed text-bone-newsprint">
-									{Sentence(Crate.Role)}.
-								</p>
-								<p class="type-meta mt-2 uppercase text-zinc-dust">{Crate.Kind}</p>
-							</header>
-
-							<div class="prose-flow flex-1 px-5 py-5">
-								<p>
-									<span class="type-meta block uppercase text-zinc-dust">SHIPS</span>
-									<span class="mt-1 block font-body text-body leading-relaxed text-bone-newsprint">
-										{Crate.Ships}
-									</span>
-								</p>
-								{Crate.Body.map((Line) => (
-									<p class="font-body text-body leading-relaxed text-bone-newsprint">
-										{Line}
-									</p>
-								))}
-
-								{Crate.Installs ? (
-									<div>
-										<p class="type-meta uppercase text-stamped-canary">INSTALL // CARGO:</p>
-										<CodeFence
-											Class="mt-2"
-											Code={`$ cargo install ${Crate.Name}`}
-											CopyPayload={`cargo install ${Crate.Name}`}
-										/>
-										{Crate.Marker ? (
-											<div class="ccr-marker mt-3 font-mono text-code font-bold text-weathered-teal">
-												{`<<<CCR:${Crate.Marker}|${Crate.Version.replace(/^v/, "")}|axum-0.8.9+tokio-1.53.1>>>`}
-											</div>
-										) : null}
-									</div>
-								) : (
-									<div>
-										<p class="type-meta uppercase text-zinc-dust">
-											ARRIVES AS // A DEPENDENCY, NOT A COMMAND:
-										</p>
-										<div class="well mt-2 px-4 py-3 font-mono text-code leading-relaxed">
-											<span class="text-weathered-teal">aphrodite</span>
-											<span class="text-zinc-dust"> → </span>
-											<span class="text-stamped-canary">{Crate.Name}</span>
-										</div>
-										<p class="mt-2 font-body text-body leading-relaxed text-zinc-dust">
-											A library only, so <code class="font-mono text-base">cargo install</code>
-											has no binary to place on disk: the proxy crate declares it, and the
-											transforms compile into the binary.
-										</p>
-									</div>
-								)}
+				{Crates.map((Crate) => (
+					<article
+						id={Crate.Name}
+						class="grunge shell-card flex scroll-mt-24 flex-col"
+						data-grunge
+						data-grunge-mode="edge"
+					>
+						<header class="border-b border-[color:var(--tier-shell-edge)] px-5 py-4">
+							<div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+								<span class="type-meta uppercase text-zinc-dust">{`CASE #${Crate.N}`}</span>
+								<h3 class="font-mono text-code font-bold text-bone-white">
+									{Crate.Name}
+								</h3>
+								<span class:list={["telemetry-tag ml-auto", Crate.Chip]}>
+									{Crate.Version}
+								</span>
 							</div>
-
-							<p class="border-t border-[color:var(--tier-shell-edge)] px-5 py-3 font-mono text-meta text-zinc-dust">
-								SRC: {Crate.Path}
+							<p class="mt-3 font-body text-body leading-relaxed text-bone-newsprint">
+								{Sentence(Crate.Role)}.
 							</p>
-						</article>
-					))
-				}
+							<p class="type-meta mt-2 uppercase text-zinc-dust">{Crate.Kind}</p>
+						</header>
+
+						<div class="prose-flow flex-1 px-5 py-5">
+							<p>
+								<span class="type-meta block uppercase text-zinc-dust">SHIPS</span>
+								<span class="mt-1 block font-body text-body leading-relaxed text-bone-newsprint">
+									{Crate.Ships}
+								</span>
+							</p>
+							{Crate.Body.map((Line) => (
+								<p class="font-body text-body leading-relaxed text-bone-newsprint">
+									{Line}
+								</p>
+							))}
+
+							{Crate.Installs ? (
+								<div>
+									<p class="type-meta uppercase text-stamped-canary">
+										INSTALL // CARGO:
+									</p>
+									<CodeFence
+										Class="mt-2"
+										Code={`$ cargo install ${Crate.Name}`}
+										CopyPayload={`cargo install ${Crate.Name}`}
+									/>
+									{Crate.Marker ? (
+										<div class="ccr-marker mt-3 font-mono text-code font-bold text-weathered-teal">
+											{`<<<CCR:${Crate.Marker}|${Crate.Version.replace(/^v/, "")}|axum-0.8.9+tokio-1.53.1>>>`}
+										</div>
+									) : null}
+								</div>
+							) : (
+								<div>
+									<p class="type-meta uppercase text-zinc-dust">
+										ARRIVES AS // A DEPENDENCY, NOT A COMMAND:
+									</p>
+									<div class="well mt-2 px-4 py-3 font-mono text-code leading-relaxed">
+										<span class="text-weathered-teal">aphrodite</span>
+										<span class="text-zinc-dust"> → </span>
+										<span class="text-stamped-canary">{Crate.Name}</span>
+									</div>
+									<p class="mt-2 font-body text-body leading-relaxed text-zinc-dust">
+										A library only, so{" "}
+										<code class="font-mono text-base">cargo install</code>
+										has no binary to place on disk: the proxy crate declares it,
+										and the transforms compile into the binary.
+									</p>
+								</div>
+							)}
+						</div>
+
+						<p class="border-t border-[color:var(--tier-shell-edge)] px-5 py-3 font-mono text-meta text-zinc-dust">
+							SRC: {Crate.Path}
+						</p>
+					</article>
+				))}
 			</div>
 		</section>
 
@@ -281,10 +287,11 @@ const Chain = [
 				Who pulls whom
 			</h2>
 			<p class="mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
-				The three names are one chain and not three islands. Each link is a path dependency in the
-				manifest one step up, so the direction never reverses: the vendored core knows nothing about
-				the proxy, the proxy knows nothing about Hermes, and Hermes is the only crate that speaks to
-				the agent. That is why an install names two crates and receives three.
+				The three names are one chain and not three islands. Each link is a path dependency
+				in the manifest one step up, so the direction never reverses: the vendored core
+				knows nothing about the proxy, the proxy knows nothing about Hermes, and Hermes is
+				the only crate that speaks to the agent. That is why an install names two crates and
+				receives three.
 			</p>
 
 			<ZineBox
@@ -299,40 +306,41 @@ const Chain = [
 					WHAT A CARGO INSTALL PULLS // DECLARED IN EACH MANIFEST
 				</p>
 
-				<dl
-					class="well mt-6 grid grid-cols-1 gap-x-6 gap-y-5 p-4 font-body sm:p-5 lg:grid-cols-[minmax(0,19rem)_1fr]"
-				>
-					{
-						Chain.map((Link) => (
-							<>
-								<dt class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-									<span class="font-mono text-code font-bold text-bone-white">{Link.Name}</span>
-									<span class="telemetry-tag">{Link.Version}</span>
-								</dt>
-								<dd class="text-body leading-relaxed text-bone-newsprint">
-									{Link.Pull.split("`").map((Part, At) =>
-										At % 2 === 1 ? (
-											<code class="font-mono text-base text-weathered-teal">{Part}</code>
-										) : (
-											Part
-										),
-									)}
-								</dd>
-							</>
-						))
-					}
+				<dl class="well mt-6 grid grid-cols-1 gap-x-6 gap-y-5 p-4 font-body sm:p-5 lg:grid-cols-[minmax(0,19rem)_1fr]">
+					{Chain.map((Link) => (
+						<>
+							<dt class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+								<span class="font-mono text-code font-bold text-bone-white">
+									{Link.Name}
+								</span>
+								<span class="telemetry-tag">{Link.Version}</span>
+							</dt>
+							<dd class="text-body leading-relaxed text-bone-newsprint">
+								{Link.Pull.split("`").map((Part, At) =>
+									At % 2 === 1 ? (
+										<code class="font-mono text-base text-weathered-teal">
+											{Part}
+										</code>
+									) : (
+										Part
+									),
+								)}
+							</dd>
+						</>
+					))}
 				</dl>
 
 				<p class="mt-8 border-t border-[color:var(--tier-shell-edge)] pt-6 font-body text-body leading-relaxed text-bone-newsprint">
-					The first two are the ones a user installs; the third arrives as their dependency.
+					The first two are the ones a user installs; the third arrives as their
+					dependency.
 				</p>
 				<p class="mt-3 font-body text-body leading-relaxed text-zinc-dust">
-					The chain is also why the fork stays separate rather than being absorbed: the vendored
-					core carries the content transforms and nothing else, the proxy adds the preview pipeline,
-					the CCR store, the tool relay and the dual-proxy architecture around it, and Hermes adds
-					the tool schemas, the hook dispatch and the skill registration on top of the proxy. Each
-					layer is installable on its own, and the boundary between them is a manifest line rather
-					than a convention.
+					The chain is also why the fork stays separate rather than being absorbed: the
+					vendored core carries the content transforms and nothing else, the proxy adds
+					the preview pipeline, the CCR store, the tool relay and the dual-proxy
+					architecture around it, and Hermes adds the tool schemas, the hook dispatch and
+					the skill registration on top of the proxy. Each layer is installable on its
+					own, and the boundary between them is a manifest line rather than a convention.
 				</p>
 			</ZineBox>
 		</section>
@@ -344,15 +352,17 @@ const Chain = [
 				What the crates read at runtime
 			</h2>
 			<p class="mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
-				One TOML file is read by both halves of the pair: the proxy takes its listeners and its flow
-				budget from it, the dylib takes the compression thresholds and the previews. These are the
-				keys the shipped example carries, grouped the way the file groups them, and every value below
-				is the example's own default rather than a recommendation.
+				One TOML file is read by both halves of the pair: the proxy takes its listeners and
+				its flow budget from it, the dylib takes the compression thresholds and the
+				previews. These are the keys the shipped example carries, grouped the way the file
+				groups them, and the values are the example's own.
 			</p>
 
 			<div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
 				<div class="well p-4 sm:p-5">
-					<p class="type-meta mb-4 uppercase text-zinc-dust">PROXY // PROXIES, DEFAULTS, FLOW</p>
+					<p class="type-meta mb-4 uppercase text-zinc-dust">
+						PROXY // PROXIES, DEFAULTS, FLOW
+					</p>
 					<div class="font-mono text-code leading-relaxed text-bone-newsprint">
 						<div class="text-weathered-teal">[[proxies]]</div>
 						<div>
@@ -371,7 +381,8 @@ const Chain = [
 						</div>
 						<div class="pt-3 text-weathered-teal">[defaults]</div>
 						<div>
-							api_url = <span class="text-stamped-canary">"https://api.openai.com"</span>
+							api_url ={" "}
+							<span class="text-stamped-canary">"https://api.openai.com"</span>
 						</div>
 						<div>
 							ccr_ttl_seconds = <span class="text-stamped-canary">3600</span>
@@ -384,7 +395,9 @@ const Chain = [
 				</div>
 
 				<div class="well p-4 sm:p-5">
-					<p class="type-meta mb-4 uppercase text-zinc-dust">ENGINE // COMPRESSION, PREVIEWS</p>
+					<p class="type-meta mb-4 uppercase text-zinc-dust">
+						ENGINE // COMPRESSION, PREVIEWS
+					</p>
 					<div class="font-mono text-code leading-relaxed text-bone-newsprint">
 						<div class="text-weathered-teal">[compression]</div>
 						<div>
@@ -417,13 +430,12 @@ const Chain = [
 				</div>
 			</div>
 
-			<p
-				class="mt-8 max-w-[46rem] border-t border-oxblood-dark pt-6 font-body text-body leading-relaxed text-zinc-dust"
-			>
-				Keys without a live consumer are annotated DOCUMENTED BUT UNWIRED in the example; the
-				<code class="font-mono text-base">[templates.*]</code> section is live configuration - preview
-				families, the marker block, prompt templates and the reverse key map render from these format
-				strings (hardcoded builders apply when a block is absent).
+			<p class="mt-8 max-w-[46rem] border-t border-oxblood-dark pt-6 font-body text-body leading-relaxed text-zinc-dust">
+				Keys without a live consumer are annotated DOCUMENTED BUT UNWIRED in the example;
+				the
+				<code class="font-mono text-base">[templates.*]</code> section is live configuration
+				- preview families, the marker block, prompt templates and the reverse key map
+				render from these format strings (hardcoded builders apply when a block is absent).
 			</p>
 			<p class="mt-3 max-w-[46rem] font-body text-body leading-relaxed text-zinc-dust">
 				Marker grammar:

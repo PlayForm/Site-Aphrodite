@@ -479,17 +479,10 @@ const Decision = [
 			     The card's 24-unit drop to the wordmark was the ceremonial stack
 			     this beat was paying for: the product's own name now follows its
 			     mark at reading distance. -->
-			<div
-				class="group relative mb-10 -rotate-[2.5deg] cursor-pointer transition-transform duration-300 hover:rotate-0"
-			>
-				<div
-					class="pointer-events-none absolute -inset-2 translate-x-3 translate-y-3 border border-black bg-oxblood-dark opacity-80"
-				>
-				</div>
+			<div class="group relative mb-10 -rotate-[2.5deg] cursor-pointer transition-transform duration-300 hover:rotate-0">
+				<div class="pointer-events-none absolute -inset-2 translate-x-3 translate-y-3 border border-black bg-oxblood-dark opacity-80"></div>
 				<div class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-5 sm:p-7">
-					<div
-						class="tape-strip absolute -top-3.5 left-1/2 -translate-x-1/2 -rotate-1 border-b border-t border-bone-newsprint/30 px-6 py-1 text-[13px] font-black uppercase tracking-widest text-bone-newsprint"
-					>
+					<div class="tape-strip absolute -top-3.5 left-1/2 -translate-x-1/2 -rotate-1 border-b border-t border-bone-newsprint/30 px-6 py-1 text-[13px] font-black uppercase tracking-widest text-bone-newsprint">
 						// REPRO_PROOF #001
 					</div>
 					<img
@@ -499,9 +492,7 @@ const Decision = [
 						width="160"
 						height="160"
 					/>
-					<div
-						class="absolute -bottom-3.5 -right-3 border border-black bg-raw-blood px-2.5 py-0.5 text-base font-black tracking-widest text-bone-white shadow"
-					>
+					<div class="absolute -bottom-3.5 -right-3 border border-black bg-raw-blood px-2.5 py-0.5 text-base font-black tracking-widest text-bone-white shadow">
 						CCR CORE // STENCIL
 					</div>
 				</div>
@@ -531,9 +522,7 @@ const Decision = [
 				     against the overflow-x-hidden body; 17.5vw keeps the full
 				     name inside the viewport until the fixed scale resumes
 				     above ~412px. -->
-				<h1
-					class="select-none font-headline text-[min(72px,17.5vw)] font-black uppercase leading-[0.85] tracking-tighter text-bone-white sm:text-[108px] lg:text-[144px]"
-				>
+				<h1 class="select-none font-headline text-[min(72px,17.5vw)] font-black uppercase leading-[0.85] tracking-tighter text-bone-white sm:text-[108px] lg:text-[144px]">
 					Aphrodite
 				</h1>
 			</div>
@@ -542,9 +531,7 @@ const Decision = [
 			     sentence - and its teal made the hero carry two accents against
 			     the card's crimson. As a line of type under the wordmark it still
 			     states the product, and the hero speaks one colour. -->
-			<p
-				class="mb-8 mt-14 text-center font-mono text-base font-black uppercase tracking-widest text-bone-newsprint"
-			>
+			<p class="mb-8 mt-14 text-center font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
 				CONTEXT MANAGEMENT FOR TOOL-USING AI AGENTS
 			</p>
 			<!-- THE LEAD: one sentence states the product, and the two actions are
@@ -557,9 +544,9 @@ const Decision = [
 			<p class="type-body max-w-[40rem] text-bone-newsprint">
 				A tool call's output becomes part of the model's context, and a release build adds
 				thousands of lines the model reads - and pays for - before it can answer. Aphrodite
-				intercepts that result: logs, diffs, files,
-				searches, JSON, and browser snapshots arrive as compact previews the agent can act on,
-				with the original always one retrieval away.
+				intercepts that result: logs, diffs, files, searches, JSON, and browser snapshots
+				arrive as compact previews the agent can act on, with the original always one
+				retrieval away.
 			</p>
 			<div class="mt-8 flex flex-wrap items-center justify-center gap-4">
 				<ZineButton Label="Install for Hermes" Href="/setup/" />
@@ -615,8 +602,8 @@ const Decision = [
 			     the two panes are, so a reader who scrolled straight to the image
 			     knows what they are looking at without opening anything. -->
 			<p class="figure-caption mt-6">
-				The flood arrives one line at a time; the line the agent would have
-				read instead is recomputed as each line lands.
+				The flood arrives one line at a time; the line the agent would have read instead is
+				recomputed as each line lands.
 			</p>
 			<div class="mt-10 max-w-[62ch]">
 				<ZineFold Tag="METHOD" Label="How the demonstration works" Body={MethodFold} />
@@ -644,21 +631,20 @@ const Decision = [
 		     heading, the rule and the chip - and only those; the figure and
 		     the description stay bone so the reading text never competes. -->
 		<section class="band relative w-full" data-reveal>
-			<p class="section-kicker !mb-4">03 / MECHANISM &middot; PIPELINE // 4-STAGE ABSORPTION</p>
+			<p class="section-index">03 // MECHANISM // PIPELINE // 4-STAGE ABSORPTION</p>
 			<h2 class="type-section mb-4 text-bone-white">How it works</h2>
 			<p class="type-sub mb-6 text-bone-newsprint">Four steps, one decision</p>
 			<div class="prose-flow max-w-[62ch]">
 				<p class="type-body text-bone-newsprint">
-					A tool result is appended to the model's context the moment the tool returns, so a
-					build log the agent never needed is read in full, and paid for in full.
-					Aphrodite intercepts that output before it reaches the LLM and replaces it with a compact,
-					structured preview - because the agent's reasoning budget is the context budget,
-					and raw noise spends both.
+					A tool result is appended to the model's context the moment the tool returns, so
+					a build log the agent never needed is read in full, and paid for in full.
+					Aphrodite intercepts that output before it reaches the LLM and replaces it with
+					a compact, structured preview - because the agent's reasoning budget is the
+					context budget, and raw noise spends both.
 				</p>
 				<p class="type-body text-bone-newsprint">
-					What happens between the tool printing and the model reading is four steps, run in
-					the same order every time, and only one of them
-					costs anything measurable.
+					What happens between the tool printing and the model reading is four steps, run
+					in the same order every time, and only one of them costs anything measurable.
 				</p>
 				<p class="type-body text-bone-newsprint">
 					The first two are the engine's: name the content, then render the one line that
@@ -667,12 +653,12 @@ const Decision = [
 					the budget the other three just saved.
 				</p>
 				<p class="type-body text-bone-newsprint">
-					The agent sees {Narrative.PreviewTokens} of metadata instead of hundreds - and retrieves the full content
-					only when it actually needs it.
+					The agent sees {Narrative.PreviewTokens} of metadata instead of hundreds - and
+					retrieves the full content only when it actually needs it.
 				</p>
 				<p class="type-body text-bone-newsprint">
-					It is the reason tool-heavy agents keep working: the context window stops paying for noise
-					before the reasoning starts.
+					It is the reason tool-heavy agents keep working: the context window stops paying
+					for noise before the reasoning starts.
 				</p>
 			</div>
 			<div class="mt-10 max-w-[62ch]">
@@ -694,7 +680,10 @@ const Decision = [
 			     plate adds ~10px per side, and `main > section` clips that overflow,
 			     so a full-bleed plate would have its corners and its shadow plane
 			     shaved off. -->
-			<div class="grunge grunge--bone emphasis-quiet mx-3 mt-12 p-5 sm:mx-4 sm:p-8 lg:p-10" data-grunge>
+			<div
+				class="grunge grunge--bone emphasis-quiet mx-3 mt-12 p-5 sm:mx-4 sm:p-8 lg:p-10"
+				data-grunge
+			>
 				<div
 					class="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-[1.45fr_1fr_1fr_1.45fr]"
 					data-enter="180"
@@ -706,11 +695,11 @@ const Decision = [
 							<h3 class="type-meta font-bold stage-ink">01 // CLASSIFY</h3>
 							<span class="type-meta stage-ink">STAGE // A</span>
 						</div>
-						<div class="mt-4 mb-4 font-headline text-sub font-black tracking-tight text-bone-white">
-							40 - 123 ns
-						</div>
+						<div class="metric mt-4 mb-4">40 - 123 ns</div>
 						<div class="stage-rule mt-auto border-t pt-3">
-							<p class="type-body text-bone-newsprint">Type-aware classifier names the content.</p>
+							<p class="type-body text-bone-newsprint">
+								Type-aware classifier names the content.
+							</p>
 							<p class="type-meta mt-2 stage-ink">SIMD BYTE</p>
 						</div>
 					</div>
@@ -718,12 +707,18 @@ const Decision = [
 					     acts on. -->
 					<div class="emphasis-quiet stage-card stage-card--b flex flex-col p-5">
 						<div class="flex flex-col gap-1">
-							<h3 class="type-meta font-bold stage-ink">02 // ENRICH &amp; PREVIEW</h3>
+							<h3 class="type-meta font-bold stage-ink">
+								02 // ENRICH &amp; PREVIEW
+							</h3>
 							<span class="type-meta stage-ink">STAGE // B</span>
 						</div>
-						<div class="mt-4 mb-4 font-headline text-sub font-black tracking-tight text-bone-white">~1 ms</div>
+						<div class="mt-4 mb-4 font-headline text-sub font-black tracking-tight text-bone-white">
+							~1 ms
+						</div>
 						<div class="stage-rule mt-auto border-t pt-3">
-							<p class="type-body text-bone-newsprint">Enriched, type-aware preview rendering.</p>
+							<p class="type-body text-bone-newsprint">
+								Enriched, type-aware preview rendering.
+							</p>
 							<p class="type-meta mt-2 stage-ink">TYPE-AWARE</p>
 						</div>
 					</div>
@@ -734,7 +729,9 @@ const Decision = [
 							<h3 class="type-meta font-bold stage-ink">03 // BLAKE3 STORE</h3>
 							<span class="type-meta stage-ink">STAGE // C</span>
 						</div>
-						<div class="mt-4 mb-4 font-headline text-sub font-black tracking-tight text-bone-white">SQLite</div>
+						<div class="mt-4 mb-4 font-headline text-sub font-black tracking-tight text-bone-white">
+							SQLite
+						</div>
 						<div class="stage-rule mt-auto border-t pt-3">
 							<p class="type-body ccr-marker text-bone-newsprint">
 								CCR marker: &lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;
@@ -751,10 +748,14 @@ const Decision = [
 							<span class="type-meta stage-ink">STAGE // D</span>
 						</div>
 						<div class="mt-4 mb-4 font-mono text-sub font-bold tracking-tight text-bone-white">
-							aphrodite_<wbr />retrieve
+							aphrodite_
+							<wbr />
+							retrieve
 						</div>
 						<div class="stage-rule mt-auto border-t pt-3">
-							<p class="type-body text-bone-newsprint">Full content only when needed.</p>
+							<p class="type-body text-bone-newsprint">
+								Full content only when needed.
+							</p>
 							<p class="type-meta mt-2 stage-ink">ON DEMAND</p>
 						</div>
 					</div>
@@ -789,11 +790,11 @@ const Decision = [
 			<p class="section-kicker !mb-4 !text-oxblood-dark">
 				04 / EVIDENCE &middot; {Study.Sessions} SESSIONS
 			</p>
-			<h2 class="type-section mb-8 text-soot-black">One result, and the four figures beside it</h2>
+			<h2 class="type-section mb-8 text-soot-black">
+				One result, and the four figures beside it
+			</h2>
 			<div class="flex flex-col gap-4 border-y-2 border-soot-black py-8 lg:flex-row lg:items-end lg:gap-12">
-				<div
-					class="font-headline text-[clamp(3.5rem,11vw,8rem)] font-black leading-[0.85] tracking-tighter text-raw-blood"
-				>
+				<div class="font-headline text-[clamp(3.5rem,11vw,8rem)] font-black leading-[0.85] tracking-tighter text-raw-blood">
 					{Study.SavedPct}
 				</div>
 				<div class="max-w-xl">
@@ -801,13 +802,14 @@ const Decision = [
 						CONTEXT TOKENS DEFLECTED
 					</p>
 					<p class="type-body mt-2 text-soot-black">
-						Measured over {Study.Sessions} real Hermes sessions: {Study.SavedPct} of all context tokens
-						deflected, a median session saved ratio of {Study.MedianRatio}, and ~{Study.AvgPerCall} tokens
-						saved per API call. {Study.SessionsSaved} of the {Study.Sessions} sessions saved tokens.
+						Measured over {Study.Sessions} real Hermes sessions: {Study.SavedPct} of all
+						context tokens deflected, a median session saved ratio of{" "}
+						{Study.MedianRatio}, and ~{Study.AvgPerCall} tokens saved per API call.{" "}
+						{Study.SessionsSaved} of the {Study.Sessions} sessions saved tokens.
 					</p>
 					<p class="type-body mt-3 text-oxblood-dark">
-						The sensitivity band is {Study.Band}: the estimate depends on the chars-per-token ratio,
-						which the study puts at {Study.CharsPerTok}.
+						The sensitivity band is {Study.Band}: the estimate depends on the
+						chars-per-token ratio, which the study puts at {Study.CharsPerTok}.
 					</p>
 				</div>
 			</div>
@@ -815,9 +817,10 @@ const Decision = [
 				THE OTHER FOUR MEASUREMENTS
 			</p>
 			<p class="type-body mt-2 max-w-[62ch] text-soot-black">
-				Each of these is a different measurement in a different domain, and the qualifier under
-				each one is part of the number. The ceiling is not the average, the average is not the
-				latency, and the saved total is the session study rather than any single run.
+				Each of these is a different measurement in a different domain, and the qualifier
+				under each one is part of the number. The ceiling is not the average, the average is
+				not the latency, and the saved total is the session study rather than any single
+				run.
 			</p>
 			<!-- BENTO, ONE DOMINANT + THREE SUPPORTING: the ceiling is the page's
 			     headline figure, so it takes 1.5fr of a weighted track set while
@@ -848,29 +851,29 @@ const Decision = [
 				data-enter="260"
 			>
 				<div class="flex flex-col items-center gap-2">
-					<span
-						class="border-4 border-black bg-raw-blood px-6 py-3 font-mono text-lg font-black uppercase tracking-widest text-bone-white"
-					>
-						<span data-count={Benchmark.Ceiling.replace("×", "")}>{Benchmark.Ceiling.replace("×", "")}</span>&times; COMPRESSION
+					<span class="border-4 border-black bg-raw-blood px-6 py-3 font-mono text-lg font-black uppercase tracking-widest text-bone-white">
+						<span data-count={Benchmark.Ceiling.replace("×", "")}>
+							{Benchmark.Ceiling.replace("×", "")}
+						</span>
+						&times; COMPRESSION
 					</span>
 					<span class="max-w-[18rem] text-pretty text-base leading-relaxed text-oxblood-dark">
 						Best case, on large low-entropy prose.
 					</span>
 				</div>
 				<div class="flex flex-col items-center gap-2">
-					<span
-						class="border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-weathered-teal"
-					>
-						<span data-count={Benchmark.Overall.replace("×", "")}>{Benchmark.Overall.replace("×", "")}</span>&times; OVERALL
+					<span class="border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
+						<span data-count={Benchmark.Overall.replace("×", "")}>
+							{Benchmark.Overall.replace("×", "")}
+						</span>
+						&times; OVERALL
 					</span>
 					<span class="max-w-[15rem] text-pretty text-base leading-relaxed text-oxblood-dark">
 						The whole standard corpus: {Benchmark.CorpusIn} to {Benchmark.CorpusOut}.
 					</span>
 				</div>
 				<div class="flex flex-col items-center gap-2">
-					<span
-						class="border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white"
-					>
+					<span class="border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white">
 						{Benchmark.LatencyHeadline.toUpperCase().replace(" ", "")} E2E OVERHEAD
 					</span>
 					<span class="max-w-[15rem] text-pretty text-base leading-relaxed text-oxblood-dark">
@@ -878,13 +881,15 @@ const Decision = [
 					</span>
 				</div>
 				<div class="flex flex-col items-center gap-2">
-					<span
-						class="border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-soot-black"
-					>
-						<span data-count={Study.SavedMillions.replace("M+", "")}>{Study.SavedMillions.replace("M+", "")}</span>M+ TOKENS SAVED
+					<span class="border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-soot-black">
+						<span data-count={Study.SavedMillions.replace("M+", "")}>
+							{Study.SavedMillions.replace("M+", "")}
+						</span>
+						M+ TOKENS SAVED
 					</span>
 					<span class="max-w-[15rem] text-pretty text-base leading-relaxed text-oxblood-dark">
-						{Study.Sessions} real sessions, {Study.ApiCalls} API calls, {Study.Measured}.
+						{Study.Sessions} real sessions, {Study.ApiCalls} API calls, {Study.Measured}
+						.
 					</span>
 				</div>
 			</div>
@@ -909,9 +914,9 @@ const Decision = [
 			<h2 class="type-section mb-6 text-bone-white">Two ways to run it</h2>
 			<div class="prose-flow max-w-[62ch]">
 				<p class="type-body text-bone-newsprint">
-					Both lanes run the same engine over the same CCR store. One is a native plugin inside
-					Hermes, where the interception lives inside the turn; the other is a listener on a port,
-					where it can only see traffic that arrives over HTTP.
+					Both lanes run the same engine over the same CCR store. One is a native plugin
+					inside Hermes, where the interception lives inside the turn; the other is a
+					listener on a port, where it can only see traffic that arrives over HTTP.
 				</p>
 			</div>
 			<div class="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
@@ -922,22 +927,29 @@ const Decision = [
 					<h3 class="type-sub mt-3 text-bone-white">Hermes plugin</h3>
 					<div class="prose-flow mt-4 mb-6">
 						<p class="type-body text-bone-newsprint">
-							Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a
-							client at. It is the reason the interception lives inside the turn: tool output never
-							hits a wire, so only hook-level registration can catch it before it becomes message
-							history - six hooks, thirteen tools, and an optional context engine, every call
-							forwarded into the Rust dylib.
+							Aphrodite connects to Hermes Agent as a native plugin, not as a proxy
+							you point a client at. It is the reason the interception lives inside
+							the turn: tool output never hits a wire, so only hook-level registration
+							can catch it before it becomes message history - six hooks, thirteen
+							tools, and an optional context engine, every call forwarded into the
+							Rust dylib.
 						</p>
 						<p class="type-body text-bone-newsprint">
-							The trade-off is stated plainly: the hooks are Hermes' contract - no other client can
-							register them, so this lane works with Hermes only.
+							The trade-off is stated plainly: the hooks are Hermes' contract - no
+							other client can register them, so this lane works with Hermes only.
 						</p>
 					</div>
 					<div class="mt-auto flex flex-wrap gap-x-6 gap-y-2 border-t border-oxblood-dark pt-4">
-						<a class="type-code font-bold text-stamped-canary hover:underline" href={Routes.Hermes}>
+						<a
+							class="type-code font-bold text-stamped-canary hover:underline"
+							href={Routes.Hermes}
+						>
 							THE INTEGRATION &rarr;
 						</a>
-						<a class="type-code font-bold text-stamped-canary hover:underline" href={Routes.Plugin}>
+						<a
+							class="type-code font-bold text-stamped-canary hover:underline"
+							href={Routes.Plugin}
+						>
 							THE PLUGIN &rarr;
 						</a>
 					</div>
@@ -949,24 +961,30 @@ const Decision = [
 					<h3 class="type-sub mt-3 text-bone-white">Standalone proxy</h3>
 					<div class="prose-flow mt-4 mb-6">
 						<p class="type-body text-bone-newsprint">
-							The plugin already spawns both listeners, so this lane runs without extra setup:
-							point <code class="type-code text-weathered-teal">base_url</code> at
-							<code class="type-code text-weathered-teal">:9798</code> and any OpenAI-compatible
-							client gets the same CCR compression over plain HTTP. That is the agent-to-agent
-							path - a second agent, a script, or an external tool can converse through the same
-							compressed channel, share the persistent SQLite store (which survives a restart;
-							the plugin lane's inline store is session-scoped), and call the tool relay to
-							retrieve or create CCR entries.
+							The plugin already spawns both listeners, so this lane runs without
+							extra setup: point{" "}
+							<code class="type-code text-weathered-teal">base_url</code> at
+							<code class="type-code text-weathered-teal">:9798</code> and any
+							OpenAI-compatible client gets the same CCR compression over plain HTTP.
+							That is the agent-to-agent path - a second agent, a script, or an
+							external tool can converse through the same compressed channel, share
+							the persistent SQLite store (which survives a restart; the plugin lane's
+							inline store is session-scoped), and call the tool relay to retrieve or
+							create CCR entries.
 						</p>
 						<p class="type-body text-bone-newsprint">
-							The limit is real too: the proxy only sees HTTP traffic - no tool-output interception,
-							no terminal compression, no directives, no context engine, and SSE streams pass
-							through uncompressed. Because of that the proxy extends the stack to other callers;
-							it does not replace the hooks inside Hermes.
+							The limit is real too: the proxy only sees HTTP traffic - no tool-output
+							interception, no terminal compression, no directives, no context engine,
+							and SSE streams pass through uncompressed. Because of that the proxy
+							extends the stack to other callers; it does not replace the hooks inside
+							Hermes.
 						</p>
 					</div>
 					<div class="mt-auto flex flex-wrap gap-x-6 gap-y-2 border-t border-oxblood-dark pt-4">
-						<a class="type-code font-bold text-stamped-canary hover:underline" href={Anchor(Routes.Setup, "proxy")}>
+						<a
+							class="type-code font-bold text-stamped-canary hover:underline"
+							href={Anchor(Routes.Setup, "proxy")}
+						>
 							THE PROXY LANE &rarr;
 						</a>
 					</div>
@@ -983,15 +1001,20 @@ const Decision = [
 			<p class="section-kicker !mb-4">06 / INSTALLATION</p>
 			<h2 class="type-section mb-8 text-bone-white">Installing it</h2>
 			<div class="grunge emphasis-standard max-w-4xl p-6 sm:p-8 lg:p-10" data-grunge>
-				<p class="type-meta font-bold uppercase tracking-widest text-stamped-canary">PREREQUISITE</p>
+				<p class="type-meta font-bold uppercase tracking-widest text-stamped-canary">
+					PREREQUISITE
+				</p>
 				<p class="type-body mt-3 text-bone-newsprint">
 					Hermes Agent, with <code class="type-code text-weathered-teal">hermes</code> on
-					<code class="type-code text-weathered-teal">PATH</code> and a route to GitHub Releases.
+					<code class="type-code text-weathered-teal">PATH</code> and a route to GitHub
+					Releases.
 					<code class="type-code text-weathered-teal">aphrodite setup</code> runs
-					<code class="type-code text-weathered-teal">hermes --version</code> as its first step and
-					fails fast with a clear error, before anything is written.
+					<code class="type-code text-weathered-teal">hermes --version</code> as its first
+					step and fails fast with a clear error, before anything is written.
 				</p>
-				<p class="type-meta mt-8 font-bold uppercase tracking-widest text-stamped-canary">FOUR STEPS</p>
+				<p class="type-meta mt-8 font-bold uppercase tracking-widest text-stamped-canary">
+					FOUR STEPS
+				</p>
 				<!-- The commands as a block, not as inline prose: a reader who wants
 				     to install needs something to copy, and an inline <code> inside a
 				     sentence both hides the sequence and breaks mid-token on a narrow
@@ -1008,47 +1031,65 @@ hermes`}
 				/>
 				<ol class="prose-flow mt-3 list-decimal pl-5">
 					<li class="type-body text-bone-newsprint">
-						<code class="type-code text-bone-white">hermes plugins install aphrodite</code> - the
-						catalog entry: a reviewed pinned checkout of
+						<code class="type-code text-bone-white">
+							hermes plugins install aphrodite
+						</code>{" "}
+						- the catalog entry: a reviewed pinned checkout of
 						<code class="type-code text-weathered-teal">plugin.yaml</code> plus the
 						<code class="type-code text-weathered-teal">__init__.py</code> shim, in
-						<code class="type-code text-weathered-teal">~/.hermes/plugins/aphrodite</code>.
+						<code class="type-code text-weathered-teal">
+							~/.hermes/plugins/aphrodite
+						</code>
+						.
 					</li>
 					<li class="type-body text-bone-newsprint">
-						<code class="type-code text-bone-white">hermes plugins enable aphrodite</code> - or
-						answer yes at the Enable now? prompt. Enabling is a separate write to Hermes's own
-						<code class="type-code text-weathered-teal">config.yaml</code>, so a finished download
-						alone does not register the hooks.
+						<code class="type-code text-bone-white">
+							hermes plugins enable aphrodite
+						</code>{" "}
+						- or answer yes at the Enable now? prompt. Enabling is a separate write to
+						Hermes's own
+						<code class="type-code text-weathered-teal">config.yaml</code>, so a
+						finished download alone does not register the hooks.
 					</li>
 					<li class="type-body text-bone-newsprint">
-						<code class="type-code text-bone-white">bash download.sh</code> - run from inside
-						<code class="type-code text-weathered-teal">~/.hermes/plugins/aphrodite</code>. It
-						fetches the binary and the dylib into
-						<code class="type-code text-weathered-teal">~/.hermes/aphrodite/binaries/</code>,
-						validated against the in-tree
-						<code class="type-code text-weathered-teal">SHA256SUMS.txt</code> and magic-byte
-						checked. On Windows: <code class="type-code text-weathered-teal">pwsh ./download.ps1</code>.
+						<code class="type-code text-bone-white">bash download.sh</code> - run from
+						inside
+						<code class="type-code text-weathered-teal">
+							~/.hermes/plugins/aphrodite
+						</code>
+						. It fetches the binary and the dylib into
+						<code class="type-code text-weathered-teal">
+							~/.hermes/aphrodite/binaries/
+						</code>
+						, validated against the in-tree
+						<code class="type-code text-weathered-teal">SHA256SUMS.txt</code> and
+						magic-byte checked. On Windows:{" "}
+						<code class="type-code text-weathered-teal">pwsh ./download.ps1</code>.
 					</li>
 					<li class="type-body text-bone-newsprint">
 						<code class="type-code text-bone-white">hermes</code> - start it.
 					</li>
 				</ol>
-				<p class="type-meta mt-8 font-bold uppercase tracking-widest text-stamped-canary">EXPECTED RESULT</p>
+				<p class="type-meta mt-8 font-bold uppercase tracking-widest text-stamped-canary">
+					EXPECTED RESULT
+				</p>
 				<div class="prose-flow mt-3">
 					<p class="type-body text-bone-newsprint">
-						Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256 verified,
-						plugin enabled. Start <code class="type-code text-weathered-teal">hermes</code> and the
-						plugin logs that Aphrodite is enabled.
+						Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256
+						verified, plugin enabled. Start{" "}
+						<code class="type-code text-weathered-teal">hermes</code> and the plugin
+						logs that Aphrodite is enabled.
 					</p>
 					<p class="type-body text-bone-newsprint">
 						Two proxy listeners come up with it:
-						<code class="type-code text-weathered-teal">:9797</code> (the cache proxy, threshold
-						2048 bytes by default) and <code class="type-code text-weathered-teal">:9798</code>
+						<code class="type-code text-weathered-teal">:9797</code> (the cache proxy,
+						threshold 2048 bytes by default) and{" "}
+						<code class="type-code text-weathered-teal">:9798</code>
 						(the token proxy, threshold 256 bytes by default).
 					</p>
 					<p class="type-body text-zinc-dust">
-						If the binaries are missing, the plugin logs the setup command and stays disabled until
-						you run it.
+						If the binaries are missing, the plugin logs the setup command and stays
+						disabled until you run it.
 					</p>
 				</div>
 			</div>
@@ -1056,7 +1097,10 @@ hermes`}
 			     harness that used to sit here is /setup/'s story (install-surfaces 1)
 			     and the telemetry module that used to sit above it is /benchmarks/'. -->
 			<p class="mt-12 w-full border-t border-oxblood-dark pt-8 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
-				FULL INSTRUCTIONS ON THE <a class="text-stamped-canary" href={Routes.Setup}>SETUP PAGE</a>
+				FULL INSTRUCTIONS ON THE{" "}
+				<a class="text-stamped-canary" href={Routes.Setup}>
+					SETUP PAGE
+				</a>
 			</p>
 		</section>
 
@@ -1071,8 +1115,8 @@ hermes`}
 
 		<!-- COLOPHON // the print line the page closes on. -->
 		<p class="w-full border-t border-oxblood-dark pt-6 font-mono text-base uppercase tracking-widest text-zinc-dust">
-			APHRODITE // CCR CORE &middot; CONTEXT MANAGEMENT FOR TOOL-USING AI AGENTS &middot; ONE BINARY,
-			ZERO DEPENDENCIES
+			APHRODITE // CCR CORE &middot; CONTEXT MANAGEMENT FOR TOOL-USING AI AGENTS &middot; ONE
+			BINARY, ZERO DEPENDENCIES
 		</p>
 	</PageShell>
 </Base>

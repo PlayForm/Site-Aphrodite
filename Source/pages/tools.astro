@@ -224,7 +224,7 @@ const BuildLines: string[] = [
 	"error[E0599]: no method named `take` found for struct `Vec<String>` in the current scope",
 	"   --> crates/aphrodite/src/preview/builders/ls.rs:62:22",
 	"    |",
-	" 62 |         .map(|(e, n)| format!(\"{}×{}\", e, n))",
+	' 62 |         .map(|(e, n)| format!("{}×{}", e, n))',
 	"    |                      ^^^^^^ method not found in `Vec<String>`",
 	"    |",
 	"    = help: items from traits can only be used if the trait is in scope",
@@ -253,7 +253,9 @@ const TerminalLines: string[] = [
 /** `builders/terminal.rs`'s summary: the last exit-code line, clipped to 60. */
 const TerminalSummary = (Lines: readonly string[]): string =>
 	(
-		[...Lines].reverse().find((Line) => Line.includes("exit code:") || Line.includes("Error:")) ??
+		[...Lines]
+			.reverse()
+			.find((Line) => Line.includes("exit code:") || Line.includes("Error:")) ??
 		Lines[0] ??
 		""
 	)
@@ -322,9 +324,9 @@ const MarkerFields = (Marker: string): string[] =>
 			</h2>
 			<p class="mt-6 max-w-[46rem] font-body text-body text-bone-newsprint">
 				Each row is one registered handle: the identifier the agent types, the side of the
-				session store it moves, the arguments its schema declares, and the sentence the schema
-				gives it. The door chip's colour is the family and not a rank - teal reads, canary
-				writes, and bone is the engine tuning itself.
+				session store it moves, the arguments its schema declares, and the sentence the
+				schema gives it. The door chip's colour is the family and not a rank - teal reads,
+				canary writes, and bone is the engine tuning itself.
 			</p>
 
 			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
@@ -380,7 +382,12 @@ const MarkerFields = (Marker: string): string[] =>
 									</td>
 									<td class="px-4 py-4 sm:px-5">
 										{Tool.Door ? (
-											<span class:list={["telemetry-tag", DoorTone[Tool.Door.Tone]]}>
+											<span
+												class:list={[
+													"telemetry-tag",
+													DoorTone[Tool.Door.Tone],
+												]}
+											>
 												{Tool.Door.Label}
 											</span>
 										) : null}
@@ -389,9 +396,13 @@ const MarkerFields = (Marker: string): string[] =>
 										<span class="telemetry-tag">{Tool.Args}</span>
 									</td>
 									<td class="max-w-[34rem] px-4 py-4 sm:px-5">
-										<p class="font-body text-body text-bone-newsprint">{Tool.Summary}</p>
+										<p class="font-body text-body text-bone-newsprint">
+											{Tool.Summary}
+										</p>
 										{Tool.Note ? (
-											<p class="mt-2 font-body text-body text-zinc-dust">{Tool.Note}</p>
+											<p class="mt-2 font-body text-body text-zinc-dust">
+												{Tool.Note}
+											</p>
 										) : null}
 									</td>
 								</tr>
@@ -407,8 +418,11 @@ const MarkerFields = (Marker: string): string[] =>
 				{Undeclared.length > 0 ? (
 					<span class="mt-3 block">
 						{Undeclared.map((Tool) => Tool.Name).join(", ")} is compiled in under
-						<code class="font-mono text-base text-weathered-teal">debug_assertions</code> only:
-						a real schema, not a registered tool, so it is named rather than counted.
+						<code class="font-mono text-base text-weathered-teal">
+							debug_assertions
+						</code>{" "}
+						only: a real schema, not a registered tool, so it is named rather than
+						counted.
 					</span>
 				) : null}
 			</p>
@@ -477,26 +491,36 @@ const MarkerFields = (Marker: string): string[] =>
 						</thead>
 						<tbody>
 							{Scenarios.map((Payload) => {
-								const [Hash = "", Type = "", Size = ""] = MarkerFields(Payload.Marker);
+								const [Hash = "", Type = "", Size = ""] = MarkerFields(
+									Payload.Marker,
+								);
 
 								return (
 									<tr class="border-t border-[color:var(--tier-shell-edge)] align-top">
 										<th scope="row" class="px-4 py-4 text-left align-top">
-											<span class="type-meta block uppercase text-zinc-dust">{Payload.Label}</span>
+											<span class="type-meta block uppercase text-zinc-dust">
+												{Payload.Label}
+											</span>
 											<span class="type-meta mt-1 block text-zinc-dust">
-												{Payload.Count} lines · {Payload.Bytes.toLocaleString("en-US")} bytes
+												{Payload.Count} lines ·{" "}
+												{Payload.Bytes.toLocaleString("en-US")} bytes
 											</span>
 										</th>
 										<td class="border-l border-[color:var(--tier-shell-edge)] px-4 py-4">
 											<div class="ccr-marker text-code text-bone-newsprint">
-												&lt;&lt;&lt;<span class="text-stamped-canary">CCR:</span>
+												&lt;&lt;&lt;
+												<span class="text-stamped-canary">CCR:</span>
 												<span class="text-weathered-teal">{Hash}...</span>
-												<span class="text-bone-white">|{Type}|{Size}</span>
+												<span class="text-bone-white">
+													|{Type}|{Size}
+												</span>
 												<span class="text-bone-white">&gt;&gt;&gt;</span>
 											</div>
 										</td>
 										<td class="border-l border-[color:var(--tier-shell-edge)] px-4 py-4">
-											<div class="text-code text-zinc-dust">{Payload.Preview}</div>
+											<div class="text-code text-zinc-dust">
+												{Payload.Preview}
+											</div>
 										</td>
 									</tr>
 								);
@@ -507,27 +531,29 @@ const MarkerFields = (Marker: string): string[] =>
 			</ZineBox>
 
 			<p class="mt-10 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
-				A marker and its preview are two views of one payload, so both are computed from
-				the same bytes: the hash addresses the stored output, the type is the
-				classifier's verdict, and the size is the UTF-8 byte count of the bytes behind
-				the hash - which is what a retrieval of that marker puts back into the
-				transcript, not an estimate of it. The preview beside each one comes from the
-				engine's own builders, so its tallies are the payload's own: the build-log sample
-				counts four error lines, one warning line and every line it printed, and the test
-				run reports the exit code of the last line it printed.
+				A marker and its preview are two views of one payload, so both are computed from the
+				same bytes: the hash addresses the stored output, the type is the classifier's
+				verdict, and the size is the UTF-8 byte count of the bytes behind the hash - which
+				is what a retrieval of that marker puts back into the transcript, not an estimate of
+				it. The preview beside each one comes from the engine's own builders, so its tallies
+				are the payload's own: the build-log sample counts four error lines, one warning
+				line and every line it printed, and the test run reports the exit code of the last
+				line it printed.
 			</p>
 			<p class="mt-3 max-w-[46rem] font-body text-body leading-relaxed text-zinc-dust">
-				Both payloads clear their gate before either becomes a marker - 4,096 characters
-				for a tool result, 1,024 for terminal output - because below the gate the engine
-				passes the bytes through raw and no marker exists at all. Every figure here is
-				the payload's own length rather than a typed number, so a change to the output
-				moves the preview, the tallies and the size together.
+				Both payloads clear their gate before either becomes a marker - 4,096 characters for
+				a tool result, 1,024 for terminal output - because below the gate the engine passes
+				the bytes through raw and no marker exists at all. Every figure here is the
+				payload's own length rather than a typed number, so a change to the output moves the
+				preview, the tallies and the size together.
 			</p>
 			<ul class="mt-12 space-y-6 font-body text-base text-bone-newsprint">
 				<li class="border-l-4 border-raw-blood pl-4">
 					<span class="font-bold text-bone-white">BLAKE3 hash</span> - pattern
-					<code class="font-mono text-base text-weathered-teal">{'^^[0-9a-fA-F]{8,64}$'}</code>;
-					truncated hashes never resolve, exact match only.
+					<code class="font-mono text-base text-weathered-teal">
+						{"^^[0-9a-fA-F]{8,64}$"}
+					</code>
+					; truncated hashes never resolve, exact match only.
 				</li>
 				<li class="border-l-4 border-raw-blood pl-4">
 					<span class="font-bold text-bone-white">Byte-exact round-trip</span> -
@@ -540,11 +566,16 @@ const MarkerFields = (Marker: string): string[] =>
 					capped at 10 MiB and refuse paths outside the workspace.
 				</li>
 				<li class="border-l-4 border-raw-blood pl-4">
-					<span class="font-bold text-bone-white">Markers don't survive a session restart</span>
+					<span class="font-bold text-bone-white">
+						Markers don't survive a session restart
+					</span>
 					- the dylib is loaded once per process, so a new session starts a fresh store.
 				</li>
 			</ul>
-			<figure class="mt-16 border border-oxblood-dark bg-soot-black p-4" data-diagram="marker-format">
+			<figure
+				class="mt-16 border border-oxblood-dark bg-soot-black p-4"
+				data-diagram="marker-format"
+			>
 				<div class="overflow-x-auto" set:html={MarkerFormat} />
 				<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 					M6 // MARKER FORMAT
@@ -570,50 +601,58 @@ const MarkerFields = (Marker: string): string[] =>
 			</p>
 
 			<div class="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-2">
-				{
-					Tools.map((Tool) => (
-						<div
-							id={Tool.Name}
-							class="grunge shell-card scroll-mt-24"
-							data-grunge
-							data-grunge-mode="edge"
-						>
-							<div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[color:var(--tier-shell-edge)] px-5 py-4">
-								<span class="font-mono text-meta font-bold text-zinc-dust">{Tool.N}</span>
-								<h4 class="font-mono text-code font-bold text-bone-white">{Tool.Name}</h4>
-								{Tool.Door ? (
-									<span class:list={["telemetry-tag", DoorTone[Tool.Door.Tone]]}>
-										{Tool.Door.Label}
-									</span>
-								) : null}
-								<span class="telemetry-tag ml-auto">{Tool.Args}</span>
-							</div>
-							<div class="prose-flow px-5 py-5">
-								<div class="well px-4 py-4 font-mono text-code leading-relaxed">
-									{Tool.Parameters.length === 0 ? (
-										<div class="text-zinc-dust">takes no arguments</div>
-									) : (
-										Tool.Parameters.map((Parameter) => (
-											<div class="mb-3 last:mb-0">
-												<div>
-													<span class="text-zinc-dust">"{Parameter.Name}":</span>{" "}
-													<span class="text-bone-newsprint">{`{ ${Parameter.Type}${Parameter.Required ? " · required" : " · optional"} }`}</span>
-												</div>
-												<div class="pl-4 text-zinc-dust">{Parameter.Description}</div>
-											</div>
-										))
-									)}
-								</div>
-								<p class="font-body text-body leading-relaxed text-bone-newsprint">
-									{Tool.Description}
-								</p>
-								{(ToolProse[Tool.Name]?.Paragraph ?? []).map((Line) => (
-									<p class="font-body text-body leading-relaxed text-zinc-dust">{Line}</p>
-								))}
-							</div>
+				{Tools.map((Tool) => (
+					<div
+						id={Tool.Name}
+						class="grunge shell-card scroll-mt-24"
+						data-grunge
+						data-grunge-mode="edge"
+					>
+						<div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[color:var(--tier-shell-edge)] px-5 py-4">
+							<span class="font-mono text-meta font-bold text-zinc-dust">
+								{Tool.N}
+							</span>
+							<h4 class="font-mono text-code font-bold text-bone-white">
+								{Tool.Name}
+							</h4>
+							{Tool.Door ? (
+								<span class:list={["telemetry-tag", DoorTone[Tool.Door.Tone]]}>
+									{Tool.Door.Label}
+								</span>
+							) : null}
+							<span class="telemetry-tag ml-auto">{Tool.Args}</span>
 						</div>
-					))
-				}
+						<div class="prose-flow px-5 py-5">
+							<div class="well px-4 py-4 font-mono text-code leading-relaxed">
+								{Tool.Parameters.length === 0 ? (
+									<div class="text-zinc-dust">takes no arguments</div>
+								) : (
+									Tool.Parameters.map((Parameter) => (
+										<div class="mb-3 last:mb-0">
+											<div>
+												<span class="text-zinc-dust">
+													"{Parameter.Name}":
+												</span>{" "}
+												<span class="text-bone-newsprint">{`{ ${Parameter.Type}${Parameter.Required ? " · required" : " · optional"} }`}</span>
+											</div>
+											<div class="pl-4 text-zinc-dust">
+												{Parameter.Description}
+											</div>
+										</div>
+									))
+								)}
+							</div>
+							<p class="font-body text-body leading-relaxed text-bone-newsprint">
+								{Tool.Description}
+							</p>
+							{(ToolProse[Tool.Name]?.Paragraph ?? []).map((Line) => (
+								<p class="font-body text-body leading-relaxed text-zinc-dust">
+									{Line}
+								</p>
+							))}
+						</div>
+					</div>
+				))}
 			</div>
 		</section>
 
@@ -630,9 +669,9 @@ const MarkerFields = (Marker: string): string[] =>
 				<p class="font-body text-body leading-relaxed text-bone-newsprint">
 					Output from meta-tools (like
 					<code class="font-mono text-base text-weathered-teal">aphrodite_stats</code> or
-					<code class="font-mono text-base text-weathered-teal">aphrodite_catalog</code>) is
-					expanded inline, never compressed - the agent always sees its own engine's status
-					in full.
+					<code class="font-mono text-base text-weathered-teal">aphrodite_catalog</code>)
+					is expanded inline, never compressed - the agent always sees its own engine's
+					status in full.
 				</p>
 				<p class="font-body text-body leading-relaxed text-bone-newsprint">
 					Compressing the catalog would just be the engine hiding its own ledger.

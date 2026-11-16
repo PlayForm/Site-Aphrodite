@@ -93,18 +93,16 @@ const LinkClass =
 >
 	<ZineStamp Label="ON THIS PAGE" Color="raw" />
 	<ul class="section-nav__list flex flex-wrap items-center gap-x-5 gap-y-1">
-		{
-			Entries.map((Entry) => (
-				<li class="flex items-baseline gap-2">
-					<span class="section-nav__ordinal" aria-hidden="true">
-						{Entry.Ordinal}
-					</span>
-					<a href={`#${Entry.Id}`} class={LinkClass} title={Entry.Label}>
-						{Entry.Nav}
-					</a>
-				</li>
-			))
-		}
+		{Entries.map((Entry) => (
+			<li class="flex items-baseline gap-2">
+				<span class="section-nav__ordinal" aria-hidden="true">
+					{Entry.Ordinal}
+				</span>
+				<a href={`#${Entry.Id}`} class={LinkClass} title={Entry.Label}>
+					{Entry.Nav}
+				</a>
+			</li>
+		))}
 	</ul>
 </nav>
 
@@ -113,27 +111,23 @@ const LinkClass =
 	data-section-nav
 	class="section-nav sticky top-0 z-30 -mx-5 w-full border-b bg-carbon-void px-5 py-2 sm:hidden"
 >
-	<summary
-		class="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden"
-	>
+	<summary class="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
 		<ZineStamp Label="ON THIS PAGE" Color="raw" />
-		<span class="type-meta uppercase text-zinc-dust"
-			>{Entries.length} {Entries.length === 1 ? "SECTION" : "SECTIONS"}</span
-		>
+		<span class="type-meta uppercase text-zinc-dust">
+			{Entries.length} {Entries.length === 1 ? "SECTION" : "SECTIONS"}
+		</span>
 	</summary>
 	<ul class="flex flex-col pb-1 pt-3">
-		{
-			Entries.map((Entry) => (
-				<li class="section-nav__row border-t">
-					<a href={`#${Entry.Id}`} class={`${LinkClass} block py-2.5`} title={Entry.Label}>
-						<span class="section-nav__ordinal mr-2" aria-hidden="true">
-							{Entry.Ordinal}
-						</span>
-						{Entry.Nav}
-					</a>
-				</li>
-			))
-		}
+		{Entries.map((Entry) => (
+			<li class="section-nav__row border-t">
+				<a href={`#${Entry.Id}`} class={`${LinkClass} block py-2.5`} title={Entry.Label}>
+					<span class="section-nav__ordinal mr-2" aria-hidden="true">
+						{Entry.Ordinal}
+					</span>
+					{Entry.Nav}
+				</a>
+			</li>
+		))}
 	</ul>
 </details>
 

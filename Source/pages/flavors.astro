@@ -277,25 +277,25 @@ const [Plugin, ...Others] = Hosts;
 							</tr>
 						</thead>
 						<tbody class="text-bone-newsprint">
-							{
-								Hosts.map((Host) => (
-									<tr class="border-b border-oxblood-dark">
-										<td class="py-3 pr-4 text-bone-white">
-											<a
-												href={`#${Host.Id}`}
-												class="underline decoration-transparent decoration-2 underline-offset-4 transition-colors hover:decoration-stamped-canary"
-											>
-												{Host.Flavor}
-											</a>
-										</td>
-										<td class="py-3 pr-4">{Host.Host}</td>
-										<td class="py-3 pr-4 text-zinc-dust">{Host.Sees}</td>
-										<td class={`py-3 font-black uppercase tracking-widest ${Host.Tone}`}>
-											{Host.Status}
-										</td>
-									</tr>
-								))
-							}
+							{Hosts.map((Host) => (
+								<tr class="border-b border-oxblood-dark">
+									<td class="py-3 pr-4 text-bone-white">
+										<a
+											href={`#${Host.Id}`}
+											class="underline decoration-transparent decoration-2 underline-offset-4 transition-colors hover:decoration-stamped-canary"
+										>
+											{Host.Flavor}
+										</a>
+									</td>
+									<td class="py-3 pr-4">{Host.Host}</td>
+									<td class="py-3 pr-4 text-zinc-dust">{Host.Sees}</td>
+									<td
+										class={`py-3 font-black uppercase tracking-widest ${Host.Tone}`}
+									>
+										{Host.Status}
+									</td>
+								</tr>
+							))}
 						</tbody>
 					</table>
 				</div>
@@ -323,7 +323,9 @@ const [Plugin, ...Others] = Hosts;
 			>
 				<div class="flex flex-wrap items-center gap-4">
 					<ZineStamp Label="RECOMMENDED" Color="canary" Rotate="-rotate-2" />
-					<p class={`font-mono text-base font-black uppercase tracking-widest ${Plugin.Tone}`}>
+					<p
+						class={`font-mono text-base font-black uppercase tracking-widest ${Plugin.Tone}`}
+					>
 						{Plugin.Status}
 					</p>
 					<span class={Chip}>{Plugin.Cost}</span>
@@ -336,32 +338,28 @@ const [Plugin, ...Others] = Hosts;
 					/>
 
 					<div class="flex flex-wrap gap-6 lg:flex-col lg:items-start">
-						{
-							Plugin.Chips.map((Name) => (
-								<span class={Chip}>{Name}</span>
-							))
-						}
+						{Plugin.Chips.map((Name) => (
+							<span class={Chip}>{Name}</span>
+						))}
 					</div>
 				</div>
 
-				<dl
-					class="mt-8 grid gap-x-6 gap-y-3 border-t border-oxblood-dark pt-6 sm:grid-cols-[9rem_1fr]"
-				>
+				<dl class="mt-8 grid gap-x-6 gap-y-3 border-t border-oxblood-dark pt-6 sm:grid-cols-[9rem_1fr]">
 					<dt class={Label}>HOST</dt>
 					<dd class="font-body text-base leading-relaxed text-bone-newsprint">
 						{Plugin.Host}
 					</dd>
 
 					<dt class={Label}>WHAT IT SEES</dt>
-					<dd class="font-body text-base leading-relaxed text-zinc-dust">{Plugin.Sees}</dd>
+					<dd class="font-body text-base leading-relaxed text-zinc-dust">
+						{Plugin.Sees}
+					</dd>
 
 					<dt class={Label}>TRADE-OFF</dt>
 					<dd class="flex flex-wrap gap-4">
-						{
-							Plugin.Trade.map((Name) => (
-								<span class={Chip}>{Name}</span>
-							))
-						}
+						{Plugin.Trade.map((Name) => (
+							<span class={Chip}>{Name}</span>
+						))}
 					</dd>
 				</dl>
 			</ZineBox>
@@ -380,69 +378,63 @@ const [Plugin, ...Others] = Hosts;
 			</p>
 
 			<div class="mt-16 grid gap-10 md:grid-cols-2 xl:grid-cols-3">
-				{
-					Others.map((Card) => (
-						<ZineBox
-							Emphasis="standard"
-							Accent={Card.Accent}
-							Tape={Card.Label}
-							TapeColor={Card.Tape}
-							Grunge={true}
-							Class="flex h-full flex-col"
-						>
-							<div class="flex flex-wrap items-center gap-4">
-								<p
-									class={`font-mono text-base font-black uppercase tracking-widest ${Card.Tone}`}
-								>
-									{Card.Status}
-								</p>
-								<span class={Chip}>{Card.Cost}</span>
-							</div>
-
-							<h3
-								id={Card.Id}
-								class="mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+				{Others.map((Card) => (
+					<ZineBox
+						Emphasis="standard"
+						Accent={Card.Accent}
+						Tape={Card.Label}
+						TapeColor={Card.Tape}
+						Grunge={true}
+						Class="flex h-full flex-col"
+					>
+						<div class="flex flex-wrap items-center gap-4">
+							<p
+								class={`font-mono text-base font-black uppercase tracking-widest ${Card.Tone}`}
 							>
-								{Card.Head}
-							</h3>
+								{Card.Status}
+							</p>
+							<span class={Chip}>{Card.Cost}</span>
+						</div>
 
-							<dl class="mt-6 grid gap-x-4 gap-y-3">
-								<dt class={Label}>HOST</dt>
-								<dd class="font-body text-base leading-relaxed text-bone-newsprint">
-									{Card.Host}
-								</dd>
+						<h3
+							id={Card.Id}
+							class="mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+						>
+							{Card.Head}
+						</h3>
 
-								<dt class={Label}>WHAT IT SEES</dt>
-								<dd class="font-body text-base leading-relaxed text-zinc-dust">
-									{Card.Sees}
-								</dd>
-							</dl>
+						<dl class="mt-6 grid gap-x-4 gap-y-3">
+							<dt class={Label}>HOST</dt>
+							<dd class="font-body text-base leading-relaxed text-bone-newsprint">
+								{Card.Host}
+							</dd>
 
-							<div
-								class="mt-6 prose-flow font-body text-base leading-relaxed text-bone-newsprint"
-								set:html={Card.Body}
-							/>
+							<dt class={Label}>WHAT IT SEES</dt>
+							<dd class="font-body text-base leading-relaxed text-zinc-dust">
+								{Card.Sees}
+							</dd>
+						</dl>
 
-							<div class="mt-auto pt-8">
-								<p class={Label}>TRADE-OFF</p>
-								<div class="mt-3 flex flex-wrap gap-4">
-									{
-										Card.Trade.map((Name) => (
-											<span class={Chip}>{Name}</span>
-										))
-									}
-								</div>
-								<div class="mt-3 flex flex-wrap gap-4">
-									{
-										Card.Chips.map((Name) => (
-											<span class={Chip}>{Name}</span>
-										))
-									}
-								</div>
+						<div
+							class="mt-6 prose-flow font-body text-base leading-relaxed text-bone-newsprint"
+							set:html={Card.Body}
+						/>
+
+						<div class="mt-auto pt-8">
+							<p class={Label}>TRADE-OFF</p>
+							<div class="mt-3 flex flex-wrap gap-4">
+								{Card.Trade.map((Name) => (
+									<span class={Chip}>{Name}</span>
+								))}
 							</div>
-						</ZineBox>
-					))
-				}
+							<div class="mt-3 flex flex-wrap gap-4">
+								{Card.Chips.map((Name) => (
+									<span class={Chip}>{Name}</span>
+								))}
+							</div>
+						</div>
+					</ZineBox>
+				))}
 			</div>
 
 			<ZineSource

@@ -22,25 +22,30 @@ const { Entries, Placeholder = "FILTER..." } = Astro.props;
 			placeholder={Placeholder}
 			aria-label="Filter the registry"
 		/>
-		<span class="px-3 font-mono text-base font-bold text-zinc-dust" data-registry-count aria-live="polite">
+		<span
+			class="px-3 font-mono text-base font-bold text-zinc-dust"
+			data-registry-count
+			aria-live="polite"
+		>
 			{String(Entries.length).padStart(2, "0")}
 		</span>
 	</div>
 	<ul class="max-h-80 divide-y divide-oxblood-dark/60 overflow-y-auto">
-		{
-			Entries.map((Entry) => (
-				<li data-registry-tags={[Entry.Label, ...(Entry.Tags ?? [])].join(" ").toLowerCase()}>
-					<a class="block px-3 py-2 font-mono text-base text-bone-newsprint hover:bg-raw-blood/20 hover:text-bone-white" href={Entry.Href}>
-						<span class="font-bold">{Entry.Label}</span>
-						{/* The note is PROSE, not part of the label: it reads at `type-body`
+		{Entries.map((Entry) => (
+			<li data-registry-tags={[Entry.Label, ...(Entry.Tags ?? [])].join(" ").toLowerCase()}>
+				<a
+					class="block px-3 py-2 font-mono text-base text-bone-newsprint hover:bg-raw-blood/20 hover:text-bone-white"
+					href={Entry.Href}
+				>
+					<span class="font-bold">{Entry.Label}</span>
+					{/* The note is PROSE, not part of the label: it reads at `type-body`
 						    (17px), never at the row's `text-base`, because sentence-length
 						    text never renders below the reading voice. The label above it
 						    stays in the row's mono voice, so the gap between the two grows. */}
-						{Entry.Note && <span class="type-body text-zinc-dust"> - {Entry.Note}</span>}
-					</a>
-				</li>
-			))
-		}
+					{Entry.Note && <span class="type-body text-zinc-dust"> - {Entry.Note}</span>}
+				</a>
+			</li>
+		))}
 	</ul>
 </div>
 

@@ -53,9 +53,7 @@ const Shadow = {
 >
 	<!-- THE HEADER BAND -->
 	<div class="mb-8 flex items-center gap-4 border-b border-[var(--tier-shell-edge)] pb-3">
-		<span
-			class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
-		>
+		<span class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
 			{Title}
 		</span>
 		<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
@@ -64,35 +62,35 @@ const Shadow = {
 	<!-- ONE FIELD, TWO COLUMNS: the divider lives in the gutter on a wide
 	     viewport and disappears when the columns stack. -->
 	<div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-0">
-		{
-			[
-				{ Index: "01", Caption: "EVIDENCE // A", Items: Left, Edge: "" },
-				{
-					Index: "02",
-					Caption: "EVIDENCE // B",
-					Items: Right,
-					Edge: "lg:border-l lg:border-[var(--tier-shell-edge)] lg:pl-16",
-				},
-			].map((Column) => (
-				<div class={`min-w-0 ${Column.Edge}`}>
-					<div class="mb-4 flex items-baseline gap-3 border-b border-oxblood-dark pb-1">
-						<span class="section-index">{Column.Index}</span>
-						<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-							{Column.Caption}
-						</span>
-					</div>
-					<dl class="space-y-6">
-						{Column.Items.map((Item) => (
-							<div class="border-l-2 border-oxblood-dark pl-4">
-								<dt class="type-meta !font-black uppercase tracking-widest text-bone-white">
-									{Item.Label}
-								</dt>
-								<dd class="mt-1 font-body text-base leading-relaxed text-bone-newsprint">{Item.Text}</dd>
-							</div>
-						))}
-					</dl>
+		{[
+			{ Index: "01", Caption: "EVIDENCE // A", Items: Left, Edge: "" },
+			{
+				Index: "02",
+				Caption: "EVIDENCE // B",
+				Items: Right,
+				Edge: "lg:border-l lg:border-[var(--tier-shell-edge)] lg:pl-16",
+			},
+		].map((Column) => (
+			<div class={`min-w-0 ${Column.Edge}`}>
+				<div class="mb-4 flex items-baseline gap-3 border-b border-oxblood-dark pb-1">
+					<span class="section-index">{Column.Index}</span>
+					<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+						{Column.Caption}
+					</span>
 				</div>
-			))
-		}
+				<dl class="space-y-6">
+					{Column.Items.map((Item) => (
+						<div class="border-l-2 border-oxblood-dark pl-4">
+							<dt class="type-meta !font-black uppercase tracking-widest text-bone-white">
+								{Item.Label}
+							</dt>
+							<dd class="mt-1 font-body text-base leading-relaxed text-bone-newsprint">
+								{Item.Text}
+							</dd>
+						</div>
+					))}
+				</dl>
+			</div>
+		))}
 	</div>
 </section>

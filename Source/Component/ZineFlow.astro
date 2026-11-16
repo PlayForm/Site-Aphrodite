@@ -89,9 +89,7 @@ const PaneText = (Step: Props["Steps"][number], Pane: (typeof Panes)[number]) =>
 	data-grunge
 	data-zine-flow
 >
-	<div
-		class="absolute -top-3.5 left-6 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
-	>
+	<div class="absolute -top-3.5 left-6 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
 		{Title}
 	</div>
 
@@ -108,24 +106,26 @@ const PaneText = (Step: Props["Steps"][number], Pane: (typeof Panes)[number]) =>
 		role="group"
 		aria-label={`Traversal stages, ${Total} in order`}
 	>
-		{
-			Steps.map((Step, I) => (
-				<button
-					class="zine-flow-tick flex h-11 items-center px-0.5"
-					data-flow-tick={I}
-					type="button"
-					aria-label={`Go to stage ${I + 1} of ${Total}: ${Step.Title}`}
-				>
-					<span
-						class="zine-flow-tick-bar block h-2.5 w-8 border border-black bg-soot-black"
-						aria-hidden="true"
-					/>
-				</button>
-			))
-		}
+		{Steps.map((Step, I) => (
+			<button
+				class="zine-flow-tick flex h-11 items-center px-0.5"
+				data-flow-tick={I}
+				type="button"
+				aria-label={`Go to stage ${I + 1} of ${Total}: ${Step.Title}`}
+			>
+				<span
+					class="zine-flow-tick-bar block h-2.5 w-8 border border-black bg-soot-black"
+					aria-hidden="true"
+				/>
+			</button>
+		))}
 		<span class="ml-auto flex flex-wrap items-baseline gap-x-2 font-mono text-base font-bold">
-			<span class="text-zinc-dust" data-flow-stage>{Steps[0]?.Title ?? ""}</span>
-			<span class="text-bone-white" data-flow-count>{Pad(1)} / {Pad(Total)}</span>
+			<span class="text-zinc-dust" data-flow-stage>
+				{Steps[0]?.Title ?? ""}
+			</span>
+			<span class="text-bone-white" data-flow-count>
+				{Pad(1)} / {Pad(Total)}
+			</span>
 		</span>
 	</div>
 
@@ -133,13 +133,7 @@ const PaneText = (Step: Props["Steps"][number], Pane: (typeof Panes)[number]) =>
 	     stage is on screen. Announcing the whole root made every repaint a
 	     screen-reader event; announcing the stage makes the change the
 	     message. -->
-	<p
-		class="sr-only"
-		data-flow-status
-		role="status"
-		aria-live="polite"
-		aria-atomic="true"
-	>
+	<p class="sr-only" data-flow-status role="status" aria-live="polite" aria-atomic="true">
 		Step 1 of {Total}: {Steps[0]?.Title ?? ""}.
 	</p>
 
@@ -149,55 +143,51 @@ const PaneText = (Step: Props["Steps"][number], Pane: (typeof Panes)[number]) =>
 	     as two consoles at the same depth, and the difference between them is
 	     what they show, never how far they sit from the page. -->
 	<div class="mt-4 flex flex-col gap-4">
-		{
-			Steps.map((Step, I) => (
-				<div class="zine-flow-step" data-flow-step={I}>
-					<div class="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-						<span
-							class="zine-flow-step-index font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
+		{Steps.map((Step, I) => (
+			<div class="zine-flow-step" data-flow-step={I}>
+				<div class="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+					<span class="zine-flow-step-index font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+						STEP {Pad(I + 1)} / {Pad(Total)}
+					</span>
+					<span
+						class="font-mono text-base font-black uppercase tracking-widest text-bone-white"
+						data-flow-title
+					>
+						{Step.Title}
+					</span>
+					{Step.Anchor && (
+						<a
+							class="border border-oxblood-dark bg-soot-black px-2 py-0.5 font-mono text-base font-bold text-weathered-teal hover:bg-weathered-teal hover:text-bone-white"
+							href={Step.Anchor}
+							rel={Step.Anchor.startsWith("http") ? "noreferrer" : undefined}
 						>
-							STEP {Pad(I + 1)} / {Pad(Total)}
-						</span>
-						<span
-							class="font-mono text-base font-black uppercase tracking-widest text-bone-white"
-							data-flow-title
-						>
-							{Step.Title}
-						</span>
-						{Step.Anchor && (
-							<a
-								class="border border-oxblood-dark bg-soot-black px-2 py-0.5 font-mono text-base font-bold text-weathered-teal hover:bg-weathered-teal hover:text-bone-white"
-								href={Step.Anchor}
-								rel={Step.Anchor.startsWith("http") ? "noreferrer" : undefined}
-							>
-								{Step.AnchorLabel ?? "SRC"} ↗
-							</a>
-						)}
-					</div>
-
-					<div class="grid min-h-[5.5rem] gap-4 lg:grid-cols-2">
-						{Panes.map((Pane) => (
-							<div class="shell-card flex flex-col" data-flow-pane={Pane}>
-								<div class="zine-flow-pane-label border-b border-oxblood-dark bg-asphalt-panel px-3 py-1 text-base font-black uppercase tracking-widest">
-									{PaneLabel(Pane)}
-								</div>
-								<div class="tier-well grow p-2.5 font-mono text-base font-bold leading-relaxed text-bone-white">
-									{PaneText(Step, Pane).map((Line) => (
-										<div class={PaneLineClass(Line)}>{Line}</div>
-									))}
-								</div>
-							</div>
-						))}
-					</div>
-
-					{Step.Detail && (
-						<p class="zine-flow-detail mt-1.5 font-body text-base leading-relaxed text-bone-newsprint opacity-70 transition-opacity hover:opacity-100">
-							{Step.Detail}
-						</p>
+							{Step.AnchorLabel ?? "SRC"} ↗
+						</a>
 					)}
 				</div>
-			))
-		}
+
+				<div class="grid min-h-[5.5rem] gap-4 lg:grid-cols-2">
+					{Panes.map((Pane) => (
+						<div class="shell-card flex flex-col" data-flow-pane={Pane}>
+							<div class="zine-flow-pane-label border-b border-oxblood-dark bg-asphalt-panel px-3 py-1 text-base font-black uppercase tracking-widest">
+								{PaneLabel(Pane)}
+							</div>
+							<div class="tier-well grow p-2.5 font-mono text-base font-bold leading-relaxed text-bone-white">
+								{PaneText(Step, Pane).map((Line) => (
+									<div class={PaneLineClass(Line)}>{Line}</div>
+								))}
+							</div>
+						</div>
+					))}
+				</div>
+
+				{Step.Detail && (
+					<p class="zine-flow-detail mt-1.5 font-body text-base leading-relaxed text-bone-newsprint opacity-70 transition-opacity hover:opacity-100">
+						{Step.Detail}
+					</p>
+				)}
+			</div>
+		))}
 	</div>
 
 	<!-- Controls: manual first, autoplay behind Replay, and the stamp that

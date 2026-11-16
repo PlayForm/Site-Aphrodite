@@ -137,37 +137,38 @@ const Tally = Bytes === undefined ? Count : `${Count} · ${Bytes.toLocaleString(
 ---
 
 <figure class="well ccr-marker m-0">
-	{
-		Ribbon && (
-			<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
-				<span class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5 font-mono text-base leading-snug">
-					{Command !== undefined && (
-						<span class="shrink-0 text-zinc-dust" aria-hidden="true">
-							$
-						</span>
-					)}
-					<span
-						class:list={[
-							"break-words",
-							Command === undefined
-								? "font-black uppercase tracking-widest text-zinc-dust"
-								: "font-bold text-stamped-canary",
-						]}
-					>
-						{Command ?? Label}
+	{Ribbon && (
+		<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
+			<span class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5 font-mono text-base leading-snug">
+				{Command !== undefined && (
+					<span class="shrink-0 text-zinc-dust" aria-hidden="true">
+						$
 					</span>
-				</span>
+				)}
 				<span
-					class="telemetry-tag ml-auto shrink-0"
-					title={`${Lines.length} lines in this stream`}
+					class:list={[
+						"break-words",
+						Command === undefined
+							? "font-black uppercase tracking-widest text-zinc-dust"
+							: "font-bold text-stamped-canary",
+					]}
 				>
-					{Tally}
+					{Command ?? Label}
 				</span>
-			</div>
-		)
-	}
+			</span>
+			<span
+				class="telemetry-tag ml-auto shrink-0"
+				title={`${Lines.length} lines in this stream`}
+			>
+				{Tally}
+			</span>
+		</div>
+	)}
 
-	<div class="p-3.5 font-mono text-base leading-relaxed text-zinc-dust" data-stream={Stream ? "" : undefined}>
+	<div
+		class="p-3.5 font-mono text-base leading-relaxed text-zinc-dust"
+		data-stream={Stream ? "" : undefined}
+	>
 		{
 			/*
 			 * The tone lives on an INNER span, never on the line itself. The stream

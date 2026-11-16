@@ -88,9 +88,12 @@ const KindTag = {
 	     measurement, then the corpus it was taken over. Metadata, not a
 	     sentence, which is why they are chips and not prose. -->
 	<div class="flex flex-wrap items-center justify-between gap-2">
-		<span class="telemetry-tag telemetry-tag--teal">MEASURED, {Study.Measured.toUpperCase()}</span>
+		<span class="telemetry-tag telemetry-tag--teal">
+			MEASURED, {Study.Measured.toUpperCase()}
+		</span>
 		<span class="telemetry-tag">
-			{Study.Sessions} HERMES SESSIONS &bull; {Study.ApiCalls} API CALLS &bull; {Study.Period.toUpperCase()}
+			{Study.Sessions} HERMES SESSIONS &bull; {Study.ApiCalls} API CALLS &bull;{" "}
+			{Study.Period.toUpperCase()}
 		</span>
 	</div>
 
@@ -99,14 +102,16 @@ const KindTag = {
 	<div class="mt-8 border-l-2 border-blood-crimson pl-5">
 		<div class="section-index">ESTIMATED CONTEXT REDUCTION</div>
 		<div class={`mt-2 !text-stamped-canary ${LeadSize}`}>
-			{Reduction.Value}<span class="metric__unit">{Reduction.Unit}</span>
+			{Reduction.Value}
+			<span class="metric__unit">{Reduction.Unit}</span>
 		</div>
 		<p class="mt-3 max-w-2xl type-body text-bone-newsprint">
-			Across {Sessions.Value} recorded sessions, with a sensitivity band of {Band.Value}. The band is the
-			result: {SavedTokens.Value} tokens is the same reconstruction counted at the centre of that range.
+			Across {Sessions.Value} recorded sessions, with a sensitivity band of {Band.Value}. The
+			band is the result: {SavedTokens.Value} tokens is the same reconstruction counted at the
+			centre of that range.
 		</p>
 		<p class="mt-2 max-w-2xl type-body text-zinc-dust">
-			<span class="type-meta">{Reduction.Kind.toUpperCase()}</span>{" "}&bull; {Reduction.Scope}
+			<span class="type-meta">{Reduction.Kind.toUpperCase()}</span> &bull; {Reduction.Scope}
 		</p>
 	</div>
 
@@ -119,7 +124,9 @@ const KindTag = {
 		<table class="w-full border-collapse font-mono text-base">
 			<thead>
 				<tr class="border-b border-[var(--tier-well-edge)]">
-					<th class="px-3 py-2 text-left type-meta !font-black text-zinc-dust">MEASURE</th>
+					<th class="px-3 py-2 text-left type-meta !font-black text-zinc-dust">
+						MEASURE
+					</th>
 					<th class="px-3 py-2 text-right type-meta !font-black text-zinc-dust">VALUE</th>
 					<th class="px-3 py-2 text-left type-meta !font-black text-zinc-dust">UNIT</th>
 					<th class="px-3 py-2 text-left type-meta !font-black text-zinc-dust">KIND</th>
@@ -127,19 +134,19 @@ const KindTag = {
 				</tr>
 			</thead>
 			<tbody>
-				{
-					Rows.map(({ Label, Fact }) => (
-						<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
-							<td class="px-3 py-2 text-left text-bone-newsprint">{Label}</td>
-							<td class="px-3 py-2 text-right font-black tabular-nums text-bone-white">{Fact.Value}</td>
-							<td class="px-3 py-2 text-left text-zinc-dust">{Fact.Unit}</td>
-							<td class="px-3 py-2 text-left">
-								<span class={KindTag[Fact.Kind].Class}>{KindTag[Fact.Kind].Tag}</span>
-							</td>
-							<td class="px-3 py-2 text-left type-body text-zinc-dust">{Fact.Scope}</td>
-						</tr>
-					))
-				}
+				{Rows.map(({ Label, Fact }) => (
+					<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
+						<td class="px-3 py-2 text-left text-bone-newsprint">{Label}</td>
+						<td class="px-3 py-2 text-right font-black tabular-nums text-bone-white">
+							{Fact.Value}
+						</td>
+						<td class="px-3 py-2 text-left text-zinc-dust">{Fact.Unit}</td>
+						<td class="px-3 py-2 text-left">
+							<span class={KindTag[Fact.Kind].Class}>{KindTag[Fact.Kind].Tag}</span>
+						</td>
+						<td class="px-3 py-2 text-left type-body text-zinc-dust">{Fact.Scope}</td>
+					</tr>
+				))}
 			</tbody>
 		</table>
 	</div>
@@ -150,25 +157,25 @@ const KindTag = {
 	<div class="mt-8 border-l-4 border-stamped-canary tier-shell p-4">
 		<div class="type-meta font-black text-stamped-canary">HOW THIS WAS MEASURED</div>
 		<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
-			The study is the author's own work - multi-agent atomization fan-outs, merge/PR work, plugin
-			integration - reconstructed payload-by-payload from the session transcripts.
+			The study is the author's own work - multi-agent atomization fan-outs, merge/PR work,
+			plugin integration - reconstructed payload-by-payload from the session transcripts.
 		</p>
 		<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
-			It is an author-run reconstruction, not a randomised comparison: it establishes neither better task
-			success nor universal cost savings. What it measures is how much context the markers replaced in these
-			sessions, and what that reconstruction cost in tokens.
+			It is an author-run reconstruction, not a randomised comparison: it establishes neither
+			better task success nor universal cost savings. What it measures is how much context the
+			markers replaced in these sessions, and what that reconstruction cost in tokens.
 		</p>
 		<p class="mt-3 max-w-3xl type-body text-zinc-dust">
-			Every figure above carries its own method and the pinned revision it was extracted from - the register on
-			the benchmarks page lists all of them with their IDs.
+			Every figure above carries its own method and the pinned revision it was extracted from
+			- the register on the benchmarks page lists all of them with their IDs.
 		</p>
 	</div>
 
 	<!-- CAVEAT: its own bordered note, visually distinct -->
 	<div class="mt-4 border-l-4 border-stamped-canary tier-shell p-4 font-mono text-base leading-relaxed text-bone-newsprint">
 		<span class="font-black uppercase tracking-widest text-stamped-canary">CAVEAT &bull; </span>
-		THE EXACT PERCENTAGE IS A BAND: {Study.Band} ACROSS A {Study.CharsPerTok} CHARS/TOKEN SENSITIVITY RANGE,
-		CENTERED {Study.BandCenter}.
+		THE EXACT PERCENTAGE IS A BAND: {Study.Band} ACROSS A {Study.CharsPerTok} CHARS/TOKEN
+		SENSITIVITY RANGE, CENTERED {Study.BandCenter}.
 	</div>
 
 	<!-- SRC: the plain citation token the CodeMentions pass links at build time -->

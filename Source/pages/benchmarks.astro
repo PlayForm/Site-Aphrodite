@@ -15,7 +15,18 @@ import StudyLedger from "@Component/StudyLedger.astro";
 import CodeFence from "@Component/CodeFence.astro";
 
 import { Routes } from "@Library/Links";
-import { Band, Benchmark, ClassId, Cite, Figure, Figures, Narrative, Provenance, SourceRevision, Study } from "@Library/Numbers";
+import {
+	Band,
+	Benchmark,
+	ClassId,
+	Cite,
+	Figure,
+	Figures,
+	Narrative,
+	Provenance,
+	SourceRevision,
+	Study,
+} from "@Library/Numbers";
 
 // ONE QUESTION PER CHAPTER.
 //
@@ -92,32 +103,27 @@ const Chart: Record<string, { Label: string; Color: "teal" | "raw" | "canary"; C
 	"benchmark.class.browser-snapshot": {
 		Label: "BROWSER SNAPSHOT",
 		Color: "teal",
-		Corpus:
-			"one serialised page: every element, every attribute, the same wrapper nesting repeated to the leaves",
+		Corpus: "one serialised page: every element, every attribute, the same wrapper nesting repeated to the leaves",
 	},
 	"benchmark.class.build-output": {
 		Label: "BUILD OUTPUT",
 		Color: "raw",
-		Corpus:
-			"a compiler and linker log - repeated paths, repeated warning shapes, one error restated at the end",
+		Corpus: "a compiler and linker log - repeated paths, repeated warning shapes, one error restated at the end",
 	},
 	"benchmark.class.json-blob": {
 		Label: "JSON",
 		Color: "canary",
-		Corpus:
-			"one structured API payload: keys, nesting, and the values a reader needs kept byte-exact",
+		Corpus: "one structured API payload: keys, nesting, and the values a reader needs kept byte-exact",
 	},
 	"benchmark.class.git-diff": {
 		Label: "GIT DIFF",
 		Color: "raw",
-		Corpus:
-			"a patch: hunk headers, context lines, and the same file path on both sides of every change",
+		Corpus: "a patch: hunk headers, context lines, and the same file path on both sides of every change",
 	},
 	"benchmark.class.terminal-output": {
 		Label: "TERMINAL",
 		Color: "canary",
-		Corpus:
-			"shell output - listings, test runners, the progress lines that carry no verdict",
+		Corpus: "shell output - listings, test runners, the progress lines that carry no verdict",
 	},
 };
 
@@ -225,7 +231,9 @@ const Classification: Pillar = {
 	TapeColor: "teal",
 	Accent: "teal",
 	Caption: "THE FLOOR",
-	Body: ["Classification is the step before it: naming the content type costs nanoseconds, and it runs on every call."],
+	Body: [
+		"Classification is the step before it: naming the content type costs nanoseconds, and it runs on every call.",
+	],
 	Src: `SRC: ${Cite(Benchmark.From)}`,
 };
 
@@ -319,7 +327,13 @@ const Shape = [
 	},
 ];
 
-const Shapes = Shape.map(({ Id, Label, Color, ...Rest }) => ({ Id, Label, Color, ...Rest, ...Band(Id) }));
+const Shapes = Shape.map(({ Id, Label, Color, ...Rest }) => ({
+	Id,
+	Label,
+	Color,
+	...Rest,
+	...Band(Id),
+}));
 
 const RecordedShapes = Shapes.filter(({ Kind }) => Kind !== "simulated");
 const SimulatedShapes = Shapes.filter(({ Kind }) => Kind === "simulated");
@@ -410,23 +424,32 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 		     what is new is the sentence saying which chapter carries which. -->
 		<section class="relative w-full" data-reveal>
 			<div class="max-w-3xl">
-				<p class="type-body text-bone-newsprint">Read the four together and the shape of the product is in them:</p>
+				<p class="type-body text-bone-newsprint">
+					Read the four together and the shape of the product is in them:
+				</p>
 				<ul class="prose-flow mt-4 max-w-3xl type-body text-bone-newsprint">
-					<li class="border-l-4 border-raw-blood pl-4">a ceiling that belongs to one long document</li>
+					<li class="border-l-4 border-raw-blood pl-4">
+						a ceiling that belongs to one long document
+					</li>
 					<li class="border-l-4 border-raw-blood pl-4">a band for the round-trip</li>
-					<li class="border-l-4 border-raw-blood pl-4">a floor for the step that runs on every call</li>
-					<li class="border-l-4 border-raw-blood pl-4">and a median for the ordinary case.</li>
+					<li class="border-l-4 border-raw-blood pl-4">
+						a floor for the step that runs on every call
+					</li>
+					<li class="border-l-4 border-raw-blood pl-4">
+						and a median for the ordinary case.
+					</li>
 				</ul>
 				<p class="mt-4 max-w-3xl type-body text-bone-newsprint">
-					The ceiling and the median belong to the next section - how much output a marker replaces. The
-					round-trip band and the classification floor belong to the one after it - what that replacement
-					costs. The per-class mechanism follows, then the recorded sessions and the field audit, the
-					harness, and the limits, in that order.
+					The ceiling and the median belong to the next section - how much output a marker
+					replaces. The round-trip band and the classification floor belong to the one
+					after it - what that replacement costs. The per-class mechanism follows, then
+					the recorded sessions and the field audit, the harness, and the limits, in that
+					order.
 				</p>
 				<p class="mt-3 max-w-3xl type-body text-zinc-dust">
-					The ceiling is the number quoted in the repository's first line; the median is the ordinary case -
-					the one to plan a context budget against, as far as a median over {Classes.length} selected
-					samples can tell you.
+					The ceiling is the number quoted in the repository's first line; the median is
+					the ordinary case - the one to plan a context budget against, as far as a median
+					over {Classes.length} selected samples can tell you.
 				</p>
 			</div>
 			<ZineSource
@@ -444,9 +467,10 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 				How much output is replaced?
 			</h2>
 			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
-				What follows is the best case and the corpus it belongs to, with the per-class detail in the
-				mechanism chapter. Every figure in this section is measured - arithmetic on a fixed corpus - and the
-				method that computes it is stated before the first one so the unit is never in doubt.
+				What follows is the best case and the corpus it belongs to, with the per-class
+				detail in the mechanism chapter. Every figure in this section is measured -
+				arithmetic on a fixed corpus - and the method that computes it is stated before the
+				first one so the unit is never in doubt.
 			</p>
 
 			<!-- THE CEILING: the page's one expressive assembly, and its brand moment.
@@ -462,11 +486,14 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 				<ZineTape Variant="corner" Label={Ceiling.Tape} Color={Ceiling.TapeColor} />
 				<div class="mt-2 type-meta font-black">{Ceiling.Caption}</div>
 				<div class="metric mt-3 !text-carbon-void drop-shadow-[3px_3px_0px_#520612]">
-					{CeilingFact.Value}<span class="metric__unit !text-carbon-void">{CeilingFact.Unit}</span>
+					{CeilingFact.Value}
+					<span class="metric__unit !text-carbon-void">{CeilingFact.Unit}</span>
 				</div>
 				<div class="mt-3 type-body">{CeilingFact.Scope}</div>
 				<div class="mt-4 border-t border-carbon-void pt-3 prose-flow">
-					{Ceiling.Body.map((Sentence) => <p class="type-body">{Sentence}</p>)}
+					{Ceiling.Body.map((Sentence) => (
+						<p class="type-body">{Sentence}</p>
+					))}
 				</div>
 				<div class="mt-auto pt-6 type-meta text-carbon-void">{Ceiling.Src}</div>
 			</article>
@@ -477,25 +504,25 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 			<div class="mt-16">
 				<div class="section-kicker">THE WHOLE CORPUS, COUNTED AT ONCE</div>
 				<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-3">
-					{
-						[
-							{ Id: "benchmark.corpus.in", Label: "CORPUS IN" },
-							{ Id: "benchmark.corpus.out", Label: "CORPUS OUT" },
-							{ Id: "benchmark.overall", Label: "OVERALL RATIO" },
-						].map(({ Id, Label }) => {
-							const Fact = Figure(Id);
+					{[
+						{ Id: "benchmark.corpus.in", Label: "CORPUS IN" },
+						{ Id: "benchmark.corpus.out", Label: "CORPUS OUT" },
+						{ Id: "benchmark.overall", Label: "OVERALL RATIO" },
+					].map(({ Id, Label }) => {
+						const Fact = Figure(Id);
 
-							return (
-								<article class="grunge shell-card flex flex-col p-6" data-grunge>
-									<div class="type-meta font-bold text-zinc-dust">{Label}</div>
-									<div class="mt-3 font-headline text-2xl font-black tracking-tight text-bone-white">{Fact.Value}</div>
-									<div class="mt-2 type-body text-zinc-dust">
-										<span class="type-meta">{Fact.Unit}</span>{" "}&bull; {Fact.Scope}
-									</div>
-								</article>
-							);
-						})
-					}
+						return (
+							<article class="grunge shell-card flex flex-col p-6" data-grunge>
+								<div class="type-meta font-bold text-zinc-dust">{Label}</div>
+								<div class="mt-3 font-headline text-2xl font-black tracking-tight text-bone-white">
+									{Fact.Value}
+								</div>
+								<div class="mt-2 type-body text-zinc-dust">
+									<span class="type-meta">{Fact.Unit}</span> &bull; {Fact.Scope}
+								</div>
+							</article>
+						);
+					})}
 				</div>
 			</div>
 
@@ -508,16 +535,20 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 					<h3 class="mt-3 max-w-3xl type-sub text-bone-white">How a ratio is computed</h3>
 					<div class="prose-flow mt-6 max-w-3xl">
 						<p class="type-body text-bone-newsprint">
-							A ratio is one payload counted twice: the tokens the tool produced, the tokens the
-							model actually reads, and the first divided by the second.
+							A ratio is one payload counted twice: the tokens the tool produced, the
+							tokens the model actually reads, and the first divided by the second.
 						</p>
 						<p class="type-body text-bone-newsprint">
-							Nothing else enters the number - no weighting, no projection, no averaging across calls.
+							Nothing else enters the number - no weighting, no projection, no
+							averaging across calls.
 						</p>
-						<p class="type-body text-bone-newsprint">The denominator is not the raw output minus a preview.</p>
 						<p class="type-body text-bone-newsprint">
-							It is the whole replacement the model receives: the marker, its type, its size, and the short
-							preview that lets the model decide whether the bytes are worth retrieving.
+							The denominator is not the raw output minus a preview.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							It is the whole replacement the model receives: the marker, its type,
+							its size, and the short preview that lets the model decide whether the
+							bytes are worth retrieving.
 						</p>
 					</div>
 					<div class="mt-8">
@@ -550,14 +581,16 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 					</div>
 					<div class="prose-flow mt-8 max-w-3xl">
 						<p class="type-body text-bone-newsprint">
-							The corpus is fixed, and it is the same corpus for every row: the per-type table takes one
-							representative sample per output class, and the headline figure aggregates the whole set -{" "}
-							{Benchmark.CorpusIn} in, {Benchmark.CorpusOut} out, {Benchmark.Overall} overall, with the single
+							The corpus is fixed, and it is the same corpus for every row: the
+							per-type table takes one representative sample per output class, and the
+							headline figure aggregates the whole set - {Benchmark.CorpusIn} in,{" "}
+							{Benchmark.CorpusOut} out, {Benchmark.Overall} overall, with the single
 							best document reaching {Benchmark.Ceiling}.
 						</p>
 						<p class="type-body text-zinc-dust">
-							The three figures that are timed rather than counted are in the next section, on their own axis:
-							the classification floor, the compress step, and the round-trip a client waits for.
+							The three figures that are timed rather than counted are in the next
+							section, on their own axis: the classification floor, the compress step,
+							and the round-trip a client waits for.
 						</p>
 					</div>
 				</div>
@@ -574,12 +607,16 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 				>
 					<ZineTape Variant="corner" Label={Median.Tape} Color={Median.TapeColor} />
 					<div class="section-kicker">{Median.Caption}</div>
-					<div class="mt-3 font-headline text-3xl font-black tracking-tighter text-bone-white">{MedianFact.Value}</div>
+					<div class="mt-3 font-headline text-3xl font-black tracking-tighter text-bone-white">
+						{MedianFact.Value}
+					</div>
 					<div class="mt-2 type-body text-zinc-dust">
-						<span class="type-meta">{MedianFact.Unit}</span>{" "}&bull; {MedianFact.Scope}
+						<span class="type-meta">{MedianFact.Unit}</span> &bull; {MedianFact.Scope}
 					</div>
 					<div class="mt-4 prose-flow">
-						{Median.Body.map((Sentence) => <p class="type-body text-bone-newsprint">{Sentence}</p>)}
+						{Median.Body.map((Sentence) => (
+							<p class="type-body text-bone-newsprint">{Sentence}</p>
+						))}
 					</div>
 					<div class="mt-auto pt-6 type-meta text-zinc-dust">{Median.Src}</div>
 				</article>
@@ -595,9 +632,10 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 				What overhead does it add?
 			</h2>
 			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
-				Timing is reported on a different axis on purpose. A ratio says how much is replaced; it says nothing
-				about what the replacement costs to produce, and a reader deciding whether to put a proxy in front of
-				their client needs the second number more than the first.
+				Timing is reported on a different axis on purpose. A ratio says how much is
+				replaced; it says nothing about what the replacement costs to produce, and a reader
+				deciding whether to put a proxy in front of their client needs the second number
+				more than the first.
 			</p>
 
 			<!-- THE ROUND-TRIP: the pillar a reader weighing the proxy actually needs,
@@ -610,12 +648,16 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 				>
 					<ZineTape Variant="corner" Label={Latency.Tape} Color={Latency.TapeColor} />
 					<div class="section-kicker">{Latency.Caption}</div>
-					<div class="mt-3 font-headline text-3xl font-black tracking-tighter text-bone-white">{LatencyFact.Value}</div>
+					<div class="mt-3 font-headline text-3xl font-black tracking-tighter text-bone-white">
+						{LatencyFact.Value}
+					</div>
 					<div class="mt-2 type-body text-zinc-dust">
-						<span class="type-meta">{LatencyFact.Unit}</span>{" "}&bull; {LatencyFact.Scope}
+						<span class="type-meta">{LatencyFact.Unit}</span> &bull; {LatencyFact.Scope}
 					</div>
 					<div class="mt-4 prose-flow">
-						{Latency.Body.map((Sentence) => <p class="type-body text-bone-newsprint">{Sentence}</p>)}
+						{Latency.Body.map((Sentence) => (
+							<p class="type-body text-bone-newsprint">{Sentence}</p>
+						))}
 					</div>
 					<div class="mt-auto pt-6 type-meta text-zinc-dust">{Latency.Src}</div>
 				</article>
@@ -627,31 +669,35 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 			<div class="mt-16">
 				<div class="section-kicker">TWO COSTS TOO SMALL FOR THE SAME AXIS</div>
 				<div class="mt-6 grid grid-cols-1 gap-10 sm:grid-cols-2">
-					{
-						[
-							{ Pillar: Classification, Fact: ClassificationFact },
-							{ Pillar: CompressStep, Fact: CompressStepFact },
-						].map(({ Pillar, Fact }) => (
-							<article
-								class="grunge shell-card flex flex-col p-6 sm:p-8"
-								style={`border-left: 4px solid var(${AccentInk[Pillar.Accent]})`}
-								data-grunge
-							>
-								<ZineTape Variant="corner" Label={Pillar.Tape} Color={Pillar.TapeColor} />
-								<div class="section-kicker">{Pillar.Caption}</div>
-								<div class="mt-3 font-headline text-3xl font-black tracking-tighter text-bone-white">{Fact.Value}</div>
-								<div class="mt-2 type-body text-zinc-dust">
-									<span class="type-meta">{Fact.Unit}</span>{" "}&bull; {Fact.Scope}
-								</div>
-								<div class="mt-4 prose-flow">
-									{Pillar.Body.map((Sentence) => (
-										<p class="type-body text-bone-newsprint">{Sentence}</p>
-									))}
-								</div>
-								<div class="mt-auto pt-6 type-meta text-zinc-dust">{Pillar.Src}</div>
-							</article>
-						))
-					}
+					{[
+						{ Pillar: Classification, Fact: ClassificationFact },
+						{ Pillar: CompressStep, Fact: CompressStepFact },
+					].map(({ Pillar, Fact }) => (
+						<article
+							class="grunge shell-card flex flex-col p-6 sm:p-8"
+							style={`border-left: 4px solid var(${AccentInk[Pillar.Accent]})`}
+							data-grunge
+						>
+							<ZineTape
+								Variant="corner"
+								Label={Pillar.Tape}
+								Color={Pillar.TapeColor}
+							/>
+							<div class="section-kicker">{Pillar.Caption}</div>
+							<div class="mt-3 font-headline text-3xl font-black tracking-tighter text-bone-white">
+								{Fact.Value}
+							</div>
+							<div class="mt-2 type-body text-zinc-dust">
+								<span class="type-meta">{Fact.Unit}</span> &bull; {Fact.Scope}
+							</div>
+							<div class="mt-4 prose-flow">
+								{Pillar.Body.map((Sentence) => (
+									<p class="type-body text-bone-newsprint">{Sentence}</p>
+								))}
+							</div>
+							<div class="mt-auto pt-6 type-meta text-zinc-dust">{Pillar.Src}</div>
+						</article>
+					))}
 				</div>
 			</div>
 
@@ -660,37 +706,42 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 			<div class="mt-16">
 				<div class="section-kicker">WHAT THE OVERHEAD BUYS</div>
 				<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
-					{
-						[
-							{ Id: "benchmark.round-trips", Label: "ROUND TRIPS" },
-							{ Id: "narrative.marker-tokens", Label: "THE REPLACEMENT ITSELF" },
-						].map(({ Id, Label }) => {
-							const Fact = Figure(Id);
+					{[
+						{ Id: "benchmark.round-trips", Label: "ROUND TRIPS" },
+						{ Id: "narrative.marker-tokens", Label: "THE REPLACEMENT ITSELF" },
+					].map(({ Id, Label }) => {
+						const Fact = Figure(Id);
 
-							return (
-								<article class="grunge shell-card flex flex-col p-6" data-grunge>
-									<div class="type-meta font-bold text-zinc-dust">
-										{Label} &bull; {Fact.Kind.toUpperCase()}
-									</div>
-									<div class="mt-3 font-headline text-xl font-black tracking-tight text-bone-white">{Fact.Value}</div>
-									<div class="mt-2 type-body text-zinc-dust">
-										<span class="type-meta">{Fact.Unit}</span>{" "}&bull; {Fact.Scope}
-									</div>
-								</article>
-							);
-						})
-					}
+						return (
+							<article class="grunge shell-card flex flex-col p-6" data-grunge>
+								<div class="type-meta font-bold text-zinc-dust">
+									{Label} &bull; {Fact.Kind.toUpperCase()}
+								</div>
+								<div class="mt-3 font-headline text-xl font-black tracking-tight text-bone-white">
+									{Fact.Value}
+								</div>
+								<div class="mt-2 type-body text-zinc-dust">
+									<span class="type-meta">{Fact.Unit}</span> &bull; {Fact.Scope}
+								</div>
+							</article>
+						);
+					})}
 				</div>
 				<div class="prose-flow mt-8 max-w-3xl">
 					<p class="type-body text-bone-newsprint">
-						Classification is {Benchmark.Classify} and is timed on its own because it runs on every call.
-					</p>
-					<p class="type-body text-bone-newsprint">The whole compress step is {Narrative.CompressStep}.</p>
-					<p class="type-body text-bone-newsprint">
-						{Benchmark.Latency} is what a client waits once the HTTP round-trip is included.
+						Classification is {Benchmark.Classify} and is timed on its own because it
+						runs on every call.
 					</p>
 					<p class="type-body text-bone-newsprint">
-						And the {Benchmark.LatencyHeadline} headline sits near the fast end of that band.
+						The whole compress step is {Narrative.CompressStep}.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						{Benchmark.Latency} is what a client waits once the HTTP round-trip is
+						included.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						And the {Benchmark.LatencyHeadline} headline sits near the fast end of that
+						band.
 					</p>
 				</div>
 			</div>
@@ -706,37 +757,49 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 		<!-- ============ 03 // MECHANISM // THE PER-TYPE PROFILE ============ -->
 		<section class="blueprint-section relative w-full" data-reveal>
 			<p class="section-index">03 // MECHANISM // MEASURED, PER-TYPE COMPRESSION</p>
-			<h2 id="per-type" class="mt-3 max-w-4xl type-section text-bone-white">Ratio by output class</h2>
+			<h2 id="per-type" class="mt-3 max-w-4xl type-section text-bone-white">
+				Ratio by output class
+			</h2>
 			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
-				The bars are drawn at the ratios' log-scale positions, so the top row sits at full width and each
-				subsequent row reads as a step down. Because a log position is a ranking rather than a proportion,
-				the counts behind each row are stated first.
+				The bars are drawn at the ratios' log-scale positions, so the top row sits at full
+				width and each subsequent row reads as a step down. Because a log position is a
+				ranking rather than a proportion, the counts behind each row are stated first.
 			</p>
 
 			<div class="well mt-8 overflow-x-auto">
 				<table class="w-full border-collapse font-mono text-base">
 					<thead>
 						<tr class="border-b-2 border-blood-crimson">
-							<th class="px-3 py-2 text-left type-meta font-black text-zinc-dust">SAMPLE</th>
-							<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">ORIGINAL TOKENS</th>
-							<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">REPLACEMENT TOKENS</th>
-							<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">RATIO</th>
+							<th class="px-3 py-2 text-left type-meta font-black text-zinc-dust">
+								SAMPLE
+							</th>
+							<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">
+								ORIGINAL TOKENS
+							</th>
+							<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">
+								REPLACEMENT TOKENS
+							</th>
+							<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">
+								RATIO
+							</th>
 						</tr>
 					</thead>
 					<tbody>
-						{
-							Classes.map(({ Label, Corpus, Without, With, Ratio }) => (
-								<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
-									<td class="px-3 py-3 text-left">
-										<div class="font-black text-bone-white">{Label}</div>
-										<div class="mt-1 max-w-md type-body text-zinc-dust">{Corpus}</div>
-									</td>
-									<td class="px-3 py-3 text-right text-bone-newsprint">{Without}</td>
-									<td class="px-3 py-3 text-right text-bone-newsprint">{With}</td>
-									<td class="px-3 py-3 text-right font-black text-weathered-teal">{Ratio}</td>
-								</tr>
-							))
-						}
+						{Classes.map(({ Label, Corpus, Without, With, Ratio }) => (
+							<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
+								<td class="px-3 py-3 text-left">
+									<div class="font-black text-bone-white">{Label}</div>
+									<div class="mt-1 max-w-md type-body text-zinc-dust">
+										{Corpus}
+									</div>
+								</td>
+								<td class="px-3 py-3 text-right text-bone-newsprint">{Without}</td>
+								<td class="px-3 py-3 text-right text-bone-newsprint">{With}</td>
+								<td class="px-3 py-3 text-right font-black text-weathered-teal">
+									{Ratio}
+								</td>
+							</tr>
+						))}
 					</tbody>
 				</table>
 			</div>
@@ -746,57 +809,69 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 					RATIO BY OUTPUT CLASS (README STANDARD CORPUS, LOG SCALE):
 				</div>
 				<div class="mt-6 space-y-8">
-					{
-						Classes.map(({ Label, Ratio, Percent, Color, Corpus }) => (
-							<div>
-								<ZineStatBar Label={Label} Ratio={Ratio} Percent={Percent} Color={Color} />
-								<p class="mt-2 max-w-3xl type-body text-zinc-dust">{Corpus}</p>
-							</div>
-						))
-					}
+					{Classes.map(({ Label, Ratio, Percent, Color, Corpus }) => (
+						<div>
+							<ZineStatBar
+								Label={Label}
+								Ratio={Ratio}
+								Percent={Percent}
+								Color={Color}
+							/>
+							<p class="mt-2 max-w-3xl type-body text-zinc-dust">{Corpus}</p>
+						</div>
+					))}
 				</div>
 				<!-- THE AXIS: the decade marks, so the log scale is readable rather than
 				     assumed. Same function the generator used for the bar widths. -->
 				<div class="mt-10">
 					<div class="relative h-2 border-t border-oxblood-dark">
-						{
-							Ticks.map(({ Label, Left }, Index) => (
-								<div class={Index === 0 ? "absolute top-0" : "absolute top-0 -translate-x-1/2"} style={`left: ${Left}%`}>
-									<div class="h-2 w-px bg-zinc-dust" />
-									<div class="mt-1 whitespace-nowrap type-meta text-zinc-dust">{Label}</div>
+						{Ticks.map(({ Label, Left }, Index) => (
+							<div
+								class={
+									Index === 0
+										? "absolute top-0"
+										: "absolute top-0 -translate-x-1/2"
+								}
+								style={`left: ${Left}%`}
+							>
+								<div class="h-2 w-px bg-zinc-dust" />
+								<div class="mt-1 whitespace-nowrap type-meta text-zinc-dust">
+									{Label}
 								</div>
-							))
-						}
+							</div>
+						))}
 					</div>
 					<p class="mt-10 max-w-3xl type-body text-zinc-dust">
-						Decade marks on the log axis: {Ticks.map(({ Label }) => Label).join(", ")}. The top bar reaches{" "}
-						{Peak.Ratio}, which is why the last mark sits short of the right edge.
+						Decade marks on the log axis: {Ticks.map(({ Label }) => Label).join(", ")}.
+						The top bar reaches {Peak.Ratio}, which is why the last mark sits short of
+						the right edge.
 					</p>
 				</div>
 			</div>
 
 			<div class="prose-flow mt-12 border-t border-oxblood-dark pt-8 max-w-3xl">
 				<p class="type-body text-bone-newsprint">
-					The chart peaks at <span class="text-stamped-canary">{Peak.Ratio}</span>, on the browser snapshot:
-					a serialised DOM repeats the same wrapper nesting down to the leaves, and the ratio is a measure
-					of exactly that repetition.
+					The chart peaks at <span class="text-stamped-canary">{Peak.Ratio}</span>, on the
+					browser snapshot: a serialised DOM repeats the same wrapper nesting down to the
+					leaves, and the ratio is a measure of exactly that repetition.
 				</p>
 				<p class="type-body text-bone-newsprint">
 					The {Benchmark.Ceiling} plate is deliberately outside this chart.
 				</p>
 				<p class="type-body text-bone-newsprint">
-					It is not a sixth class: it is the best case on a single long low-entropy document, while the{" "}
-					{Classes.length} per-class figures are one representative sample each and {Benchmark.Overall} is the
-					whole corpus counted at once.
+					It is not a sixth class: it is the best case on a single long low-entropy
+					document, while the {Classes.length} per-class figures are one representative
+					sample each and {Benchmark.Overall} is the whole corpus counted at once.
 				</p>
 				<p class="type-body text-bone-newsprint">
-					Plotting a best case beside five class samples would invite a comparison the number cannot
-					support.
+					Plotting a best case beside five class samples would invite a comparison the
+					number cannot support.
 				</p>
 				<p class="type-body text-zinc-dust">
-					Read the chart as a ranking, not a promise: a diff, a build log and a terminal session are the
-					ordinary material of an agent turn, and they land between {Floor.Ratio} and {RunnerUp.Ratio},
-					while the median the README reports for the same table is {Benchmark.Median}.
+					Read the chart as a ranking, not a promise: a diff, a build log and a terminal
+					session are the ordinary material of an agent turn, and they land between{" "}
+					{Floor.Ratio} and {RunnerUp.Ratio}, while the median the README reports for the
+					same table is {Benchmark.Median}.
 				</p>
 			</div>
 			<div class="mt-8">
@@ -817,20 +892,22 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 				What happened in recorded sessions?
 			</h2>
 			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
-				The study takes {Study.Sessions} real Hermes sessions - <span class="text-stamped-canary">{Study.ApiCalls}</span>{" "}
-				API calls over three days - and reconstructs every call's payload from the session transcript.
+				The study takes {Study.Sessions} real Hermes sessions -{" "}
+				<span class="text-stamped-canary">{Study.ApiCalls}</span> API calls over three days
+				- and reconstructs every call's payload from the session transcript.
 			</p>
 			<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
-				Each payload is counted twice: as the model saw it, with the CCR markers in place, and with every
-				marker expanded back to the content it replaced, which is what stock Hermes would have sent.
+				Each payload is counted twice: as the model saw it, with the CCR markers in place,
+				and with every marker expanded back to the content it replaced, which is what stock
+				Hermes would have sent.
 			</p>
 			<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
 				The difference between those two counts is the saving.
 			</p>
 			<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
-				Nothing is simulated in that arithmetic - the markers, the retrieval calls and the expansions are the
-				ones the transcripts contain - but the expansion depends on a tokenizer, so the result is a band rather
-				than a point.
+				Nothing is simulated in that arithmetic - the markers, the retrieval calls and the
+				expansions are the ones the transcripts contain - but the expansion depends on a
+				tokenizer, so the result is a band rather than a point.
 			</p>
 
 			<div class="mt-12">
@@ -841,46 +918,54 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 			     its own block. A simulated workload is not a fourth observation. -->
 			<div class="mt-16 border-t border-oxblood-dark pt-8">
 				<div class="section-kicker">THE SHAPE OF A SESSION // FOUR PAYOFFS</div>
-				<h3 id="shape" class="mt-3 max-w-3xl type-sub text-bone-white">Why the same engine reports four numbers</h3>
+				<h3 id="shape" class="mt-3 max-w-3xl type-sub text-bone-white">
+					Why the same engine reports four numbers
+				</h3>
 				<div class="prose-flow mt-6 max-w-3xl">
-					<p class="type-body text-bone-newsprint">Savings track tool-output volume, not session count.</p>
 					<p class="type-body text-bone-newsprint">
-						A chat-only session has nothing to compress, so it saves {Band("study.band.chat-only").Range}.
+						Savings track tool-output volume, not session count.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						A chat-only session has nothing to compress, so it saves{" "}
+						{Band("study.band.chat-only").Range}.
 					</p>
 					<p class="type-body text-bone-newsprint">
 						A light developer session saves {Band("study.band.light-developer").Range}.
 					</p>
 					<p class="type-body text-bone-newsprint">
-						A tool-heavy session lands in the {Band("study.band.tool-heavy").Range} band.
+						A tool-heavy session lands in the {Band("study.band.tool-heavy").Range}{" "}
+						band.
 					</p>
 					<p class="type-body text-bone-newsprint">
-						And a simulated pure-tool loop - a diff, an ls, a build and a search on repeat - reaches{" "}
-						{Band("study.band.pure-tool").Range}.
+						And a simulated pure-tool loop - a diff, an ls, a build and a search on
+						repeat - reaches {Band("study.band.pure-tool").Range}.
 					</p>
 					<p class="type-body text-bone-newsprint">
-						That last figure is a stress test, not real usage, and it is labelled as one where it is
-						printed.
+						That last figure is a stress test, not real usage, and it is labelled as one
+						where it is printed.
 					</p>
 				</div>
 
 				<div class="mt-10">
 					<div class="type-meta font-bold text-zinc-dust">
-						RECORDED SESSION SHAPES &bull; ESTIMATED &bull; PERCENT OF THE SESSION'S CONTEXT BUDGET
+						RECORDED SESSION SHAPES &bull; ESTIMATED &bull; PERCENT OF THE SESSION'S
+						CONTEXT BUDGET
 					</div>
 					<div class="mt-6 space-y-6">
-						{
-							RecordedShapes.map(({ Label, Range, Percent, Color }) => (
-								<div>
-									<div class="mb-1 flex flex-wrap justify-between gap-2 text-base font-bold">
-										<span class="text-bone-newsprint">{Label}</span>
-										<span class={BarText[Color]}>{Range}</span>
-									</div>
-									<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-										<div class={`h-full ${BarColor[Color]}`} style={`width: ${Percent}%;`} />
-									</div>
+						{RecordedShapes.map(({ Label, Range, Percent, Color }) => (
+							<div>
+								<div class="mb-1 flex flex-wrap justify-between gap-2 text-base font-bold">
+									<span class="text-bone-newsprint">{Label}</span>
+									<span class={BarText[Color]}>{Range}</span>
 								</div>
-							))
-						}
+								<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+									<div
+										class={`h-full ${BarColor[Color]}`}
+										style={`width: ${Percent}%;`}
+									/>
+								</div>
+							</div>
+						))}
 					</div>
 				</div>
 
@@ -894,24 +979,25 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 					<div class="type-meta font-black text-stamped-canary">
 						SIMULATED WORKLOAD // NOT A RECORDED SESSION
 					</div>
-					{
-						SimulatedShapes.map(({ Label, Range, Percent, Note }) => (
-							<div class="mt-4">
-								<div class="mb-1 flex flex-wrap justify-between gap-2 text-base font-bold">
-									<span class="text-bone-newsprint">{Label}</span>
-									<span class="text-stamped-canary">{Range}</span>
-								</div>
-								<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-									<div class="h-full bg-raw-blood" style={`width: ${Percent}%;`} />
-								</div>
-								{Note && <div class="mt-2 max-w-3xl type-body text-zinc-dust">{Note}</div>}
+					{SimulatedShapes.map(({ Label, Range, Percent, Note }) => (
+						<div class="mt-4">
+							<div class="mb-1 flex flex-wrap justify-between gap-2 text-base font-bold">
+								<span class="text-bone-newsprint">{Label}</span>
+								<span class="text-stamped-canary">{Range}</span>
 							</div>
-						))
-					}
+							<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+								<div class="h-full bg-raw-blood" style={`width: ${Percent}%;`} />
+							</div>
+							{Note && (
+								<div class="mt-2 max-w-3xl type-body text-zinc-dust">{Note}</div>
+							)}
+						</div>
+					))}
 					<p class="mt-4 max-w-3xl type-body text-zinc-dust">
-						This range comes from a scripted loop, not from the study's sessions. It is the engine's
-						behaviour on an input nobody's day produced, and it is here to show where the ceiling of the
-						recorded shapes sits - never to be quoted as a session result.
+						This range comes from a scripted loop, not from the study's sessions. It is
+						the engine's behaviour on an input nobody's day produced, and it is here to
+						show where the ceiling of the recorded shapes sits - never to be quoted as a
+						session result.
 					</p>
 				</div>
 			</div>
@@ -927,7 +1013,9 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 		<!-- ============ 05 // FIELD AUDIT // COVERAGE, RATES, THE TAX ============ -->
 		<section class="blueprint-section relative w-full" data-reveal>
 			<p class="section-index">05 // FIELD AUDIT // RECORDED SESSIONS, COUNTED</p>
-			<h2 class="mt-3 max-w-4xl type-section text-bone-white">What did the field data show?</h2>
+			<h2 class="mt-3 max-w-4xl type-section text-bone-white">
+				What did the field data show?
+			</h2>
 
 			<!-- THE AUDIT: what the study's own records say when they are read as an
 			     audit rather than as a headline - how many sessions were touched at
@@ -940,18 +1028,21 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 					style={`border-left: 4px solid var(${AccentInk.teal})`}
 					data-grunge
 				>
-					<div class="telemetry-tag telemetry-tag--teal">COVERAGE // SESSIONS WITH A SAVING</div>
+					<div class="telemetry-tag telemetry-tag--teal">
+						COVERAGE // SESSIONS WITH A SAVING
+					</div>
 					<div class="mt-4 font-headline text-3xl font-black tracking-tighter text-bone-white">
 						{Figure("study.sessions.saved").Value}
 					</div>
 					<div class="mt-2 type-body text-zinc-dust">
-						<span class="type-meta">{Figure("study.sessions.saved").Unit}</span>{" "}&bull;{" "}
+						<span class="type-meta">{Figure("study.sessions.saved").Unit}</span> &bull;{" "}
 						{Figure("study.sessions.saved").Scope}
 					</div>
 					<div class="mt-4 prose-flow">
 						<p class="type-body text-bone-newsprint">
 							The {Study.SessionsSaved} row is the other way to read the same data: in{" "}
-							{Study.SessionsSaved.split("/")[0]!.trim()} of the {Study.Sessions} sessions something was saved.
+							{Study.SessionsSaved.split("/")[0]!.trim()} of the {Study.Sessions}{" "}
+							sessions something was saved.
 						</p>
 					</div>
 					<div class="mt-auto pt-6 type-meta text-zinc-dust">SRC: {Cite(Study.From)}</div>
@@ -962,26 +1053,29 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 					style={`border-left: 4px solid var(${AccentInk.canary})`}
 					data-grunge
 				>
-					<div class="telemetry-tag telemetry-tag--canary">RATES // TWO QUESTIONS, TWO ANSWERS</div>
+					<div class="telemetry-tag telemetry-tag--canary">
+						RATES // TWO QUESTIONS, TWO ANSWERS
+					</div>
 					<div class="mt-4 font-headline text-3xl font-black tracking-tighter text-bone-white">
 						{Figure("study.median-ratio").Value}
 					</div>
 					<div class="mt-2 type-body text-zinc-dust">
-						<span class="type-meta">{Figure("study.median-ratio").Unit}</span>{" "}&bull;{" "}
+						<span class="type-meta">{Figure("study.median-ratio").Unit}</span> &bull;{" "}
 						{Figure("study.median-ratio").Scope}
 					</div>
 					<div class="mt-3 font-headline text-xl font-black tracking-tight text-bone-newsprint">
 						{Figure("study.average-per-call").Value}
 					</div>
 					<div class="mt-1 type-body text-zinc-dust">
-						<span class="type-meta">{Figure("study.average-per-call").Unit}</span>{" "}&bull;{" "}
-						{Figure("study.average-per-call").Scope}
+						<span class="type-meta">{Figure("study.average-per-call").Unit}</span>{" "}
+						&bull; {Figure("study.average-per-call").Scope}
 					</div>
 					<div class="mt-4 prose-flow">
 						<p class="type-body text-bone-newsprint">
-							The two rates beside it answer different questions - {Study.MedianRatio} is the median session's
-							saved ratio, {Study.AvgPerCall} is what an average call did not have to carry - and both are
-							reported because neither alone describes the study.
+							The two rates beside it answer different questions - {Study.MedianRatio}{" "}
+							is the median session's saved ratio, {Study.AvgPerCall} is what an
+							average call did not have to carry - and both are reported because
+							neither alone describes the study.
 						</p>
 					</div>
 					<div class="mt-auto pt-6 type-meta text-zinc-dust">SRC: {Cite(Study.From)}</div>
@@ -992,23 +1086,26 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 					style={`border-left: 4px solid var(${AccentInk.crimson})`}
 					data-grunge
 				>
-					<div class="telemetry-tag telemetry-tag--crimson">THE RETRIEVAL TAX // THE COST SIDE</div>
+					<div class="telemetry-tag telemetry-tag--crimson">
+						THE RETRIEVAL TAX // THE COST SIDE
+					</div>
 					<div class="mt-4 font-headline text-3xl font-black tracking-tighter text-bone-white">
 						{Figure("study.retrieval.share").Value}
 					</div>
 					<div class="mt-2 type-body text-zinc-dust">
-						<span class="type-meta">{Figure("study.retrieval.share").Unit}</span>{" "}&bull;{" "}
+						<span class="type-meta">{Figure("study.retrieval.share").Unit}</span> &bull;{" "}
 						{Figure("study.retrieval.share").Scope}
 					</div>
 					<div class="mt-4 prose-flow">
 						<p class="type-body text-bone-newsprint">
 							The retrieval tax is the cost side of the ledger:{" "}
-							<span class="text-stamped-canary">{Study.TaxCalls}</span>{" "}
-							retrieve calls returned <span class="text-stamped-canary">{Study.TaxTokens}</span> tokens, roughly{" "}
-							{Study.TaxPct} of what was saved.
+							<span class="text-stamped-canary">{Study.TaxCalls}</span> retrieve calls
+							returned <span class="text-stamped-canary">{Study.TaxTokens}</span>{" "}
+							tokens, roughly {Study.TaxPct} of what was saved.
 						</p>
 						<p class="type-body text-zinc-dust">
-							Savings are gross; this row is what the model paid to get its bytes back.
+							Savings are gross; this row is what the model paid to get its bytes
+							back.
 						</p>
 					</div>
 					<div class="mt-auto pt-6 type-meta text-zinc-dust">SRC: {Cite(Study.From)}</div>
@@ -1031,12 +1128,12 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 				How can I reproduce this?
 			</h2>
 			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
-				The harness is five examples in the aphrodite crate, and each one prints the figure its own row
-				quotes.
+				The harness is five examples in the aphrodite crate, and each one prints the figure
+				its own row quotes.
 			</p>
 			<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
-				Nothing in the table is a vendor number: a reader with a checkout can re-derive every row on their own
-				machine.
+				Nothing in the table is a vendor number: a reader with a checkout can re-derive
+				every row on their own machine.
 			</p>
 			<div class="mt-8">
 				<CodeFence
@@ -1064,38 +1161,53 @@ $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 
 			<div class="mt-16 border-t border-oxblood-dark pt-8">
 				<div class="section-kicker">FIVE EXAMPLES // WHAT EACH ONE PROVES</div>
-				<h3 id="examples" class="mt-3 max-w-3xl type-sub text-bone-white">What a run actually does</h3>
+				<h3 id="examples" class="mt-3 max-w-3xl type-sub text-bone-white">
+					What a run actually does
+				</h3>
 				<p class="mt-4 max-w-3xl type-body text-bone-newsprint">
-					Each example starts its own proxies, drives them over HTTP, and exits non-zero the moment a promise
-					breaks - so a green run is a verdict, not a printout.
+					Each example starts its own proxies, drives them over HTTP, and exits non-zero
+					the moment a promise breaks - so a green run is a verdict, not a printout.
 				</p>
 				<div class="mt-6 space-y-3">
-					{Harness.map(({ Tag, Label, Body }) => <ZineFold Tag={Tag} Label={Label} Body={Body} />)}
+					{Harness.map(({ Tag, Label, Body }) => (
+						<ZineFold Tag={Tag} Label={Label} Body={Body} />
+					))}
 				</div>
 			</div>
 
 			<div class="mt-16 border-t border-oxblood-dark pt-8">
 				<div class="section-kicker">WHAT A RUN NEEDS // PRECONDITIONS</div>
-				<h3 id="needs" class="mt-3 max-w-3xl type-sub text-bone-white">Before the first command</h3>
+				<h3 id="needs" class="mt-3 max-w-3xl type-sub text-bone-white">
+					Before the first command
+				</h3>
 				<div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-					{
-						Needs.map(({ Label, Text }) => (
-							<article
-								class="grunge shell-card flex flex-col p-5"
-								style={`border-left: 4px solid var(${AccentInk.crimson})`}
-								data-grunge
-							>
-								<div class="type-meta font-black text-stamped-canary">{Label}</div>
-								<p class="mt-2 type-body text-bone-newsprint">{Text}</p>
-							</article>
-						))
-					}
+					{Needs.map(({ Label, Text }) => (
+						<article
+							class="grunge shell-card flex flex-col p-5"
+							style={`border-left: 4px solid var(${AccentInk.crimson})`}
+							data-grunge
+						>
+							<div class="type-meta font-black text-stamped-canary">{Label}</div>
+							<p class="mt-2 type-body text-bone-newsprint">{Text}</p>
+						</article>
+					))}
 				</div>
 				<p class="mt-8 max-w-3xl type-body text-zinc-dust">
 					The versions the site builds against are on{" "}
-					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={Routes.Setup}>SETUP</a>,
-					and the crate layout that holds the examples is on{" "}
-					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={Routes.Crates}>CRATES</a>.
+					<a
+						class="text-weathered-teal underline transition-colors hover:text-bone-white"
+						href={Routes.Setup}
+					>
+						SETUP
+					</a>
+					, and the crate layout that holds the examples is on{" "}
+					<a
+						class="text-weathered-teal underline transition-colors hover:text-bone-white"
+						href={Routes.Crates}
+					>
+						CRATES
+					</a>
+					.
 				</p>
 			</div>
 
@@ -1110,26 +1222,31 @@ $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 				</h3>
 				<div class="prose-flow mt-6 max-w-3xl">
 					<p class="type-body text-bone-newsprint">
-						Nothing is typed by hand: every figure is extracted from the repository on the build
-						that produces the site - not copied into a template once and trusted afterwards.
+						Nothing is typed by hand: every figure is extracted from the repository on
+						the build that produces the site - not copied into a template once and
+						trusted afterwards.
 					</p>
 					<p class="type-body text-bone-newsprint">
-						The generator reads the README and the docs tree, writes the numbers into a generated record,
-						and the page renders that record. A figure the repository stops carrying stops the build; it
-						never survives as a stale plate.
+						The generator reads the README and the docs tree, writes the numbers into a
+						generated record, and the page renders that record. A figure the repository
+						stops carrying stops the build; it never survives as a stale plate.
 					</p>
 					<p class="type-body text-bone-newsprint">
-						The revision for this build is {SourceRevision.Branch} at {SourceRevision.Short} (
-						{SourceRevision.Commit}). That is the pin the generator read, so "generated" here means
-						generated from an address a reader can check out - not merely that no one retyped the number.
+						The revision for this build is {SourceRevision.Branch} at{" "}
+						{SourceRevision.Short} ({SourceRevision.Commit}). That is the pin the
+						generator read, so "generated" here means generated from an address a reader
+						can check out - not merely that no one retyped the number.
 					</p>
 					<p class="type-body text-bone-newsprint">
-						The provenance chain is the whole of it: the fact, the file it is read from, and the section
-						it feeds.
+						The provenance chain is the whole of it: the fact, the file it is read from,
+						and the section it feeds.
 					</p>
 				</div>
 				<div class="mt-8">
-					<ZineLedger Headers={["FACT", "READ FROM", "WHAT IT FEEDS"]} Rows={ProvenanceRows} />
+					<ZineLedger
+						Headers={["FACT", "READ FROM", "WHAT IT FEEDS"]}
+						Rows={ProvenanceRows}
+					/>
 				</div>
 			</div>
 
@@ -1145,36 +1262,46 @@ $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 		<!-- ============ 07 // INTEGRITY // THE REGISTER AND THE LIMITS ============ -->
 		<section class="blueprint-section relative w-full" data-reveal>
 			<p class="section-index">07 // INTEGRITY // LIMITATIONS, WHAT THE NUMBERS ARE NOT</p>
-			<h2 id="limits" class="mt-3 max-w-4xl type-section text-bone-white">Where the figures stop</h2>
+			<h2 id="limits" class="mt-3 max-w-4xl type-section text-bone-white">
+				Where the figures stop
+			</h2>
 
 			<!-- WHAT IS MEASURED AND WHAT IS ESTIMATED: the page's two halves, stated
 			     before the individual limits so a reader knows which half each one
 			     applies to. -->
 			<div id="confidence" class="mt-10">
 				<div class="section-kicker">TWO HALVES // TWO CONFIDENCE LEVELS</div>
-				<h3 class="mt-3 max-w-3xl type-sub text-bone-white">What is measured and what is estimated</h3>
+				<h3 class="mt-3 max-w-3xl type-sub text-bone-white">
+					What is measured and what is estimated
+				</h3>
 				<div class="prose-flow mt-6 max-w-3xl">
 					<p class="type-body text-bone-newsprint">
 						The page has two halves and they do not carry the same confidence.
 					</p>
 					<p class="type-body text-bone-newsprint">
-						Everything in the plates and the per-type chart is measured: a fixed payload goes in, a marker
-						comes out, and the quotient is arithmetic.
+						Everything in the plates and the per-type chart is measured: a fixed payload
+						goes in, a marker comes out, and the quotient is arithmetic.
 					</p>
 					<p class="type-body text-bone-newsprint">
-						The session study is an estimate by construction: it reconstructs what each API call would have
-						carried with every marker expanded, so its figure depends on the tokenizer used to count that
-						reconstruction.
+						The session study is an estimate by construction: it reconstructs what each
+						API call would have carried with every marker expanded, so its figure
+						depends on the tokenizer used to count that reconstruction.
 					</p>
 					<p class="type-body text-bone-newsprint">
-						That is why it ships as a band with a stated sensitivity range rather than as a single
-						percentage.
+						That is why it ships as a band with a stated sensitivity range rather than
+						as a single percentage.
 					</p>
 					<p class="type-body text-bone-newsprint">Neither half is a vendor number.</p>
 					<p class="type-body text-zinc-dust">
-						A reader with a checkout can re-derive the measured half exactly and the estimated half to within
-						its band - the harness section is the first half of that sentence, and{" "}
-						<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={Routes.CaseStudy}>the case study</a>{" "}
+						A reader with a checkout can re-derive the measured half exactly and the
+						estimated half to within its band - the harness section is the first half of
+						that sentence, and{" "}
+						<a
+							class="text-weathered-teal underline transition-colors hover:text-bone-white"
+							href={Routes.CaseStudy}
+						>
+							the case study
+						</a>{" "}
 						is where the second half is argued.
 					</p>
 				</div>
@@ -1189,15 +1316,19 @@ $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 				<div class="section-kicker">THE FIGURE REGISTER // ONE ROW PER FIGURE</div>
 				<p class="mt-4 max-w-3xl type-body text-bone-newsprint">
 					Every figure is a record with a stable ID. The kind says how it came to exist -{" "}
-					<strong class="telemetry-tag telemetry-tag--teal">measured</strong> is arithmetic on a fixed corpus,{" "}
-					<strong class="telemetry-tag telemetry-tag--canary">estimated</strong> is a reconstruction that depends on a
-					tokenizer, <strong class="telemetry-tag telemetry-tag--crimson">simulated</strong> is a workload that never
-					happened, and <strong class="telemetry-tag telemetry-tag--bone">derived</strong> is a quotient of two other
-					records.
+					<strong class="telemetry-tag telemetry-tag--teal">measured</strong> is
+					arithmetic on a fixed corpus,{" "}
+					<strong class="telemetry-tag telemetry-tag--canary">estimated</strong> is a
+					reconstruction that depends on a tokenizer,{" "}
+					<strong class="telemetry-tag telemetry-tag--crimson">simulated</strong> is a
+					workload that never happened, and{" "}
+					<strong class="telemetry-tag telemetry-tag--bone">derived</strong> is a quotient
+					of two other records.
 				</p>
 				<p class="mt-3 max-w-3xl type-body text-zinc-dust">
-					The page joins each record by ID, never by position, so a label cannot drift onto a
-					neighbouring figure's value. A missing record stops the build and names the ID.
+					The page joins each record by ID, never by position, so a label cannot drift
+					onto a neighbouring figure's value. A missing record stops the build and names
+					the ID.
 				</p>
 				<div class="mt-6">
 					<ZineLedger
@@ -1207,12 +1338,13 @@ $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 				</div>
 				<div class="prose-flow mt-12 max-w-3xl">
 					<p class="type-body text-zinc-dust">
-						A wrong figure is fixed in the repository and the pin advances - never in the generated record,
-						which the next build overwrites.
+						A wrong figure is fixed in the repository and the pin advances - never in
+						the generated record, which the next build overwrites.
 					</p>
 					<p class="type-body text-zinc-dust">
-						That is what makes the SRC line under each plate an address rather than a formality: the line
-						numbers beside it come from the same pass that produced the number it describes.
+						That is what makes the SRC line under each plate an address rather than a
+						formality: the line numbers beside it come from the same pass that produced
+						the number it describes.
 					</p>
 				</div>
 			</div>
@@ -1246,17 +1378,21 @@ $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 			</div>
 
 			<div class="prose-flow mt-12 border-t border-oxblood-dark pt-8 max-w-3xl">
-				<p class="type-body text-bone-newsprint">None of this weakens the claim the page makes.</p>
 				<p class="type-body text-bone-newsprint">
-					A compression proxy earns its place on the ordinary turn - a diff, a build log, a terminal dump -
-					where the ratio is {Floor.Ratio} to {RunnerUp.Ratio} and the model keeps working from the preview.
+					None of this weakens the claim the page makes.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					A compression proxy earns its place on the ordinary turn - a diff, a build log,
+					a terminal dump - where the ratio is {Floor.Ratio} to {RunnerUp.Ratio} and the
+					model keeps working from the preview.
 				</p>
 				<p class="type-body text-bone-newsprint">
 					The ceiling is what the engine can do; the median is what a session gets.
 				</p>
 				<p class="type-body text-zinc-dust">
-					If a number here disagrees with your own run, the harness is the arbiter: the examples ship with the
-					crate, and the SRC lines name the README section each figure is copied from.
+					If a number here disagrees with your own run, the harness is the arbiter: the
+					examples ship with the crate, and the SRC lines name the README section each
+					figure is copied from.
 				</p>
 			</div>
 

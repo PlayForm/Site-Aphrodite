@@ -74,7 +74,13 @@ function ReadGenerated(): {
 	Changelog?: { Version?: string; Date?: string; Title?: string; Pairing?: string };
 } | null {
 	const Candidates = [
-		resolve(dirname(fileURLToPath(import.meta.url)), "..", "Generated", "Facts", "Versions.json"),
+		resolve(
+			dirname(fileURLToPath(import.meta.url)),
+			"..",
+			"Generated",
+			"Facts",
+			"Versions.json",
+		),
 		resolve(process.cwd(), "Source", "Generated", "Facts", "Versions.json"),
 	];
 
@@ -184,9 +190,12 @@ export const Versions = {
 	Headroom: Generated?.Headroom?.Version ?? ReadHeadroomVersion() ?? Fallback.Headroom,
 	/** The plugin downloader's pinned binary version (plugins/aphrodite/BINARY_VERSION). */
 	BinaryVersionFile:
-		Generated?.BinaryVersionFile?.Version ?? ReadBinaryVersionFile() ?? Fallback.BinaryVersionFile,
+		Generated?.BinaryVersionFile?.Version ??
+		ReadBinaryVersionFile() ??
+		Fallback.BinaryVersionFile,
 	/** The CHANGELOG head's entry version (the generated current release). */
-	ChangelogVersion: Generated?.Changelog?.Version ?? ChangelogHead?.Version ?? Fallback.Changelog.Version,
+	ChangelogVersion:
+		Generated?.Changelog?.Version ?? ChangelogHead?.Version ?? Fallback.Changelog.Version,
 	/** The CHANGELOG head's entry date. */
 	ChangelogDate: Generated?.Changelog?.Date ?? ChangelogHead?.Date ?? Fallback.Changelog.Date,
 	/** The CHANGELOG head's entry title. */

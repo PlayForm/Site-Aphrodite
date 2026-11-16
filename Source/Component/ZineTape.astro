@@ -77,8 +77,15 @@ interface Props {
 	Class?: string;
 }
 
-const { Label, Variant = "corner", Color = "raw", Side = "left", Offset = "-top-7", Rotate, Class = "" } =
-	Astro.props;
+const {
+	Label,
+	Variant = "corner",
+	Color = "raw",
+	Side = "left",
+	Offset = "-top-7",
+	Rotate,
+	Class = "",
+} = Astro.props;
 
 /** A tape's colour is a FILL with text on it. */
 const Palette = {

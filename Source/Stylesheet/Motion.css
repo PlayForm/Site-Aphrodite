@@ -117,9 +117,7 @@ body [data-section-nav] {
    still wins with an id selector or an inline style - this is a floor, not a
    ceiling. */
 html [id] {
-	scroll-margin-top: calc(
-		var(--site-header-height) + var(--section-nav-height) + 1rem
-	);
+	scroll-margin-top: calc(var(--site-header-height) + var(--section-nav-height) + 1rem);
 }
 
 /* ═══ READABLE WITHOUT JAVASCRIPT ════════════════════════════════════════

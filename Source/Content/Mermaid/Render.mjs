@@ -349,7 +349,9 @@ const Selected = Filter
 	? Sources.filter((Name) => Filter.has(Name.replace(/\.mmd$/, "")))
 	: Sources;
 if (Filter && Selected.length === 0) {
-	console.error(`No .mmd source matches APHRODITE_DIAGRAMS="${process.env["APHRODITE_DIAGRAMS"]}".`);
+	console.error(
+		`No .mmd source matches APHRODITE_DIAGRAMS="${process.env["APHRODITE_DIAGRAMS"]}".`,
+	);
 	process.exit(1);
 }
 

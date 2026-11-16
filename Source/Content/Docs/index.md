@@ -118,4 +118,4 @@ Every doc in this tree follows one style, the same one this page and the root `R
 | No file/line citations    | Docs describe behavior directly; they don't cite exact source files or line numbers as proof - accuracy is a writing standard, not a footnote |
 | No placeholder content    | If a documented setting or feature isn't confirmed to do anything, the doc says so plainly instead of presenting it as working                |
 | Minimal external links    | Link out only when the reader needs to click through to do something (download a release, read an upstream project's own docs)                |
-| Roadmap ideas are labeled | Forward-looking or unimplemented designs (see [Centers](/docs/centers/)) say clearly which parts are shipped and which are sketches               |
+| Roadmap ideas are labeled | Forward-looking or unimplemented designs (see [Centers](/docs/centers/)) say clearly which parts are shipped and which are sketches           |

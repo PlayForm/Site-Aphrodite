@@ -27,9 +27,7 @@ export const CrateNote: Record<string, CrateProseRecord> = {
 	aphrodite: {
 		Role: "Chat Completions proxy with CCR, tool relay, and programmatic CCR",
 		Ships: "the aphrodite binary + a cdylib/rlib",
-		Body: [
-			"Ships the aphrodite binary and a cdylib/rlib library; built on axum and tokio.",
-		],
+		Body: ["Ships the aphrodite binary and a cdylib/rlib library; built on axum and tokio."],
 		Marker: "crate.aphrodite",
 	},
 	"aphrodite-hermes": {

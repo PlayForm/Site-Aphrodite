@@ -56,36 +56,34 @@ const { Links = [], Title = "NEXT STEPS" } = Astro.props;
 const Entries = Links.filter(({ Href, Label }) => Boolean(Href) && Boolean(Label));
 ---
 
-{
-	Entries.length > 0 && (
-		<nav aria-label="Next steps" class="next-steps w-full">
-			<div class="next-steps__head">
-				<p class="type-meta uppercase tracking-widest text-zinc-dust">{Title}</p>
-				<p class="type-meta uppercase tracking-widest text-zinc-dust">
-					{Entries.length} {Entries.length === 1 ? "DESTINATION" : "DESTINATIONS"}
-				</p>
-			</div>
-			<ul class="next-steps__list">
-				{Entries.map((Link, Position) => (
-					<li class="next-steps__row">
-						<span class="next-steps__ordinal" aria-hidden="true">
-							{String(Position + 1).padStart(2, "0")}
-						</span>
-						<div class="next-steps__body">
-							<a
-								class="w-fit font-mono text-base text-bone-white underline decoration-stamped-canary decoration-2 underline-offset-4 transition-colors hover:bg-raw-blood hover:text-bone-white"
-								href={Link.Href}
-							>
-								{Link.Label}
-							</a>
-							{Link.Reason && <p class="type-body text-zinc-dust">{Link.Reason}</p>}
-						</div>
-					</li>
-				))}
-			</ul>
-		</nav>
-	)
-}
+{Entries.length > 0 && (
+	<nav aria-label="Next steps" class="next-steps w-full">
+		<div class="next-steps__head">
+			<p class="type-meta uppercase tracking-widest text-zinc-dust">{Title}</p>
+			<p class="type-meta uppercase tracking-widest text-zinc-dust">
+				{Entries.length} {Entries.length === 1 ? "DESTINATION" : "DESTINATIONS"}
+			</p>
+		</div>
+		<ul class="next-steps__list">
+			{Entries.map((Link, Position) => (
+				<li class="next-steps__row">
+					<span class="next-steps__ordinal" aria-hidden="true">
+						{String(Position + 1).padStart(2, "0")}
+					</span>
+					<div class="next-steps__body">
+						<a
+							class="w-fit font-mono text-base text-bone-white underline decoration-stamped-canary decoration-2 underline-offset-4 transition-colors hover:bg-raw-blood hover:text-bone-white"
+							href={Link.Href}
+						>
+							{Link.Label}
+						</a>
+						{Link.Reason && <p class="type-body text-zinc-dust">{Link.Reason}</p>}
+					</div>
+				</li>
+			))}
+		</ul>
+	</nav>
+)}
 
 <style>
 	/* THE MODULE'S RULE. One hairline above the whole block, in the chapter-rule

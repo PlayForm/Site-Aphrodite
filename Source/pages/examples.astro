@@ -330,11 +330,18 @@ const Artifacts = [
 	{
 		Line: "git status",
 		Shape: "[git:2M 2A 1D 3?? | src/x.rs src/y.rs +6 more]",
-		Reads:
-			"2 modified, 2 added, 1 deleted, 3 untracked; first files named, and the +6 more counter names the six entries the preview does not print - eight in all",
+		Reads: "2 modified, 2 added, 1 deleted, 3 untracked; first files named, and the +6 more counter names the six entries the preview does not print - eight in all",
 	},
-	{ Line: "test run", Shape: "[test:220 pass 0 fail 1 ignored | 0.31s]", Reads: "all green - the one ignored test is visible, nothing to retrieve" },
-	{ Line: "grep", Shape: "[grep:4 hits in 3 files | src/preview.rs:12 ...]", Reads: "hit count, distinct files, first location - retrieve or narrow the search" },
+	{
+		Line: "test run",
+		Shape: "[test:220 pass 0 fail 1 ignored | 0.31s]",
+		Reads: "all green - the one ignored test is visible, nothing to retrieve",
+	},
+	{
+		Line: "grep",
+		Shape: "[grep:4 hits in 3 files | src/preview.rs:12 ...]",
+		Reads: "hit count, distinct files, first location - retrieve or narrow the search",
+	},
 ] as const;
 
 // The seven built-in directives, baked into the binary (docs/plugin/directives.md:34-42).
@@ -350,7 +357,11 @@ const Builtins = [
 
 // The injection order of pre_llm_call, top to bottom (docs/plugin/hooks.md:123-128).
 const InjectionOrder = [
-	{ N: "01", Section: "FIRST-TURN ORIENTATION", Rule: "turn 0 only, from [prompts] session_inject" },
+	{
+		N: "01",
+		Section: "FIRST-TURN ORIENTATION",
+		Rule: "turn 0 only, from [prompts] session_inject",
+	},
 	{ N: "02", Section: "DIRECTIVES", Rule: "never dropped" },
 	{ N: "03", Section: "NUDGES", Rule: "one-shots, at most two - never dropped" },
 	{ N: "04", Section: "BACKGROUND STATUS", Rule: "yields under pressure" },
@@ -382,7 +393,10 @@ const Cases: CaseRecord[] = [
 		Command: { Lang: "text", Code: "APHRODITE_RETRIEVE(HASH)" },
 		Output: [
 			{ Text: "turn 7, tool result", Tone: "dim" },
-			{ Text: "↓ APHRODITE_RETRIEVE(HASH) - THE AGENT DECIDES, NOT THE ENGINE ↓", Tone: "canary" },
+			{
+				Text: "↓ APHRODITE_RETRIEVE(HASH) - THE AGENT DECIDES, NOT THE ENGINE ↓",
+				Tone: "canary",
+			},
 			{ Text: "173 bytes return unchanged · nested markers resolved", Tone: "result" },
 		],
 		Preview: "[git:2M 2A 1D 3?? | src/x.rs src/y.rs +6 more]",
@@ -391,7 +405,11 @@ const Cases: CaseRecord[] = [
 			{
 				Kind: "cards",
 				Label: "THE ANNOTATED ARTIFACTS // PREVIEWS THAT MADE RETRIEVAL UNNECESSARY",
-				Cards: Artifacts.map(({ Line, Shape, Reads }) => ({ Title: Line, Body: Shape, Note: Reads })),
+				Cards: Artifacts.map(({ Line, Shape, Reads }) => ({
+					Title: Line,
+					Body: Shape,
+					Note: Reads,
+				})),
 			},
 			{
 				Kind: "rows",
@@ -438,14 +456,17 @@ const Cases: CaseRecord[] = [
 			{ Text: "01 EMPTY · nothing to compress", Tone: "result" },
 			{ Text: "02 ESSENTIAL SET · the agent needs raw output", Tone: "result" },
 			{ Text: "03 SELF TOOLS · already compact metadata", Tone: "result" },
-			{ Text: "04 SIZE GATE · 1,024 bytes on the token lane, 8,192 on the cache lane", Tone: "result" },
+			{
+				Text: "04 SIZE GATE · 1,024 bytes on the token lane, 8,192 on the cache lane",
+				Tone: "result",
+			},
 			{ Text: "04 SIZE GATE // THE DYLIB LANE", Tone: "dim" },
 			{ Text: "4,096 chars default; 0 disables the gate", Tone: "dim" },
 		],
 		Preview: "the raw bytes, unchanged",
 		Marker: "none - this is the gate that refuses the machine.",
 		Note: [
-			'The gate order is fixed: the empty check, the essential set, the self-tools, then the size gate (docs/plugin/hooks.md:69-94).',
+			"The gate order is fixed: the empty check, the essential set, the self-tools, then the size gate (docs/plugin/hooks.md:69-94).",
 			`The classifier demo in <a class="text-stamped-canary hover:text-bone-white" href="${Routes.Workbench}">the workbench</a> walks the same gates with live output.`,
 		],
 		Src: "SRC: docs/plugin/hooks.md:69-94,146-153 · docs/config/aphrodite-toml.md:121-131",
@@ -507,11 +528,17 @@ const Cases: CaseRecord[] = [
 		Command: { Lang: "text", Code: "POST /reload" },
 		Output: [
 			{ Text: "&lt; 1,000 bytes of prose, above the token gate &gt;", Tone: "dim" },
-			{ Text: "SAME BYTES ON THE CACHE LANE: NO PREVIEW, NO MARKER, NO STORE ENTRY", Tone: "dim" },
+			{
+				Text: "SAME BYTES ON THE CACHE LANE: NO PREVIEW, NO MARKER, NO STORE ENTRY",
+				Tone: "dim",
+			},
 		],
 		Preview: `[text:3L ${PayloadBytes}B | some unrecognizable prose here]`,
 		Marker: `&lt;&lt;&lt;CCR:0e3a5c9f...a1e|text|${PayloadBytes}&gt;&gt;&gt;`,
-		Diagram: { Html: ConfigResolution, Caption: "THE HOT PATH // EDIT-SAVE - 500 MS DEBOUNCE - FOUR ATOMICS" },
+		Diagram: {
+			Html: ConfigResolution,
+			Caption: "THE HOT PATH // EDIT-SAVE - 500 MS DEBOUNCE - FOUR ATOMICS",
+		},
 		Src: "SRC: README.md:389-407,584-588 · docs/architecture/07-config-resolution.md:66-71 · docs/config/aphrodite-toml.md:121-131,204 · aphrodite.toml.example:95-123 · docs/examples/README.md:21 · docs/classification/content-types.md:153",
 	},
 	{
@@ -581,7 +608,10 @@ const Cases: CaseRecord[] = [
 			{ Text: "SYNCHRONOUS // NO CALLBACK_URL", Tone: "dim" },
 			{ Text: "POST /tool/relay - tool runs - full result inline", Tone: "result" },
 			{ Text: "ASYNC // WITH CALLBACK_URL", Tone: "canary" },
-			{ Text: '{"{ \\"success\\": true, \\"result\\": null, \\"async_call\\": true }"}', Tone: "result" },
+			{
+				Text: '{"{ \\"success\\": true, \\"result\\": null, \\"async_call\\": true }"}',
+				Tone: "result",
+			},
 			{ Text: "... later, 5s timeout, no auth, no retries ...", Tone: "dim" },
 			{ Text: "POST callback_url - the real result", Tone: "result" },
 		],
@@ -622,8 +652,14 @@ const Cases: CaseRecord[] = [
 				Kind: "rows",
 				Label: "TWO LISTENERS, TWO BACKENDS",
 				Rows: [
-					{ Left: "CACHE :9797", Right: "DASHMAP · 10,000 · 8192-BYTE THRESHOLD · TRANSIENT" },
-					{ Left: "TOKEN :9798", Right: "SQLITE · ccr.db · 1024-BYTE THRESHOLD · PERSISTENT" },
+					{
+						Left: "CACHE :9797",
+						Right: "DASHMAP · 10,000 · 8192-BYTE THRESHOLD · TRANSIENT",
+					},
+					{
+						Left: "TOKEN :9798",
+						Right: "SQLITE · ccr.db · 1024-BYTE THRESHOLD · PERSISTENT",
+					},
 				],
 			},
 		],
@@ -649,51 +685,62 @@ const Sections = [
 	<PageShell Crumbs>
 		<!-- ============ HERO // THE WORKED SCENARIOS ============ -->
 		<header class="relative flex w-full flex-col items-start pt-12" data-reveal>
-			<div
-				class="tape-strip absolute -top-6 left-0 z-10 -rotate-1 border-b border-t border-bone-newsprint/30 px-4 py-1 text-base font-black uppercase tracking-widest text-bone-newsprint"
-			>
+			<div class="tape-strip absolute -top-6 left-0 z-10 -rotate-1 border-b border-t border-bone-newsprint/30 px-4 py-1 text-base font-black uppercase tracking-widest text-bone-newsprint">
 				EXAMPLES // MECHANICS-FIRST · THE OTHER SHELF IS /SHOWCASE
 			</div>
 			<div class="zine-box-teal relative w-full border-4 border-blood-crimson bg-carbon-void p-8 sm:p-12 lg:p-16">
 				<p class="font-mono text-base font-bold uppercase tracking-widest text-weathered-teal">
 					THE WORKED SCENARIOS // HOW IT ACTUALLY MOVES
 				</p>
-				<h1
-					class="type-display mt-8 uppercase text-bone-white max-sm:!text-4xl drop-shadow-[4px_4px_0px_#520612]"
-				>
-					Seven scenarios,<br />one <span class="text-stamped-canary">lifecycle</span>
+				<h1 class="type-display mt-8 uppercase text-bone-white max-sm:!text-4xl drop-shadow-[4px_4px_0px_#520612]">
+					Seven scenarios,
+					<br />
+					one <span class="text-stamped-canary">lifecycle</span>
 				</h1>
 				<p class="type-body mt-16 max-w-3xl text-bone-newsprint">
-					A tool call's output is appended to the model's context, and the model reads every
-					line of it. These are the scenarios where Aphrodite changes what arrives.
+					A tool call's output is appended to the model's context, and the model reads
+					every line of it. These are the scenarios where Aphrodite changes what arrives.
 				</p>
 				<p class="type-body mt-6 max-w-3xl text-bone-newsprint">
 					Not what the output looks like - what happens to it, step by step.
 				</p>
 				<!-- The index: the seven behaviours, each a jump link to its chapter -->
 				<ol class="mt-12 flex max-w-3xl flex-col border-b border-oxblood-dark">
-					{
-						Cases.map(({ Id, Hero }) => (
-							<li class="border-t border-oxblood-dark">
-								<a
-									class="group flex flex-col gap-1 py-3 transition-colors sm:flex-row sm:items-baseline sm:gap-6"
-									href={`#${Id}`}
-								>
-									<span class="shrink-0 font-mono text-base font-bold uppercase tracking-widest text-stamped-canary transition-colors group-hover:text-bone-white">
-										{Chapter(Id)}
-									</span>
-									<span class="type-body text-bone-newsprint transition-colors group-hover:text-bone-white">
-										{Hero}
-									</span>
-								</a>
-							</li>
-						))
-					}
+					{Cases.map(({ Id, Hero }) => (
+						<li class="border-t border-oxblood-dark">
+							<a
+								class="group flex flex-col gap-1 py-3 transition-colors sm:flex-row sm:items-baseline sm:gap-6"
+								href={`#${Id}`}
+							>
+								<span class="shrink-0 font-mono text-base font-bold uppercase tracking-widest text-stamped-canary transition-colors group-hover:text-bone-white">
+									{Chapter(Id)}
+								</span>
+								<span class="type-body text-bone-newsprint transition-colors group-hover:text-bone-white">
+									{Hero}
+								</span>
+							</a>
+						</li>
+					))}
 				</ol>
 				<div class="mt-24 flex flex-wrap gap-12 font-mono text-base font-bold uppercase tracking-widest">
-					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-stamped-canary transition-colors hover:text-bone-white" href={Routes.Workbench}>TRY THE SIMULATOR</a>
-					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-zinc-dust transition-colors hover:text-bone-white" href={Routes.Tools}>THE TOOLS</a>
-					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-zinc-dust transition-colors hover:text-bone-white" href={Routes.Docs}>THE DOCS</a>
+					<a
+						class="border border-oxblood-dark bg-soot-black px-4 py-2 text-stamped-canary transition-colors hover:text-bone-white"
+						href={Routes.Workbench}
+					>
+						TRY THE SIMULATOR
+					</a>
+					<a
+						class="border border-oxblood-dark bg-soot-black px-4 py-2 text-zinc-dust transition-colors hover:text-bone-white"
+						href={Routes.Tools}
+					>
+						THE TOOLS
+					</a>
+					<a
+						class="border border-oxblood-dark bg-soot-black px-4 py-2 text-zinc-dust transition-colors hover:text-bone-white"
+						href={Routes.Docs}
+					>
+						THE DOCS
+					</a>
 				</div>
 			</div>
 		</header>
@@ -702,27 +749,26 @@ const Sections = [
 		<SectionNav Sections={Sections} />
 
 		<!-- ============ 01-07 // THE SEVEN BEHAVIOURS, ONE CONSOLE POD ============ -->
-		{
-			Cases.map(({ Hero: _Hero, ...Scenario }) => {
-				const Beat = StreamBeat(Scenario.Output.length);
+		{Cases.map(({ Hero: _Hero, ...Scenario }) => {
+			const Beat = StreamBeat(Scenario.Output.length);
 
-				return (
-					<section
-						id={Scenario.Id}
-						class="blueprint-section relative flex w-full scroll-mt-24 flex-col"
-						style={`--blueprint-rule: ${ChapterRule[Scenario.Tone ?? "crimson"]}`}
-						data-reveal
-					>
-						<p class="section-index">{Chapter(Scenario.Id)}</p>
+			return (
+				<section
+					id={Scenario.Id}
+					class="blueprint-section relative flex w-full scroll-mt-24 flex-col"
+					style={`--blueprint-rule: ${ChapterRule[Scenario.Tone ?? "crimson"]}`}
+					data-reveal
+				>
+					<p class="section-index">{Chapter(Scenario.Id)}</p>
 
-						<ZineBox Tone={Scenario.Tone} Rotate={Scenario.Rotate} Class="mt-10 w-full">
-							<ZineTape
-								Label={Scenario.Label}
-								Color={TapeColor[Scenario.Tone ?? "crimson"]}
-								Side="left"
-							/>
+					<ZineBox Tone={Scenario.Tone} Rotate={Scenario.Rotate} Class="mt-10 w-full">
+						<ZineTape
+							Label={Scenario.Label}
+							Color={TapeColor[Scenario.Tone ?? "crimson"]}
+							Side="left"
+						/>
 
-							{/* TWO COLUMNS, ONE POD. The claim is the left column and the
+						{/* TWO COLUMNS, ONE POD. The claim is the left column and the
 							    console pod the right, because the pod is ONE payload and not
 							    a set of findings: a reader follows command -> output ->
 							    preview down a single shell instead of comparing four panels
@@ -731,85 +777,85 @@ const Sections = [
 							    the pod reads as a console and not as a stack of cards), and
 							    the preview keeps the one asphalt result card the product's
 							    own output deserves. */}
-							<div class="mt-6 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-								<!-- THE CLAIM -->
-								<div class="flex min-w-0 flex-col">
-									<h2 class="type-section uppercase text-bone-white">
-										{Scenario.Title}
-									</h2>
-									<div class="prose-flow type-body mt-[var(--space-tight)] text-bone-newsprint">
-										{Scenario.Claim.map((Sentence) => (
-											<p set:html={Sentence} />
-										))}
-									</div>
-								</div>
-
-								<!-- THE CONSOLE POD -->
-								<div class="shell-card flex min-w-0 flex-col">
-									<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b border-oxblood-dark px-4 py-3">
-										<span class="telemetry-tag">CONSOLE POD</span>
-										<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
-											COMMAND → OUTPUT → WHAT THE MODEL READS
-										</span>
-									</div>
-
-									<div class="p-4">
-										<p class="telemetry-tag">01 // THE COMMAND</p>
-										<div class="well mt-3 p-3" data-plate-flush>
-											<CodeFence
-												Code={Scenario.Command.Code}
-												Lang={Scenario.Command.Lang}
-												Copy
-											/>
-										</div>
-									</div>
-
-									<div class="border-t border-oxblood-dark p-4">
-										<p class="telemetry-tag">02 // THE OUTPUT</p>
-										<div class="mt-3">
-											<ZineStream Lines={Scenario.Output} Stream />
-										</div>
-									</div>
-
-									<div class="border-t border-oxblood-dark p-4">
-										<p class="telemetry-tag telemetry-tag--canary">
-											03 // PREVIEW + MARKER
-										</p>
-										<div class="mt-3">
-											<ZinePreview
-												Label="PREVIEW + MARKER"
-												Result={Scenario.Preview}
-												Hash={Scenario.Marker}
-												Enter={Beat}
-											/>
-										</div>
-									</div>
+						<div class="mt-6 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+							<!-- THE CLAIM -->
+							<div class="flex min-w-0 flex-col">
+								<h2 class="type-section uppercase text-bone-white">
+									{Scenario.Title}
+								</h2>
+								<div class="prose-flow type-body mt-[var(--space-tight)] text-bone-newsprint">
+									{Scenario.Claim.map((Sentence) => (
+										<p set:html={Sentence} />
+									))}
 								</div>
 							</div>
 
-							{/* THE SCENARIO'S OWN EVIDENCE - the same five shapes, rendered
-							    by the one component that owns them. */}
-							<ExamplePanels Panels={Scenario.Panels} Class="mt-16" />
-
-							{Scenario.Diagram && (
-								<figure class="mt-16 border border-oxblood-dark bg-asphalt-panel p-4">
-									<div class="overflow-x-auto" set:html={Scenario.Diagram.Html} />
-									<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-										{Scenario.Diagram.Caption}
-									</figcaption>
-								</figure>
-							)}
-
-							{Scenario.Note?.length ? (
-								<div class="prose-flow mt-16 max-w-3xl">
-									{Scenario.Note.map((Sentence) => (
-										<p class="type-body text-bone-newsprint" set:html={Sentence} />
-									))}
+							<!-- THE CONSOLE POD -->
+							<div class="shell-card flex min-w-0 flex-col">
+								<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b border-oxblood-dark px-4 py-3">
+									<span class="telemetry-tag">CONSOLE POD</span>
+									<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
+										COMMAND → OUTPUT → WHAT THE MODEL READS
+									</span>
 								</div>
-							) : null}
 
-							<ZineSource Lines={[Scenario.Src]} />
-						</ZineBox>
+								<div class="p-4">
+									<p class="telemetry-tag">01 // THE COMMAND</p>
+									<div class="well mt-3 p-3" data-plate-flush>
+										<CodeFence
+											Code={Scenario.Command.Code}
+											Lang={Scenario.Command.Lang}
+											Copy
+										/>
+									</div>
+								</div>
+
+								<div class="border-t border-oxblood-dark p-4">
+									<p class="telemetry-tag">02 // THE OUTPUT</p>
+									<div class="mt-3">
+										<ZineStream Lines={Scenario.Output} Stream />
+									</div>
+								</div>
+
+								<div class="border-t border-oxblood-dark p-4">
+									<p class="telemetry-tag telemetry-tag--canary">
+										03 // PREVIEW + MARKER
+									</p>
+									<div class="mt-3">
+										<ZinePreview
+											Label="PREVIEW + MARKER"
+											Result={Scenario.Preview}
+											Hash={Scenario.Marker}
+											Enter={Beat}
+										/>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* THE SCENARIO'S OWN EVIDENCE - the same five shapes, rendered
+							    by the one component that owns them. */}
+						<ExamplePanels Panels={Scenario.Panels} Class="mt-16" />
+
+						{Scenario.Diagram && (
+							<figure class="mt-16 border border-oxblood-dark bg-asphalt-panel p-4">
+								<div class="overflow-x-auto" set:html={Scenario.Diagram.Html} />
+								<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+									{Scenario.Diagram.Caption}
+								</figcaption>
+							</figure>
+						)}
+
+						{Scenario.Note?.length ? (
+							<div class="prose-flow mt-16 max-w-3xl">
+								{Scenario.Note.map((Sentence) => (
+									<p class="type-body text-bone-newsprint" set:html={Sentence} />
+								))}
+							</div>
+						) : null}
+
+						<ZineSource Lines={[Scenario.Src]} />
+					</ZineBox>
 					{/* THE THRESHOLDS COMPARISON - one question, one table, and the
 					    precision behind a disclosure. It is NOT a console pod row:
 					    the evidence shapes are rows, cards and lane pairs, and this
@@ -831,8 +877,8 @@ const Sections = [
 							    because the table only stops scrolling at a 1024px viewport,
 							    not at `sm`. */}
 							<p class="type-body mb-3 max-w-3xl text-zinc-dust lg:hidden">
-								Swipe the table sideways: the docs column and the same-answer verdict are
-								off-screen here.
+								Swipe the table sideways: the docs column and the same-answer
+								verdict are off-screen here.
 							</p>
 							<div
 								class="overflow-x-auto"
@@ -842,7 +888,8 @@ const Sections = [
 							>
 								<table class="w-full min-w-[48rem] border-collapse text-left">
 									<caption class="type-sub mb-[var(--space-tight)] text-left text-bone-white">
-										What happens to the same {PayloadBytes.toLocaleString("en-US")}-byte payload?
+										What happens to the same{" "}
+										{PayloadBytes.toLocaleString("en-US")}-byte payload?
 									</caption>
 									<thead>
 										<tr>
@@ -856,13 +903,17 @@ const Sections = [
 												scope="col"
 												class="border border-oxblood-dark px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
 											>
-												SHIPPED EXAMPLE<br />256 / 2048 / 1.0 / 1024
+												SHIPPED EXAMPLE
+												<br />
+												256 / 2048 / 1.0 / 1024
 											</th>
 											<th
 												scope="col"
 												class="border border-oxblood-dark px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
 											>
-												DOCS/EXAMPLES<br />512 / 4096 / 3.0 / 2048
+												DOCS/EXAMPLES
+												<br />
+												512 / 4096 / 3.0 / 2048
 											</th>
 											<th
 												scope="col"
@@ -873,8 +924,16 @@ const Sections = [
 										</tr>
 									</thead>
 									<tbody>
-										{
-											Doors.map(({ Door, Shipped, Docs, ShippedVerdict, DocsVerdict, ShippedWhy, DocsWhy }) => (
+										{Doors.map(
+											({
+												Door,
+												Shipped,
+												Docs,
+												ShippedVerdict,
+												DocsVerdict,
+												ShippedWhy,
+												DocsWhy,
+											}) => (
 												<tr>
 													<th
 														scope="row"
@@ -915,12 +974,14 @@ const Sections = [
 																	: "text-stamped-canary",
 															]}
 														>
-															{ShippedVerdict === DocsVerdict ? "SAME" : "DIFFERS"}
+															{ShippedVerdict === DocsVerdict
+																? "SAME"
+																: "DIFFERS"}
 														</span>
 													</td>
 												</tr>
-											))
-										}
+											),
+										)}
 									</tbody>
 								</table>
 							</div>
@@ -933,10 +994,9 @@ const Sections = [
 							</div>
 						</div>
 					)}
-					</section>
-				);
-			})
-		}
+				</section>
+			);
+		})}
 
 		<!-- ============ 08 // THE TURN CYCLE (INTERACTIVE) ============ -->
 		<section
@@ -950,13 +1010,16 @@ const Sections = [
 			<div class="prose-flow type-body mt-[var(--space-tight)] max-w-3xl text-bone-newsprint">
 				<p>Each scenario zooms into one mechanism.</p>
 				<p>
-					This is the loop that holds them: the six hooks, in firing order, with what the agent sees
-					and what the system does at each step.
+					This is the loop that holds them: the six hooks, in firing order, with what the
+					agent sees and what the system does at each step.
 				</p>
 				<p>
-					Two columns answer together: the transcript the model reads, and the work
-					that produced it. Every step cites the hook section that owns it, so the diagram is a
-					route into <code class="font-mono text-base text-weathered-teal">docs/plugin/hooks.md</code>
+					Two columns answer together: the transcript the model reads, and the work that
+					produced it. Every step cites the hook section that owns it, so the diagram is a
+					route into{" "}
+					<code class="font-mono text-base text-weathered-teal">
+						docs/plugin/hooks.md
+					</code>
 					rather than a summary of it.
 				</p>
 			</div>
@@ -987,7 +1050,7 @@ const Sections = [
 							],
 							System: [
 								"pre_tool_call can auto-background long-running terminal/process calls (poll worker, default on) and split chained commands (chain split, off by default).",
-							"If neither applies, the call passes through unchanged",
+								"If neither applies, the call passes through unchanged",
 							],
 							Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
 							AnchorLabel: "hooks.md:29-42",
@@ -1048,7 +1111,9 @@ const Sections = [
 				/>
 			</div>
 			<ZineSource
-				Lines={["SRC: docs/plugin/hooks.md:13-20 (the six-hook table) · each step cites its hook section"]}
+				Lines={[
+					"SRC: docs/plugin/hooks.md:13-20 (the six-hook table) · each step cites its hook section",
+				]}
 			/>
 		</section>
 
@@ -1063,13 +1128,13 @@ const Sections = [
 			<h2 class="type-section mt-2 text-bone-white">One runtime home</h2>
 			<div class="prose-flow type-body mt-[var(--space-tight)] max-w-3xl text-bone-newsprint">
 				<p>
-					The history behind issue #40, as a decision walk: how the runtime home is resolved today,
-					and why both halves of the plugin agree by construction.
+					The history behind issue #40, as a decision walk: how the runtime home is
+					resolved today, and why both halves of the plugin agree by construction.
 				</p>
 				<p>
-					Each step names the rule that decides, the mechanism that carries it, and the changelog
-					entry the claim rests on - so a reader can check the last column instead of trusting the
-					first.
+					Each step names the rule that decides, the mechanism that carries it, and the
+					changelog entry the claim rests on - so a reader can check the last column
+					instead of trusting the first.
 				</p>
 			</div>
 			<div class="mt-[var(--space-group)]">
@@ -1123,7 +1188,7 @@ const Sections = [
 							],
 							System: [
 								"the startup log prints: runtime home: path (decided by ...).",
-							"Before v1.6.3, the shim read HERMES_HOME while the Rust half read HOME - the divergence that orphaned configs and disabled plugins whenever the two differed.",
+								"Before v1.6.3, the shim read HERMES_HOME while the Rust half read HOME - the divergence that orphaned configs and disabled plugins whenever the two differed.",
 								"Fixed as one decision, shared",
 							],
 							Anchor: Link(OurRepo, "CHANGELOG.md"),
@@ -1145,7 +1210,9 @@ const Sections = [
 				/>
 			</div>
 			<ZineSource
-				Lines={["SRC: CHANGELOG.md:104-154 (v1.6.3) · CHANGELOG.md:39-67 (v1.6.5) · issue #40"]}
+				Lines={[
+					"SRC: CHANGELOG.md:104-154 (v1.6.3) · CHANGELOG.md:39-67 (v1.6.5) · issue #40",
+				]}
 			/>
 		</section>
 
