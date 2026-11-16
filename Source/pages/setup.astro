@@ -1074,9 +1074,9 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 				Four installs, one at a time
 			</h2>
 			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
-				Each route is self-contained: the commands, what they leave on disk, what makes
-				them fail, and the one check that says the install is live. The recommended path
-				is selected first; the other three are one pill away, in the same container.
+				Each route is self-contained: the commands, what they leave on disk, what makes them
+				fail, and the one check that says the install is live. The recommended path is
+				selected first; the other three are one pill away, in the same container.
 			</p>
 
 			<!-- THE PLATFORM FACT sits beside the selector rather than inside it: the
@@ -1164,8 +1164,9 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 				</fieldset>
 			</div>
 
-				<!-- THE CONTAINER. One terminal, eight lanes, four records - all in
+			<!-- THE CONTAINER. One terminal, eight lanes, four records - all in
 				     the document, one of each shown. -->
+			<div>
 				<div
 					class="workflow__terminal grunge shell-card"
 					data-grunge
@@ -1177,15 +1178,9 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 								<div class="workflow__lane" data-os={Platform(Lane)}>
 									<div class="workflow__bar">
 										<span class="flex gap-1.5" aria-hidden="true">
-											<span
-												class="block h-2 w-2 bg-[color:var(--tier-well-edge)]"
-											/>
-											<span
-												class="block h-2 w-2 bg-[color:var(--tier-well-edge)]"
-											/>
-											<span
-												class="block h-2 w-2 bg-[color:var(--tier-well-edge)]"
-											/>
+											<span class="block h-2 w-2 bg-[color:var(--tier-well-edge)]" />
+											<span class="block h-2 w-2 bg-[color:var(--tier-well-edge)]" />
+											<span class="block h-2 w-2 bg-[color:var(--tier-well-edge)]" />
 										</span>
 										<span class="telemetry-tag telemetry-tag--teal">
 											SESSION // {Lane.Shell.toUpperCase()} - {Lane.Platform}
@@ -1341,6 +1336,59 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 						</div>
 					))}
 				</div>
+
+				<!-- THE VERIFICATION GATE, once across the container's footer. The
+				     fact is true of all four routes, so it does not repeat under every
+				     lane; the per-route verification is the record's own VERIFY panel,
+				     which travels with the route. -->
+				<div class="flex flex-col gap-2 border-t border-[color:var(--tier-shell-edge)] bg-[color:var(--tier-well)] px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-between">
+					<span class="flex flex-wrap items-center gap-2 type-body text-zinc-dust">
+						<span class="telemetry-tag telemetry-tag--canary">VERIFICATION GATE</span>
+						the two plugin routes fetch prebuilt binaries magic-byte verified against
+						the in-tree{" "}
+						<code class="font-mono text-base text-weathered-teal">SHA256SUMS.txt</code>;
+						the cargo and source routes build from source, so there is no downloaded
+						binary to verify
+					</span>
+					<span class="type-meta font-bold text-weathered-teal">
+						DAEMON LISTENING // :9797 cache proxy · :9798 token proxy
+					</span>
+				</div>
+			</div>
+
+			<!-- THE CALLOUT BANNER. Stitch's bottom terminal callout, and the band's
+			     closing line: the claim, the two facts that decide whether the install
+			     worked, and the two places a reader goes when it did not. -->
+			<div
+				class="grunge shell-card mt-10 flex flex-wrap items-center justify-between gap-6 p-6 sm:p-8"
+				data-grunge
+				data-grunge-mode="edge"
+			>
+				<div class="min-w-0 max-w-[46rem]">
+					<div class="flex items-center gap-3">
+						<span class="block h-3 w-3 shrink-0 bg-raw-blood" aria-hidden="true"></span>
+						<h3 class="type-sub text-bone-white">
+							The install is done when two ports answer
+						</h3>
+					</div>
+					<p class="mt-3 type-body text-bone-newsprint">
+						Start <code class="font-mono text-base text-weathered-teal">hermes</code>. A
+						working install logs that Aphrodite is enabled and answers on
+						<code class="font-mono text-base text-weathered-teal">:9797</code> (cache)
+						and
+						<code class="font-mono text-base text-weathered-teal">:9798</code> (token);
+						a missing binary logs the setup command instead, and the plugin stays
+						disabled until you run it.
+					</p>
+				</div>
+				<div class="flex flex-wrap items-center gap-3">
+					<ZineButton Label="When it does not come up" Href="#failures" />
+					<ZineButton
+						Label="The Windows walkthrough"
+						Href={DocsRoute("install/windows")}
+						Role="ghost"
+					/>
+				</div>
 			</div>
 
 			<p class="mt-8 font-mono text-base text-zinc-dust">
@@ -1461,9 +1509,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 			<!-- THE PERSISTENCE BLOCK: the same layout read as records - every
 			     path a route writes, what writes it, and what it holds. -->
 			<div class="grunge shell-card mt-10" data-grunge data-grunge-mode="edge">
-				<div
-					class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[color:var(--tier-shell-edge)] px-5 py-4"
-				>
+				<div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[color:var(--tier-shell-edge)] px-5 py-4">
 					<span class="telemetry-tag telemetry-tag--bone">PERSISTENCE</span>
 					<span class="telemetry-tag">{Persistence.length} PATHS</span>
 					<span class="telemetry-tag telemetry-tag--teal">
@@ -1474,19 +1520,13 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 					<table class="w-full border-collapse font-mono text-base">
 						<thead>
 							<tr class="border-b border-[color:var(--tier-well-edge)] text-left">
-								<th
-									class="type-meta px-4 py-3 font-black uppercase text-stamped-canary sm:px-5"
-								>
+								<th class="type-meta px-4 py-3 font-black uppercase text-stamped-canary sm:px-5">
 									PATH
 								</th>
-								<th
-									class="type-meta px-4 py-3 font-black uppercase text-stamped-canary sm:px-5"
-								>
+								<th class="type-meta px-4 py-3 font-black uppercase text-stamped-canary sm:px-5">
 									WRITTEN BY
 								</th>
-								<th
-									class="type-meta px-4 py-3 font-black uppercase text-stamped-canary sm:px-5"
-								>
+								<th class="type-meta px-4 py-3 font-black uppercase text-stamped-canary sm:px-5">
 									WHAT IT HOLDS
 								</th>
 							</tr>
@@ -1994,4 +2034,3 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 		/>
 	</PageShell>
 </Base>
-

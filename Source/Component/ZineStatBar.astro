@@ -220,7 +220,7 @@ const Width = Math.max(0, Math.min(100, Percent ?? 0));
 			<div class="statbar__track well">
 				{Fill === "scroll" ? (
 					<div
-						class="statbar__fill"
+						class="statbar__fill zine-stat-fill"
 						style={`width: ${Width}%;`}
 						data-stat-fill={Width}
 						aria-hidden="true"
@@ -283,16 +283,8 @@ const Width = Math.max(0, Math.min(100, Percent ?? 0));
 	document.addEventListener("astro:page-load", BindStatFills);
 </script>
 
-<style>
-	/* The pre-hide, on the same three conditions the site's reveal system uses
-	   (Source/Stylesheet/Motion.css): `html.js` is set by Base.astro's head
-	   script before paint, so a reader without JavaScript never has the bar
-	   hidden from them; a reader who asked for stillness reads the final width
-	   immediately; and `:not([data-stat-fill-on])` means the rule can never
-	   outlive the fill that releases it. */
-	@media (prefers-reduced-motion: no-preference) {
-		:global(html.js) .statbar__fill[data-stat-fill]:not([data-stat-fill-on]) {
-			width: 0 !important;
-		}
-	}
-</style>
+<!-- No <style> block here on purpose: the fill's pre-hide is part of the readout's
+     own state contract and lives in `Stylesheet/Component/Data.scss` beside the
+     geometry it hides, while the hard-step snap stays in Global.css behind the
+     `.zine-stat-fill` motion hook the fill element still carries. A component
+     that carries a style block is the extraction reversing itself. -->

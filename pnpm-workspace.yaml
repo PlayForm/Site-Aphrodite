@@ -1,12 +1,13 @@
 packages:
-  - "!**/Target/**"
+    - "!**/Target/**"
 
 minimumReleaseAge: 0
 
 nodeLinker: hoisted
 
 allowBuilds:
-  '@firebase/util': true
-  esbuild: true
-  protobufjs: true
-  puppeteer: true
+    "@firebase/util": true
+    "@parcel/watcher": true
+    esbuild: true
+    protobufjs: true
+    puppeteer: true

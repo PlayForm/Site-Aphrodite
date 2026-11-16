@@ -491,6 +491,26 @@ $ink-body: var(--bone-newsprint);
 	background-color: var(--statbar-fill);
 }
 
+/* THE PRE-HIDE, on the same three conditions the site's reveal system uses
+   (`Motion.css`): `html.js` is set by `Base.astro`'s head script before paint, so
+   a reader without JavaScript never has the bar hidden from them; a reader who
+   asked for stillness reads the final width immediately; and
+   `:not([data-stat-fill-on])` means the rule can never outlive the fill that
+   releases it. The hook is the `data-stat-fill` attribute - the thing the
+   component's script binds - so the rule cannot be broken by a class rename that
+   leaves the binding in place.
+
+   The fill's OTHER motion is not here: the hard-step snap
+   (`transition: width 0.8s steps(8)`) and its reduced-motion cancellation live in
+   `Global.css` under `.zine-stat-fill`, which the element still carries as its
+   motion hook. A surface states what a reading looks like; the motion vocabulary
+   states how it arrives. */
+@media (prefers-reduced-motion: no-preference) {
+	html.js .statbar__fill[data-stat-fill]:not([data-stat-fill-on]) {
+		width: 0 !important;
+	}
+}
+
 /* THE POD VARIANT: the same readout as a filled plate with no track, because the
    figures a pod carries are not shares of anything ("610x", "~10MS") and a bar
    beneath one would encode nothing. The plate's own fill and ink are the accent's
@@ -720,7 +740,7 @@ $ink-body: var(--bone-newsprint);
 	font-size: 1rem;
 	line-height: 1.5rem;
 	color: $ink-body;
-	transition-property: color, border-color;
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
 	transition-duration: 150ms;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -776,5 +796,20 @@ $ink-body: var(--bone-newsprint);
 	.example__grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 1.5rem;
+	}
+}
+
+/* The LEGACY presentation's band is looser than the outcome-aware one: the same
+   two pods, further apart, because that form is a page's whole subject rather
+   than one card in a library. The modifier is stated after the base and after
+   its wide rule, so it wins at every width without an `!important`. */
+.example__grid--loose {
+	margin-top: 1.5rem;
+	gap: 3rem;
+}
+
+@media (min-width: 1024px) {
+	.example__grid--loose {
+		gap: 2rem;
 	}
 }

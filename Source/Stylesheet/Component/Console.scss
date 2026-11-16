@@ -379,34 +379,18 @@ body .zine-plate.well > pre.astro-code:focus-within {
 /* THE RIBBON. `order: -1` puts it above the code without moving the DOM: the
    bar is appended AFTER the `<pre>` (so the cluster can be positioned over it
    in the non-well plate), and the well simply renders it first. Static, opaque
-   and full-width, which is why it can be always visible.
-
-   `.console__bar` is the published name for this row: a console's ribbon and a
-   well's ribbon are one band, so they are one rule. */
-body .zine-plate.well > .zine-plate-bar,
-.console__bar {
+   and full-width, which is why it can be always visible. */
+body .zine-plate.well > .zine-plate-bar {
 	position: static;
 	order: -1;
 	display: flex;
-	flex-wrap: wrap;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 1rem 0.25rem;
-	margin: 0;
-	padding: 0.375rem 0.75rem;
-	border-bottom: 1px solid var(--oxblood-dark);
-	background-color: var(--asphalt-panel);
-	opacity: 1;
-}
-
-/* A well's ribbon carries the well's own edge colour and a tighter gap: the
-   channel's band is part of the channel, so it may not paint a second palette
-   edge into it. */
-body .zine-plate.well > .zine-plate-bar {
+	align-items: center;
 	gap: 0.5rem;
+	margin: 0;
 	padding: 0.4rem 0.6rem;
-	border-bottom-color: var(--tier-well-edge);
+	border-bottom: 1px solid var(--tier-well-edge);
 	background-color: var(--tier-shell);
+	opacity: 1;
 }
 
 /* THE PATH is the ribbon's leading field: it says WHERE the block came from,
@@ -459,6 +443,30 @@ body .zine-plate.well > .zine-plate-bar > .zine-plate-copy {
 	background-color: var(--soot-black);
 }
 
+/* THE CONSOLE RIBBON. The pod's header band: what produced the bytes on the
+   left, its telemetry tag on the right. It is the one row a reader can scan
+   without reading the console underneath, which is why it carries the pod's
+   own edge colour and its own plane instead of a second border.
+
+   The declarations are exactly the ones the two live call sites already spell
+   in their class string (`flex flex-wrap items-baseline justify-between
+   gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5`),
+   so the class and the string cannot disagree while both are present. */
+.console__bar {
+	position: static;
+	order: -1;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 1rem 0.25rem;
+	margin: 0;
+	padding: 0.375rem 0.75rem;
+	border-bottom: 1px solid var(--oxblood-dark);
+	background-color: var(--asphalt-panel);
+	opacity: 1;
+}
+
 /* THE RECESSED WELL. The body is cut INTO the plate, not laid on top of it:
    the ribbon above is the lighter asphalt plane and this one hard 3px inset in
    the plate's own black is the lip the cut leaves behind. It is the same
@@ -478,4 +486,357 @@ body .zine-plate.well > .zine-plate-bar > .zine-plate-copy {
 	display: flex;
 	align-items: center;
 	gap: 0.75rem;
+}
+
+/* ---- 4. PIPELINE CHROME // the console family's own names ----------------
+
+   `ZinePipeline` renders the two pods, the stage rail, the switchboard and the
+   readout. Its classes are the `.zp-*` family the contract assigns to this
+   file: a page or a component outside the owner never names one, and the
+   component no longer carries a `<style>` block at all.
+
+   MOVED, NOT REWRITTEN - declaration for declaration, in the same order, so
+   the two routes that mount it (/workbench/, /case-study/) render exactly what
+   they rendered while the rules were scoped to the component. The scoping
+   added no specificity here (`:where(.astro-...)` contributes zero) and no other
+   rule in the tree names a `.zp-*` class, so the move cannot change a computed
+   value.
+
+   The `--font-mono` / `--font-headline` fallbacks are kept as written: they are
+   the component's own safety net for a page that mounts it outside this tree,
+   not a second copy of a token the sheet is allowed to know. */
+
+/* The pipeline's own chrome. Self-contained: it must render identically on
+   /workbench/ and /case-study/, so it carries no page-local class. Radius
+   stays 0, shadows are hard offsets, rotation only from sm up. */
+.zp-title {
+	margin-top: 1.5rem;
+	font-family: var(--font-headline, inherit);
+	font-size: 1.5rem;
+	font-weight: 900;
+	text-transform: uppercase;
+	letter-spacing: -0.01em;
+	color: var(--bone-white, #ece9e0);
+}
+@media (min-width: 640px) {
+	.zp-title {
+		font-size: 2.25rem;
+	}
+}
+
+/* THE RAIL */
+.zp-rail {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.75rem;
+	margin-top: 2rem;
+}
+@media (min-width: 900px) {
+	.zp-rail {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+.zp-step {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	border: 2px solid var(--oxblood-dark, #520612);
+	background: var(--soot-black, #09090b);
+	padding: 0.75rem 1rem;
+	opacity: 0.55;
+	transition: opacity 0.2s ease;
+}
+.zp-step[data-on] {
+	opacity: 1;
+	border-color: var(--blood-crimson, #7a0a1e);
+	box-shadow: 3px 3px 0 #000;
+}
+.zp-step-n {
+	font-family: var(--font-mono, monospace);
+	font-size: 13px;
+	letter-spacing: 0.1em;
+	color: var(--zinc-dust, #82808a);
+}
+.zp-step-name {
+	font-family: var(--font-mono, monospace);
+	font-size: 16px;
+	font-weight: 900;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--bone-white, #ece9e0);
+}
+.zp-step-figure {
+	font-family: var(--font-mono, monospace);
+	font-size: 13px;
+	letter-spacing: 0.08em;
+	color: var(--zinc-dust, #82808a);
+}
+.zp-step-canary .zp-step-figure {
+	color: var(--stamped-canary, #e5a93b);
+}
+.zp-step-teal .zp-step-figure {
+	color: var(--weathered-teal, #2a938d);
+}
+/* `raw` and `bone` carry the same identity the index stage cards give stage
+   03 and stage 04, so the rail reads as the same four stages as the home
+   page. Raw blood measures 2.12:1 on carbon-void, so the figure takes the
+   same 55% lift the stage cards use for their ink: same colour, legible
+   text. */
+.zp-step-raw .zp-step-figure {
+	color: color-mix(in srgb, var(--raw-blood, #931128) 55%, var(--bone-newsprint, #dedbd2));
+}
+.zp-step-bone .zp-step-figure {
+	color: var(--bone-newsprint, #dedbd2);
+}
+
+/* THE SWITCHBOARD */
+.zp-switch {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 1.25rem;
+	margin-top: 3rem;
+}
+.zp-pill {
+	border: 2px solid var(--blood-crimson, #7a0a1e);
+	background: var(--carbon-void, #111014);
+	padding: 0.5rem 0.9rem;
+	font-family: var(--font-mono, monospace);
+	font-size: 16px;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--bone-newsprint, #dedbd2);
+	box-shadow: 3px 3px 0 #000;
+}
+.zp-pill:hover,
+.zp-pill[data-active] {
+	background: var(--raw-blood, #931128);
+	color: var(--bone-white, #ece9e0);
+}
+.zp-exec {
+	border-color: #000;
+	background: var(--stamped-canary, #e5a93b);
+	color: var(--soot-black, #09090b);
+}
+.zp-exec.zp-exec-spin {
+	animation: zp-spin-once 0.42s ease;
+}
+@keyframes zp-spin-once {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* THE PAIR, AS TWO PODS. A pod is a crimson frame carrying the hard offset
+   shadow the plate grammar has always used, a header ribbon banded across
+   its top, and a body that is simply the pod's own fill. One depth per pod:
+   the difference between the two halves is what they hold, never how far
+   they sit from the page. */
+.zp-pane {
+	display: flex;
+	flex-direction: column;
+	border: 4px solid var(--blood-crimson, #7a0a1e);
+	background: var(--carbon-void, #111014);
+	box-shadow: 6px 6px 0 #520612;
+}
+
+/* THE HEADER RIBBON. What produced these bytes and how many there are: the
+   pod's name on the left, its telemetry tag on the right. It sits on the
+   pod's darkest fill under a crimson rule, so it separates from the body it
+   caps without a second border colour, and it is the one row a reader can
+   scan without reading the console underneath. */
+.zp-pane-head,
+.zp-pane-foot {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 0.75rem;
+	border-bottom: 2px solid var(--blood-crimson, #7a0a1e);
+	background: var(--soot-black, #09090b);
+	padding: 0.75rem 1.25rem;
+}
+.zp-pane-foot {
+	border-bottom: 0;
+	border-top: 2px solid var(--blood-crimson, #7a0a1e);
+}
+.zp-h3 {
+	font-family: var(--font-mono, monospace);
+	font-size: 16px;
+	font-weight: 900;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--stamped-canary, #e5a93b);
+}
+/* Teal is the preview side's identity, not a variation of the amber one:
+   the same pairing the stream/preview pair carries everywhere. */
+.zp-h3-teal {
+	color: var(--weathered-teal, #2a938d);
+}
+.zp-classified {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.5rem;
+	font-family: var(--font-mono, monospace);
+	font-size: 16px;
+	color: var(--bone-newsprint, #dedbd2);
+}
+.zp-type {
+	font-weight: 900;
+	color: var(--bone-white, #ece9e0);
+}
+.zp-tier,
+.zp-dot {
+	color: var(--zinc-dust, #82808a);
+}
+.zp-preview-body {
+	display: flex;
+	flex-grow: 1;
+	flex-direction: column;
+	gap: 2rem;
+	padding: 1.5rem;
+}
+
+/* THE RESULT: an inset bone-white plate. */
+.zp-result {
+	background: var(--bone-white, #ece9e0);
+	padding: 1rem;
+	box-shadow: inset 3px 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* THE RECESSED INPUT WELL. The pane's body is cut INTO the panel by one hard
+   3px inset in the plate's own black - the same lip `ZineStream` and
+   `ZineSplit` leave in their console bodies - so the bytes arrive in a
+   channel rather than on a slab. Hard offset, no blur, no radius. */
+.zp-input-well {
+	box-shadow: inset 3px 3px 0 #000;
+}
+
+/* THE CUTOFF LINE. One labelled rule marking the one boundary the pair
+   exists to show: the preview stops at it and the stored original begins
+   under it. A rule, not a panel - the label sits at meta size because a
+   rule's label is a caption and never a sentence. */
+.zp-cutoff {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+.zp-cutoff-rule {
+	height: 1px;
+	flex: 1;
+	background: var(--oxblood-dark, #520612);
+}
+.zp-line {
+	font-family: var(--font-mono, monospace);
+	font-size: 16px;
+	color: var(--soot-black, #09090b);
+}
+/* The kicker is the TELEMETRY VOICE, at the size a label is allowed: 11.5px
+   mono, 0.08em tracking. It used to be 16px - the size of the prose it
+   labels - which made every micro-label on the console shout as loudly as
+   the sentence under it. A label that cannot be quieter than its value is
+   not a label. */
+.zp-kicker {
+	font-family: var(--font-mono, monospace);
+	font-size: var(--type-meta, 11.5px);
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zinc-dust, #82808a);
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+}
+.zp-kicker-ink {
+	color: rgba(9, 9, 11, 0.6);
+}
+.zp-kicker-teal {
+	color: var(--weathered-teal, #2a938d);
+}
+.zp-kicker-canary {
+	color: var(--stamped-canary, #e5a93b);
+}
+.zp-kicker-newsprint {
+	color: var(--bone-newsprint, #dedbd2);
+}
+.zp-address {
+	font-family: var(--font-mono, monospace);
+	font-size: 16px;
+	color: var(--weathered-teal, #2a938d);
+	overflow-wrap: anywhere;
+}
+.zp-chip {
+	font-family: var(--font-mono, monospace);
+	font-size: 16px;
+	color: var(--weathered-teal, #2a938d);
+	overflow-wrap: anywhere;
+}
+.zp-chip:hover {
+	background: var(--weathered-teal, #2a938d);
+	color: var(--soot-black, #09090b);
+}
+.zp-decision {
+	border-left: 4px solid var(--stamped-canary, #e5a93b);
+	background: var(--soot-black, #09090b);
+	padding: 1rem;
+}
+.zp-decision .zp-h3 {
+	color: var(--stamped-canary, #e5a93b);
+}
+.zp-inject {
+	border-left: 4px solid var(--oxblood-dark, #520612);
+	background: var(--soot-black, #09090b);
+	padding: 1rem;
+}
+.zp-note-block {
+	font-family: var(--font-mono, monospace);
+	font-size: 16px;
+	line-height: 1.6;
+	color: var(--bone-newsprint, #dedbd2);
+}
+.zp-note {
+	font-family: var(--font-mono, monospace);
+	font-size: 16px;
+	color: var(--zinc-dust, #82808a);
+}
+
+/* THE READOUT */
+.zp-stat {
+	margin-top: 1rem;
+	font-family: var(--font-mono, monospace);
+	font-size: 1.5rem;
+	font-weight: 900;
+	color: var(--bone-white, #ece9e0);
+}
+.zp-stat-track {
+	height: 0.75rem;
+	border: 2px solid #000;
+	background: var(--soot-black, #09090b);
+}
+.zp-stat-fill {
+	height: 100%;
+	background: var(--raw-blood, #931128);
+	transition: width 0.2s ease;
+}
+.zp-terminal {
+	font-family: var(--font-mono, monospace);
+	font-size: 16px;
+	line-height: 1.5;
+	outline: none;
+}
+.zp-terminal::placeholder {
+	color: var(--zinc-dust, #82808a);
+}
+@media (prefers-reduced-motion: reduce) {
+	.zp-exec.zp-exec-spin,
+	.zp-step,
+	.zp-stat-fill {
+		animation: none;
+		transition: none;
+	}
 }

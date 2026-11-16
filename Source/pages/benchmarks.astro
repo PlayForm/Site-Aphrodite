@@ -260,7 +260,7 @@ const CompressStepFact = Figure(CompressStep.Id);
 // 02 // PILLARS - THE COST AXIS AS ONE DRAWING
 //
 // Three of this chapter's costs are timed, two of them are BANDS, and the bands
-// sit six orders of magnitude apart. Printed in separate cards that is three
+// sit orders of magnitude apart. Printed in separate cards that is three
 // numbers a reader has to hold in their head to compare; drawn on ONE
 // logarithmic nanosecond axis it is the argument the chapter already makes in
 // prose - the step that runs on every call is invisible beside the round-trip a
@@ -416,6 +416,12 @@ const Replacement: Pillar = {
 };
 
 const ReplacementFact = Figure(Replacement.Id);
+
+/** The harness result is not a pillar, so its own qualifiers - the unit, the
+ *  scope and the kind - are printed under the cost axis it measured, where a
+ *  reader is looking at the figures it produced. The ribbon above the page
+ *  carries the value; this line carries what the value was measured over. */
+const HarnessFact = Figure("benchmark.round-trips");
 
 /** The accent a card's bar and figure paint with. Crimson is a FILL token - as
  *  text on a shell card `--raw-blood` measures 2.23:1 - so a crimson pillar
@@ -1040,6 +1046,11 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 					Classification is {Benchmark.Classify} and is timed on its own because it runs on
 					every call. The whole compress step is {Narrative.CompressStep}, so its lane marks a
 					ceiling rather than a range.
+				</p>
+
+				<p class="mt-4 max-w-3xl type-meta uppercase text-zinc-dust">
+					THE HARNESS // {HarnessFact.Kind.toUpperCase()} &bull; {HarnessFact.Unit} &bull;
+					{HarnessFact.Scope}
 				</p>
 			</div>
 

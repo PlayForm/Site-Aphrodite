@@ -183,6 +183,13 @@ interface Props {
 			@import "@Stylesheet/Global.css";
 		</style>
 
+		<!-- SYSTEM // the SCSS layer, loaded once for every route. It is a second
+		     block on purpose: the CSS `@import` above is resolved by PostCSS with
+		     the `@Stylesheet` alias, while Sass needs a real relative path. -->
+		<style is:global lang="scss">
+			@import "../Stylesheet/System.scss";
+		</style>
+
 		<slot name="Head" />
 
 		<!-- Favicon -->

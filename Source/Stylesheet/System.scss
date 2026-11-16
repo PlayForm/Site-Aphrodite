@@ -1,0 +1,34 @@
+/* ============================================================================
+   SYSTEM - the one stylesheet entry point.
+
+   THE LAYER ORDER (each partial may only assume the ones above it):
+
+     1. _contract     comments only, emits nothing - the layer rules
+     2. _tokens       values: palette, type roles, spacing roles, ink, tiers
+     3. _base         reset, body typography, focus rings, selection
+     4. Component/Plate    the zine surface: frame, plane, splat, tape, stamp
+     5. Component/Texture  grunge ink, halftone, photocopy, print overlays
+     6. Component/Console  code plates, consoles, streams
+     7. Component/Data     ledgers, tables, dossiers, stat bars, examples
+     8. Component/Chrome   shell, header, crumbs, nav, sidebar, related, bands
+     9. _utilities    type roles, prose flow, emphasis tiers, chips
+
+   Loaded ONCE, globally, from `Source/Layout/Base.astro`. Nothing else imports a
+   partial directly: a partial that nothing reaches is not extracted, it is
+   deleted (see the "never strand a rule" note in .hermes/tmp/stitch/BRIDGE.md).
+
+   `@import` rather than `@use` is deliberate: these partials were written
+   against one global scope and reference each other's variables directly.
+   Migrating them to namespaced `@use` is a later, mechanical pass - doing it now
+   would mean rewriting every variable reference in nine files at once.
+   ============================================================================ */
+
+@import "contract";
+@import "tokens";
+@import "base";
+@import "Component/Plate";
+@import "Component/Texture";
+@import "Component/Console";
+@import "Component/Data";
+@import "Component/Chrome";
+@import "utilities";
