@@ -729,7 +729,7 @@ const GridFold = `
 		     average them into one outcome, so every figure keeps the qualifier
 		     that names its domain - and the qualifier is part of the number. -->
 		<section
-			class="relative w-full bg-bone-newsprint py-6 text-soot-black sm:py-10 lg:py-14"
+			class="paper-band relative bg-bone-newsprint py-6 text-soot-black sm:py-10 lg:py-14"
 			data-reveal
 		>
 			<!-- ONE EXPRESSIVE DEVICE IN THIS BAND: the giant numeral. The ribbon
@@ -1053,6 +1053,40 @@ hermes`}
 	   Nothing is page-scoped any more, so nothing can drift: a band that
 	   wants air uses margin on its own plate (`mx-3` on the stage plate
 	   exists for the tilt's bounding box, not for a gutter). */
+
+	/* THE BONE SPREAD IS A SPREAD, NOT A BOX. The evidence band is the page's
+	   only surface change, and its light ground used to be exactly the text
+	   column (x 56 to 1383 at 1440), so the kicker's glyph sat 0px from the
+	   paper's edge and the 26.9% numeral 5px from it - while every other
+	   surface on the page insets its text (the demo plate 55px, the install
+	   panel 44px). A light rectangle that ends where the text ends reads as a
+	   text box, not as paper.
+
+	   The ground therefore bleeds to the shell's box edges while the TEXT
+	   stays on the page's one gutter: the margin is negative by exactly the
+	   padding it adds back, so the net text position is unchanged (verified:
+	   textX 56 at 1440, 32 at 768, 20 at 390 - identical to the five dark
+	   bands) and only the surface grows. The values are PageShell's own scale
+	   (`px-5 sm:px-8 lg:px-14`), restated because a child cannot read its
+	   parent's utility. */
+	.paper-band {
+		margin-inline: -1.25rem;
+		padding-inline: 1.25rem;
+	}
+
+	@media (min-width: 40rem) {
+		.paper-band {
+			margin-inline: -2rem;
+			padding-inline: 2rem;
+		}
+	}
+
+	@media (min-width: 64rem) {
+		.paper-band {
+			margin-inline: -3.5rem;
+			padding-inline: 3.5rem;
+		}
+	}
 
 	/* One measure for every prose line on the page. Per-container classes were
 	   not enough: the install panel is 896px wide, so its paragraphs measured
