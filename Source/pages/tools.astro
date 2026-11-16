@@ -62,6 +62,16 @@ const DoorTone: Record<Door, string> = {
 	control: "telemetry-tag--bone",
 };
 
+/** The triage matrix's ONE gutter and its dense row height. Pure geometry, so
+ * the same string is valid on the band's `<th>` as on a body `<td>` - which is
+ * what keeps the header labels on the columns they name. */
+const CellBox = "px-4 py-2 sm:px-5";
+
+/** The band's label voice: the telemetry caption, black weight, one line. The
+ * `!` on the weight is required - `Global.css` loads after the utility layer,
+ * so `.type-meta`'s own 700 wins over a bare `font-black`. */
+const CellHead = "type-meta whitespace-nowrap !font-black uppercase text-zinc-dust";
+
 const Tools: (ToolRecord & {
 	N: string;
 	Note?: string;
@@ -329,50 +339,49 @@ const MarkerFields = (Marker: string): string[] =>
 				canary writes, and bone is the engine tuning itself.
 			</p>
 
+			{/* THE TRIAGE MATRIX. One row per handle, no card per row: a filled band
+			    names the columns, a hairline separates the rows, the identifier is
+			    mono, and the row index is right-aligned and tabular so the numbers
+			    align on their digits. The family chip is a FIXED column - a reader
+			    scans one column of statuses instead of hunting a colour across four
+			    places in the row. */}
 			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
 				<div class="overflow-x-auto">
-					<table class="w-full border-collapse text-left">
-						<thead>
+					<table class="w-full min-w-[52rem] border-collapse text-left">
+						<thead class="bg-asphalt-panel">
 							<tr class="border-b border-[color:var(--tier-well-edge)]">
 								<th
 									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+									class:list={[CellHead, "text-right", CellBox]}
 								>
 									#
 								</th>
-								<th
-									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
-								>
+								<th scope="col" class:list={[CellHead, CellBox]}>
 									Handle
 								</th>
-								<th
-									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
-								>
+								<th scope="col" class:list={[CellHead, CellBox]}>
 									Door
 								</th>
-								<th
-									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
-								>
+								<th scope="col" class:list={[CellHead, CellBox]}>
 									Args
 								</th>
-								<th
-									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
-								>
+								<th scope="col" class:list={[CellHead, CellBox]}>
 									What the model reads
 								</th>
 							</tr>
 						</thead>
 						<tbody>
 							{Tools.map((Tool) => (
-								<tr class="border-b border-[color:var(--tier-shell-edge)] align-top last:border-b-0">
-									<td class="px-4 py-4 font-mono text-meta font-bold text-zinc-dust sm:px-5">
+								<tr class="border-b border-oxblood-dark/60 align-top last:border-b-0 hover:bg-[color-mix(in_srgb,var(--raw-blood)_10%,transparent)]">
+									<td
+										class:list={[
+											"whitespace-nowrap text-right font-mono text-meta font-bold tabular-nums text-zinc-dust",
+											CellBox,
+										]}
+									>
 										{Tool.N}
 									</td>
-									<td class="whitespace-nowrap px-4 py-4 font-mono text-code sm:px-5">
+									<td class:list={["whitespace-nowrap font-mono text-code", CellBox]}>
 										<a
 											class="text-weathered-teal underline decoration-transparent decoration-2 underline-offset-4 transition-colors hover:decoration-stamped-canary"
 											href={`#${Tool.Name}`}
@@ -380,7 +389,7 @@ const MarkerFields = (Marker: string): string[] =>
 											{Tool.Name}
 										</a>
 									</td>
-									<td class="px-4 py-4 sm:px-5">
+									<td class:list={[CellBox]}>
 										{Tool.Door ? (
 											<span
 												class:list={[
@@ -392,10 +401,10 @@ const MarkerFields = (Marker: string): string[] =>
 											</span>
 										) : null}
 									</td>
-									<td class="px-4 py-4 sm:px-5">
+									<td class:list={[CellBox]}>
 										<span class="telemetry-tag">{Tool.Args}</span>
 									</td>
-									<td class="max-w-[34rem] px-4 py-4 sm:px-5">
+									<td class:list={["max-w-[34rem]", CellBox]}>
 										<p class="font-body text-body text-bone-newsprint">
 											{Tool.Summary}
 										</p>

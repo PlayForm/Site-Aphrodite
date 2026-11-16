@@ -338,6 +338,42 @@ const Shapes = Shape.map(({ Id, Label, Color, ...Rest }) => ({
 const RecordedShapes = Shapes.filter(({ Kind }) => Kind !== "simulated");
 const SimulatedShapes = Shapes.filter(({ Kind }) => Kind === "simulated");
 
+/* ═══ THE AUDIT MATRIX ═════════════════════════════════════════════════════
+ *
+ * The study's own records read as an audit rather than as a headline: how many
+ * sessions were touched at all, what the two rates measure, and what the bytes
+ * cost to get back. Four readings in ONE matrix, one row each - the family is
+ * the row's chip and its colour is IDENTITY (teal coverage, canary rates,
+ * crimson the cost side), so a reader scans one column of families instead of
+ * hunting a spine colour across three cards.
+ *
+ * `Tone` is a published `.telemetry-tag` modifier, never a hand-rolled fill, so
+ * contrast stays the stylesheet's problem. `Fact` is joined by ID: a renamed
+ * figure stops the build rather than silently reprinting an old number.
+ */
+const Audit = [
+	{
+		Label: "COVERAGE // SESSIONS WITH A SAVING",
+		Tone: "telemetry-tag--teal",
+		Fact: Figure("study.sessions.saved"),
+	},
+	{
+		Label: "RATES // MEDIAN SESSION",
+		Tone: "telemetry-tag--canary",
+		Fact: Figure("study.median-ratio"),
+	},
+	{
+		Label: "RATES // AVERAGE PER CALL",
+		Tone: "telemetry-tag--canary",
+		Fact: Figure("study.average-per-call"),
+	},
+	{
+		Label: "THE RETRIEVAL TAX // THE COST SIDE",
+		Tone: "telemetry-tag--crimson",
+		Fact: Figure("study.retrieval.share"),
+	},
+];
+
 const BarColor = {
 	zinc: "bg-zinc-dust",
 	teal: "bg-weathered-teal",
@@ -390,10 +426,22 @@ const ProvenanceRows = [
 // THE FIGURE REGISTER - every record the page prints, with the four fields a
 // reader needs in order to refuse to trust it blindly: what kind of figure it
 // is, what unit it counts, what it was measured over, and how it was produced.
+//
+// The kind is a CHIP in its own column and its colour is IDENTITY, not rank: the
+// same four modifiers StudyLedger's `KindTag` spends, so a reader who learned the
+// colours in the session ledger reads this register without a second legend.
+// An unknown kind falls through to the bare word rather than to a guessed colour.
+const KindTag: Record<string, "teal" | "canary" | "crimson" | "plain"> = {
+	measured: "teal",
+	estimated: "canary",
+	simulated: "crimson",
+	derived: "plain",
+};
+
 const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => ({
 	Cells: [
 		{ Text: Id },
-		{ Text: Kind },
+		{ Text: Kind, Tag: KindTag[Kind] },
 		{ Text: Value, Align: "right" as const },
 		{ Text: Unit },
 		{ Text: Scope },
@@ -766,42 +814,66 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 				ranking rather than a proportion, the counts behind each row are stated first.
 			</p>
 
-			<div class="well mt-8 overflow-x-auto">
-				<table class="w-full border-collapse font-mono text-base">
-					<thead>
-						<tr class="border-b-2 border-blood-crimson">
-							<th class="px-3 py-2 text-left type-meta font-black text-zinc-dust">
-								SAMPLE
-							</th>
-							<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">
-								ORIGINAL TOKENS
-							</th>
-							<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">
-								REPLACEMENT TOKENS
-							</th>
-							<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">
-								RATIO
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{Classes.map(({ Label, Corpus, Without, With, Ratio }) => (
-							<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
-								<td class="px-3 py-3 text-left">
-									<div class="font-black text-bone-white">{Label}</div>
-									<div class="mt-1 max-w-md type-body text-zinc-dust">
-										{Corpus}
-									</div>
-								</td>
-								<td class="px-3 py-3 text-right text-bone-newsprint">{Without}</td>
-								<td class="px-3 py-3 text-right text-bone-newsprint">{With}</td>
-								<td class="px-3 py-3 text-right font-black text-weathered-teal">
-									{Ratio}
-								</td>
+			{/* THE TRIAGE MATRIX. Hairline rows, one filled band naming the columns,
+			    the three numeric columns right-aligned in tabular figures so the
+			    digits line up down each column, and no card per row. The band keeps
+			    its 2px crimson rule: it is this section's own edge. The grunge plate
+			    is the OUTER box and the scroll container the INNER one - `overflow`
+			    on the plate would clip the ink that paints past its edge. */}
+			<div
+				class="grunge well mt-8"
+				data-grunge
+				data-grunge-mode="edge"
+			>
+				<div class="overflow-x-auto">
+					<table class="w-full min-w-[46rem] border-collapse font-mono text-base">
+						<thead class="bg-asphalt-panel">
+							<tr class="border-b-2 border-blood-crimson">
+								<th
+									class="type-meta whitespace-nowrap px-4 py-2 text-left !font-black uppercase text-zinc-dust sm:px-5"
+								>
+									SAMPLE
+								</th>
+								<th
+									class="type-meta whitespace-nowrap px-4 py-2 text-right !font-black uppercase text-zinc-dust sm:px-5"
+								>
+									ORIGINAL TOKENS
+								</th>
+								<th
+									class="type-meta whitespace-nowrap px-4 py-2 text-right !font-black uppercase text-zinc-dust sm:px-5"
+								>
+									REPLACEMENT TOKENS
+								</th>
+								<th
+									class="type-meta whitespace-nowrap px-4 py-2 text-right !font-black uppercase text-zinc-dust sm:px-5"
+								>
+									RATIO
+								</th>
 							</tr>
-						))}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							{Classes.map(({ Label, Corpus, Without, With, Ratio }) => (
+								<tr class="border-b border-oxblood-dark/60 align-top last:border-b-0 hover:bg-[color-mix(in_srgb,var(--raw-blood)_10%,transparent)]">
+									<td class="px-4 py-2 text-left sm:px-5">
+										<div class="font-black text-bone-white">{Label}</div>
+										<div class="mt-1 max-w-md type-body text-zinc-dust">
+											{Corpus}
+										</div>
+									</td>
+									<td class="whitespace-nowrap px-4 py-2 text-right tabular-nums text-bone-newsprint sm:px-5">
+										{Without}
+									</td>
+									<td class="whitespace-nowrap px-4 py-2 text-right tabular-nums text-bone-newsprint sm:px-5">
+										{With}
+									</td>
+									<td class="whitespace-nowrap px-4 py-2 text-right font-black tabular-nums text-weathered-teal sm:px-5">
+										{Ratio}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
 			</div>
 
 			<div class="mt-12">
@@ -1017,99 +1089,118 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 				What did the field data show?
 			</h2>
 
-			<!-- THE AUDIT: what the study's own records say when they are read as an
-			     audit rather than as a headline - how many sessions were touched at
-			     all, what the two rates measure, and what the bytes cost to get back.
-			     Three records, one per question, each a shell card with its stage
-			     colour on the edge and its label in the telemetry voice. -->
-			<div class="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
-				<article
-					class="grunge shell-card flex flex-col p-6"
-					style={`border-left: 4px solid var(${AccentInk.teal})`}
-					data-grunge
-				>
-					<div class="telemetry-tag telemetry-tag--teal">
+			<!-- THE AUDIT MATRIX: what the study's own records say when they are read
+			     as an audit rather than as a headline - how many sessions were
+			     touched at all, what the two rates measure, and what the bytes cost
+			     to get back. FOUR readings in ONE dense matrix, no card per row: the
+			     family chip is a FIXED first column and its colour is identity rather
+			     than rank (teal coverage, canary rates, crimson the cost side), the
+			     figure is right-aligned in tabular figures so the column of numbers
+			     aligns on its digits, and the notes that explain each reading follow
+			     the plate as prose. -->
+			<div class="grunge shell-card mt-10" data-grunge data-grunge-mode="edge">
+				<div class="overflow-x-auto">
+					<table class="w-full min-w-[46rem] border-collapse font-mono text-base">
+						<thead class="bg-asphalt-panel">
+							<tr class="border-b border-[color:var(--tier-well-edge)]">
+								<th
+									scope="col"
+									class="type-meta whitespace-nowrap px-4 py-2 text-left !font-black uppercase text-zinc-dust sm:px-5"
+								>
+									READING
+								</th>
+								<th
+									scope="col"
+									class="type-meta whitespace-nowrap px-4 py-2 text-right !font-black uppercase text-zinc-dust sm:px-5"
+								>
+									VALUE
+								</th>
+								<th
+									scope="col"
+									class="type-meta whitespace-nowrap px-4 py-2 text-left !font-black uppercase text-zinc-dust sm:px-5"
+								>
+									UNIT
+								</th>
+								<th
+									scope="col"
+									class="type-meta whitespace-nowrap px-4 py-2 text-left !font-black uppercase text-zinc-dust sm:px-5"
+								>
+									SCOPE
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{Audit.map(({ Label, Tone, Fact }) => (
+								<tr class="border-b border-oxblood-dark/60 align-top last:border-b-0 hover:bg-[color-mix(in_srgb,var(--raw-blood)_10%,transparent)]">
+									<td class="px-4 py-2 sm:px-5">
+										<span class:list={["telemetry-tag", Tone]}>
+											{Label}
+										</span>
+									</td>
+									<td class="whitespace-nowrap px-4 py-2 text-right font-headline text-xl font-black tabular-nums text-bone-white sm:px-5">
+										{Fact.Value}
+									</td>
+									<td class="type-meta whitespace-nowrap px-4 py-2 text-zinc-dust sm:px-5">
+										{Fact.Unit}
+									</td>
+									<td class="px-4 py-2 type-body text-zinc-dust sm:px-5">
+										{Fact.Scope}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- THE NOTES: one block per family of reading, in the matrix's own order,
+			     each introduced by the same chip its row carries - so a paragraph
+			     joins back to a row without a second numbering scheme. Label to note
+			     is the tight distance; note to note is the group distance. -->
+			<div class="mt-8 max-w-3xl space-y-6">
+				<div>
+					<div class="type-meta !font-black uppercase text-weathered-teal">
 						COVERAGE // SESSIONS WITH A SAVING
 					</div>
-					<div class="mt-4 font-headline text-3xl font-black tracking-tighter text-bone-white">
-						{Figure("study.sessions.saved").Value}
-					</div>
-					<div class="mt-2 type-body text-zinc-dust">
-						<span class="type-meta">{Figure("study.sessions.saved").Unit}</span> &bull;{" "}
-						{Figure("study.sessions.saved").Scope}
-					</div>
-					<div class="mt-4 prose-flow">
-						<p class="type-body text-bone-newsprint">
-							The {Study.SessionsSaved} row is the other way to read the same data: in{" "}
-							{Study.SessionsSaved.split("/")[0]!.trim()} of the {Study.Sessions}{" "}
-							sessions something was saved.
-						</p>
-					</div>
-					<div class="mt-auto pt-6 type-meta text-zinc-dust">SRC: {Cite(Study.From)}</div>
-				</article>
-
-				<article
-					class="grunge shell-card flex flex-col p-6"
-					style={`border-left: 4px solid var(${AccentInk.canary})`}
-					data-grunge
-				>
-					<div class="telemetry-tag telemetry-tag--canary">
+					<p class="mt-2 type-body text-bone-newsprint">
+						The {Study.SessionsSaved} row is the other way to read the same data: in{" "}
+						{Study.SessionsSaved.split("/")[0]!.trim()} of the {Study.Sessions}{" "}
+						sessions something was saved.
+					</p>
+				</div>
+				<div>
+					<div class="type-meta !font-black uppercase text-stamped-canary">
 						RATES // TWO QUESTIONS, TWO ANSWERS
 					</div>
-					<div class="mt-4 font-headline text-3xl font-black tracking-tighter text-bone-white">
-						{Figure("study.median-ratio").Value}
-					</div>
-					<div class="mt-2 type-body text-zinc-dust">
-						<span class="type-meta">{Figure("study.median-ratio").Unit}</span> &bull;{" "}
-						{Figure("study.median-ratio").Scope}
-					</div>
-					<div class="mt-3 font-headline text-xl font-black tracking-tight text-bone-newsprint">
-						{Figure("study.average-per-call").Value}
-					</div>
-					<div class="mt-1 type-body text-zinc-dust">
-						<span class="type-meta">{Figure("study.average-per-call").Unit}</span>{" "}
-						&bull; {Figure("study.average-per-call").Scope}
-					</div>
-					<div class="mt-4 prose-flow">
-						<p class="type-body text-bone-newsprint">
-							The two rates beside it answer different questions - {Study.MedianRatio}{" "}
-							is the median session's saved ratio, {Study.AvgPerCall} is what an
-							average call did not have to carry - and both are reported because
-							neither alone describes the study.
-						</p>
-					</div>
-					<div class="mt-auto pt-6 type-meta text-zinc-dust">SRC: {Cite(Study.From)}</div>
-				</article>
-
-				<article
-					class="grunge shell-card flex flex-col p-6"
-					style={`border-left: 4px solid var(${AccentInk.crimson})`}
-					data-grunge
-				>
-					<div class="telemetry-tag telemetry-tag--crimson">
+					<p class="mt-2 type-body text-bone-newsprint">
+						The two rates above answer different questions - {Study.MedianRatio}{" "}
+						is the median session's saved ratio, {Study.AvgPerCall} is what an
+						average call did not have to carry - and both are reported because
+						neither alone describes the study.
+					</p>
+				</div>
+				<div>
+					<!-- The cost side's identity is the crimson CHIP in the matrix row.
+					     `--raw-blood` is a FILL token: as text on this ground it measures
+					     2.23:1 and fails the 4.5:1 floor, so the note's label takes the
+					     heading voice rather than an illegible red. -->
+					<div class="type-meta !font-black uppercase text-bone-white">
 						THE RETRIEVAL TAX // THE COST SIDE
 					</div>
-					<div class="mt-4 font-headline text-3xl font-black tracking-tighter text-bone-white">
-						{Figure("study.retrieval.share").Value}
-					</div>
-					<div class="mt-2 type-body text-zinc-dust">
-						<span class="type-meta">{Figure("study.retrieval.share").Unit}</span> &bull;{" "}
-						{Figure("study.retrieval.share").Scope}
-					</div>
-					<div class="mt-4 prose-flow">
-						<p class="type-body text-bone-newsprint">
-							The retrieval tax is the cost side of the ledger:{" "}
-							<span class="text-stamped-canary">{Study.TaxCalls}</span> retrieve calls
-							returned <span class="text-stamped-canary">{Study.TaxTokens}</span>{" "}
-							tokens, roughly {Study.TaxPct} of what was saved.
-						</p>
-						<p class="type-body text-zinc-dust">
-							Savings are gross; this row is what the model paid to get its bytes
-							back.
-						</p>
-					</div>
-					<div class="mt-auto pt-6 type-meta text-zinc-dust">SRC: {Cite(Study.From)}</div>
-				</article>
+					<p class="mt-2 type-body text-bone-newsprint">
+						The retrieval tax is the cost side of the ledger:{" "}
+						<span class="text-stamped-canary">{Study.TaxCalls}</span> retrieve calls
+						returned <span class="text-stamped-canary">{Study.TaxTokens}</span>{" "}
+						tokens, roughly {Study.TaxPct} of what was saved.
+					</p>
+					<p class="mt-3 type-body text-zinc-dust">
+						Savings are gross; this row is what the model paid to get its bytes
+						back.
+					</p>
+				</div>
+				<!-- ONE citation for the four readings. The three cards each repeated
+				     the same SRC line; the fact is the citation, not the repetition. -->
+				<p class="type-meta text-zinc-dust">SRC: {Cite(Study.From)}</p>
 			</div>
 
 			<div class="prose-flow mt-12 max-w-3xl">

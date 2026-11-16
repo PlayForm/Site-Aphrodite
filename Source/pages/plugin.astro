@@ -13,6 +13,7 @@ import ZineReveal from "@Component/ZineReveal.astro";
 import ZineFlow from "@Component/ZineFlow.astro";
 import ZineSource from "@Component/ZineSource.astro";
 import ZineKicker from "@Component/ZineKicker.astro";
+import ZineDiagram from "@Component/ZineDiagram.astro";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import ContextEngine from "../Content/Mermaid/context-engine.svg?raw";
 import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
@@ -141,6 +142,41 @@ const Lanes = [
 		Hook: "post_llm_call",
 		When: "after each LLM response",
 		Does: "archives the turn, advances the counter, expires stale state",
+	},
+];
+
+// THE CANONICAL LAYOUT - two directories, two owners, and the arrow
+// annotations are the whole map of who writes what. One row per line of the
+// tree, byte for byte as the section has always printed it; only the carrier
+// changed, so the pod that draws the diagrams draws the tree too.
+type TreeRow = {
+	Text: string;
+	Note?: string;
+	Tone?: "node" | "leaf" | "mute";
+	Depth?: number;
+};
+
+const Filesystem: TreeRow[] = [
+	{ Text: "~/.hermes/", Tone: "node" },
+	{
+		Text: "├── plugins/aphrodite",
+		Note: "manual symlink to the plugin repo",
+		Depth: 1,
+	},
+	{ Text: "└── aphrodite/", Note: "runtime home", Tone: "node", Depth: 1 },
+	{
+		Text: "├── binaries/aphrodite",
+		Note: "proxy binary, fetched + verified",
+		Depth: 2,
+	},
+	{ Text: "├── binaries/libaphrodite_hermes.dylib", Depth: 2 },
+	{ Text: "├── aphrodite.toml", Note: "config", Depth: 2 },
+	{ Text: "├── directives/", Note: "7 built-ins materialized", Depth: 2 },
+	{ Text: "├── ccr.db", Note: "SQLite CCR store", Depth: 2 },
+	{
+		Text: "└── proxy-stderr.log",
+		Note: "proxy logs (empty = healthy)",
+		Depth: 2,
 	},
 ];
 
@@ -465,8 +501,8 @@ const Essential = [
 			</div>
 		</section>
 
-		<!-- 03 // ARCHITECTURE - the call chain, the five layers, and one call
-		     walked end to end. -->
+		<!-- 03 // ARCHITECTURE - the two lanes (hook and proxy), the five layers,
+		     and one call walked end to end. -->
 		<section class="blueprint-section relative w-full" data-reveal>
 			<p class="section-index">03 // ARCHITECTURE // CALL CHAIN</p>
 			<h2 id="architecture" class={Section}>
@@ -475,49 +511,103 @@ const Essential = [
 			<p class={Lede}>
 				Five layers, one contract between each pair. Read top to bottom, the list is the
 				path a single tool result takes; read bottom to top, it is the path a retrieval
-				takes when the model asks for the bytes back.
+				takes when the model asks for the bytes back. The same engine answers as a proxy
+				too, with no Hermes in the path.
 			</p>
 
-			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
-				<div class={CardHead}>
-					<span class="telemetry-tag telemetry-tag--bone">CALL CHAIN</span>
-					<span class="telemetry-tag">{Layers.length} layers</span>
-					<span class="telemetry-tag telemetry-tag--teal">
-						one JSON contract per pair
-					</span>
+			<div class="mt-8 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
+				<!-- LANE A: the hook path - Hermes fires a seam, the dylib decides.
+				     Same weight as lane B: same frame, same ribbon, same channel. -->
+				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+					<div class:list={["h-0.5 w-full", Accent.raw]} />
+					<div class={CardHead}>
+						<span class="telemetry-tag telemetry-tag--crimson">A</span>
+						<span class="font-mono text-code font-bold text-bone-white">
+							HERMES PLUGIN HOOK
+						</span>
+						<span class="telemetry-tag">{Layers.length} layers</span>
+						<span class="telemetry-tag telemetry-tag--teal">
+							one JSON contract per pair
+						</span>
+					</div>
+					<div class="well m-4 p-5 font-mono text-code leading-relaxed">
+						<div class="text-bone-white">Hermes Agent (hooks + tool dispatch)</div>
+						<div class="pl-4 text-zinc-dust">│</div>
+						<div class="pl-4 text-bone-newsprint">
+							__init__.py - ctypes FFI, registers hooks/tools/engine · no logic
+						</div>
+						<div class="pl-4 text-zinc-dust">│</div>
+						<div class="pl-4 text-stamped-canary">
+							libaphrodite_hermes.dylib - Hermes bridge (JSON contract) · 6 hooks · 13
+							tools · schemas
+						</div>
+						<div class="pl-4 text-zinc-dust">│</div>
+						<div class="pl-4 text-bone-newsprint">
+							libaphrodite (core engine) - ALL compression logic: hooks · resolve ·
+							retrieve · marker · preview · directives
+						</div>
+						<div class="pl-4 text-zinc-dust">│</div>
+						<div class="pl-4 text-weathered-teal">
+							CCR store - SQLite :9798 / in-memory :9797 / inline
+						</div>
+					</div>
+					<div class={CardBody}>
+						<p class={Note}>
+							Registration is driven by the dylib: the shim asks the dylib for its hook
+							names and tool schemas and registers one callback per name.
+						</p>
+						<p class="mt-3 font-body text-body leading-relaxed text-zinc-dust">
+							It is the reason there is no hot-reload: the dylib is resolved once per
+							process, so to pick up a new build you restart the Hermes session.
+						</p>
+					</div>
 				</div>
-				<div class="well m-4 p-5 font-mono text-code leading-relaxed">
-					<div class="text-bone-white">Hermes Agent (hooks + tool dispatch)</div>
-					<div class="pl-4 text-zinc-dust">│</div>
-					<div class="pl-4 text-bone-newsprint">
-						__init__.py - ctypes FFI, registers hooks/tools/engine · no logic
+
+				<!-- LANE B: the proxy path - the same engine, one hop from the client.
+				     The two listeners are the lane's whole surface, so they are the
+				     body of the channel rather than a paragraph about it. -->
+				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+					<div class:list={["h-0.5 w-full", Accent.teal]} />
+					<div class={CardHead}>
+						<span class="telemetry-tag telemetry-tag--teal">B</span>
+						<span class="font-mono text-code font-bold text-bone-white">
+							OPENAI-COMPATIBLE PROXY
+						</span>
+						<span class="telemetry-tag">token :9798 · cache :9797</span>
 					</div>
-					<div class="pl-4 text-zinc-dust">│</div>
-					<div class="pl-4 text-stamped-canary">
-						libaphrodite_hermes.dylib - Hermes bridge (JSON contract) · 6 hooks · 13
-						tools · schemas
+					<div class="well m-4 p-5 font-mono text-code leading-relaxed">
+						<div class="text-bone-white">Any OpenAI-compatible client (base_url)</div>
+						<div class="pl-4 text-zinc-dust">│</div>
+						<div class="pl-4 text-bone-newsprint">
+							token proxy :9798 - threshold 256 bytes by default
+						</div>
+						<div class="pl-4 text-bone-newsprint">
+							cache proxy :9797 - threshold 2048 bytes by default
+						</div>
+						<div class="pl-4 text-zinc-dust">│</div>
+						<div class="pl-4 text-stamped-canary">
+							libaphrodite (core engine) - the same compression, no Hermes in the path
+						</div>
+						<div class="pl-4 text-zinc-dust">│</div>
+						<div class="pl-4 text-weathered-teal">
+							CCR store - SQLite / in-memory / inline
+						</div>
 					</div>
-					<div class="pl-4 text-zinc-dust">│</div>
-					<div class="pl-4 text-bone-newsprint">
-						libaphrodite (core engine) - ALL compression logic: hooks · resolve ·
-						retrieve · marker · preview · directives
-					</div>
-					<div class="pl-4 text-zinc-dust">│</div>
-					<div class="pl-4 text-weathered-teal">
-						CCR store - SQLite :9798 / in-memory :9797 / inline
+					<div class={CardBody}>
+						<p class={Note}>
+							The proxy is the same engine one hop from the client: it needs no Hermes
+							session, and responses compress over plain HTTP.
+						</p>
+						<p class="mt-3 font-body text-body leading-relaxed text-zinc-dust">
+							It needs its own credentials - APHRODITE_API_KEY, aphrodite setup, or
+							api_key in aphrodite.toml - and Hermes' provider config is NOT reused.
+							Without a key it refuses to start: there is no keyless mode.
+						</p>
 					</div>
 				</div>
 			</div>
 
 			<div class="prose-flow mt-8 max-w-[46rem]">
-				<p class={Note}>
-					Registration is driven by the dylib: the shim asks the dylib for its hook names
-					and tool schemas and registers one callback per name.
-				</p>
-				<p class={Note}>
-					It is the reason there is no hot-reload: the dylib is resolved once per process,
-					so to pick up a new build you restart the Hermes session.
-				</p>
 				<p class={Note}>
 					The same resolve-once rule is why the plugin never half-loads. Either the dylib
 					opens and every seam registers, or the import raises and nothing registers -
@@ -1044,52 +1134,56 @@ const Essential = [
 			/>
 		</section>
 
-		<!-- 06 // FILESYSTEM - the loader surface: a shell card holding the tree in
-		     an inset well, then the three files that matter, then the self-heal. -->
+		<!-- 06 // FILESYSTEM - the loader surface: the tree in the pod, beside the
+		     two-owner explanation, then the three files that matter, then the
+		     self-heal. -->
 		<section class="blueprint-section relative w-full" data-reveal>
 			<p class="section-index">06 // FILESYSTEM // CANONICAL LAYOUT</p>
 			<h2 id="layout" class={Section}>
 				What changes after install
 			</h2>
-			<p class={Lede}>
-				Two directories, two owners. Hermes owns the plugin directory and the plugin owns
-				everything under the runtime home - the arrow annotations are the whole map of who
-				writes what.
-			</p>
-
-			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
-				<div class={CardHead}>
-					<span class="telemetry-tag telemetry-tag--bone">FILESYSTEM TOPOLOGY</span>
-					<span class="telemetry-tag">~/.hermes/</span>
-					<span class="telemetry-tag telemetry-tag--teal">2 owners</span>
+			<div class="mt-8 grid grid-cols-1 items-start gap-8 lg:grid-cols-5">
+				<!-- LEFT: the tree, in the pod the diagrams use - ribbon, recessed
+				     channel, caption. The tree is the map; the explanation is beside
+				     it, not above it. -->
+				<div class="lg:col-span-3">
+					<ZineDiagram
+						Tree={Filesystem}
+						Name="FILESYSTEM TOPOLOGY"
+						Tags={["~/.hermes/", "2 owners"]}
+						Caption="HERMES OWNS plugins/aphrodite · APHRODITE OWNS aphrodite/"
+					/>
 				</div>
-				<div class="well m-4 p-5 font-mono text-code leading-relaxed text-bone-newsprint">
-					<div>~/.hermes/</div>
-					<div class="pl-4">
-						├── plugins/aphrodite{" "}
-						<span class="text-zinc-dust">← manual symlink to the plugin repo</span>
-					</div>
-					<div class="pl-4 text-bone-white">
-						└── aphrodite/ <span class="text-zinc-dust">← runtime home</span>
-					</div>
-					<div class="pl-10">
-						├── binaries/aphrodite{" "}
-						<span class="text-zinc-dust">← proxy binary, fetched + verified</span>
-					</div>
-					<div class="pl-10">├── binaries/libaphrodite_hermes.dylib</div>
-					<div class="pl-10">
-						├── aphrodite.toml <span class="text-zinc-dust">← config</span>
-					</div>
-					<div class="pl-10">
-						├── directives/{" "}
-						<span class="text-zinc-dust">← 7 built-ins materialized</span>
-					</div>
-					<div class="pl-10">
-						├── ccr.db <span class="text-zinc-dust">← SQLite CCR store</span>
-					</div>
-					<div class="pl-10">
-						└── proxy-stderr.log{" "}
-						<span class="text-zinc-dust">← proxy logs (empty = healthy)</span>
+
+				<!-- RIGHT: what the map means. Two directories, two owners, and
+				     neither one writes in the other's half. -->
+				<div class="lg:col-span-2">
+					<p class={Body}>
+						Two directories, two owners. Hermes owns the plugin directory and the plugin
+						owns everything under the runtime home - the arrow annotations are the whole
+						map of who writes what.
+					</p>
+					<div class="mt-6 grid grid-cols-1 gap-4">
+						<div class="well p-4">
+							<ZineKicker Tone="teal" As="div">HERMES OWNS</ZineKicker>
+							<p class="mt-2 break-token font-mono text-base text-bone-white">
+								~/.hermes/plugins/aphrodite/
+							</p>
+							<p class="mt-2 font-body text-body leading-relaxed text-zinc-dust">
+								The catalog checkout. The plugin never creates, converts or modifies
+								it, and the self-heal below stops at this boundary.
+							</p>
+						</div>
+						<div class="well p-4">
+							<ZineKicker Tone="teal" As="div">APHRODITE OWNS</ZineKicker>
+							<p class="mt-2 break-token font-mono text-base text-bone-white">
+								~/.hermes/aphrodite/
+							</p>
+							<p class="mt-2 font-body text-body leading-relaxed text-zinc-dust">
+								The runtime home: binaries, config, directives, the CCR store and the
+								proxy logs.
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -1165,7 +1259,7 @@ const Essential = [
 				<ZineReveal
 					Cover="QUARANTINE // stale plugin-source copy, moved aside with its bytes intact"
 					Tag="MOVED ASIDE"
-					Raw="<span class='font-mono text-base text-stamped-canary'>~/.hermes/aphrodite/quarantine/&lt;timestamp&gt;/plugins-aphrodite</span>"
+					Raw="<span class='font-mono text-base text-stamped-canary'>~/.hermes/aphrodite/.stale-backup/</span>"
 				/>
 			</div>
 

@@ -1,0 +1,57 @@
+/* Config.css - the Config route's own sheet.
+   The key-filter enhancement gate and the #keys elevation matrix, which this page dresses over the ConfigKeys component it does not own.
+
+   PAGE-LOCAL BY CONSTRUCTION. These rules used to be a <style> block inside the
+   page, and a page's block ships only with that page. They are a sheet the page
+   imports for the same reason: routing them through the global entry point would
+   apply them to every route. `Deck.css` is the precedent.
+
+   Every value here is a token or a utility the layer already defines; nothing in
+   this file introduces a colour, a distance or a radius of its own.
+   Extracted from Source/pages/config.astro - 1 block(s), no value changed. */
+
+/* The key filter is an enhancement, never a requirement: the head script's
+   html.js is what tells us scripting is alive, so a reader without
+   JavaScript is not shown a control that would do nothing. The table itself
+   is server-rendered and complete in both cases. */
+html:not(.js) [data-key-filter-wrap] {
+	display: none;
+}
+
+/* THE KEYS MATRIX, dressed from this page.
+
+   `ConfigKeys` owns the rows, the section grouping and the columns, and it is
+   not this card's file - so the elevation is applied HERE, scoped to `#keys`.
+   One id plus one attribute outranks the single utility classes the component
+   ships, so no `!important` is needed and no rule escapes this route.
+
+   The grammar: each TOML section is a SHELL lifted off the canvas with its own
+   hairline, and the table inside it is a WELL recessed into that shell - the
+   lighter `--tier-well-edge` against the darker `--tier-shell-edge` is what
+   makes the table read as depth rather than as one more panel. The group head
+   keeps a bottom rule of its own so the shell has a title bar. */
+#keys [data-key-group] {
+	position: relative;
+	border: 1px solid var(--tier-shell-edge);
+	background-color: var(--tier-shell);
+	padding: 1.25rem;
+}
+
+#keys [data-key-group] > div:first-child {
+	border-bottom: 1px solid var(--tier-shell-edge);
+	padding-bottom: 0.75rem;
+}
+
+#keys [data-key-group] > div:last-child {
+	border: 1px solid var(--tier-well-edge);
+	background-color: var(--tier-well);
+}
+
+#keys [data-key-group] th {
+	font-size: var(--type-meta);
+	letter-spacing: 0.08em;
+}
+
+#keys [data-key-group] tbody > tr {
+	border-color: var(--tier-shell-edge);
+}

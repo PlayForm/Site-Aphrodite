@@ -1,4 +1,6 @@
 ---
+import "@Stylesheet/Component/Data.scss";
+
 /**
  * ZineLedger - the generic DATA MATRIX: a recessed well of readings, one row per
  * record, an optional caption band of column labels.
@@ -21,10 +23,14 @@
  *                 the TRACKS (a figure column, a unit column, a label column),
  *                 not a drawn lattice.
  *   the DIGITS    every cell is tabular-numeric, every figure is right-aligned by
- *                 the caller and never wraps (`whitespace-nowrap` on a
- *                 right-aligned cell), so a column of figures aligns on the
- *                 decimal and stays one line tall whether or not the caller
- *                 padded it.
+ *                 the caller and never wraps (`.ledger__value`), so a column of
+ *                 figures aligns on the decimal and stays one line tall whether
+ *                 or not the caller padded it.
+ *   the CHIPS     a cell may declare a `Tag`, which renders it as a
+ *                 `.telemetry-tag` in one of the published families. A status
+ *                 column is a CHIP column: a word set in the same weight as its
+ *                 neighbours is not scannable, and the modifier's colour is the
+ *                 distinction a reader actually uses.
  *
  * `Delta` is IDENTITY, not emphasis: `up` is the canary and `down` the teal, on
  * the arrow as well as on the value. A matrix that greyed its deltas would be
@@ -43,6 +49,14 @@ interface Props {
 			Delta?: "up" | "down";
 			/** Align this cell right (numeric columns). */
 			Align?: "right";
+			/** Render this cell as a `.telemetry-tag` chip in the named family.
+			 *  A chip is a STATUS, so it belongs in a column of its own: the
+			 *  modifier is the same vocabulary StudyLedger's kind tags spend
+			 *  (teal measured, canary estimated, crimson simulated), and
+			 *  `"plain"` is the quiet default chip a derived reading wears.
+			 *  Unset renders the text bare, exactly as before - the field is
+			 *  additive, so no existing call site changes. */
+			Tag?: "teal" | "canary" | "crimson" | "plain";
 		}[];
 	}[];
 
@@ -53,13 +67,24 @@ interface Props {
 const { Rows, Headers } = Astro.props;
 
 const Delta = {
-	up: "text-stamped-canary",
-	down: "text-weathered-teal",
+	up: "ledger__cell--up",
+	down: "ledger__cell--down",
 };
 
-/** One cell of the matrix: the plate's one gutter and the dense row height. It is
- * pure geometry, so it is valid on a `<th>` in the band as well as on a `<td>`. */
-const CellBox = "px-4 py-2 sm:px-5";
+/** The chip modifier per family, spelled through the published
+ *  `.telemetry-tag` modifiers so contrast stays the stylesheet's problem. */
+const Tag = {
+	teal: "telemetry-tag telemetry-tag--teal",
+	canary: "telemetry-tag telemetry-tag--canary",
+	crimson: "telemetry-tag telemetry-tag--crimson",
+	plain: "telemetry-tag",
+};
+
+/** One cell of the matrix is `.ledger__cell` in
+ *  `Stylesheet/Component/Data.scss`: the plate's one gutter and the dense row
+ *  height. It is pure geometry, so it is valid on a `<th>` in the band as well as
+ *  on a `<td>` - which is why the sheet states it once instead of this file
+ *  spelling it twice. */
 ---
 
 <!-- The table cannot shrink below its content's min-content width, so on a
@@ -73,19 +98,13 @@ const CellBox = "px-4 py-2 sm:px-5";
 	offsets would register as scrollable overflow, putting scrollbars on the
 	matrix for a drawing that is behind it. -->
 <div class="grunge grunge--faint zine-box-subtle well" data-grunge data-grunge-mode="edge">
-	<div class="overflow-x-auto">
-		<table class="w-full min-w-[42rem] border-collapse font-mono text-base">
+	<div class="ledger__scroll">
+		<table class="ledger">
 			{Headers && (
-				<thead class="bg-asphalt-panel">
-					<tr class="border-b border-[color:var(--tier-well-edge)]">
+				<thead class="ledger__band">
+					<tr class="ledger__bandrow">
 						{Headers.map((Header) => (
-							<th
-								scope="col"
-								class:list={[
-									"type-meta whitespace-nowrap text-left !font-black uppercase text-zinc-dust",
-									CellBox,
-								]}
-							>
+							<th scope="col" class="ledger__head type-meta">
 								{Header}
 							</th>
 						))}
@@ -94,24 +113,26 @@ const CellBox = "px-4 py-2 sm:px-5";
 			)}
 			<tbody>
 				{Rows.map((Row) => (
-					<tr class="border-b border-oxblood-dark/60 align-top last:border-b-0 hover:bg-[color-mix(in_srgb,var(--raw-blood)_10%,transparent)]">
+					<tr class="ledger__row">
 						{Row.Cells.map((Cell) => (
 							<td
 								class:list={[
-									CellBox,
-									"tabular-nums leading-snug",
-									Cell.Delta ? Delta[Cell.Delta] : "text-bone-newsprint",
-									Cell.Align === "right"
-										? "whitespace-nowrap text-right"
-										: "text-left",
+									"ledger__cell",
+									"ledger__cell--numeric",
+									Cell.Delta ? Delta[Cell.Delta] : "",
+									Cell.Align === "right" ? "ledger__value" : "",
 								]}
 							>
 								{Cell.Delta && (
-									<span class="mr-1 font-black">
+									<span class="ledger__arrow">
 										{Cell.Delta === "up" ? "▲" : "▼"}
 									</span>
 								)}
-								{Cell.Text}
+								{Cell.Tag ? (
+									<span class={Tag[Cell.Tag]}>{Cell.Text}</span>
+								) : (
+									Cell.Text
+								)}
 							</td>
 						))}
 					</tr>

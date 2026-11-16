@@ -11,21 +11,29 @@
  * deck's `transform` beat draws and what the landing page needs immediately
  * after its hero.
  *
- * TWO PODS, ONE PLATE (the Stitch console grammar). The pair is no longer two
- * framed boxes with a label floating above each: each half is a POD, and a pod
- * is a HEADER RIBBON over an INSET BODY.
+ * A DUAL-PANE VIEWER (the Stitch console grammar). The pair is not two framed
+ * boxes with a label floating above each: it is two PANELS of one viewer, and
+ * every panel is a TITLE BAR over a RECESSED BODY, with one labelled CUTOFF
+ * LINE inside the right-hand panel.
  *
- *   the ribbon   what produced these bytes and how many there are - the
- *                command in amber mono on the left, the count as a telemetry
- *                tag on the right. It is the first thing read.
- *   the body     the pod's own 1px oxblood edge on soot-black: the terminal
- *                weight this plate has always drawn its panes with, so the pair
- *                reads as two instruments on one bench instead of two more
- *                panels.
- *
- * The tally moved into the ribbon for that reason: a byte count is a header
- * fact, not a footer one, and a figure a reader has to read a terminal to find
- * is a figure the terminal did not state.
+ *   the title bar  what produced these bytes and how many there are - the
+ *                  panel's name, the command in amber mono beside it, and the
+ *                  byte count as a telemetry tag on the right. It is the first
+ *                  thing read, and it is why the tally moved up out of a
+ *                  footer: a figure a reader has to read a terminal to find is
+ *                  a figure the terminal did not state.
+ *   the body       the panel's own 1px oxblood edge on soot-black, recessed by
+ *                  one hard inset in the plate's black: the terminal weight
+ *                  this plate has always drawn its panes with, so the pair
+ *                  reads as two instruments on one bench.
+ *   the cutoff     the rule that marks where the preview stops and the stored
+ *                  original begins. Above it is the one line the model reads;
+ *                  below it is the receipt for the bytes that stayed behind -
+ *                  the marker and its copy control. The boundary belongs to the
+ *                  PAIR, not to `ZinePreview` (which owns the preview line and
+ *                  its well, and which other pages mount alone), so the pair
+ *                  renders the receipt: a boundary is a property of the two
+ *                  panes together.
  *
  * Tones come in on the line, not as a second array: a leading `dim:`, `fade:`
  * or `mute:` selects the suppression opacity (law 4's 70/40/25%), so a caller
@@ -52,11 +60,21 @@
  * copy of their output). That frame is what a reader with no JavaScript reads,
  * and what a reader who asked for reduced motion keeps: no stream, no cycling,
  * nothing to wait for. The runtime only replaces it once it has mounted.
+ *
+ * THE RIBBON'S BYTE COUNT IS A LIVE FACT ONLY WHERE THE RUNTIME OWNS ONE. The
+ * stream panel's tally is recomputed on every arrival (`data-run-tally`); the
+ * preview panel's count is printed in the still frame, where the preview is
+ * fixed, and is deliberately absent in `Run` mode, where the runtime rewrites
+ * the preview on every line and a frozen count beside it would be a stale
+ * number on a page whose pitch is honest previews. The marker below the cutoff
+ * carries the stored size live in both modes, because the engine's own marker
+ * format states it.
  */
 import ZineBox from "./ZineBox.astro";
 import ZineKicker from "./ZineKicker.astro";
 import ZineStream from "./ZineStream.astro";
 import ZinePreview from "./ZinePreview.astro";
+import ZineCopyChip from "./ZineCopyChip.astro";
 
 import { RunBytes, RunKind, RunMarker, RunPreview, RunTone, type RunScript } from "@Library/Motion";
 
@@ -168,6 +186,39 @@ const Lines = Raw.map((Line) => {
 const RawBytes = RunBytes(Lines.map((Line) => Line.Text));
 
 /**
+ * The byte count of one string, by the same measure as `RunBytes`: the marker
+ * quotes a byte count, so every count on this plate has to be a count of bytes.
+ */
+const BytesOf = (Text: string): number =>
+	typeof TextEncoder === "undefined" ? Text.length : new TextEncoder().encode(Text).length;
+
+/**
+ * The command the still frame's transcript opens with. The panel's title bar
+ * carries it - a console's title bar says what was run - and it is read off the
+ * first `$ ` line rather than passed twice, so a caller still hands the pane
+ * one array of lines and the shape stays a rendering detail.
+ */
+const FirstPrompt = Lines.find((Line) => Line.Text.trimStart().startsWith("$ "));
+
+const RawCommand = FirstPrompt === undefined ? undefined : FirstPrompt.Text.trimStart().slice(2).trim();
+
+/** `exactOptionalPropertyTypes`: an optional prop is omitted, never passed as `undefined`. */
+const CommandProp = RawCommand === undefined || RawCommand === "" ? {} : { Command: RawCommand };
+
+/** The preview's own byte count, for the right-hand panel's title bar. */
+const PreviewBytes = BytesOf(Preview);
+
+const PreviewTally =
+	Preview === "" ? "ABSORBED" : `ABSORBED · ${PreviewBytes.toLocaleString("en-US")} B`;
+
+/**
+ * The clipboard payload: the marker as TEXT. `Hash` may arrive carrying tone
+ * markup, so the copy control gets the stripped string - the bytes a reader
+ * would actually paste, never markup.
+ */
+const Payload = Hash.replace(/<[^>]*>/g, "").trim();
+
+/**
  * When the preview lands: the frame the last printed line finishes. The
  * numbers are Documentation/Motion.md's `[data-stream]` beat - the first line
  * starts at 140ms, each next one 70ms later, and each line takes 160ms - so a
@@ -233,162 +284,222 @@ const FrameRows = Tail.map(
 ).join("");
 ---
 
-{Run === undefined ? (
-	<ZineBox Size="lg" Rotate="-rotate-[1deg]" Wipe={Wipe}>
-		<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
-			{/* POD ONE - the raw stream. Its ribbon is ZineStream's own: the pod's
-				    name on the left, the byte count of this exact stream on the right. */}
-			<div class="flex min-w-0 flex-col gap-4">
-				<ZineStream
-					Lines={Lines}
-					Stream
-					Label="RAW STREAM // WHAT THE TERMINAL KEEPS"
-					Bytes={RawBytes}
-				/>
-				<p class="font-body text-base leading-relaxed text-zinc-dust">
-					The repeated compile steps fade out, the warnings that were already counted
-					mute, and the one line that stopped the build stays at full strength. Every one
-					of those lines is context the agent would have paid for.
-				</p>
-			</div>
-
-			{/* POD TWO - the preview. Its ribbon is the panel's own header bar:
-				    attached to the frame below it, so the pair reads as two consoles
-				    and not as a label that drifted off its box. */}
-			<div class="flex min-w-0 flex-col gap-4">
-				<div class="flex flex-col">
-					<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-2 border-oxblood-dark border-b-0 bg-asphalt-panel px-3.5 py-1.5">
-						<ZineKicker As="div" Tone="canary">
-							PREVIEW // WHAT THE MODEL READS
-						</ZineKicker>
-						<span class="telemetry-tag telemetry-tag--canary ml-auto shrink-0">
-							ABSORBED
-						</span>
-					</div>
-					<ZinePreview
-						Label={Label}
-						Result={Preview}
-						Hash={Hash}
-						Color="canary"
-						Enter={StreamBeat}
+{/* THE CUTOFF LINE. One labelled rule, in both modes, marking the one boundary
+    the pair exists to show: the preview stops at this rule and the stored
+    original begins under it. The hairlines are `--oxblood-dark` - the plate's
+    own edge colour - and the label sits at meta size, because a rule's label is
+    a caption and never a sentence. */}
+{
+	Run === undefined ? (
+		<ZineBox Size="lg" Rotate="-rotate-[1deg]" Wipe={Wipe}>
+			<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
+				{/* PANEL ONE - the stored original, as a console: title bar over a
+				    recessed well. The bar names the panel, quotes the command the
+				    transcript opens with, and counts the bytes of this exact
+				    stream. */}
+				<div class="flex min-w-0 flex-col gap-4">
+					<ZineStream
+						Lines={Lines}
+						Stream
+						Label="RAW STREAM // WHAT THE TERMINAL KEEPS"
+						Bytes={RawBytes}
+						{...CommandProp}
 					/>
+					<p class="font-body text-base leading-relaxed text-zinc-dust">
+						The repeated compile steps fade out, the warnings that were already counted
+						mute, and the one line that stopped the build stays at full strength. Every one
+						of those lines is context the agent would have paid for.
+					</p>
 				</div>
-				<p class="font-body text-base leading-relaxed text-zinc-dust">
-					The same build on one line: the type, the counts, and the one error that
-					mattered. The marker underneath is the address of the bytes that stayed behind -
-					the agent pays for them only when this line fails to answer the question.
-				</p>
+
+				{/* PANEL TWO - the line the model reads. Its title bar caps the
+				    preview's own frame (attached, `border-b-0`, so the pair reads as
+				    two consoles and not as a label that drifted off its box); the
+				    cutoff rule and the stored-original receipt sit under that frame,
+				    because the boundary is the pair's and not the preview's. */}
+				<div class="flex min-w-0 flex-col gap-4">
+					<div class="flex flex-col">
+						<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-2 border-oxblood-dark border-b-0 bg-asphalt-panel px-3.5 py-1.5">
+							<ZineKicker As="div" Tone="canary">
+								PREVIEW // WHAT THE MODEL READS
+							</ZineKicker>
+							<span
+								class="telemetry-tag telemetry-tag--canary ml-auto shrink-0"
+								title={`${PreviewBytes} bytes in the preview line`}
+							>
+								{PreviewTally}
+							</span>
+						</div>
+						<ZinePreview Label={Label} Result={Preview} Color="canary" Enter={StreamBeat} />
+						<div class="mt-3 flex items-center gap-3">
+							<span class="type-meta shrink-0 !font-black uppercase text-zinc-dust">
+								CUTOFF
+							</span>
+							<span class="h-px flex-1 bg-oxblood-dark" aria-hidden="true" />
+							<span class="type-meta uppercase text-zinc-dust">
+								THE PREVIEW STOPS HERE · THE ORIGINAL IS STORED
+							</span>
+						</div>
+						{Hash !== "" && (
+							<details class="group mt-2">
+								<summary class="flex cursor-pointer list-none items-center justify-between gap-3 font-mono text-caption text-zinc-dust transition-colors hover:text-bone-white">
+									<span>Original retained</span>
+									<span class="shrink-0 group-open:hidden" aria-hidden="true">
+										+
+									</span>
+									<span class="hidden shrink-0 group-open:inline" aria-hidden="true">
+										−
+									</span>
+								</summary>
+								<div class="mt-2 flex items-start gap-3">
+									<div
+										class="ccr-marker grow font-mono text-caption font-bold text-weathered-teal"
+										set:html={Hash}
+									/>
+									<ZineCopyChip Label="MARKER" Copy={Payload} />
+								</div>
+							</details>
+						)}
+					</div>
+					<p class="font-body text-base leading-relaxed text-zinc-dust">
+						The same build on one line: the type, the counts, and the one error that
+						mattered. The marker underneath is the address of the bytes that stayed behind -
+						the agent pays for them only when this line fails to answer the question.
+					</p>
+				</div>
 			</div>
-		</div>
-	</ZineBox>
-) : (
-	<ZineBox Size="lg" Rotate="-rotate-[1deg]" Wipe={Wipe}>
-		{/* `data-run` is on the GRID, not on the terminal pod: the runtime owns
-		    both halves of the pair, because the right one is a function of the
-		    left one. The terminal is the left column's pod; the preview, the
-		    marker, the verdict chip and the tally are the right column's. */}
-		<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10" data-run={Slug}>
-			{/* POD ONE - the live terminal. Without JavaScript the pane is the
-				    settled build at its natural height, with the command in the ribbon
-				    above it and the byte count beside the command - the still frame
-				    this page has always shown. `[data-run]` converts it to a live
-				    window the moment it mounts.
+		</ZineBox>
+	) : (
+		<ZineBox Size="lg" Rotate="-rotate-[1deg]" Wipe={Wipe}>
+			{/* `data-run` is on the GRID, not on the terminal panel: the runtime
+			    owns both halves of the pair, because the right one is a function of
+			    the left one. The terminal is the left column's panel; the preview,
+			    the marker, the verdict chip and the tally are the right column's. */}
+			<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10" data-run={Slug}>
+				{/* PANEL ONE - the live terminal. Without JavaScript the pane is the
+				    settled build at its natural height, with the command in the
+				    title bar above it and the byte count beside the command - the
+				    still frame this page has always shown. `[data-run]` converts it
+				    to a live window the moment it mounts.
 
 				    The prompt element carries its own `$`: the runtime writes
 				    `$ <command>` into it, so a `$` beside it would print twice. */}
-			<div class="flex min-w-0 flex-col gap-4">
-				<div class="ccr-marker flex flex-col border border-oxblood-dark bg-soot-black">
-					<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
-						<span class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
-							<span class="shrink-0 font-mono text-meta font-bold uppercase text-zinc-dust">
-								RAW STREAM // WHAT THE TERMINAL KEEPS
+				<div class="flex min-w-0 flex-col gap-4">
+					<div class="ccr-marker flex flex-col border border-oxblood-dark bg-soot-black">
+						<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
+							<span class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
+								<span class="type-meta shrink-0 !font-black uppercase text-zinc-dust">
+									RAW STREAM // WHAT THE TERMINAL KEEPS
+								</span>
+								<span
+									class="break-words font-mono text-base font-bold leading-snug text-stamped-canary"
+									data-run-prompt
+									set:html={Escape(`$ ${Build?.Command ?? ""}`)}
+								/>
 							</span>
 							<span
-								class="break-words font-mono text-base font-bold leading-snug text-stamped-canary"
-								data-run-prompt
-								set:html={Escape(`$ ${Build?.Command ?? ""}`)}
+								class="telemetry-tag ml-auto shrink-0"
+								data-run-tally
+								set:html={Escape(SettledTally)}
 							/>
-						</span>
-						<span
-							class="telemetry-tag ml-auto shrink-0"
-							data-run-tally
-							set:html={Escape(SettledTally)}
-						/>
-					</div>
-					<div class="p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
-						<div class="overflow-hidden" data-run-viewport>
-							<pre class="m-0 font-mono" data-run-track set:html={FrameRows} />
+						</div>
+						<div class="console-well p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
+							<div class="overflow-hidden" data-run-viewport>
+								<pre class="m-0 font-mono" data-run-track set:html={FrameRows} />
+							</div>
 						</div>
 					</div>
+					<p class="font-mono text-base leading-relaxed text-zinc-dust">
+						the whole thing enters the context
+					</p>
+					<p class="font-body text-base leading-relaxed text-zinc-dust">
+						The commands in a tool-heavy session arrive in exactly this variety: a build
+						that stalls and then bursts, a search that arrives flat and fast, a listing, a
+						test run that ticks, a JSON body that only parses on its last line. The fade,
+						the dim and the mute are the suppression marks the engine puts on these same
+						lines - repeated compile steps recede, counted warnings mute, the one line that
+						stopped the build stays at full strength.
+					</p>
 				</div>
-				<p class="font-mono text-base leading-relaxed text-zinc-dust">
-					the whole thing enters the context
-				</p>
-				<p class="font-body text-base leading-relaxed text-zinc-dust">
-					The commands in a tool-heavy session arrive in exactly this variety: a build
-					that stalls and then bursts, a search that arrives flat and fast, a listing, a
-					test run that ticks, a JSON body that only parses on its last line. The fade,
-					the dim and the mute are the suppression marks the engine puts on these same
-					lines - repeated compile steps recede, counted warnings mute, the one line that
-					stopped the build stays at full strength.
-				</p>
-			</div>
 
-			{/* POD TWO - the line the model reads, recomputed on every arrival. */}
-			<div class="flex min-w-0 flex-col gap-4">
-				<div class="flex flex-col">
-					<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-2 border-oxblood-dark border-b-0 bg-asphalt-panel px-3.5 py-1.5">
-						<ZineKicker As="div" Tone="canary">
-							PREVIEW // WHAT THE MODEL READS
-						</ZineKicker>
-						<span
-							class="telemetry-tag telemetry-tag--crimson ml-auto shrink-0"
-							data-run-type
-							set:html={Escape(Build?.Type ?? "")}
-						/>
-					</div>
-					<div
-						class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5"
-						data-enter="980"
-					>
-						<div class="type-meta mb-1.5 uppercase text-stamped-canary">{Label}</div>
-						<div class="border border-oxblood-dark bg-soot-black p-2">
-							<div
-								class="font-mono text-base font-bold text-bone-white"
-								data-run-preview
-								set:html={Escape(SettledPreview)}
-							/>
-							<div
-								class="ccr-marker mt-2 font-mono text-base font-bold text-weathered-teal"
-								data-run-marker
-								set:html={Escape(SettledMarker)}
+				{/* PANEL TWO - the line the model reads, recomputed on every arrival.
+				    The cutoff rule sits INSIDE the well: the preview above it is what
+				    the model reads, the marker below it is the receipt for the bytes
+				    that were stored instead of printed, and the marker's own size
+				    field states how many of them there are. */}
+				<div class="flex min-w-0 flex-col gap-4">
+					<div class="flex flex-col">
+						<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-2 border-oxblood-dark border-b-0 bg-asphalt-panel px-3.5 py-1.5">
+							<ZineKicker As="div" Tone="canary">
+								PREVIEW // WHAT THE MODEL READS
+							</ZineKicker>
+							<span
+								class="telemetry-tag telemetry-tag--crimson ml-auto shrink-0"
+								data-run-type
+								set:html={Escape(Build?.Type ?? "")}
 							/>
 						</div>
+						<div
+							class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5"
+							data-enter="980"
+						>
+							<div class="type-meta mb-1.5 uppercase text-stamped-canary">{Label}</div>
+							<div class="border border-oxblood-dark bg-soot-black p-2">
+								<div
+									class="font-mono text-base font-bold text-bone-white"
+									data-run-preview
+									set:html={Escape(SettledPreview)}
+								/>
+								<div class="mt-2 flex items-center gap-3">
+									<span class="type-meta shrink-0 !font-black uppercase text-zinc-dust">
+										CUTOFF
+									</span>
+									<span class="h-px flex-1 bg-oxblood-dark" aria-hidden="true" />
+									<span class="type-meta uppercase text-zinc-dust">
+										THE PREVIEW STOPS HERE · THE ORIGINAL IS STORED
+									</span>
+								</div>
+								<div
+									class="ccr-marker mt-2 font-mono text-base font-bold text-weathered-teal"
+									data-run-marker
+									set:html={Escape(SettledMarker)}
+								/>
+							</div>
+						</div>
 					</div>
+					<p class="font-body text-base leading-relaxed text-zinc-dust">
+						Aphrodite previews the output it has received, not the output a command will
+						eventually produce: the counts are the counts of the lines that have actually
+						arrived, and the marker's size is the size of the bytes behind it at that
+						moment. Every intermediate preview reads as one sentence -
+						<em>if the stream ended here, this is the line the agent would read</em> - and
+						the tally climbs with the stream until it settles on the line the build really
+						ends on.
+					</p>
+					<p class="font-body text-base leading-relaxed text-zinc-dust">
+						The type chip names the type the tool hands the engine, and the engine honours
+						it: a build counts errors and warnings, a search counts hits and files, a
+						listing counts entries and extensions, a test run counts passes and failures, a
+						JSON body counts items and keys. One engine, five arms of it - the same four
+						stages, reading five different kinds of output.
+					</p>
 				</div>
-				<p class="font-body text-base leading-relaxed text-zinc-dust">
-					Aphrodite previews the output it has received, not the output a command will
-					eventually produce: the counts are the counts of the lines that have actually
-					arrived, and the marker's size is the size of the bytes behind it at that
-					moment. Every intermediate preview reads as one sentence -
-					<em>if the stream ended here, this is the line the agent would read</em> - and
-					the tally climbs with the stream until it settles on the line the build really
-					ends on.
-				</p>
-				<p class="font-body text-base leading-relaxed text-zinc-dust">
-					The type chip names the type the tool hands the engine, and the engine honours
-					it: a build counts errors and warnings, a search counts hits and files, a
-					listing counts entries and extensions, a test run counts passes and failures, a
-					JSON body counts items and keys. One engine, five arms of it - the same four
-					stages, reading five different kinds of output.
-				</p>
 			</div>
-		</div>
-		<script
-			type="application/json"
-			is:inline
-			data-run-script={Slug}
-			set:html={JSON.stringify(Run)}
-		/>
-	</ZineBox>
-)}
+			<script
+				type="application/json"
+				is:inline
+				data-run-script={Slug}
+				set:html={JSON.stringify(Run)}
+			/>
+		</ZineBox>
+	)
+}
+
+<style>
+	/* THE RECESSED WELL, the same rule `ZineStream` carries: the running
+	   terminal's body is cut into the plate by one hard 3px inset in the plate's
+	   own black. Hard offset, no blur, no radius - the site has neither. */
+	.console-well {
+		box-shadow: inset 3px 3px 0 #000;
+	}
+</style>

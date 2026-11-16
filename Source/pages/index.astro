@@ -8,6 +8,7 @@ import CodeFence from "@Component/CodeFence.astro";
 import ZineButton from "@Component/ZineButton.astro";
 import ZineFold from "@Component/ZineFold.astro";
 import ZineSplit from "@Component/ZineSplit.astro";
+import ZineStatBar from "@Component/ZineStatBar.astro";
 
 import { Anchor, Routes } from "@Library/Links";
 import { Benchmark, Narrative, Study } from "@Library/Numbers";
@@ -174,6 +175,14 @@ tracing-subscriber 0.3.23
 
 /** The two path crates compile last, and their versions are the generated ones. */
 const Workspace = [`aphrodite-headroom-core ${Versions.Headroom}`, `aphrodite ${Versions.Binary}`];
+
+/**
+ * The hero's four standing claims - what is true of the product before any
+ * number is quoted. The hero used to carry them as four chips AND as a sentence
+ * under those chips that restated three of them; they are the instrument panel
+ * beside the lead now, said once.
+ */
+const Claims = ["One binary", "Zero dependencies", "Millions of tokens saved", "One retrieval away"];
 
 /** `name version` -> the line cargo prints for it. */
 const Compile = (Row: string): string => {
@@ -471,6 +480,120 @@ const Decision = [
 		Two: "No tool-output interception, no terminal compression, no directives, no context engine. It extends the stack to other callers; it does not replace the hooks inside Hermes.",
 	},
 ];
+
+/**
+ * THE TWO LANES, as the decision matrix's cards.
+ *
+ * `Decision` is the axis table read across a row: one axis, two values. The
+ * cards are that same data read down a COLUMN, so a card cannot say anything
+ * the axis rows do not - a lane is its four axis values, its name, its "best
+ * for" line and the one action it offers. `Dominant` is the recommended route:
+ * it takes the wider track, the crimson top line and the RECOMMENDED tag, which
+ * is how Stitch draws a matrix with one lead without a second layout.
+ *
+ * The `Lead` is the lane's own thesis, kept because the axis cells compress it
+ * rather than contain it: `tool output never hits a wire`, `base_url at :9798`,
+ * `a second agent, a script, an external tool`. Nothing from the two lane
+ * articles is dropped - each sentence's fact is either in the Lead or in the
+ * row that summarises it.
+ */
+const Lanes = [
+	{
+		Path: "PATH 01 // NATIVE PLUGIN",
+		Name: "Hermes plugin",
+		Badge: "RECOMMENDED",
+		BestFor: "BEST FOR: HERMES",
+		Dominant: true,
+		Lead: "Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a client at. Tool output never hits a wire, so only hook-level registration catches it before it becomes message history.",
+		Rows: Decision.map((Row) => ({ Axis: Row.Axis, Value: Row.One })),
+		Action: { Label: "THE INTEGRATION", Href: Routes.Hermes },
+	},
+	{
+		Path: "PATH 02 // OPENAI-COMPATIBLE PROXY",
+		Name: "Standalone proxy",
+		Badge: "HTTP",
+		BestFor: "BEST FOR: OTHER CLIENTS",
+		Dominant: false,
+		Lead: "The plugin already spawns both listeners, so this lane needs no extra setup: point base_url at :9798 and any OpenAI-compatible client - a second agent, a script, an external tool - gets the same CCR compression over plain HTTP.",
+		Rows: Decision.map((Row) => ({ Axis: Row.Axis, Value: Row.Two })),
+		Action: { Label: "THE PROXY LANE", Href: Anchor(Routes.Setup, "proxy") },
+	},
+];
+
+/**
+ * WHAT LANDS ON DISK - the persistence band's tree, one row per line.
+ *
+ * Every line is a fact the page already states elsewhere: the catalog entry is
+ * a reviewed pinned checkout of `plugin.yaml` plus the `__init__.py` shim (step
+ * 1), `download.sh` fetches the binary and the dylib into
+ * `~/.hermes/aphrodite/binaries/` validated against the in-tree
+ * `SHA256SUMS.txt` (step 3), the store is SQLite and survives a restart (lane
+ * 02), and the directives are the plugin lane's own (lane 02's limit names
+ * them). `Prefix` is the drawing, `Name` the path segment, `Note` the comment -
+ * so a new file is one row, never a redrawn branch.
+ */
+const Topology = [
+	{ Prefix: "", Name: "~/.hermes/", Note: "" },
+	{
+		Prefix: "├── ",
+		Name: "plugins/aphrodite/",
+		Note: "the catalog entry: a reviewed pinned checkout",
+	},
+	{ Prefix: "│   ├── ", Name: "plugin.yaml", Note: "Hermes manifest" },
+	{ Prefix: "│   ├── ", Name: "__init__.py", Note: "loader shim" },
+	{ Prefix: "│   ├── ", Name: "BINARY_VERSION", Note: "the release this tree pins" },
+	{
+		Prefix: "│   └── ",
+		Name: "SHA256SUMS.txt",
+		Note: "in-tree checksums, BINARY_VERSION header",
+	},
+	{ Prefix: "└── ", Name: "aphrodite/", Note: "the runtime home" },
+	{
+		Prefix: "    ├── ",
+		Name: "binaries/",
+		Note: "fetched by download.sh, SHA-256 and magic-byte verified",
+	},
+	{ Prefix: "    │   ├── ", Name: "aphrodite", Note: "the proxy binary" },
+	{
+		Prefix: "    │   └── ",
+		Name: "libaphrodite_hermes.*",
+		Note: "the dylib the plugin loads",
+	},
+	{ Prefix: "    ├── ", Name: "ccr.db", Note: "SQLite store: survives a restart" },
+	{ Prefix: "    └── ", Name: "directives/", Note: "agent directives, hot-reloaded" },
+];
+
+/**
+ * THE TWO LAYERS BESIDE THE TREE - Stitch's right column: one card per
+ * directory, each with its own accent edge, plus the two guarantees that make
+ * the layout safe to reason about. The accents are identity (teal = the
+ * checked-in plugin tree, blood = the runtime home), not decoration, so they
+ * travel with the card rather than with a rule.
+ */
+const Layers = [
+	{
+		Tone: "weathered-teal",
+		Label: "THE PLUGIN DIRECTORY // HOOKS-ONLY",
+		Path: "~/.hermes/plugins/aphrodite",
+		Body: "Carries the manifest, the loader shim and the checksum list, and nothing else: a reviewed pinned checkout of the catalog entry. Enabling is a separate write to Hermes' own config.yaml, so a finished download alone does not register the hooks.",
+	},
+	{
+		Tone: "raw-blood",
+		Label: "THE RUNTIME HOME // PERSISTENCE",
+		Path: "~/.hermes/aphrodite",
+		Body: "Houses everything fetched or written at runtime: the binary and the dylib, and the SQLite store that survives a restart and is shared with any client that speaks HTTP. The plugin lane's inline store is session-scoped instead.",
+	},
+];
+
+/**
+ * The two guarantees the persistence band closes on. Both are failure-path
+ * facts the install panel already stated, and both are about what does NOT get
+ * written - which is exactly what a reader deciding to install wants to know.
+ */
+const Guarantees = [
+	"aphrodite setup runs hermes --version as its first step and fails fast with a clear error, before anything is written.",
+	"If the binaries are missing, the plugin logs the setup command and stays disabled until you run it.",
+];
 ---
 
 <Base
@@ -496,30 +619,42 @@ const Decision = [
 		>
 			<!-- Beat 01. The folio, in the published blueprint voice: six of these
 			     number the six chapters, and each is quiet on purpose - a chapter
-			     number is navigation, not decoration. -->
-			<p class="section-index !mb-10">01 // POSITIONING</p>
+			     number is navigation, not decoration. This one is the hero's
+			     BREADCRUMB as well as its coordinate, so it names the publication
+			     the chapter sits in - the same shape Stitch's overline takes
+			     (`01 / SYSTEM PROVISIONING / RUNTIME INTEGRATION PLAYBOOK`). -->
+			<p class="section-index !mb-10">01 // POSITIONING // CCR COMPRESSION ENGINE</p>
 			<!-- Brand card: the red aphrodite.svg mark in the crimson module,
 			     oxblood offset underlay (user instruction: the red mark everywhere).
 			     The card's 24-unit drop to the wordmark was the ceremonial stack
 			     this beat was paying for: the product's own name now follows its
-			     mark at reading distance. -->
-			<div class="group relative mb-10 -rotate-[2.5deg] cursor-pointer transition-transform duration-300 hover:rotate-0">
-				<div class="pointer-events-none absolute -inset-2 translate-x-3 translate-y-3 border border-black bg-oxblood-dark opacity-80"></div>
-				<div class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-5 sm:p-7">
-					<div class="tape-strip absolute -top-3.5 left-1/2 -translate-x-1/2 -rotate-1 border-b border-t border-bone-newsprint/30 px-6 py-1 text-[13px] font-black uppercase tracking-widest text-bone-newsprint">
-						// REPRO_PROOF #001
-					</div>
-					<img
-						class="h-32 w-auto sm:h-44"
-						src="/Brand/aphrodite.svg"
-						alt="Aphrodite brand mark"
-						width="160"
-						height="160"
-					/>
-					<div class="absolute -bottom-3.5 -right-3 border border-black bg-raw-blood px-2.5 py-0.5 text-base font-black tracking-widest text-bone-white shadow">
-						CCR CORE // STENCIL
+			     mark at reading distance.
+
+			     The build chip sits BESIDE the card, not under it: the version is
+			     the one number on this page a reader can check against their own
+			     install (`Versions.Binary`, read from the module's
+			     `crates/aphrodite/Cargo.toml`), and a fact belongs in the same row
+			     as the identity it is a fact about. -->
+			<div class="mb-10 flex flex-wrap items-center gap-6">
+				<div class="group relative -rotate-[2.5deg] cursor-pointer transition-transform duration-300 hover:rotate-0">
+					<div class="pointer-events-none absolute -inset-2 translate-x-3 translate-y-3 border border-black bg-oxblood-dark opacity-80"></div>
+					<div class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-5 sm:p-7">
+						<div class="tape-strip absolute -top-3.5 left-1/2 -translate-x-1/2 -rotate-1 border-b border-t border-bone-newsprint/30 px-6 py-1 text-[13px] font-black uppercase tracking-widest text-bone-newsprint">
+							// REPRO_PROOF #001
+						</div>
+						<img
+							class="h-32 w-auto sm:h-44"
+							src="/Brand/aphrodite.svg"
+							alt="Aphrodite brand mark"
+							width="160"
+							height="160"
+						/>
+						<div class="absolute -bottom-3.5 -right-3 border border-black bg-raw-blood px-2.5 py-0.5 text-base font-black tracking-widest text-bone-white shadow">
+							CCR CORE // STENCIL
+						</div>
 					</div>
 				</div>
+				<span class="telemetry-tag telemetry-tag--teal">Binary v{Versions.Binary}</span>
 			</div>
 			<!-- Stamped wordmark. THE HERO'S EXPRESSIVE BUDGET IS THE BRAND CARD
 			     above; the wordmark carries the scale jump and nothing else. The
@@ -540,7 +675,7 @@ const Decision = [
 			     white, which no shadow was ever carrying; the offset plane
 			     belongs to the card alone now. Verified in the rendered page:
 			     the hero's only remaining offset planes are the card's. -->
-			<div class="relative flex flex-col items-center">
+			<div class="relative flex flex-col items-start">
 				<!-- The wordmark clamps at the small breakpoints: at 320px the
 				     fixed 72px measures ~346px wide and clips both edges
 				     against the overflow-x-hidden body; 17.5vw keeps the full
@@ -554,111 +689,250 @@ const Decision = [
 			     and tilted, it made the page's third-strongest element out of one
 			     sentence - and its teal made the hero carry two accents against
 			     the card's crimson. As a line of type under the wordmark it still
-			     states the product, and the hero speaks one colour. -->
-			<p class="mb-8 mt-14 text-center font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
+			     states the product, and the hero speaks one colour.
+
+			     It starts on the same vertical as everything above it now: a
+			     centred hero makes the eye hunt for a starting edge on every line,
+			     and the arrangement this beat takes from Stitch starts the whole
+			     stack on one edge. -->
+			<p class="mb-8 mt-14 text-start font-mono text-base font-black uppercase tracking-widest text-bone-newsprint">
 				CONTEXT MANAGEMENT FOR TOOL-USING AI AGENTS
 			</p>
-			<!-- THE LEAD: one sentence states the product, and the two actions are
-			     the only two things a reader can do from here - install it, or
-			     watch it work. The justification that used to follow the lead is
-			     beat 03's, and the stat grid that used to sit under it is beat
-			     04's: four figures with four different measurement domains belong
-			     beside the study that qualifies them, not between the reader and
-			     the demonstration. -->
-			<p class="type-body max-w-[40rem] text-bone-newsprint">
-				A tool call's output becomes part of the model's context, and a release build adds
-				thousands of lines the model reads - and pays for - before it can answer. Aphrodite
-				intercepts that result: logs, diffs, files, searches, JSON, and browser snapshots
-				arrive as compact previews the agent can act on, with the original always one
-				retrieval away.
-			</p>
-			<div class="mt-8 flex flex-wrap items-center justify-center gap-4">
-				<ZineButton Label="Install for Hermes" Href="/setup/" />
-				<ZineButton Label="See the before / after" Href="#hero-run" Role="secondary" />
+			<!-- THE BODY, IN TWO COLUMNS: the reader's path on the left, the
+			     instrument panel on the right. The panel is the Stitch hero's side
+			     cluster - ours carries the four standing claims rather than abstract
+			     telemetry, because a panel with no words in it is decoration, and
+			     the four claims are exactly what a reader should be able to read
+			     without scrolling. Below `lg` the panel stacks under the actions,
+			     which is the same reading order. -->
+			<div class="grid w-full grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-12">
+				<div class="flex min-w-0 flex-col items-start">
+					<!-- THE LEAD: one sentence states the product, and the two actions are
+					     the only two things a reader can do from here - install it, or
+					     watch it work. The justification that used to follow the lead is
+					     beat 03's, and the stat grid that used to sit under it is beat
+					     04's: four figures with four different measurement domains belong
+					     beside the study that qualifies them, not between the reader and
+					     the demonstration. -->
+					<p class="type-body max-w-[40rem] text-bone-newsprint">
+						A tool call's output becomes part of the model's context, and a release build adds
+						thousands of lines the model reads - and pays for - before it can answer. Aphrodite
+						intercepts that result: logs, diffs, files, searches, JSON, and browser snapshots
+						arrive as compact previews the agent can act on, with the original always one
+						retrieval away.
+					</p>
+					<!-- THE TELEMETRY MATRIX. Four status chips, each one a fact a reader
+					     can check without reading further: the engine is Rust, the
+					     integration is a Hermes plugin, the proxy is its own process with
+					     two listeners, and the licence is CC0-1.0. They replace the four
+					     claim chips that used to sit here - those claims are the panel on
+					     the right now, in the readout voice, so the hero states each fact
+					     once instead of twice. The four accents keep their original order
+					     (bone / teal / canary / crimson), so no chip changes identity. -->
+					<ul class="chips mt-10">
+						<li class="telemetry-tag telemetry-tag--bone">Rust engine</li>
+						<li class="telemetry-tag telemetry-tag--teal">Hermes plugin</li>
+						<li class="telemetry-tag telemetry-tag--canary">Standalone proxy // :9797 :9798</li>
+						<li class="telemetry-tag telemetry-tag--crimson">Licensed CC0-1.0</li>
+					</ul>
+					<!-- THE TWO ACTIONS, under the chips: the reader has been told what
+					     it is and what is true of it, so the next thing they meet is the
+					     two things they can do from here. -->
+					<div class="mt-8 flex flex-wrap items-center gap-4">
+						<ZineButton Label="Install for Hermes" Href="/setup/" />
+						<ZineButton Label="See the before / after" Href="#hero-run" Role="secondary" />
+					</div>
+				</div>
+				<!-- THE TELEMETRY PANEL. Index on the left, claim on the right, ruled
+				     like a ledger - the hero's standing claims in the voice every later
+				     chapter speaks. `.well` is grunge-safe by construction (it sets no
+				     isolation, z-index, transform, filter or opacity), so the hero's
+				     right column carries the page's own texture instead of reading as
+				     the one clean block on the sheet. -->
+				<aside
+					class="grunge well w-full p-4 sm:p-5"
+					data-grunge
+					data-grunge-mode="edge"
+					aria-label="Aphrodite in four claims"
+				>
+					<p class="section-index">// STANDING CLAIMS</p>
+					<ul class="mt-3 flex flex-col border-t border-[color:var(--tier-well-edge)]">
+						{Claims.map((Claim, Index) => (
+							<li class="flex items-baseline justify-between gap-3 border-b border-[color:var(--tier-well-edge)] py-2 font-mono text-meta font-bold uppercase last:border-b-0">
+								<span class="text-zinc-dust">{String(Index + 1).padStart(2, "0")}</span>
+								<span class="text-end text-bone-newsprint">{Claim}</span>
+							</li>
+						))}
+					</ul>
+				</aside>
 			</div>
-			<!-- TELEMETRY STRIP - the hero's standing claims in the voice every
-			     later chapter speaks. The chips carry the three facts the sentence
-			     below states plus the one the lead states, and the sentence stays:
-			     a hero that ends on prose reads as a publication, a hero that ends
-			     on a chip row reads as a spec sheet. Both, in that order, so the
-			     reader meets the claim twice and never has to choose a register. -->
-			<ul class="chips mt-10 justify-center">
-				<li class="telemetry-tag telemetry-tag--bone">One binary</li>
-				<li class="telemetry-tag telemetry-tag--teal">Zero dependencies</li>
-				<li class="telemetry-tag telemetry-tag--canary">Millions of tokens saved</li>
-				<li class="telemetry-tag telemetry-tag--crimson">One retrieval away</li>
-			</ul>
-			<p class="mt-8 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
-				One binary. Zero dependencies. Millions of tokens saved.
-			</p>
 		</header>
 
-		<!-- 02 // THE DIFFERENCE - the product's whole argument, and the second
-		     thing on the page. ZineSplit owns the plate and the two panes; above
-		     it there is one claim and one introduction, and nothing else, because
-		     a demonstration that needs to be explained first is not a
-		     demonstration. The instructions did not go anywhere: they are the
-		     fold under the plate, verbatim, for the reader the plate has already
-		     convinced. `Cycle` above holds the scripts.
-		     The section is the entrance root: it reveals on first view and its
-		     plate wipes once. The left pane is a terminal that never stops - five
-		     commands in a cycle, each streaming its real output on its own rhythm
-		     - and the right pane is recomputed from the stream so far, so the
-		     marker is never a lie about a flood that has not finished arriving. -->
+		<!-- 02 // DECISION MATRIX - the Stitch route matrix, and the first thing
+		     after the hero: a reader who has read the lead has exactly one
+		     question left, and it is which lane they are installing.
+
+		     ONE DOMINANT CARD. The plugin lane is the recommended route, so it
+		     takes the wider track, the crimson top line and the RECOMMENDED tag;
+		     the proxy card keeps its own facts at the quiet tier. Both cards carry
+		     the same four axes as ruled rows, so the comparison survives the change
+		     of shape: `Decision` is read down a COLUMN instead of across a row, and
+		     a card can therefore never say anything its rows do not.
+
+		     The two lane articles that used to stand below the axis table are gone
+		     as ARTICLES, not as content: each lane's thesis is its card's `Lead`,
+		     its four comparison facts are the card's rows, its "best for" line is
+		     the card's footer and its link is the card's one action. The /plugin/
+		     link the plugin lane carried is reachable from the site's own
+		     navigation (MenuLinks carries PLUGIN immediately before HERMES), which
+		     is why the card spends its one action on THE INTEGRATION. -->
 		<section class="band relative w-full" data-reveal>
-			<p class="section-index">02 // THE DIFFERENCE // THE PAIR // STREAM + PREVIEW</p>
-			<h2 class="type-section mb-6 text-bone-white">
-				The agent spends its budget reading noise
-			</h2>
-			<div class="prose-flow max-w-[62ch]">
-				<p class="type-body text-bone-newsprint">
-					Every file read, build, code search, or browser open floods the agent's context
-					with raw output - compilation logs, accessibility trees, JSON blobs.
-				</p>
-				<p class="type-body text-bone-newsprint">
-					The agent spends its budget reading noise instead of reasoning.
+			<div
+				class="flex flex-col gap-4 border-b border-oxblood-dark pb-5 md:flex-row md:items-end md:justify-between"
+			>
+				<div class="flex flex-col gap-2">
+					<p class="section-index !mb-0">02 // DECISION MATRIX</p>
+					<h2 class="type-section text-bone-white">Two ways to run it</h2>
+				</div>
+				<p class="type-body max-w-md text-zinc-dust">
+					Both lanes run the same engine over the same CCR store. One lives inside the
+					turn; the other can only see traffic that arrives over HTTP.
 				</p>
 			</div>
-			<div class="mt-12">
-				<ZineSplit Run={Cycle} Label="ONE LINE, ONE MARKER" Id="hero-run" />
-			</div>
-			<!-- The one visible caption. It belongs to the plate - it names what
-			     the two panes are, so a reader who scrolled straight to the image
-			     knows what they are looking at without opening anything. -->
-			<p class="figure-caption mt-6">
-				The flood arrives one line at a time; the line the agent would have read instead is
-				recomputed as each line lands.
-			</p>
-			<div class="mt-10 max-w-[62ch]">
-				<ZineFold Tag="METHOD" Label="How the demonstration works" Body={MethodFold} />
+			<div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+				{Lanes.map((Lane) => (
+					<article
+						class:list={[
+							"grunge shell-card flex flex-col p-6 sm:p-8",
+							{ "shadow-[6px_6px_0px_var(--oxblood-dark)]": Lane.Dominant },
+						]}
+						data-grunge
+						data-grunge-mode="edge"
+					>
+						<span
+							class:list={[
+								"absolute inset-x-0 top-0 h-1",
+								Lane.Dominant ? "bg-raw-blood" : "bg-oxblood-dark",
+							]}
+							aria-hidden="true"
+						></span>
+						<div class="flex flex-wrap items-center justify-between gap-3">
+							<span
+								class:list={[
+									"telemetry-tag",
+									Lane.Dominant ? "telemetry-tag--crimson" : "telemetry-tag--teal",
+								]}
+							>
+								{Lane.Badge}
+							</span>
+							<span class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
+								{Lane.Path}
+							</span>
+						</div>
+						<h3 class="type-sub mt-4 text-bone-white">{Lane.Name}</h3>
+						<p class="type-body mt-3 text-bone-newsprint">{Lane.Lead}</p>
+						<dl class="mt-6 flex flex-col">
+							{Lane.Rows.map((Row) => (
+								<div class="grid grid-cols-1 gap-1 border-t border-[color:var(--tier-shell-edge)] py-3 sm:grid-cols-[8rem_minmax(0,1fr)] sm:gap-5">
+									<dt class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
+										{Row.Axis}
+									</dt>
+									<dd class="type-body max-w-[40rem] text-bone-newsprint">{Row.Value}</dd>
+								</div>
+							))}
+						</dl>
+						<div class="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-oxblood-dark pt-4">
+							<span class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
+								{Lane.BestFor}
+							</span>
+							<a
+								class="type-code font-bold text-stamped-canary hover:underline"
+								href={Lane.Action.Href}
+							>
+								{Lane.Action.Label} &rarr;
+							</a>
+						</div>
+					</article>
+				))}
 			</div>
 		</section>
 
-		<!-- BEAT 03 // MECHANISM - below the pair, because the pair is the argument
-		     and this is the machinery behind it. The tape that used to stamp this
-		     section is the quiet kicker now: `PIPELINE // 4-STAGE ABSORPTION` is
-		     a plate label, and a plate label that is also a stamped tape is two
-		     things claiming to introduce one section.
-		     ONE EXPRESSIVE ASSEMBLY: the stage grid sits inside a single tilted
-		     crimson plate, and the four cards inside it stay at the quiet tier -
-		     hairline rules, no per-card tilt, no per-card shadow, no tape -
-		     because four emphasised cards is four sections pretending to be one.
+		<!-- 03 // OPERATIONAL WORKFLOW - the product's whole argument, moving, and
+		     the band the page is built around. Stitch's operational-workflow band
+		     is a header, a terminal with its own ribbon and a footer callout; ours
+		     is the pair `ZineSplit` already owns (two pods, each a ribbon over a
+		     recessed well), the compression cutoff stated as the strip beneath it,
+		     and the four steps the pair is running.
 
-		     EMPHASIS AND IDENTITY ARE DIFFERENT AXES. Emphasis is the volume
-		     knob (shadow, tilt, tape, fill, rotation) and it is turned down
-		     here. Identity is the information (accent, stage letter, figure,
-		     chip label) and it is not part of the knob: a reader has to be able
-		     to tell stage 03 from stage 01 at a glance, and to match it to the
-		     same stage on the case study. Flattening the accents to one would
-		     have lowered identity, not emphasis. Each card therefore carries
-		     its own accent through the left edge, the corner stamp, the
-		     heading, the rule and the chip - and only those; the figure and
-		     the description stay bone so the reading text never competes. -->
+		     THE FOUR STAGES LIVE HERE, and not in a band of their own. The six
+		     bands are the Stitch sequence, and the four stage figures are the
+		     workflow's own measurements - `40 - 123 ns` to name the content, `~1
+		     ms` to render it, `SQLite` to store it, `aphrodite_retrieve` to get it
+		     back. A separate MECHANISM band would have been a seventh coordinate
+		     for a subject this band already states, so the stage row sits under the
+		     pair as the workflow's step list. Every figure, unit, stage letter and
+		     chip survives verbatim; only the coordinate moved.
+
+		     The section is the entrance root: it reveals on first view, and the
+		     grunge ink rides behind the stage plate at the band's foot. The left
+		     pane is a terminal that never stops - five commands in a cycle, each
+		     streaming its real output on its own rhythm - and the right pane is
+		     recomputed from the stream so far, so the marker is never a lie about
+		     a flood that has not finished arriving. -->
 		<section class="band relative w-full" data-reveal>
-			<p class="section-index">03 // MECHANISM // PIPELINE // 4-STAGE ABSORPTION</p>
-			<h2 class="type-section mb-4 text-bone-white">How it works</h2>
-			<p class="type-sub mb-6 text-bone-newsprint">Four steps, one decision</p>
-			<div class="prose-flow max-w-2xl">
+			<div
+				class="flex flex-col gap-4 border-b border-oxblood-dark pb-5 md:flex-row md:items-end md:justify-between"
+			>
+				<div class="flex flex-col gap-2">
+					<p class="section-index !mb-0">
+						03 // OPERATIONAL WORKFLOW // THE PAIR // STREAM + PREVIEW
+					</p>
+					<h2 class="type-section text-bone-white">
+						The agent spends its budget reading noise
+					</h2>
+				</div>
+				<p class="type-body max-w-md text-zinc-dust">
+					Every file read, build, code search or browser open floods the agent's context
+					with raw output - compilation logs, accessibility trees, JSON blobs - and the
+					agent spends its budget reading noise instead of reasoning.
+				</p>
+			</div>
+			<ZineSplit Run={Cycle} Label="ONE LINE, ONE MARKER" Id="hero-run" />
+			<!-- The one visible caption. It belongs to the plate - it names what
+			     the two panes are, so a reader who scrolled straight to the image
+			     knows what they are looking at without opening anything. -->
+			<p class="figure-caption">
+				The flood arrives one line at a time; the line the agent would have read instead is
+				recomputed as each line lands.
+			</p>
+			<!-- THE COMPRESSION CUTOFF. Stitch closes its console band on a footer
+			     callout that states the one fact the two panes add up to; ours is
+			     the line the flood stops being read at, said once, between the
+			     demonstration and the machinery. It is a ruled strip rather than a
+			     second plate: the band already spends its expressive budget on the
+			     pair above it. -->
+			<div
+				class="flex flex-col gap-3 border-y border-oxblood-dark py-4 md:flex-row md:items-center md:justify-between md:gap-8"
+			>
+				<span class="type-meta font-bold uppercase tracking-widest text-raw-blood">
+					COMPRESSION CUTOFF
+				</span>
+				<p class="type-meta max-w-2xl text-zinc-dust">
+					Everything above the line is stored and addressed; the agent reads the one line,
+					and pays for the rest only when the preview cannot answer.
+				</p>
+				<span class="telemetry-tag telemetry-tag--canary">ONE RETRIEVAL AWAY</span>
+			</div>
+			<div class="max-w-[62ch]">
+				<ZineFold Tag="METHOD" Label="How the demonstration works" Body={MethodFold} />
+			</div>
+			<!-- THE FOUR STEPS // the workflow's own step list, under the pair it
+			     runs. The instructions for reading the grid stay one click away, so
+			     the four figures are the first thing the eye lands on. -->
+			<div class="flex flex-col gap-4 border-b border-oxblood-dark pb-5">
+				<p class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
+					THE FOUR STEPS // WHAT HAPPENS BETWEEN THE TOOL PRINTING AND THE MODEL READING
+				</p>
 				<p class="type-body text-bone-newsprint">
 					A tool result is appended to the model's context the moment the tool returns, so
 					a build log the agent never needed is read in full, and paid for in full.
@@ -666,9 +940,9 @@ const Decision = [
 					a compact, structured preview - because the agent's reasoning budget is the
 					context budget, and raw noise spends both.
 				</p>
-			</div>
-			<div class="mt-10 max-w-[62ch]">
-				<ZineFold Tag="GUIDE" Label="How to read the four stages" Body={GridFold} />
+				<div class="max-w-[62ch]">
+					<ZineFold Tag="GUIDE" Label="How to read the four stages" Body={GridFold} />
+				</div>
 			</div>
 			<!-- The section's one expressive assembly. BENTO GRAMMAR: the four
 			     stages are not four equal boxes - 01 and 04 take 45% more width
@@ -681,13 +955,12 @@ const Decision = [
 			     against 212 and keeps the cards readable. The grid keeps its 2x2
 			     shape through the tablet range and only splits into weighted
 			     tracks at xl, where each track has room to mean something.
-			     The plate is inset (`mx-3`/`sm:mx-4`) because a tilted plate's
-			     BOUNDING box is wider than its layout box: at -1.2deg a 500px-tall
-			     plate adds ~10px per side, and `main > section` clips that overflow,
-			     so a full-bleed plate would have its corners and its shadow plane
-			     shaved off. -->
+			     The plate is inset (`mx-3`/`sm:mx-4`) so the grunge ink that bleeds
+			     past its edge has somewhere to go: `main > section` clips overflow,
+			     so a full-bleed plate would have its splats shaved off at the page
+			     edge and the texture would read as a hard cut rather than as ink. -->
 			<div
-				class="grunge grunge--bone emphasis-quiet mx-3 mt-12 p-5 sm:mx-4 sm:p-8 lg:p-10"
+				class="grunge grunge--bone emphasis-quiet mx-3 p-5 sm:mx-4 sm:p-8 lg:p-10"
 				data-grunge
 			>
 				<div
@@ -763,23 +1036,99 @@ const Decision = [
 			</div>
 		</section>
 
-		<!-- BEAT 04 // EVIDENCE - the chapter break, and the only surface change on
-		     the page. Dark wall, one bone clipping: a result pasted onto the
-		     publication rather than another panel in it, which is what makes the
-		     subject change legible without a single extra word.
-		     ONE DOMINANT RESULT - the session study. The four benchmark badges
-		     that used to sit under the hero are here beside it, because they are
-		     four DIFFERENT measurements: the ceiling is one corpus, the overall
-		     is the whole standard corpus, the latency is the engine's own
-		     overhead, the saved total is the study. A reader must not be able to
-		     average them into one outcome, so every figure keeps the qualifier
-		     that names its domain - and the qualifier is part of the number. -->
-		<!-- BAND 04 // EVIDENCE - the inverted sand band: bone ground, carbon ink,
-		     the page's only surface change. It is a BAND and not an inset pod
-		     because a pod would have to be laid on the same dark ground as the
-		     other five chapters, and the subject change would stop being visible
-		     without a word; the pod's composition (one dominant figure, the
-		     comparison beside it, the qualifier under it) is the band's own.
+		<!-- 04 // PERSISTENCE ARCHITECTURE - Stitch's "what changes on disk", and
+		     the band that answers the question the workflow band raises: the
+		     preview is one line, so where did the other four thousand go?
+
+		     TREE BESIDE EXPLANATION: seven columns of filesystem, five columns of
+		     layer cards - one card per directory, each with its own accent edge.
+		     The tree is DATA (`Topology`), so a new file is one row rather than a
+		     redrawn branch, and every line is a fact the install panel already
+		     states. The band closes on the two guarantees, both of which are about
+		     what does NOT get written - which is exactly what a reader deciding to
+		     install wants to know before running anything. -->
+		<section class="band relative w-full" data-reveal>
+			<div class="flex flex-col gap-3 border-b border-oxblood-dark pb-5">
+				<p class="section-index !mb-0">04 // PERSISTENCE ARCHITECTURE</p>
+				<h2 class="type-section text-bone-white">What lands on disk</h2>
+				<p class="type-body max-w-3xl text-bone-newsprint">
+					Two directories, and neither of them is the plugin's own tree: a reviewed pinned
+					checkout that carries the manifest and the checksum list, and a runtime home that
+					carries everything fetched or written after it.
+				</p>
+			</div>
+			<div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+				<div class="well flex flex-col lg:col-span-7">
+					<div
+						class="flex flex-wrap items-center justify-between gap-2 border-b border-[color:var(--tier-well-edge)] bg-soot-black px-4 py-2.5"
+					>
+						<span class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
+							FILESYSTEM TOPOLOGY // ~/.HERMES/
+						</span>
+						<span class="telemetry-tag telemetry-tag--teal">TWO DIRECTORIES</span>
+					</div>
+					<div class="overflow-x-auto px-4 py-4 font-mono text-[13px] leading-relaxed select-all">
+						{Topology.map((Row) => (
+							<div class="whitespace-pre">
+								<span class="text-oxblood-dark">{Row.Prefix}</span>
+								<span class="text-bone-white">{Row.Name}</span>
+								<span class="text-zinc-dust">
+									{Row.Note === "" ? "" : `   # ${Row.Note}`}
+								</span>
+							</div>
+						))}
+					</div>
+				</div>
+				<div class="flex flex-col gap-4 lg:col-span-5">
+					{Layers.map((Layer) => (
+						<div
+							class="tier-shell flex flex-col gap-2 border-y border-r border-[color:var(--tier-shell-edge)] p-5"
+							style={`border-left: 2px solid var(--${Layer.Tone})`}
+						>
+							<div class="flex flex-wrap items-center justify-between gap-2">
+								<span
+									class="type-meta font-bold uppercase tracking-widest"
+									style={`color: var(--${Layer.Tone})`}
+								>
+									{Layer.Label}
+								</span>
+								<span class="type-meta text-zinc-dust">{Layer.Path}</span>
+							</div>
+							<p class="type-body text-bone-newsprint">{Layer.Body}</p>
+						</div>
+					))}
+					{Guarantees.map((Guarantee) => (
+						<p
+							class="flex items-start gap-3 border border-[color:var(--tier-shell-edge)] bg-soot-black px-4 py-3 font-mono text-base leading-relaxed text-zinc-dust"
+						>
+							<span class="font-black text-stamped-canary" aria-hidden="true">!</span>
+							<span>{Guarantee}</span>
+						</p>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<!-- 05 // EVIDENCE - the sand pod, and the page's only surface change.
+		     Stitch's evidence block is a GIANT STAT FLAGSHIP with the smaller
+		     readouts as HERO METRICS PODS under it: one enormous number, then a
+		     row of three cards, each a label over a figure over the qualifier
+		     that keeps it honest. Ours keeps the bone BAND - the surface change
+		     is what makes the subject change legible without a word - and takes
+		     that grammar inside it: the flagship in the first five columns with
+		     the study that qualifies it in the other seven, then the three pods
+		     across the full width.
+
+		     THE FOURTH MEASUREMENT IS THE FLAGSHIP'S OWN AGGREGATE. The saved
+		     total is not a fourth domain beside the other three: it is the same
+		     study this figure reads as a percentage, so it sits under the giant
+		     numeral as the flagship's unit line (Stitch's own card carries its
+		     percentage in exactly that slot) instead of becoming a fourth equal
+		     badge.
+
+		     ONE EXPRESSIVE DEVICE IN THIS BAND: the giant numeral. The pods are
+		     flat for that reason - with the numeral as the band's one expressive
+		     assembly, a shadowed, tilted pod is a second and a third.
 		     `border-t-0` because the bone surface IS the divider: the shell's grey
 		     chapter rule would otherwise paint a 1px dark seam across the top edge
 		     of the paper, which is the one place on the page it cannot sit. -->
@@ -787,288 +1136,140 @@ const Decision = [
 			class="paper-band relative border-t-0 bg-bone-newsprint py-6 text-soot-black sm:py-10 lg:py-14"
 			data-reveal
 		>
-			<!-- ONE EXPRESSIVE DEVICE IN THIS BAND: the giant numeral. The ribbon
-			     that used to stamp the section is gone - a tape label AND a
-			     kicker are two things introducing one section, which is the same
-			     defect the mechanism band already answered by demoting its tape
-			     to a kicker. The tape's one fact (how many sessions the study
-			     covers) moves into the kicker, so nothing is lost but a second
-			     device. The four chips below are flat for the same reason: with
-			     the numeral as the band's one expressive assembly, a shadowed,
-			     tilted chip is a second and third. -->
-			<p class="section-index !mb-4 !text-oxblood-dark">
-				04 // EVIDENCE // {Study.Sessions} SESSIONS
-			</p>
-			<h2 class="type-section mb-8 text-soot-black">
-				One result, and the four figures beside it
-			</h2>
-			<div class="flex flex-col gap-4 border-y-2 border-soot-black py-8 lg:flex-row lg:items-end lg:gap-12">
-				<div class="font-headline text-[clamp(3.5rem,11vw,8rem)] font-black leading-[0.85] tracking-tighter text-raw-blood">
-					{Study.SavedPct}
-				</div>
-				<div class="max-w-xl">
-					<p class="type-meta font-bold uppercase tracking-widest text-oxblood-dark">
+			<div class="flex flex-col gap-4 border-b-2 border-soot-black pb-6">
+				<p class="section-index !mb-0 !text-oxblood-dark">
+					05 // EVIDENCE // {Study.Sessions} SESSIONS
+				</p>
+				<h2 class="type-section text-soot-black">
+					One result, and the four figures that qualify it
+				</h2>
+			</div>
+			<div class="grid grid-cols-1 gap-8 border-b-2 border-soot-black py-8 lg:grid-cols-12 lg:gap-12">
+				<!-- THE FLAGSHIP: the one number the band is built around, its
+				     domain named under it, and the aggregate it stands for in the
+				     unit-line slot Stitch gives its own flagship card. The study
+				     that qualifies it sits in the column beside, so the figure is
+				     read first and qualified immediately after. -->
+				<div class="flex flex-col lg:col-span-5">
+					<div class="font-headline text-[clamp(3.5rem,11vw,8rem)] font-black leading-[0.85] tracking-tighter text-raw-blood">
+						{Study.SavedPct}
+					</div>
+					<p class="type-meta mt-3 font-bold uppercase tracking-widest text-oxblood-dark">
 						CONTEXT TOKENS DEFLECTED
 					</p>
-					<p class="type-body mt-2 text-soot-black">
+					{/* THE AGGREGATE THE RATIO STANDS FOR. The enormous figure is the
+					    share, and the absolute token count sits under it in the
+					    study's own canary - the fourth measurement is this one read
+					    a second way, so it belongs here rather than in the pod row.
+					    Its `data-count` stays on the digits alone: the climb writes
+					    textContent, so an attribute on the chip would rewrite the
+					    words beside the number. */}
+					<p class="mt-3">
+						<span class="telemetry-tag telemetry-tag--canary">
+							<span data-count={Study.SavedMillions.replace("M+", "")}>
+								{Study.SavedMillions.replace("M+", "")}
+							</span>
+							M+ TOKENS SAVED
+						</span>
+					</p>
+					<p class="mt-3 text-base leading-relaxed text-oxblood-dark">
+						{Study.Sessions} real sessions, {Study.ApiCalls} API calls, {Study.Measured}.
+					</p>
+				</div>
+				<!-- THE STUDY THAT QUALIFIES THE FIGURE: the prose sits in the second
+				     column of the flagship row, so every qualifier is read in the same
+				     pass as the number it qualifies. -->
+				<div class="flex flex-col gap-3 lg:col-span-7">
+					<p class="type-body text-soot-black">
 						Measured over {Study.Sessions} real Hermes sessions: {Study.SavedPct} of all
 						context tokens deflected, a median session saved ratio of{" "}
 						{Study.MedianRatio}, and ~{Study.AvgPerCall} tokens saved per API call.{" "}
 						{Study.SessionsSaved} of the {Study.Sessions} sessions saved tokens.
 					</p>
-					<p class="type-body mt-3 text-oxblood-dark">
+					<p class="type-body text-oxblood-dark">
 						The sensitivity band is {Study.Band}: the estimate depends on the
 						chars-per-token ratio, which the study puts at {Study.CharsPerTok}.
 					</p>
 				</div>
-			</div>
-			<p class="type-meta mt-10 font-bold uppercase tracking-widest text-oxblood-dark">
-				THE OTHER FOUR MEASUREMENTS
-			</p>
-			<p class="type-body mt-2 max-w-[62ch] text-soot-black">
-				Each of these is a different measurement in a different domain, and the qualifier
-				under each one is part of the number. The ceiling is not the average, the average is
-				not the latency, and the saved total is the session study rather than any single
-				run.
-			</p>
-			<!-- BENTO, ONE DOMINANT + THREE SUPPORTING: the ceiling is the page's
-			     headline figure, so it takes 1.5fr of a weighted track set while
-			     the other three take 1fr each - a two-size cluster instead of a
-			     row of four equals.
+				<div class="flex flex-col gap-4 lg:col-span-12">
+					<p class="type-meta font-bold uppercase tracking-widest text-oxblood-dark">
+						THE OTHER MEASUREMENTS
+					</p>
+					<p class="type-body max-w-[46rem] text-soot-black">
+						Each of these is a different measurement in a different domain, and the
+						qualifier under each one is part of the number. The ceiling is not the
+						average, the average is not the latency, and the saved total is the session
+						study rather than any single run.
+					</p>
+					<!-- THE HERO METRICS PODS - three readouts in a row across the
+					     band's full measure, each a label over its figure over the
+					     qualifier that keeps it honest, instead of four equal badges.
+					     The row spans all twelve columns because three pods need the
+					     width; the flagship has already taken the row above.
 
-			     FOUR ACCENTS, AND THEY ARE IDENTITY, NOT DECORATION. These four
-			     badges are four measurements in four different domains: the
-			     ceiling is one corpus, the overall is the whole standard corpus,
-			     the latency is the engine's own overhead, the saved total is the
-			     session study. Their colours are the only cue saying the numbers
-			     are not comparable, so each keeps its own surface and ink:
+					     THREE ACCENTS, AND THEY ARE IDENTITY, NOT DECORATION. The
+					     accent is the only cue saying these numbers are not
+					     comparable, so each pod keeps its own plate - ZineStatBar's
+					     pod variant resolves the fill and its legible ink together:
 
-			       610x COMPRESSION      raw blood on bone white
-			       132x OVERALL          carbon void, weathered teal ink
-			       ~10MS E2E OVERHEAD    raw blood on bone white
-			       156M+ TOKENS SAVED    stamped canary on soot black
+					       610x COMPRESSION      raw blood, bone-white ink
+					       132x OVERALL          carbon void, weathered teal ink
+					       ~10MS E2E OVERHEAD    raw blood, bone-white ink
 
-			     "One accent per cluster" governs DECORATION - tape, rules,
-			     shadows, chips that carry no meaning. It does not apply where
-			     colour IS the distinction: flattening these four to one accent
-			     was tried and the owner's verdict was that they "lost their
-			     visual identity". Same carve-out as the four stage cards.
-			     Emphasis is still the quiet tier: no shadow, no tilt, because
-			     the giant numeral above is the band's one expressive assembly. -->
-			<div
-				class="mt-8 grid max-w-5xl grid-cols-1 items-start justify-items-center gap-4 sm:grid-cols-2 xl:grid-cols-[1.5fr_1fr_1fr_1fr]"
-				data-enter="260"
-			>
-				<div class="flex flex-col items-center gap-2">
-					<span class="border-4 border-black bg-raw-blood px-6 py-3 font-mono text-lg font-black uppercase tracking-widest text-bone-white">
-						<span data-count={Benchmark.Ceiling.replace("×", "")}>
-							{Benchmark.Ceiling.replace("×", "")}
-						</span>
-						&times; COMPRESSION
-					</span>
-					<span class="max-w-[18rem] text-pretty text-base leading-relaxed text-oxblood-dark">
-						Best case, on large low-entropy prose.
-					</span>
-				</div>
-				<div class="flex flex-col items-center gap-2">
-					<span class="border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
-						<span data-count={Benchmark.Overall.replace("×", "")}>
-							{Benchmark.Overall.replace("×", "")}
-						</span>
-						&times; OVERALL
-					</span>
-					<span class="max-w-[15rem] text-pretty text-base leading-relaxed text-oxblood-dark">
-						The whole standard corpus: {Benchmark.CorpusIn} to {Benchmark.CorpusOut}.
-					</span>
-				</div>
-				<div class="flex flex-col items-center gap-2">
-					<span class="border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white">
-						{Benchmark.LatencyHeadline.toUpperCase().replace(" ", "")} E2E OVERHEAD
-					</span>
-					<span class="max-w-[15rem] text-pretty text-base leading-relaxed text-oxblood-dark">
-						Including the HTTP round-trip; the spread is {Benchmark.Latency}.
-					</span>
-				</div>
-				<div class="flex flex-col items-center gap-2">
-					<span class="border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-soot-black">
-						<span data-count={Study.SavedMillions.replace("M+", "")}>
-							{Study.SavedMillions.replace("M+", "")}
-						</span>
-						M+ TOKENS SAVED
-					</span>
-					<span class="max-w-[15rem] text-pretty text-base leading-relaxed text-oxblood-dark">
-						{Study.Sessions} real sessions, {Study.ApiCalls} API calls, {Study.Measured}
-						.
-					</span>
+					     The fourth domain - the saved total, stamped canary on soot
+					     black - is the flagship's own aggregate above, because it is
+					     the same measurement the flagship reads as a percentage.
+					     "One accent per cluster" governs DECORATION; it does not
+					     apply where colour IS the distinction (the owner's verdict
+					     on flattening these: they "lost their visual identity"). -->
+					<div class="grid grid-cols-1 gap-4 md:grid-cols-3" data-enter="260">
+						<ZineStatBar
+							Variant="pod"
+							Scale="compact"
+							Count
+							Color="raw"
+							Label="COMPRESSION"
+							Ratio={Benchmark.Ceiling}
+							Qualifier="Best case, on large low-entropy prose."
+						/>
+						<ZineStatBar
+							Variant="pod"
+							Scale="compact"
+							Count
+							Color="teal"
+							Label="OVERALL"
+							Ratio={Benchmark.Overall}
+							Qualifier={`The whole standard corpus: ${Benchmark.CorpusIn} to ${Benchmark.CorpusOut}.`}
+						/>
+						<ZineStatBar
+							Variant="pod"
+							Scale="compact"
+							Color="raw"
+							Label="E2E OVERHEAD"
+							Ratio={Benchmark.LatencyHeadline.toUpperCase().replace(" ", "")}
+							Qualifier={`Including the HTTP round-trip; the spread is ${Benchmark.Latency}.`}
+						/>
+					</div>
 				</div>
 			</div>
 		</section>
 
-		<!-- BEAT 05 // INTEGRATION - two paths, and the difference between them is
-		     stated rather than implied: one lives inside the turn, the other speaks
-		     HTTP. The wording is /hermes/'s and /plugin/'s own, not a second
-		     description of the same thing.
+		<!-- 06 // START - one focused procedural panel, drawn as Stitch's playbook
+		     terminal: a header ribbon that names the session, a body that carries
+		     the command block and the four steps, and a footer callout that states
+		     the verification gate and the two listeners. The panel is a PROCEDURE,
+		     not a command list, so the outcome line and the two thresholds are part
+		     of its furniture rather than prose beside it.
 
-		     THE PAGE'S QUIET BAND. 02 and 03 are the two dense bands (a plate
-		     plus prose plus a fold; five paragraphs plus a card cluster) and 06
-		     is the panel the reader acts on. Drawn as two filled plates, this
-		     band was a third and fourth heavy box in a row, so the page had no
-		     valley between the evidence spread and the install panel. The lanes
-		     are the same two lanes with the same words and the same links -
-		     drawn as ruled columns instead of plates, with the chapter distance
-		     above them. Nothing was cut to buy the air; the band simply stops
-		     filling its own background. -->
+		     The full matrix of lanes (catalog, clone, cargo, source) is /setup/'s
+		     story; this panel is the one path a reader takes from this page. The
+		     prerequisite moved into the band header because it is a gate, not a
+		     step: a reader who fails it never reaches the block. -->
 		<section class="band relative w-full" data-reveal>
-			<p class="section-index">05 // CONNECT</p>
-			<h2 class="type-section mb-6 text-bone-white">Two ways to run it</h2>
-			<div class="prose-flow max-w-[62ch]">
-				<p class="type-body text-bone-newsprint">
-					Both lanes run the same engine over the same CCR store. One is a native plugin
-					inside Hermes, where the interception lives inside the turn; the other is a
-					listener on a port, where it can only see traffic that arrives over HTTP.
-				</p>
-			</div>
-			<!-- THE DECISION MATRIX - the band's composition, and the reason this
-			     chapter is CONNECT rather than a second pair of plates. Four axes
-			     down the side, the two lanes across, one row per axis. Ruled rows
-			     rather than a <table>: every cell holds a sentence, and a sentence
-			     in a table cell wraps against a fixed track.
-			     The two lane columns below are the SOURCE these cells compress -
-			     every cell is a fact its own lane's prose already states, so the
-			     matrix may summarise a sentence and may never carry a claim the
-			     prose does not make. The stack repeats the lane name above each
-			     cell on small screens, because a stack loses the column header
-			     that named it. -->
-			<div class="grunge shell-card mt-10" data-grunge data-grunge-mode="edge">
-				<div
-					class="flex flex-wrap items-center gap-3 border-b border-[color:var(--tier-shell-edge)] bg-soot-black px-4 py-3 sm:px-5"
-				>
-					<span class="telemetry-tag telemetry-tag--crimson shadow-[2px_2px_0px_#000]">
-						THE DECISION MATRIX
-					</span>
-					<span class="grow font-mono text-base leading-relaxed text-zinc-dust">
-						one engine, two lanes - what each one sees, shares, and cannot do
-					</span>
-				</div>
-				<div class="px-4 sm:px-5">
-					<div
-						class="hidden border-b border-[color:var(--tier-shell-edge)] py-3 lg:grid lg:grid-cols-[13rem_1fr_1fr] lg:gap-10"
-					>
-						<span class="type-meta font-bold uppercase tracking-widest text-zinc-dust">AXIS</span>
-						<span class="type-meta font-bold uppercase tracking-widest text-bone-white">
-							PATH 01 // NATIVE PLUGIN
-						</span>
-						<span class="type-meta font-bold uppercase tracking-widest text-bone-white">
-							PATH 02 // OPENAI-COMPATIBLE PROXY
-						</span>
-					</div>
-					{Decision.map((Row) => (
-						<div class="grid grid-cols-1 gap-4 border-b border-[color:var(--tier-shell-edge)] py-5 last:border-b-0 lg:grid-cols-[13rem_1fr_1fr] lg:gap-10">
-							<p class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
-								{Row.Axis}
-							</p>
-							<div>
-								<p class="type-meta mb-2 font-bold uppercase tracking-widest text-zinc-dust lg:hidden">
-									PATH 01 // NATIVE PLUGIN
-								</p>
-								<p class="type-body text-bone-newsprint">{Row.One}</p>
-							</div>
-							<div>
-								<p class="type-meta mb-2 font-bold uppercase tracking-widest text-zinc-dust lg:hidden">
-									PATH 02 // OPENAI-COMPATIBLE PROXY
-								</p>
-								<p class="type-body text-bone-newsprint">{Row.Two}</p>
-							</div>
-						</div>
-					))}
-				</div>
-			</div>
-			<div class="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
-				<article class="flex flex-col border-t-2 border-oxblood-dark pt-6">
-					<p class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
-						PATH 01 // NATIVE PLUGIN
-					</p>
-					<h3 class="type-sub mt-3 text-bone-white">Hermes plugin</h3>
-					<div class="prose-flow mt-4 mb-6">
-						<p class="type-body text-bone-newsprint">
-							Aphrodite connects to Hermes Agent as a native plugin, not as a proxy
-							you point a client at. It is the reason the interception lives inside
-							the turn: tool output never hits a wire, so only hook-level registration
-							can catch it before it becomes message history - six hooks, thirteen
-							tools, and an optional context engine, every call forwarded into the
-							Rust dylib.
-						</p>
-						<p class="type-body text-bone-newsprint">
-							The trade-off is stated plainly: the hooks are Hermes' contract - no
-							other client can register them, so this lane works with Hermes only.
-						</p>
-					</div>
-					<div class="mt-auto flex flex-wrap gap-x-6 gap-y-2 border-t border-oxblood-dark pt-4">
-						<a
-							class="type-code font-bold text-stamped-canary hover:underline"
-							href={Routes.Hermes}
-						>
-							THE INTEGRATION &rarr;
-						</a>
-						<a
-							class="type-code font-bold text-stamped-canary hover:underline"
-							href={Routes.Plugin}
-						>
-							THE PLUGIN &rarr;
-						</a>
-					</div>
-				</article>
-				<article class="flex flex-col border-t-2 border-oxblood-dark pt-6">
-					<p class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
-						PATH 02 // OPENAI-COMPATIBLE PROXY
-					</p>
-					<h3 class="type-sub mt-3 text-bone-white">Standalone proxy</h3>
-					<div class="prose-flow mt-4 mb-6">
-						<p class="type-body text-bone-newsprint">
-							The plugin already spawns both listeners, so this lane runs without
-							extra setup: point{" "}
-							<code class="type-code text-weathered-teal">base_url</code> at
-							<code class="type-code text-weathered-teal">:9798</code> and any
-							OpenAI-compatible client gets the same CCR compression over plain HTTP.
-							That is the agent-to-agent path - a second agent, a script, or an
-							external tool can converse through the same compressed channel, share
-							the persistent SQLite store (which survives a restart; the plugin lane's
-							inline store is session-scoped), and call the tool relay to retrieve or
-							create CCR entries.
-						</p>
-						<p class="type-body text-bone-newsprint">
-							The limit is real too: the proxy only sees HTTP traffic - no tool-output
-							interception, no terminal compression, no directives, no context engine,
-							and SSE streams pass through uncompressed. Because of that the proxy
-							extends the stack to other callers; it does not replace the hooks inside
-							Hermes.
-						</p>
-					</div>
-					<div class="mt-auto flex flex-wrap gap-x-6 gap-y-2 border-t border-oxblood-dark pt-4">
-						<a
-							class="type-code font-bold text-stamped-canary hover:underline"
-							href={Anchor(Routes.Setup, "proxy")}
-						>
-							THE PROXY LANE &rarr;
-						</a>
-					</div>
-				</article>
-			</div>
-		</section>
-
-		<!-- BEAT 06 // INSTALLATION - one focused procedural panel: what you need,
-		     four steps, what you should see. The full matrix of lanes (catalog,
-		     clone, cargo, source) is /setup/'s story; this panel is the one path a
-		     reader takes from this page, and the outcome line is what makes it a
-		     procedure rather than a command list. -->
-		<section class="band relative w-full" data-reveal>
-			<p class="section-index">06 // START</p>
-			<h2 class="type-section mb-8 text-bone-white">Installing it</h2>
-			<div class="grunge emphasis-standard max-w-4xl p-6 sm:p-8 lg:p-10" data-grunge>
-				<p class="type-meta font-bold uppercase tracking-widest text-stamped-canary">
-					PREREQUISITE
-				</p>
-				<p class="type-body mt-3 text-bone-newsprint">
+			<div class="flex flex-col gap-3 border-b border-oxblood-dark pb-5">
+				<p class="section-index !mb-0">06 // START // INSTALLATION</p>
+				<h2 class="type-section text-bone-white">Installing it</h2>
+				<p class="type-body max-w-3xl text-bone-newsprint">
 					Hermes Agent, with <code class="type-code text-weathered-teal">hermes</code> on
 					<code class="type-code text-weathered-teal">PATH</code> and a route to GitHub
 					Releases.
@@ -1076,95 +1277,113 @@ const Decision = [
 					<code class="type-code text-weathered-teal">hermes --version</code> as its first
 					step and fails fast with a clear error, before anything is written.
 				</p>
-				<p class="type-meta mt-8 font-bold uppercase tracking-widest text-stamped-canary">
-					FOUR STEPS
-				</p>
-				<!-- The commands as a block, not as inline prose: a reader who wants
-				     to install needs something to copy, and an inline <code> inside a
-				     sentence both hides the sequence and breaks mid-token on a narrow
-				     viewport (`hermes --version` split across two lines). The prose
-				     beside each step explains it; this is the thing itself. -->
-				<CodeFence
-					Lang="bash"
-					Copy
-					CopyLabel="Copy commands"
-					Code={`hermes plugins install aphrodite
+			</div>
+			<div class="grunge shell-card max-w-4xl" data-grunge data-grunge-mode="edge">
+				<!-- The ribbon: what this transcript is, and that it is ready to run.
+				     It carries no control of its own - the copy chip belongs to the
+				     command block below it, and one payload gets one control. -->
+				<div
+					class="flex flex-wrap items-center justify-between gap-2 border-b border-[color:var(--tier-shell-edge)] bg-soot-black px-4 py-3 sm:px-5"
+				>
+					<span class="telemetry-tag telemetry-tag--crimson">
+						SESSION // PLUGIN CATALOG
+					</span>
+					<span class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
+						FOUR STEPS // READY
+					</span>
+				</div>
+				<div class="p-6 sm:p-8">
+					<!-- The commands as a block, not as inline prose: a reader who wants
+					     to install needs something to copy, and an inline <code> inside
+					     a sentence both hides the sequence and breaks mid-token on a
+					     narrow viewport (`hermes --version` split across two lines). The
+					     prose beside each step explains it; this is the thing itself. -->
+					<CodeFence
+						Lang="bash"
+						Copy
+						CopyLabel="Copy commands"
+						Path="~/.hermes/plugins/aphrodite"
+						Code={`hermes plugins install aphrodite
 hermes plugins enable aphrodite
 cd ~/.hermes/plugins/aphrodite && bash download.sh
 hermes`}
-				/>
-				<ol class="prose-flow mt-3 list-decimal pl-5">
-					<li class="type-body text-bone-newsprint">
-						<code class="type-code text-bone-white">
-							hermes plugins install aphrodite
-						</code>{" "}
-						- the catalog entry: a reviewed pinned checkout of
-						<code class="type-code text-weathered-teal">plugin.yaml</code> plus the
-						<code class="type-code text-weathered-teal">__init__.py</code> shim, in
-						<code class="type-code text-weathered-teal">
-							~/.hermes/plugins/aphrodite
-						</code>
-						.
-					</li>
-					<li class="type-body text-bone-newsprint">
-						<code class="type-code text-bone-white">
-							hermes plugins enable aphrodite
-						</code>{" "}
-						- or answer yes at the Enable now? prompt. Enabling is a separate write to
-						Hermes's own
-						<code class="type-code text-weathered-teal">config.yaml</code>, so a
-						finished download alone does not register the hooks.
-					</li>
-					<li class="type-body text-bone-newsprint">
-						<code class="type-code text-bone-white">bash download.sh</code> - run from
-						inside
-						<code class="type-code text-weathered-teal">
-							~/.hermes/plugins/aphrodite
-						</code>
-						. It fetches the binary and the dylib into
-						<code class="type-code text-weathered-teal">
-							~/.hermes/aphrodite/binaries/
-						</code>
-						, validated against the in-tree
-						<code class="type-code text-weathered-teal">SHA256SUMS.txt</code> and
-						magic-byte checked. On Windows:{" "}
-						<code class="type-code text-weathered-teal">pwsh ./download.ps1</code>.
-					</li>
-					<li class="type-body text-bone-newsprint">
-						<code class="type-code text-bone-white">hermes</code> - start it.
-					</li>
-				</ol>
-				<p class="type-meta mt-8 font-bold uppercase tracking-widest text-stamped-canary">
-					EXPECTED RESULT
-				</p>
-				<div class="prose-flow mt-3">
-					<p class="type-body text-bone-newsprint">
-						Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256
-						verified, plugin enabled. Start{" "}
-						<code class="type-code text-weathered-teal">hermes</code> and the plugin
-						logs that Aphrodite is enabled.
+					/>
+					<ol class="prose-flow mt-6 list-decimal pl-5">
+						<li class="type-body text-bone-newsprint">
+							<code class="type-code text-bone-white">
+								hermes plugins install aphrodite
+							</code>{" "}
+							- the catalog entry: a reviewed pinned checkout of
+							<code class="type-code text-weathered-teal">plugin.yaml</code> plus the
+							<code class="type-code text-weathered-teal">__init__.py</code> shim, in
+							<code class="type-code text-weathered-teal">
+								~/.hermes/plugins/aphrodite
+							</code>
+							.
+						</li>
+						<li class="type-body text-bone-newsprint">
+							<code class="type-code text-bone-white">
+								hermes plugins enable aphrodite
+							</code>{" "}
+							- or answer yes at the Enable now? prompt. Enabling is a separate write
+							to Hermes's own
+							<code class="type-code text-weathered-teal">config.yaml</code>, so a
+							finished download alone does not register the hooks.
+						</li>
+						<li class="type-body text-bone-newsprint">
+							<code class="type-code text-bone-white">bash download.sh</code> - run from
+							inside
+							<code class="type-code text-weathered-teal">
+								~/.hermes/plugins/aphrodite
+							</code>
+							. It fetches the binary and the dylib into
+							<code class="type-code text-weathered-teal">
+								~/.hermes/aphrodite/binaries/
+							</code>
+							, validated against the in-tree
+							<code class="type-code text-weathered-teal">SHA256SUMS.txt</code> and
+							magic-byte checked. On Windows:{" "}
+							<code class="type-code text-weathered-teal">pwsh ./download.ps1</code>.
+						</li>
+						<li class="type-body text-bone-newsprint">
+							<code class="type-code text-bone-white">hermes</code> - start it.
+						</li>
+					</ol>
+					<p class="type-meta mt-8 font-bold uppercase tracking-widest text-stamped-canary">
+						EXPECTED RESULT
 					</p>
-					<p class="type-body text-bone-newsprint">
-						Two proxy listeners come up with it:
-						<code class="type-code text-weathered-teal">:9797</code> (the cache proxy,
-						threshold 2048 bytes by default) and{" "}
-						<code class="type-code text-weathered-teal">:9798</code>
-						(the token proxy, threshold 256 bytes by default).
-					</p>
-					<p class="type-body text-zinc-dust">
-						If the binaries are missing, the plugin logs the setup command and stays
-						disabled until you run it.
-					</p>
+					<div class="prose-flow mt-3">
+						<p class="type-body text-bone-newsprint">
+							Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256
+							verified, plugin enabled. Start{" "}
+							<code class="type-code text-weathered-teal">hermes</code> and the plugin
+							logs that Aphrodite is enabled.
+						</p>
+					</div>
+				</div>
+				<!-- The footer callout: the verification gate on the left, the two
+				     listeners on the right - the same two facts Stitch prints under its
+				     playbook, and the two a reader checks before believing the install
+				     worked. -->
+				<div
+					class="flex flex-col gap-2 border-t border-[color:var(--tier-shell-edge)] bg-soot-black px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-between"
+				>
+					<span class="type-meta text-zinc-dust">
+						VERIFICATION GATE // prebuilt binaries magic-byte verified against the
+						in-tree SHA256SUMS.txt
+					</span>
+					<span class="type-meta font-bold text-weathered-teal">
+						DAEMON LISTENING // :9797 cache proxy (threshold 2048 bytes by default) ·
+						:9798 token proxy (threshold 256 bytes by default)
+					</span>
 				</div>
 			</div>
 			<!-- ONWARD // one install line, then the routing block. The install
 			     harness that used to sit here is /setup/'s story (install-surfaces 1)
 			     and the telemetry module that used to sit above it is /benchmarks/'. -->
-			<p class="mt-12 w-full border-t border-oxblood-dark pt-8 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
+			<p class="mt-8 w-full border-t border-oxblood-dark pt-6 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 				FULL INSTRUCTIONS ON THE{" "}
-				<a class="text-stamped-canary" href={Routes.Setup}>
-					SETUP PAGE
-				</a>
+				<a class="text-stamped-canary" href={Routes.Setup}> SETUP PAGE </a>
 			</p>
 		</section>
 

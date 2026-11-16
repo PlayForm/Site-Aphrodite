@@ -1,4 +1,6 @@
 ---
+import "@Stylesheet/Component/Data.scss";
+
 /**
  * StudyLedger - the canonical real-world study block, rendered as a TELEMETRY
  * MATRIX: one grunge plate whose RIBBON carries the corpus, whose dominant LEAD
@@ -112,15 +114,10 @@ const KindTag = {
 	derived: { Tag: "DERIVED", Class: "telemetry-tag" },
 } as const;
 
-/** The matrix's one gutter. Every register of the plate indents by the same
- * step, so the ribbon, the lead and the grid all hang off one column. */
-const Gutter = "px-4 sm:px-5";
-
-/** One cell of the grid: the plate's one gutter and the dense row height. A
- * value, a unit and a kind are one token each, so those cells add
- * `whitespace-nowrap` and never wrap to a second line; the two prose cells (the
- * measure, the scope) wrap. */
-const Cell = "px-4 py-2 sm:px-5";
+/** The matrix's one gutter and its cell box live in
+ *  `Stylesheet/Component/Data.scss` as `.ledger__ribbon` / `.ledger__lead` /
+ *  `.ledger__cell`, so the study matrix and the generic one cannot drift apart.
+ *  What stays here is the DATA: which measures exist and how each is voiced. */
 ---
 
 <div class="blueprint-section">
@@ -132,12 +129,7 @@ const Cell = "px-4 py-2 sm:px-5";
 		<!-- RIBBON: what was measured, then the corpus it was taken over. Two
 		     telemetry tags - metadata, not a sentence, which is why they are
 		     chips on their own band and not prose. -->
-		<div
-			class:list={[
-				"flex flex-wrap items-center justify-between gap-2 border-b border-oxblood-dark bg-asphalt-panel py-2.5",
-				Gutter,
-			]}
-		>
+		<div class="ledger__ribbon">
 			<span class="telemetry-tag telemetry-tag--teal">
 				MEASURED, {Study.Measured.toUpperCase()}
 			</span>
@@ -151,7 +143,7 @@ const Cell = "px-4 py-2 sm:px-5";
 		     child so the two never separate on a narrow viewport. The crimson
 		     spine is this cell's identity - it is the result, and the grid below
 		     is what the result is computed from. -->
-		<div class:list={["border-l-2 border-blood-crimson py-6", Gutter]}>
+		<div class="ledger__lead">
 			<div class="section-index">ESTIMATED CONTEXT REDUCTION</div>
 			<div class={`mt-2 !text-stamped-canary ${LeadSize}`}>
 				{Reduction.Value}

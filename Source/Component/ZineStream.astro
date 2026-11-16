@@ -5,20 +5,27 @@
  * THE CONSOLE GRAMMAR (Stitch direction). A stream is a CONSOLE, not a text
  * box, so the component owns three parts of one:
  *
- *   a HEADER RIBBON   the command in amber mono on the left, the byte count as
- *                     a telemetry tag on the right. The ribbon is where a
- *                     reader learns what produced the bytes and how many there
- *                     are, before reading one of them.
- *   an INSET BODY     the pod's own 1px oxblood edge on soot-black - the
- *                     terminal-panel weight every other console on the site is
- *                     drawn with - so the stream reads as a channel cut into
- *                     the plate rather than as one more panel beside it.
+ *   a HEADER RIBBON   the pod's name, the command that produced the bytes in
+ *                     amber mono beside it, and the byte count as a telemetry
+ *                     tag on the right. The ribbon is where a reader learns
+ *                     what produced the bytes and how many there are, before
+ *                     reading one of them - the title bar a dual-pane viewer
+ *                     puts over each of its two panels.
+ *   a RECESSED WELL   the body is CUT INTO the plate: the lighter asphalt
+ *                     ribbon sits above it and one hard 3px inset in the
+ *                     plate's own black runs down its top-left edge, so the
+ *                     stream reads as a channel milled into the plate rather
+ *                     than as one more panel beside it. Radius stays 0 and the
+ *                     shadow is a hard offset - the site has no blur shadows.
  *   SYNTAX ROLES      four roles, each carried by colour AND by shape, so a
  *                     line's kind is legible before its text is read.
  *
  * The ribbon is OPT-IN (`Command` / `Label` / `Bytes`), so every existing call
  * site renders exactly the pane it rendered before - a stream with nothing to
- * put in a ribbon does not get an empty one.
+ * put in a ribbon does not get an empty one. `Command` is what makes the
+ * ribbon a title bar: a pod with both a name and a command prints the name in
+ * the label voice and the command in the amber one, because a name and a
+ * command are two facts and the command is the louder of them.
  */
 type Tone = "plain" | "dim" | "fade" | "mute" | "result" | "canary" | "teal";
 
@@ -139,22 +146,30 @@ const Tally = Bytes === undefined ? Count : `${Count} · ${Bytes.toLocaleString(
 <figure class="ccr-marker m-0 border border-oxblood-dark bg-soot-black">
 	{Ribbon && (
 		<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
-			<span class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5 font-mono text-base leading-snug">
-				{Command !== undefined && (
-					<span class="shrink-0 text-zinc-dust" aria-hidden="true">
-						$
+			<span class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+				{Label !== undefined && (
+					<span
+						class:list={[
+							"break-words",
+							/* A pod that also names its command gives the name the
+							   label voice: two loud uppercase strings on one ribbon
+							   would leave the reader no order to read them in. */
+							Command === undefined
+								? "font-black uppercase tracking-widest text-zinc-dust"
+								: "type-meta !font-black uppercase text-zinc-dust",
+						]}
+					>
+						{Label}
 					</span>
 				)}
-				<span
-					class:list={[
-						"break-words",
-						Command === undefined
-							? "font-black uppercase tracking-widest text-zinc-dust"
-							: "font-bold text-stamped-canary",
-					]}
-				>
-					{Command ?? Label}
-				</span>
+				{Command !== undefined && (
+					<span class="flex min-w-0 items-baseline gap-x-2 font-mono text-base leading-snug">
+						<span class="shrink-0 text-zinc-dust" aria-hidden="true">
+							$
+						</span>
+						<span class="break-words font-bold text-stamped-canary">{Command}</span>
+					</span>
+				)}
 			</span>
 			<span
 				class="telemetry-tag ml-auto shrink-0"
@@ -166,7 +181,7 @@ const Tally = Bytes === undefined ? Count : `${Count} · ${Bytes.toLocaleString(
 	)}
 
 	<div
-		class="p-3.5 font-mono text-base leading-relaxed text-zinc-dust"
+		class="console-well p-3.5 font-mono text-base leading-relaxed text-zinc-dust"
 		data-stream={Stream ? "" : undefined}
 	>
 		{
@@ -186,3 +201,14 @@ const Tally = Bytes === undefined ? Count : `${Count} · ${Bytes.toLocaleString(
 		}
 	</div>
 </figure>
+
+<style>
+	/* THE RECESSED WELL. The body is cut INTO the plate, not laid on top of it:
+	   the ribbon above is the lighter asphalt plane and this one hard 3px inset
+	   in the plate's own black is the lip the cut leaves behind. It is the same
+	   shadow plane `.zp-result` prints its bone plate with - hard offset, no
+	   blur, no radius, because the site has neither. */
+	.console-well {
+		box-shadow: inset 3px 3px 0 #000;
+	}
+</style>

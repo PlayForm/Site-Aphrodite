@@ -1,0 +1,202 @@
+/* Setup.css - the Setup route's own sheet.
+   The installation contract's platform plates and step rail.
+
+   PAGE-LOCAL BY CONSTRUCTION. These rules used to be a <style> block inside the
+   page, and a page's block ships only with that page. They are a sheet the page
+   imports for the same reason: routing them through the global entry point would
+   apply them to every route. `Deck.css` is the precedent.
+
+   Every value here is a token or a utility the layer already defines; nothing in
+   this file introduces a colour, a distance or a radius of its own.
+   Extracted from Source/pages/setup.astro - 1 block(s), no value changed. */
+
+/* ---- THE WORKFLOW SWITCH -------------------------------------------------
+
+   One instrument, two inputs, one output. A reader picks a PLATFORM and a ROUTE
+   and the container below shows exactly that lane, plus the record for that
+   route. Nothing here is a script: the switch is a pair of radio groups and
+   `:has()`, so it works with JavaScript off and the pills are real form
+   controls a keyboard can reach.
+
+   WHY `is:global`. The show/hide rules are `:has()` on a checked radio, and
+   Astro's scoped-CSS pass rewrites compound selectors inside a page's style
+   block; a scoped `:has()` chain is not a shape it can rewrite reliably. Every
+   selector below is namespaced `workflow`, and no other page in the tree uses
+   that word, so global here means global-to-this-page in practice.
+
+   THE ID CONTRACT. `route-catalog|clone|cargo|source` and
+   `platform-posix|windows` are the ids the radios carry and the ids these rules
+   name. They are generated from `Route.ID` and from the lane's shell, so a
+   renamed route ID must be renamed here too - otherwise the controls render,
+   every panel stays hidden, and nothing reports an error. */
+
+.workflow {
+	position: relative;
+}
+
+/* THE CONTROLS sit on the container's top edge as one bar: the two groups
+   side by side where there is room, stacked where there is not, and no gap
+   between the bar and the terminal so the pair reads as one instrument. */
+.workflow__controls {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem 2.5rem;
+	border: 1px solid var(--tier-shell-edge);
+	border-bottom: 0;
+	background-color: var(--tier-shell);
+	padding: 1rem 1.25rem;
+}
+
+.workflow__group {
+	min-width: 0;
+	margin: 0;
+	border: 0;
+	padding: 0;
+}
+
+/* The legend is the label voice: mono, 11.5px, canary, tracked - the same
+   voice the page's `PLATFORM //` line always used, now doing the job the
+   chips above it could not. */
+.workflow__legend {
+	margin: 0 0 0.5rem;
+	padding: 0;
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--stamped-canary);
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+}
+
+.workflow__pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+/* The input is present, focusable and named; it is simply not drawn. The
+   label beside it is the visible control, which is why the focus ring is
+   moved onto the label in the rule below - a hidden radio that keeps its own
+   invisible focus ring is a control a keyboard user cannot see. */
+.workflow__radio {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+/* THE PILL. A stamp-shaped chip whose LEFT EDGE is the route's own accent -
+   colour as identity, and it survives the checked state, which is the only
+   moment a reader needs to tell four pills apart. The fill does the
+   selection; the edge does the naming. */
+.workflow__pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	border: 1px solid var(--oxblood-dark);
+	border-left: 3px solid var(--pill-accent, var(--oxblood-dark));
+	border-radius: 0;
+	background-color: var(--asphalt-panel);
+	padding: 0.375rem 0.75rem;
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zinc-dust);
+	cursor: pointer;
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+	transition:
+		background-color 120ms linear,
+		color 120ms linear;
+}
+
+.workflow__pill:hover {
+	color: var(--bone-white);
+}
+
+/* The selected pill is the canary stamp: a solid fill, soot ink and the
+   hard 3px offset plane every other mark on the site carries. */
+.workflow__radio:checked + .workflow__pill {
+	border-color: #000000;
+	border-left-color: var(--pill-accent, #000000);
+	background-color: var(--stamped-canary);
+	color: var(--soot-black);
+	box-shadow: 3px 3px 0 #000000;
+}
+
+.workflow__radio:focus-visible + .workflow__pill {
+	outline: 2px solid var(--stamped-canary);
+	outline-offset: 2px;
+}
+
+/* The container. `shell-card` already states the fill and the 1px edge; the
+   top edge is dropped so the bar above it continues into the plate. The
+   grunge ink is the plate's own edge - `data-grunge-mode="edge"` keeps it
+   off the copy. */
+.workflow__terminal {
+	border-top: 0;
+}
+
+.workflow__bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 0.75rem;
+	border-bottom: 1px solid var(--tier-shell-edge);
+	background-color: var(--tier-well);
+	padding: 0.75rem 1rem;
+}
+
+/* EVERY panel is in the document; exactly one of each pair is drawn. The
+   hidden ones are still text a reader can select, copy and search - which is
+   the difference between a switch and a deletion. */
+.workflow__route,
+.workflow__lane {
+	display: none;
+}
+
+.workflow:has(#route-catalog:checked) .workflow__route[data-route="catalog"],
+.workflow:has(#route-clone:checked) .workflow__route[data-route="clone"],
+.workflow:has(#route-cargo:checked) .workflow__route[data-route="cargo"],
+.workflow:has(#route-source:checked) .workflow__route[data-route="source"] {
+	display: block;
+}
+
+.workflow:has(#platform-posix:checked) .workflow__lane[data-os="posix"],
+.workflow:has(#platform-windows:checked) .workflow__lane[data-os="windows"] {
+	display: block;
+}
+
+/* The record follows the route, so its notes, outcome, warning, lesson and
+   verification are always the ones the selected sequence belongs to. */
+.workflow__dossier {
+	position: relative;
+}
+
+/* THE NO-`:has()` FALLBACK. Without the selector above, every panel stays
+   hidden by default and the page would ship an instrument with nothing in
+   it: the controls would toggle nothing and the reader would see an empty
+   plate where eight command sequences used to be. A browser that cannot
+   switch gets the whole set instead - the longer page this design replaced,
+   with every lane and every record present - and the controls are dropped,
+   because a control that does nothing is worse than no control. */
+@supports not selector(:has(*)) {
+	.workflow__controls {
+		display: none;
+	}
+
+	.workflow__route,
+	.workflow__lane {
+		display: block;
+	}
+}

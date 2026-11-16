@@ -9,26 +9,33 @@
  *   quiet     A hairline rule - 1px outline-oxblood with a 2px crimson left
  *             edge, no fill, no shadow, no tilt. The tier for a block the
  *             reader has to study: methodology, caveats, a definition list, a
- *             long quotation. Renders Global.css `.emphasis-quiet` directly,
+ *             long quotation. Renders `.plate--quiet` (one published class in
+ *             `Plate.scss`, sharing its budget with `.emphasis-quiet`),
  *             because quiet spends a complete budget and nothing here competes
  *             with it - `Surface`, `Accent`, `Tilt`, `Tone` and `Hover` are
  *             inert under quiet by design, not by omission.
  *   standard  The 4px crimson module boundary plus the hard offset shadow,
  *             flat. The default, and the plate for an example, a figure or a
- *             table. Mirrors `.emphasis-standard` declaration for declaration
- *             (`border-4 border-blood-crimson bg-carbon-void zine-box-crimson`)
- *             but is composed instead of classed, because `Surface`, `Accent`
- *             and `Tilt` each have to beat the tier's own background,
- *             box-shadow and transform - and those sit at equal specificity in
- *             Global.css with the tier declared last.
+ *             table. Renders `.plate--standard` for the boundary, a
+ *             `.plate--surface-*` fill and a `.zine-box-*` plane for the
+ *             shadow - three separate axes, so `Surface` and `Accent` each move
+ *             their own value without the tier's declarations winning a
+ *             specificity tie against them. The values live in
+ *             `Stylesheet/Component/Plate.scss`.
  *   featured  standard plus a tilt: the ONE expressive assembly a section is
- *             allowed. Mirrors `.emphasis-expressive`. One per section - a
- *             second one takes emphasis away from the first, and from
+ *             allowed. Mirrors `.emphasis-expressive`'s frame. One per section -
+ *             a second one takes emphasis away from the first, and from
  *             everything the reader actually has to study.
  *
  * Grammar law 1 is the border (4px crimson = the module boundary) and law 2 is
  * the shadow (zero-blur, pasted down, radius 0); law 3 is "mobile flattens",
  * which is why every tilt is composed with `max-sm:rotate-0`.
+ *
+ * THE LEAN STAYS A UTILITY, and the reason is the prop's own type: `Rotate`
+ * takes a free-form angle (`-rotate-[0.6deg]`, `rotate-[0.4deg]`) chosen per
+ * call site, so no class in the sheet can carry it. The component composes it,
+ * and `max-sm:rotate-0` follows it so the mobile flatten keeps winning the way
+ * it always did. `Tilt`'s named values resolve to the same utilities.
  *
  * The legacy props keep their meaning. `Tone` still selects only the shadow
  * plane, and it still outranks `Accent`'s shadow, so a call site that passes
@@ -45,7 +52,8 @@ interface Props {
 	 * the shadow plane and nothing else, and it wins over `Accent`'s shadow. */
 	Tone?: "crimson" | "subtle" | "canary" | "teal";
 
-	/** The plate's padding: md = p-6 sm:p-8, lg = p-8 sm:p-12. */
+	/** The plate's padding: md = 1.5rem, 2rem from `sm` (`.plate--size-md`);
+	 * lg = 2rem, 3rem from `sm` (`.plate--size-lg`). */
 	Size?: "md" | "lg";
 
 	/** Rotation from `sm` up; mobile is always flat. Pass the unprefixed class.
@@ -155,28 +163,33 @@ const GrungeSurface: "transparent" | "filled" =
 	Emphasis === "quiet" || /(^|\s)bg-transparent(\s|$)/.test(Class) ? "transparent" : "filled";
 
 const Pad = {
-	md: "p-6 sm:p-8",
-	lg: "p-8 sm:p-12",
+	md: "plate--size-md",
+	lg: "plate--size-lg",
 }[Size];
 
-/** The fill under the frame. The three legacy values map to the same Tailwind
- * surfaces they always did; the three tier values map to the blueprint
- * grammar's fill classes in Global.css, which set a background and nothing
- * else, so the frame composed above stays intact. */
+/** The fill under the frame. The three legacy values map to the plate's own
+ *  surface modifiers; the three tier values map to the blueprint grammar's fill
+ *  classes, which set a background and nothing else, so the frame composed
+ *  above stays intact.
+ *
+ *  The two families are `:where()`-scoped in `Plate.scss` for the first three
+ *  and plain classes for the last three, so a call site that passes its own
+ *  `bg-*` (the `GrungeSurface` derivation below exists for exactly that case)
+ *  still wins - the fill is the one value a page may still take away. */
 const Fill = {
-	plain: "bg-carbon-void",
-	inset: "bg-soot-black",
-	paper: "bg-asphalt-panel",
+	plain: "plate--surface-plain",
+	inset: "plate--surface-inset",
+	paper: "plate--surface-paper",
 	canvas: "tier-canvas",
 	shell: "tier-shell",
 	well: "tier-well",
 }[Surface];
 
 const Boundary = {
-	none: "border-oxblood-dark",
-	crimson: "border-blood-crimson",
-	canary: "border-stamped-canary",
-	teal: "border-weathered-teal",
+	none: "plate--accent-none",
+	crimson: "plate--accent-crimson",
+	canary: "plate--accent-canary",
+	teal: "plate--accent-teal",
 }[Accent];
 
 /** `Tone` is the shadow-only legacy alias, so it outranks `Accent` here: that is
@@ -220,24 +233,26 @@ const Lean =
 const Transform = Lean === "" ? "max-sm:rotate-0" : `${Lean} max-sm:rotate-0`;
 
 /** Quiet is one published class carrying a complete budget; standard and
- * featured are composed so that Surface / Accent / Tilt can beat the tier's own
- * declarations instead of losing a specificity tie to them. */
+ * featured name the plate's own tier, then the three axes that move under it -
+ * the boundary, the fill and the plane - followed by the lean and its
+ * straighten. The modifiers come after the tier in `Plate.scss`, so each one
+ * wins its own property by source order instead of losing a specificity tie. */
 const Frame =
 	Emphasis === "quiet"
-		? ["emphasis-quiet"]
+		? ["plate--quiet"]
 		: [
-				"border-4",
+				`plate--${Emphasis}`,
 				Boundary,
 				Fill,
 				Plane,
 				Transform,
-				Lean !== "" && Hover && "transition-transform duration-300 hover:rotate-0",
+				Lean !== "" && Hover && "plate--straighten",
 			];
 ---
 
 <div
 	class:list={[
-		"relative",
+		"plate",
 		...Frame,
 		Pad,
 		Wipe && "motion-wipe-host",

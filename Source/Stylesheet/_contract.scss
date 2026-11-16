@@ -1,0 +1,335 @@
+/* ============================================================================
+   CONTRACT - the class API this layer publishes.
+
+   READ THIS FILE BEFORE YOU WRITE A CLASS. It is the whole public vocabulary:
+   every class a page, a component or a test may name, with its variants. It is
+   imported FIRST by `System.scss` and emits nothing - it is comments only, so
+   importing it costs no bytes and no cascade position.
+
+   THE LAYERS. `System.scss` is the one entry point and imports in this order:
+
+     _contract          this file - the vocabulary, no rules
+     _tokens            every `:root` custom property. The palette, the type
+                        roles, the four spacing roles, the elevation tiers, the
+                        splat and deck ink. A value is DECLARED here once.
+     _mixins            the repeated idioms: `hard-shadow`, `plate-frame`,
+                        `mono-label`, `inset-well`, `telemetry-tag`. A partial
+                        that repeats one of these inlines is a missing `@use`.
+     _base              the reset, body typography, focus rings, selection,
+                        scrollbars, the long-token and label-voice law.
+     Component/Plate    `.zine-box-*`, `.emphasis-*`, `.tier-*`, `.shell-card`,
+                        `.well`, `.splat-frame*`
+     Component/Texture  `.grunge*`, `.halftone-screen`, `.photocopy-grit`,
+                        `.tape-staple`, `.tape-strip`
+     Component/Console  the console grammar and the code plates
+     Component/Data     ledgers, dossiers, stat bars, matrices, diagrams
+     Component/Chrome   `.shell*`, `.header*`, `.crumbs*`, `.section-nav*`,
+                        `.related*`, `.docs-sidebar*`, `.band*`, `.split`,
+                        `.pods`, `.matrix`, `.chips`
+     _utilities         the page-level utilities: `.prose-flow*`, `.break-token`,
+                        `.blueprint-section`, `.section-index`, `.type-*`
+
+   PAGE SHEETS ARE NOT IN THAT LIST, ON PURPOSE. `Source/Stylesheet/Page/<Name>.css`
+   is imported by the page that owns it (`Deck.css` is the same arrangement for
+   the presentation route). A page's rules ship only with that page; routing them
+   through `System.scss` would apply them to all 64 routes - a homepage
+   `main p.type-body { max-width: 40rem }` would re-measure every other page's
+   prose. A page sheet is the faithful home for a page's own geometry.
+
+   THE RULES.
+
+   1. A NEW VALUE IS A TOKEN, NEVER A LITERAL. A colour, a distance, a radius or
+      a type size that is not in `_tokens` is added to `_tokens` first and read
+      as `var(--name)` afterwards. A `var(--token, #fallback)` is still a stray
+      literal: the fallback is a second copy of the palette and a token-contract
+      check will refuse it.
+   2. A PUBLIC CLASS IS NAMED BY OTHER FILES; A COMPONENT-LOCAL ONE IS NOT.
+      Everything in section 1-10 below is public - a page may put it on its own
+      markup. The families in section 11 are owned by one partial and are named
+      only by the component that renders them. A page naming `.zp-*` or `.wb-*`
+      is reaching into another file's internals and will break silently when
+      that file changes.
+   3. ONE EXPRESSIVE ASSEMBLY PER SECTION. `.emphasis-expressive` spends the
+      whole budget (tilt, stacked shadow, tape); `.emphasis-quiet` spends none.
+      Two expressive plates in one section halve each other. Emphasis is the
+      volume knob - identity (accent colour, stage letter, headline figure) is
+      never turned down with it.
+   4. A SENTENCE IS NEVER SET AT `--type-caption` OR `--type-meta`. Those roles
+      are for labels, units, counts and identifiers. Prose that will not fit
+      gets a shorter sentence, never a smaller size.
+   5. A LABEL BREAKS AT ITS SPACES OR NOT AT ALL. `.type-meta`, `.section-index`,
+      `.telemetry-tag` and the tape/stamp voices carry `overflow-wrap: normal`;
+      only a container holding an unbreakable token opts in with `.break-token`.
+
+   ========================================================================= */
+
+/* ----------------------------------------------------------------------------
+   1. TOKENS
+   ---------------------------------------------------------------------------- */
+
+/*   SURFACES
+     --soot-black          the page ground
+     --carbon-void         the plate ground one step up
+     --asphalt-panel       a raised panel
+     --asphalt-panel-dark  the panel's darker sibling
+     --void-inset          a plate recessed INTO the page (darker than ground)
+
+     BLOOD FAMILY
+     --oxblood-dark        the hairline / boundary volume
+     --blood-crimson       the frame
+     --raw-blood           the ink
+     --outline-oxblood     a boundary that must not read as ink
+
+     TEXT
+     --bone-newsprint      the reading ink
+     --bone-white          the loudest ink
+     --zinc-dust           the quiet ink (labels, metadata, units)
+
+     ACCENTS
+     --stamped-canary      result / evidence
+     --weathered-teal      the technical voice
+     (--raw-blood is the third accent; there is no fourth)
+
+     TYPE ROLES - seven, and a page never writes a raw size
+     --type-display  --type-section  --type-sub  --type-body
+     --type-caption  --type-meta     --type-code
+     --type-scale    the deck's cqw multiplier, not a page token
+
+     SPACING ROLES - four distances, each MEANING a relationship
+     --space-tight    label -> value
+     --space-reading  paragraph -> paragraph
+     --space-group    explanation -> figure
+     --space-chapter  a new subject
+
+     ELEVATION TIERS - five named depths, see section 3
+     --tier-canvas  --tier-shell  --tier-shell-edge
+     --tier-well    --tier-well-edge
+     --tier-critical  --tier-critical-glow
+     --tier-inverted  --tier-inverted-ink
+
+     CHROME
+     --site-header-height   the bar's whole height, border included
+     --section-nav-height   the sticky index, parked under the header
+     --blueprint-rule       the section hairline's colour
+     --blueprint-inset      rule -> first line
+
+     TEXTURE
+     --splat-ink  --splat-ink-strong  --splat-inset  --splat-inset-right
+
+     DECK (the presentation route only; see Deck.css)
+     --deck-accent  --deck-neutral  --deck-floor  --deck-floor-display
+     --deck-floor-label
+*/
+
+/* ----------------------------------------------------------------------------
+   2. TYPE ROLES
+   ---------------------------------------------------------------------------- */
+
+/*   .type-display   the deck's one claim, clamp()ed to the frame
+     .type-section   a chapter heading - the reader's chapter signal
+     .type-sub       a sub-heading inside a chapter
+     .type-body      the reading voice. Prose is never smaller than this.
+     .type-caption   a sentence under a figure
+     .type-meta      a label, unit, count or identifier
+     .type-code      an inline identifier or a command
+
+     A role sets size, leading, weight and tracking together. Pair it with a
+     colour utility; never restate its size.
+*/
+
+/* ----------------------------------------------------------------------------
+   3. EMPHASIS TIERS AND SURFACES
+   ---------------------------------------------------------------------------- */
+
+/*   EMPHASIS - the volume knob, three levels
+     .emphasis-quiet       a hairline rule. No shadow, no tilt, no fill.
+     .emphasis-standard    the boxed plate: 4px crimson boundary + hard shadow
+     .emphasis-expressive  the full budget: plate, tilt, tape, stacked shadow
+
+     FILLS - background only, so they compose with whatever frame you have
+     .tier-canvas  .tier-shell  .tier-well
+
+     COMPLETE TIERS - not legible as a bare fill
+     .tier-critical   crimson fill + its glow + bone type
+     .tier-inverted   bone ground + carbon type
+
+     SURFACE UTILITIES - fill + 1px edge + radius 0 + position: relative.
+     No padding: the caller's own `p-*` states how tight the block is.
+     .shell-card      shell fill, --tier-shell-edge
+     .well            well fill, --tier-well-edge (the LIGHTER edge: that is
+                      what makes a well read as depth, not as one more panel)
+
+     PLATES - the zine surface a component owns
+     .zine-box-crimson  .zine-box-teal  .zine-box-canary  .zine-box-subtle
+     .zine-plate         the code plate
+     .zine-plate--scroll a plate whose payload scrolls inside it
+     .zine-plate-bar     the chip band across the plate's top padding
+     .zine-plate-lang    the language tag - METADATA, never an action
+     .zine-plate-copy    the copy chip - the ONE action per payload
+     .zine-plate-path    the path line above a plate
+
+     SPLAT FRAME - the asymmetric torn edge
+     .splat-frame          base
+     .splat-frame--bone    bone ink instead of oxblood
+     .splat-frame--right   torn on the trailing edge
+     .splat-frame--strong  the full displacement
+*/
+
+/* ----------------------------------------------------------------------------
+   4. SECTION GRAMMAR
+   ---------------------------------------------------------------------------- */
+
+/*   .blueprint-section   the chapter wrapper: a full-width hairline on its top
+                          edge and the short drop to the first line. Knobs:
+                          `--blueprint-rule`, `--blueprint-inset`.
+     .section-index       the numbered tag, `01 // POSITIONING`. Mono, 11px,
+                          uppercase, 0.08em. Never breaks mid-token.
+     .section-kicker      the quiet eyebrow above a heading
+     .band                a full-width horizontal band
+     .band--split         prose beside its figure instead of above it
+     .split               two panels side by side
+     .pods                two console pods in one band
+     .matrix              a row of cells where one is visibly dominant
+     .chips               a telemetry chip row
+
+     A page writes no padding of its own: `.shell` owns the gutter and the
+     three rhythms (`.shell--wide`, `.shell--dense`, `.shell--hero`).
+*/
+
+/* ----------------------------------------------------------------------------
+   5. TELEMETRY VOICE
+   ---------------------------------------------------------------------------- */
+
+/*   .telemetry-tag          the mono micro-label chip (11.5px, 700, 0.08em)
+     .telemetry-tag--crimson solid raw-blood, bone text
+     .telemetry-tag--canary  solid stamped-canary, soot text
+     .telemetry-tag--bone    solid bone-newsprint, soot text
+     .telemetry-tag--teal    teal OUTLINE, transparent fill
+
+     Crimson is solid and teal is an outline because `--raw-blood` as text on
+     the dark fills fails 4.5:1. Follow that pattern; do not invent a fifth.
+
+     .metric        the giant mono figure, one per section
+     .metric__unit  the unit, as a CHILD of .metric so the two stay on one line
+     .metric--compact  the same figure at a smaller step, for two on one page
+*/
+
+/* ----------------------------------------------------------------------------
+   6. PROSE
+   ---------------------------------------------------------------------------- */
+
+/*   .prose-flow         the ONLY vertical distance between the children of a
+                         prose block: `> * + *` takes --space-reading
+     .prose-flow--group  the same mechanism one relationship out (figure + its
+                         argument)
+     .figure-caption     the sentence under a figure, at --type-body
+     .zine-drop-cap      the first letter as a stamped block
+     .break-token        opt-in `overflow-wrap: anywhere` for a container that
+                         holds an unbreakable token (a hash, a path, a TOML key)
+     .ccr-marker         a CCR marker line
+     .code-link          an identifier chip that links to its definition
+     .zine-comment       a commented-out TOML/CLI line
+     .zine-prompt        the `$`/`>` prompt glyph
+*/
+
+/* ----------------------------------------------------------------------------
+   7. TEXTURE AND MOTION
+   ---------------------------------------------------------------------------- */
+
+/*   TEXTURE - decoration only, always BEHIND the plate (z-index: -1)
+     .halftone-screen  .photocopy-grit
+     .grunge           the noise-drawn ink layer, a real inline <svg> child
+     .grunge__ink      one ink group inside .grunge
+     .grunge--oxblood  .grunge--bone  .grunge--faint
+     .tape-staple      .tape-strip
+
+     MOTION - every one of these degrades to the final state
+     .motion-wipe        the 2px wipe bar
+     .motion-wipe-host   its host
+     .zine-stat-fill     a bar that fills when it enters the viewport
+     .zine-exec-spin     the stepped rotation on an exec demo
+     .zine-flow-step  .zine-flow-step-index  .zine-flow-tick-bar
+     .zine-flow-pane-label  .zine-toggle-bar
+     .zine-diagram-node  .zine-diagram-hot  .zine-diagram-dim
+     .zine-diagram-linkable
+
+     A pre-hide is only legal under
+     `html.js [data-reveal]:not([data-revealed])` inside
+     `@media (prefers-reduced-motion: no-preference)`: a no-JS reader and a
+     reduced-motion reader must both get the finished page.
+*/
+
+/* ----------------------------------------------------------------------------
+   8. CHROME
+   ---------------------------------------------------------------------------- */
+
+/*   .shell            the <main> measure, gutter and rhythm
+   .shell--wide      no measure: a full-bleed application surface
+   .shell--dense     the tight rhythm
+   .shell--hero      the opening rhythm
+   .shell--grow      fills the viewport's remaining height
+   .shell--blueprint the drawn ruling behind every plate
+
+   .header  .header__index  .header__title  .header__lead
+   .header__lead--first
+
+   .crumbs  .crumbs__trail  .crumbs__sep  .crumbs__link  .crumbs__current
+   .crumbs__promise  .crumbs__group  .crumbs__body
+
+   .section-nav  .section-nav--bar  .section-nav--drawer  .section-nav__list
+   .section-nav__entry  .section-nav__ordinal  .section-nav__ordinal--inline
+   .section-nav__link  .section-nav__link--block  .section-nav__summary
+   .section-nav__count  .section-nav__drawer-list  .section-nav__row
+
+   .related  .related__head  .related__label  .related__list  .related__row
+   .related__ordinal  .related__body  .related__link  .related__reason
+
+   .docs-sidebar__eyebrow  __panel  __sections  __group  __summary  __marker
+   __marker--current  __label  __label--current  __count  __chevron  __branch
+   __branch--nested  __link  __link--current  __active  __wip
+*/
+
+/* ----------------------------------------------------------------------------
+   9. COMPONENT-LOCAL FAMILIES - named only by the component that renders them
+   ---------------------------------------------------------------------------- */
+
+/*   .zp-*        ZinePipeline / the console family      (Component/Console)
+     .wb-*        the workbench route                    (Page/Workbench.css)
+     .workflow*   the setup route's CSS-only switch      (Page/Setup.css)
+     .deck-*      the presentation route                 (Deck.css)
+     .console-well  the console pod's recessed body      (Component/Console)
+     .docs-prose  the docs reading column                (Page/Docs.css)
+     .stage-card* .paper-band  the homepage's own bands  (Page/Index.css)
+     #keys        the config route's matrix anchor       (Page/Config.css)
+
+     A page or component OUTSIDE the owner never names one of these. If a page
+     needs a different look for one, it scopes to its own anchor plus a
+     semantic hook (`aria-label`, a `data-*` the script reads) - never to the
+     private class, which survives no refactor.
+*/
+
+/* ----------------------------------------------------------------------------
+   10. WHERE A NEW RULE GOES
+   ---------------------------------------------------------------------------- */
+
+/*   A palette / distance / radius / type size  ->  _tokens
+     A repeated declaration block               ->  _mixins
+     The reset, body, focus, selection, scroll  ->  _base
+     A plate, its frame or its splat            ->  Component/Plate
+     Noise, tape, print overlays                ->  Component/Texture
+     A console, a code plate, a stream          ->  Component/Console
+     A ledger, a dossier, a stat bar, a diagram ->  Component/Data
+     The shell, the header, nav, crumbs, bands  ->  Component/Chrome
+     A prose utility, a type role, a label law  ->  _utilities
+     One route's own geometry                   ->  Source/Stylesheet/Page/<Name>.css,
+                                                    imported by that page
+     A component's own internals                ->  its `Component/<Area>` partial
+
+   A rule that lands in a page or a component instead of one of those homes is
+   the extraction reversing itself. The check is mechanical: `grep -rc "<style"`
+   over `Source/Component` and `Source/pages` reports the remaining blocks, and
+   the only ones allowed are a `<noscript>` block (which must not load when
+   scripting is alive) and a value that is genuinely data-driven - the grunge's
+   per-element custom properties, the stage accent variables, Shiki's inline
+   colour, which a stylesheet cannot know.
+*/

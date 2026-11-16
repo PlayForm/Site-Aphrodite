@@ -1,0 +1,162 @@
+/* Texture - the print layers: grunge ink, halftone, photocopy, tape.
+   ---------------------------------------------------------------------
+
+   Everything on this sheet is a SURFACE TREATMENT, not a frame and not a
+   layout. A plate's fill, border and shadow live in `Component/Plate`; where a
+   plate SITS lives in the layout bands. What lives here is the ink that a
+   printing press leaves on top of a surface: the drawn grunge, the halftone
+   dot screen, the photocopy tooth and the tape that holds a strip down.
+
+   The ink palette is a variable block rather than literals inside the rules,
+   because the same drawing has to read as a dark stain on the page ground and
+   as a light bloom on a crimson band - colour and weight are two knobs on one
+   drawing, and a knob that is written in three places is three knobs.
+
+   The grunge geometry is NOT here: `Script/Grunge.ts` draws it at run time from
+   simplex noise and appends one SVG per group, positioning each one through the
+   `--grunge-*` custom properties. This sheet only positions that element and
+   supplies the tokens it reads, so nothing here overrides the painter. */
+
+/* ---- INK PALETTE ------------------------------------------------------- */
+
+/* The default ink: newsprint bloom, what a stain looks like on the soot ground. */
+$ink-body: rgb(214, 205, 190);
+$ink-weight: 0.16;
+
+/* Oxblood: a dark stain read against the page, the ink behind a dark plate. */
+$ink-oxblood: rgb(147, 17, 40);
+$ink-weight-oxblood: 0.5;
+
+/* Bone: a light bloom, the ink that reads on a crimson band. */
+$ink-bone: rgb(236, 233, 224);
+$ink-weight-bone: 0.18;
+
+/* Faint: the same ink at half volume, for a surface that already separates. */
+$ink-weight-faint: 0.1;
+
+/* ---- PRINT OVERLAYS ---------------------------------------------------- */
+
+$halftone-dot: rgba(147, 17, 40, 0.28);
+$halftone-pitch: 13px;
+$photocopy-dot: rgba(222, 219, 210, 0.08);
+$photocopy-pitch: 8px;
+
+/* Halftone red dot screen (risograph) */
+.halftone-screen {
+	background-image: radial-gradient(#{$halftone-dot} 1.5px, transparent 1.5px);
+	background-size: $halftone-pitch $halftone-pitch;
+}
+
+/* Photocopy grit (newsprint tooth) */
+.photocopy-grit {
+	background-image: radial-gradient(#{$photocopy-dot} 1px, transparent 1px);
+	background-size: $photocopy-pitch $photocopy-pitch;
+}
+
+/* ---- GRUNGE // noise-drawn ink, the asymmetric layer -------------------
+
+   `splat-frame` was a displaced rectangle: it read as a duplicate that had
+   slipped a few pixels, because a warped box is still a box. Ink does not
+   behave that way - it leaves a body, throws lobes, and drops satellites - so
+   this layer is DRAWN, not displaced. `Script/Grunge.ts` builds the geometry in
+   the browser from simplex noise (body outline riding the noise field, rounded
+   lobes, power-curve droplets) and appends one SVG per GROUP of five splats,
+   each with its own seed, scale, rotation and ink weight.
+
+   HOW MUCH ink a surface takes is a density score drawn from that same noise
+   field and biased by the surface behind the element: a TRANSPARENT plate (no
+   fill of its own - a band, a split column, a pods panel) gets 6-8 groups,
+   larger and pushed out to its edges, because the ink is the only thing marking
+   its edge; a FILLED plate gets 0-2, smaller and fainter, because the fill
+   already separates it from the page. The table is `Density` in
+   `Script/Grunge.ts` and nothing here overrides it - this block only positions
+   a group and holds the ink tokens.
+
+   The ink is a real SVG element, coloured by `color` and sized by the custom
+   properties below, so one drawing serves every region: oxblood behind a dark
+   plate, bone behind a crimson band, whatever the region needs. */
+
+.grunge {
+	position: relative;
+	isolation: isolate;
+}
+
+/* The ink is a REAL SVG element in the document, not a mask over a pseudo-element.
+   A mask is rasterised to the element's box, so anything the drawing puts outside
+   that box - arms and droplets thrown past the plate edge - was clipped off. An
+   inline SVG with a padded viewBox renders the whole splat, can be inspected in
+   the DOM, and takes its colour from `color`, so one drawing serves every ink. */
+.grunge__ink {
+	position: absolute;
+	left: var(--grunge-x, -10%);
+	top: var(--grunge-y, -10%);
+	width: var(--grunge-w, 70%);
+	height: var(--grunge-h, 70%);
+	z-index: var(--grunge-z, -1);
+	pointer-events: none;
+	color: var(--grunge-ink-color, #{$ink-body});
+	fill: currentColor;
+	opacity: var(--grunge-opacity, #{$ink-weight});
+	transform: rotate(var(--grunge-rot, 0deg));
+	overflow: visible;
+}
+
+/* Every group registers ITSELF: position, size and turn are its own, so two
+   sections never bleed identically - and neither do two groups on one plate. */
+
+/* Ink by region, not by habit: the same drawing reads as a dark stain on the
+   page ground and as a light bloom on a crimson band. Colour and weight are two
+   knobs, so a plate can be tinted without redrawing it. */
+.grunge--oxblood {
+	--grunge-ink-color: #{$ink-oxblood};
+	--grunge-opacity: #{$ink-weight-oxblood};
+}
+.grunge--bone {
+	--grunge-ink-color: #{$ink-bone};
+	--grunge-opacity: #{$ink-weight-bone};
+}
+.grunge--faint {
+	--grunge-opacity: #{$ink-weight-faint};
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.grunge__ink {
+		transform: none;
+	}
+}
+
+/* ---- TAPE -------------------------------------------------------------- */
+
+$tape-staple: #73717b;
+$tape-fill: rgba(222, 219, 210, 0.15);
+$tape-edge: rgba(255, 255, 255, 0.2);
+
+/* The staple is the small metal bar that pins a tape strip to the sheet: 14 by
+   3 pixels, turned three degrees off square, with a one-pixel shadow beneath it
+   so it reads as sitting ON the tape rather than printed with it. */
+.tape-staple {
+	position: relative;
+}
+
+.tape-staple::before {
+	content: "";
+	position: absolute;
+	width: 14px;
+	height: 3px;
+	background: $tape-staple;
+	top: 6px;
+	left: 12px;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+	transform: rotate(-3deg);
+	z-index: 30;
+}
+
+/* The strip itself: translucent, faintly blurred, torn on both short edges -
+   dashed borders are the tear, which is why the long edges stay the caller's
+   (a strip carries its own top and bottom rule at the call site). */
+.tape-strip {
+	background: $tape-fill;
+	backdrop-filter: blur(1px);
+	border-left: 1px dashed $tape-edge;
+	border-right: 1px dashed $tape-edge;
+}

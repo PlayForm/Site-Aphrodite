@@ -37,6 +37,8 @@
  * tape carries the section's identity colour, and a second chip in the same
  * colour would take emphasis from it rather than add information.
  */
+import "@Stylesheet/Component/Chrome.scss";
+
 import ZineTape from "./ZineTape.astro";
 
 import { AllLinks, IsActive } from "@Library/Links";
@@ -87,22 +89,22 @@ const Coordinate = Index ?? Derived;
 const Total = String(AllLinks.length).padStart(2, "0");
 ---
 
-<header class="relative flex w-full flex-col items-start">
+<header class="header">
 	{Coordinate !== undefined && (
-		<p class="telemetry-tag mb-4" title={`Entry ${Coordinate} of ${Total} in the site index`}>
+		<p
+			class="header__index telemetry-tag"
+			title={`Entry ${Coordinate} of ${Total} in the site index`}
+		>
 			INDEX {Coordinate} / {Total}
 		</p>
 	)}
 	<ZineTape Variant="section" Label={Tape} Color={Tone} />
-	<h1 class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-6xl">
+	<h1 class="header__title">
 		{Title}
 	</h1>
 	{Lead.map((Sentence, Position) => (
 		<p
-			class:list={[
-				Position === 0 ? "mt-6" : "mt-3",
-				"max-w-3xl font-body text-base leading-relaxed text-bone-newsprint",
-			]}
+			class:list={["header__lead", Position === 0 && "header__lead--first"]}
 			set:html={Sentence}
 		/>
 	))}

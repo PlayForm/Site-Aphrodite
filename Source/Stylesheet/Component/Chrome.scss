@@ -1,0 +1,893 @@
+/* ============================================================================
+   CHROME - the page frame.
+
+   THE LAYER. Part of `Component/`, between `Component/Data` and `_utilities`
+   in `System.scss`'s order (_tokens -> _mixins -> _base -> Plate -> Texture ->
+   Console -> Data -> Chrome -> _utilities). A chrome block reads tokens and
+   nothing else: it never restates a palette value, never re-derives a type
+   role, and never sets a distance the four `--space-*` roles already name.
+
+   THE CONTRACT. Each block below replaces the Tailwind class string the
+   component carried, declaration for declaration. Where the class string named
+   a token (`text-bone-white`, `bg-carbon-void`) the block reads the same
+   `var(--token)`; where it named a scale step (`px-5`, `gap-16`, `text-3xl`)
+   the block carries that step's resolved value. Nothing is rounded, nothing is
+   re-chosen - the proof of the extraction is that the page renders identically.
+
+   CASCADE NOTE. `Global.css` loads AFTER the Tailwind utility layer (stated at
+   `.section-index` in that file), so a `.type-*` class beat a conflicting
+   `tracking-*` / `leading-*` utility in every class string below. The blocks
+   therefore carry the value that actually won: `.type-meta`'s 0.08em, not
+   `tracking-widest`'s 0.1em, wherever both were named. A no-op utility is
+   dropped rather than transcribed, because transcribing it would CHANGE the
+   render once this file loads later than both.
+
+   SECTIONS
+     1. Shell        - the `<main>` measure, rhythm, blueprint ruling
+     2. Header       - page coordinate, title, lead
+     3. Crumbs       - the "where you are" spine
+     4. Section index- the sticky on-page index (bar + phone disclosure)
+     5. Next steps   - the continuation matrix at the foot of a page
+     6. Docs sidebar - the docs rail
+     7. Bands        - the Stitch layout grammar (moved out of Global.css)
+   ========================================================================= */
+
+/* ---- 1. SHELL ----------------------------------------------------------
+   Replaces: `shell-main relative z-10 mx-auto flex w-full max-w-[1440px]
+   flex-col px-5 sm:px-8 lg:px-14` + the rhythm string + `flex-1`.
+
+   The shell owns three named rhythms and no page writes padding of its own.
+   The blueprint ruling and the chapter rule are ONE switch (`--blueprint`),
+   defaulted on for a document and off for a viewport. */
+
+.shell {
+	position: relative;
+	z-index: 10;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-width: 1440px;
+	margin-inline: auto;
+	padding-inline: 1.25rem; /* px-5 */
+
+	@media (min-width: 640px) {
+		padding-inline: 2rem; /* sm:px-8 */
+	}
+
+	@media (min-width: 1024px) {
+		padding-inline: 3.5rem; /* lg:px-14 */
+	}
+}
+
+/* The default page rhythm: shell A (case-study, examples, hermes, plugin). */
+.shell--wide {
+	gap: 4rem; /* gap-16 */
+	padding-block: 4rem; /* py-16 */
+
+	@media (min-width: 1024px) {
+		gap: 5rem; /* lg:gap-20 */
+		padding-block: 6rem; /* lg:py-24 */
+	}
+}
+
+/* Shell B: benchmarks, setup, versions. */
+.shell--dense {
+	gap: 3rem; /* gap-12 */
+	padding-block: 3rem; /* py-12 */
+
+	@media (min-width: 1024px) {
+		gap: 4rem; /* lg:gap-16 */
+		padding-block: 4rem; /* lg:py-16 */
+	}
+}
+
+/* Shell C: the landing page's asymmetric top - a shorter opening, the same
+   chapter gap below it. */
+.shell--hero {
+	gap: 3rem; /* gap-12 */
+	padding-block-start: 2.5rem; /* pt-10 */
+	padding-block-end: 4rem; /* pb-16 */
+
+	@media (min-width: 1024px) {
+		gap: 4rem; /* lg:gap-16 */
+		padding-block-start: 3rem; /* lg:pt-12 */
+		padding-block-end: 6rem; /* lg:pb-24 */
+	}
+}
+
+/* A viewport surface (the workbench) fills what is left of the window. */
+.shell--grow {
+	flex: 1 1 0%; /* flex-1 */
+}
+
+/* THE RULING. Two 1px gradients crossing at 40px - one hairline per cell edge,
+   in the chapter-rule token so the grid and the rules are the same colour at
+   two volumes. `opacity` is the volume knob rather than a second hex: 35% of
+   #27272a over the page ground lands near #131315, a line the eye finds when
+   it looks for it and never reads as a border.
+
+   It is `pointer-events: none` and out of the accessibility tree by
+   construction (an empty pseudo-element carries no text), and it paints at
+   `z-index: -1` inside the shell's own stacking context (`z-10`), so it sits
+   above the page ground and BELOW every plate - a filled surface covers the
+   ruling, which is what a drawn sheet does. */
+.shell--blueprint::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;
+	background-image:
+		linear-gradient(to right, var(--blueprint-rule) 1px, transparent 1px),
+		linear-gradient(to bottom, var(--blueprint-rule) 1px, transparent 1px);
+	background-size: 40px 40px;
+	opacity: 0.35;
+}
+
+/* THE CHAPTER RULE. `:where()` keeps this at element-level specificity so a
+   page's own `border-t` / `border-oxblood-dark` / `pt-*` utilities all win:
+   the shell states a rule only where the page states none, and never repaints
+   a crimson chapter boundary as a grey one. The inset is the label distance
+   (`--blueprint-inset`), because the rule is a marker and the head follows it
+   the way a value follows a label - the shell's own rhythm still owns the gap
+   BETWEEN chapters. */
+:where(.shell--blueprint) > section {
+	border-top: 1px solid var(--blueprint-rule);
+	padding-block-start: var(--blueprint-inset);
+}
+
+/* ---- 2. HEADER ---------------------------------------------------------
+   Replaces: `relative flex w-full flex-col items-start` on the `<header>`,
+   `telemetry-tag mb-4` on the coordinate, the `<h1>` class string, and the
+   lead's `mt-6` / `mt-3` + `max-w-3xl font-body text-base leading-relaxed
+   text-bone-newsprint`. */
+
+.header {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	width: 100%;
+}
+
+/* The index coordinate sits above the tape, in the QUIET telemetry voice
+   whatever the tape's tone is - the tape carries the section's identity
+   colour, and a second chip in the same colour would take emphasis from it
+   rather than add information. `.telemetry-tag` still supplies the chip; this
+   block owns only the distance to the tape below it. */
+.header__index {
+	margin-bottom: 1rem; /* mb-4 */
+}
+
+/* THE PAGE TITLE SCALE. Unchanged: 30px/36px rising to 60px/1 at `sm`, black
+   weight, uppercase, -0.025em tracking, bone-white, with the 4px oxblood
+   offset that gives the headline its printed weight. */
+.header__title {
+	font-family: "Space Grotesk", sans-serif;
+	font-size: 1.875rem; /* text-3xl */
+	line-height: 2.25rem;
+	font-weight: 900; /* font-black */
+	letter-spacing: -0.025em; /* tracking-tight */
+	text-transform: uppercase;
+	color: var(--bone-white);
+	filter: drop-shadow(4px 4px 0px #520612); /* drop-shadow-[4px_4px_0px_#520612] */
+
+	@media (min-width: 640px) {
+		font-size: 3.75rem; /* sm:text-6xl */
+		line-height: 1;
+	}
+}
+
+/* The lead is one sentence per array entry. The first entry opens the block at
+   1.5rem, every sibling follows at 0.75rem - the split is structural, the
+   words stay byte-identical. The measure is 48rem, capped in `rem` rather than
+   `ch` because `ch` is the width of the "0" glyph. */
+.header__lead {
+	max-width: 48rem; /* max-w-3xl */
+	margin-block-start: 0.75rem; /* mt-3 */
+	font-family: "DM Sans", sans-serif;
+	font-size: 1rem; /* text-base */
+	line-height: 1.625; /* leading-relaxed */
+	color: var(--bone-newsprint);
+}
+
+.header__lead--first {
+	margin-block-start: 1.5rem; /* mt-6 */
+}
+
+/* ---- 3. CRUMBS ---------------------------------------------------------
+   Replaces: `crumbs flex flex-col gap-2`, the trail's `type-meta flex
+   flex-wrap items-center gap-2 uppercase text-zinc-dust`, the separator and
+   current spans, the `transition-colors hover:text-bone-white` link, and the
+   promise's `flex max-w-3xl flex-col gap-1` with its `type-meta uppercase
+   text-weathered-teal` group and `type-body text-pretty text-zinc-dust` body.
+
+   THE SPINE. One hairline on the leading edge of the block, in the shell-edge
+   token rather than a second grey, so the trail, the blueprint ruling and the
+   chapter rules all draw at one volume. It is a border on the BLOCK, not on
+   the trail: the promise line belongs to the same coordinate, and a rule that
+   stopped between them would split one statement into two. No fill, no shadow
+   - chrome that competes with the page's own claim is chrome the reader has to
+   read twice. */
+
+.crumbs {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem; /* gap-2 */
+	border-left: 1px solid var(--tier-shell-edge);
+	padding-left: 1rem;
+}
+
+.crumbs__trail {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem; /* gap-2 */
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 500;
+	line-height: 1.4;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zinc-dust);
+}
+
+/* The separator is TEXT, so it takes a text colour: `zinc-dust` is the muted
+   text role (5.12:1), and it is the colour the docs trail already uses for its
+   own separator, so both trails divide a path the same way. */
+.crumbs__sep {
+	color: var(--zinc-dust);
+}
+
+.crumbs__link {
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+
+	&:hover {
+		color: var(--bone-white);
+	}
+}
+
+.crumbs__current {
+	color: var(--bone-newsprint);
+}
+
+/* The line under the trail is PROSE: it reads at the body role and never at
+   the caption role, and the group stays at the meta role - promoting the
+   sentence is what CREATES the gap between the label and the description. */
+.crumbs__promise {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem; /* gap-1 */
+	max-width: 48rem; /* max-w-3xl */
+}
+
+.crumbs__group {
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 500;
+	line-height: 1.4;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--weathered-teal);
+}
+
+.crumbs__body {
+	font-family: "DM Sans", sans-serif;
+	font-size: var(--type-body);
+	font-weight: 400;
+	line-height: 1.7;
+	text-wrap: pretty; /* text-pretty */
+	color: var(--zinc-dust);
+}
+
+/* ---- 4. SECTION INDEX --------------------------------------------------
+   Replaces the two presentations' class strings: the sticky bar
+   (`sticky top-0 z-30 -mx-5 hidden w-full items-center gap-6 border-b
+   bg-carbon-void px-5 py-3 sm:-mx-8 sm:flex sm:px-8 lg:-mx-14 lg:px-14`) and
+   the phone disclosure (`sticky top-0 z-30 -mx-5 w-full border-b
+   bg-carbon-void px-5 py-2 sm:hidden`), plus the list, the entries, the
+   ordinal, the summary and the row rules.
+
+   THE HAIRLINE. One declaration for both presentations: the lower boundary is
+   the shell edge, the colour the blueprint ruling and the chapter rules use,
+   so the bar, the grid and the sections draw at one volume.
+
+   The bar keeps the page ground it already painted and nothing more: a sticky
+   element that paints a raised surface reads as a floating panel, and the
+   point of the hairline is that the document continues behind it. */
+
+.section-nav {
+	position: sticky;
+	/* `top: 0` is the base value the bar carried; `Motion.css`'s
+	   `body .section-nav { top: var(--site-header-height) }` outranks it at
+	   (0,2,0) and parks the index UNDER the header. Do not "fix" the zero - it
+	   is the fallback, and the header offset is the chrome rule's to state. */
+	top: 0;
+	z-index: 30;
+	width: 100%;
+	margin-inline: -1.25rem; /* -mx-5 */
+	border-bottom: 1px solid var(--tier-shell-edge);
+	background-color: var(--carbon-void);
+	padding-inline: 1.25rem; /* px-5 */
+}
+
+/* The desktop bar. Hidden below `sm`, where the disclosure takes over. */
+.section-nav--bar {
+	display: none;
+	align-items: center;
+	gap: 1.5rem; /* gap-6 */
+	padding-block: 0.75rem; /* py-3 */
+
+	@media (min-width: 640px) {
+		display: flex; /* sm:flex */
+		margin-inline: -2rem; /* sm:-mx-8 */
+		padding-inline: 2rem; /* sm:px-8 */
+	}
+
+	@media (min-width: 1024px) {
+		margin-inline: -3.5rem; /* lg:-mx-14 */
+		padding-inline: 3.5rem; /* lg:px-14 */
+	}
+}
+
+/* The phone's disclosure: the same index collapsed to one row. */
+.section-nav--drawer {
+	padding-block: 0.5rem; /* py-2 */
+
+	@media (min-width: 640px) {
+		display: none; /* sm:hidden */
+	}
+}
+
+.section-nav__list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	column-gap: 1.25rem; /* gap-x-5 */
+	row-gap: 0.25rem; /* gap-y-1 */
+}
+
+/* THE DIVISION between the stamp and the sequence: a vertical hairline from
+   `sm` up, where the bar is a row. On the phone the stamp sits above the
+   list, so a vertical rule there would divide nothing. */
+@media (min-width: 640px) {
+	.section-nav__list {
+		border-left: 1px solid var(--tier-shell-edge);
+		padding-left: 1.5rem;
+	}
+}
+
+.section-nav__entry {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5rem; /* gap-2 */
+}
+
+/* THE ORDINAL. 10px mono, tabular so `01`-`09` and `10` share a width and the
+   labels stay in one column. Quiet by design: it is a ruler mark, not a label,
+   and the label beside it is the thing being read. */
+.section-nav__ordinal {
+	display: inline-block;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 10px;
+	font-weight: 700;
+	line-height: 1.4;
+	letter-spacing: 0.08em;
+	font-variant-numeric: tabular-nums;
+	color: var(--zinc-dust);
+}
+
+/* In the phone's rows the ordinal is a prefix on the link's own line. */
+.section-nav__ordinal--inline {
+	margin-inline-end: 0.5rem; /* mr-2 */
+}
+
+/* The link, in the index's own voice: quiet until it is the section you are
+   in. The canary label and its underline stay the only "you are here", so the
+   ordinal and the active marker never compete for the same signal. */
+.section-nav__link {
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 500;
+	line-height: 1.4;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zinc-dust);
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+
+	&:hover {
+		color: var(--bone-white);
+	}
+
+	&[aria-current="true"] {
+		color: var(--stamped-canary);
+		text-decoration-line: underline;
+		text-decoration-thickness: 2px;
+		text-underline-offset: 4px;
+	}
+}
+
+/* A row in the disclosure: the whole line is the target. */
+.section-nav__link--block {
+	display: block;
+	padding-block: 0.625rem; /* py-2.5 */
+}
+
+.section-nav__summary {
+	display: flex;
+	cursor: pointer;
+	list-style: none;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem; /* gap-3 */
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+
+	&::-webkit-details-marker {
+		display: none;
+	}
+}
+
+.section-nav__count {
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 500;
+	line-height: 1.4;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zinc-dust);
+}
+
+.section-nav__drawer-list {
+	display: flex;
+	flex-direction: column;
+	padding-top: 0.75rem; /* pt-3 */
+	padding-bottom: 0.25rem; /* pb-1 */
+}
+
+/* THE PHONE'S ROW RULES. The disclosure's rows are divided by the same
+   hairline as everything else in the chrome, so the whole strip - boundary,
+   division and rows - is one colour at one volume. */
+.section-nav__row {
+	border-top: 1px solid var(--tier-shell-edge);
+}
+
+/* ---- 5. NEXT STEPS -----------------------------------------------------
+   Replaces `next-steps w-full`, the head row, the matrix rows, the ordinal and
+   the body column, and the link's `w-fit font-mono text-base text-bone-white
+   underline decoration-stamped-canary decoration-2 underline-offset-4
+   transition-colors hover:bg-raw-blood hover:text-bone-white`.
+
+   The module is a MATRIX, not a list: every step is a row of two columns - the
+   ordinal in mono, the destination and its reason in the reading column - with
+   a hairline between rows and one full-width rule above the whole module. */
+
+/* THE MODULE'S RULE. One hairline above the whole block, in the chapter-rule
+   token: the module closes the page, and the same rule that opens a chapter is
+   what separates the argument from what follows it. */
+.related {
+	width: 100%; /* w-full */
+	border-top: 1px solid var(--blueprint-rule);
+	padding-block-start: var(--space-reading);
+}
+
+/* THE HEAD ROW: the module's name on the left, its size on the right, on one
+   baseline. `flex-wrap` because at 390px the two labels are wider than the
+   column and must stack rather than shrink the type. */
+.related__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 0.5rem 1rem;
+}
+
+.related__label {
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 500;
+	line-height: 1.4;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zinc-dust);
+}
+
+/* THE MATRIX. Rows, each a two-column grid: a fixed ordinal gutter and the
+   reading column. Hairlines between rows and none above the first, because the
+   module's own rule is already there - two rules 12px apart read as one thick
+   one. */
+.related__list {
+	display: flex;
+	flex-direction: column;
+	margin-block-start: var(--space-reading);
+}
+
+.related__row {
+	display: grid;
+	grid-template-columns: 2.5rem minmax(0, 1fr);
+	gap: 0 var(--space-reading);
+	align-items: start;
+	padding-block: 0.875rem;
+	border-top: 1px solid var(--tier-shell-edge);
+}
+
+.related__row:first-child {
+	border-top: 0;
+	padding-block-start: 0;
+}
+
+.related__ordinal {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 1.6;
+	letter-spacing: 0.08em;
+	font-variant-numeric: tabular-nums;
+	color: var(--zinc-dust);
+}
+
+/* The destination and its reason share the reading column: `space-tight`
+   between them (a label and its value), never the paragraph rhythm, because
+   the reason belongs to the label rather than following it. */
+.related__body {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-tight);
+	min-width: 0;
+}
+
+.related__link {
+	width: fit-content; /* w-fit */
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem; /* text-base */
+	line-height: 1.5rem;
+	color: var(--bone-white);
+	text-decoration-line: underline;
+	text-decoration-color: var(--stamped-canary);
+	text-decoration-thickness: 2px;
+	text-underline-offset: 4px;
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+
+	&:hover {
+		background-color: var(--raw-blood);
+		color: var(--bone-white);
+	}
+}
+
+/* ONE MEASURE FOR THE REASON, IN REM. The reason is a sentence, so it takes the
+   reading column's width up to the measure the site already uses for body copy
+   - 40rem, about 71 characters. The plate this replaced capped it at `62ch`,
+   which is not 62 characters: `ch` is the width of the "0" glyph, and in DM
+   Sans that computed to 763px, roughly 84 characters. */
+.related__reason {
+	max-width: 40rem;
+	font-family: "DM Sans", sans-serif;
+	font-size: var(--type-body);
+	font-weight: 400;
+	line-height: 1.7;
+	color: var(--zinc-dust);
+}
+
+/* ---- 6. DOCS SIDEBAR ---------------------------------------------------
+   Replaces the rail's class strings: the eyebrow's `type-meta uppercase
+   tracking-widest text-zinc-dust`, the panel's `mt-2
+   max-h-[calc(100vh-9rem)] overflow-y-auto p-5`, the group `<details>`, its
+   summary, the marker, the label, the count, the chevron, the branches and the
+   links with their WIP chip.
+
+   The index is a QUIET surface: one hairline boundary, sentence-case group
+   labels, a neutral count and one restrained active marker. The expressive
+   budget on a docs page belongs to the page itself, and a rail wearing a tape,
+   a 4px crimson frame and an offset shadow competed with the article it was
+   meant to serve. */
+
+/* THE EYEBROW'S RULE. The rail's name sits on a hairline instead of floating
+   above a box: it is the column's header, and a header with a rule under it is
+   what makes the list below read as its contents. */
+.docs-sidebar__eyebrow {
+	border-bottom: 1px solid var(--tier-shell-edge);
+	padding-bottom: var(--space-tight);
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 500;
+	line-height: 1.4;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zinc-dust);
+}
+
+/* THE WELL. One step darker than the page ground with a LIGHTER edge
+   (`--tier-well-edge` against `--tier-shell-edge`), which is the whole
+   difference between "recessed channel" and "another plate": the edge is what
+   tells the eye the surface went in rather than came out. Radius 0 like every
+   other edge on the site, and no shadow - the rail is quiet by design and the
+   article beside it spends the page's emphasis. */
+.docs-sidebar__panel {
+	position: relative;
+	margin-block-start: 0.5rem; /* mt-2 */
+	max-height: calc(100vh - 9rem); /* max-h-[calc(100vh-9rem)] */
+	overflow-y: auto;
+	padding: 1.25rem; /* p-5 */
+	border: 1px solid var(--tier-well-edge);
+	border-radius: 0;
+	background-color: var(--tier-well);
+}
+
+.docs-sidebar__sections {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem; /* gap-3 */
+}
+
+/* THE GROUP RULE. Sections are divided by the same hairline the blueprint uses
+   everywhere else, and the first one keeps no rule (the eyebrow's rule is
+   already above it). A `<details>` is a block, so the border costs no layout:
+   the container's own gap still owns the distance. */
+.docs-sidebar__group + .docs-sidebar__group {
+	border-top: 1px solid var(--tier-shell-edge);
+	padding-top: 0.75rem;
+}
+
+.docs-sidebar__summary {
+	display: flex;
+	cursor: pointer;
+	list-style: none;
+	align-items: center;
+	gap: 0.5rem; /* gap-2 */
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem; /* text-base */
+	line-height: 1.5rem;
+	letter-spacing: 0; /* tracking-normal */
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+
+	&::-webkit-details-marker {
+		display: none;
+	}
+}
+
+/* The active marker: a 3px by 1px bar in the group's own gutter. Canary when
+   the group holds the page being read, oxblood otherwise - the bar is what
+   carries the section's identity colour, so the label can stay quiet. */
+.docs-sidebar__marker {
+	display: inline-block;
+	height: 0.75rem; /* h-3 */
+	width: 0.25rem; /* w-1 */
+	flex-shrink: 0; /* shrink-0 */
+	background-color: var(--oxblood-dark);
+}
+
+.docs-sidebar__marker--current {
+	background-color: var(--stamped-canary);
+}
+
+.docs-sidebar__label {
+	min-width: 0; /* min-w-0 */
+	flex: 1 1 0%; /* flex-1 */
+	color: var(--bone-newsprint);
+}
+
+.docs-sidebar__label--current {
+	color: var(--bone-white);
+}
+
+.docs-sidebar__group:hover .docs-sidebar__label {
+	color: var(--bone-white);
+}
+
+.docs-sidebar__count {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 13px; /* text-[13px] */
+	letter-spacing: 0; /* tracking-normal */
+	color: var(--zinc-dust);
+}
+
+.docs-sidebar__chevron {
+	display: inline-block;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 13px; /* text-[13px] */
+	color: var(--zinc-dust);
+	transition-property: transform;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+}
+
+.docs-sidebar__group[open] .docs-sidebar__chevron {
+	transform: rotate(90deg);
+}
+
+/* THE BRANCH RULE. The page list and the nested child list are indented by a
+   hairline rather than by a crimson plate edge - the same 1px, at the same
+   volume as the rail's own boundary, so depth reads as depth and not as a
+   second colour system. */
+.docs-sidebar__branch {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem; /* gap-1 */
+	margin-block-start: 0.5rem; /* mt-2 */
+	border-left: 1px solid var(--tier-shell-edge);
+	padding-inline-start: 0.75rem; /* pl-3 */
+}
+
+.docs-sidebar__branch--nested {
+	margin-block-start: 0.25rem; /* mt-1 */
+}
+
+.docs-sidebar__link {
+	display: block;
+	padding-block: 0.125rem; /* py-0.5 */
+	padding-inline-start: 0.5rem; /* pl-2 */
+	padding-inline-end: 0.5rem; /* pr-2 */
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem; /* text-base */
+	line-height: 1.625; /* leading-relaxed */
+	color: var(--zinc-dust);
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+
+	&:hover {
+		color: var(--bone-white);
+	}
+}
+
+.docs-sidebar__link--current {
+	color: var(--bone-white);
+}
+
+/* The page you are reading, marked in the link's own line: a 2px canary bar,
+   aligned to the middle of the row's type. */
+.docs-sidebar__active {
+	margin-inline-end: 0.375rem; /* mr-1.5 */
+	display: inline-block;
+	height: 0.875rem; /* h-3.5 */
+	width: 0.125rem; /* w-0.5 */
+	vertical-align: middle;
+	background-color: var(--stamped-canary);
+}
+
+/* THE WIP FLAG. A roadmap mark, not a status: the canary stamp with a hard
+   black edge, in the same mono voice as the counts around it. */
+.docs-sidebar__wip {
+	margin-inline-start: 0.5rem; /* ml-2 */
+	display: inline-block;
+	border: 1px solid #000000; /* border border-black */
+	padding-inline: 0.375rem; /* px-1.5 */
+	vertical-align: middle;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 13px; /* text-[13px] */
+	font-weight: 900; /* font-black */
+	line-height: 1.25; /* leading-tight */
+	letter-spacing: 0.1em; /* tracking-widest */
+	text-transform: uppercase;
+	background-color: var(--stamped-canary);
+	color: var(--soot-black);
+}
+
+/* ---- 7. BANDS ----------------------------------------------------------
+   THE STITCH COMPOSITION, OUR SURFACE. Moved here from `Global.css` so the
+   band grammar sits with the chrome that arranges it.
+
+   These are ARRANGEMENT only: grid, gap, ordering, measure. No background, no
+   border, no shadow, no colour, no font - those stay with the plate, tape and
+   grunge partials. The point is to take Stitch's positioning (numbered bands, a
+   decision matrix with a dominant lead, dual pods, two-column splits) without
+   importing its token system over ours. */
+
+.band {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-group);
+	width: 100%;
+	padding-block-start: var(--space-group);
+	/* The hairline is the section grammar itself, not decoration: Stitch divides
+	   every content domain with a full-width 1px rule. Nothing else here paints. */
+	border-top: 1px solid var(--oxblood-dark);
+}
+
+/* A row of cards where one child is visibly dominant. Collapses to a stack. */
+.matrix {
+	display: grid;
+	gap: var(--space-group);
+	grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+	.matrix {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1280px) {
+	.matrix {
+		grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+	}
+
+	.matrix > .matrix-lead {
+		grid-column: span 2;
+	}
+}
+
+/* Two panels in one band: header ribbon slot over a well slot. */
+.pods {
+	display: grid;
+	gap: var(--space-group);
+	grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+	.pods {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+/* Prose left, figure right - the split Stitch uses for explanation + evidence. */
+.split {
+	display: grid;
+	gap: var(--space-group);
+	grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+	.split {
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		align-items: start;
+	}
+
+	.split--even {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+/* A telemetry chip row: status, version, prerequisites. */
+.chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-tight);
+}
+
+/* A band whose prose sits BESIDE its figure instead of above it - the Stitch
+   split. The kicker, heading and subhead span both columns; the reading column
+   takes the left, the plate takes the right and spans the remaining rows, so a
+   section never leaves half the page empty. */
+.band--split {
+	display: grid;
+	grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+	column-gap: var(--space-group);
+	align-items: start;
+}
+
+.band--split > :is(.section-index, .section-kicker, h2, .type-sub) {
+	grid-column: 1 / -1;
+}
+
+.band--split > .prose-flow,
+.band--split > .mt-10 {
+	grid-column: 1;
+}
+
+.band--split > .grunge {
+	grid-column: 2;
+	grid-row: 2 / span 3;
+	margin: 0;
+}
+
+@media (max-width: 1023px) {
+	.band--split {
+		display: flex;
+	}
+
+	.band--split > .grunge {
+		grid-row: auto;
+		margin-block-start: var(--space-group);
+	}
+}

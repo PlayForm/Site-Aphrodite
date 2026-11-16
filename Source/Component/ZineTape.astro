@@ -88,24 +88,24 @@ const {
 } = Astro.props;
 
 /** A tape's colour is a FILL with text on it. */
-const Palette = {
-	raw: "bg-raw-blood text-bone-white",
-	canary: "bg-stamped-canary text-soot-black",
+const Fill = {
+	raw: "plate__tape--fill-raw",
+	canary: "plate__tape--fill-canary",
 	// Teal takes DARK ink, on the same measurement ZineStamp records: bone-white
 	// on weathered-teal is 3.06:1 at 16px (below the 4.5:1 floor), soot-black on
 	// the same fill is 5.36:1. The fill carries the identity; only the ink moves.
-	teal: "bg-weathered-teal text-soot-black",
-	bone: "bg-bone-newsprint text-soot-black",
+	teal: "plate__tape--fill-teal",
+	bone: "plate__tape--fill-bone",
 }[Color];
 
-/** `kicker` has no box to fill, so it takes the same voice as TEXT. `raw` is a
+/** `kicker` has no box to fill, so it takes the same colour as TEXT. `raw` is a
  * chrome colour and never a text colour (the AA-LIFT law), so the section-label
  * voice is dust - which is also what a label should read as. */
 const Ink = {
-	raw: "text-zinc-dust",
-	canary: "text-stamped-canary",
-	teal: "text-weathered-teal",
-	bone: "text-bone-newsprint",
+	raw: "plate__tape--ink-raw",
+	canary: "plate__tape--ink-canary",
+	teal: "plate__tape--ink-teal",
+	bone: "plate__tape--ink-bone",
 }[Color];
 
 const Position = {
@@ -134,18 +134,31 @@ const Tilt = Rotate ?? DefaultTilt;
  * lost by a page that passes the unprefixed class. */
 const Lean = Tilt === "" ? "" : `${Tilt} max-sm:rotate-0`;
 
+/** The SHAPE and the PALETTE live in `Plate.scss` as `plate__tape--*`. What is
+ *  composed here is PLACEMENT - the side, the offset and the lean - because
+ *  those values are props the call site chooses and a class in the sheet cannot
+ *  carry an angle or an offset that exists only at that call site.
+ *
+ *  The mobile flatten rides with the lean for the same reason: Tailwind emits
+ *  `max-sm:rotate-0` after the unprefixed rotation, so it wins against whatever
+ *  angle a caller passed - a class in the sheet would have to fight that
+ *  utility for the same property and would lose the flatten on a phone.
+ *
+ *  `hash` keeps the published `.telemetry-tag` chip (11.5px mono, 0.08em
+ *  tracking, teal OUTLINE on no fill - the modifier's own contrast decision) and
+ *  adds only the hard plane, so it still reads as a tape rather than as a badge
+ *  from another design. `strip` keeps `.tape-strip`, which is
+ *  `Component/Texture`'s: that block owns the tape's translucent fill and its
+ *  torn short edges, and this one owns where the strip sits and its two
+ *  hairlines. */
 const Shape = {
-	corner: `absolute ${Offset} ${Position} z-10 ${Lean} border border-black px-3 py-0.5 text-base font-black uppercase tracking-widest shadow-[2px_2px_0px_#000] ${Palette}`,
-	section: `mb-12 ${Lean} border border-black px-3 py-1 text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] ${Palette}`,
-	hero: `${Lean} border-2 border-black px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest shadow-[4px_4px_0px_#000] ${Palette}`,
-	// The mechanical voice is the telemetry chip, not a hand-rolled copy of it:
-	// 11.5px mono, 0.08em tracking, teal OUTLINE on no fill (the modifier's own
-	// contrast decision), with the hard plane kept on top so it still reads as a
-	// tape rather than as a badge from another design.
-	hash: `telemetry-tag telemetry-tag--teal ${Lean} shadow-[3px_3px_0px_#000]`,
-	tab: `relative z-10 -mb-7 ml-6 inline-block border border-black px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] ${Lean} ${Palette}`,
-	strip: `tape-strip absolute -top-6 left-0 z-10 ${Lean} border-b border-t border-bone-newsprint/30 px-4 py-1 text-base font-black uppercase tracking-widest text-bone-newsprint`,
-	kicker: `inline-block font-mono text-base font-black uppercase tracking-widest ${Ink} ${Lean}`,
+	corner: `plate__tape--corner ${Offset} ${Position} ${Lean} ${Fill}`,
+	section: `plate__tape--section ${Lean} ${Fill}`,
+	hero: `plate__tape--hero ${Lean} ${Fill}`,
+	hash: `plate__tape--hash telemetry-tag telemetry-tag--teal ${Lean}`,
+	tab: `plate__tape--tab ${Lean} ${Fill}`,
+	strip: `plate__tape--strip tape-strip ${Lean}`,
+	kicker: `plate__tape--kicker ${Ink} ${Lean}`,
 }[Variant];
 
 /** The hash chip and the kicker are the inline shapes: they sit inside a flow

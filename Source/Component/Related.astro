@@ -1,4 +1,6 @@
 ---
+import "@Stylesheet/Component/Chrome.scss";
+
 import type { InternalLink } from "@Library/Links";
 
 /**
@@ -57,106 +59,27 @@ const Entries = Links.filter(({ Href, Label }) => Boolean(Href) && Boolean(Label
 ---
 
 {Entries.length > 0 && (
-	<nav aria-label="Next steps" class="next-steps w-full">
-		<div class="next-steps__head">
-			<p class="type-meta uppercase tracking-widest text-zinc-dust">{Title}</p>
-			<p class="type-meta uppercase tracking-widest text-zinc-dust">
+	<nav aria-label="Next steps" class="related">
+		<div class="related__head">
+			<p class="related__label">{Title}</p>
+			<p class="related__label">
 				{Entries.length} {Entries.length === 1 ? "DESTINATION" : "DESTINATIONS"}
 			</p>
 		</div>
-		<ul class="next-steps__list">
+		<ul class="related__list">
 			{Entries.map((Link, Position) => (
-				<li class="next-steps__row">
-					<span class="next-steps__ordinal" aria-hidden="true">
+				<li class="related__row">
+					<span class="related__ordinal" aria-hidden="true">
 						{String(Position + 1).padStart(2, "0")}
 					</span>
-					<div class="next-steps__body">
-						<a
-							class="w-fit font-mono text-base text-bone-white underline decoration-stamped-canary decoration-2 underline-offset-4 transition-colors hover:bg-raw-blood hover:text-bone-white"
-							href={Link.Href}
-						>
+					<div class="related__body">
+						<a class="related__link" href={Link.Href}>
 							{Link.Label}
 						</a>
-						{Link.Reason && <p class="type-body text-zinc-dust">{Link.Reason}</p>}
+						{Link.Reason && <p class="related__reason">{Link.Reason}</p>}
 					</div>
 				</li>
 			))}
 		</ul>
 	</nav>
 )}
-
-<style>
-	/* THE MODULE'S RULE. One hairline above the whole block, in the chapter-rule
-	   token: the module closes the page, and the same rule that opens a chapter
-	   is what separates the argument from what follows it. */
-	.next-steps {
-		border-top: 1px solid var(--blueprint-rule);
-		padding-block-start: var(--space-reading);
-	}
-
-	/* THE HEAD ROW: the module's name on the left, its size on the right, on one
-	   baseline. `flex-wrap` because at 390px the two labels are wider than the
-	   column and must stack rather than shrink the type. */
-	.next-steps__head {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 0.5rem 1rem;
-	}
-
-	/* THE MATRIX. Rows, each a two-column grid: a fixed ordinal gutter and the
-	   reading column. Hairlines between rows and none above the first, because
-	   the module's own rule is already there - two rules 12px apart read as one
-	   thick one. */
-	.next-steps__list {
-		display: flex;
-		flex-direction: column;
-		margin-block-start: var(--space-reading);
-	}
-
-	.next-steps__row {
-		display: grid;
-		grid-template-columns: 2.5rem minmax(0, 1fr);
-		gap: 0 var(--space-reading);
-		align-items: start;
-		padding-block: 0.875rem;
-		border-top: 1px solid var(--tier-shell-edge);
-	}
-
-	.next-steps__row:first-child {
-		border-top: 0;
-		padding-block-start: 0;
-	}
-
-	.next-steps__ordinal {
-		font-family: "JetBrains Mono", monospace;
-		font-size: 11px;
-		font-weight: 700;
-		line-height: 1.6;
-		letter-spacing: 0.08em;
-		font-variant-numeric: tabular-nums;
-		color: var(--zinc-dust);
-	}
-
-	/* The destination and its reason share the reading column: `space-tight`
-	   between them (a label and its value), never the paragraph rhythm, because
-	   the reason belongs to the label rather than following it. */
-	.next-steps__body {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-tight);
-		min-width: 0;
-	}
-
-	/* ONE MEASURE FOR THE REASON, IN REM. The reason is a sentence, so it takes
-	   the reading column's width up to the measure the site already uses for body
-	   copy - 40rem, about 71 characters. The plate this replaced capped it at
-	   `62ch`, which is not 62 characters: `ch` is the width of the "0" glyph, and
-	   in DM Sans that computed to 763px, roughly 84 characters. On a 1440px shell
-	   the uncapped row would run past 200 characters, which is not a line anyone
-	   reads - so the cap stays, in the unit that means what it says. */
-	.next-steps__body p {
-		max-width: 40rem;
-	}
-</style>

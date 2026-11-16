@@ -76,17 +76,11 @@
 	src: url("/Font/dm-sans-latin.woff2") format("woff2");
 }
 
-/* Halftone red dot screen (risograph) */
-.halftone-screen {
-	background-image: radial-gradient(rgba(147, 17, 40, 0.28) 1.5px, transparent 1.5px);
-	background-size: 13px 13px;
-}
-
-/* Photocopy grit (newsprint tooth) */
-.photocopy-grit {
-	background-image: radial-gradient(rgba(222, 219, 210, 0.08) 1px, transparent 1px);
-	background-size: 8px 8px;
-}
+/* Halftone, photocopy, grunge and tape are the SURFACE-TREATMENT layer and now
+   live in `Component/Texture.scss`. The class names are unchanged - the layout
+   still paints `.photocopy-grit` and `.halftone-screen` over the page, the
+   painter still emits `.grunge__ink`, and the tape still wraps a strip - so
+   nothing that reads this sheet needs to know where the rules moved. */
 
 /* Hard offset shadows - zero blur, print misregistration */
 .zine-box-crimson {
@@ -189,77 +183,17 @@
 	}
 }
 
-/* ---- GRUNGE // noise-drawn ink, the asymmetric layer -------------------
+/* ---- GRUNGE // moved to `Component/Texture.scss` -----------------------
 
-   `splat-frame` above was a displaced rectangle: it read as a duplicate that
-   had slipped a few pixels, because a warped box is still a box. Ink does not
-   behave that way - it leaves a body, throws lobes, and drops satellites - so
-   this layer is DRAWN, not displaced. `Script/Grunge.ts` builds the geometry in
-   the browser from simplex noise (body outline riding the noise field, rounded
-   lobes, power-curve droplets) and appends one SVG per GROUP of five splats,
-   each with its own seed, scale, rotation and ink weight.
+   The grunge layer is a surface treatment, so it lives with the other print
+   layers: `.grunge`, `.grunge__ink`, the ink variants (`--oxblood`, `--bone`,
+   `--faint`) and the reduced-motion rule are all in `Component/Texture.scss`,
+   with the ink palette as variables.
 
-   HOW MUCH ink a surface takes is a density score drawn from that same noise
-   field and biased by the surface behind the element: a TRANSPARENT plate (no
-   fill of its own - a band, a split column, a pods panel) gets 6-8 groups,
-   larger and pushed out to its edges, because the ink is the only thing marking
-   its edge; a FILLED plate gets 0-2, smaller and fainter, because the fill
-   already separates it from the page. The table is `Density` in
-   `Script/Grunge.ts` and nothing here overrides it - this block only positions
-   a group and holds the ink tokens.
-
-   The ink is a real SVG element, coloured by `color` and sized by the custom
-   properties below, so one drawing serves every region: oxblood behind a dark
-   plate, bone behind a crimson band, whatever the region needs. */
-
-.grunge {
-	position: relative;
-	isolation: isolate;
-}
-
-/* The ink is a REAL SVG element in the document, not a mask over a pseudo-element.
-   A mask is rasterised to the element's box, so anything the drawing puts outside
-   that box - arms and droplets thrown past the plate edge - was clipped off. An
-   inline SVG with a padded viewBox renders the whole splat, can be inspected in
-   the DOM, and takes its colour from `color`, so one drawing serves every ink. */
-.grunge__ink {
-	position: absolute;
-	left: var(--grunge-x, -10%);
-	top: var(--grunge-y, -10%);
-	width: var(--grunge-w, 70%);
-	height: var(--grunge-h, 70%);
-	z-index: var(--grunge-z, -1);
-	pointer-events: none;
-	color: var(--grunge-ink-color, rgb(214, 205, 190));
-	fill: currentColor;
-	opacity: var(--grunge-opacity, 0.16);
-	transform: rotate(var(--grunge-rot, 0deg));
-	overflow: visible;
-}
-
-/* Every group registers ITSELF: position, size and turn are its own, so two
-   sections never bleed identically - and neither do two groups on one plate. */
-
-/* Ink by region, not by habit: the same drawing reads as a dark stain on the
-   page ground and as a light bloom on a crimson band. Colour and weight are two
-   knobs, so a plate can be tinted without redrawing it. */
-.grunge--oxblood {
-	--grunge-ink-color: rgb(147, 17, 40);
-	--grunge-opacity: 0.5;
-}
-.grunge--bone {
-	--grunge-ink-color: rgb(236, 233, 224);
-	--grunge-opacity: 0.18;
-}
-.grunge--faint {
-	--grunge-opacity: 0.1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.grunge__ink {
-		transform: none;
-	}
-}
+   `Script/Grunge.ts` still owns the geometry and the density table - it appends
+   one SVG per group and positions each through the `--grunge-*` properties -
+   and the ARRANGEMENT of a grunge plate is still this sheet's business:
+   `.band--split > .grunge` below places one in the split column. */
 
 /* ---- LAYOUT BANDS // the Stitch composition, our surface ----------------
 
@@ -372,6 +306,50 @@
 	}
 }
 
+/* ---- GRUNGE INK // RESTORED ------------------------------------------
+
+   These rules were moved to `Stylesheet/Component/Texture.scss` while that
+   partial's entry point (`System.scss`) does not exist yet, so nothing was
+   importing them: the ink SVGs fell back to the SVG default fill - BLACK -
+   and painted solid black splats over the page. Until `System.scss` is wired,
+   the live stylesheet has to carry them. Delete this block the moment the
+   entry point imports `Component/Texture`, or the values will fork. */
+
+.grunge__ink {
+	position: absolute;
+	left: var(--grunge-x, -10%);
+	top: var(--grunge-y, -10%);
+	width: var(--grunge-w, 70%);
+	height: var(--grunge-h, 70%);
+	z-index: var(--grunge-z, -1);
+	pointer-events: none;
+	color: var(--grunge-ink-color, rgb(214, 205, 190));
+	fill: currentColor;
+	opacity: var(--grunge-opacity, 0.16);
+	transform: rotate(var(--grunge-rot, 0deg));
+	overflow: visible;
+}
+
+.grunge--oxblood {
+	--grunge-ink-color: rgb(147, 17, 40);
+	--grunge-opacity: 0.5;
+}
+
+.grunge--bone {
+	--grunge-ink-color: rgb(236, 233, 224);
+	--grunge-opacity: 0.18;
+}
+
+.grunge--faint {
+	--grunge-opacity: 0.1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.grunge__ink {
+		transform: none;
+	}
+}
+
 /* A telemetry chip row: status, version, prerequisites. */
 .chips {
 	display: flex;
@@ -379,29 +357,11 @@
 	gap: var(--space-tight);
 }
 
-.tape-staple {
-	position: relative;
-}
-
-.tape-staple::before {
-	content: "";
-	position: absolute;
-	width: 14px;
-	height: 3px;
-	background: #73717b;
-	top: 6px;
-	left: 12px;
-	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
-	transform: rotate(-3deg);
-	z-index: 30;
-}
-
-.tape-strip {
-	background: rgba(222, 219, 210, 0.15);
-	backdrop-filter: blur(1px);
-	border-left: 1px dashed rgba(255, 255, 255, 0.2);
-	border-right: 1px dashed rgba(255, 255, 255, 0.2);
-}
+/* The tape textures - the strip's translucent fill and torn short edges, and the
+   staple that pins one down - live in `Component/Texture.scss` with the rest of
+   the surface treatments. Only the LABEL voice still names them here (`.tape-
+   strip` / `.tape-staple` in the no-mid-word-break group below), because that
+   rule is typography and applies to the class wherever it is painted. */
 
 html {
 	-webkit-tap-highlight-color: transparent;

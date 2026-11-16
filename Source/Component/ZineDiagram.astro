@@ -1,7 +1,7 @@
 ---
 /**
- * ZineDiagram - one diagram, framed as a console pod: a header ribbon that
- * names it, a RECESSED CHANNEL holding the drawing, a footer ribbon carrying
+ * ZineDiagram - one figure, framed as a console pod: a header ribbon that
+ * names it, a RECESSED CHANNEL holding the payload, a footer ribbon carrying
  * the caption. The arrangement is the Stitch console grammar applied to a
  * figure - ribbon, channel, ribbon - and the surface is ours: the crimson
  * module boundary, the hard offset plane and the carbon-void ribbons are
@@ -9,15 +9,51 @@
  * LIGHTER than the plate's own so it reads as depth rather than as one more
  * panel.
  *
+ * TWO PAYLOADS, ONE POD. `Svg` is a raw-imported Mermaid drawing; `Tree` is an
+ * ASCII directory tree written as rows. They are the same thing to this
+ * component - a body of lines the reader scans for structure - so they share
+ * the frame, the channel and the caption, and a page never hand-rolls a second
+ * tree markup beside a diagram. The pod does not DRAW the tree: the
+ * box-drawing glyphs live in `Text`, byte for byte, because the tree a reader
+ * copies must be the tree that was authored.
+ *
  * ZineDiagramNav is attached below: it builds the figure's numbered stage row
  * (one entry per node, in the SVG's own order) and owns the hover highlight,
- * so a diagram is navigable by name and not only by pointing at a box.
+ * so a diagram is navigable by name and not only by pointing at a box. A tree
+ * pod carries no `<svg>`, so the nav passes it by - a row naming nothing is a
+ * row it does not emit.
  */
 import ZineDiagramNav from "./ZineDiagramNav.astro";
 
+/** One row of an ASCII tree: the line as it prints, and the annotation that
+ *  explains it. */
+interface TreeLine {
+	/** The row exactly as it prints, box-drawing glyphs included. */
+	Text: string;
+
+	/** The annotation after the row - who writes it, or what it is. */
+	Note?: string;
+
+	/** The row's ink. Identity, not emphasis: a directory and a file are
+	 *  different things, and the tree has no other way to say which is which. */
+	Tone?: "node" | "leaf" | "mute";
+
+	/** Indent in levels: 0 is the root, 1 one level down. */
+	Depth?: number;
+}
+
 interface Props {
 	/** The raw-imported Mermaid SVG (e.g. `import X from "...svg?raw"`). */
-	Svg: string;
+	Svg?: string;
+
+	/** An ASCII tree, as rows - used instead of `Svg` when the payload is a
+	 *  directory listing rather than a drawing. */
+	Tree?: TreeLine[];
+
+	/** Extra ribbon chips: a path, an owner count, the section's own name.
+	 *  They render at the `.telemetry-tag` voice, so they read as metadata and
+	 *  never as an action. */
+	Tags?: string[];
 
 	/** The diagram id written to data-diagram; also the figcaption prefix. */
 	Name: string;
@@ -30,9 +66,19 @@ interface Props {
 	Links?: Record<string, string>;
 }
 
-const { Svg, Name, Caption, Links } = Astro.props;
+const { Svg, Tree, Tags = [], Name, Caption, Links } = Astro.props;
 
 const LinkAttribute = Links ? JSON.stringify(Links) : undefined;
+
+const Ink: Record<string, string> = {
+	node: "text-bone-white",
+	leaf: "text-bone-newsprint",
+	mute: "text-zinc-dust",
+};
+
+/** Indent is a table, not arithmetic in a class string: Tailwind has to SEE a
+ *  class to emit it, so `pl-${Depth * 4}` would emit nothing at all. */
+const Indent = ["pl-0", "pl-4", "pl-8", "pl-12", "pl-16"];
 ---
 
 <figure
@@ -40,21 +86,55 @@ const LinkAttribute = Links ? JSON.stringify(Links) : undefined;
 	data-diagram={Name}
 	data-diagram-links={LinkAttribute}
 >
-	<!-- THE RIBBON: the diagram's own name, at the section-index voice. It names
+	<!-- THE RIBBON: the figure's own name, at the section-index voice. It names
 	     the figure the way the fence ribbon names a file, so a reader meeting
-	     three diagrams in a row can tell which one they are looking at before
-	     reading the caption under it. -->
-	<div class="flex items-center gap-3 border-b border-[var(--tier-shell-edge)] bg-carbon-void px-4 py-2">
+	     three figures in a row can tell which one they are looking at before
+	     reading the caption under it. The chips after the dashed rule are the
+	     payload's own metadata - a path, an owner count - never a control. -->
+	<div
+		class="flex flex-wrap items-center gap-3 border-b border-[var(--tier-shell-edge)] bg-carbon-void px-4 py-2"
+	>
 		<span class="section-index">{Name}</span>
 		<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
+		{
+			Tags.map((Tag) => (
+				<span class="telemetry-tag">{Tag}</span>
+			))
+		}
 	</div>
-	<!-- THE CHANNEL: the drawing sits in the recessed tier, inset from the plate
+	<!-- THE CHANNEL: the payload sits in the recessed tier, inset from the plate
 	     on all four sides, so the ribbons above and below read as the pod's
-	     edges and the diagram reads as the thing the pod holds. -->
-	<div class="well m-4 overflow-x-auto p-3 [&_svg]:h-auto" set:html={Svg} />
+	     edges and the payload reads as the thing the pod holds. -->
+	{
+		Tree ? (
+			<div class="well m-4 overflow-x-auto p-3">
+				<div class="font-mono text-code leading-relaxed">
+					{Tree.map(({ Text, Note, Tone = "leaf", Depth = 0 }) => (
+						<div
+							class:list={[
+								"flex items-baseline gap-3",
+								Indent[Depth] ?? "pl-0",
+							]}
+						>
+							<span class:list={["whitespace-pre", Ink[Tone]]}>
+								{Text}
+							</span>
+							{Note ? (
+								<span class="min-w-0 text-zinc-dust">← {Note}</span>
+							) : null}
+						</div>
+					))}
+				</div>
+			</div>
+		) : (
+			<div class="well m-4 overflow-x-auto p-3 [&_svg]:h-auto" set:html={Svg} />
+		)
+	}
 	<!-- THE FOOTER RIBBON: the same band as the header, in the same fill, so the
 	     frame closes the way it opened. -->
-	<figcaption class="border-t border-[var(--tier-shell-edge)] bg-carbon-void px-4 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+	<figcaption
+		class="border-t border-[var(--tier-shell-edge)] bg-carbon-void px-4 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
+	>
 		{Caption}
 	</figcaption>
 </figure>

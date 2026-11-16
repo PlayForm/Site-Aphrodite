@@ -1,0 +1,759 @@
+/* Data - the measurement surfaces: matrix, dossier, readout, worked example.
+   ---------------------------------------------------------------------------
+
+   Everything on this sheet is a DATA SURFACE: the part of a page that presents
+   readings, comparisons and evidence rather than prose. Four blocks live here,
+   and they share one grammar - a frame, a band that names what the frame holds,
+   and hairlines between records instead of a box per cell.
+
+     .ledger     a matrix: one row per record, tabular figures down a column,
+                 an optional caption band naming the columns.
+     .dossier    two evidence columns read as ONE comparison: paired rows, one
+                 gutter, the same two tracks in the heads and in the rows.
+     .statbar    a figure, its unit in the label voice, and the track that
+                 measures it.
+     .example    one worked example: the raw input on one side, what the model
+                 kept on the other, and the seam where one became the other.
+
+   A data surface is not a prose block with numbers in it. The differences are
+   the ones this sheet owns and no page should re-state: the digits are tabular
+   and right-aligned so a column aligns on the decimal, the rows are separated by
+   one hairline each rather than drawn as a grid of boxes, and the accent colour
+   is IDENTITY - it says which kind of reading a value is, and it survives at
+   every emphasis level.
+
+   WHY THE ACCENTS ARE VARIABLES
+   The same four inks carry the same four meanings across all four surfaces: a
+   measured reading is teal, an estimated one canary, a simulated one crimson,
+   and a figure the reader must not miss is bone. Writing `var(--stamped-canary)`
+   at nine call sites makes nine decisions out of one, so the palette is stated
+   once here and the rules read by ROLE. The token itself still lives in
+   `Global.css` `:root` - these variables are aliases, not a second palette, and
+   a value may not change here without changing it there. The kind CHIPS
+   (`.telemetry-tag--teal`, `--canary`, `--crimson`, `--bone`) stay in
+   `Global.css`: a chip is shared vocabulary across the whole site, and this
+   sheet is not the place a second spelling of it is invented.
+
+   WHAT IS DELIBERATELY NOT HERE
+   Motion. A plate's rotation, its hover settle and a stat bar's pre-hide are
+   states of the page, not the geometry of a reading, so they stay with the
+   component that binds them (and the pre-hide with the script that releases it).
+   A surface that moves is not a different surface. */
+
+/* ---- MEASUREMENT ACCENTS ----------------------------------------------- */
+
+/* A measured reading. Teal is the instrument's own voice on this site. */
+$measured: var(--weathered-teal);
+
+/* An estimated reading: computed from a band, not observed. */
+$estimated: var(--stamped-canary);
+
+/* A simulated reading - the fourth session shape that never happened. */
+$simulated: var(--blood-crimson);
+
+/* The figure the block is built around. Bone, so the number is the loudest
+   thing on a surface whose body copy is newsprint. */
+$figure: var(--bone-white);
+
+/* ---- SURFACE INKS ------------------------------------------------------- */
+
+/* The fill a bar or a stamp takes when its identity is the blood family. Not
+   one of the four accents: a fill is a ground, not a kind of reading. */
+$raw-fill: var(--raw-blood);
+
+/* The muted ink of a caption, a unit or a scope - a label, never a sentence. */
+$ink-muted: var(--zinc-dust);
+
+/* The body ink of a cell a reader studies. */
+$ink-body: var(--bone-newsprint);
+
+/* ========================================================================
+   THE MATRIX - .ledger
+   ======================================================================== */
+
+/* The table itself. `min-width` is a FLOOR, not a size: at a narrow viewport the
+   tracks stop shrinking and the scroll container below moves the rows, because a
+   matrix squeezed to four characters a column is not a denser matrix, it is an
+   unreadable one. The floor is a variable so a matrix with wider figures (a
+   study's token counts) states its own, and the rule here stays one. */
+.ledger {
+	width: 100%;
+	min-width: var(--ledger-min, 42rem);
+	border-collapse: collapse;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem;
+	line-height: 1.5rem;
+	/* The matrix's default ink lives on the TABLE, not on each cell: a cell that
+	   needs another voice (a muted unit, a bone figure) carries its own class, and
+	   a class always beats an inherited value - so the two never have to agree
+	   about which sheet loads last. */
+	color: $ink-body;
+}
+
+/* The scroll container is the INNER box and the plate is the OUTER one. Not
+   cosmetic: `overflow` on the plate would clip the grunge ink's own bleed and
+   its negative offsets would register as scrollable overflow, putting scrollbars
+   on the matrix for a drawing that is behind it. */
+.ledger__scroll {
+	overflow-x: auto;
+}
+
+/* The caption band: a real band, not a line of small text. The asphalt fill and
+   the stronger rule under it are the ribbon the readings hang from. */
+.ledger__band {
+	background-color: var(--asphalt-panel);
+}
+
+.ledger__bandrow {
+	border-bottom: 1px solid var(--tier-well-edge);
+}
+
+/* A column caption. The label voice supplies size, tracking and family through
+   `.type-meta` at the call site; this rule owns the rest of what makes it a
+   caption rather than a cell: it is black, uppercase, one line tall, and it
+   reads left even where the column it names is right-aligned.
+
+   `!important` is inherited from the extraction: the caption used to carry
+   `!font-black` because `.type-meta` declares weight 500 and the sheet that
+   declares it is not guaranteed to load before this one. Same reason, same
+   idiom. */
+.ledger__head {
+	padding: 0.5rem 1rem;
+	font-weight: 900 !important;
+	text-transform: uppercase;
+	white-space: nowrap;
+	text-align: left;
+	color: $ink-muted;
+}
+
+/* A caption for a column whose cells are right-aligned: the caption reads right
+   with them, so the column's head sits over its own digits. */
+.ledger__head--right {
+	text-align: right;
+}
+
+/* A caption that is allowed to wrap. The band's captions are single words and
+   never wrap, but a matrix whose caption is a phrase keeps its own line breaking
+   rather than being forced onto one line. */
+.ledger__head--wrap {
+	white-space: normal;
+}
+
+/* One cell: the matrix's one gutter and its dense row height. Pure geometry, so
+   it is valid on a `<th>` in the band as well as on a `<td>`. */
+.ledger__cell {
+	padding: 0.5rem 1rem;
+	text-align: left;
+}
+
+/* Every cell of a matrix whose content is numeric. Tabular figures are what make
+   a column align on the decimal, and the snug leading is what keeps a row one
+   line tall whether or not the caller padded it. */
+.ledger__cell--numeric {
+	font-variant-numeric: tabular-nums;
+	line-height: 1.375;
+}
+
+/* A numeric column: right-aligned and never wrapped, so the digits line up down
+   the column at every width. */
+.ledger__value {
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+	white-space: nowrap;
+}
+
+/* The one figure a block leads with, at the weight a reading is read at. */
+.ledger__value--strong {
+	font-weight: 900;
+	color: $figure;
+}
+
+/* `Delta` is IDENTITY, not emphasis: a matrix that greyed its deltas would be
+   quieter and would stop saying which direction a reading moved. */
+.ledger__cell--up {
+	color: $estimated;
+}
+
+.ledger__cell--down {
+	color: $measured;
+}
+
+/* The arrow is part of the value, not a decoration beside it: it carries the
+   direction in the same ink as the figure it qualifies. */
+.ledger__arrow {
+	margin-right: 0.25rem;
+	font-weight: 900;
+}
+
+/* A body row. Rows are separated by ONE hairline each - no box per cell, no
+   vertical rules - and the last row closes the matrix rather than adding a rule
+   under it. The rule's colour is `currentColor`, which is what the row actually
+   renders: the extraction found the caller's `border-oxblood-dark/60` emits no
+   declaration at all under Tailwind 3.4 for a `var()`-backed colour, so the
+   hairline has always been drawn in the row's own ink. This rule states what is
+   drawn; changing it to the intended 60% oxblood would be a design change, not
+   an extraction. */
+.ledger__row {
+	border-bottom: 1px solid currentColor;
+	vertical-align: top;
+}
+
+.ledger__row:last-child {
+	border-bottom-width: 0;
+}
+
+/* A reading under the pointer is the one the reader is asking about. */
+.ledger__row:hover {
+	background-color: color-mix(in srgb, var(--raw-blood) 10%, transparent);
+}
+
+/* The matrix's own ribbon: what was measured, and over what corpus. Two
+   telemetry tags on their own band, the way a pod's header names what produced
+   the bytes in the well beneath it. */
+.ledger__ribbon {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	border-bottom: 1px solid var(--oxblood-dark);
+	background-color: var(--asphalt-panel);
+	padding: 0.625rem 1rem;
+}
+
+/* The dominant cell: the one result, with its crimson spine. The plate is built
+   around it, so it reads as the figure the grid belongs to rather than as a
+   caption above a table. */
+.ledger__lead {
+	border-left: 2px solid $simulated;
+	padding: 1.5rem 1rem;
+}
+
+@media (min-width: 640px) {
+	.ledger__head,
+	.ledger__cell {
+		padding-left: 1.25rem;
+		padding-right: 1.25rem;
+	}
+
+	.ledger__ribbon,
+	.ledger__lead {
+		padding-left: 1.25rem;
+		padding-right: 1.25rem;
+	}
+}
+
+/* ========================================================================
+   THE DOSSIER - .dossier
+   ======================================================================== */
+
+/* One comparison, not two panels of prose that happen to sit side by side. The
+   frame, the fill and the one gutter step belong to the surface; the plate's
+   shadow tone and its lean are the caller's (`zine-box-*` plus the `Rotate`
+   prop), because that is the plate's identity and not the comparison's. */
+.dossier {
+	position: relative;
+	border: 4px solid $simulated;
+	background-color: var(--carbon-void);
+	padding: 1.5rem;
+}
+
+@media (min-width: 640px) {
+	.dossier {
+		padding: 2.5rem;
+	}
+}
+
+/* The header band: the stamp names the dossier and a hairline closes the band,
+   so both columns start from one line instead of from the plate's own padding. */
+.dossier__band {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	border-bottom: 1px solid var(--tier-shell-edge);
+	padding-bottom: 0.75rem;
+}
+
+/* The stamp: the dossier's own name, printed as a stamp rather than a heading,
+   because it names the evidence rather than introducing a section. */
+.dossier__stamp {
+	border: 2px solid #000000;
+	background-color: $raw-fill;
+	padding: 0.25rem 0.75rem;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem;
+	line-height: 1.5rem;
+	font-weight: 900;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: $figure;
+	box-shadow: 3px 3px 0px #000000;
+}
+
+/* The dashed rule that carries the band from the stamp to its far edge. */
+.dossier__rule {
+	height: 0;
+	flex-grow: 1;
+	border-top: 1px dashed var(--oxblood-dark);
+}
+
+/* The column heads sit on the SAME two tracks as the rows below, so the field is
+   declared before the comparison starts: a reader knows which side is which
+   without inferring it from the first label. */
+.dossier__heads {
+	display: grid;
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+	border-bottom: 1px solid var(--oxblood-dark);
+}
+
+/* One side's head. */
+.dossier__column {
+	display: flex;
+	align-items: baseline;
+	gap: 0.75rem;
+	padding-bottom: 0.5rem;
+	padding-top: 1rem;
+}
+
+/* The side's name, in the section-index voice for its number and the mono label
+   voice for its caption - the caption is what a reader reads, so it is black. */
+.dossier__caption {
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem;
+	line-height: 1.5rem;
+	font-weight: 900;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: $estimated;
+}
+
+/* One comparison: entry N of the left column and entry N of the right sit on ONE
+   band, so the two labels begin on the same line and the rule between bands runs
+   the full width of both. */
+.dossier__row {
+	display: grid;
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+/* Every band after the first is closed by a rule that runs across both columns -
+   which is what makes the pair read as one record with two parts. */
+.dossier__row--ruled {
+	border-top: 1px solid var(--oxblood-dark);
+}
+
+/* One side of a paired band. */
+.dossier__cell {
+	min-width: 0;
+	padding-top: 1.25rem;
+	padding-bottom: 1.25rem;
+}
+
+/* A side with no entry for this row renders an empty cell rather than closing the
+   gap: an unpaired entry keeps its own band instead of disappearing, and no
+   placeholder word is printed to fill it. */
+.dossier__label {
+	font-weight: 900 !important;
+	text-transform: uppercase;
+	color: $figure;
+}
+
+.dossier__text {
+	margin-top: 0.25rem;
+	font-family: "DM Sans", sans-serif;
+	font-size: 1rem;
+	line-height: 1.625;
+	color: $ink-body;
+}
+
+@media (max-width: 1023.98px) {
+	/* Stacked, the two sides are separated by a dashed rule - the same tear the
+	   seam uses in a worked example, so a stacked comparison still reads as one
+	   record split across two lines rather than as two lists. */
+	.dossier__cell--right {
+		border-top: 1px dashed var(--oxblood-dark);
+	}
+}
+
+@media (min-width: 1024px) {
+	.dossier__heads,
+	.dossier__row {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0;
+	}
+
+	/* The gutter hairline is the ONLY thing between the two claims. */
+	.dossier__cell--left {
+		padding-right: 4rem;
+	}
+
+	.dossier__cell--right {
+		border-left: 1px solid var(--tier-shell-edge);
+		padding-left: 4rem;
+	}
+
+	.dossier__column--right {
+		border-left: 1px solid var(--tier-shell-edge);
+		padding-left: 4rem;
+	}
+}
+
+/* ========================================================================
+   THE READOUT - .statbar
+   ======================================================================== */
+
+/* The readout is read in one order and only that order: the label, the figure,
+   its unit, then the track that measures it. The colour is stated ONCE on the
+   block and the parts read it, so a caller picks a tone and the figure and the
+   bar can never disagree about which reading they are showing.
+
+   `--statbar-text` is separate from `--statbar-fill` on purpose: `--raw-blood` is
+   a FILL token and as text on soot-black it measures 2.23:1, so a raw bar prints
+   its figure in the heading ink while the bar keeps the raw fill, which is where
+   the variant's identity lives. */
+.statbar {
+	--statbar-fill: #{$measured};
+	--statbar-text: #{$measured};
+}
+
+.statbar--raw {
+	--statbar-fill: #{$raw-fill};
+	--statbar-text: #{$figure};
+}
+
+.statbar--canary {
+	--statbar-fill: #{$estimated};
+	--statbar-text: #{$estimated};
+}
+
+/* The tight label: mono, uppercase, black, one line above its own figure. It is a
+   label, not a sentence - the sentence that explains the figure belongs to the
+   page, which is the only thing that knows the context. */
+.statbar__label {
+	margin: 0;
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	line-height: 1.4;
+	font-weight: 900 !important;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: $figure;
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+}
+
+/* The figure and its unit. `.metric` is a block, so the numeral and the unit's
+   span stay inline on one baseline - no flex here, because the sheet that
+   declares `.metric` also declares `display: block` and would win. */
+.statbar__figure {
+	margin-top: 0.5rem;
+}
+
+/* The numeral takes the block's tone. `!important` because `.metric` declares its
+   own colour and the two sheets' load order is not something a surface may
+   depend on. */
+.statbar__value {
+	color: var(--statbar-text) !important;
+}
+
+/* The word that keeps a number honest ("ESTIMATED", "PER CALL", "MEASURED"), in
+   the label voice - legible where the giant figure would swallow a sentence. */
+.statbar__qualifier {
+	margin-top: 0.5rem;
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	line-height: 1.4;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: $ink-muted;
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+}
+
+/* The track runs under both and takes the full width, because a bar whose length
+   encodes a percentage must not be sized by the figure above it. */
+.statbar__track {
+	margin-top: 0.75rem;
+	display: flex;
+	height: 1rem;
+	width: 100%;
+	overflow: hidden;
+}
+
+.statbar__fill {
+	height: 100%;
+	background-color: var(--statbar-fill);
+}
+
+/* ========================================================================
+   THE WORKED EXAMPLE - .example
+   ======================================================================== */
+
+/* The pre-assembled form of one example: the raw input pod, the seam, and the
+   preview the model kept, in one plate. The plate's tone, its lean and its
+   motion are the caller's; the arrangement is the surface's. */
+.example__plate {
+	padding: 1rem;
+	padding-top: 1.75rem;
+}
+
+@media (min-width: 640px) {
+	.example__plate {
+		padding: 1.5rem;
+		padding-top: 2rem;
+	}
+}
+
+/* The outcome and provenance chips sit on their own line above the pair: they
+   name what happened to the bytes before the reader looks at the bytes. */
+.example__tags {
+	margin-bottom: 1rem;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+/* THE DUAL PODS. The middle track is the seam, sized to the word it carries, so
+   the two pods are one band with a mechanism between them rather than two
+   columns that happen to sit next to each other. */
+.example__pods {
+	display: grid;
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+/* One pod: a header ribbon and the channel beneath it. `min-width: 0` lets the
+   pod take the row's width instead of being widened by an unbreakable token in
+   its own stream. */
+.example__pod {
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+}
+
+/* A pod's header ribbon: the pane's name on the left, its extent or outcome on
+   the right. The band is flush with the channel below it - the ribbon's bottom
+   edge is the channel's top edge, one frame, not two. */
+.example__ribbon {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	column-gap: 0.75rem;
+	border: 1px solid var(--oxblood-dark);
+	border-bottom-width: 0;
+	background-color: var(--asphalt-panel);
+	padding: 0.375rem 0.75rem;
+}
+
+/* A ribbon whose contents do not need pushing apart (a single label, or a
+   coordinate and its name). */
+.example__ribbon--packed {
+	justify-content: flex-start;
+	gap: 0.75rem;
+}
+
+/* The channel a pod holds. A pod body is one frame with its ribbon above it, so
+   the body's own top edge is suppressed. */
+.example__panel {
+	min-width: 0;
+	border: 1px solid var(--oxblood-dark);
+	border-top-width: 0;
+	background-color: var(--carbon-void);
+	padding: 1rem;
+}
+
+@media (min-width: 640px) {
+	.example__panel {
+		padding: 1.25rem;
+	}
+}
+
+/* A list of facts about the exchange (bytes, marker, store, retrieval): one term
+   in the muted ink, one statement in the body ink, on one baseline. */
+.example__facts {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 1rem;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem;
+	line-height: 1.625;
+}
+
+/* THE SEAM. A dashed rule either side of the word: upright between the pods on a
+   wide screen, lying flat between them on a narrow one - the same element,
+   turned, so the pair never reads as two unrelated plates. */
+.example__seam {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.example__seamrule {
+	height: 0;
+	flex-grow: 1;
+	border-top: 1px dashed var(--oxblood-dark);
+}
+
+/* The word says what happened in the gutter - the left side BECAME the right
+   side - so it is never dropped for a decorative mark. */
+.example__seamword {
+	flex-shrink: 0;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem;
+	line-height: 1.5rem;
+	font-weight: 900;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: $ink-muted;
+}
+
+/* The retrieval round trip, printed under the pair: the call that brought the
+   bytes back, in the instrument's voice. */
+.example__retrieval {
+	margin-top: 0.75rem;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem;
+	line-height: 1.625;
+	color: $measured;
+}
+
+/* The pair side by side: two pods of one band, in the order the mechanism runs. */
+.example__grid {
+	margin-top: 2rem;
+	display: grid;
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+	gap: 2rem;
+}
+
+/* A mechanism that runs in stages renders its own order: one column, each stage
+   a numbered band over its own stream. */
+.example__stack {
+	margin-top: 2rem;
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+.example__stages {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+/* A stage's numbered band: the coordinate and the stage's own name in the pod's
+   header ribbon, the stream in the channel beneath it. */
+.example__stage {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.75rem;
+	border: 1px solid var(--oxblood-dark);
+	border-bottom-width: 0;
+	background-color: var(--asphalt-panel);
+	padding: 0.375rem 0.75rem;
+}
+
+/* The stage's name: it can name a URL, and one unbreakable token sets the flex
+   item's min-content width, so the item takes the row's width and the token
+   breaks only because it cannot fit. The label's own words never split. */
+.example__stagename {
+	min-width: 0;
+	overflow-wrap: break-word;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem;
+	line-height: 1.5rem;
+	font-weight: 900;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: $estimated;
+}
+
+/* The inspect fold: one disclosure holding the whole record - the claim, the
+   command, every output line, the retrieval, the threshold, the evidence and the
+   citation. Its summary is a ribbon that closes itself off from the fold's body
+   the moment the fold opens. */
+.example__fold {
+	margin-top: 2.5rem;
+}
+
+.example__foldsummary {
+	display: flex;
+	cursor: pointer;
+	list-style: none;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+	border-bottom: 1px solid transparent;
+	background-color: var(--tier-shell);
+	padding: 0.75rem 1rem;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem;
+	line-height: 1.5rem;
+	color: $ink-body;
+	transition-property: color, border-color;
+	transition-duration: 150ms;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.example__foldsummary:hover {
+	color: $figure;
+}
+
+.example__fold[open] .example__foldsummary {
+	border-bottom-color: var(--tier-well-edge);
+}
+
+/* The fold's own body: one column of blocks, each a subject. */
+.example__foldbody {
+	display: flex;
+	flex-direction: column;
+	gap: 3rem;
+	padding: 1rem;
+}
+
+@media (min-width: 640px) {
+	.example__foldbody {
+		padding: 1.5rem;
+	}
+}
+
+@media (min-width: 1024px) {
+	.example__pods {
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		gap: 0;
+	}
+
+	/* The seam stands upright between the pods and the word turns with it. */
+	.example__seam {
+		flex-direction: column;
+		justify-content: center;
+		gap: 0;
+	}
+
+	.example__seamrule {
+		height: auto;
+		width: 0;
+		border-top-width: 0;
+		border-left: 1px dashed var(--oxblood-dark);
+	}
+
+	.example__seamword {
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+		writing-mode: vertical-rl;
+	}
+
+	.example__grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1.5rem;
+	}
+}

@@ -1,0 +1,766 @@
+/* ============================================================================
+   PLATE - the zine surface: the frame, its plane, its splat, and the parts
+   that sit on it (tape, stamp, button, fold).
+
+   THE LAYER. `Component/Plate` in `System.scss`'s order
+   (_contract -> _tokens -> _mixins -> _base -> **Plate** -> Texture -> Console
+   -> Data -> Chrome -> _utilities). It reads tokens and nothing else: no
+   palette value is restated, no type role is re-derived, no distance the four
+   `--space-*` roles already name is re-chosen.
+
+   WHAT IT OWNS (the vocabulary `_contract.scss` assigns to this file):
+     .zine-box-*      the hard offset planes
+     .splat-frame*    the torn edge
+     .emphasis-*      the three emphasis tiers
+     .tier-*          the elevation fills
+     .shell-card .well  the two surface utilities
+     .plate*          the module plate and its modifiers
+     .plate__tape*    ZineTape's shapes
+     .plate__stamp*   ZineStamp's shapes
+     .button*         ZineButton's action hierarchy
+     .fold*           ZineFold's disclosure
+
+   SECTIONS 1-4 ARE A MOVE, NOT A REWRITE. `.zine-box-*`, `.splat-frame*`,
+   `.emphasis-*`, `.tier-*`, `.shell-card` and `.well` were published in
+   `Global.css`; they are carried here declaration for declaration, in their
+   original order, so nothing renders differently. The copies in `Global.css`
+   are the ones to delete once `System.scss` is the only entry point - while
+   both exist the declarations are identical and the cascade is unchanged.
+
+   SECTIONS 5-9 REPLACE CLASS STRINGS. Each block replaces the Tailwind class
+   string a component carried, declaration for declaration: where the string
+   named a token (`text-bone-white`, `bg-raw-blood`) the block reads the same
+   `var(--token)`; where it named a scale step (`px-3`, `py-1.5`, `text-base`)
+   the block carries that step's resolved value. Nothing is rounded, nothing is
+   re-chosen - the proof of the extraction is that the page renders identically.
+
+   THE CASCADE, AND WHY THREE SELECTORS ARE `:where()`. `Global.css` loads
+   AFTER the Tailwind utility layer (stated at `.section-index` in that file),
+   so a class here beats a utility of equal specificity. That is right for a
+   value the sheet decides and wrong for the three a CALL SITE still decides:
+   the fill, the padding and the lean. Those stay overridable, so
+   `.plate--surface-*` and `.plate--size-*` are `:where()`-scoped (specificity
+   zero) and any `bg-*` / `p-*` utility a page passes still wins, exactly as it
+   did when the component carried utilities. The lean is not a class here at
+   all: `Rotate` accepts a free-form angle per call site, so the component
+   composes that utility itself (see the note in `ZineBox.astro`).
+
+   THE PRESS BLACK is the one colour with no token. `#000000` is not a palette
+   entry - it is the shadow plane of a press misregistration, already spelled
+   literally by `.zine-box-*` - so it is declared once here as `$ink-black`
+   rather than repeated in fifteen declarations.
+   ========================================================================= */
+
+/* ---- INK AND MOTION CONSTANTS ------------------------------------------ */
+
+/* The press plane: the black half of every hard offset shadow. */
+$ink-black: #000000;
+
+/* Tailwind's own easing and duration for `transition-colors` /
+   `transition-transform`, carried literally so a transition here and a
+   transition in a utility run at the same speed. */
+$ease: cubic-bezier(0.4, 0, 0.2, 1);
+$duration: 150ms;
+
+/* THE TAPE VOICE, shared by five of the seven shapes. Declared once: a shape
+   that restates four of these five declarations is how two tapes drift apart. */
+@mixin tape-voice {
+	font-size: 1rem; /* text-base */
+	line-height: 1.5rem;
+	font-weight: 900; /* font-black */
+	text-transform: uppercase;
+	letter-spacing: 0.1em; /* tracking-widest */
+}
+
+/* ----------------------------------------------------------------------------
+   1. PLANES - the hard offset shadow, zero blur, print misregistration
+   ------------------------------------------------------------------------- */
+
+.zine-box-crimson {
+	box-shadow:
+		6px 6px 0px #000000,
+		10px 10px 0px #520612;
+}
+
+.zine-box-subtle {
+	box-shadow:
+		5px 5px 0px #000000,
+		8px 8px 0px #3d040d;
+}
+
+.zine-box-canary {
+	box-shadow:
+		5px 5px 0px #000000,
+		8px 8px 0px #705018;
+}
+
+.zine-box-teal {
+	box-shadow:
+		5px 5px 0px #000000,
+		8px 8px 0px #134643;
+}
+
+/* ----------------------------------------------------------------------------
+   2. SPLAT FRAME - the asymmetric torn edge
+   ------------------------------------------------------------------------- */
+
+.splat-frame {
+	position: relative;
+	isolation: isolate;
+}
+
+.splat-frame::before {
+	content: "";
+	position: absolute;
+	inset: var(--splat-inset);
+	background: var(--splat-ink);
+	/* No blur. The displacement IS the edge; blurring it turns a torn silhouette
+	   back into the soft glow a box-shadow already produces, which is exactly
+	   what the first pass looked like. */
+	filter: url(#splat-edge);
+	transform: rotate(-0.6deg);
+	z-index: -1;
+	pointer-events: none;
+}
+
+.splat-frame--right::before {
+	inset: var(--splat-inset-right);
+	transform: rotate(0.6deg);
+}
+
+.splat-frame--strong::before {
+	background: var(--splat-ink-strong);
+}
+
+/* A dark bleed vanishes against a dark or coloured band. Where the plate sits on
+   the crimson band (the four-stage row), the halo has to go the other way: bone
+   ink at low alpha, which reads as toner that lightened the sheet rather than a
+   shadow that darkened it. Same layer, opposite value. */
+.splat-frame--bone::before {
+	background: rgba(236, 233, 224, 0.1);
+}
+
+/* The filter is a decoration, never a carrier of meaning: where motion is
+   reduced the shape stays, but the displacement is flattened to a plain wash
+   so nothing depends on an animated-looking artefact. */
+@media (prefers-reduced-motion: reduce) {
+	.splat-frame::before {
+		filter: blur(2px);
+	}
+}
+
+/* ----------------------------------------------------------------------------
+   3. EMPHASIS TIERS - the volume knob
+   ------------------------------------------------------------------------- */
+
+/* Each tier is published twice on purpose: `.emphasis-*` is the standalone
+   name a page puts on its own markup, `.plate--*` is the name the plate emits.
+   One block carries both, so there is one budget and two spellings - never two
+   budgets that drift.
+
+   quiet spends nothing: a hairline rule, a 2px crimson left edge, no fill, no
+   shadow, no tilt. It is the tier for a block the reader has to study -
+   methodology, a caveat, a definition list, a long quotation. `Surface`,
+   `Accent`, `Tilt` and `Hover` are inert under quiet by design, so the plate
+   emits no modifier beside this class. */
+.emphasis-quiet,
+.plate--quiet {
+	border: 1px solid var(--outline-oxblood);
+	border-left: 2px solid var(--blood-crimson);
+	border-radius: 0;
+	background-color: transparent;
+	box-shadow: none;
+	transform: none;
+}
+
+/* standard and expressive are the 4px crimson module boundary plus the hard
+   offset shadow, flat. The values mirror `.zine-box-crimson` and the plate's
+   `crimson` tone, so a tier and a plate read as the same surface rather than
+   two near-identical ones.
+
+   The tape is NOT synthesized here on purpose: the zine tape is ZineTape's
+   component (it carries a label, a tone and a side), and a CSS pseudo-strip
+   would double the tape on every plate that already renders one. The tier
+   owns the frame, the shadow plane and the tilt; the tape is the assembly's
+   choice. */
+.emphasis-standard,
+.emphasis-expressive {
+	border: 4px solid var(--blood-crimson);
+	border-radius: 0;
+	background-color: var(--carbon-void);
+	box-shadow:
+		6px 6px 0px #000000,
+		10px 10px 0px var(--oxblood-dark);
+}
+
+.emphasis-expressive {
+	transform: rotate(-1.2deg);
+}
+
+/* Grammar law 3, mobile flattens: a tilt is a desktop reading cue, and on a
+   narrow viewport it spends horizontal room the copy needs. */
+@media (max-width: 639px) {
+	.emphasis-expressive {
+		transform: none;
+	}
+}
+
+/* THE PLATE'S OWN TIER BLOCK. `.plate--standard` and `.plate--featured` are the
+   plate's frame only - no shadow and no transform - because the plate composes
+   those from props: the shadow is the `Tone` / `Accent` plane (a `.zine-box-*`
+   class, always emitted, which is why the tier does not restate it) and the
+   lean is `Tilt` / `Rotate` (a utility the call site may replace).
+
+   `.emphasis-standard` / `.emphasis-expressive` above keep their own shadow and
+   tilt for a page that uses the tier on markup it owns. The plate never emits
+   them: it emits the modifiers below, in the order they must win. */
+.plate--standard,
+.plate--featured {
+	border: 4px solid var(--blood-crimson);
+	border-radius: 0;
+}
+
+/* ----------------------------------------------------------------------------
+   4. ELEVATION - five named depths, and the two surface utilities
+   ------------------------------------------------------------------------- */
+
+/* TIER FILLS - background only, so each composes with whatever frame the caller
+   already has. */
+.tier-canvas {
+	background-color: var(--tier-canvas);
+}
+
+.tier-shell {
+	background-color: var(--tier-shell);
+}
+
+.tier-well {
+	background-color: var(--tier-well);
+}
+
+/* The two COMPLETE tiers. A bare fill is not enough for either: the alert is
+   not an alert without its glow, and a bone sheet with bone type is unreadable,
+   so the carbon ink travels with the ground. */
+.tier-critical {
+	background-color: var(--tier-critical);
+	box-shadow: var(--tier-critical-glow);
+	color: var(--bone-white);
+}
+
+.tier-inverted {
+	background-color: var(--tier-inverted);
+	color: var(--tier-inverted-ink);
+}
+
+/* THE TWO SURFACE UTILITIES. A panel that wants the shell or the well says so
+   and stops hand-rolling a background, an edge and a radius. Padding is
+   deliberately NOT included: the caller's own `p-*` already states how tight
+   the block is, and a second padding here would either double it or fight it.
+
+   GRUNGE SAFETY. Neither class creates a stacking context - no `isolation`, no
+   `z-index`, no `transform`, no `filter`, no `opacity` - so a `.grunge` plate
+   that takes a tier keeps its `.grunge__ink` child painting above the fill and
+   below the copy, exactly as `z-index: -1` inside the plate's isolated context
+   does today. `position: relative` is declared because the ink is absolutely
+   positioned and must resolve against the plate it bleeds out of; with
+   `z-index: auto` that gives a containing block and changes no paint order. */
+.shell-card {
+	position: relative;
+	border: 1px solid var(--tier-shell-edge);
+	border-radius: 0;
+	background-color: var(--tier-shell);
+}
+
+.well {
+	position: relative;
+	border: 1px solid var(--tier-well-edge);
+	border-radius: 0;
+	background-color: var(--tier-well);
+}
+
+/* ----------------------------------------------------------------------------
+   5. THE PLATE
+   ------------------------------------------------------------------------- */
+
+/* Replaces the class list's `relative`. Every child that positions itself
+   against the plate - the corner tape, the wipe bar, the grunge ink - resolves
+   against this box, and `.grunge` / `.motion-wipe-host` rely on it as well. */
+.plate {
+	position: relative;
+}
+
+/* THE FILL. Three legacy values, unchanged byte for byte so no call site moves:
+   `plain` = the module surface (carbon-void, the default); `inset` = the page
+   ground, so the plate reads as a hole in it; `paper` = one sheet above the
+   module surface (asphalt-panel).
+
+   `:where()` because the fill is the one value a call site may still take away:
+   `ZineBox`'s `GrungeSurface` derivation reads a `bg-transparent` class on the
+   caller's `Class` prop and tells the painter the plate has no fill, so that
+   utility must keep winning here or the ink would be drawn for a surface that
+   is no longer transparent.
+
+   The three elevation fills (`canvas`, `shell`, `well`) stay the published
+   `.tier-*` classes, emitted by the component, because those set a background
+   and nothing else and a second spelling of them would be a second place the
+   depth values live. */
+:where(.plate--surface-plain) {
+	background-color: var(--carbon-void);
+}
+
+:where(.plate--surface-inset) {
+	background-color: var(--soot-black);
+}
+
+:where(.plate--surface-paper) {
+	background-color: var(--asphalt-panel);
+}
+
+/* THE BOUNDARY. `Accent` names the frame colour and, through the plane, the
+   shadow that mirrors it. `none` is the quietest framed plate: an oxblood-dark
+   boundary on a subtle plane. Declared after the tier's `border` shorthand, so
+   the colour wins without a specificity argument. */
+.plate--accent-none {
+	border-color: var(--oxblood-dark);
+}
+
+.plate--accent-crimson {
+	border-color: var(--blood-crimson);
+}
+
+.plate--accent-canary {
+	border-color: var(--stamped-canary);
+}
+
+.plate--accent-teal {
+	border-color: var(--weathered-teal);
+}
+
+/* THE PADDING. `:where()` for the same reason as the fill: a call site that
+   passes its own `p-*` / `lg:p-*` owns the padding, and one does
+   (`case-study.astro`'s manifesto open adds `lg:p-16` on a `Size="lg"` plate).
+   Without the zero specificity this block would load after the utility layer
+   and silently win that argument at 3rem instead of 4rem. */
+:where(.plate--size-md) {
+	padding: 1.5rem; /* p-6 */
+
+	@media (min-width: 640px) {
+		padding: 2rem; /* sm:p-8 */
+	}
+}
+
+:where(.plate--size-lg) {
+	padding: 2rem; /* p-8 */
+
+	@media (min-width: 640px) {
+		padding: 3rem; /* sm:p-12 */
+	}
+}
+
+/* HOVER MOTION - the plate straightens under the pointer. Opt-in (`Hover`): a
+   plate that carries copy is not a control, and a plate that leans away when a
+   pointer crosses it tells the reader it can be clicked. Only a plate that IS
+   the affordance asks for it.
+
+   The resting lean is NOT here - it is a utility the component composes from
+   `Tilt` / `Rotate` - so a call site passing its own angle still owns it, while
+   the straighten has to beat that angle on hover. `(0,2,0)` against the
+   utility's `(0,1,0)` does exactly that. */
+.plate--straighten {
+	transition: transform 300ms $ease;
+}
+
+.plate--straighten:hover {
+	transform: none;
+}
+
+/* ----------------------------------------------------------------------------
+   6. THE TAPE - ZineTape's seven shapes
+   ------------------------------------------------------------------------- */
+
+/* Replaces the per-variant class strings. The SHAPE and the PALETTE live here;
+   PLACEMENT does not: `Side`, `Offset` and `Rotate` are props whose values a
+   call site chooses, so `left-6` / `-top-7` / `-rotate-1` stay utilities on the
+   element (the same reason `ZineBox` keeps its `Rotate`). Grammar law 3, the
+   mobile flatten, also stays a utility for the same reason: `max-sm:rotate-0`
+   is emitted by Tailwind after the unprefixed rotation, so it wins the way it
+   always did.
+
+   `corner` keeps the geometry the site ships today - a narrow strip on the
+   module's top edge, 2px of plane - so the pages that already render it are
+   unchanged. */
+
+.plate__tape--corner {
+	position: absolute;
+	z-index: 10;
+	@include tape-voice;
+	border: 1px solid $ink-black;
+	padding: 0.125rem 0.75rem; /* px-3 py-0.5 */
+	box-shadow: 2px 2px 0 $ink-black;
+}
+
+/* The in-flow section stamp, with the full 3rem rhythm under it. */
+.plate__tape--section {
+	@include tape-voice;
+	margin-bottom: 3rem; /* mb-12 */
+	border: 1px solid $ink-black;
+	padding: 0.25rem 0.75rem; /* px-3 py-1 */
+	box-shadow: 3px 3px 0 $ink-black;
+}
+
+/* The brand sticker: mono, a 2px boundary and the 4px plane. ONE per section. */
+.plate__tape--hero {
+	@include tape-voice;
+	border: 2px solid $ink-black;
+	padding: 0.375rem 1rem; /* px-4 py-1.5 */
+	font-family: "JetBrains Mono", monospace;
+	box-shadow: 4px 4px 0 $ink-black;
+}
+
+/* The mechanical voice is the telemetry chip, not a hand-rolled copy of it:
+   11.5px mono, 0.08em tracking, teal OUTLINE on no fill (the modifier's own
+   contrast decision), with the hard plane kept on top so it still reads as a
+   tape rather than as a badge from another design. The chip's own voice comes
+   from `.telemetry-tag`, so this block adds only the plane. */
+.plate__tape--hash {
+	box-shadow: 3px 3px 0 $ink-black;
+}
+
+/* The index tab that hangs above a plate: in flow, pulled up over the top edge
+   by its own negative margin, mono and 3px of plane. */
+.plate__tape--tab {
+	position: relative;
+	z-index: 10;
+	display: inline-block;
+	margin-bottom: -1.75rem; /* -mb-7 */
+	margin-left: 1.5rem; /* ml-6 */
+	@include tape-voice;
+	border: 1px solid $ink-black;
+	padding: 0.375rem 1rem; /* px-4 py-1.5 */
+	font-family: "JetBrains Mono", monospace;
+	box-shadow: 3px 3px 0 $ink-black;
+}
+
+/* The full-bleed file strip across a hero's top edge. Its two hairlines are the
+   bone ink at 30%, so the strip separates from the plate without drawing a
+   third boundary - `color-mix` keeps that from becoming a second copy of the
+   palette. */
+.plate__tape--strip {
+	position: absolute;
+	top: -1.5rem; /* -top-6 */
+	left: 0;
+	z-index: 10;
+	@include tape-voice;
+	border-block: 1px solid color-mix(in srgb, var(--bone-newsprint) 30%, transparent);
+	padding: 0.25rem 1rem; /* px-4 py-1 */
+	color: var(--bone-newsprint);
+}
+
+/* A section identifier with no box: mono, and nothing else. This is what most
+   section labels actually need - the reader has to find the section, not
+   admire the label. */
+.plate__tape--kicker {
+	display: inline-block;
+	@include tape-voice;
+	font-family: "JetBrains Mono", monospace;
+}
+
+/* THE FILL. A tape's colour is a FILL with text on it, and the ink moves only
+   where legibility requires it: bone-white on weathered-teal measures 3.06:1 at
+   16px (below the 4.5:1 floor), soot-black on the same fill is 5.36:1. The fill
+   carries the identity; only the ink moves. */
+.plate__tape--fill-raw {
+	background-color: var(--raw-blood);
+	color: var(--bone-white);
+}
+
+.plate__tape--fill-canary {
+	background-color: var(--stamped-canary);
+	color: var(--soot-black);
+}
+
+.plate__tape--fill-teal {
+	background-color: var(--weathered-teal);
+	color: var(--soot-black);
+}
+
+.plate__tape--fill-bone {
+	background-color: var(--bone-newsprint);
+	color: var(--soot-black);
+}
+
+/* THE INK, for the shape that has no box to fill. `raw` is a chrome colour and
+   never a text colour (the AA-LIFT law), so the section-label voice is dust -
+   which is also what a label should read as. */
+.plate__tape--ink-raw {
+	color: var(--zinc-dust);
+}
+
+.plate__tape--ink-canary {
+	color: var(--stamped-canary);
+}
+
+.plate__tape--ink-teal {
+	color: var(--weathered-teal);
+}
+
+.plate__tape--ink-bone {
+	color: var(--bone-newsprint);
+}
+
+/* ----------------------------------------------------------------------------
+   7. THE STAMP - the expressive accent at its loudest legal volume
+   ------------------------------------------------------------------------- */
+
+/* Replaces `inline-block border-2 border-black px-4 py-1.5 font-mono text-base
+   font-black uppercase tracking-widest shadow-[4px_4px_0px_#000]`. ONE per
+   section: two stamps in one chapter halve each other.
+
+   `Rotate` and the `max-sm:rotate-0` flatten stay utilities on the element -
+   the angle is the call site's, and the flatten has to win against it, which is
+   what Tailwind's variant order already does. */
+.plate__stamp {
+	display: inline-block;
+	border: 2px solid $ink-black;
+	padding: 0.375rem 1rem; /* px-4 py-1.5 */
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem; /* text-base */
+	line-height: 1.5rem;
+	font-weight: 900; /* font-black */
+	text-transform: uppercase;
+	letter-spacing: 0.1em; /* tracking-widest */
+	box-shadow: 4px 4px 0 $ink-black;
+}
+
+/* COLOUR IS IDENTITY, NOT DECORATION. The fill says which evidence the stamp
+   marks - raw = the section's own claim, canary = a highlight, teal = verified,
+   bone = neutral - so the fill never moves to quieten a stamp. Only the ink
+   moves, and only where legibility requires it: a teal stamp takes soot-black
+   ink because bone-white on weathered-teal measures 3.06:1 at the stamp's 16px,
+   below the 4.5:1 floor, while soot-black measures 5.36:1. */
+.plate__stamp--raw {
+	background-color: var(--raw-blood);
+	color: var(--bone-white);
+}
+
+.plate__stamp--canary {
+	background-color: var(--stamped-canary);
+	color: var(--soot-black);
+}
+
+.plate__stamp--teal {
+	background-color: var(--weathered-teal);
+	color: var(--soot-black);
+}
+
+.plate__stamp--bone {
+	background-color: var(--bone-newsprint);
+	color: var(--soot-black);
+}
+
+/* ----------------------------------------------------------------------------
+   8. THE BUTTON - the site's one action control
+   ------------------------------------------------------------------------- */
+
+/* Replaces `inline-block font-mono transition-colors`. The base carries the two
+   things every role shares: the box model and the transition, so a role only
+   states what makes it different. */
+.button {
+	display: inline-block;
+	font-family: "JetBrains Mono", monospace;
+	transition:
+		color $duration $ease,
+		background-color $duration $ease,
+		border-color $duration $ease,
+		text-decoration-color $duration $ease,
+		fill $duration $ease,
+		stroke $duration $ease;
+}
+
+/* primary - FILLED raw-blood, bone-white text, black hairline, hard 3px offset
+   shadow, press collapses both. THE action of a section; a second one competes
+   with the first. */
+.button--primary {
+	border: 1px solid $ink-black;
+	background-color: var(--raw-blood);
+	padding: 0.5rem 1rem; /* px-4 py-2 */
+	font-size: 1rem; /* text-base */
+	line-height: 1.5rem;
+	font-weight: 900; /* font-black */
+	color: var(--bone-white);
+	box-shadow: 3px 3px 0 $ink-black;
+}
+
+/* THE LASER EDGE is the hover grammar of every role that HAS an edge: the
+   border turns stamped-canary under the pointer and under keyboard focus. It is
+   a 1px colour change on a border that already exists, so it costs no layout
+   and adds no shadow - the hard offset plane stays the resting/pressed signal.
+   The global `:focus-visible` ring (2px raw-blood, 2px offset) still applies on
+   top; the laser is an addition for the pointer and for a filled control whose
+   own fill would swallow a crimson ring, never a replacement for the ring. */
+.button--primary:hover {
+	background-color: var(--blood-crimson);
+	border-color: var(--stamped-canary);
+}
+
+.button--primary:focus-visible {
+	border-color: var(--stamped-canary);
+}
+
+/* The press: the control moves onto its own shadow and the shadow goes. */
+.button--primary:active {
+	transform: translate(0.125rem, 0.125rem); /* active:translate-x-0.5 + y-0.5 */
+	box-shadow: none;
+}
+
+/* ghost - a thin oxblood-dark hairline on no fill. An action that must be
+   visible without being THE action: a sibling destination, a "compare the other
+   number". `secondary` is the same treatment under the name the tree already
+   ships, and both resolve to one block so neither can drift. */
+.button--ghost,
+.button--secondary {
+	border: 1px solid var(--oxblood-dark);
+	background-color: transparent;
+	padding: 0.5rem 1rem; /* px-4 py-2 */
+	font-size: 1rem; /* text-base */
+	line-height: 1.5rem;
+	font-weight: 700; /* font-bold */
+	color: var(--bone-newsprint);
+}
+
+.button--ghost:hover,
+.button--secondary:hover {
+	color: var(--bone-white);
+	border-color: var(--stamped-canary);
+}
+
+.button--ghost:focus-visible,
+.button--secondary:focus-visible {
+	border-color: var(--stamped-canary);
+}
+
+/* text - an underlined link, no border, no shadow, no fill. Navigation that
+   belongs inside the argument: "read the source", "see the measured page". It
+   has no border, so it takes the canary underline the edge roles take as a
+   border. */
+.button--text {
+	font-size: 1rem; /* text-base */
+	line-height: 1.5rem;
+	font-weight: 700; /* font-bold */
+	color: var(--bone-newsprint);
+	text-decoration-line: underline;
+	text-decoration-color: var(--oxblood-dark);
+	text-decoration-thickness: 2px; /* decoration-2 */
+	text-underline-offset: 4px; /* underline-offset-4 */
+}
+
+.button--text:hover {
+	color: var(--bone-white);
+	text-decoration-color: var(--stamped-canary);
+}
+
+/* utility - the small neutral control: mono, one step down, dust until it is
+   pointed at. Reserved for SHORT labels (COPY, RUN, OPEN), where uppercase is a
+   mark rather than a shout.
+
+   The tracking is 0.1em, not `--type-meta`'s 0.08em: the class string named
+   `text-meta` AND `tracking-widest`, and Tailwind emits `letter-spacing` after
+   `font-size`, so `tracking-widest` is the value that actually renders. */
+.button--utility {
+	border: 1px solid var(--oxblood-dark);
+	background-color: var(--soot-black);
+	padding: 0.25rem 0.5rem; /* px-2 py-1 */
+	font-size: var(--type-meta);
+	line-height: 1.4;
+	font-weight: 900; /* font-black */
+	text-transform: uppercase;
+	letter-spacing: 0.1em; /* tracking-widest */
+	color: var(--zinc-dust);
+}
+
+.button--utility:hover {
+	color: var(--bone-white);
+	border-color: var(--stamped-canary);
+}
+
+.button--utility:focus-visible {
+	border-color: var(--stamped-canary);
+}
+
+/* ----------------------------------------------------------------------------
+   9. THE FOLD - the quiet disclosure
+   ------------------------------------------------------------------------- */
+
+/* Replaces the whole class list of ZineFold's four elements. ONE top rule, no
+   shadow, no inner card, no fill - a fold is a list item the reader opens, not a
+   plate competing with the argument above it, so consecutive folds read as one
+   list: rule, title, body, rule, title, body.
+
+   The state is a GLYPH rather than a word, and it is driven by the element's
+   own `[open]` attribute: the two markers swap display, so no `group` class and
+   no JavaScript are involved. */
+.fold {
+	border-top: 1px solid var(--oxblood-dark);
+}
+
+.fold__summary {
+	display: flex;
+	align-items: baseline;
+	gap: 0.75rem; /* gap-3 */
+	padding-block: 0.75rem; /* py-3 */
+	cursor: pointer;
+	list-style-type: none; /* list-none */
+	color: var(--bone-newsprint);
+	transition: color $duration $ease;
+}
+
+.fold__summary:hover {
+	color: var(--bone-white);
+}
+
+/* The tag is the published telemetry chip (`.telemetry-tag`), held at its own
+   width so a long title wraps around it instead of squeezing it. */
+.fold__tag {
+	flex-shrink: 0;
+}
+
+/* `leading-snug` (1.375), not `text-base`'s 1.5rem: the class string named both
+   and Tailwind emits `line-height` after `font-size`, so 1.375 is what renders. */
+.fold__label {
+	flex-grow: 1; /* grow */
+	font-family: "DM Sans", sans-serif;
+	font-size: 1rem; /* text-base */
+	font-weight: 700; /* font-bold */
+	line-height: 1.375;
+}
+
+.fold__marker {
+	flex-shrink: 0;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 1rem; /* text-base */
+	line-height: 1.5rem;
+	color: var(--zinc-dust);
+}
+
+/* Closed by default; the pair swaps when the disclosure opens. */
+.fold__marker--open {
+	display: none;
+}
+
+.fold[open] .fold__marker--open {
+	display: inline;
+}
+
+.fold[open] .fold__marker--closed {
+	display: none;
+}
+
+/* `leading-relaxed` (1.625), not `text-base`'s 1.5rem - same reason as the
+   label. */
+.fold__body {
+	padding-bottom: 1rem; /* pb-4 */
+	font-family: "DM Sans", sans-serif;
+	font-size: 1rem; /* text-base */
+	line-height: 1.625;
+	color: var(--bone-newsprint);
+}

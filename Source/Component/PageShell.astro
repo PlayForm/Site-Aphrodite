@@ -42,11 +42,13 @@
  * or `Blueprint` explicitly.
  *
  * BOTH SELECTORS ARE DELIBERATELY WEAK. The chapter rule is written
- * `:where(.shell-main--blueprint) > section`, so it carries element-level
+ * `:where(.shell--blueprint) > section`, so it carries element-level
  * specificity and every utility a page already puts on its own section wins
  * (`border-t border-oxblood-dark` keeps its crimson hairline, `pt-24` keeps its
  * padding). The shell supplies a rule only where a page states none.
  */
+import "@Stylesheet/Component/Chrome.scss";
+
 import Breadcrumbs from "./Breadcrumbs.astro";
 
 interface Props {
@@ -76,60 +78,16 @@ const { Rhythm = "wide", Crumbs = false, Grow = false, Blueprint = !Grow } = Ast
  * Byte-exact from the measured shells: wide is shell A (case-study, examples,
  * hermes, plugin, tools and the rest), dense is shell B (benchmarks, setup,
  * versions), hero is shell C (the landing page's asymmetric top).
+ *
+ * The three rhythms are stylesheet classes now (`.shell--wide/dense/hero` in
+ * Component/Chrome.scss), so a page names its rhythm and writes no padding.
  */
-const RhythmClass = {
-	wide: "gap-16 py-16 lg:gap-20 lg:py-24",
-	dense: "gap-12 py-12 lg:gap-16 lg:py-16",
-	hero: "gap-12 pb-16 pt-10 lg:gap-16 lg:pb-24 lg:pt-12",
-}[Rhythm];
+const RhythmClass = `shell--${Rhythm}`;
 ---
 
 <main
-	class:list={[
-		"shell-main relative z-10 mx-auto flex w-full max-w-[1440px] flex-col px-5 sm:px-8 lg:px-14",
-		Blueprint && "shell-main--blueprint",
-		RhythmClass,
-		Grow && "flex-1",
-	]}
+	class:list={["shell", RhythmClass, Blueprint && "shell--blueprint", Grow && "shell--grow"]}
 >
 	{Crumbs && <Breadcrumbs />}
 	<slot />
 </main>
-
-<style>
-	/* THE RULING. Two 1px gradients crossing at 40px - one hairline per cell edge,
-	   in the chapter-rule token so the grid and the rules are the same colour at
-	   two volumes. `opacity` is the volume knob rather than a second hex: 35% of
-	   #27272a over the page ground lands near #131315, a line the eye finds when
-	   it looks for it and never reads as a border.
-
-	   It is `pointer-events: none` and out of the accessibility tree by
-	   construction (an empty pseudo-element carries no text), and it paints at
-	   `z-index: -1` inside the shell's own stacking context (`z-10`), so it sits
-	   above the page ground and BELOW every plate - a filled surface covers the
-	   ruling, which is what a drawn sheet does. */
-	.shell-main--blueprint::before {
-		content: "";
-		position: absolute;
-		inset: 0;
-		z-index: -1;
-		pointer-events: none;
-		background-image:
-			linear-gradient(to right, var(--blueprint-rule) 1px, transparent 1px),
-			linear-gradient(to bottom, var(--blueprint-rule) 1px, transparent 1px);
-		background-size: 40px 40px;
-		opacity: 0.35;
-	}
-
-	/* THE CHAPTER RULE. `:where()` keeps this at element-level specificity so a
-	   page's own `border-t` / `border-oxblood-dark` / `pt-*` utilities all win:
-	   the shell states a rule only where the page states none, and never
-	   repaints a crimson chapter boundary as a grey one. The inset is the label
-	   distance (`--blueprint-inset`), because the rule is a marker and the head
-	   follows it the way a value follows a label - the shell's own rhythm still
-	   owns the gap BETWEEN chapters. */
-	:where(.shell-main--blueprint) > :global(section) {
-		border-top: 1px solid var(--blueprint-rule);
-		padding-block-start: var(--blueprint-inset);
-	}
-</style>

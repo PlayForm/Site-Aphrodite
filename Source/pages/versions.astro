@@ -240,6 +240,16 @@ const Register = Releases.map((Entry, Index) => ({
 	Status: Entry.Emphasis ? "SHAPE CHANGE" : Index === CurrentIndex ? "CURRENT" : "RELEASE",
 }));
 
+/** THE REGISTER'S ONE GUTTER, and its dense row height. Pure geometry, so the
+ * same string is valid on the band's `<th>` as on a body `<td>` - which is what
+ * keeps the column labels on the columns they name. */
+const CellBox = "px-4 py-2 sm:px-5";
+
+/** The band's label voice. The `!` on the weight is required: `Global.css`
+ * loads after the utility layer, so `.type-meta`'s own 700 wins over a bare
+ * `font-black`. */
+const CellHead = "type-meta whitespace-nowrap !font-black uppercase text-zinc-dust";
+
 // THE CHANGELOG - the current release's own entries, one block per group, with
 // the group labels the CHANGELOG.md subsections carry. `Why` is the line the
 // changelog itself implies but never states: what the group was for.
@@ -544,23 +554,17 @@ const Holes = [0, 1, 2, 3, 4, 5];
 			>
 				<div class="overflow-x-auto">
 					<table class="w-full min-w-[44rem] border-collapse text-left">
-						<thead>
+						<thead class="bg-asphalt-panel">
 							<tr class="border-b border-[color:var(--tier-well-edge)]">
-								<th
-									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
-								>
+								<th scope="col" class:list={[CellHead, CellBox]}>
 									ARTIFACT
 								</th>
-								<th
-									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
-								>
+								<th scope="col" class:list={[CellHead, CellBox]}>
 									SOURCE OF TRUTH
 								</th>
 								<th
 									scope="col"
-									class="type-meta px-4 py-3 text-right font-bold uppercase text-zinc-dust sm:px-5"
+									class:list={[CellHead, "text-right", CellBox]}
 								>
 									STAMP
 								</th>
@@ -568,14 +572,24 @@ const Holes = [0, 1, 2, 3, 4, 5];
 						</thead>
 						<tbody>
 							{Artifacts.map(({ Artifact, Source, Stamp }) => (
-								<tr class="border-b border-[color:var(--tier-shell-edge)] align-top last:border-b-0">
-									<td class="whitespace-nowrap px-4 py-3 font-mono text-code text-bone-white sm:px-5">
+								<tr class="border-b border-oxblood-dark/60 align-top last:border-b-0 hover:bg-[color-mix(in_srgb,var(--raw-blood)_10%,transparent)]">
+									<td
+										class:list={[
+											"whitespace-nowrap font-mono text-code tabular-nums text-bone-white",
+											CellBox,
+										]}
+									>
 										{Artifact}
 									</td>
-									<td class="break-token px-4 py-3 font-mono text-code text-zinc-dust sm:px-5">
+									<td
+										class:list={[
+											"break-token font-mono text-code text-zinc-dust",
+											CellBox,
+										]}
+									>
 										{Source}
 									</td>
-									<td class="whitespace-nowrap px-4 py-3 text-right sm:px-5">
+									<td class:list={["whitespace-nowrap text-right", CellBox]}>
 										<span class="telemetry-tag telemetry-tag--teal">
 											{Stamp}
 										</span>
@@ -808,10 +822,13 @@ const Holes = [0, 1, 2, 3, 4, 5];
 				GitHub release note, which is the long form of the same fact.
 			</p>
 
-			{/* THE MATRIX. Hairline rows, mono identifiers, a status chip per row. The
-			    table keeps its own scroll container so a narrow viewport scrolls the
-			    matrix instead of widening the page, and `min-w` holds the columns at a
-			    readable width rather than squeezing the prose column to a ribbon. */}
+			{/* THE MATRIX. Hairline rows, mono identifiers, a status chip in a FIXED
+			    first column, and the date right-aligned in tabular figures so the
+			    column of stamps aligns on its digits. No card per row: the plate is
+			    one frame around one band of readings. The table keeps its own scroll
+			    container so a narrow viewport scrolls the matrix instead of widening
+			    the page, and `min-w` holds the columns at a readable width rather
+			    than squeezing the prose column to a ribbon. */}
 			<div
 				class="grunge shell-card mt-8 shadow-[6px_6px_0px_#000]"
 				data-grunge
@@ -819,36 +836,24 @@ const Holes = [0, 1, 2, 3, 4, 5];
 			>
 				<div class="overflow-x-auto">
 					<table class="w-full min-w-[58rem] border-collapse text-left">
-						<thead>
+						<thead class="bg-asphalt-panel">
 							<tr class="border-b border-[color:var(--tier-well-edge)]">
-								<th
-									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
-								>
+								<th scope="col" class:list={[CellHead, CellBox]}>
 									STATUS
 								</th>
-								<th
-									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
-								>
+								<th scope="col" class:list={[CellHead, CellBox]}>
 									VERSION
 								</th>
 								<th
 									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+									class:list={[CellHead, "text-right", CellBox]}
 								>
 									DATE
 								</th>
-								<th
-									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
-								>
+								<th scope="col" class:list={[CellHead, CellBox]}>
 									PAIRED WITH
 								</th>
-								<th
-									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
-								>
+								<th scope="col" class:list={[CellHead, CellBox]}>
 									WHAT LANDED
 								</th>
 							</tr>
@@ -868,11 +873,13 @@ const Holes = [0, 1, 2, 3, 4, 5];
 								}) => (
 									<tr
 										class:list={[
-											"border-b border-[color:var(--tier-shell-edge)] align-top last:border-b-0",
+											"border-b border-oxblood-dark/60 align-top last:border-b-0",
 											Current && "tier-inverted",
+											!Current &&
+												"hover:bg-[color-mix(in_srgb,var(--raw-blood)_10%,transparent)]",
 										]}
 									>
-										<td class="whitespace-nowrap px-4 py-4 sm:px-5">
+										<td class:list={[CellBox]}>
 											<span
 												class:list={[
 													"telemetry-tag",
@@ -882,10 +889,10 @@ const Holes = [0, 1, 2, 3, 4, 5];
 												{Status}
 											</span>
 										</td>
-										<td class="whitespace-nowrap px-4 py-4 sm:px-5">
+										<td class:list={["whitespace-nowrap", CellBox]}>
 											<div
 												class:list={[
-													"font-mono text-code font-bold",
+													"font-mono text-code font-bold tabular-nums",
 													Current
 														? "text-carbon-void"
 														: "text-weathered-teal",
@@ -919,7 +926,8 @@ const Holes = [0, 1, 2, 3, 4, 5];
 										</td>
 										<td
 											class:list={[
-												"whitespace-nowrap px-4 py-4 font-mono text-code sm:px-5",
+												"whitespace-nowrap text-right font-mono text-code tabular-nums",
+												CellBox,
 												Current ? "text-oxblood-dark" : "text-zinc-dust",
 											]}
 										>
@@ -927,7 +935,8 @@ const Holes = [0, 1, 2, 3, 4, 5];
 										</td>
 										<td
 											class:list={[
-												"whitespace-nowrap px-4 py-4 font-mono text-code sm:px-5",
+												"whitespace-nowrap font-mono text-code tabular-nums",
+												CellBox,
 												Current ? "text-oxblood-dark" : "text-zinc-dust",
 											]}
 										>
@@ -935,7 +944,8 @@ const Holes = [0, 1, 2, 3, 4, 5];
 										</td>
 										<td
 											class:list={[
-												"min-w-[18rem] max-w-[34rem] px-4 py-4 font-body text-body sm:px-5",
+												"min-w-[18rem] max-w-[34rem] font-body text-body",
+												CellBox,
 												Current
 													? "text-carbon-void"
 													: "text-bone-newsprint",

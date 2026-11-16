@@ -13,6 +13,7 @@ import ConfigKeys from "../Component/ConfigKeys.astro";
 import PageShell from "@Component/PageShell.astro";
 import PageHeader from "@Component/PageHeader.astro";
 import Related from "@Component/Related.astro";
+import "@Stylesheet/Page/Config.css";
 
 // The CONFIG PLAYGROUND: the aphrodite.toml surface made explorable, as a
 // CLIENT-SIDE SIMULATION (no runtime, no network). Every fact below traces to
@@ -1270,53 +1271,6 @@ const Chapters = {
 	<ZineDiagramNav />
 </Base>
 
-<style>
-	/* The key filter is an enhancement, never a requirement: the head script's
-	   html.js is what tells us scripting is alive, so a reader without
-	   JavaScript is not shown a control that would do nothing. The table itself
-	   is server-rendered and complete in both cases. */
-	:global(html:not(.js)) [data-key-filter-wrap] {
-		display: none;
-	}
-
-	/* THE KEYS MATRIX, dressed from this page.
-
-	   `ConfigKeys` owns the rows, the section grouping and the columns, and it is
-	   not this card's file - so the elevation is applied HERE, scoped to `#keys`.
-	   One id plus one attribute outranks the single utility classes the component
-	   ships, so no `!important` is needed and no rule escapes this route.
-
-	   The grammar: each TOML section is a SHELL lifted off the canvas with its own
-	   hairline, and the table inside it is a WELL recessed into that shell - the
-	   lighter `--tier-well-edge` against the darker `--tier-shell-edge` is what
-	   makes the table read as depth rather than as one more panel. The group head
-	   keeps a bottom rule of its own so the shell has a title bar. */
-	:global(#keys [data-key-group]) {
-		position: relative;
-		border: 1px solid var(--tier-shell-edge);
-		background-color: var(--tier-shell);
-		padding: 1.25rem;
-	}
-
-	:global(#keys [data-key-group] > div:first-child) {
-		border-bottom: 1px solid var(--tier-shell-edge);
-		padding-bottom: 0.75rem;
-	}
-
-	:global(#keys [data-key-group] > div:last-child) {
-		border: 1px solid var(--tier-well-edge);
-		background-color: var(--tier-well);
-	}
-
-	:global(#keys [data-key-group] th) {
-		font-size: var(--type-meta);
-		letter-spacing: 0.08em;
-	}
-
-	:global(#keys [data-key-group] tbody > tr) {
-		border-color: var(--tier-shell-edge);
-	}
-</style>
 
 <script>
 	// ---- The editor default (captured on first init - the reset restores it

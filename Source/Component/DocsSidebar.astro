@@ -1,4 +1,6 @@
 ---
+import "@Stylesheet/Component/Chrome.scss";
+
 import { getCollection } from "astro:content";
 
 // ── THE DOCS TREE ─────────────────────────────────────────────────────────
@@ -251,70 +253,59 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
     groups inside it are divided by the same hairline, so the rail reads as one
     indexed column instead of a stack of collapsible boxes. No words changed and
     no page, section or WIP flag was dropped. */}
-<nav aria-label={Label} class="docs-index">
-	<p class="docs-index__eyebrow type-meta uppercase tracking-widest text-zinc-dust">Doc index</p>
-	<div class="docs-index__panel mt-2 max-h-[calc(100vh-9rem)] overflow-y-auto p-5">
+<nav aria-label={Label} class="docs-sidebar">
+	<p class="docs-sidebar__eyebrow">Doc index</p>
+	<div class="docs-sidebar__panel">
 		{/* The in-page outline is the docs route's own (pages/docs/[...slug].astro):
 		    the rail names where a reader can go, not where they are inside a page. */}
-		<div class="flex flex-col gap-3">
+		<div class="docs-sidebar__sections">
 			{Sections.map((Section) => {
 				const IsCurrent = HoldsCurrent(Section);
 
 				return (
 					<details
-						class="group docs-index__group"
+						class="docs-sidebar__group"
 						open={IsCurrent}
 						data-docs-section={Section.Name}
 						data-current-section={IsCurrent ? "1" : undefined}
 					>
-						<summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base tracking-normal transition-colors [&::-webkit-details-marker]:hidden">
+						<summary class="docs-sidebar__summary">
 							<span
-								class={`inline-block h-3 w-1 shrink-0 ${
-									IsCurrent ? "bg-stamped-canary" : "bg-oxblood-dark"
-								}`}
+								class:list={[
+									"docs-sidebar__marker",
+									IsCurrent && "docs-sidebar__marker--current",
+								]}
 								aria-hidden="true"
 							/>
 							<span
-								class={`min-w-0 flex-1 ${
-									IsCurrent
-										? "text-bone-white"
-										: "text-bone-newsprint group-hover:text-bone-white"
-								}`}
+								class:list={[
+									"docs-sidebar__label",
+									IsCurrent && "docs-sidebar__label--current",
+								]}
 							>
 								{Section.Name}
 							</span>
-							<span class="font-mono text-[13px] tracking-normal text-zinc-dust">
-								{Section.Count}
-							</span>
-							<span
-								class="inline-block font-mono text-[13px] text-zinc-dust transition-transform group-open:rotate-90"
-								aria-hidden="true"
-							>
-								▸
-							</span>
+							<span class="docs-sidebar__count">{Section.Count}</span>
+							<span class="docs-sidebar__chevron" aria-hidden="true">▸</span>
 						</summary>
-						<ul class="docs-index__branch mt-2 flex flex-col gap-1 border-l pl-3">
+						<ul class="docs-sidebar__branch">
 							{Section.Pages.map((Page) => (
 								<li>
 									<a
 										href={Page.Href}
 										aria-current={Page.Id === Current ? "page" : undefined}
-										class={`block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors ${
-											Page.Id === Current
-												? "pl-2 text-bone-white"
-												: "pl-2 text-zinc-dust hover:text-bone-white"
-										}`}
+										class:list={[
+											"docs-sidebar__link",
+											Page.Id === Current && "docs-sidebar__link--current",
+										]}
 									>
 										{Page.Id === Current && (
-											<span
-												class="mr-1.5 inline-block h-3.5 w-0.5 bg-stamped-canary align-middle"
-												aria-hidden="true"
-											/>
+											<span class="docs-sidebar__active" aria-hidden="true" />
 										)}
 										{Page.Title}
 										{WipIds.has(Page.Id) && (
 											<span
-												class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black"
+												class="docs-sidebar__wip"
 												title="Roadmap: partly unimplemented"
 											>
 												WIP
@@ -322,32 +313,30 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
 										)}
 									</a>
 									{Page.Children.length > 0 && (
-										<ul class="docs-index__branch mt-1 flex flex-col gap-1 border-l pl-3">
+										<ul class="docs-sidebar__branch docs-sidebar__branch--nested">
 											{Page.Children.map((Child) => (
 												<li>
 													<a
 														href={Child.Href}
 														aria-current={
-															Child.Id === Current
-																? "page"
-																: undefined
+															Child.Id === Current ? "page" : undefined
 														}
-														class={`block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors ${
-															Child.Id === Current
-																? "pl-2 text-bone-white"
-																: "pl-2 text-zinc-dust hover:text-bone-white"
-														}`}
+														class:list={[
+															"docs-sidebar__link",
+															Child.Id === Current &&
+																"docs-sidebar__link--current",
+														]}
 													>
 														{Child.Id === Current && (
 															<span
-																class="mr-1.5 inline-block h-3.5 w-0.5 bg-stamped-canary align-middle"
+																class="docs-sidebar__active"
 																aria-hidden="true"
 															/>
 														)}
 														{Child.Title}
 														{WipIds.has(Child.Id) && (
 															<span
-																class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black"
+																class="docs-sidebar__wip"
 																title="Roadmap: partly unimplemented"
 															>
 																WIP
@@ -367,44 +356,3 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
 		</div>
 	</div>
 </nav>
-
-<style>
-	/* THE EYEBROW'S RULE. The rail's name sits on a hairline instead of floating
-	   above a box: it is the column's header, and a header with a rule under it
-	   is what makes the list below read as its contents. */
-	.docs-index__eyebrow {
-		border-bottom: 1px solid var(--tier-shell-edge);
-		padding-bottom: var(--space-tight);
-	}
-
-	/* THE WELL. One step darker than the page ground with a LIGHTER edge
-	   (`--tier-well-edge` against `--tier-shell-edge`), which is the whole
-	   difference between "recessed channel" and "another plate": the edge is
-	   what tells the eye the surface went in rather than came out. Radius 0 like
-	   every other edge on the site, and no shadow - the rail is quiet by design
-	   and the article beside it spends the page's emphasis. */
-	.docs-index__panel {
-		position: relative;
-		border: 1px solid var(--tier-well-edge);
-		border-radius: 0;
-		background-color: var(--tier-well);
-	}
-
-	/* THE GROUP RULE. Sections are divided by the same hairline the blueprint
-	   uses everywhere else, and the first one keeps no rule (the eyebrow's rule
-	   is already above it). A `<details>` is a block, so the border costs no
-	   layout: the container's own `gap-3` still owns the distance. */
-	.docs-index__group + .docs-index__group {
-		border-top: 1px solid var(--tier-shell-edge);
-		padding-top: 0.75rem;
-	}
-
-	/* THE BRANCH RULE. The page list and the nested child list are indented by a
-	   hairline rather than by a crimson plate edge - the same 1px, at the same
-	   volume as the rail's own boundary, so depth reads as depth and not as a
-	   second colour system. Declared here because `--tier-shell-edge` has no
-	   Tailwind colour of its own. */
-	.docs-index__branch {
-		border-left-color: var(--tier-shell-edge);
-	}
-</style>

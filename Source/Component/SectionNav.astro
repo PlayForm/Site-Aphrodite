@@ -50,6 +50,8 @@
  * element that paints a raised surface reads as a floating panel, and the point
  * of the hairline is that the document continues behind it.
  */
+import "@Stylesheet/Component/Chrome.scss";
+
 import ZineStamp from "./ZineStamp.astro";
 
 import { NavLabels } from "@Library/Links";
@@ -79,26 +81,18 @@ const Entries = Sections.map((Section, Position) => ({
 	/** The ordinal, in the index's own two-digit voice. */
 	Ordinal: String(Position + 1).padStart(2, "0"),
 }));
-
-/** The link classes, in the index's own voice: quiet until it is the section you are in. */
-const LinkClass =
-	"type-meta uppercase text-zinc-dust transition-colors hover:text-bone-white aria-[current=true]:text-stamped-canary aria-[current=true]:underline aria-[current=true]:decoration-2 aria-[current=true]:underline-offset-4";
 ---
 
 <!-- Desktop: the sticky bar. Hidden below `sm`, where it becomes a disclosure. -->
-<nav
-	aria-label="On this page"
-	data-section-nav
-	class="section-nav sticky top-0 z-30 -mx-5 hidden w-full items-center gap-6 border-b bg-carbon-void px-5 py-3 sm:-mx-8 sm:flex sm:px-8 lg:-mx-14 lg:px-14"
->
+<nav aria-label="On this page" data-section-nav class="section-nav section-nav--bar">
 	<ZineStamp Label="ON THIS PAGE" Color="raw" />
-	<ul class="section-nav__list flex flex-wrap items-center gap-x-5 gap-y-1">
+	<ul class="section-nav__list">
 		{Entries.map((Entry) => (
-			<li class="flex items-baseline gap-2">
+			<li class="section-nav__entry">
 				<span class="section-nav__ordinal" aria-hidden="true">
 					{Entry.Ordinal}
 				</span>
-				<a href={`#${Entry.Id}`} class={LinkClass} title={Entry.Label}>
+				<a class="section-nav__link" href={`#${Entry.Id}`} title={Entry.Label}>
 					{Entry.Nav}
 				</a>
 			</li>
@@ -107,21 +101,25 @@ const LinkClass =
 </nav>
 
 <!-- Mobile: the same index, collapsed to one row until the reader opens it. -->
-<details
-	data-section-nav
-	class="section-nav sticky top-0 z-30 -mx-5 w-full border-b bg-carbon-void px-5 py-2 sm:hidden"
->
-	<summary class="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+<details data-section-nav class="section-nav section-nav--drawer">
+	<summary class="section-nav__summary">
 		<ZineStamp Label="ON THIS PAGE" Color="raw" />
-		<span class="type-meta uppercase text-zinc-dust">
+		<span class="section-nav__count">
 			{Entries.length} {Entries.length === 1 ? "SECTION" : "SECTIONS"}
 		</span>
 	</summary>
-	<ul class="flex flex-col pb-1 pt-3">
+	<ul class="section-nav__drawer-list">
 		{Entries.map((Entry) => (
-			<li class="section-nav__row border-t">
-				<a href={`#${Entry.Id}`} class={`${LinkClass} block py-2.5`} title={Entry.Label}>
-					<span class="section-nav__ordinal mr-2" aria-hidden="true">
+			<li class="section-nav__row">
+				<a
+					href={`#${Entry.Id}`}
+					class="section-nav__link section-nav__link--block"
+					title={Entry.Label}
+				>
+					<span
+						class="section-nav__ordinal section-nav__ordinal--inline"
+						aria-hidden="true"
+					>
 						{Entry.Ordinal}
 					</span>
 					{Entry.Nav}
@@ -130,50 +128,6 @@ const LinkClass =
 		))}
 	</ul>
 </details>
-
-<style>
-	/* THE HAIRLINE. One declaration for both presentations: the lower boundary is
-	   the shell edge, the colour the blueprint ruling and the chapter rules use,
-	   so the bar, the grid and the sections draw at one volume. Declared here
-	   rather than as a `border-*` utility because `--tier-shell-edge` has no
-	   Tailwind colour of its own, and a literal hex in the markup would be a
-	   second copy of the palette. */
-	.section-nav {
-		border-bottom-color: var(--tier-shell-edge);
-	}
-
-	/* THE ORDINAL. 10px mono, tabular so `01`-`09` and `10` share a width and the
-	   labels stay in one column. Quiet by design: it is a ruler mark, not a
-	   label, and the label beside it is the thing being read. */
-	.section-nav__ordinal {
-		display: inline-block;
-		font-family: "JetBrains Mono", monospace;
-		font-size: 10px;
-		font-weight: 700;
-		line-height: 1.4;
-		letter-spacing: 0.08em;
-		font-variant-numeric: tabular-nums;
-		color: var(--zinc-dust);
-	}
-
-	/* THE DIVISION between the stamp and the sequence: a vertical hairline from
-	   `sm` up, where the bar is a row. On the phone the stamp sits above the
-	   list, so a vertical rule there would divide nothing. */
-	@media (min-width: 640px) {
-		.section-nav__list {
-			border-left: 1px solid var(--tier-shell-edge);
-			padding-left: 1.5rem;
-		}
-	}
-
-	/* THE PHONE'S ROW RULES. The disclosure's rows are divided by the same
-	   hairline as everything else in the chrome; they carried `oxblood-dark` at
-	   40%, which is a PLATE edge seen through a dimmer. Declared here so the
-	   whole strip - boundary, division and rows - is one colour at one volume. */
-	.section-nav__row {
-		border-top-color: var(--tier-shell-edge);
-	}
-</style>
 
 <script>
 	// WHICH SECTION IS ACTIVE - one rule, stated once, and the code below is

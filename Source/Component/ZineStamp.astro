@@ -35,22 +35,28 @@ interface Props {
 
 const { Label, Color = "raw", Rotate = "", Class = "" } = Astro.props;
 
-const Palette = {
-	raw: "bg-raw-blood text-bone-white",
-	canary: "bg-stamped-canary text-soot-black",
-	// A teal stamp takes DARK ink: bone-white on weathered-teal measures 3.06:1
-	// at the stamp's 16px, below the 4.5:1 floor for text under 18.66px bold,
-	// while soot-black on the same fill measures 5.36:1. The fill is the
-	// identity (teal = verified) and stays; only the ink moves.
-	teal: "bg-weathered-teal text-soot-black",
-	bone: "bg-bone-newsprint text-soot-black",
+/** The stamp's SHAPE lives in `Plate.scss` (`.plate__stamp`); this map is only
+ *  the colour axis, which is identity and therefore never quietened.
+ *
+ *  The fill says which evidence the stamp marks - raw = the section's own claim,
+ *  canary = a highlight, teal = verified, bone = neutral. Only the ink moves,
+ *  and only where legibility requires it: a teal stamp takes soot-black ink
+ *  because bone-white on weathered-teal measures 3.06:1 at the stamp's 16px,
+ *  below the 4.5:1 floor for text under 18.66px bold, while soot-black on the
+ *  same fill measures 5.36:1. The fill is the identity (teal = verified) and
+ *  stays; only the ink moves. */
+const Fill = {
+	raw: "plate__stamp--raw",
+	canary: "plate__stamp--canary",
+	teal: "plate__stamp--teal",
+	bone: "plate__stamp--bone",
 }[Color];
 ---
 
 <span
 	class:list={[
-		"inline-block border-2 border-black px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest shadow-[4px_4px_0px_#000]",
-		Palette,
+		"plate__stamp",
+		Fill,
 		Rotate,
 		"max-sm:rotate-0",
 		Class,

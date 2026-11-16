@@ -12,7 +12,7 @@
  *              action that must be visible without being THE action - a sibling
  *              destination, a "compare the other number". `secondary` is the
  *              same treatment under the name the tree already ships, and both
- *              resolve to one shared string so neither can drift.
+ *              resolve to one block in `Plate.scss` so neither can drift.
  *   text       An underlined link - no border, no shadow, no fill. Navigation
  *              that belongs inside the argument: "read the source", "see the
  *              measured page".
@@ -61,25 +61,20 @@ interface Props {
 
 const { Label, Copy, Href, Role = "primary", Class = "" } = Astro.props;
 
-const Base = "inline-block font-mono transition-colors";
-
-/** The laser edge, declared once so the roles cannot drift apart. */
-const Laser = "hover:border-stamped-canary focus-visible:border-stamped-canary";
-
-/** The hairline treatment, shared by `ghost` (the Stitch name) and `secondary`
- * (the name the tree already ships). One string, so the two cannot diverge. */
-const Hairline =
-	"border border-oxblood-dark bg-transparent px-4 py-2 text-base font-bold text-bone-newsprint hover:text-bone-white";
-
+/** The action hierarchy lives in `Plate.scss`: `.button` carries the box model
+ *  and the transition every role shares, and a role modifier carries only what
+ *  makes it different. The laser edge, the hairline treatment and the press are
+ *  declared there with the role they belong to, so nothing here composes a
+ *  string that a second component could drift away from. */
 const Shape = {
-	primary: `border border-black bg-raw-blood px-4 py-2 text-base font-black text-bone-white shadow-[3px_3px_0px_#000] hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${Laser}`,
-	ghost: `${Hairline} ${Laser}`,
-	secondary: `${Hairline} ${Laser}`,
-	text: "text-base font-bold text-bone-newsprint underline decoration-oxblood-dark decoration-2 underline-offset-4 hover:text-bone-white hover:decoration-stamped-canary",
-	utility: `border border-oxblood-dark bg-soot-black px-2 py-1 text-meta font-black uppercase tracking-widest text-zinc-dust hover:text-bone-white ${Laser}`,
+	primary: "button--primary",
+	ghost: "button--ghost",
+	secondary: "button--secondary",
+	text: "button--text",
+	utility: "button--utility",
 }[Role];
 
-const Classes = [Base, Shape, Class];
+const Classes = ["button", Shape, Class];
 ---
 
 {Href ? (

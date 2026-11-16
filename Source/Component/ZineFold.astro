@@ -50,26 +50,26 @@ const TagAccent = {
 };
 ---
 
-<details class="group border-t border-oxblood-dark" data-zine-fold>
-	<summary class="flex cursor-pointer list-none items-baseline gap-3 py-3 text-bone-newsprint transition-colors hover:text-bone-white">
+<details class="fold" data-zine-fold>
+	<summary class="fold__summary">
 		{Tag && (
-			<span class:list={["telemetry-tag shrink-0", TagTone && TagAccent[TagTone]]}>
+			<span class:list={["telemetry-tag fold__tag", TagTone && TagAccent[TagTone]]}>
 				{Tag}
 			</span>
 		)}
-		<span class="grow font-body text-base font-bold leading-snug">{Label}</span>
+		<span class="fold__label">{Label}</span>
 		<span
-			class="shrink-0 font-mono text-base text-zinc-dust group-open:hidden"
+			class="fold__marker fold__marker--closed"
 			aria-hidden="true"
 		>
 			+
 		</span>
 		<span
-			class="hidden shrink-0 font-mono text-base text-zinc-dust group-open:inline"
+			class="fold__marker fold__marker--open"
 			aria-hidden="true"
 		>
 			−
 		</span>
 	</summary>
-	<div class="pb-4 font-body text-base leading-relaxed text-bone-newsprint" set:html={Body} />
+	<div class="fold__body" set:html={Body} />
 </details>
