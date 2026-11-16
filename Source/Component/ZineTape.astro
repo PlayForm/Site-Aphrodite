@@ -4,7 +4,14 @@
  *
  * EMPHASIS TIER: this component spans the tiers, and the shape IS the tier.
  * `kicker` and `hash` are quiet; `corner` and `tab` are standard; `section`,
- * `strip` and `hero` are expressive - the tier a section spends once.
+ * `hero` and `strip` are expressive - the tier a section spends once.
+ *
+ * THE BUDGET. A tape is the site's expressive accent, so a section is allowed
+ * ONE of `section`, `hero` or `strip` - never two in the same chapter. A second
+ * one does not add emphasis; it takes emphasis from the first, and from the
+ * reading the section was written for. Everything that is a LABEL rather than
+ * an accent is quiet, and DEMOTION is the fix rather than deletion: the words
+ * stay, only the volume changes.
  *
  * THE HIERARCHY, loudest last. Pick the smallest shape that carries the job;
  * a page that tapes everything has no tape.
@@ -12,13 +19,20 @@
  *   kicker   A SECTION IDENTIFIER: small mono text, no box, no shadow, no
  *            rotation. This is what most section labels actually need - the
  *            reader has to find the section, not admire the label.
- *   hash     The mechanical voice: a mono chip for a hash, a version, a count.
+ *   hash     The mechanical voice: the published `.telemetry-tag--teal` chip
+ *            (Global.css) under the hard 3px offset plane, for a hash, a
+ *            version or a count.
  *   corner   IMPORTANT ANNOTATION: a narrow strip on a module's top edge. The
  *            default shape, and the workhorse.
  *   tab      The index tab that hangs above a plate.
  *   strip    The full-bleed file strip across a hero's top edge.
  *   section  The in-flow section stamp, with the full `mb-12` rhythm.
  *   hero     The BRAND STICKER: the large stamp in the hero row.
+ *
+ * DEMOTION PATH. A chapter that needs an identifier and not an accent uses
+ * `Variant="kicker"`, `Variant="hash"`, or writes the `.section-index` tag
+ * (`01 // POSITIONING`, Global.css) directly: 11px mono, no chip, no tilt.
+ * Every path keeps every word of the label.
  *
  * RESERVE THE FULL TAPE for a few moments. `section`, `hero` and `strip` are
  * the expressive tier - one per section at most, and the page's own brand
@@ -28,11 +42,15 @@
  * a finite number of shapes and a page picks one; six free-form knobs would let
  * the grammar drift back.
  *
+ * Grammar law 3 (mobile flattens) is enforced HERE rather than at the call
+ * site: every shape that leans appends `max-sm:rotate-0`, so a page cannot
+ * reintroduce a lean on a 390px screen by passing the unprefixed class.
+ *
  * `corner` keeps the geometry the site ships today (`-top-7`, `-rotate-1`) so
  * the pages that already import this component render unchanged; a caller that
  * wants the hand-rolled sites' `-top-5` passes `Offset`.
  *
- * Grammar law 3 lives in the defaults: raw-blood is the section label,
+ * The palette defaults are the grammar's: raw-blood is the section label,
  * stamped-canary the highlight, weathered-teal the mechanical voice, and the
  * tilt is 1-2 degrees.
  */
@@ -54,9 +72,12 @@ interface Props {
 
 	/** The tilt. Each variant has its own default, so pass one only to override it. */
 	Rotate?: "-rotate-1" | "rotate-1" | "-rotate-2";
+
+	/** Extra classes for the tape itself. */
+	Class?: string;
 }
 
-const { Label, Variant = "corner", Color = "raw", Side = "left", Offset = "-top-7", Rotate } =
+const { Label, Variant = "corner", Color = "raw", Side = "left", Offset = "-top-7", Rotate, Class = "" } =
 	Astro.props;
 
 /** A tape's colour is a FILL with text on it. */
@@ -101,14 +122,23 @@ const DefaultTilt = {
 
 const Tilt = Rotate ?? DefaultTilt;
 
+/** Grammar law 3: the lean exists from `sm` up and nowhere below it. Composed
+ * here so no call site has to remember, and so the mobile flatten cannot be
+ * lost by a page that passes the unprefixed class. */
+const Lean = Tilt === "" ? "" : `${Tilt} max-sm:rotate-0`;
+
 const Shape = {
-	corner: `absolute ${Offset} ${Position} z-10 ${Tilt} border border-black px-3 py-0.5 text-base font-black uppercase tracking-widest shadow-[2px_2px_0px_#000] ${Palette}`,
-	section: `mb-12 ${Tilt} border border-black px-3 py-1 text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] ${Palette}`,
-	hero: `${Tilt} border-2 border-black px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest shadow-[4px_4px_0px_#000] ${Palette}`,
-	hash: "rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]",
-	tab: `relative z-10 -mb-7 ml-6 inline-block border border-black px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] ${Tilt} max-sm:rotate-0 ${Palette}`,
-	strip: `tape-strip absolute -top-6 left-0 z-10 ${Tilt} border-b border-t border-bone-newsprint/30 px-4 py-1 text-base font-black uppercase tracking-widest text-bone-newsprint`,
-	kicker: `inline-block font-mono text-base font-black uppercase tracking-widest ${Ink} ${Tilt}`,
+	corner: `absolute ${Offset} ${Position} z-10 ${Lean} border border-black px-3 py-0.5 text-base font-black uppercase tracking-widest shadow-[2px_2px_0px_#000] ${Palette}`,
+	section: `mb-12 ${Lean} border border-black px-3 py-1 text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] ${Palette}`,
+	hero: `${Lean} border-2 border-black px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest shadow-[4px_4px_0px_#000] ${Palette}`,
+	// The mechanical voice is the telemetry chip, not a hand-rolled copy of it:
+	// 11.5px mono, 0.08em tracking, teal OUTLINE on no fill (the modifier's own
+	// contrast decision), with the hard plane kept on top so it still reads as a
+	// tape rather than as a badge from another design.
+	hash: `telemetry-tag telemetry-tag--teal ${Lean} shadow-[3px_3px_0px_#000]`,
+	tab: `relative z-10 -mb-7 ml-6 inline-block border border-black px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] ${Lean} ${Palette}`,
+	strip: `tape-strip absolute -top-6 left-0 z-10 ${Lean} border-b border-t border-bone-newsprint/30 px-4 py-1 text-base font-black uppercase tracking-widest text-bone-newsprint`,
+	kicker: `inline-block font-mono text-base font-black uppercase tracking-widest ${Ink} ${Lean}`,
 }[Variant];
 
 /** The hash chip and the kicker are the inline shapes: they sit inside a flow
@@ -116,4 +146,4 @@ const Shape = {
 const Element = Variant === "hash" || Variant === "kicker" ? "span" : "div";
 ---
 
-<Element class={Shape}>{Label}</Element>
+<Element class:list={[Shape, Class]}>{Label}</Element>

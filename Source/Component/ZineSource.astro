@@ -25,6 +25,12 @@
  * The citation is plain prose by law (site-modules §5): the CodeMentions pass
  * links the paths in the BUILT tree, so the lines stay text here and no page
  * hand-writes a `<code>` around a source path.
+ *
+ * The mono carriers take `.break-token` (overflow-wrap: anywhere plus a zero
+ * min-width) rather than `break-all`: a repository path or a hash has no break
+ * opportunity of its own, so the CONTAINER holding it has to collapse its
+ * min-content - while the prose beside it keeps `break-word`, and a label
+ * elsewhere on the page is never shredded mid-token.
  */
 interface Methodology {
 	/** The source paths and line ranges the claim was read from. */
@@ -83,7 +89,7 @@ const Rows = [
 		<section class="mt-12 border-t border-oxblood-dark pt-8" data-zine-source="methodology">
 			{Title && <h3 class="section-kicker">{Title}</h3>}
 			{Lines.length > 0 && (
-				<div class="mt-3 space-y-1 font-mono text-caption leading-relaxed text-zinc-dust">
+				<div class="break-token mt-3 space-y-1 font-mono text-caption leading-relaxed text-zinc-dust">
 					{Lines.map((Line) => (
 						<p>{Line}</p>
 					))}
@@ -96,7 +102,7 @@ const Rows = [
 							<dt class="type-meta text-zinc-dust">{Row.Key}</dt>
 							<dd class:list={[Voice[Row.Voice], "space-y-1 leading-relaxed text-bone-newsprint"]}>
 								{Row.Values.map((Value) => (
-									<p class={Row.Voice === "mono" ? "break-all" : ""}>{Value}</p>
+									<p class={Row.Voice === "mono" ? "break-token" : ""}>{Value}</p>
 								))}
 							</dd>
 						</>
@@ -105,7 +111,7 @@ const Rows = [
 			)}
 		</section>
 	) : (
-		<div class="mt-12 space-y-1 border-t border-oxblood-dark pt-8 font-mono text-caption leading-relaxed text-zinc-dust">
+		<div class="break-token mt-12 space-y-1 border-t border-oxblood-dark pt-8 font-mono text-caption leading-relaxed text-zinc-dust">
 			{Lines.map((Line) => (
 				<p>{Line}</p>
 			))}

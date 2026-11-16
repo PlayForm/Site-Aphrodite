@@ -1,6 +1,6 @@
 ---
 /**
- * ZineFold - the quiet disclosure.
+ * ZineFold - the quiet disclosure, wearing the telemetry tag.
  *
  * EMPHASIS TIER: quiet. ONE top rule, no shadow, no inner card, no fill - a
  * fold is a list item the reader opens, not a plate competing with the argument
@@ -13,29 +13,48 @@
  * control that already has one - the reader does not need to be told twice what
  * a disclosure does.
  *
- * `Tag` is quiet mono metadata, never a second bordered badge: a badge beside a
- * fold title reads as a competing label, which is the old problem (everything
- * shouts, so nothing does) in miniature.
+ * `Tag` speaks the telemetry voice: the published `.telemetry-tag` chip
+ * (Global.css) - 11.5px mono, 700, 0.08em tracking, uppercase, on the
+ * sub-panel fill with the oxblood hairline. It stays the QUIET variant by
+ * default, and that is the point: an unaccented chip beside a fold title reads
+ * as metadata, while a solid accent chip reads as a competing label - which is
+ * the old problem (everything shouts, so nothing does) in miniature. A tag that
+ * genuinely marks an IDENTITY passes `TagTone`, and the chip's own modifier
+ * carries the ink so contrast holds.
+ *
+ * The tag never breaks mid-token: the chip declares its own wrap rules, so a
+ * tag like "8 STEPS" or "REPRO_PROOF #001" wraps at its spaces or not at all.
  */
 interface Props {
 	/** The closed-state headline. */
 	Label: string;
 
-	/** Optional side tag, e.g. "DETAIL" or a step number. Quiet mono, no badge. */
+	/** Optional side tag, e.g. "DETAIL" or a step number: the telemetry voice. */
 	Tag?: string;
+
+	/** The tag's accent, when the tag marks an identity rather than a note. */
+	TagTone?: "crimson" | "canary" | "teal" | "bone";
 
 	/** The body content (rich). */
 	Body: string;
 }
 
-const { Label, Tag, Body } = Astro.props;
+const { Label, Tag, TagTone, Body } = Astro.props;
+
+/** The chip modifiers, in the order the grammar publishes them. */
+const TagAccent = {
+	crimson: "telemetry-tag--crimson",
+	canary: "telemetry-tag--canary",
+	teal: "telemetry-tag--teal",
+	bone: "telemetry-tag--bone",
+};
 ---
 
 <details class="group border-t border-oxblood-dark" data-zine-fold>
 	<summary
 		class="flex cursor-pointer list-none items-baseline gap-3 py-3 text-bone-newsprint transition-colors hover:text-bone-white"
 	>
-		{Tag && <span class="type-meta shrink-0 uppercase text-zinc-dust">{Tag}</span>}
+		{Tag && <span class:list={["telemetry-tag shrink-0", TagTone && TagAccent[TagTone]]}>{Tag}</span>}
 		<span class="grow font-body text-base font-bold leading-snug">{Label}</span>
 		<span class="shrink-0 font-mono text-base text-zinc-dust group-open:hidden" aria-hidden="true">+</span>
 		<span class="hidden shrink-0 font-mono text-base text-zinc-dust group-open:inline" aria-hidden="true">−</span>

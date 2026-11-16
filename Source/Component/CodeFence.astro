@@ -62,6 +62,15 @@
 // "extra padding inside the frame" a reader sees. The wrapper keeps a stable
 // `.zine-fence` name so a panel that already frames or pads can zero the
 // plate's margin for the fences inside it (Global.css, CODE PLATES).
+//
+// THE RIBBON'S LEADING FIELD. `Path` is the file a block was taken from, and it
+// is METADATA like the language tag beside it - the ribbon reads
+// `aphrodite.toml  TOML  Copy`. It is a prop rather than something the plate
+// could infer, because a fence has no idea where its bytes came from: the page
+// that pasted them does. Unset is the normal case (a command has no path) and
+// renders the ribbon with the language and the control only, so no call site
+// has to change. Source/Script/CodePlate.ts builds the ribbon and reads this
+// as `data-plate-path`; this component still renders no control of its own.
 import { codeToHtml } from "shiki";
 
 import { ZineTheme } from "@Library/ShikiTheme";
@@ -88,9 +97,15 @@ interface Props {
 	 * bare command for a block that displays a transcript. Unset = `Code`.
 	 */
 	CopyPayload?: string;
+	/**
+	 * The file the block was taken from, printed as the ribbon's leading
+	 * field. Metadata, never an action: it sits beside the language tag and
+	 * the copy chip, and nothing about it is clickable.
+	 */
+	Path?: string;
 }
 
-const { Code, Lang = "bash", Class = "", CopyPayload } = Astro.props;
+const { Code, Lang = "bash", Class = "", CopyPayload, Path } = Astro.props;
 
 // The plate owns the frame - border, radius, background, shadow, hover lift.
 // `Class` carries the layout half only, so the frame utilities that used to be
@@ -110,4 +125,9 @@ const Html = (await codeToHtml(Code, { lang: Lang, theme: ZineTheme }))
 	.replace("<pre ", `<pre data-language="${Lang}" `);
 ---
 
-<div class:list={["zine-fence", Layout]} data-plate-payload={CopyPayload} set:html={Html} />
+<div
+	class:list={["zine-fence", Layout]}
+	data-plate-payload={CopyPayload}
+	data-plate-path={Path}
+	set:html={Html}
+/>

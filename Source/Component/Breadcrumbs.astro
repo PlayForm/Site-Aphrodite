@@ -26,6 +26,21 @@ import { DocsTrail } from "./DocsSidebar.astro";
 // apart rather than together. The sentence takes its own line (`flex-col`, not
 // `flex-wrap`) so it never competes for width with the label; the rule is
 // documented at the type roles in `Global.css`.
+//
+// ── THE HAIRLINE SPINE (Stitch grammar) ──────────────────────────────────
+//
+// The whole "where you are" block hangs off a 1px `--tier-shell-edge` rule on
+// its leading edge, and the crumbs are divided by a mono `/`. Both are the
+// blueprint's margin marks: the spine says "this block is where you are"
+// without a plate, a fill or a shadow, because the header below it spends the
+// section's emphasis and chrome that competes with the page's own claim is
+// chrome the reader has to read twice.
+//
+// THE SEPARATOR IS RESTORED, NOT ADDED. The span that carries it had been left
+// holding its own explanation and no character, so the trail rendered as two
+// words with a gap - which is the exact failure the comment beside it
+// describes ("the trail read as two words with a gap instead of a path"). The
+// slash is the payload that comment was written about.
 
 interface Crumb {
 	Label: string;
@@ -63,7 +78,7 @@ const ActiveGroup = !IsDocs && Active && Active.Href !== "/" ? Active.Group : un
 {
 	// The docs root and the home page each match only themselves: no trail.
 	Trail.length > 1 && (
-		<div class="flex flex-col gap-2">
+		<div class="crumbs flex flex-col gap-2">
 			<nav
 				aria-label="Breadcrumb"
 				class="type-meta flex flex-wrap items-center gap-2 uppercase text-zinc-dust"
@@ -80,7 +95,7 @@ const ActiveGroup = !IsDocs && Active && Active.Href !== "/" ? Active.Group : un
 								    text role (5.12:1) and is the colour the docs
 								    trail already uses for its own separator, so both
 								    trails divide a path the same way. */}
-								//
+								{"/"}
 							</span>
 						)}
 						{Crumb.Href ? (
@@ -110,3 +125,16 @@ const ActiveGroup = !IsDocs && Active && Active.Href !== "/" ? Active.Group : un
 		</div>
 	)
 }
+
+<style>
+	/* THE SPINE. One hairline on the leading edge of the block, in the shell-edge
+	   token rather than a second grey, so the trail, the blueprint ruling and the
+	   chapter rules all draw at one volume. It is a border on the BLOCK, not on
+	   the trail: the promise line belongs to the same coordinate, and a rule that
+	   stopped between them would split one statement into two. No fill, no
+	   shadow - see the header for why chrome stays at this volume. */
+	.crumbs {
+		border-left: 1px solid var(--tier-shell-edge);
+		padding-left: 1rem;
+	}
+</style>

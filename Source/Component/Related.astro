@@ -15,6 +15,30 @@ import type { InternalLink } from "@Library/Links";
  * The frame is deliberately quiet (a single hairline rule, no plate, no
  * shadow, no tape): this is the last thing on a page, and the reader has
  * already been carried by whatever expressive assembly the page spent.
+ *
+ * ── THE NEXT-STEPS MATRIX (Stitch grammar) ───────────────────────────────
+ *
+ * The module is a MATRIX, not a list: every step is a row of two columns - the
+ * ordinal in mono, the destination and its reason in the reading column - with
+ * a hairline between rows and one full-width rule above the whole module. The
+ * shape says what the module is for. A vertical list of underlined names reads
+ * as more navigation; a numbered ledger with a reason beside each number reads
+ * as a continuation OF THE ARGUMENT the page just made, which is what "next
+ * step" means.
+ *
+ * The head row states the module's own size (`3 DESTINATIONS`) so the reader
+ * knows how much is left before starting, the same way the section index states
+ * its section count on a phone.
+ *
+ * Everything the module ever carried still renders: the heading, every
+ * destination label verbatim, every reason sentence verbatim, and the filter
+ * that drops a link with no destination. Nothing was demoted to a caption and
+ * nothing was dropped to make the block smaller - the reasons are the point,
+ * and they now sit in a column instead of under a link.
+ *
+ * The ordinal is `aria-hidden`: it is the row's place in the sequence, and a
+ * screen reader announcing "zero one Benchmarks" would read the ruler instead
+ * of the destination.
  */
 interface Props {
 	/** The natural neighbours of the page - truthful links only, never forced. */
@@ -34,26 +58,107 @@ const Entries = Links.filter(({ Href, Label }) => Boolean(Href) && Boolean(Label
 
 {
 	Entries.length > 0 && (
-		<nav
-			aria-label="Next steps"
-			class="w-full border-t border-oxblood-dark pt-6"
-		>
-			<p class="type-meta uppercase tracking-widest text-zinc-dust">{Title}</p>
-			<ul class="mt-3 flex flex-col gap-4">
-				{Entries.map((Link) => (
-					<li class="flex flex-col gap-1">
-						<a
-							class="w-fit font-mono text-base text-bone-white underline decoration-stamped-canary decoration-2 underline-offset-4 transition-colors hover:bg-raw-blood hover:text-bone-white"
-							href={Link.Href}
-						>
-							{Link.Label}
-						</a>
-						{Link.Reason && (
-							<p class="type-body max-w-[62ch] text-zinc-dust">{Link.Reason}</p>
-						)}
+		<nav aria-label="Next steps" class="next-steps w-full">
+			<div class="next-steps__head">
+				<p class="type-meta uppercase tracking-widest text-zinc-dust">{Title}</p>
+				<p class="type-meta uppercase tracking-widest text-zinc-dust">
+					{Entries.length} {Entries.length === 1 ? "DESTINATION" : "DESTINATIONS"}
+				</p>
+			</div>
+			<ul class="next-steps__list">
+				{Entries.map((Link, Position) => (
+					<li class="next-steps__row">
+						<span class="next-steps__ordinal" aria-hidden="true">
+							{String(Position + 1).padStart(2, "0")}
+						</span>
+						<div class="next-steps__body">
+							<a
+								class="w-fit font-mono text-base text-bone-white underline decoration-stamped-canary decoration-2 underline-offset-4 transition-colors hover:bg-raw-blood hover:text-bone-white"
+								href={Link.Href}
+							>
+								{Link.Label}
+							</a>
+							{Link.Reason && <p class="type-body text-zinc-dust">{Link.Reason}</p>}
+						</div>
 					</li>
 				))}
 			</ul>
 		</nav>
 	)
 }
+
+<style>
+	/* THE MODULE'S RULE. One hairline above the whole block, in the chapter-rule
+	   token: the module closes the page, and the same rule that opens a chapter
+	   is what separates the argument from what follows it. */
+	.next-steps {
+		border-top: 1px solid var(--blueprint-rule);
+		padding-block-start: var(--space-reading);
+	}
+
+	/* THE HEAD ROW: the module's name on the left, its size on the right, on one
+	   baseline. `flex-wrap` because at 390px the two labels are wider than the
+	   column and must stack rather than shrink the type. */
+	.next-steps__head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.5rem 1rem;
+	}
+
+	/* THE MATRIX. Rows, each a two-column grid: a fixed ordinal gutter and the
+	   reading column. Hairlines between rows and none above the first, because
+	   the module's own rule is already there - two rules 12px apart read as one
+	   thick one. */
+	.next-steps__list {
+		display: flex;
+		flex-direction: column;
+		margin-block-start: var(--space-reading);
+	}
+
+	.next-steps__row {
+		display: grid;
+		grid-template-columns: 2.5rem minmax(0, 1fr);
+		gap: 0 var(--space-reading);
+		align-items: start;
+		padding-block: 0.875rem;
+		border-top: 1px solid var(--tier-shell-edge);
+	}
+
+	.next-steps__row:first-child {
+		border-top: 0;
+		padding-block-start: 0;
+	}
+
+	.next-steps__ordinal {
+		font-family: "JetBrains Mono", monospace;
+		font-size: 11px;
+		font-weight: 700;
+		line-height: 1.6;
+		letter-spacing: 0.08em;
+		font-variant-numeric: tabular-nums;
+		color: var(--zinc-dust);
+	}
+
+	/* The destination and its reason share the reading column: `space-tight`
+	   between them (a label and its value), never the paragraph rhythm, because
+	   the reason belongs to the label rather than following it. */
+	.next-steps__body {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-tight);
+		min-width: 0;
+	}
+
+	/* ONE MEASURE FOR THE REASON, IN REM. The reason is a sentence, so it takes
+	   the reading column's width up to the measure the site already uses for body
+	   copy - 40rem, about 71 characters. The plate this replaced capped it at
+	   `62ch`, which is not 62 characters: `ch` is the width of the "0" glyph, and
+	   in DM Sans that computed to 763px, roughly 84 characters. On a 1440px shell
+	   the uncapped row would run past 200 characters, which is not a line anyone
+	   reads - so the cap stays, in the unit that means what it says. */
+	.next-steps__body p {
+		max-width: 40rem;
+	}
+</style>

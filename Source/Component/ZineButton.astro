@@ -8,15 +8,29 @@
  *              offset shadow, press collapses both. THE action of a section.
  *              A section usually has ONE filled primary action - a second one
  *              competes with the first, and takes emphasis from both.
- *   secondary  A thin oxblood-dark boundary on no fill. Everything that is an
- *              action without being THE action: a sibling destination, a
- *              "compare the other number".
+ *   ghost      A thin oxblood-dark hairline on no fill: the Stitch ghost. An
+ *              action that must be visible without being THE action - a sibling
+ *              destination, a "compare the other number". `secondary` is the
+ *              same treatment under the name the tree already ships, and both
+ *              resolve to one shared string so neither can drift.
  *   text       An underlined link - no border, no shadow, no fill. Navigation
  *              that belongs inside the argument: "read the source", "see the
  *              measured page".
  *   utility    The small neutral control: mono, one step down, dust until it is
  *              pointed at. Reserved for SHORT labels (COPY, RUN, OPEN), where
  *              uppercase is a mark rather than a shout.
+ *
+ * THE LASER EDGE is the hover grammar of every role that HAS an edge: the
+ * border turns stamped-canary under the pointer and under keyboard focus. It is
+ * a 1px colour change on a border that already exists, so it costs no layout and
+ * adds no shadow - the hard offset plane stays the resting/pressed signal, and
+ * the laser is only the "this is live" edge. `text` has no border, so it takes
+ * the canary underline it always had.
+ *
+ * The global `:focus-visible` ring (2px raw-blood, 2px offset, Global.css) still
+ * applies on top: the laser border is an addition for the pointer and for a
+ * filled control whose own fill would swallow a crimson ring, never a
+ * replacement for the ring.
  *
  * LABEL CASING: sentence case is the default, because a button label is a
  * sentence the reader says to themselves. Uppercase belongs to the `utility`
@@ -39,7 +53,7 @@ interface Props {
 	Href?: string;
 
 	/** The action budget - see the doc comment. Defaults to the filled CTA. */
-	Role?: "primary" | "secondary" | "text" | "utility";
+	Role?: "primary" | "secondary" | "ghost" | "text" | "utility";
 
 	/** Extra classes for the control itself. */
 	Class?: string;
@@ -49,14 +63,20 @@ const { Label, Copy, Href, Role = "primary", Class = "" } = Astro.props;
 
 const Base = "inline-block font-mono transition-colors";
 
+/** The laser edge, declared once so the roles cannot drift apart. */
+const Laser = "hover:border-stamped-canary focus-visible:border-stamped-canary";
+
+/** The hairline treatment, shared by `ghost` (the Stitch name) and `secondary`
+ * (the name the tree already ships). One string, so the two cannot diverge. */
+const Hairline =
+	"border border-oxblood-dark bg-transparent px-4 py-2 text-base font-bold text-bone-newsprint hover:text-bone-white";
+
 const Shape = {
-	primary:
-		"border border-black bg-raw-blood px-4 py-2 text-base font-black text-bone-white shadow-[3px_3px_0px_#000] hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
-	secondary:
-		"border border-oxblood-dark bg-transparent px-4 py-2 text-base font-bold text-bone-newsprint hover:border-blood-crimson hover:text-bone-white",
-	text: "text-base font-bold text-bone-newsprint underline decoration-oxblood-dark decoration-2 underline-offset-4 hover:text-bone-white hover:decoration-blood-crimson",
-	utility:
-		"border border-oxblood-dark bg-soot-black px-2 py-1 text-meta font-black uppercase tracking-widest text-zinc-dust hover:border-blood-crimson hover:text-bone-white",
+	primary: `border border-black bg-raw-blood px-4 py-2 text-base font-black text-bone-white shadow-[3px_3px_0px_#000] hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${Laser}`,
+	ghost: `${Hairline} ${Laser}`,
+	secondary: `${Hairline} ${Laser}`,
+	text: "text-base font-bold text-bone-newsprint underline decoration-oxblood-dark decoration-2 underline-offset-4 hover:text-bone-white hover:decoration-stamped-canary",
+	utility: `border border-oxblood-dark bg-soot-black px-2 py-1 text-meta font-black uppercase tracking-widest text-zinc-dust hover:text-bone-white ${Laser}`,
 }[Role];
 
 const Classes = [Base, Shape, Class];

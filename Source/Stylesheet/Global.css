@@ -1036,3 +1036,250 @@ body .zine-plate > pre.astro-code {
 		transform: none;
 	}
 }
+
+/* ---- BLUEPRINT GRAMMAR // section rule, elevation, telemetry -------------
+
+   The Stitch layout direction (Reference/Stitch/DESIGN.md + code.html) asks
+   every page for the same three things, so they are published ONCE here and
+   consumed by name instead of re-invented per page:
+
+     1. a SECTION RULE     A full-width hairline that opens a chapter, with a
+                           numbered index tag above its head.
+     2. an ELEVATION TIER  Five named depths, from the page ground to a printed
+                           inverted sheet. A panel picks one; it does not pick a
+                           background, a border and a shadow on its own and land
+                           somewhere between two tiers.
+     3. a TELEMETRY VOICE  The mono micro-label and the giant mono figure.
+
+   Everything in this block is ADDITIVE. No existing selector changes meaning:
+   the `.emphasis-*` tiers, `.section-kicker`, the `.type-*` roles, the
+   `.zine-box-*` planes and the `--soot-black` / `--carbon-void` /
+   `--asphalt-panel` surfaces are untouched, so every call site that already
+   reads them keeps rendering exactly as it did.
+
+   THE TIER CLASSES ARE FILLS, NOT FRAMES. `.tier-canvas`, `.tier-shell` and
+   `.tier-well` set a background and nothing else, so each composes with a
+   frame the caller already owns (ZineBox's `border-4` plus boundary,
+   `.shell-card`'s 1px edge). `.tier-critical` and `.tier-inverted` are
+   COMPLETE treatments, because neither is legible as a bare fill: one carries
+   its own glow, the other carries the carbon type that makes it readable at
+   all. */
+
+:root {
+	/* ELEVATION TIERS - five named depths.
+
+	     canvas    The page ground. Same value as --soot-black and referenced
+	               rather than repeated, because a second copy of a hex is a
+	               second thing to change.
+	     shell     A workbench module lifted off the canvas: one step lighter
+	               with a 1px zinc edge and no shadow. The default surface for a
+	               block of content.
+	     well      A channel recessed INTO a shell: darker than the shell with a
+	               LIGHTER edge (#3f3f46 against #27272a), which is what makes
+	               it read as depth rather than as one more panel.
+	     critical  The alert tier: blood crimson carrying its own 16px glow.
+	     inverted  A printed sheet laid on the dark table: bone ground, carbon
+	               type. The one tier that inverts the page. */
+
+	--tier-canvas: var(--soot-black);
+	--tier-shell: #121216;
+	--tier-shell-edge: #27272a;
+	--tier-well: #0b0b0e;
+	--tier-well-edge: #3f3f46;
+	--tier-critical: var(--raw-blood);
+	--tier-critical-glow: 0 0 16px rgba(147, 17, 40, 0.35);
+	--tier-inverted: var(--bone-white);
+	--tier-inverted-ink: var(--carbon-void);
+
+	/* The section rule's colour, and the drop from that rule to the first line
+	   of the section. Both are knobs, so a page that wants a crimson chapter
+	   rule sets `--blueprint-rule` on its own section instead of fighting this
+	   file's cascade. */
+	--blueprint-rule: var(--tier-shell-edge);
+	--blueprint-inset: var(--space-tight);
+}
+
+/* THE SECTION RULE. A chapter opens with a full-width hairline and a numbered
+   index above its head, so a reader can see where one subject ends and the next
+   begins before reading a word. The rule is a BORDER, not a pseudo-element: it
+   spans the section's own box exactly, costs no extra box in the flow, and takes
+   its colour from `--blueprint-rule`.
+
+   The distance it needs is NOT padding around the section: the shell owns the
+   gap between sections (PageShell's rhythm), so this class adds only the short
+   drop from the rule to the first line - `--blueprint-inset`, the label
+   distance, because the rule is a marker and the head follows it the way a
+   value follows a label. A section that wants more air sets the knob. */
+.blueprint-section {
+	position: relative;
+	border-top: 1px solid var(--blueprint-rule);
+	padding-block-start: var(--blueprint-inset);
+}
+
+/* THE INDEX TAG - `01 // POSITIONING`. Eleven pixels and 0.08em of tracking in
+   JetBrains Mono, uppercase: the telemetry voice at its smallest. It is not a
+   heading and not a kicker, so it carries no border, no fill, no shadow and no
+   tilt - a chip here would turn the section's structure into a badge.
+
+   The colour is the quiet default; a section whose identity is a stage colour
+   recolours it with `!text-<accent>` (the house override idiom, because this
+   file loads after the utility layer). Colour is identity, so the tag is
+   allowed to take one. */
+.section-index {
+	display: inline-block;
+	margin: 0;
+	font-family: "JetBrains Mono", monospace;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 1.4;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zinc-dust);
+	/* Label voice: breaks at its spaces or not at all - never mid-token, never
+	   clipped. Declared here rather than added to the shared `:where()` label
+	   list, so no existing selector changes what it covers. */
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+}
+
+/* TIER FILLS - background only, so each composes with whatever frame the caller
+   already has. */
+.tier-canvas {
+	background-color: var(--tier-canvas);
+}
+
+.tier-shell {
+	background-color: var(--tier-shell);
+}
+
+.tier-well {
+	background-color: var(--tier-well);
+}
+
+/* The two COMPLETE tiers. A bare fill is not enough for either: the alert is
+   not an alert without its glow, and a bone sheet with bone type is unreadable,
+   so the carbon ink travels with the ground. */
+.tier-critical {
+	background-color: var(--tier-critical);
+	box-shadow: var(--tier-critical-glow);
+	color: var(--bone-white);
+}
+
+.tier-inverted {
+	background-color: var(--tier-inverted);
+	color: var(--tier-inverted-ink);
+}
+
+/* THE TWO SURFACE UTILITIES. A panel that wants the shell or the well says so
+   and stops hand-rolling a background, an edge and a radius. Padding is
+   deliberately NOT included: the caller's own `p-*` already states how tight
+   the block is, and a second padding here would either double it or fight it.
+
+   GRUNGE SAFETY. Neither class creates a stacking context - no `isolation`, no
+   `z-index`, no `transform`, no `filter`, no `opacity` - so a `.grunge` plate
+   that takes a tier keeps its `.grunge__ink` child painting above the fill and
+   below the copy, exactly as `z-index: -1` inside the plate's isolated context
+   does today. `position: relative` is declared because the ink is absolutely
+   positioned and must resolve against the plate it bleeds out of; with
+   `z-index: auto` that gives a containing block and changes no paint order. */
+.shell-card {
+	position: relative;
+	border: 1px solid var(--tier-shell-edge);
+	border-radius: 0;
+	background-color: var(--tier-shell);
+}
+
+.well {
+	position: relative;
+	border: 1px solid var(--tier-well-edge);
+	border-radius: 0;
+	background-color: var(--tier-well);
+}
+
+/* THE TELEMETRY TAG - a mono micro-label chip. `--type-meta` (11.5px) at 700
+   weight with 0.08em of tracking, uppercase, on the sub-panel fill with the
+   oxblood hairline. Zero radius, like every other edge on the site.
+
+   The modifiers follow the reference's own chip vocabulary and its contrast
+   behaviour: the solid variants carry their own ink (crimson and canary both
+   take a legible foreground), and the teal variant stays an OUTLINE because
+   `--weathered-teal` is lifted to pass 4.5:1 on the dark fills while
+   `--raw-blood` is not - so a crimson tag is solid, never crimson-on-asphalt
+   text. */
+.telemetry-tag {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	padding: 0.25rem 0.625rem;
+	border: 1px solid var(--oxblood-dark);
+	border-radius: 0;
+	background-color: var(--asphalt-panel);
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zinc-dust);
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+}
+
+.telemetry-tag--crimson {
+	border-color: #000000;
+	background-color: var(--raw-blood);
+	color: var(--bone-white);
+}
+
+.telemetry-tag--canary {
+	border-color: #000000;
+	background-color: var(--stamped-canary);
+	color: var(--soot-black);
+}
+
+.telemetry-tag--bone {
+	border-color: #000000;
+	background-color: var(--bone-newsprint);
+	color: var(--soot-black);
+}
+
+.telemetry-tag--teal {
+	border-color: var(--weathered-teal);
+	background-color: transparent;
+	color: var(--weathered-teal);
+}
+
+/* THE METRIC - the giant mono figure. One number a section is built around, so
+   it is the largest thing in its block and the only element at this size: a
+   second metric beside it halves both.
+
+   The unit is a CHILD (`.metric__unit`), not a sibling, so the figure and its
+   unit stay on one line while the unit keeps the telemetry voice. Tabular
+   figures because two metrics stacked in a column must align their digits. */
+.metric {
+	display: block;
+	margin: 0;
+	font-family: "JetBrains Mono", monospace;
+	font-size: clamp(2.5rem, 6vw, 4.5rem);
+	font-weight: 700;
+	line-height: 0.95;
+	letter-spacing: -0.03em;
+	font-variant-numeric: tabular-nums;
+	color: var(--bone-white);
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+}
+
+.metric__unit {
+	display: inline-block;
+	margin-inline-start: 0.375rem;
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--zinc-dust);
+}

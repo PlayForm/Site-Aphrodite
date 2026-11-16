@@ -1,4 +1,24 @@
 ---
+/**
+ * ZinePullQuote - the manifesto plate: one quotation, given the expressive
+ * budget.
+ *
+ * EMPHASIS TIER: expressive. The 4px crimson module boundary, the pasted shadow
+ * plane, the lean and the drop cap are ONE assembly, so a page spends it once -
+ * a second quotation plate in the same section halves both, and the reader
+ * starts skimming the passage the section was built to make them read.
+ *
+ * The `MANIFESTO` mark in the corner is METADATA, not a second accent: it
+ * speaks the telemetry voice (`.telemetry-tag`, the quiet chip) because the
+ * plate is already the loudest thing in its section, and a solid accent chip on
+ * top of it would be a second voice at the same volume. The word stays - it
+ * names what the reader is looking at, and it never breaks mid-token.
+ *
+ * Grammar law 3 (mobile flattens): the lean is honoured from `sm` up and the
+ * component appends `max-sm:rotate-0` itself, so a caller passing the
+ * unprefixed class cannot reintroduce a lean on a 390px screen. Hover still
+ * straightens the plate at every width.
+ */
 interface Props {
 	/** The quote text; the first letter is rendered as the drop cap. */
 	Text: string;
@@ -9,7 +29,8 @@ interface Props {
 	/** Shadow tone of the enclosing rule block: crimson (default), subtle, canary, teal. */
 	Tone?: "crimson" | "subtle" | "canary" | "teal";
 
-	/** Rotation applied from the sm breakpoint up; mobile is always flat. */
+	/** Rotation from the sm breakpoint up. Pass the unprefixed class; mobile is
+	 * flattened here regardless. */
 	Rotate?: string;
 }
 
@@ -23,9 +44,16 @@ const Shadow = {
 }[Tone];
 ---
 
-<figure class={`relative border-4 border-blood-crimson bg-carbon-void p-8 sm:p-12 ${Shadow} ${Rotate} transition-transform duration-300 hover:rotate-0`}>
-	<div class="pointer-events-none absolute right-4 top-4 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-		MANIFESTO
+<figure
+	class:list={[
+		"relative border-4 border-blood-crimson bg-carbon-void p-8 transition-transform duration-300 hover:rotate-0 sm:p-12",
+		Shadow,
+		Rotate,
+		"max-sm:rotate-0",
+	]}
+>
+	<div class="pointer-events-none absolute right-4 top-4">
+		<span class="telemetry-tag">MANIFESTO</span>
 	</div>
 	<blockquote class="zine-drop-cap font-body text-xl font-medium leading-relaxed text-bone-white sm:text-2xl">
 		{Text}

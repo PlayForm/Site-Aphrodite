@@ -259,11 +259,20 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
     wearing a tape, a 4px crimson frame and an offset shadow competed with the
     article it was meant to serve. The words are unchanged - "DOC INDEX" moved
     from a tape stamp to the eyebrow above the index. */}
+{/* ── HAIRLINE + TIER (Stitch grammar) ────────────────────────────────────
+    The boundary moved from `oxblood-dark` (a PLATE boundary colour, which made
+    the rail read as one more framed plate beside the article) to the blueprint
+    hairline `--tier-shell-edge`, and the panel took the `well` tier: one step
+    darker than the page ground with a LIGHTER edge, which is what makes a
+    channel read as recessed rather than as a second sheet laid on top. The
+    groups inside it are divided by the same hairline, so the rail reads as one
+    indexed column instead of a stack of collapsible boxes. No words changed and
+    no page, section or WIP flag was dropped. */} 
 <nav aria-label={Label} class="docs-index">
-	<p class="type-meta uppercase tracking-widest text-zinc-dust">Doc index</p>
-	<div
-		class="mt-2 max-h-[calc(100vh-9rem)] overflow-y-auto border border-oxblood-dark bg-carbon-void p-5"
-	>
+	<p class="docs-index__eyebrow type-meta uppercase tracking-widest text-zinc-dust">
+		Doc index
+	</p>
+	<div class="docs-index__panel mt-2 max-h-[calc(100vh-9rem)] overflow-y-auto p-5">
 		{/* The in-page outline is the docs route's own (pages/docs/[...slug].astro):
 		    the rail names where a reader can go, not where they are inside a page. */}
 		<div class="flex flex-col gap-3">
@@ -273,7 +282,7 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
 
 					return (
 						<details
-							class="group"
+							class="group docs-index__group"
 							open={IsCurrent}
 							data-docs-section={Section.Name}
 							data-current-section={IsCurrent ? "1" : undefined}
@@ -304,7 +313,7 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
 									▸
 								</span>
 							</summary>
-							<ul class="mt-2 flex flex-col gap-1 border-l border-oxblood-dark pl-3">
+							<ul class="docs-index__branch mt-2 flex flex-col gap-1 border-l pl-3">
 								{Section.Pages.map((Page) => (
 									<li>
 										<a
@@ -333,7 +342,7 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
 											)}
 										</a>
 										{Page.Children.length > 0 && (
-											<ul class="mt-1 flex flex-col gap-1 border-l border-oxblood-dark pl-3">
+											<ul class="docs-index__branch mt-1 flex flex-col gap-1 border-l pl-3">
 												{Page.Children.map((Child) => (
 													<li>
 														<a
@@ -377,3 +386,44 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
 		</div>
 	</div>
 </nav>
+
+<style>
+	/* THE EYEBROW'S RULE. The rail's name sits on a hairline instead of floating
+	   above a box: it is the column's header, and a header with a rule under it
+	   is what makes the list below read as its contents. */
+	.docs-index__eyebrow {
+		border-bottom: 1px solid var(--tier-shell-edge);
+		padding-bottom: var(--space-tight);
+	}
+
+	/* THE WELL. One step darker than the page ground with a LIGHTER edge
+	   (`--tier-well-edge` against `--tier-shell-edge`), which is the whole
+	   difference between "recessed channel" and "another plate": the edge is
+	   what tells the eye the surface went in rather than came out. Radius 0 like
+	   every other edge on the site, and no shadow - the rail is quiet by design
+	   and the article beside it spends the page's emphasis. */
+	.docs-index__panel {
+		position: relative;
+		border: 1px solid var(--tier-well-edge);
+		border-radius: 0;
+		background-color: var(--tier-well);
+	}
+
+	/* THE GROUP RULE. Sections are divided by the same hairline the blueprint
+	   uses everywhere else, and the first one keeps no rule (the eyebrow's rule
+	   is already above it). A `<details>` is a block, so the border costs no
+	   layout: the container's own `gap-3` still owns the distance. */
+	.docs-index__group + .docs-index__group {
+		border-top: 1px solid var(--tier-shell-edge);
+		padding-top: 0.75rem;
+	}
+
+	/* THE BRANCH RULE. The page list and the nested child list are indented by a
+	   hairline rather than by a crimson plate edge - the same 1px, at the same
+	   volume as the rail's own boundary, so depth reads as depth and not as a
+	   second colour system. Declared here because `--tier-shell-edge` has no
+	   Tailwind colour of its own. */
+	.docs-index__branch {
+		border-left-color: var(--tier-shell-edge);
+	}
+</style>

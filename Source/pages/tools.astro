@@ -4,7 +4,6 @@ import Base from "@Layout/Base.astro";
 import Related from "@Component/Related.astro";
 import PageShell from "@Component/PageShell.astro";
 import PageHeader from "@Component/PageHeader.astro";
-import ZineTape from "@Component/ZineTape.astro";
 import ZineBox from "@Component/ZineBox.astro";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import { Assert, ToolNames, Tools as Roster, Undeclared } from "@Library/Roster";
@@ -21,10 +20,61 @@ import MarkerFormat from "../Content/Mermaid/marker-format.svg?raw";
 // does not register.
 Assert("Source/Library/Prose/Tools.ts", ToolProse, ToolNames);
 
-const Tools: (ToolRecord & { N: string; Note?: string })[] = Roster.map((Tool, Index) => ({
+/* ═══ THE DOOR CHIP ════════════════════════════════════════════════════════
+ *
+ * The matrix's third column says which side of the session store a handle
+ * moves, and it is read off the tool's OWN schema sentence - the one printed
+ * in the same row - rather than off a list kept somewhere else.
+ *
+ * Three families, three colours, and the colour is IDENTITY rather than rank:
+ * teal is a read, canary is a write, bone is the engine tuning itself. The
+ * chip vocabulary is Global.css's published `.telemetry-tag` modifiers, so
+ * contrast is the stylesheet's problem and not this page's.
+ *
+ * A tool added upstream arrives WITHOUT a door chip and that is the honest
+ * state: the page does not yet know what it does, and inventing a family for
+ * it would be a guess rendered as a fact. The row still renders - identifier,
+ * argument count, description - so the matrix never hides a shipped handle.
+ */
+type Door = "read" | "write" | "control";
+
+const Doors: Record<string, { Label: string; Tone: Door }> = {
+	aphrodite_compress: { Label: "Store", Tone: "write" },
+	aphrodite_prefetch: { Label: "Preload", Tone: "write" },
+	aphrodite_retrieve: { Label: "Pull", Tone: "read" },
+	aphrodite_search: { Label: "Find", Tone: "read" },
+	aphrodite_stats: { Label: "Status", Tone: "read" },
+	aphrodite_files: { Label: "Status", Tone: "read" },
+	aphrodite_diff: { Label: "Status", Tone: "read" },
+	aphrodite_catalog: { Label: "Status", Tone: "read" },
+	aphrodite_prefetch_status: { Label: "Status", Tone: "read" },
+	aphrodite_rebuild: { Label: "Status", Tone: "read" },
+	aphrodite_directive: { Label: "Tune", Tone: "control" },
+	aphrodite_reclassify: { Label: "Re-type", Tone: "control" },
+	aphrodite_test: { Label: "Test", Tone: "control" },
+	aphrodite_debug: { Label: "Toggle", Tone: "control" },
+};
+
+/** The published `.telemetry-tag` modifier per family - colour as identity. */
+const DoorTone: Record<Door, string> = {
+	read: "telemetry-tag--teal",
+	write: "telemetry-tag--canary",
+	control: "telemetry-tag--bone",
+};
+
+const Tools: (ToolRecord & {
+	N: string;
+	Note?: string;
+	Door?: { Label: string; Tone: Door };
+	Args: string;
+})[] = Roster.map((Tool, Index) => ({
 	...Tool,
 	N: String(Index + 1).padStart(2, "0"),
 	Note: ToolProse[Tool.Name]?.Note,
+	Door: Doors[Tool.Name],
+	// Derived, never typed: the schema declares the arguments, so the chip
+	// counts them. A tool that gains an argument upstream moves its own chip.
+	Args: Tool.Parameters.length === 0 ? "No args" : `${Tool.Parameters.length} args`,
 }));
 
 /* ═══ ONE PAYLOAD, ONE MARKER, ONE PREVIEW ═════════════════════════════════
@@ -210,18 +260,33 @@ const TerminalSummary = (Lines: readonly string[]): string =>
 		.trim()
 		.slice(0, 60);
 
-/** One payload: the bytes, the classifier's verdict, and everything derived. */
-const Scenario = (Hash: string, Type: string, Lines: readonly string[], Preview: string) => ({
+/**
+ * One payload: the bytes, the classifier's verdict, and everything derived.
+ *
+ * `Count` and `Bytes` are what the console pair's row label prints - the
+ * payload's own length, not a typed number, so a change to the sample moves
+ * the label, the preview and the marker's size field together.
+ */
+const Scenario = (
+	Label: string,
+	Hash: string,
+	Type: string,
+	Lines: readonly string[],
+	Preview: string,
+) => ({
+	Label,
 	Hash,
 	Type,
+	Count: Lines.length,
 	Bytes: RunBytes(Lines),
 	Preview,
 	Marker: RunMarker(Hash, Type, Lines),
 });
 
 const Scenarios = [
-	Scenario("a1b2c3d4", "build", BuildLines, RunPreview("build", BuildLines)),
+	Scenario("Build log", "a1b2c3d4", "build", BuildLines, RunPreview("build", BuildLines)),
 	Scenario(
+		"Test run",
 		"e5f6a7b8",
 		"terminal",
 		TerminalLines,
@@ -249,21 +314,84 @@ const MarkerFields = (Marker: string): string[] =>
 			]}
 		/>
 
-		<!-- SLOT 3: one claim's evidence - the register, its contract, its two schemas -->
-		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label={`REGISTRY // ${Tools.length} ENTRIES`} />
-			<ZineBox Size="lg" Rotate="-rotate-[1deg]">
+		<!-- 01 // REGISTRY - one row per handle, hairline-ruled -->
+		<section class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index">01 // REGISTRY // {Tools.length} ENTRIES</p>
+			<h2 class="mt-3 font-headline text-sub font-black uppercase text-bone-white">
+				Every handle, one relay
+			</h2>
+			<p class="mt-6 max-w-[46rem] font-body text-body text-bone-newsprint">
+				Each row is one registered handle: the identifier the agent types, the side of the
+				session store it moves, the arguments its schema declares, and the sentence the schema
+				gives it. The door chip's colour is the family and not a rank - teal reads, canary
+				writes, and bone is the engine tuning itself.
+			</p>
+
+			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
 				<div class="overflow-x-auto">
-					<table class="w-full border-collapse font-mono text-base">
+					<table class="w-full border-collapse text-left">
+						<thead>
+							<tr class="border-b border-[color:var(--tier-well-edge)]">
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
+									#
+								</th>
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
+									Handle
+								</th>
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
+									Door
+								</th>
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
+									Args
+								</th>
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
+									What the model reads
+								</th>
+							</tr>
+						</thead>
 						<tbody>
-							{Tools.map((Tool, I) => (
-								<tr class={I < Tools.length - 1 ? "border-b border-oxblood-dark" : ""}>
-									<td class="py-3 pr-4 align-top text-base font-black text-zinc-dust">{Tool.N}</td>
-									<td class="py-3 pr-6 align-top whitespace-nowrap text-weathered-teal">{Tool.Name}</td>
-									<td class="py-3 align-top text-bone-newsprint">
-										{Tool.Summary}
+							{Tools.map((Tool) => (
+								<tr class="border-b border-[color:var(--tier-shell-edge)] align-top last:border-b-0">
+									<td class="px-4 py-4 font-mono text-meta font-bold text-zinc-dust sm:px-5">
+										{Tool.N}
+									</td>
+									<td class="whitespace-nowrap px-4 py-4 font-mono text-code sm:px-5">
+										<a
+											class="text-weathered-teal underline decoration-transparent decoration-2 underline-offset-4 transition-colors hover:decoration-stamped-canary"
+											href={`#${Tool.Name}`}
+										>
+											{Tool.Name}
+										</a>
+									</td>
+									<td class="px-4 py-4 sm:px-5">
+										{Tool.Door ? (
+											<span class:list={["telemetry-tag", DoorTone[Tool.Door.Tone]]}>
+												{Tool.Door.Label}
+											</span>
+										) : null}
+									</td>
+									<td class="px-4 py-4 sm:px-5">
+										<span class="telemetry-tag">{Tool.Args}</span>
+									</td>
+									<td class="max-w-[34rem] px-4 py-4 sm:px-5">
+										<p class="font-body text-body text-bone-newsprint">{Tool.Summary}</p>
 										{Tool.Note ? (
-											<span class="mt-1 block text-zinc-dust">{Tool.Note}</span>
+											<p class="mt-2 font-body text-body text-zinc-dust">{Tool.Note}</p>
 										) : null}
 									</td>
 								</tr>
@@ -271,136 +399,202 @@ const MarkerFields = (Marker: string): string[] =>
 						</tbody>
 					</table>
 				</div>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
-					THERE IS AN INTERNAL 14TH REGISTRY ENTRY, context_engine_pre_llm - THE CONTEXT
-					ENGINE'S OWN PRE-LLM HOOK, NOT A TOOL AN AGENT CALLS DIRECTLY.
-					{Undeclared.length > 0 ? (
-						<span class="mt-3 block">
-							{Undeclared.map((Tool) => Tool.Name).join(", ")} is compiled in under
-							<code class="font-mono text-base text-weathered-teal">debug_assertions</code> only:
-							a real schema, not a registered tool, so it is named rather than counted.
-						</span>
-					) : null}
-				</p>
+			</div>
 
-				<figure
-					class="mt-16 border border-oxblood-dark bg-soot-black p-4"
-					data-diagram="tool-relay"
-				>
-					<div class="overflow-x-auto" set:html={ToolRelay} />
-					<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-						M4 // TOOL RELAY
-					</figcaption>
-				</figure>
+			<p class="mt-8 max-w-[46rem] border-t border-oxblood-dark pt-6 font-body text-body leading-relaxed text-zinc-dust">
+				THERE IS AN INTERNAL 14TH REGISTRY ENTRY, context_engine_pre_llm - THE CONTEXT
+				ENGINE'S OWN PRE-LLM HOOK, NOT A TOOL AN AGENT CALLS DIRECTLY.
+				{Undeclared.length > 0 ? (
+					<span class="mt-3 block">
+						{Undeclared.map((Tool) => Tool.Name).join(", ")} is compiled in under
+						<code class="font-mono text-base text-weathered-teal">debug_assertions</code> only:
+						a real schema, not a registered tool, so it is named rather than counted.
+					</span>
+				) : null}
+			</p>
 
-				<ZineTape Variant="section" Label="CONTRACT // THE MARKER" />
-				<h3
-					id="marker"
-					class="mb-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					THE MARKER
-				</h3>
-				<div class="ccr-marker mb-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-					&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;
-				</div>
-				<div
-					class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed"
-					data-stream
-				>
-					{Scenarios.map((Payload, Index) => {
-						const [Hash = "", Type = "", Size = ""] = MarkerFields(Payload.Marker);
+			<figure
+				class="mt-16 border border-oxblood-dark bg-soot-black p-4"
+				data-diagram="tool-relay"
+			>
+				<div class="overflow-x-auto" set:html={ToolRelay} />
+				<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+					M4 // TOOL RELAY
+				</figcaption>
+			</figure>
+		</section>
 
-						return (
-							<>
-								<div
-									class:list={[
-										"ccr-marker text-bone-newsprint",
-										{ "mt-6": Index > 0 },
-									]}
+		<!-- 02 // CONTRACT - the retrieval vocabulary as one console pair -->
+		<section class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index">02 // CONTRACT // THE MARKER</p>
+			<h2
+				id="marker"
+				class="mt-3 scroll-mt-24 font-headline text-sub font-black uppercase text-bone-white"
+			>
+				THE MARKER
+			</h2>
+			<div class="ccr-marker mt-6 font-headline text-sub font-black uppercase text-bone-white">
+				&lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;
+			</div>
+
+			<ZineBox
+				Emphasis="standard"
+				Accent="crimson"
+				Size="lg"
+				Surface="shell"
+				Grunge={true}
+				Class="mt-10"
+			>
+				<div class="overflow-x-auto">
+					<table class="w-full border-collapse text-left font-mono">
+						<thead>
+							<tr>
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 text-left font-bold uppercase text-zinc-dust"
 								>
-									&lt;&lt;&lt;<span class="text-stamped-canary">CCR:</span>
-									<span class="text-weathered-teal">{Hash}...</span>
-									<span class="text-bone-white">|{Type}|{Size}</span>
-									<span class="text-bone-white">&gt;&gt;&gt;</span>
-								</div>
-								<div class="pl-4 text-zinc-dust">{Payload.Preview}</div>
-							</>
-						);
-					})}
-				</div>
-				<p class="mt-8 font-body text-base leading-relaxed text-bone-newsprint">
-					A marker and its preview are two views of one payload, so both are computed from
-					the same bytes: the hash addresses the stored output, the type is the
-					classifier's verdict, and the size is the UTF-8 byte count of the bytes behind
-					the hash - which is what a retrieval of that marker puts back into the
-					transcript, not an estimate of it. The preview beside each one comes from the
-					engine's own builders, so its tallies are the payload's own: the build-log sample
-					counts four error lines, one warning line and every line it printed, and the test
-					run reports the exit code of the last line it printed.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					Both payloads clear their gate before either becomes a marker - 4,096 characters
-					for a tool result, 1,024 for terminal output - because below the gate the engine
-					passes the bytes through raw and no marker exists at all. Every figure here is
-					the payload's own length rather than a typed number, so a change to the output
-					moves the preview, the tallies and the size together.
-				</p>
-				<ul class="mt-12 space-y-6 font-body text-base text-bone-newsprint">
-					<li class="border-l-4 border-raw-blood pl-4">
-						<span class="font-bold text-bone-white">BLAKE3 hash</span> - pattern
-						<code class="font-mono text-base text-weathered-teal">{'^^[0-9a-fA-F]{8,64}$'}</code>;
-						truncated hashes never resolve, exact match only.
-					</li>
-					<li class="border-l-4 border-raw-blood pl-4">
-						<span class="font-bold text-bone-white">Byte-exact round-trip</span> -
-						<code class="font-mono text-base text-weathered-teal">aphrodite_retrieve</code>
-						returns the original bytes, nested markers expanded recursively.
-					</li>
-					<li class="border-l-4 border-raw-blood pl-4">
-						<span class="font-bold text-bone-white">Workspace-confined reads</span> -
-						<code class="font-mono text-base text-weathered-teal">path</code> reads are
-						capped at 10 MiB and refuse paths outside the workspace.
-					</li>
-					<li class="border-l-4 border-raw-blood pl-4">
-						<span class="font-bold text-bone-white">Markers don't survive a session restart</span>
-						- the dylib is loaded once per process, so a new session starts a fresh store.
-					</li>
-				</ul>
-				<figure class="mt-16 border border-oxblood-dark bg-soot-black p-4" data-diagram="marker-format">
-					<div class="overflow-x-auto" set:html={MarkerFormat} />
-					<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-						M6 // MARKER FORMAT
-					</figcaption>
-				</figure>
+									Payload
+								</th>
+								<th
+									scope="col"
+									class="border-l border-[color:var(--tier-well-edge)] px-4 py-3 text-left"
+								>
+									<span class="telemetry-tag telemetry-tag--canary">MARKER</span>
+									<span class="type-meta mt-2 block uppercase text-zinc-dust">
+										What the model receives
+									</span>
+								</th>
+								<th
+									scope="col"
+									class="border-l border-[color:var(--tier-well-edge)] px-4 py-3 text-left"
+								>
+									<span class="telemetry-tag telemetry-tag--teal">PREVIEW</span>
+									<span class="type-meta mt-2 block uppercase text-zinc-dust">
+										What it already reads
+									</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{Scenarios.map((Payload) => {
+								const [Hash = "", Type = "", Size = ""] = MarkerFields(Payload.Marker);
 
-				<ZineTape Variant="section" Label="SCHEMAS // EVERY ARGUMENT" />
-				<h3
-					id="schemas"
-					class="mt-20 mb-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					SCHEMAS // EVERY TOOL
-				</h3>
-				<p class="mb-12 font-body text-base leading-relaxed text-bone-newsprint">
-					Each panel is the schema the agent is handed: the description it reads, then every
-					argument with its type and its own sentence. None of it is retyped - the schema is
-					rendered straight from
-					<code class="font-mono text-base text-weathered-teal">schemas.rs</code>, so an
-					argument added to a tool appears without an edit.
-				</p>
-				<div class="grid grid-cols-1 gap-12 lg:grid-cols-2">
-					{
-						Tools.map((Tool) => (
-							<div id={Tool.Name} class="scroll-mt-24">
-								<h4 class="mb-6 font-headline text-lg font-black uppercase text-bone-white">
-									<span class="mr-3 text-zinc-dust">{Tool.N}</span>
-									{Tool.Name}
-								</h4>
-								<div class="mb-6 space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed">
+								return (
+									<tr class="border-t border-[color:var(--tier-shell-edge)] align-top">
+										<th scope="row" class="px-4 py-4 text-left align-top">
+											<span class="type-meta block uppercase text-zinc-dust">{Payload.Label}</span>
+											<span class="type-meta mt-1 block text-zinc-dust">
+												{Payload.Count} lines · {Payload.Bytes.toLocaleString("en-US")} bytes
+											</span>
+										</th>
+										<td class="border-l border-[color:var(--tier-shell-edge)] px-4 py-4">
+											<div class="ccr-marker text-code text-bone-newsprint">
+												&lt;&lt;&lt;<span class="text-stamped-canary">CCR:</span>
+												<span class="text-weathered-teal">{Hash}...</span>
+												<span class="text-bone-white">|{Type}|{Size}</span>
+												<span class="text-bone-white">&gt;&gt;&gt;</span>
+											</div>
+										</td>
+										<td class="border-l border-[color:var(--tier-shell-edge)] px-4 py-4">
+											<div class="text-code text-zinc-dust">{Payload.Preview}</div>
+										</td>
+									</tr>
+								);
+							})}
+						</tbody>
+					</table>
+				</div>
+			</ZineBox>
+
+			<p class="mt-10 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
+				A marker and its preview are two views of one payload, so both are computed from
+				the same bytes: the hash addresses the stored output, the type is the
+				classifier's verdict, and the size is the UTF-8 byte count of the bytes behind
+				the hash - which is what a retrieval of that marker puts back into the
+				transcript, not an estimate of it. The preview beside each one comes from the
+				engine's own builders, so its tallies are the payload's own: the build-log sample
+				counts four error lines, one warning line and every line it printed, and the test
+				run reports the exit code of the last line it printed.
+			</p>
+			<p class="mt-3 max-w-[46rem] font-body text-body leading-relaxed text-zinc-dust">
+				Both payloads clear their gate before either becomes a marker - 4,096 characters
+				for a tool result, 1,024 for terminal output - because below the gate the engine
+				passes the bytes through raw and no marker exists at all. Every figure here is
+				the payload's own length rather than a typed number, so a change to the output
+				moves the preview, the tallies and the size together.
+			</p>
+			<ul class="mt-12 space-y-6 font-body text-base text-bone-newsprint">
+				<li class="border-l-4 border-raw-blood pl-4">
+					<span class="font-bold text-bone-white">BLAKE3 hash</span> - pattern
+					<code class="font-mono text-base text-weathered-teal">{'^^[0-9a-fA-F]{8,64}$'}</code>;
+					truncated hashes never resolve, exact match only.
+				</li>
+				<li class="border-l-4 border-raw-blood pl-4">
+					<span class="font-bold text-bone-white">Byte-exact round-trip</span> -
+					<code class="font-mono text-base text-weathered-teal">aphrodite_retrieve</code>
+					returns the original bytes, nested markers expanded recursively.
+				</li>
+				<li class="border-l-4 border-raw-blood pl-4">
+					<span class="font-bold text-bone-white">Workspace-confined reads</span> -
+					<code class="font-mono text-base text-weathered-teal">path</code> reads are
+					capped at 10 MiB and refuse paths outside the workspace.
+				</li>
+				<li class="border-l-4 border-raw-blood pl-4">
+					<span class="font-bold text-bone-white">Markers don't survive a session restart</span>
+					- the dylib is loaded once per process, so a new session starts a fresh store.
+				</li>
+			</ul>
+			<figure class="mt-16 border border-oxblood-dark bg-soot-black p-4" data-diagram="marker-format">
+				<div class="overflow-x-auto" set:html={MarkerFormat} />
+				<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+					M6 // MARKER FORMAT
+				</figcaption>
+			</figure>
+		</section>
+
+		<!-- 03 // SCHEMAS - one panel per handle, every argument -->
+		<section class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index">03 // SCHEMAS // EVERY ARGUMENT</p>
+			<h2
+				id="schemas"
+				class="mt-3 scroll-mt-24 font-headline text-sub font-black uppercase text-bone-white"
+			>
+				SCHEMAS // EVERY TOOL
+			</h2>
+			<p class="mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
+				Each panel is the schema the agent is handed: the description it reads, then every
+				argument with its type and its own sentence. None of it is retyped - the schema is
+				rendered straight from
+				<code class="font-mono text-base text-weathered-teal">schemas.rs</code>, so an
+				argument added to a tool appears without an edit.
+			</p>
+
+			<div class="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-2">
+				{
+					Tools.map((Tool) => (
+						<div
+							id={Tool.Name}
+							class="grunge shell-card scroll-mt-24"
+							data-grunge
+							data-grunge-mode="edge"
+						>
+							<div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[color:var(--tier-shell-edge)] px-5 py-4">
+								<span class="font-mono text-meta font-bold text-zinc-dust">{Tool.N}</span>
+								<h4 class="font-mono text-code font-bold text-bone-white">{Tool.Name}</h4>
+								{Tool.Door ? (
+									<span class:list={["telemetry-tag", DoorTone[Tool.Door.Tone]]}>
+										{Tool.Door.Label}
+									</span>
+								) : null}
+								<span class="telemetry-tag ml-auto">{Tool.Args}</span>
+							</div>
+							<div class="prose-flow px-5 py-5">
+								<div class="well px-4 py-4 font-mono text-code leading-relaxed">
 									{Tool.Parameters.length === 0 ? (
 										<div class="text-zinc-dust">takes no arguments</div>
 									) : (
 										Tool.Parameters.map((Parameter) => (
-											<div class="mb-3">
+											<div class="mb-3 last:mb-0">
 												<div>
 													<span class="text-zinc-dust">"{Parameter.Name}":</span>{" "}
 													<span class="text-bone-newsprint">{`{ ${Parameter.Type}${Parameter.Required ? " · required" : " · optional"} }`}</span>
@@ -410,33 +604,40 @@ const MarkerFields = (Marker: string): string[] =>
 										))
 									)}
 								</div>
-								<p class="font-body text-base leading-relaxed text-zinc-dust">{Tool.Description}</p>
+								<p class="font-body text-body leading-relaxed text-bone-newsprint">
+									{Tool.Description}
+								</p>
 								{(ToolProse[Tool.Name]?.Paragraph ?? []).map((Line) => (
-									<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">{Line}</p>
+									<p class="font-body text-body leading-relaxed text-zinc-dust">{Line}</p>
 								))}
 							</div>
-						))
-					}
-				</div>
+						</div>
+					))
+				}
+			</div>
+		</section>
 
-				<ZineTape Variant="section" Label="RULE // META-TOOLS" />
-				<h3
-					id="meta-tools"
-					class="mb-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					Meta-tool output is auto-expanded
-				</h3>
-				<p class="font-body text-base leading-relaxed text-bone-newsprint">
+		<!-- 04 // RULE - the engine's own status is never compressed -->
+		<section class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index">04 // RULE // META-TOOLS</p>
+			<h2
+				id="meta-tools"
+				class="mt-3 scroll-mt-24 font-headline text-sub font-black uppercase text-bone-white"
+			>
+				Meta-tool output is auto-expanded
+			</h2>
+			<div class="prose-flow mt-6 max-w-[46rem]">
+				<p class="font-body text-body leading-relaxed text-bone-newsprint">
 					Output from meta-tools (like
 					<code class="font-mono text-base text-weathered-teal">aphrodite_stats</code> or
 					<code class="font-mono text-base text-weathered-teal">aphrodite_catalog</code>) is
 					expanded inline, never compressed - the agent always sees its own engine's status
 					in full.
 				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+				<p class="font-body text-body leading-relaxed text-bone-newsprint">
 					Compressing the catalog would just be the engine hiding its own ledger.
 				</p>
-			</ZineBox>
+			</div>
 		</section>
 
 		<!-- SLOT 4: exactly one onward link -->

@@ -23,6 +23,32 @@
  * section am I reading" is a runtime fact, not a build-time one. The script is
  * a module with no dependencies and no framework: it reads the nav's own
  * links, so a page that renders no sections renders no listener.
+ *
+ * ── HAIRLINE + MONO (Stitch grammar) ─────────────────────────────────────
+ *
+ * The bar is chrome at the top of a document, so it reads as the drawing's
+ * header strip:
+ *
+ *   - its lower boundary is the 1px `--tier-shell-edge` hairline instead of the
+ *     oxblood panel border it carried. Oxblood is a BOUNDARY colour for plates,
+ *     and a sticky strip that borrowed it read as one more plate sliding over
+ *     the page;
+ *   - every entry carries its own ordinal (`01`, `02`, ...) in 10px mono, because
+ *     the index is a SEQUENCE - the numbers say how far through the page a
+ *     section sits, which is the one thing a list of names cannot say;
+ *   - the stamp and the list are divided by a vertical hairline from `sm` up, so
+ *     the label is a margin mark beside the sequence rather than a word glued to
+ *     it.
+ *
+ * The ordinals are `aria-hidden`: they are positional marks, and a screen
+ * reader announcing "zero one Retrieve" would read the ruler instead of the
+ * name. The number is also NOT the active marker - the canary label and its
+ * underline stay the only "you are here", so the two never compete for the same
+ * signal.
+ *
+ * The bar keeps the page ground it already painted and nothing more: a sticky
+ * element that paints a raised surface reads as a floating panel, and the point
+ * of the hairline is that the document continues behind it.
  */
 import ZineStamp from "./ZineStamp.astro";
 
@@ -46,10 +72,12 @@ interface Props {
 
 const { Sections } = Astro.props;
 
-const Entries = Sections.map((Section) => ({
+const Entries = Sections.map((Section, Position) => ({
 	Id: Section.Id,
 	Label: Section.Label,
 	Nav: Section.Nav ?? NavLabels[Section.Id] ?? Section.Label,
+	/** The ordinal, in the index's own two-digit voice. */
+	Ordinal: String(Position + 1).padStart(2, "0"),
 }));
 
 /** The link classes, in the index's own voice: quiet until it is the section you are in. */
@@ -61,13 +89,16 @@ const LinkClass =
 <nav
 	aria-label="On this page"
 	data-section-nav
-	class="section-nav sticky top-0 z-30 -mx-5 hidden w-full items-center gap-6 border-b border-oxblood-dark bg-carbon-void px-5 py-3 sm:-mx-8 sm:flex sm:px-8 lg:-mx-14 lg:px-14"
+	class="section-nav sticky top-0 z-30 -mx-5 hidden w-full items-center gap-6 border-b bg-carbon-void px-5 py-3 sm:-mx-8 sm:flex sm:px-8 lg:-mx-14 lg:px-14"
 >
 	<ZineStamp Label="ON THIS PAGE" Color="raw" />
-	<ul class="flex flex-wrap items-center gap-x-5 gap-y-1">
+	<ul class="section-nav__list flex flex-wrap items-center gap-x-5 gap-y-1">
 		{
 			Entries.map((Entry) => (
-				<li>
+				<li class="flex items-baseline gap-2">
+					<span class="section-nav__ordinal" aria-hidden="true">
+						{Entry.Ordinal}
+					</span>
 					<a href={`#${Entry.Id}`} class={LinkClass} title={Entry.Label}>
 						{Entry.Nav}
 					</a>
@@ -80,7 +111,7 @@ const LinkClass =
 <!-- Mobile: the same index, collapsed to one row until the reader opens it. -->
 <details
 	data-section-nav
-	class="section-nav sticky top-0 z-30 -mx-5 w-full border-b border-oxblood-dark bg-carbon-void px-5 py-2 sm:hidden"
+	class="section-nav sticky top-0 z-30 -mx-5 w-full border-b bg-carbon-void px-5 py-2 sm:hidden"
 >
 	<summary
 		class="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden"
@@ -93,8 +124,11 @@ const LinkClass =
 	<ul class="flex flex-col pb-1 pt-3">
 		{
 			Entries.map((Entry) => (
-				<li class="border-t border-oxblood-dark/40">
+				<li class="section-nav__row border-t">
 					<a href={`#${Entry.Id}`} class={`${LinkClass} block py-2.5`} title={Entry.Label}>
+						<span class="section-nav__ordinal mr-2" aria-hidden="true">
+							{Entry.Ordinal}
+						</span>
 						{Entry.Nav}
 					</a>
 				</li>
@@ -102,6 +136,50 @@ const LinkClass =
 		}
 	</ul>
 </details>
+
+<style>
+	/* THE HAIRLINE. One declaration for both presentations: the lower boundary is
+	   the shell edge, the colour the blueprint ruling and the chapter rules use,
+	   so the bar, the grid and the sections draw at one volume. Declared here
+	   rather than as a `border-*` utility because `--tier-shell-edge` has no
+	   Tailwind colour of its own, and a literal hex in the markup would be a
+	   second copy of the palette. */
+	.section-nav {
+		border-bottom-color: var(--tier-shell-edge);
+	}
+
+	/* THE ORDINAL. 10px mono, tabular so `01`-`09` and `10` share a width and the
+	   labels stay in one column. Quiet by design: it is a ruler mark, not a
+	   label, and the label beside it is the thing being read. */
+	.section-nav__ordinal {
+		display: inline-block;
+		font-family: "JetBrains Mono", monospace;
+		font-size: 10px;
+		font-weight: 700;
+		line-height: 1.4;
+		letter-spacing: 0.08em;
+		font-variant-numeric: tabular-nums;
+		color: var(--zinc-dust);
+	}
+
+	/* THE DIVISION between the stamp and the sequence: a vertical hairline from
+	   `sm` up, where the bar is a row. On the phone the stamp sits above the
+	   list, so a vertical rule there would divide nothing. */
+	@media (min-width: 640px) {
+		.section-nav__list {
+			border-left: 1px solid var(--tier-shell-edge);
+			padding-left: 1.5rem;
+		}
+	}
+
+	/* THE PHONE'S ROW RULES. The disclosure's rows are divided by the same
+	   hairline as everything else in the chrome; they carried `oxblood-dark` at
+	   40%, which is a PLATE edge seen through a dimmer. Declared here so the
+	   whole strip - boundary, division and rows - is one colour at one volume. */
+	.section-nav__row {
+		border-top-color: var(--tier-shell-edge);
+	}
+</style>
 
 <script>
 	// WHICH SECTION IS ACTIVE - one rule, stated once, and the code below is

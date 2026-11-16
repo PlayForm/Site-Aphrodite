@@ -381,15 +381,37 @@ for (const Arc of Arcs) {
 	for (const Version of Arc.Span.match(/v[\d.]+/g) ?? []) Release(Version);
 }
 
+// The arc's own colour, in the two places the blueprint grammar reads it: the
+// chapter rule that opens the arc, and the numbered index beside it. Colour is
+// identity here, not decoration - ARC 1 was crimson-ruled before this page had
+// a blueprint grammar and it is crimson-ruled after it - so both are DERIVED
+// from the record's existing `Border` and `Tone` rather than restated beside
+// them, where they could drift from the left rule the arc already carries.
+const BorderRule: Record<string, string> = {
+	"border-raw-blood": "var(--raw-blood)",
+	"border-stamped-canary": "var(--stamped-canary)",
+	"border-weathered-teal": "var(--weathered-teal)",
+};
+
+const ToneInk: Record<string, string> = {
+	canary: "!text-stamped-canary",
+	teal: "!text-weathered-teal",
+	dust: "!text-zinc-dust",
+};
+
 // The arcs with their three beats normalized: `[Beat].flat()` turns a
 // single-sentence beat into a one-entry array and leaves a multi-sentence beat
-// as it is, so the template has exactly one shape to render.
+// as it is, so the template has exactly one shape to render. The three beats
+// are the arc's blueprint row - incident, fix, mechanic - so the record carries
+// the row's own numbers rather than the template counting its way through them.
 const ArcsWithBeats = Arcs.map((Arc) => ({
 	...Arc,
+	Rule: BorderRule[Arc.Border]!,
+	Ink: ToneInk[Arc.Tone]!,
 	Beats: [
-		{ Label: "The incident.", Sentences: [Arc.Incident].flat() },
-		{ Label: "The fix.", Sentences: [Arc.Fix].flat() },
-		{ Label: "Mechanics today.", Sentences: [Arc.Today].flat() },
+		{ N: "01", Label: "The incident.", Sentences: [Arc.Incident].flat() },
+		{ N: "02", Label: "The fix.", Sentences: [Arc.Fix].flat() },
+		{ N: "03", Label: "Mechanics today.", Sentences: [Arc.Today].flat() },
 	],
 }));
 // The monument figure below is rendered as comma-separated groups with a <wbr>
@@ -428,17 +450,23 @@ const TokenGroups = Study.TokensSaved.split(",");
 					substance on call, and make the agent - not the engine - the one who pays for
 					detail.
 				</p>
-				<!-- Monument stat: the hook. The study's full ledger lives on /benchmarks/.
-				     It is its own entrance root, 240ms behind the manifesto it follows,
-				     and the two figures climb to their values once. -->
-				<div
-					class="zine-box-subtle mt-24 w-full max-w-4xl border-[3px] border-raw-blood bg-soot-black p-8 sm:p-10"
+				<!-- THE SESSION STUDY, as a printed sheet laid on the dark table. It is the
+				     page's ONE inverted tier - `.tier-inverted`, re-tinted to the sand /
+				     newsprint tone so the sheet reads as a proof pulled off a press
+				     rather than as a white card - and the only place on the page where the
+				     ground and the ink swap. Its three secondary figures keep dark `well`
+				     cells below, because an inverted ground would have made their teal and
+				     bone accents unreadable, and colour on this page is identity, not
+				     decoration.
+				     Its own entrance root, 240ms behind the manifesto it follows. -->
+				<aside
+					class="tier-inverted grunge grunge--oxblood zine-box-subtle relative mt-24 w-full max-w-4xl border-[3px] border-raw-blood p-8 sm:p-10"
+					style="--tier-inverted: var(--bone-newsprint)"
+					data-grunge
 					data-enter="240"
 				>
-					<ZineKicker Tone="dust">CONTEXT TOKENS SAVED · 200 REAL SESSIONS</ZineKicker>
-					<div
-						class="mt-6 font-headline text-5xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-7xl"
-					>
+					<ZineKicker Tone="ink">CONTEXT TOKENS SAVED · 200 REAL SESSIONS</ZineKicker>
+					<div class="metric mt-6 !text-soot-black drop-shadow-[3px_3px_0px_#520612]">
 						{/* set:html, not a JSX map: Astro preserves the whitespace between
 						    sibling expressions in a multi-line template, so the mapped
 						    version rendered "156 , 342 , 817" with visible spaces around
@@ -446,21 +474,21 @@ const TokenGroups = Study.TokensSaved.split(",");
 						    cannot re-introduce one. */}
 						<span set:html={TokenGroups.join(",<wbr>")} />
 					</div>
-					<div class="mt-6 flex flex-wrap items-center gap-8 font-mono text-base font-bold">
-						<span class="text-stamped-canary"
+					<div class="mt-6 flex flex-wrap items-center gap-4">
+						<span class="telemetry-tag telemetry-tag--canary"
 							>{Study.SavedPct.replace("%", "")}% OF THE TOTAL BUDGET</span
 						>
 					</div>
-					<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-carbon-void">
 						The percentage is the honest way to read the number: {Study.TokensSaved} tokens is
 						only impressive once you know what it was a share of. {Study.SessionsUnsaved} of
 						the {Study.Sessions} sessions saved nothing at all, and the mean is pulled up by
 						the long tool-heavy runs - which is why the median sits beside it.
 					</p>
-					<div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-3">
+					<div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
 						{
 							Metrics.map(({ Label, Fact, Unit, Accent }) => (
-								<div class="border-t border-oxblood-dark pt-4">
+								<div class="well p-4 sm:p-5">
 									<div class="type-meta font-black text-zinc-dust">{Label}</div>
 									<div class={`mt-2 font-headline text-2xl font-black tracking-tight ${Accent}`}>
 										{Fact.Value}
@@ -473,8 +501,11 @@ const TokenGroups = Study.TokensSaved.split(",");
 							))
 						}
 					</div>
-					<ZineSource Lines={[`SRC: ${Cite(Study.From)}.`]} />
-				</div>
+				</aside>
+				<!-- The study's citation stays on the plate's own ground, just below the
+				     sheet: a source is a quiet voice, and the sand tier has no quiet voice
+				     - zinc-dust on bone is a contrast failure, not a whisper. -->
+				<ZineSource Lines={[`SRC: ${Cite(Study.From)}.`]} />
 			</ZineBox>
 		</header>
 
@@ -1018,45 +1049,64 @@ const TokenGroups = Study.TokensSaved.split(",");
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					Five incidents that set the laws
 				</h2>
-				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Every rule in the engine was paid for once.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Each arc runs the same three beats: the incident, the fix, and the
-					mechanic that still stands today.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					All of it is public record - the CHANGELOG entries and the release notes.
-				</p>
+				<div class="prose-flow mt-8 max-w-3xl">
+					<p class="font-body text-base leading-relaxed text-bone-newsprint">
+						Every rule in the engine was paid for once.
+					</p>
+					<p class="font-body text-base leading-relaxed text-bone-newsprint">
+						Each arc runs the same three beats: the incident, the fix, and the
+						mechanic that still stands today.
+					</p>
+					<p class="font-body text-base leading-relaxed text-bone-newsprint">
+						All of it is public record - the CHANGELOG entries and the release notes.
+					</p>
+				</div>
 				<div class="mt-24 flex flex-col gap-32">
 					{
-						ArcsWithBeats.map(({ N, Span, Law, Tone, Border, Title, Beats, Src }) => (
-							<article class={`border-l-4 ${Border} pl-6 sm:pl-10`} data-reveal>
-								<ZineKicker Tone={Tone} As="div">
-									{`${N} · ${Span} · ${Law}`}
-								</ZineKicker>
-								<h3 class="mt-6 font-headline text-xl font-black uppercase tracking-tight text-bone-white sm:text-2xl">
+						ArcsWithBeats.map(({ N, Span, Law, Border, Title, Beats, Src, Rule, Ink }) => (
+							<article
+								class:list={["blueprint-section", "border-l-4", Border, "pl-6 sm:pl-10"]}
+								style={`--blueprint-rule: ${Rule}`}
+								data-reveal
+							>
+								{/* THE NUMBERED SECTION. `ARC 1 · v1.3.0 -> v1.3.2 · THE LOSSLESSNESS
+								    LAW` becomes the blueprint's index tag, so the arc opens the way
+								    every chapter on the page does - a rule, then a number, then the
+								    subject - and the arc's own colour travels in `Ink` (identity)
+								    rather than in the tag's default dust (volume). */}
+								<p class:list={["section-index", Ink]}>{`${N} · ${Span} · ${Law}`}</p>
+								<h3 class="mt-4 font-headline text-xl font-black uppercase tracking-tight text-bone-white sm:text-2xl">
 									{Title}
 								</h3>
-								{
-									Beats.map((Beat, BeatIndex) =>
-										Beat.Sentences.map((Sentence, Index) => (
-											<p
-												class:list={[
-													BeatIndex === 0 && Index === 0 ? "mt-6" : "mt-3",
-													"max-w-3xl font-body text-base leading-relaxed text-bone-newsprint",
-												]}
-											>
-												{Index === 0 && (
-													<>
-														<strong class="text-bone-white">{Beat.Label}</strong>{" "}
-													</>
-												)}
-												<span set:html={Sentence} />
-											</p>
-										)),
-									)
-								}
+								{/* THE BLUEPRINT ROW: the arc's three beats side by side, one column
+								    each, divided by the drawing's own hairlines instead of by three
+								    separate cards. A ruled row is the blueprint reading, and it keeps
+								    the arc's colour in ONE left rule rather than repeating a frame
+								    three times. Each beat's label moves from the head of its first
+								    paragraph to the column head, where it names the column - the
+								    sentences themselves are untouched, in their original order. */}
+								<div class="mt-8 grid grid-cols-1 divide-y divide-oxblood-dark border-y border-oxblood-dark sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+									{
+										Beats.map((Beat) => (
+											<div class="flex flex-col py-6 sm:px-6 sm:first:pl-0 sm:last:pr-0">
+												<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+													<span class:list={["section-index", Ink]}>{Beat.N}</span>
+													<strong class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+														{Beat.Label}
+													</strong>
+												</div>
+												<div class="prose-flow mt-4">
+													{Beat.Sentences.map((Sentence) => (
+														<p
+															class="font-body text-base leading-relaxed text-bone-newsprint"
+															set:html={Sentence}
+														/>
+													))}
+												</div>
+											</div>
+										))
+									}
+								</div>
 								<ZineSource Lines={[Src]} />
 							</article>
 						))

@@ -225,17 +225,21 @@ const Exhibit = {
 				</button>
 			</div>
 
-			<!-- THE PAIR: the raw flow beside the line the LLM reads. -->
-			<div class="grid gap-20 lg:grid-cols-2">
-				<!-- INPUT + CLASSIFIED: the soot-black terminal panel. -->
+			<!-- THE PAIR: two pods. Each pod is a HEADER RIBBON over an inset well
+			     - the console grammar - so the pair reads as two instruments on one
+			     bench rather than two boxes that happen to sit together. The ribbon
+			     carries what produced the bytes and how many there are; the well
+			     holds them. -->
+			<div class="grid gap-10 lg:grid-cols-2">
+				<!-- POD ONE: INPUT + CLASSIFIED. The ribbon is the command side of
+				     the console: the pod's name on the left, the byte count of what
+				     has arrived on the right. -->
 				<div class="zp-pane">
 					<div class="zp-pane-head">
 						<h3 class="zp-h3">INPUT</h3>
-						<span class="zp-note" data-stat="raw-bytes">
-							0 B
-						</span>
+						<span class="telemetry-tag" data-stat="raw-bytes">0 B</span>
 					</div>
-					<div class="relative flex-1">
+					<div class="tier-well relative">
 						<label class="sr-only" for="zp-input">Tool output to classify</label>
 						<textarea
 							id="zp-input"
@@ -244,11 +248,11 @@ const Exhibit = {
 							class="zp-terminal h-72 w-full resize-y bg-transparent p-5 text-bone-newsprint"
 							placeholder="paste any output here - or load a sample"></textarea>
 						<!-- The opacity-fade suppression overlay: the tail of the
-						     raw feed dims toward the bottom of the pane. -->
+						     raw feed dims toward the bottom of the well. -->
 						<div
 							aria-hidden="true"
 							class="pointer-events-none absolute inset-x-0 bottom-0 h-16"
-							style="background: linear-gradient(to bottom, transparent, #111014);"
+							style="background: linear-gradient(to bottom, transparent, var(--tier-well));"
 						>
 						</div>
 					</div>
@@ -267,11 +271,12 @@ const Exhibit = {
 					</div>
 				</div>
 
-				<!-- PREVIEW + MARKER + DECISION: the asphalt preview pane. -->
-				<div class="zp-pane zp-pane-preview">
+				<!-- POD TWO: PREVIEW + MARKER + DECISION. The ribbon names the pod and
+				     says what it is: the line the LLM reads. -->
+				<div class="zp-pane">
 					<div class="zp-pane-head">
-						<h3 class="zp-h3">PREVIEW + MARKER</h3>
-						<span class="zp-note">the line the LLM reads</span>
+						<h3 class="zp-h3 zp-h3-teal">PREVIEW + MARKER</h3>
+						<span class="telemetry-tag telemetry-tag--teal">the line the LLM reads</span>
 					</div>
 					<div class="zp-preview-body">
 						<!-- The preview line, inset bone-white result. -->
@@ -354,7 +359,7 @@ const Exhibit = {
 					no running total, because a total would count keystrokes rather
 					than the pipeline's work.
 				</p>
-				<div class="mt-8 grid gap-20 md:grid-cols-3">
+				<div class="mt-8 grid gap-6 md:grid-cols-3">
 					{[
 						{ Key: "type", Label: "DETECTED TYPE" },
 						{ Key: "raw-bytes", Label: "INPUT BYTES" },
@@ -363,8 +368,8 @@ const Exhibit = {
 						{ Key: "marker", Label: "MARKER" },
 						{ Key: "reduction", Label: "BYTE REDUCTION FOR THIS EXAMPLE" },
 					].map((Stat) => (
-						<div class="zp-pane p-6">
-							<p class="zp-kicker">{Stat.Label}</p>
+						<div class="shell-card p-6">
+							<p class="telemetry-tag">{Stat.Label}</p>
 							<p class="zp-stat" data-fact={Stat.Key}>
 								not run yet
 							</p>
@@ -385,21 +390,26 @@ const Exhibit = {
 		</section>
 	) : (
 		<section data-pipeline="decide" class="relative w-full" aria-label="The decide branch">
-			<div class="grid gap-16 lg:grid-cols-2">
+			<div class="grid gap-10 lg:grid-cols-2">
 				<!-- What the agent already holds. -->
-				<div class="zp-pane p-6">
-					<p class="zp-kicker">WHAT THE AGENT HOLDS</p>
-					<div class="zp-result mt-4">
-						<p class="zp-line break-all">{Exhibit.Preview}</p>
-						{/* `.zp-result` is a bone-white plate, and teal on bone-white is
-						    3.06:1 - the marker was the least readable line on the one
-						    surface that is printed rather than projected. A marker on a
-						    light ground takes the ink of a printed receipt. */}
-						<p class="ccr-marker mt-4 text-soot-black">{Exhibit.Marker}</p>
+				<div class="zp-pane">
+					<div class="zp-pane-head">
+						<h3 class="zp-h3">WHAT THE AGENT HOLDS</h3>
+						<span class="telemetry-tag telemetry-tag--canary">ONE PREVIEW + ONE MARKER</span>
 					</div>
-					<p class="zp-note-block mt-4">
-						Three fields and a preview line. Retrieval is a choice, not a step.
-					</p>
+					<div class="tier-well p-5">
+						<div class="zp-result">
+							<p class="zp-line break-all">{Exhibit.Preview}</p>
+							{/* `.zp-result` is a bone-white plate, and teal on bone-white is
+							    3.06:1 - the marker was the least readable line on the one
+							    surface that is printed rather than projected. A marker on a
+							    light ground takes the ink of a printed receipt. */}
+							<p class="ccr-marker mt-4 text-soot-black">{Exhibit.Marker}</p>
+						</div>
+						<p class="zp-note-block mt-4">
+							Three fields and a preview line. Retrieval is a choice, not a step.
+						</p>
+					</div>
 				</div>
 
 				<!-- The two branches the choice opens. -->
@@ -412,20 +422,28 @@ const Exhibit = {
 							NEEDS THE BYTES
 						</button>
 					</div>
-					<div class="zp-pane p-6" data-branch-panel="preview-answers">
-						<p class="zp-kicker zp-kicker-canary">NOTHING IS RETRIEVED</p>
-						<p class="zp-note-block mt-4">
-							The marker stayed a receipt. The agent reasoned from the type, the size
-							and the one error the preview carried - and the store was never touched.
-						</p>
+					<div class="zp-pane" data-branch-panel="preview-answers">
+						<div class="zp-pane-head">
+							<h3 class="zp-h3">NOTHING IS RETRIEVED</h3>
+						</div>
+						<div class="tier-well p-5">
+							<p class="zp-note-block">
+								The marker stayed a receipt. The agent reasoned from the type, the size
+								and the one error the preview carried - and the store was never touched.
+							</p>
+						</div>
 					</div>
-					<div class="zp-pane p-6" data-branch-panel="needs-bytes" hidden>
-						<p class="zp-kicker zp-kicker-teal">THE MARKER RESOLVES</p>
-						<p class="zp-note-block mt-4">{Exhibit.Bytes}</p>
-						<p class="zp-note-block mt-4">
-							Recursive resolution - nested markers are handled, so a retrieved blob
-							that itself carries a marker resolves in the same call.
-						</p>
+					<div class="zp-pane" data-branch-panel="needs-bytes" hidden>
+						<div class="zp-pane-head">
+							<h3 class="zp-h3 zp-h3-teal">THE MARKER RESOLVES</h3>
+						</div>
+						<div class="tier-well p-5">
+							<p class="zp-note-block">{Exhibit.Bytes}</p>
+							<p class="zp-note-block mt-4">
+								Recursive resolution - nested markers are handled, so a retrieved blob
+								that itself carries a marker resolves in the same call.
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -475,8 +493,8 @@ const Exhibit = {
 		display: flex;
 		flex-direction: column;
 		gap: 0.25rem;
-		border: 2px solid var(--oxblood-dark, #520612);
-		background: var(--soot-black, #09090b);
+		border: 1px solid var(--tier-shell-edge, #27272a);
+		background: var(--tier-shell, #121216);
 		padding: 0.75rem 1rem;
 		opacity: 0.55;
 		transition: opacity 0.2s ease;
@@ -566,31 +584,38 @@ const Exhibit = {
 		}
 	}
 
-	/* THE PAIR */
+	/* THE PAIR, AS TWO PODS. A pod is ONE elevation tier - the shell - with one
+	   1px edge and the hard offset shadow the plate grammar has always used.
+	   The well inside it (`.well`, the published channel) is what makes the two
+	   read as depth instead of as two more boxes: a pod is a lifted module, its
+	   body is a channel recessed into it. */
 	.zp-pane {
 		display: flex;
 		flex-direction: column;
-		border: 4px solid var(--blood-crimson, #7a0a1e);
-		background: var(--carbon-void, #111014);
+		border: 1px solid var(--tier-shell-edge, #27272a);
+		background: var(--tier-shell, #121216);
 		box-shadow: 6px 6px 0 #520612;
 	}
-	.zp-pane-preview {
-		background: var(--carbon-void, #111014);
-	}
+
+	/* THE HEADER RIBBON. What produced these bytes and how many there are: the
+	   pod's name on the left, its telemetry tag on the right. It sits on the
+	   sub-panel fill so it separates from the shell it caps without a second
+	   border colour, and it is the one row a reader can scan without reading
+	   the console underneath. */
 	.zp-pane-head,
 	.zp-pane-foot {
 		display: flex;
 		flex-wrap: wrap;
-		align-items: baseline;
+		align-items: center;
 		justify-content: space-between;
-		gap: 0.75rem;
-		border-bottom: 2px solid var(--blood-crimson, #7a0a1e);
-		background: var(--soot-black, #09090b);
-		padding: 0.75rem 1.25rem;
+		gap: 0.5rem 0.75rem;
+		border-bottom: 1px solid var(--tier-shell-edge, #27272a);
+		background: var(--asphalt-panel, #16151a);
+		padding: 0.5rem 1rem;
 	}
 	.zp-pane-foot {
 		border-bottom: 0;
-		border-top: 2px solid var(--blood-crimson, #7a0a1e);
+		border-top: 1px solid var(--tier-shell-edge, #27272a);
 	}
 	.zp-h3 {
 		font-family: var(--font-mono, monospace);
@@ -600,7 +625,9 @@ const Exhibit = {
 		text-transform: uppercase;
 		color: var(--stamped-canary, #e5a93b);
 	}
-	.zp-pane-preview .zp-h3 {
+	/* Teal is the preview side's identity, not a variation of the amber one:
+	   the same pairing the stream/preview pair carries everywhere. */
+	.zp-h3-teal {
 		color: var(--weathered-teal, #2a938d);
 	}
 	.zp-classified {
@@ -626,6 +653,10 @@ const Exhibit = {
 		flex-direction: column;
 		gap: 2rem;
 		padding: 1.5rem;
+		/* The pod's channel: the preview side is a well too, so both halves of
+		   the pair are the same depth and the difference between them is what
+		   they hold, never how far they sit from the page. */
+		background: var(--tier-well, #0b0b0e);
 	}
 
 	/* THE RESULT: an inset bone-white plate. */
@@ -639,13 +670,21 @@ const Exhibit = {
 		font-size: 16px;
 		color: var(--soot-black, #09090b);
 	}
+	/* The kicker is the TELEMETRY VOICE, at the size a label is allowed: 11.5px
+	   mono, 0.08em tracking. It used to be 16px - the size of the prose it
+	   labels - which made every micro-label on the console shout as loudly as
+	   the sentence under it. A label that cannot be quieter than its value is
+	   not a label. */
 	.zp-kicker {
 		font-family: var(--font-mono, monospace);
-		font-size: 16px;
-		font-weight: 900;
-		letter-spacing: 0.1em;
+		font-size: var(--type-meta, 11.5px);
+		font-weight: 700;
+		letter-spacing: 0.08em;
 		text-transform: uppercase;
 		color: var(--zinc-dust, #82808a);
+		overflow-wrap: normal;
+		hyphens: none;
+		word-break: keep-all;
 	}
 	.zp-kicker-ink {
 		color: rgba(9, 9, 11, 0.6);
@@ -677,7 +716,7 @@ const Exhibit = {
 	}
 	.zp-decision {
 		border-left: 4px solid var(--stamped-canary, #e5a93b);
-		background: var(--soot-black, #09090b);
+		background: var(--tier-well, #0b0b0e);
 		padding: 1rem;
 	}
 	.zp-decision .zp-h3 {
@@ -685,7 +724,7 @@ const Exhibit = {
 	}
 	.zp-inject {
 		border-left: 4px solid var(--oxblood-dark, #520612);
-		background: var(--soot-black, #09090b);
+		background: var(--tier-well, #0b0b0e);
 		padding: 1rem;
 	}
 	.zp-note-block {

@@ -4,7 +4,6 @@ import Base from "@Layout/Base.astro";
 import Related from "@Component/Related.astro";
 import PageShell from "@Component/PageShell.astro";
 import PageHeader from "@Component/PageHeader.astro";
-import ZineTape from "@Component/ZineTape.astro";
 import ZineBox from "@Component/ZineBox.astro";
 import ZineSource from "@Component/ZineSource.astro";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
@@ -12,26 +11,129 @@ import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 import { Assert, HookNames, Hooks as Roster } from "@Library/Roster";
 import { HookCard, Sequence } from "@Library/Prose/Hooks";
 
-
 // THE SIX - from `plugins/aphrodite/plugin.yaml`, in manifest order. The
 // roster is the manifest's: a hook added upstream appears here with no edit
 // to this page, and `Assert` fails the build if the page's prose names one
 // the plugin does not register.
 Assert("Source/Library/Prose/Hooks.ts", HookCard, HookNames);
 
-const Hooks = Roster.map((Hook) => {
+/** A hook's tape colour, in ZineTape's closed set. */
+type TapeColor = "raw" | "canary" | "teal" | "bone";
+
+const TapeOf: Record<string, TapeColor> = {
+	raw: "raw",
+	canary: "canary",
+	teal: "teal",
+	bone: "bone",
+};
+
+/** The plate's boundary colour, read off the card's shadow tone. `subtle` is
+ * the oxblood boundary on the quiet plane - the quietest framed plate. */
+type Accent = "none" | "crimson" | "canary" | "teal";
+
+const AccentOf: Record<string, Accent> = {
+	subtle: "none",
+	crimson: "crimson",
+	canary: "canary",
+};
+
+/** The telemetry tag's modifiers are the PALETTE's names, not the tape's: a
+ * `raw` tape is the crimson chip. Two vocabularies, one identity - the tape
+ * fills with `raw-blood`, the chip with the same colour under its own name. */
+type TagTone = "crimson" | "canary" | "bone" | "teal";
+
+const TagOf: Record<string, TagTone> = {
+	raw: "crimson",
+	canary: "canary",
+	bone: "bone",
+	teal: "teal",
+};
+
+/**
+ * Each seam's ROLE and its chapter head - the page's own words, keyed by the
+ * manifest's name.
+ *
+ * The role is what the seam DOES in one word, and it is the word the card's
+ * tape is stamped with: colour is identity on this page, and a colour alone
+ * cannot be read, so every identity colour travels with a name.
+ *
+ * Neither entry is data the manifest carries, so a hook added upstream falls
+ * back to its own name for both and still renders - a missing annotation must
+ * not hide a registered seam.
+ */
+const Seam: Record<string, { Role: string; Headline: string }> = {
+	on_session_start: {
+		Role: "RESET",
+		Headline: "The seam that starts a clean session",
+	},
+	pre_tool_call: {
+		Role: "PRE-FLIGHT",
+		Headline: "The seam before a tool runs",
+	},
+	transform_tool_result: {
+		Role: "COMPRESS",
+		Headline: "The seam that compresses a tool result",
+	},
+	transform_terminal_output: {
+		Role: "COMPRESS",
+		Headline: "The seam that compresses terminal output",
+	},
+	pre_llm_call: {
+		Role: "ASSEMBLE",
+		Headline: "The seam that assembles the context",
+	},
+	post_llm_call: {
+		Role: "ARCHIVE",
+		Headline: "The seam that closes the turn",
+	},
+};
+
+/** The chain's length, as the signature wells print it. */
+const Total = String(Roster.length).padStart(2, "0");
+
+/** The two chapters that close the page, numbered after the six seams. */
+const ChapterOfGate = String(Roster.length + 3).padStart(2, "0");
+const ChapterOfThresholds = String(Roster.length + 4).padStart(2, "0");
+
+const Hooks = Roster.map((Hook, Index) => {
 	const Prose = HookCard[Hook.Name];
+	const Annotation = Seam[Hook.Name] ?? { Role: Hook.Name, Headline: Hook.Name };
+	const Tape = Prose?.Tape ?? "raw";
 
 	return {
 		...Hook,
-		Tape: Prose?.Tape ?? "raw",
-		Tone: Prose?.Tone ?? "subtle",
+		// The chapter a seam owns: the two opening chapters are 01 and 02.
+		Chapter: String(Index + 3).padStart(2, "0"),
+		Headline: Annotation.Headline,
+		Role: Annotation.Role,
+		Tape,
+		TapeColor: TapeOf[Tape] ?? "raw",
+		Tag: TagOf[Tape] ?? "crimson",
+		Accent: AccentOf[Prose?.Tone ?? "subtle"] ?? "none",
 		Rotate: Prose?.Rotate ?? "",
 		// A hook the manifest declares and this page has not written a card for
 		// still renders: the roster is the manifest's, the prose is the page's,
 		// and a missing sentence must not hide a registered seam.
 		Body: Prose?.Body ?? ["The manifest registers this seam; its card is not written yet."],
 	};
+});
+
+/**
+ * The turn loop, indexed.
+ *
+ * `Sequence` is the page's own list of what a turn walks, and the `↓` entries
+ * in it are the connectors between steps rather than steps of their own - so
+ * they carry no ordinal and sit in the text column, which is what makes the
+ * pane read as one ladder instead of a numbered list with gaps in it.
+ */
+let Step = 0;
+
+const Loop = Sequence.map((Entry) => {
+	const IsConnector = Entry.Tone === "mute";
+
+	if (!IsConnector) Step += 1;
+
+	return { ...Entry, Ordinal: IsConnector ? "" : String(Step).padStart(2, "0") };
 });
 ---
 
@@ -51,164 +153,243 @@ const Hooks = Roster.map((Hook) => {
 			]}
 		/>
 
-		<!-- SLOT 3: one claim's evidence - the loop, the six seams, the gates -->
-		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="SEQUENCE // PER TURN" />
-			<ZineBox Size="lg" Rotate="-rotate-[1deg]">
-				<h3
-					id="sequence"
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					The loop a turn walks
-				</h3>
-				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-4 font-mono text-base leading-relaxed">
+		<!-- 01 // THE LOOP - one claim's evidence, the chain, then its diagram -->
+		<section class="blueprint-section" data-reveal>
+			<p class="section-index">01 // SEQUENCE // PER TURN</p>
+			<h2 id="sequence" class="mt-3 type-section text-bone-white">
+				The loop a turn walks
+			</h2>
+
+			<div class="well mt-8 p-4 sm:p-5">
+				<ol class="flex flex-col">
 					{
-						Sequence.map(({ Text: Line, Tone }) => (
-							<div class={Tone === "canary" ? "pl-4 text-stamped-canary" : Tone === "mute" ? "pl-4 text-zinc-dust" : Tone === "result" ? "text-bone-white" : "pl-4 text-bone-newsprint"}>
-								{Line}
-							</div>
+						Loop.map(({ Text: Line, Tone, Ordinal }) => (
+							<li
+								class:list={[
+									"grid grid-cols-[2.5rem_1fr] items-baseline gap-x-3",
+									Tone === "mute" ? "py-0.5" : "py-1.5",
+								]}
+							>
+								<span
+									class="type-meta font-bold tabular-nums text-zinc-dust"
+									aria-hidden="true"
+								>
+									{Ordinal}
+								</span>
+								<span
+									class:list={[
+										"font-mono text-base leading-relaxed",
+										Tone === "canary"
+											? "text-stamped-canary"
+											: Tone === "mute"
+												? "text-zinc-dust"
+												: Tone === "result"
+													? "text-bone-white"
+													: "text-bone-newsprint",
+									]}
+								>
+									{Line}
+								</span>
+							</li>
 						))
 					}
-				</div>
-				<p class="mt-8 font-body text-base leading-relaxed text-bone-newsprint">
+				</ol>
+			</div>
+
+			<div class="prose-flow mt-8">
+				<p class="type-body text-bone-newsprint">
 					The loop closes on itself, so the state a turn leaves behind is the state the next
 					turn reads.
 				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+				<p class="type-body text-bone-newsprint">
 					That is why the reset seam exists: a new session starts from a clean baseline instead
 					of inheriting the previous session's counters and markers.
 				</p>
-				<figure
-					class="mt-16 border border-oxblood-dark bg-soot-black p-4"
-					data-diagram="hook-chain"
-				>
-					<div class="overflow-x-auto" set:html={HookChain} />
-					<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-						M3 // HOOK CHAIN
-					</figcaption>
-				</figure>
+			</div>
 
-				<ZineTape Variant="section" Label="THE SIX // ONE SECTION EACH" />
-				<h3
-					id="six"
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					What each seam does
-				</h3>
-				<div class="isolate grid grid-cols-1 items-start gap-16 lg:grid-cols-2 lg:gap-24">
-					{
-						Hooks.map(({ N, Name, Tape, Tone, Rotate, Body }) => (
-							<div
-								class={`zine-box-${Tone} relative border-[3px] bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 ${Rotate} ${
-									Tone === "canary"
-										? "border-stamped-canary/40"
-										: Tone === "crimson"
-											? "border-raw-blood"
-											: N === "04"
-												? "border-zinc-dust/40"
-												: "border-oxblood-dark"
-								}`}
+			<figure class="well mt-12 p-4 sm:p-5" data-diagram="hook-chain">
+				<div class="overflow-x-auto" set:html={HookChain} />
+				<figcaption class="mt-4 type-meta font-black uppercase tracking-widest text-zinc-dust">
+					M3 // HOOK CHAIN
+				</figcaption>
+			</figure>
+		</section>
+
+		<!-- 02 // THE INDEX - the ordering, as a list the reader can walk -->
+		<section id="six" class="blueprint-section" data-reveal>
+			<p class="section-index">02 // THE SIX // ONE SECTION EACH</p>
+			<h2 class="mt-3 type-section text-bone-white">What each seam does</h2>
+
+			<ol class="mt-8 flex flex-col border-t border-oxblood-dark">
+				{
+					Hooks.map(({ N, Name, Role, Tag }) => (
+						<li class="border-b border-oxblood-dark">
+							<a
+								href={`#seam-${N}`}
+								class="group flex flex-wrap items-baseline gap-x-4 gap-y-2 py-4 transition-colors hover:bg-asphalt-panel focus-visible:bg-asphalt-panel"
 							>
-								<h4
-									class={`absolute -top-5 left-4 z-10 border border-black px-2 py-0.5 text-base font-black uppercase ${
-										Tape === "canary"
-											? "bg-stamped-canary text-soot-black"
-											: Tape === "bone"
-												? "bg-bone-newsprint text-soot-black"
-												: "bg-raw-blood text-bone-white"
-									}`}
-								>
-									{N} // {Name}
-								</h4>
-								{Body.map((Paragraph, I) => (
-									<p
-										class={I === 0
-											? "mt-4 font-body text-base leading-relaxed text-bone-newsprint"
-											: "mt-3 font-body text-base leading-relaxed text-bone-newsprint"}
-										set:html={Paragraph}
-									/>
-								))}
-							</div>
-						))
-					}
-				</div>
+								<span class="type-meta font-bold tabular-nums text-zinc-dust">{N}</span>
+								<span class="font-mono text-base font-bold text-bone-white group-hover:text-stamped-canary">
+									{Name}
+								</span>
+								<span class:list={["telemetry-tag", `telemetry-tag--${Tag}`]}>
+									{Role}
+								</span>
+								<span class="ml-auto font-mono text-base text-zinc-dust" aria-hidden="true">
+									→
+								</span>
+							</a>
+						</li>
+					))
+				}
+			</ol>
+		</section>
 
-				<ZineTape Variant="section" Label="BYPASS // THE ESSENTIAL-TOOL GATE" />
-				<h3
-					id="gate"
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					What never gets compressed
-				</h3>
-				<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
+		<!-- 03-08 // ONE CHAPTER PER SEAM: the signature well, then the card -->
+		{
+			Hooks.map(({ N, Chapter, Name, Headline, Role, TapeColor, Accent, Rotate, Body }) => (
+				<section id={`seam-${N}`} class="blueprint-section" data-reveal>
+					<p class="section-index">
+						{Chapter} // {Name.toUpperCase()}
+					</p>
+					<h2 class="mt-3 type-section text-bone-white">{Headline}</h2>
+
+					{/* THE SIGNATURE WELL - the seam as machinery: its place in the
+					    chain, and the dispatch every hook in the shim shares. Recessed
+					    into the page rather than framed, because it is the hook's
+					    identity card and not a claim of its own. */}
+					<dl class="well mt-8 grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-3 p-4 sm:p-5">
+						<dt class="type-meta font-bold uppercase text-zinc-dust">ORDER</dt>
+						<dd class="font-mono text-base tabular-nums text-bone-newsprint">
+							{N} / {Total}
+						</dd>
+						<dt class="type-meta font-bold uppercase text-zinc-dust">DISPATCH</dt>
+						<dd class="font-mono text-base leading-relaxed text-bone-newsprint">
+							args → <span class="text-weathered-teal">libaphrodite_hermes.dylib</span> → JSON
+							reply
+						</dd>
+						<dt class="type-meta font-bold uppercase text-zinc-dust">REGISTERED</dt>
+						<dd class="font-mono text-base leading-relaxed text-bone-newsprint">
+							provides_hooks · plugin.yaml
+						</dd>
+					</dl>
+
+					<ZineBox
+						Class="mt-8"
+						Size="md"
+						Rotate={Rotate}
+						Accent={Accent}
+						Tape={Role}
+						TapeColor={TapeColor}
+					>
+						<div class="prose-flow">
+							{Body.map((Paragraph) => (
+								<p class="type-body text-bone-newsprint" set:html={Paragraph} />
+							))}
+						</div>
+					</ZineBox>
+				</section>
+			))
+		}
+
+		<!-- THE BYPASS GATE - what the transforms refuse to touch -->
+		<section id="gate" class="blueprint-section" data-reveal>
+			<p class="section-index">{ChapterOfGate} // BYPASS // THE ESSENTIAL-TOOL GATE</p>
+			<h2 class="mt-3 type-section text-bone-white">What never gets compressed</h2>
+
+			<div class="prose-flow mt-8">
+				<p class="type-body text-bone-newsprint">
 					A result is left untouched when it is empty, below threshold, or from the essential
 					set - tools the agent needs raw:
 				</p>
-				<div class="border border-oxblood-dark bg-soot-black p-4 font-mono text-base text-bone-newsprint">
-					skill_view · skills_list · skill_manage · memory · session_search · read_file ·
-					read_terminal
-				</div>
-				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
+			</div>
+
+			<div class="well mt-6 p-4 sm:p-5 font-mono text-base text-bone-newsprint">
+				skill_view · skills_list · skill_manage · memory · session_search · read_file ·
+				read_terminal
+			</div>
+
+			<div class="prose-flow mt-8">
+				<p class="type-body text-zinc-dust">
 					Aphrodite also skips its own tools and headroom helpers - compressing
 					<span class="font-mono text-base text-weathered-teal">aphrodite_retrieve</span>
 					would just replace resolved content with another marker.
 				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+				<p class="type-body text-zinc-dust">
 					The gate is the reason retrieval stays cheap: a marker the model resolves comes back
 					whole, because nothing downstream of the gate rewrites it a second time.
 				</p>
+			</div>
+		</section>
 
-				<ZineTape Variant="section" Label="THRESHOLDS // GATES AND BYPASSES" />
-				<h3
-					id="thresholds"
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					The numbers that decide
-				</h3>
-				<div class="overflow-x-auto">
-					<table class="w-full border-collapse font-mono text-base">
-						<thead>
-							<tr class="border-b-2 border-oxblood-dark text-left">
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">HOOK</th>
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">SETTING</th>
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">DEFAULT</th>
-								<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">BYPASS</th>
-							</tr>
-						</thead>
-						<tbody class="text-bone-newsprint">
-							<tr class="border-b border-oxblood-dark">
-								<td class="py-3 pr-4">transform_tool_result</td>
-								<td class="py-3 pr-4 text-weathered-teal">tool_threshold_token</td>
-								<td class="py-3 pr-4 text-bone-white">4,096</td>
-								<td class="py-3">empty · essential tools · self tools · <span class="text-stamped-canary">0 = always compress</span></td>
-							</tr>
-							<tr class="border-b border-oxblood-dark">
-								<td class="py-3 pr-4">transform_terminal_output</td>
-								<td class="py-3 pr-4 text-weathered-teal">terminal_threshold</td>
-								<td class="py-3 pr-4 text-bone-white">1,024</td>
-								<td class="py-3">empty · below threshold · <span class="text-stamped-canary">0 = always compress</span></td>
-							</tr>
-							<tr class="border-b border-oxblood-dark">
-								<td class="py-3 pr-4">pre_llm_call</td>
-								<td class="py-3 pr-4 text-weathered-teal">flow budget_chars</td>
-								<td class="py-3 pr-4 text-bone-white">4,000</td>
-								<td class="py-3">recall catalog drops first; directives and nudges never drop</td>
-							</tr>
-							<tr>
-								<td class="py-3 pr-4">pre_tool_call (chain split)</td>
-								<td class="py-3 pr-4 text-weathered-teal">chain_split_min_segments</td>
-								<td class="py-3 pr-4 text-bone-white">-</td>
-								<td class="py-3">feature off by default (chain_split = false)</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
-					PRECEDENCE: ENVIRONMENT &gt; TOML &gt; DEFAULT
-					(APHRODITE_TOOL_THRESHOLD_TOKEN · APHRODITE_TERMINAL_THRESHOLD ·
-					APHRODITE_FLOW_BUDGET_CHARS · APHRODITE_CHAIN_SPLIT).
-				</p>
-			</ZineBox>
+		<!-- THE NUMBERS - thresholds, defaults and the precedence that resolves them -->
+		<section id="thresholds" class="blueprint-section" data-reveal>
+			<p class="section-index">
+				{ChapterOfThresholds} // THRESHOLDS // GATES AND BYPASSES
+			</p>
+			<h2 class="mt-3 type-section text-bone-white">The numbers that decide</h2>
+
+			<div class="mt-8 overflow-x-auto">
+				<table class="w-full border-collapse font-mono text-base">
+					<thead>
+						<tr class="border-b-2 border-oxblood-dark text-left">
+							<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+								HOOK
+							</th>
+							<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+								SETTING
+							</th>
+							<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+								DEFAULT
+							</th>
+							<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">
+								BYPASS
+							</th>
+						</tr>
+					</thead>
+					<tbody class="text-bone-newsprint">
+						<tr class="border-b border-oxblood-dark">
+							<td class="py-3 pr-4">transform_tool_result</td>
+							<td class="py-3 pr-4 text-weathered-teal">tool_threshold_token</td>
+							<td class="py-3 pr-4 tabular-nums text-bone-white">4,096</td>
+							<td class="py-3">
+								empty · essential tools · self tools ·
+								<span class="text-stamped-canary">0 = always compress</span>
+							</td>
+						</tr>
+						<tr class="border-b border-oxblood-dark">
+							<td class="py-3 pr-4">transform_terminal_output</td>
+							<td class="py-3 pr-4 text-weathered-teal">terminal_threshold</td>
+							<td class="py-3 pr-4 tabular-nums text-bone-white">1,024</td>
+							<td class="py-3">
+								empty · below threshold ·
+								<span class="text-stamped-canary">0 = always compress</span>
+							</td>
+						</tr>
+						<tr class="border-b border-oxblood-dark">
+							<td class="py-3 pr-4">pre_llm_call</td>
+							<td class="py-3 pr-4 text-weathered-teal">flow budget_chars</td>
+							<td class="py-3 pr-4 tabular-nums text-bone-white">4,000</td>
+							<td class="py-3">
+								recall catalog drops first; directives and nudges never drop
+							</td>
+						</tr>
+						<tr>
+							<td class="py-3 pr-4">pre_tool_call (chain split)</td>
+							<td class="py-3 pr-4 text-weathered-teal">chain_split_min_segments</td>
+							<td class="py-3 pr-4 tabular-nums text-bone-white">-</td>
+							<td class="py-3">feature off by default (chain_split = false)</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<p class="well mt-12 p-4 sm:p-5 font-mono text-base leading-relaxed text-zinc-dust">
+				PRECEDENCE: ENVIRONMENT &gt; TOML &gt; DEFAULT
+				(APHRODITE_TOOL_THRESHOLD_TOKEN · APHRODITE_TERMINAL_THRESHOLD ·
+				APHRODITE_FLOW_BUDGET_CHARS · APHRODITE_CHAIN_SPLIT).
+			</p>
+
 			<ZineSource
 				Lines={[
 					"SRC: docs/plugin/hooks.md; plugins/aphrodite/plugin.yaml (provides_hooks)",

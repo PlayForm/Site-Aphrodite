@@ -73,10 +73,21 @@ interface Props {
 	 */
 	Wipe?: boolean;
 
-	/** The fill under the frame. plain = the module surface (carbon-void, the
-	 * default); inset = the page ground, so the plate reads as a hole in it;
-	 * paper = one sheet above the module surface (asphalt-panel). */
-	Surface?: "plain" | "inset" | "paper";
+	/**
+	 * The fill under the frame.
+	 *
+	 * ELEVATION TIERS (the blueprint grammar, Global.css): `canvas` is the page
+	 * ground, `shell` a workbench module lifted off it with a 1px zinc edge,
+	 * `well` a channel recessed into a shell. Each tier is a FILL only - the
+	 * frame stays whatever `Emphasis` and `Accent` already decided - so a tiered
+	 * plate keeps its boundary and its shadow plane.
+	 *
+	 * The three legacy values are unchanged, byte for byte, so no existing call
+	 * site moves: `plain` = the module surface (carbon-void, the default);
+	 * `inset` = the page ground, so the plate reads as a hole in it; `paper` =
+	 * one sheet above the module surface (asphalt-panel).
+	 */
+	Surface?: "plain" | "inset" | "paper" | "canvas" | "shell" | "well";
 
 	/** The emphasis tier - see the doc comment. One `featured` per section. */
 	Emphasis?: "quiet" | "standard" | "featured";
@@ -131,10 +142,17 @@ const Pad = {
 	lg: "p-8 sm:p-12",
 }[Size];
 
+/** The fill under the frame. The three legacy values map to the same Tailwind
+ * surfaces they always did; the three tier values map to the blueprint
+ * grammar's fill classes in Global.css, which set a background and nothing
+ * else, so the frame composed above stays intact. */
 const Fill = {
 	plain: "bg-carbon-void",
 	inset: "bg-soot-black",
 	paper: "bg-asphalt-panel",
+	canvas: "tier-canvas",
+	shell: "tier-shell",
+	well: "tier-well",
 }[Surface];
 
 const Boundary = {
@@ -211,6 +229,7 @@ const Frame =
 		Class,
 	]}
 	data-emphasis={Emphasis}
+	data-surface={Surface}
 	data-grunge={Grunge ? "" : undefined}
 	data-grunge-corner={Grunge ? GrungeCorner : undefined}
 	data-grunge-mode={Grunge ? (Accent === "none" ? "edge" : "scatter") : undefined}

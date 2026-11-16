@@ -27,9 +27,22 @@ const { Content, headings } = await render(Doc);
 // Astro assigns each rendered heading an id (github-slugger) and reports the
 // same slug here, so every entry resolves to a real anchor on this page. The
 // body h1 is dropped: the page header already carries the title.
+//
+// The CHAPTER NUMBER a depth-2 head carries in the article is walked here, over
+// the same list and in the same document order the sheet's CSS counter uses, so
+// the rail's entry and the head's `01 //` tag can never disagree about which
+// chapter a reader is in. A depth-3 entry sits inside its parent chapter and
+// carries no number of its own.
+let Chapter = 0;
+
 const Toc = headings
 	.filter(({ depth }) => depth === 2 || depth === 3)
-	.map(({ depth, slug, text }) => ({ Depth: depth, Id: slug, Label: text }));
+	.map(({ depth, slug, text }) => ({
+		Chapter: depth === 2 ? ++Chapter : undefined,
+		Depth: depth,
+		Id: slug,
+		Label: text,
+	}));
 
 // A page with no h2/h3 has no outline to speak of, so the rail and the narrow
 // disclosure stay out of the way; a page with even one gets its entry, because
@@ -561,8 +574,10 @@ const NextSteps = (() => {
 				{
 					PageDiagrams.map((Figure) => (
 						<figure
-							class="relative z-10 mt-16 border border-oxblood-dark bg-soot-black p-4"
+							class="grunge grunge--faint tier-shell relative z-10 mt-16 border border-oxblood-dark p-4"
 							data-diagram={Figure.Id}
+							data-grunge
+							data-grunge-mode="edge"
 							data-reveal
 						>
 							<div class="overflow-x-auto [&_svg]:h-auto [&_svg]:max-w-full" set:html={Figure.Svg} />
@@ -576,8 +591,15 @@ const NextSteps = (() => {
 				<!-- Index pages: the zine index cards with one-line purposes -->
 				{
 					IsIndex && (
-						<section aria-label="Section index" class="relative mt-16" data-reveal>
-							<h2 class="font-mono text-2xl font-black uppercase tracking-widest text-zinc-dust">
+						<section
+							aria-label="Section index"
+							class="blueprint-section relative mt-16"
+							data-reveal
+						>
+							<p class="section-index">00 // INDEX</p>
+							<h2
+								class="mt-2 font-mono text-2xl font-black uppercase tracking-widest text-zinc-dust"
+							>
 								{IsSectionIndex ? "IN THIS SECTION" : "THE SECTIONS"}
 							</h2>
 							<p class="mt-4 max-w-[62ch] type-body text-bone-newsprint">
@@ -650,13 +672,18 @@ const NextSteps = (() => {
 								document's own headings.
 							</p>
 							<ul class="flex flex-col gap-1 px-5 py-4">
-								{Toc.map(({ Depth, Id, Label }) => (
+								{Toc.map(({ Chapter, Depth, Id, Label }) => (
 									<li class={Depth === 3 ? "pl-4" : undefined}>
 										<a
 											href={`#${Id}`}
 											data-outline-link={Id}
 											class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white"
 										>
+											{Chapter !== undefined && (
+												<span class="mr-1.5 inline-block text-[11px] font-bold tracking-[0.08em] text-zinc-dust">
+													{String(Chapter).padStart(2, "0")}
+												</span>
+											)}
 											{Label}
 										</a>
 									</li>
@@ -793,13 +820,18 @@ const NextSteps = (() => {
 									document's own headings.
 								</p>
 								<ul class="mt-3 flex max-h-[calc(100vh-16rem)] flex-col gap-1 overflow-y-auto">
-									{Toc.map(({ Depth, Id, Label }) => (
+									{Toc.map(({ Chapter, Depth, Id, Label }) => (
 										<li class={Depth === 3 ? "pl-3" : undefined}>
 											<a
 												href={`#${Id}`}
 												data-outline-link={Id}
 												class="block px-2 py-0.5 font-mono text-base leading-relaxed text-zinc-dust transition-colors hover:text-bone-white aria-[current=location]:bg-raw-blood aria-[current=location]:text-bone-white"
 											>
+												{Chapter !== undefined && (
+													<span class="mr-1.5 inline-block text-[11px] font-bold tracking-[0.08em] text-zinc-dust">
+														{String(Chapter).padStart(2, "0")}
+													</span>
+												)}
 												{Label}
 											</a>
 										</li>
@@ -853,6 +885,29 @@ const NextSteps = (() => {
 	   into heading -> explanation -> command/table -> qualification, because a
 	   reference page is consulted rather than read and the chapter break turns
 	   it into a stack of landing-page sections. */
+	/* ── THE BLUEPRINT GRAMMAR, APPLIED TO GENERATED MARKDOWN ─────────────
+
+	   The article is rendered from the docs collection, so it cannot carry the
+	   `<section class="blueprint-section">` the rest of the site puts on its own
+	   blocks: a markdown h2 arrives with no wrapper and no attributes. The
+	   grammar is therefore applied to the elements the renderer DOES emit - the
+	   h2 is the chapter (hairline rule, index tag, inset drop) and the fence is
+	   the channel (well tier). Nothing here restyles an element the generator
+	   does not produce, so a regenerated page keeps the grammar with no diff.
+
+	   The chapter hairline is crimson: `--blueprint-rule` is the vocabulary's
+	   own knob for exactly this, and it is the colour the heading's 2px
+	   underline already carried - at hairline weight, so the 4px rule under the
+	   page title stays the heaviest rule on the page. */
+	.docs-prose {
+		--blueprint-rule: var(--raw-blood);
+
+		/* The chapter counter the h2 tags read. Reset on the article, so the
+		   numbering is the document's own and a page swapped in by the client
+		   router starts again at 01 instead of continuing a discarded page. */
+		counter-reset: chapter;
+	}
+
 	.docs-prose :global(h1:first-child) {
 		display: none; /* the page title already lives in the header */
 	}
@@ -864,16 +919,46 @@ const NextSteps = (() => {
 	}
 
 	.docs-prose :global(h2) {
+		/* THE CHAPTER RULE. A hairline opens the chapter and the head follows it
+		   by one label-distance (`--blueprint-inset`, 0.5rem) - the same
+		   relationship a value has to the label above it. The rule sits on TOP,
+		   where the chapter begins, rather than under the head, where a 2px
+		   crimson bar read as an underline on the words instead of as a
+		   boundary between two subjects. */
+		counter-increment: chapter;
 		margin-top: var(--space-chapter);
 		margin-bottom: 2rem;
-		padding-bottom: 0.75rem;
-		border-bottom: 2px solid var(--blood-crimson);
+		padding-top: var(--blueprint-inset);
+		border-top: 1px solid var(--blueprint-rule);
 		font-family: "Space Grotesk", sans-serif;
 		font-size: 1.5rem;
 		font-weight: 700;
 		letter-spacing: 0.02em;
 		text-transform: uppercase;
 		color: var(--bone-white);
+	}
+
+	/* THE INDEX TAG - `01 //` above the head, the telemetry voice at its
+	   smallest. A counter, not a hand-written list: the number is the chapter's
+	   position in THIS document, so a page that gains an h2 gains its tag with
+	   no edit here, and a page that loses one renumbers itself. The rail numbers
+	   the same entries from the same heading list (the frontmatter walks it), so
+	   the two presentations can never disagree about which chapter is which.
+
+	   It is a label, not a badge: no border, no fill, no shadow, no tilt. */
+	.docs-prose :global(h2)::before {
+		content: counter(chapter, decimal-leading-zero) " //";
+		display: block;
+		margin-bottom: 0.375rem;
+		font-family: "JetBrains Mono", monospace;
+		font-size: 11px;
+		font-weight: 700;
+		line-height: 1.4;
+		letter-spacing: 0.08em;
+		color: var(--zinc-dust);
+		overflow-wrap: normal;
+		hyphens: none;
+		word-break: keep-all;
 	}
 
 	.docs-prose :global(h3) {
@@ -985,6 +1070,34 @@ const NextSteps = (() => {
 	   declared here is drift, and the old `pre code { color: zinc-dust }`
 	   greyed out the tokenless `text`/`plaintext` fences, which carry no
 	   spans of their own to colour. */
+
+	/* CODE IN THE WELL TIER. The frame, padding, rhythm, overflow and scroll cue
+	   stay Global.css's - none of them is repeated here. What this page chooses
+	   is the TIER the plate sits on: the well ground with the well's LIGHTER
+	   edge, which is the pair that makes a channel read as recessed instead of
+	   as one more raised panel. The crimson left edge stays: it is the site's
+	   identity, not the tier's.
+
+	   `background-color` carries the flag because Shiki writes the theme's
+	   ground as an INLINE style on the <pre> (`editor.background` in
+	   Source/Library/ShikiTheme.ts), and an inline declaration outranks every
+	   sheet rule however specific it is.
+
+	   The hover state is restated for the same reason the base rule is scoped
+	   here: `.docs-prose[scope] pre.astro-code:hover` outranks Global.css's
+	   `body pre.astro-code:hover`, so without it the plate would stop turning
+	   crimson under the pointer. The values are Global.css's own - the shadow
+	   and the wash still come from there and are not duplicated. */
+	.docs-prose :global(pre.astro-code) {
+		border-color: var(--tier-well-edge);
+		border-left-color: var(--blood-crimson);
+		background-color: var(--tier-well) !important;
+	}
+
+	.docs-prose :global(pre.astro-code:hover) {
+		border-color: var(--raw-blood);
+		border-left-color: var(--stamped-canary);
+	}
 
 	/* ── TABLES BY CONTENT TYPE ────────────────────────────────────────────
 	   A table is three different objects on this site and `table-layout: fixed`
@@ -1185,7 +1298,6 @@ const NextSteps = (() => {
 	.docs-prose[data-density="reference"] :global(h2) {
 		margin-top: var(--space-group);
 		margin-bottom: 1rem;
-		padding-bottom: 0.5rem;
 	}
 
 	.docs-prose[data-density="reference"] :global(h3) {

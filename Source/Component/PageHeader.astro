@@ -13,8 +13,33 @@
  *
  * The tape renders through `ZineTape`'s `section` variant, so the `mb-12`/`mb-5`
  * split disappears: one margin, one shape, one component.
+ *
+ * ── THE INDEX COORDINATE (Stitch grammar) ────────────────────────────────
+ *
+ * Above the tape the header carries ONE `.telemetry-tag` reading
+ * `INDEX 05 / 14`: where this page sits in the site's own index, and how many
+ * entries that index has. It is the drawing's sheet number - the thing that
+ * tells a reader this page is one of a set, and which one.
+ *
+ * THE NUMBER IS DERIVED, NEVER TYPED. `AllLinks` (Library/Links) is the single
+ * registry every route resolves through, so the coordinate is the entry's
+ * position in it, zero-padded, and the total is that registry's own length - so
+ * the two halves can never disagree with the navigation, and a page that
+ * reorders the registry reorders its coordinate with it. A page that wants a
+ * coordinate of its own passes `Index`, and that value wins.
+ *
+ * A route the registry does not carry - the retired pages CRATES, FLAVORS and
+ * HOOKS still render this header - resolves to NO coordinate and the tag is
+ * omitted. Inventing a position for a page the index does not know would be a
+ * number that means nothing, and the header is complete without it.
+ *
+ * The tag stays in the QUIET telemetry voice whatever the tape's tone is: the
+ * tape carries the section's identity colour, and a second chip in the same
+ * colour would take emphasis from it rather than add information.
  */
 import ZineTape from "./ZineTape.astro";
+
+import { AllLinks, IsActive } from "@Library/Links";
 
 interface Props {
 	/** The tape label, e.g. "BENCHMARKS // MEASURED FIGURES". */
@@ -33,12 +58,46 @@ interface Props {
 
 	/** Tape tone; raw is the section default. */
 	Tone?: "raw" | "canary" | "teal";
+
+	/**
+	 * The page's coordinate in the site's index, overriding the derived one.
+	 * Pass the number only (`"05"`); the tag adds the label and the total.
+	 */
+	Index?: string;
 }
 
-const { Tape, Title, Lead, Tone = "raw" } = Astro.props;
+const { Tape, Title, Lead, Tone = "raw", Index } = Astro.props;
+
+/**
+ * The registry entry this route belongs to, resolved with the SAME matcher the
+ * breadcrumb trail uses (`IsActive`, which compares on the route prefix) rather
+ * than with an exact-href lookup: the header and the trail then cannot disagree
+ * about which page this is, and a trailing-slash difference between the dev
+ * server and the built route cannot silently remove the coordinate.
+ */
+const Entry = AllLinks.find((Link) => IsActive(Astro.url.pathname, Link));
+
+/** `AllLinks` IS the index, so a position in it is the coordinate. */
+const Derived =
+	Entry === undefined ? undefined : String(AllLinks.indexOf(Entry) + 1).padStart(2, "0");
+
+const Coordinate = Index ?? Derived;
+
+/** The index's size, in the same two-digit voice as the coordinate. */
+const Total = String(AllLinks.length).padStart(2, "0");
 ---
 
 <header class="relative flex w-full flex-col items-start">
+	{
+		Coordinate !== undefined && (
+			<p
+				class="telemetry-tag mb-4"
+				title={`Entry ${Coordinate} of ${Total} in the site index`}
+			>
+				INDEX {Coordinate} / {Total}
+			</p>
+		)
+	}
 	<ZineTape Variant="section" Label={Tape} Color={Tone} />
 	<h1
 		class="font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-6xl"
@@ -46,10 +105,10 @@ const { Tape, Title, Lead, Tone = "raw" } = Astro.props;
 		{Title}
 	</h1>
 	{
-		Lead.map((Sentence, Index) => (
+		Lead.map((Sentence, Position) => (
 			<p
 				class:list={[
-					Index === 0 ? "mt-6" : "mt-3",
+					Position === 0 ? "mt-6" : "mt-3",
 					"max-w-3xl font-body text-base leading-relaxed text-bone-newsprint",
 				]}
 				set:html={Sentence}

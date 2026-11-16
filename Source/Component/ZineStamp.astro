@@ -1,15 +1,39 @@
 ---
+/**
+ * ZineStamp - the expressive accent, at its loudest legal volume.
+ *
+ * EMPHASIS TIER: expressive. A stamp is the one mark a section may wear at full
+ * volume: the hard 2px black boundary, the 4px pasted plane, the 16px mono caps
+ * and its lean. ONE per section. Two stamps in one chapter halve each other and
+ * the reader stops seeing either - the section that wants a second label wants
+ * ZineTape's `kicker` or the `.section-index` tag instead, because demotion
+ * keeps every word and only lowers the volume.
+ *
+ * COLOUR IS IDENTITY, NOT DECORATION. The fill says which evidence the stamp
+ * marks - raw = the section's own claim, canary = a highlight, teal = verified,
+ * bone = neutral - so the fill never moves to quieten a stamp. Only the ink
+ * moves, and only where legibility requires it (below).
+ *
+ * Grammar law 3 (mobile flattens) is enforced here: `Rotate` is honoured from
+ * `sm` up, and the component appends `max-sm:rotate-0` itself, so a caller that
+ * passes the unprefixed class cannot reintroduce a lean on a 390px screen.
+ */
 interface Props {
+	/** The stamp's text. */
 	Label: string;
 
 	/** Stamp color: raw-blood (default), stamped-canary, weathered-teal, bone. */
 	Color?: "raw" | "canary" | "teal" | "bone";
 
-	/** Rotation in degrees, applied from the sm breakpoint up. */
+	/** Rotation from the sm breakpoint up. Pass the unprefixed class
+	 * (`-rotate-2`); mobile is flattened here regardless. */
 	Rotate?: string;
+
+	/** Extra classes for the stamp itself. */
+	Class?: string;
 }
 
-const { Label, Color = "raw", Rotate = "" } = Astro.props;
+const { Label, Color = "raw", Rotate = "", Class = "" } = Astro.props;
 
 const Palette = {
 	raw: "bg-raw-blood text-bone-white",
@@ -24,7 +48,13 @@ const Palette = {
 ---
 
 <span
-	class={`inline-block border-2 border-black px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest shadow-[4px_4px_0px_#000] sm:text-base ${Palette} ${Rotate}`}
+	class:list={[
+		"inline-block border-2 border-black px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest shadow-[4px_4px_0px_#000]",
+		Palette,
+		Rotate,
+		"max-sm:rotate-0",
+		Class,
+	]}
 >
 	{Label}
 </span>

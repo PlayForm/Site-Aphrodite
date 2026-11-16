@@ -7,6 +7,12 @@
  * expose the raw content underneath, the same hard-offset grammar, no easing.
  * Mobile has no hover, so tap flips the class there.
  *
+ * THE CONSOLE GRAMMAR (Stitch direction): the cover is the RIBBON - the tag on
+ * the right, the cover line on the left - and the revealed content sits in an
+ * inset WELL beneath it. That is the same shape a stream takes, which is the
+ * point: a suppression mark and a preview are the same object seen at two
+ * moments, so they are drawn with the same three parts.
+ *
  * DECORATIVE ONLY, and this is the rule that keeps it honest: the overlay is
  * ABSOLUTELY POSITIONED and its height is decided by the COVER, not by the raw
  * content. Put a paragraph in `Raw` and it is clipped, or overlaps the block
@@ -40,28 +46,23 @@ const { Cover, Tag = "SUPPRESSED", Raw, Flow = false } = Astro.props;
 
 {
 	Flow ? (
-		<div class="border border-oxblood-dark bg-soot-black" data-zine-reveal-flow>
-			<div class="flex items-baseline justify-between gap-3 p-3">
-				<span class="font-mono text-base text-zinc-dust">{Cover}</span>
-				<span class="type-meta shrink-0 uppercase text-zinc-dust">{Tag}</span>
+		<div class="well" data-zine-reveal-flow>
+			<div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
+				<span class="min-w-0 font-mono text-base text-zinc-dust">{Cover}</span>
+				<span class="telemetry-tag shrink-0">{Tag}</span>
 			</div>
-			<div
-				class="border-t border-oxblood-dark p-3 font-mono text-base font-bold text-bone-white"
-				set:html={Raw}
-			/>
+			<div class="p-3 font-mono text-base font-bold text-bone-white" set:html={Raw} />
 		</div>
 	) : (
 		<div
-			class="group relative cursor-crosshair border border-oxblood-dark bg-soot-black"
+			class="group relative cursor-crosshair"
 			data-zine-reveal
 			tabindex="0"
 			aria-label={`${Tag}: hover or focus to reveal the raw content`}
 		>
-			<div class="flex items-center justify-between gap-3 p-3 font-mono text-base text-zinc-dust transition-opacity duration-150 group-hover:opacity-10 group-focus:opacity-10 group-[.revealed]:opacity-10">
+			<div class="well flex items-center justify-between gap-3 p-3 font-mono text-base text-zinc-dust transition-opacity duration-150 group-hover:opacity-10 group-focus:opacity-10 group-[.revealed]:opacity-10">
 				<span class="truncate">{Cover}</span>
-				<span class="shrink-0 border border-oxblood-dark px-1.5 py-0.5 type-meta uppercase text-zinc-dust">
-					{Tag}
-				</span>
+				<span class="telemetry-tag shrink-0">{Tag}</span>
 			</div>
 			<div class="pointer-events-none absolute inset-0 flex items-center p-3 font-mono text-base font-bold text-bone-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100 group-[.revealed]:opacity-100">
 				<div class="w-full" set:html={Raw} />

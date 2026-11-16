@@ -9,7 +9,6 @@ import ZineBox from "@Component/ZineBox.astro";
 import ZineButton from "@Component/ZineButton.astro";
 import ZineDossier from "@Component/ZineDossier.astro";
 import ZineKicker from "@Component/ZineKicker.astro";
-import ZineLedger from "@Component/ZineLedger.astro";
 import ZineLesson from "@Component/ZineLesson.astro";
 import ZinePullQuote from "@Component/ZinePullQuote.astro";
 import ZineSource from "@Component/ZineSource.astro";
@@ -17,6 +16,64 @@ import ZineStamp from "@Component/ZineStamp.astro";
 import ZineStatBar from "@Component/ZineStatBar.astro";
 import ZineTape from "@Component/ZineTape.astro";
 import { ReleaseNote, Stamps, Versions } from "@Library/Versions";
+
+/**
+ * VERSIONS - the release ledger, drawn as a telemetry sheet.
+ *
+ * THE SHAPE OF THE PAGE. Six chapters, each opened by the blueprint grammar's
+ * own section rule and numbered tag (`.blueprint-section` + `.section-index`,
+ * Global.css), and each chapter's content carried by one of three surfaces:
+ *
+ *   shell-card / well   The register, the stamp ledger and the changelog groups
+ *                       are HAIRLINE ROWS: a 1px `--tier-shell-edge` rule per
+ *                       row, mono for every identifier and every version, and
+ *                       the telemetry chip (`.telemetry-tag`) for a status. A
+ *                       ledger is read by scanning a column, so the columns are
+ *                       what the design protects - not a border around them.
+ *   tier-inverted       The current release is printed on the sand sheet: bone
+ *                       ground, carbon type, oxblood ink behind it. It is the
+ *                       one row in the register that is not the same as its
+ *                       neighbours, and the same sheet opens the page.
+ *   tier-shell          The tape's stamps and the changelog groups. Quiet
+ *                       plates; the tape's two shape-changing stamps keep the
+ *                       canary boundary and the heavier plane.
+ *
+ * WHAT DID NOT MOVE. Every sentence, figure, table row, example and key this
+ * page carried, it still carries: the release register is the same thirteen
+ * records, the changelog is the same eight groups with their entries verbatim,
+ * the stamp ledger is the same five artifacts, and the tape is the same
+ * thirteen stamps with their `Why` lines. Re-layout is not a licence to trim.
+ *
+ * THE EVIDENCE ACCENTS ARE IDENTITY. A changelog group's chip is its `Tone`
+ * fill (canary / teal / crimson) and a stamp's fill is its `Color` (raw /
+ * canary / teal / bone) - the same palette the rest of the site uses, and it
+ * never moves to quieten a block. On the sand sheet the teal and canary INKS
+ * are unusable (both sit within a few points of the bone ground), so the pod's
+ * own labels take `--oxblood-dark` and its link takes `--raw-blood`: the
+ * identity is the fill, and only the ink moves where legibility requires it.
+ *
+ * THE GRUNGE STAYS. Every plate on this page that is a plate carries
+ * `data-grunge` (the ink is painted per load by Script/Grunge), and the sand
+ * pod takes `grunge--oxblood` because a bone splat on a bone sheet is no splat
+ * at all.
+ *
+ * RE-VOICING, AND WHAT IT CARRIED (the sanctioned exception: a sentence whose
+ * subject is the website is restated as a statement about the software; every
+ * fact survives):
+ *
+ *   "the review groups appear further down the page"  ->  "the review groups follow"
+ *   "the register renders whatever those files say on the day the site is built"
+ *                                                     ->  "the pairing published here is
+ *                                                          whatever those files say on the
+ *                                                          day of the build"
+ *   "The tape runs top to bottom in release order"    ->  "The tape runs in release order,
+ *                                                          oldest first"
+ *   "The table finds a version; the tape explains why the project looks the way it does"
+ *                                                     ->  "One finds a version; the other
+ *                                                          explains why the project looks
+ *                                                          the way it does"
+ *   "Both bars share one scale"                       ->  "Both figures share one scale"
+ */
 
 /** The release-note URL for a row stamp ("v1.6.6" -> the Aphrodite/v1.6.6 tag). */
 const NoteFor = (Ver: string): string =>
@@ -130,7 +187,7 @@ const Releases: Release[] = [
 		Date: "2026-10-07",
 		Pair: "PLUGIN v2.2.6",
 		Landed: "Catalog review: aphrodite_prefetch refuses .env, auth.json, ~/.ssh, the Hermes home and non-file paths; setup treats the Hermes plugin dir as report-only; the dylib arm refuses an install without in-tree checksums.",
-		Why: "This is the release whose review groups appear further down the page: a prefetch that cannot read a secret, a setup that cannot write where it does not own, and a context engine described as opt-in because it is.",
+		Why: "This is the release whose review groups follow: a prefetch that cannot read a secret, a setup that cannot write where it does not own, and a context engine described as opt-in because it is.",
 		Tag: "CATALOG REVIEW",
 		Emphasis: false,
 	},
@@ -164,6 +221,31 @@ const Releases: Release[] = [
 		Emphasis: false,
 	},
 ];
+
+/** THE REGISTER'S ROWS, with the status each one prints.
+ *
+ *  `Releases` is ordered oldest-first and its FINAL entry is the one built from
+ *  the monorepo's manifests (Library/Versions), so the last row is the current
+ *  pairing by construction - not by a typed version that could drift. That row
+ *  is the one printed on the sand sheet, the same identity the page's opening
+ *  pod carries, so a reader scanning the register can see which line the page
+ *  is about.
+ *
+ *  The status is derived from the flag the canary tag already encodes: the two
+ *  releases that changed the project's shape are `Emphasis`, everything else is
+ *  an ordinary release, and the last one is current. Nothing here is a new
+ *  claim - it is the sentence under the table ("THE CANARY TAGS MARK THE TWO
+ *  RELEASES THAT CHANGED THE PROJECT'S SHAPE") given a column to live in. */
+const CurrentIndex = Releases.length - 1;
+const Register = Releases.map((Entry, Index) => ({
+	...Entry,
+	Current: Index === CurrentIndex,
+	Status: Entry.Emphasis
+		? "SHAPE CHANGE"
+		: Index === CurrentIndex
+			? "CURRENT"
+			: "RELEASE",
+}));
 
 // THE CHANGELOG - the current release's own entries, one block per group, with
 // the group labels the CHANGELOG.md subsections carry. `Why` is the line the
@@ -271,12 +353,42 @@ const ToneText = {
 
 /** The group label chip's fill, one per changelog tone. Teal takes DARK ink -
  *  bone-white on weathered-teal is 3.06:1 at 16px, soot-black is 5.36:1 (the
- *  measurement ZineStamp records). The fill is the identity; only the ink moves. */
+ *  measurement ZineStamp records). The fill is the identity; only the ink moves.
+ *
+ *  This stays the measured 16px stamp chip: a changelog group is a heading, not
+ *  a micro-label, and its fill is what says which tone of change the group
+ *  carries. The register's status chips use the 11.5px telemetry voice instead,
+ *  because a status is a micro-label. */
 const ToneStamp = {
 	canary: "bg-stamped-canary text-soot-black",
 	teal: "bg-weathered-teal text-soot-black",
 	dust: "bg-raw-blood text-bone-white",
 };
+
+// THE FIVE STAMPS - one row per artifact, with the file that owns it and the
+// value that file currently carries. Nothing is typed by hand: the register
+// carries whatever the manifests say on the day of the build, which is why a
+// release that forgets to bump one of them surfaces as a disagreement rather
+// than as a stale figure.
+const Artifacts = [
+	{ Artifact: "binary", Source: "crates/aphrodite/Cargo.toml", Stamp: `v${Versions.Binary}` },
+	{
+		Artifact: "integration crate",
+		Source: "crates/aphrodite-hermes/Cargo.toml",
+		Stamp: `v${Versions.Hermes}`,
+	},
+	{ Artifact: "plugin spec", Source: "plugins/aphrodite/plugin.yaml", Stamp: `v${Versions.Plugin}` },
+	{
+		Artifact: "download pin",
+		Source: "plugins/aphrodite/BINARY_VERSION",
+		Stamp: `v${Versions.BinaryVersionFile}`,
+	},
+	{
+		Artifact: "headroom fork",
+		Source: "vendor/headroom/crates/headroom-core",
+		Stamp: `v${Versions.Headroom}`,
+	},
+];
 
 // The page's own sections, in document order - SectionNav renders exactly these,
 // so an entry can never name a section this page does not have.
@@ -312,50 +424,52 @@ const Holes = [0, 1, 2, 3, 4, 5];
 
 		<SectionNav Sections={Sections} />
 
-		<!-- ============ I. CURRENT // THE SHIPPED PAIRING ============ -->
-		<section id="current" class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="MONUMENT // THE SHIPPED PAIRING" />
-			<ZineBox
-				Size="lg"
-				Rotate="-rotate-[0.6deg]"
-				Tape="CURRENT // SHIPPED"
-				TapeColor="canary"
-				TapeSide="right"
+		<!-- ============ 01 // CURRENT - the shipped pairing, printed ============ -->
+		<section id="current" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index">01 // MONUMENT // THE SHIPPED PAIRING</p>
+			<h2 class="mt-3 type-section text-bone-white">The pairing that ships today</h2>
+
+			{/* THE SAND POD. The current release is the one thing on this page that is
+			    not one row among many, so it is printed rather than framed: the inverted
+			    tier is a bone sheet with carbon type, and the ink behind it is oxblood
+			    (`grunge--oxblood`) because a bone splat on a bone sheet is no splat at
+			    all. The plugin half sits in a `well` - a dark readout recessed into the
+			    printed sheet - because the two numbers are two halves of one release,
+			    and the sheet is what says they travel together. */}
+			<div
+				class="grunge grunge--oxblood tier-inverted relative mt-8 border-4 border-blood-crimson p-6 shadow-[8px_8px_0px_#000] sm:p-10"
+				data-grunge
+				data-grunge-mode="scatter"
 			>
-				<h2
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					The pairing that ships today
-				</h2>
-				<div
-					class="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end"
-				>
-					<div>
-						<ZineKicker As="div" Tone="dust">BINARY RELEASE</ZineKicker>
-						<div
-							class="font-headline text-5xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-7xl"
-						>
+				<ZineTape Variant="corner" Label="CURRENT // SHIPPED" Color="canary" Side="right" />
+				<div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+					<div class="min-w-0">
+						<p class="type-meta font-bold uppercase text-oxblood-dark">BINARY RELEASE</p>
+						{/* `.metric` declares the bone ink the giant figure wears on a dark
+						    plate; on the sand sheet it takes the sheet's own ink. The value is
+						    a token, never a hex: this is the one place where the figure and its
+						    ground are both inverted. */}
+						<p class="metric mt-2" style="color: var(--tier-inverted-ink)">
 							{Stamps.Binary()}
-						</div>
+						</p>
 					</div>
-					<div
-						class="zine-box-subtle w-full border-[3px] border-raw-blood bg-soot-black p-5 lg:w-auto"
-					>
-						<ZineKicker As="div" Tone="dust">HERMES PLUGIN</ZineKicker>
-						<div
-							class="font-headline text-3xl font-black tracking-tighter text-bone-white sm:text-5xl"
+					<div class="well min-w-0 p-5 sm:p-6">
+						<p class="type-meta font-bold uppercase text-zinc-dust">HERMES PLUGIN</p>
+						<p
+							class="mt-2 font-headline text-3xl font-black tracking-tighter text-bone-white sm:text-5xl"
 						>
 							{Stamps.Plugin()}
-						</div>
-						<div class="mt-1 text-base font-bold text-stamped-canary">
+						</p>
+						<p class="mt-2 font-mono text-meta font-bold uppercase text-stamped-canary">
 							{Versions.ChangelogDate}
-						</div>
+						</p>
 					</div>
 				</div>
-				<p class="mt-8 font-body text-base leading-relaxed text-bone-newsprint">
-					Two numbers, one release:
-				</p>
-				<ul class="mt-3 space-y-2 font-body text-base leading-relaxed text-bone-newsprint">
+			</div>
+
+			<div class="prose-flow mt-10 max-w-[46rem]">
+				<p class="type-body text-bone-newsprint">Two numbers, one release:</p>
+				<ul class="space-y-2 type-body text-bone-newsprint">
 					<li class="border-l-4 border-raw-blood pl-4">
 						the binary carries the proxy, the CCR store and the dylib the shim loads
 					</li>
@@ -364,75 +478,82 @@ const Holes = [0, 1, 2, 3, 4, 5];
 						the dylib needs from Hermes.
 					</li>
 				</ul>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+				<p class="type-body text-bone-newsprint">
 					They are released as a pair on purpose. A plugin that loads a dylib older than its
 					own schemas registers tools that do not exist, so the two versions travel together
 					and the changelog head declares the pairing in its first lines.
 				</p>
-				<div class="mt-8 border-t border-oxblood-dark pt-4 font-mono text-base text-zinc-dust">
-					{`SRC: CHANGELOG.md v${Versions.ChangelogVersion} head; crates/aphrodite/Cargo.toml; plugins/aphrodite/plugin.yaml`}
-				</div>
+			</div>
+			<p class="mt-8 border-t border-oxblood-dark pt-4 font-mono text-caption text-zinc-dust">
+				{`SRC: CHANGELOG.md v${Versions.ChangelogVersion} head; crates/aphrodite/Cargo.toml; plugins/aphrodite/plugin.yaml`}
+			</p>
 
-				<ZineTape Variant="section" Label="STAMPS // WHAT EACH NUMBER IS READ FROM" />
-				<h3
-					id="stamps"
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					Five artifacts, five sources
-				</h3>
-				<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
-					Nothing is typed by hand. Each stamp is read from the file that
-					owns it, and the register renders whatever those files say on the day the site is
-					built - which is why a release that forgets to bump one of them surfaces here as a
-					disagreement rather than as a stale figure.
-				</p>
-				<ZineLedger
-					Headers={["ARTIFACT", "SOURCE OF TRUTH", "STAMP"]}
-					Rows={[
-						{
-							Cells: [
-								{ Text: "binary" },
-								{ Text: "crates/aphrodite/Cargo.toml" },
-								{ Text: `v${Versions.Binary}` },
-							],
-						},
-						{
-							Cells: [
-								{ Text: "integration crate" },
-								{ Text: "crates/aphrodite-hermes/Cargo.toml" },
-								{ Text: `v${Versions.Hermes}` },
-							],
-						},
-						{
-							Cells: [
-								{ Text: "plugin spec" },
-								{ Text: "plugins/aphrodite/plugin.yaml" },
-								{ Text: `v${Versions.Plugin}` },
-							],
-						},
-						{
-							Cells: [
-								{ Text: "download pin" },
-								{ Text: "plugins/aphrodite/BINARY_VERSION" },
-								{ Text: `v${Versions.BinaryVersionFile}` },
-							],
-						},
-						{
-							Cells: [
-								{ Text: "headroom fork" },
-								{ Text: "vendor/headroom/crates/headroom-core" },
-								{ Text: `v${Versions.Headroom}` },
-							],
-						},
-					]}
-				/>
-				<div class="mt-8">
-					<ZineLesson
-						Label="THE PIN"
-						Text={`The plugin never asks crates.io for the newest binary. It reads BINARY_VERSION - ${Versions.BinaryVersionFile} today - and downloads that release, which is what makes a plugin install reproducible a year after the tag.`}
-					/>
+			{/* THE STAMP LEDGER. A sub-chapter, not a chapter: the quiet eyebrow and a
+			    `sub` head, so the section rule above stays the only chapter signal. */}
+			<p class="section-kicker mt-16">STAMPS // WHAT EACH NUMBER IS READ FROM</p>
+			<h3 id="stamps" class="mt-2 type-sub text-bone-white">Five artifacts, five sources</h3>
+			<p class="mt-4 max-w-[46rem] type-body text-bone-newsprint">
+				Nothing is typed by hand. Each stamp is read from the file that owns it, and the
+				pairing published here is whatever those files say on the day of the build - which
+				is why a release that forgets to bump one of them surfaces as a disagreement rather
+				than as a stale figure.
+			</p>
+
+			<div
+				class="grunge shell-card mt-8 shadow-[6px_6px_0px_#000]"
+				data-grunge
+				data-grunge-mode="edge"
+			>
+				<div class="overflow-x-auto">
+					<table class="w-full min-w-[44rem] border-collapse text-left">
+						<thead>
+							<tr class="border-b border-[color:var(--tier-well-edge)]">
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
+									ARTIFACT
+								</th>
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
+									SOURCE OF TRUTH
+								</th>
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 text-right font-bold uppercase text-zinc-dust sm:px-5"
+								>
+									STAMP
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{
+								Artifacts.map(({ Artifact, Source, Stamp }) => (
+									<tr class="border-b border-[color:var(--tier-shell-edge)] align-top last:border-b-0">
+										<td class="whitespace-nowrap px-4 py-3 font-mono text-code text-bone-white sm:px-5">
+											{Artifact}
+										</td>
+										<td class="break-token px-4 py-3 font-mono text-code text-zinc-dust sm:px-5">
+											{Source}
+										</td>
+										<td class="whitespace-nowrap px-4 py-3 text-right sm:px-5">
+											<span class="telemetry-tag telemetry-tag--teal">{Stamp}</span>
+										</td>
+									</tr>
+								))
+							}
+						</tbody>
+					</table>
 				</div>
-			</ZineBox>
+			</div>
+			<div class="mt-8">
+				<ZineLesson
+					Label="THE PIN"
+					Text={`The plugin never asks crates.io for the newest binary. It reads BINARY_VERSION - ${Versions.BinaryVersionFile} today - and downloads that release, which is what makes a plugin install reproducible a year after the tag.`}
+				/>
+			</div>
 			<ZineSource
 				Lines={[
 					"SRC: crates/aphrodite/Cargo.toml; crates/aphrodite-hermes/Cargo.toml",
@@ -441,26 +562,26 @@ const Holes = [0, 1, 2, 3, 4, 5];
 			/>
 		</section>
 
-		<!-- ============ II. CONTRACT // HOW A PAIRING IS CUT ============ -->
-		<section id="contract" class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="CONTRACT // HOW A PAIRING IS CUT" Color="canary" />
-			<h2
-				class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-			>
+		<!-- ============ 02 // CONTRACT - how a pairing is cut ============ -->
+		<section id="contract" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index">02 // CONTRACT // HOW A PAIRING IS CUT</p>
+			<h2 class="mt-3 type-section text-bone-white">
 				Four files have to agree before a tag exists
 			</h2>
-			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				A release is not a tag on one repository. The binary, the plugin spec and the pin that
-				connects them are three files that must agree, the in-tree checksum list is the
-				fourth, and the changelog head is where the agreement is written down so a later
-				reader can check it without diffing manifests.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The order matters as much as the numbers. Since v1.4.6 the plugin is tagged before the
-				parent, so the pin resolves to an asset that already exists rather than to a release
-				page that is still uploading.
-			</p>
-			<div class="mt-12">
+			<div class="prose-flow mt-6 max-w-[46rem]">
+				<p class="type-body text-bone-newsprint">
+					A release is not a tag on one repository. The binary, the plugin spec and the pin
+					that connects them are three files that must agree, the in-tree checksum list is
+					the fourth, and the changelog head is where the agreement is written down so a
+					later reader can check it without diffing manifests.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					The order matters as much as the numbers. Since v1.4.6 the plugin is tagged before
+					the parent, so the pin resolves to an asset that already exists rather than to a
+					release page that is still uploading.
+				</p>
+			</div>
+			<div class="mt-10">
 				<ZineDossier
 					Title="THE PAIRING // BOTH HALVES"
 					Rotate="rotate-[0.5deg]"
@@ -498,13 +619,13 @@ const Holes = [0, 1, 2, 3, 4, 5];
 				<ZinePullQuote
 					Text={Versions.ChangelogTitle}
 					Attribution={`CHANGELOG.md v${Versions.ChangelogVersion}`}
-					Rotate="-rotate-[0.8deg]"
+					Tone="subtle"
 				/>
 			</div>
-			<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The release's own one-line title, taken from the changelog
-				head rather than paraphrased. It is the shortest honest summary a release can
-				carry: one sentence a reader can hold while working through the register.
+			<p class="mt-8 max-w-[46rem] type-body text-bone-newsprint">
+				The release's own one-line title, taken from the changelog head rather than
+				paraphrased. It is the shortest honest summary a release can carry: one sentence a
+				reader can hold while working through the register.
 			</p>
 			<ZineSource
 				Lines={[
@@ -514,100 +635,102 @@ const Holes = [0, 1, 2, 3, 4, 5];
 			/>
 		</section>
 
-		<!-- ============ III. CHANGELOG // WHAT THIS RELEASE CHANGED ============ -->
-		<section id="changelog" class="relative w-full" data-reveal>
-			<ZineTape
-				Variant="section"
-				Label={`CHANGELOG // V${Versions.ChangelogVersion}`}
-			/>
-			<ZineBox Size="lg" Rotate="rotate-[0.8deg]">
-				<h2
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					What this release changed
-				</h2>
-				<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+		<!-- ============ 03 // CHANGELOG - what this release changed ============ -->
+		<section id="changelog" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index">03 // CHANGELOG // V{Versions.ChangelogVersion}</p>
+			<h2 class="mt-3 type-section text-bone-white">What this release changed</h2>
+			<div class="prose-flow mt-6 max-w-[46rem]">
+				<p class="type-body text-bone-newsprint">
 					The changelog is grouped by what a change is for, not by which file it touched:
 				</p>
-				<ul class="mt-3 max-w-3xl space-y-2 font-body text-base leading-relaxed text-bone-newsprint">
+				<ul class="space-y-2 type-body text-bone-newsprint">
 					<li class="border-l-4 border-raw-blood pl-4">a fix that closes an advisory</li>
 					<li class="border-l-4 border-raw-blood pl-4">a fix that closes a class of drift</li>
-					<li class="border-l-4 border-raw-blood pl-4">and the chores that keep the tree honest about itself.</li>
+					<li class="border-l-4 border-raw-blood pl-4">
+						and the chores that keep the tree honest about itself.
+					</li>
 				</ul>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				<p class="type-body text-bone-newsprint">
 					Each group carries its entries verbatim and one line on why the group exists.
 				</p>
-				<div class="mt-10">
-					{
-						CurrentChanges.map(({ Label, Tone, Intro, Lines, Why }) => (
-							<div class="relative mt-8 border-2 border-oxblood-dark bg-soot-black p-5">
-								<div
-									class={`inline-block border border-black px-3 py-0.5 font-mono text-base font-black uppercase tracking-widest ${ToneStamp[Tone]}`}
-								>
-									{Label}
-								</div>
-								{Intro && (
-									<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-										{Intro}
-									</p>
-								)}
-								<div class="mt-3 space-y-1 border border-oxblood-dark bg-carbon-void p-3.5 font-mono text-base text-zinc-dust">
-									{Lines.map((Line) => (
-										<div>{Line}</div>
-									))}
-								</div>
-								{Why && (
-									<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-										<ZineKicker Tone="canary">WHY // </ZineKicker>
-										{Why}
-									</p>
-								)}
-							</div>
-						))
-					}
-				</div>
+			</div>
 
-				<ZineTape
-					Variant="section"
-					Label="PRIOR // V1.6.6, THE CATALOG REVIEW"
-					Color="teal"
-				/>
-				<h3
-					id="catalog-review"
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					The review groups, at their own version
-				</h3>
-				<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					These groups belong to v1.6.6 and are labelled with it. They stay on the page
-					because the catalog review is where the prefetch guard, the report-only setup and
-					the opt-in context engine were decided - and a changelog group pinned to the
-					release that shipped it never has to be re-read against a newer head.
-				</p>
-				<div class="mt-10">
-					{
-						PriorChanges.map(({ Label, Tone, Intro, Lines }) => (
-							<div class="relative mt-8 border-2 border-oxblood-dark bg-soot-black p-5">
-								<div
+			<div class="mt-10 flex flex-col gap-6">
+				{
+					CurrentChanges.map(({ Label, Tone, Intro, Lines, Why }) => (
+						<article class="tier-shell relative border-2 border-oxblood-dark p-5 shadow-[4px_4px_0px_#000] sm:p-6">
+							<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+								<span
 									class={`inline-block border border-black px-3 py-0.5 font-mono text-base font-black uppercase tracking-widest ${ToneStamp[Tone]}`}
 								>
 									{Label}
-								</div>
-								{Intro && (
-									<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-										{Intro}
-									</p>
-								)}
-								<div class={`mt-3 space-y-1 border border-oxblood-dark bg-carbon-void p-3.5 font-mono text-base ${ToneText[Tone]}`}>
-									{Lines.map((Line) => (
-										<div>{Line}</div>
-									))}
-								</div>
+								</span>
+								<span class="type-meta font-bold uppercase text-zinc-dust">
+									{Lines.length} ENTRIES
+								</span>
 							</div>
-						))
-					}
-				</div>
-			</ZineBox>
+							{Intro && (
+								<p class="mt-4 max-w-[46rem] type-body text-bone-newsprint">{Intro}</p>
+							)}
+							<div class="well mt-4 p-4 font-mono text-code leading-relaxed text-zinc-dust">
+								{Lines.map((Line) => (
+									<div class="break-token">{Line}</div>
+								))}
+							</div>
+							{Why && (
+								<p class="mt-4 max-w-[46rem] type-body text-zinc-dust">
+									<ZineKicker Tone="canary">WHY // </ZineKicker>
+									{Why}
+								</p>
+							)}
+						</article>
+					))
+				}
+			</div>
+
+			{/* PRIOR - the same groups, at their own version. A sub-chapter: the
+			    eyebrow keeps the teal identity the section tape carried, at the label
+			    volume, so the chapter rule above stays the one chapter mark. */}
+			<p class="section-kicker mt-16 !text-weathered-teal">
+				PRIOR // V1.6.6, THE CATALOG REVIEW
+			</p>
+			<h3 id="catalog-review" class="mt-2 type-sub text-bone-white">
+				The review groups, at their own version
+			</h3>
+			<p class="mt-4 max-w-[46rem] type-body text-bone-newsprint">
+				These groups belong to v1.6.6 and are labelled with it. They stay on the page because
+				the catalog review is where the prefetch guard, the report-only setup and the opt-in
+				context engine were decided - and a changelog group pinned to the release that
+				shipped it never has to be re-read against a newer head.
+			</p>
+			<div class="mt-8 flex flex-col gap-6">
+				{
+					PriorChanges.map(({ Label, Tone, Intro, Lines }) => (
+						<article class="tier-shell relative border border-[color:var(--tier-shell-edge)] p-5 sm:p-6">
+							<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+								<span
+									class={`inline-block border border-black px-3 py-0.5 font-mono text-base font-black uppercase tracking-widest ${ToneStamp[Tone]}`}
+								>
+									{Label}
+								</span>
+								<span class="type-meta font-bold uppercase text-zinc-dust">
+									{Lines.length} ENTRIES
+								</span>
+							</div>
+							{Intro && (
+								<p class="mt-4 max-w-[46rem] type-body text-bone-newsprint">{Intro}</p>
+							)}
+							<div
+								class={`well mt-4 p-4 font-mono text-code leading-relaxed ${ToneText[Tone]}`}
+							>
+								{Lines.map((Line) => (
+									<div class="break-token">{Line}</div>
+								))}
+							</div>
+						</article>
+					))
+				}
+			</div>
 			<ZineSource
 				Lines={[
 					`SRC: CHANGELOG.md v${Versions.ChangelogVersion}`,
@@ -616,84 +739,154 @@ const Holes = [0, 1, 2, 3, 4, 5];
 			/>
 		</section>
 
-		<!-- ============ IV. REGISTER // EVERY RELEASE, ONE ROW ============ -->
-		<section id="register" class="relative w-full" data-reveal>
-			<ZineTape
-				Variant="section"
-				Label={`RELEASE REGISTER // v0.7.0 -> v${Versions.Binary}`}
-			/>
-			<ZineBox Size="lg" Rotate="-rotate-[1deg]">
-				<h2
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					Every release on one line
-				</h2>
-				<p class="mb-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					One row per release, oldest first: the version, the plugin it paired with, the date
-					it was tagged, and the one-line record of what landed. Each row links to its own
-					GitHub release note, which is the long form of the same fact.
-				</p>
+		<!-- ============ 04 // REGISTER - the telemetry matrix ============ -->
+		<section id="register" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index">04 // RELEASE REGISTER // v0.7.0 -> v{Versions.Binary}</p>
+			<h2 class="mt-3 type-section text-bone-white">Every release on one line</h2>
+			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
+				One row per release, oldest first: the version, the plugin it paired with, the date
+				it was tagged, and the one-line record of what landed. Each row links to its own
+				GitHub release note, which is the long form of the same fact.
+			</p>
+
+			{/* THE MATRIX. Hairline rows, mono identifiers, a status chip per row. The
+			    table keeps its own scroll container so a narrow viewport scrolls the
+			    matrix instead of widening the page, and `min-w` holds the columns at a
+			    readable width rather than squeezing the prose column to a ribbon. */}
+			<div
+				class="grunge shell-card mt-8 shadow-[6px_6px_0px_#000]"
+				data-grunge
+				data-grunge-mode="edge"
+			>
 				<div class="overflow-x-auto">
-					<table class="w-full border-collapse font-mono text-base">
+					<table class="w-full min-w-[58rem] border-collapse text-left">
 						<thead>
-							<tr class="border-b-2 border-oxblood-dark text-left">
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+							<tr class="border-b border-[color:var(--tier-well-edge)]">
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
+									STATUS
+								</th>
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
 									VERSION
 								</th>
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
 									DATE
 								</th>
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
 									PAIRED WITH
 								</th>
-								<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
 									WHAT LANDED
 								</th>
 							</tr>
 						</thead>
 						<tbody>
 							{
-								Releases.map(({ Ver, Date, Pair, Landed, Tag, Emphasis, Note }) => (
-									<tr class="border-b border-oxblood-dark transition-colors hover:bg-raw-blood/10">
-										<td class="py-3 pr-4 align-top whitespace-nowrap">
-											<div class="text-base font-black text-weathered-teal">{Ver}</div>
+								Register.map(({ Ver, Date, Pair, Landed, Tag, Emphasis, Note, Current, Status }) => (
+									<tr
+										class:list={[
+											"border-b border-[color:var(--tier-shell-edge)] align-top last:border-b-0",
+											Current && "tier-inverted",
+										]}
+									>
+										<td class="whitespace-nowrap px-4 py-4 sm:px-5">
+											<span
+												class:list={[
+													"telemetry-tag",
+													!Current && Emphasis && "telemetry-tag--canary",
+												]}
+											>
+												{Status}
+											</span>
+										</td>
+										<td class="whitespace-nowrap px-4 py-4 sm:px-5">
 											<div
-												class={`mt-1 text-base font-black uppercase tracking-widest ${
-													Emphasis ? "text-stamped-canary" : "text-zinc-dust"
-												}`}
+												class:list={[
+													"font-mono text-code font-bold",
+													Current ? "text-carbon-void" : "text-weathered-teal",
+												]}
+											>
+												{Ver}
+											</div>
+											<div
+												class:list={[
+													"mt-1 type-meta font-bold uppercase",
+													Current
+														? "text-oxblood-dark"
+														: Emphasis
+															? "text-stamped-canary"
+															: "text-zinc-dust",
+												]}
 											>
 												{Tag}
 											</div>
 											<a
-												class="mt-1 inline-block text-base font-black uppercase tracking-widest text-weathered-teal transition-colors hover:text-bone-white"
+												class:list={[
+													"mt-1 inline-block type-meta font-bold uppercase underline decoration-transparent decoration-2 underline-offset-4 transition-colors",
+													Current
+														? "text-raw-blood hover:decoration-carbon-void"
+														: "text-weathered-teal hover:text-bone-white",
+												]}
 												href={NoteFor(Note ?? Ver)}
 											>
 												RELEASE NOTE ↗
 											</a>
 										</td>
-										<td class="py-3 pr-4 align-top whitespace-nowrap text-base text-zinc-dust">
+										<td
+											class:list={[
+												"whitespace-nowrap px-4 py-4 font-mono text-code sm:px-5",
+												Current ? "text-oxblood-dark" : "text-zinc-dust",
+											]}
+										>
 											{Date}
 										</td>
-										<td class="py-3 pr-4 align-top whitespace-nowrap text-base text-zinc-dust">
+										<td
+											class:list={[
+												"whitespace-nowrap px-4 py-4 font-mono text-code sm:px-5",
+												Current ? "text-oxblood-dark" : "text-zinc-dust",
+											]}
+										>
 											{Pair}
 										</td>
-										<td class="py-3 align-top text-base text-bone-newsprint">{Landed}</td>
+										<td
+											class:list={[
+												"min-w-[18rem] max-w-[34rem] px-4 py-4 font-body text-body sm:px-5",
+												Current ? "text-carbon-void" : "text-bone-newsprint",
+											]}
+										>
+											{Landed}
+										</td>
 									</tr>
 								))
 							}
 						</tbody>
 					</table>
 				</div>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
-					THE CANARY TAGS MARK THE TWO RELEASES THAT CHANGED THE PROJECT'S SHAPE: THE FIRST
-					CRATES.IO PUBLISH, AND THE CHAIN-SPLIT CCR.
-				</p>
-				<p class="mt-3 text-base leading-relaxed text-zinc-dust">
-					The register is the ledger; the tape is the same history told once per stamp,
-					with the reason each release mattered. The table finds a version; the
-					tape explains why the project looks the way it does.
-				</p>
-			</ZineBox>
+			</div>
+
+			<p class="mt-8 max-w-[46rem] border-t border-oxblood-dark pt-6 type-body text-zinc-dust">
+				THE CANARY TAGS MARK THE TWO RELEASES THAT CHANGED THE PROJECT'S SHAPE: THE FIRST
+				CRATES.IO PUBLISH, AND THE CHAIN-SPLIT CCR.
+			</p>
+			<p class="mt-3 max-w-[46rem] type-body text-zinc-dust">
+				The register is the ledger; the tape is the same history told once per stamp, with
+				the reason each release mattered. One finds a version; the other explains why the
+				project looks the way it does.
+			</p>
 			<ZineSource
 				Lines={[
 					`SRC: README.md:12; CHANGELOG.md v${Versions.ChangelogVersion}`,
@@ -702,32 +895,26 @@ const Holes = [0, 1, 2, 3, 4, 5];
 			/>
 		</section>
 
-		<!-- ============ V. TAPE // ONE STRIP PER RELEASE STAMP ============ -->
-		<section id="tape" class="relative w-full" data-reveal>
-			<ZineTape
-				Variant="section"
-				Label={`TIMELINE TAPE // v0.7.0 -> v${Versions.Binary}`}
-				Color="canary"
-			/>
-			<h2
-				class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-			>
-				The tape, one stamp per release
-			</h2>
-			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Each strip is one release stamp: the binary and the plugin version it paired, the
-				one-line "what landed", and the release note.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The tape runs top to bottom in release order - the enlarged perforations mark the
-				two stamps that changed the project's shape (the first crates.io publish, the
-				chain-split CCR).
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Every stamp also carries the line the register has no room for: why the release
-				mattered. A version number records that something happened; the reason is what a
-				reader can actually use a year later.
-			</p>
+		<!-- ============ 05 // TAPE - one strip per release stamp ============ -->
+		<section id="tape" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index">05 // TIMELINE TAPE // v0.7.0 -> v{Versions.Binary}</p>
+			<h2 class="mt-3 type-section text-bone-white">The tape, one stamp per release</h2>
+			<div class="prose-flow mt-6 max-w-[46rem]">
+				<p class="type-body text-bone-newsprint">
+					Each strip is one release stamp: the binary and the plugin version it paired, the
+					one-line "what landed", and the release note.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					The tape runs in release order, oldest first - the enlarged perforations mark the
+					two stamps that changed the project's shape (the first crates.io publish, the
+					chain-split CCR).
+				</p>
+				<p class="type-body text-bone-newsprint">
+					Every stamp also carries the line the register has no room for: why the release
+					mattered. A version number records that something happened; the reason is what a
+					reader can actually use a year later.
+				</p>
+			</div>
 			<div class="mt-10 flex flex-wrap items-center gap-4">
 				<ZineStamp Label="ENLARGED = SHAPE CHANGE" Color="canary" Rotate="sm:-rotate-1" />
 				<ZineStamp Label="THIN = ORDINARY RELEASE" Color="teal" Rotate="sm:rotate-1" />
@@ -737,13 +924,14 @@ const Holes = [0, 1, 2, 3, 4, 5];
 				{
 					Releases.map(({ Ver, Date, Pair, Landed, Why, Tag, Emphasis, Note }, Index) => (
 						<article
-							class={`relative flex items-stretch gap-5 ${
+							class:list={[
+								"tier-shell relative flex items-stretch gap-5 transition-transform duration-300 hover:rotate-0 hover:-translate-y-0.5",
 								Emphasis
-									? "border-4 border-stamped-canary bg-carbon-void p-6 shadow-[6px_6px_0px_#000] sm:p-8"
-									: "border-2 border-oxblood-dark bg-carbon-void p-5 shadow-[4px_4px_0px_#000] sm:p-6"
-							} transition-transform duration-300 hover:rotate-0 hover:-translate-y-0.5 ${
-								Emphasis ? "-rotate-[0.6deg]" : "rotate-[0.3deg]"
-							}`}
+									? "border-2 border-stamped-canary p-6 shadow-[6px_6px_0px_#000] sm:p-8"
+									: "border border-[color:var(--tier-shell-edge)] p-5 shadow-[3px_3px_0px_#000] sm:p-6",
+								Emphasis ? "-rotate-[0.6deg]" : "rotate-[0.3deg]",
+								"max-sm:rotate-0",
+							]}
 						>
 							{/* Perforation spine: enlarged holes mark the two shape changes */}
 							<div
@@ -762,7 +950,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 							</div>
 							<div class="flex min-w-0 flex-1 flex-col gap-4">
 								<div class="flex flex-wrap items-baseline gap-x-4 gap-y-2">
-									<span class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+									<span class="type-meta font-bold tabular-nums text-zinc-dust">
 										{`STAMP ${String(Index + 1).padStart(2, "0")} / ${String(Releases.length).padStart(2, "0")}`}
 									</span>
 									<span class="font-mono text-base font-bold text-zinc-dust">{Date}</span>
@@ -783,7 +971,9 @@ const Holes = [0, 1, 2, 3, 4, 5];
 										{Tag}
 									</span>
 								</div>
-								<div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+								<div
+									class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8"
+								>
 									<div class="min-w-0 flex-1">
 										<div
 											class={`font-headline font-black tracking-tighter text-bone-white ${
@@ -794,7 +984,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 										</div>
 										<div class="mt-3">
 											<ZineKicker As="div" Tone="dust">WHAT LANDED</ZineKicker>
-											<p class="mt-1 max-w-2xl font-body text-base leading-relaxed text-bone-newsprint">
+											<p class="mt-1 max-w-[46rem] type-body text-bone-newsprint">
 												{Landed}
 											</p>
 										</div>
@@ -804,7 +994,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 											}`}
 										>
 											<ZineKicker As="div" Tone="canary">WHY IT MATTERED</ZineKicker>
-											<p class="mt-1 max-w-2xl font-body text-base leading-relaxed text-bone-newsprint">
+											<p class="mt-1 max-w-[46rem] type-body text-bone-newsprint">
 												{Why}
 											</p>
 										</div>
@@ -829,22 +1019,24 @@ const Holes = [0, 1, 2, 3, 4, 5];
 			/>
 		</section>
 
-		<!-- ============ VI. NUMBERS // WHERE THE MEASUREMENTS LIVE ============ -->
-		<section id="numbers" class="relative w-full lg:w-8/12 lg:self-end" data-reveal>
-			<ZineTape Variant="section" Label="POINTER // THE MEASUREMENTS" />
+		<!-- ============ 06 // NUMBERS - where the measurements live ============ -->
+		<section
+			id="numbers"
+			class="blueprint-section relative w-full lg:w-8/12 lg:self-end"
+			data-reveal
+		>
+			<p class="section-index">06 // POINTER // THE MEASUREMENTS</p>
+			<h2 class="mt-3 type-section text-bone-white">Full numbers</h2>
 			<ZineBox
 				Size="lg"
+				Surface="well"
 				Rotate="-rotate-[1.4deg]"
 				Tape="POINTER"
 				TapeColor="raw"
 				TapeSide="right"
+				Class="mt-8"
 			>
-				<h2
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					Full numbers
-				</h2>
-				<p class="max-w-2xl font-body text-base leading-relaxed text-bone-newsprint">
+				<p class="max-w-[46rem] type-body text-bone-newsprint">
 					The complete telemetry -
 					<span class="text-stamped-canary" data-count="610">610</span>&times;/<span
 						class="text-stamped-canary"
@@ -866,25 +1058,27 @@ const Holes = [0, 1, 2, 3, 4, 5];
 						Color="canary"
 					/>
 				</div>
-				<p class="mt-3 text-base leading-relaxed text-zinc-dust">
-					Both bars share one scale: 610&times; is the ceiling on a single long
-					low-entropy document.
-				</p>
-				<p class="mt-3 text-base leading-relaxed text-zinc-dust">
-					132&times; is the standard corpus overall (106 KB to 800 B).
-				</p>
-				<p class="mt-3 text-base leading-relaxed text-zinc-dust">
-					Quote the ceiling only with the corpus attached.
-				</p>
+				<div class="prose-flow mt-3">
+					<p class="type-body text-zinc-dust">
+						Both figures share one scale: 610&times; is the ceiling on a single long
+						low-entropy document.
+					</p>
+					<p class="type-body text-zinc-dust">
+						132&times; is the standard corpus overall (106 KB to 800 B).
+					</p>
+					<p class="type-body text-zinc-dust">
+						Quote the ceiling only with the corpus attached.
+					</p>
+				</div>
 				<div class="mt-8 flex flex-wrap items-center gap-3">
 					<ZineStamp Label="8-40 ms END TO END" Color="teal" Rotate="sm:-rotate-1" />
 					<ZineStamp Label="40-123 ns CLASSIFY" Color="bone" Rotate="sm:rotate-1" />
 					<ZineStamp Label="200 SESSIONS" Color="raw" />
 				</div>
-				<p class="mt-8 max-w-2xl font-body text-base leading-relaxed text-bone-newsprint">
-					The register records what changed; the benchmarks record what it cost and what
-					it saved. Keeping the two apart is deliberate - a release note that also argues
-					about throughput is a release note nobody can cite.
+				<p class="mt-8 max-w-[46rem] type-body text-bone-newsprint">
+					The register records what changed; the benchmarks record what it cost and what it
+					saved. Keeping the two apart is deliberate - a release note that also argues about
+					throughput is a release note nobody can cite.
 				</p>
 				<div class="mt-8">
 					<ZineButton Label="OPEN BENCHMARKS" Href="/benchmarks/" />

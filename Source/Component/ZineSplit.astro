@@ -11,9 +11,28 @@
  * deck's `transform` beat draws and what the landing page needs immediately
  * after its hero.
  *
+ * TWO PODS, ONE PLATE (the Stitch console grammar). The pair is no longer two
+ * framed boxes with a label floating above each: each half is a POD, and a pod
+ * is a HEADER RIBBON over an INSET WELL.
+ *
+ *   the ribbon   what produced these bytes and how many there are - the
+ *                command in amber mono on the left, the count as a telemetry
+ *                tag on the right. It is the first thing read.
+ *   the well     `.well` from the elevation grammar: the recessed channel of
+ *                the plate, one step darker than the shell with a LIGHTER 1px
+ *                edge, which is what makes the pair read as two instruments on
+ *                one bench instead of two more panels.
+ *
+ * The tally moved into the ribbon for that reason: a byte count is a header
+ * fact, not a footer one, and a figure a reader has to read a terminal to find
+ * is a figure the terminal did not state.
+ *
  * Tones come in on the line, not as a second array: a leading `dim:`, `fade:`
  * or `mute:` selects the suppression opacity (law 4's 70/40/25%), so a caller
  * passes the terminal lines as strings and the pane stays a rendering detail.
+ * The SYNTAX ROLE (command / tree / tag / warning) is read here off the line's
+ * own shape, because a caller made to name it twice would eventually name it
+ * differently - and colour is identity, so it may not drift.
  *
  * TWO MODES.
  *
@@ -50,6 +69,9 @@ import {
 
 /** The tones `ZineStream` renders, reachable as a line prefix. */
 type LineTone = "plain" | "dim" | "fade" | "mute" | "result" | "canary" | "teal";
+
+/** The syntax role a line's own shape names - identity, never emphasis. */
+type LineRole = "command" | "tree" | "tag" | "warning";
 
 interface Props {
 	/** The terminal lines; a leading "dim:", "fade:" or "mute:" selects the tone. */
@@ -98,13 +120,59 @@ const {
  */
 const Prefix = /^(plain|dim|fade|mute|result|canary|teal): ?([\s\S]*)$/;
 
+/**
+ * The syntax role, read off the line the way a reader reads it: a `$` prompt is
+ * a command, a `warning:`/`error[` opener is something to look at, a tree glyph
+ * or a compile step is the structure the command printed, and a CCR marker is a
+ * tag - a name with an address. Everything else keeps the caller's tone and
+ * claims no role, so a role is only ever taken by a line that proves it.
+ */
+const RoleOf = (Text: string): LineRole | undefined => {
+	const Trimmed = Text.trimStart();
+
+	if (Trimmed.startsWith("$ ")) {
+		return "command";
+	}
+
+	if (
+		/^(warning|error)[:[]/i.test(Trimmed) ||
+		Trimmed.includes(": error[") ||
+		Trimmed.includes(": warning:")
+	) {
+		return "warning";
+	}
+
+	if (/^[├└│─]/.test(Trimmed) || Trimmed.startsWith("Compiling ")) {
+		return "tree";
+	}
+
+	if (Trimmed.includes("<<<CCR:")) {
+		return "tag";
+	}
+
+	return undefined;
+};
+
+/**
+ * The line records. `Role` is omitted rather than set to `undefined` when the
+ * line claims none: the tsconfig sets `exactOptionalPropertyTypes`, so an
+ * explicitly-undefined optional is a type error, not a harmless default.
+ */
 const Lines = Raw.map((Line) => {
 	const Match = Prefix.exec(Line);
+	const Text = Match === null ? Line : Match[2];
+	const Tone = Match === null ? ("plain" as LineTone) : (Match[1] as LineTone);
+	const Role = RoleOf(Text);
 
-	return Match === null
-		? { Text: Line, Tone: "plain" as LineTone }
-		: { Text: Match[2], Tone: Match[1] as LineTone };
+	return Role === undefined ? { Text, Tone } : { Text, Tone, Role };
 });
+
+/**
+ * The byte count in the ribbon, measured from the PLAIN text of the stream -
+ * the same measure `RunBytes` gives the running terminal, so the still frame
+ * and the live one quote one number for one stream.
+ */
+const RawBytes = RunBytes(Lines.map((Line) => Line.Text));
 
 /**
  * When the preview lands: the frame the last printed line finishes. The
@@ -155,6 +223,10 @@ const Slug =
  *     runtime's own rows could never produce.
  *   - it means the string is joined with no separators: any newline between
  *     two rows would be a blank line the stream never emitted.
+ *
+ * The tone comes from `RunTone` and NOT from this component's syntax roles: the
+ * runtime replaces these rows on mount and classifies them with `RunTone`, and
+ * two classifications of one stream would disagree the moment the script ran.
  */
 const Escape = (Text: string): string =>
 	Text.replace(/&/g, "&amp;")
@@ -173,24 +245,39 @@ const FrameRows = Tail.map(
 {
 	Run === undefined ? (
 		<ZineBox Size="lg" Rotate="-rotate-[1deg]" Wipe={Wipe}>
-			<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-				<div>
-					<ZineKicker As="div" Tone="dust">RAW STREAM // WHAT THE TERMINAL KEEPS</ZineKicker>
-					<div class="mt-2">
-						<ZineStream Lines={Lines} Stream />
-					</div>
-					<p class="mt-4 font-body text-base leading-relaxed text-zinc-dust">
+			<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
+				{/* POD ONE - the raw stream. Its ribbon is ZineStream's own: the pod's
+				    name on the left, the byte count of this exact stream on the right. */}
+				<div class="flex min-w-0 flex-col gap-4">
+					<ZineStream
+						Lines={Lines}
+						Stream
+						Label="RAW STREAM // WHAT THE TERMINAL KEEPS"
+						Bytes={RawBytes}
+					/>
+					<p class="font-body text-base leading-relaxed text-zinc-dust">
 						The repeated compile steps fade out, the warnings that were
 						already counted mute, and the one line that stopped the build stays at full
 						strength. Every one of those lines is context the agent would have paid for.
 					</p>
 				</div>
-				<div>
-					<ZineKicker As="div" Tone="canary">PREVIEW // WHAT THE MODEL READS</ZineKicker>
-					<div class="mt-2">
+
+				{/* POD TWO - the preview. Its ribbon is the panel's own header bar:
+				    attached to the frame below it, so the pair reads as two consoles
+				    and not as a label that drifted off its box. */}
+				<div class="flex min-w-0 flex-col gap-4">
+					<div class="flex flex-col">
+						<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-2 border-oxblood-dark border-b-0 bg-asphalt-panel px-3.5 py-1.5">
+							<ZineKicker As="div" Tone="canary">
+								PREVIEW // WHAT THE MODEL READS
+							</ZineKicker>
+							<span class="telemetry-tag telemetry-tag--canary ml-auto shrink-0">
+								ABSORBED
+							</span>
+						</div>
 						<ZinePreview Label={Label} Result={Preview} Hash={Hash} Color="canary" Enter={StreamBeat} />
 					</div>
-					<p class="mt-4 font-body text-base leading-relaxed text-zinc-dust">
+					<p class="font-body text-base leading-relaxed text-zinc-dust">
 						The same build on one line: the type, the counts, and the one error that
 						mattered. The marker underneath is the address of the bytes that stayed
 						behind - the agent pays for them only when this line fails to answer the
@@ -201,32 +288,48 @@ const FrameRows = Tail.map(
 		</ZineBox>
 	) : (
 		<ZineBox Size="lg" Rotate="-rotate-[1deg]" Wipe={Wipe}>
-			{/* `data-run` is on the GRID, not on the terminal pane: the runtime owns
+			{/* `data-run` is on the GRID, not on the terminal pod: the runtime owns
 			    both halves of the pair, because the right one is a function of the
-			    left one. The terminal is the left column's pane; the preview, the
+			    left one. The terminal is the left column's well; the preview, the
 			    marker, the verdict chip and the tally are the right column's. */}
-			<div class="grid grid-cols-1 gap-6 lg:grid-cols-2" data-run={Slug}>
-				<div>
-					<ZineKicker As="div" Tone="dust">RAW STREAM // WHAT THE TERMINAL KEEPS</ZineKicker>
-					{/* The terminal. Without JavaScript the pane is the settled build at
-					    its natural height, with the command above it and the tally below
-					    it - the still frame this page has always shown. `[data-run]`
-					    converts it to a fixed window the moment it mounts. */}
-					<div class="ccr-marker mt-2 border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
-						<div
-							class="border-b border-oxblood-dark pb-1.5 text-bone-newsprint"
-							data-run-prompt
-							set:html={Escape(`$ ${Build?.Command ?? ""}`)}
-						/>
-						<div class="overflow-hidden" data-run-viewport>
-							<pre class="m-0 font-mono" data-run-track set:html={FrameRows} />
+			<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10" data-run={Slug}>
+				{/* POD ONE - the live terminal. Without JavaScript the pane is the
+				    settled build at its natural height, with the command in the ribbon
+				    above it and the byte count beside the command - the still frame
+				    this page has always shown. `[data-run]` converts it to a live
+				    window the moment it mounts.
+
+				    The prompt element carries its own `$`: the runtime writes
+				    `$ <command>` into it, so a `$` beside it would print twice. */}
+				<div class="flex min-w-0 flex-col gap-4">
+					<div class="well ccr-marker flex flex-col">
+						<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
+							<span class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
+								<span class="shrink-0 font-mono text-meta font-bold uppercase text-zinc-dust">
+									RAW STREAM // WHAT THE TERMINAL KEEPS
+								</span>
+								<span
+									class="break-words font-mono text-base font-bold leading-snug text-stamped-canary"
+									data-run-prompt
+									set:html={Escape(`$ ${Build?.Command ?? ""}`)}
+								/>
+							</span>
+							<span
+								class="telemetry-tag ml-auto shrink-0"
+								data-run-tally
+								set:html={Escape(SettledTally)}
+							/>
 						</div>
-						<div class="mt-1.5 flex flex-wrap items-baseline justify-between gap-x-3 border-t border-oxblood-dark pt-1.5 text-base">
-							<span data-run-tally set:html={Escape(SettledTally)} />
-							<span class="text-zinc-dust">the whole thing enters the context</span>
+						<div class="p-3.5 font-mono text-base leading-relaxed text-zinc-dust">
+							<div class="overflow-hidden" data-run-viewport>
+								<pre class="m-0 font-mono" data-run-track set:html={FrameRows} />
+							</div>
 						</div>
 					</div>
-					<p class="mt-4 font-body text-base leading-relaxed text-zinc-dust">
+					<p class="font-mono text-base leading-relaxed text-zinc-dust">
+						the whole thing enters the context
+					</p>
+					<p class="font-body text-base leading-relaxed text-zinc-dust">
 						The commands in a tool-heavy session arrive in exactly this variety: a build that
 						stalls and then bursts, a search that arrives flat
 						and fast, a listing, a test run that ticks, a JSON body that only parses on its
@@ -235,31 +338,37 @@ const FrameRows = Tail.map(
 						mute, the one line that stopped the build stays at full strength.
 					</p>
 				</div>
-				<div>
-					<ZineKicker As="div" Tone="canary">PREVIEW // WHAT THE MODEL READS</ZineKicker>
-					<div class="mt-2 border-2 border-oxblood-dark bg-asphalt-panel p-3.5" data-enter="980">
-						<div class="mb-1 flex flex-wrap items-baseline justify-between gap-x-3">
-							<span class="text-base font-black uppercase tracking-widest text-stamped-canary">
-								{Label}
-							</span>
+
+				{/* POD TWO - the line the model reads, recomputed on every arrival. */}
+				<div class="flex min-w-0 flex-col gap-4">
+					<div class="flex flex-col">
+						<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-2 border-oxblood-dark border-b-0 bg-asphalt-panel px-3.5 py-1.5">
+							<ZineKicker As="div" Tone="canary">
+								PREVIEW // WHAT THE MODEL READS
+							</ZineKicker>
 							<span
-								class="border border-raw-blood/40 bg-raw-blood/10 px-2 py-0.5 font-mono text-base font-black uppercase text-bone-newsprint"
+								class="telemetry-tag telemetry-tag--crimson ml-auto shrink-0"
 								data-run-type
 								set:html={Escape(Build?.Type ?? "")}
 							/>
 						</div>
-						<div
-							class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold text-bone-white sm:text-base"
-							data-run-preview
-							set:html={Escape(SettledPreview)}
-						/>
-						<div
-							class="ccr-marker mt-2 font-mono text-base font-bold text-weathered-teal"
-							data-run-marker
-							set:html={Escape(SettledMarker)}
-						/>
+						<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5" data-enter="980">
+							<div class="type-meta mb-1.5 uppercase text-stamped-canary">{Label}</div>
+							<div class="well p-3">
+								<div
+									class="font-mono text-base font-bold text-bone-white"
+									data-run-preview
+									set:html={Escape(SettledPreview)}
+								/>
+								<div
+									class="ccr-marker mt-2 font-mono text-base font-bold text-weathered-teal"
+									data-run-marker
+									set:html={Escape(SettledMarker)}
+								/>
+							</div>
+						</div>
 					</div>
-					<p class="mt-4 font-body text-base leading-relaxed text-zinc-dust">
+					<p class="font-body text-base leading-relaxed text-zinc-dust">
 						Aphrodite previews the output it has received, not the output a command will
 						eventually produce: the counts are the counts of the lines that have actually
 						arrived, and the marker's size is the size of the bytes behind it at that
@@ -268,7 +377,7 @@ const FrameRows = Tail.map(
 						the tally climbs with the stream until it settles on the line the build really
 						ends on.
 					</p>
-					<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+					<p class="font-body text-base leading-relaxed text-zinc-dust">
 						The type chip names the type the tool hands the engine, and the
 						engine honours it: a build counts errors and warnings, a search counts hits
 						and files, a listing counts entries and extensions, a test run counts passes

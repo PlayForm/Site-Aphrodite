@@ -1,4 +1,18 @@
 ---
+/**
+ * ZineLesson - one lesson, stamped and set beside the argument it came from.
+ *
+ * THE CONSOLE GRAMMAR (Stitch direction), at the smallest scale it goes: the
+ * STAMP is the ribbon - the lesson's name, tilted, in the one colour that says
+ * "this is the takeaway" - and the body is an inset WELL, so the words sit one
+ * step down from the callout's own surface the way a value sits under its
+ * label. The crimson left rule is the callout's identity and stays: it is what
+ * separates a lesson from a note.
+ *
+ * `Lines` is the enumerated form (a reader picks between options) and `Text`
+ * the single-sentence form; both render in the well, so the two shapes differ
+ * in how the copy is divided and never in how loud it is.
+ */
 interface Props {
 	/** The lesson headline, stamped. */
 	Label: string;
@@ -25,19 +39,24 @@ const Palette = {
 }[Color];
 ---
 
-<aside class="flex flex-col gap-3 border-l-4 border-blood-crimson bg-asphalt-panel p-4 sm:flex-row sm:items-start sm:gap-5">
+<aside
+	class="grunge grunge--faint flex flex-col gap-3 border-l-4 border-blood-crimson bg-asphalt-panel p-4 sm:flex-row sm:items-start sm:gap-5"
+	data-grunge
+>
 	<span class={`shrink-0 -rotate-1 self-start border-2 border-black px-3 py-1 font-mono text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] sm:-rotate-2 ${Palette}`}>
 		{Label}
 	</span>
-	{
-		Lines && Lines.length > 0 ? (
-			<ul class="flex flex-col gap-2 font-body text-base leading-relaxed text-bone-newsprint">
-				{Lines.map((Line) => (
-					<li class="border-l-2 border-oxblood-dark pl-3">{Line}</li>
-				))}
-			</ul>
-		) : (
-			<p class="font-body text-base leading-relaxed text-bone-newsprint">{Text}</p>
-		)
-	}
+	<div class="well min-w-0 grow p-3">
+		{
+			Lines && Lines.length > 0 ? (
+				<ul class="flex flex-col gap-2 font-body text-base leading-relaxed text-bone-newsprint">
+					{Lines.map((Line) => (
+						<li class="border-l-2 border-oxblood-dark pl-3">{Line}</li>
+					))}
+				</ul>
+			) : (
+				<p class="font-body text-base leading-relaxed text-bone-newsprint">{Text}</p>
+			)
+		}
+	</div>
 </aside>

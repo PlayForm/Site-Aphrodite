@@ -9,9 +9,9 @@ import ZineBox from "../Component/ZineBox.astro";
 import ZineKicker from "../Component/ZineKicker.astro";
 import ZineStamp from "../Component/ZineStamp.astro";
 import ZineStream from "../Component/ZineStream.astro";
-import ZineTape from "../Component/ZineTape.astro";
 import ConfigKeys from "../Component/ConfigKeys.astro";
 import PageShell from "@Component/PageShell.astro";
+import PageHeader from "@Component/PageHeader.astro";
 import Related from "@Component/Related.astro";
 
 // The CONFIG PLAYGROUND: the aphrodite.toml surface made explorable, as a
@@ -30,6 +30,25 @@ import Related from "@Component/Related.astro";
 // prose enumerating each parser's keys, and the ladder's own chain arrays)
 // could. The record shape lives in Source/Library/Records.ts - the page fills
 // it, it never declares a second copy of it.
+//
+// ── THE SHAPE OF THE PAGE (blueprint grammar) ─────────────────────────────
+//
+// Every chapter is a `.blueprint-section` with a numbered `.section-index`
+// above its head, and the page spends its expressive budget exactly twice: the
+// PageHeader's tape, and the one stamp on the /reload callout. Everything else
+// reads in the three published voices - `.type-section` for a chapter head,
+// `.type-body` for a sentence, `.type-meta` / `.telemetry-tag` for a label - so
+// the emphasis lands where a reader needs it instead of being spread evenly
+// over twelve chapters. The vocabulary itself is Global.css's
+// `BLUEPRINT GRAMMAR` block, consumed by name; nothing here hand-rolls a
+// border, a fill or a chip.
+//
+// The four live classes (hot / startup / load / unwired) used to be four
+// ZineStamps in a row. They are four `.telemetry-tag`s in the same four
+// colours now: DEMOTION, not deletion - the shadow and the tilt come off, the
+// colour and every word stay, because that colour is the identity the matrix's
+// LIVE column is read against. Four stamps in one chapter was four things
+// shouting one label.
 
 // The editor's default text: the shipped example, byte-faithful except the
 // commented api_key sample line, which renders as its env-var name only.
@@ -158,7 +177,6 @@ const Keys: ConfigKeyLadderRecord[] = GeneratedKeys.map((Key) => {
 });
 Assert("Source/Library/Prose/Config.ts", ConfigProse, ConfigNames);
 
-
 // A sentence under the sections that need one - the table cannot say these.
 const SectionNotes: Record<string, string> = {
 	"[[proxies]]":
@@ -211,7 +229,15 @@ const FactorLabel = (Row: { Factor: number | "code_multiplier" }): string =>
 // the fields the client-side simulation needs. The excluded keys are the ones
 // whose value the page must never echo (a key, a callback) or whose absence
 // would say nothing about precedence.
-const LadderExcluded = new Set(["dev", "notify_url", "notify_key", "max_context", "max_output", "timeout", "name"]);
+const LadderExcluded = new Set([
+	"dev",
+	"notify_url",
+	"notify_key",
+	"max_context",
+	"max_output",
+	"timeout",
+	"name",
+]);
 
 const Tracked = Keys.filter((Row) => Row.Live !== "unwired" && !LadderExcluded.has(Row.Key)).map(
 	({ Key, Section, Env, Default, Reader, Live, Chain, From }) => ({
@@ -241,6 +267,32 @@ const Sections = [
 	{ Id: "parsers", Label: "TWO PARSERS" },
 	{ Id: "reload", Label: "/RELOAD" },
 ];
+
+// The override ledger, grouped by the surface that reads each variable, with
+// its own row count. Grouped here rather than filtered three times inside the
+// template: the heading and the rows then come from ONE pass, so a count can
+// never disagree with the table under it.
+const Surfaces = [...new Set(EnvVars.map((Entry) => Entry.Surface))].map((Surface) => ({
+	Surface,
+	Rows: EnvVars.filter((Entry) => Entry.Surface === Surface),
+}));
+
+// The twelve chapter indices, in one place, so a chapter inserted in the middle
+// is renumbered here instead of in a dozen <p> tags that can drift apart.
+const Chapters = {
+	File: "01 // THE FILE // WHERE IT IS FOUND",
+	Editor: "02 // EDITOR // THE SHIPPED EXAMPLE, LIVE",
+	Keys: "03 // EVERY KEY // THE MATRIX",
+	Knobs: "04 // THE KNOBS // WHAT [COMPRESSION] DOES",
+	Flow: "05 // PER TURN // FLOW, DIRECTIVES, PREVIEWS",
+	Unwired: "06 // UNWIRED // THE HONEST LEDGER",
+	Env: "07 // OVERRIDES // ENVIRONMENT",
+	Classify: "08 // CLASSIFY // ONE TYPE, ONE THRESHOLD",
+	Proxies: "09 // THE PAIR // TWO LISTENERS",
+	Parsers: "10 // TWO PARSERS // ONE FILE",
+	Reload: "11 // /RELOAD // WHAT A SAVE APPLIES",
+	Boundary: "12 // SIMULATION BOUNDARY // REAL VS SIMULATED",
+};
 ---
 
 <Base
@@ -248,38 +300,29 @@ const Sections = [
 	Description="The interactive aphrodite.toml explorer - the pick chain, the two stacks, the [[proxies]] pair and the compression knobs, simulated client-side."
 >
 	<PageShell Crumbs>
-		<!-- Header -->
-		<header class="relative border-l-4 border-blood-crimson bg-carbon-void p-8">
-			<ZineTape Label="aphrodite.toml" Color="raw" Side="left" />
-			<p class="font-mono text-base font-bold uppercase tracking-widest text-stamped-canary">
-				THE FILE THAT TUNES EVERYTHING
-			</p>
-			<h1 class="mt-3 text-3xl font-bold tracking-tight text-bone-white sm:text-4xl">
-				Configuration Playground
-			</h1>
-			<p class="mt-4 max-w-3xl text-base text-zinc-dust">
-				A tool call's output becomes part of the model's context, and aphrodite.toml decides
-				how much of it is replaced before the model reads it.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				One TOML file, two independent parsers, three places it can live.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				The resolution order re-decides what wins as the shipped example changes - env var,
-				per-proxy entry, defaults, or the compiled-in fallback.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">Everything here runs in your browser.</p>
-		</header>
+		<PageHeader
+			Tape="aphrodite.toml // THE FILE THAT TUNES EVERYTHING"
+			Title="Configuration Playground"
+			Lead={[
+				"A tool call's output becomes part of the model's context, and aphrodite.toml decides how much of it is replaced before the model reads it.",
+				"One TOML file, two independent parsers, three places it can live.",
+				"The resolution order re-decides what wins as the shipped example changes - env var, per-proxy entry, defaults, or the compiled-in fallback.",
+				"Everything here runs in your browser.",
+			]}
+		/>
 
 		<SectionNav Sections={Sections} />
 
-		<!-- The pick chain -->
-		<section id="pick-chain" class="relative w-full" aria-label="The file pick chain" data-reveal>
-			<ZineTape Label="the pick chain" Color="teal" Side="right" />
-			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
-				Where the file is found
-			</h2>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+		<!-- 01 // THE FILE - where it is found -->
+		<section
+			id="pick-chain"
+			class="blueprint-section relative w-full"
+			aria-label="The file pick chain"
+			data-reveal
+		>
+			<p class="section-index">{Chapters.File}</p>
+			<h2 class="mt-3 type-section text-bone-white">Where the file is found</h2>
+			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
 				Three stops, in order - and a hard fall-through when none of them exists
 				(docs/config/aphrodite-toml.md, "File location"):
 			</p>
@@ -307,13 +350,18 @@ const Sections = [
 			</div>
 		</section>
 
-		<!-- The live editor + the resolution ladder -->
-		<section id="editor" class="relative w-full" aria-label="The live TOML editor" data-reveal>
-			<ZineTape Label="live editor" Color="canary" Side="left" />
-			<div class="flex flex-wrap items-center justify-between gap-3">
-				<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
-					Edit the shipped example
-				</h2>
+		<!-- 02 // EDITOR - the shipped example, the ladder that resolves it, and the
+		     diagram that explains the chain between them. The diagram keeps its own
+		     anchor (#diagram) so a deep link to it still lands. -->
+		<section
+			id="editor"
+			class="blueprint-section relative w-full"
+			aria-label="The live TOML editor"
+			data-reveal
+		>
+			<p class="section-index">{Chapters.Editor}</p>
+			<div class="mt-3 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+				<h2 class="type-section text-bone-white">Edit the shipped example</h2>
 				<div class="flex flex-wrap items-center gap-3">
 					<CopyButton Label="COPY TOML" Payload={Example} Tone="teal" Size="md" />
 					<button
@@ -325,103 +373,127 @@ const Sections = [
 					</button>
 				</div>
 			</div>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				This is the shipped <code class="text-bone-newsprint">aphrodite.toml.example</code> (sanitized:
-				the api_key sample renders as its env-var name).
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Edit it - the resolution ladder on the right re-decides every tracked key as you type.
-			</p>
+			<div class="prose-flow mt-6 max-w-[46rem]">
+				<p class="type-body text-bone-newsprint">
+					This is the shipped{" "}
+					<code class="font-mono text-code text-bone-newsprint">
+						aphrodite.toml.example
+					</code>
+					(sanitized: the api_key sample renders as its env-var name).
+				</p>
+				<p class="type-body text-bone-newsprint">
+					Edit it - the resolution ladder on the right re-decides every tracked key as you
+					type.
+				</p>
+			</div>
 
-			<div class="mt-8 grid gap-10 lg:grid-cols-2">
-				<!-- Editor pane -->
-				<div class="flex flex-col border-4 border-blood-crimson bg-carbon-void">
-					<div class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3">
-						<ZineKicker Tone="canary">aphrodite.toml</ZineKicker>
-						<span class="font-mono text-base text-zinc-dust" data-editor-status aria-live="polite">
+			<div class="mt-10 grid gap-6 lg:grid-cols-2">
+				<!-- Editor pane: a shell with the buffer recessed into it -->
+				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+					<div class="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--tier-well-edge)] px-5 py-3">
+						<span class="telemetry-tag telemetry-tag--canary">aphrodite.toml</span>
+						<span
+							class="type-meta text-zinc-dust"
+							data-editor-status
+							aria-live="polite"
+						>
 							parsed
 						</span>
 					</div>
-					<label class="sr-only" for="config-editor">aphrodite.toml contents</label>
+					<label class="sr-only" for="config-editor">
+						aphrodite.toml contents
+					</label>
 					<textarea
 						id="config-editor"
 						data-editor
 						spellcheck="false"
-						class="h-[36rem] w-full resize-y bg-transparent p-5 font-mono text-base leading-relaxed text-bone-newsprint"
-						placeholder="loading the shipped example..."></textarea>
+						class="h-[36rem] w-full resize-y bg-transparent p-5 font-mono text-code leading-relaxed text-bone-newsprint"
+						placeholder="loading the shipped example..."
+					></textarea>
 				</div>
 
-				<!-- Resolution ladder pane -->
-				<div class="flex flex-col border-4 border-blood-crimson bg-carbon-void">
-					<div class="flex items-center justify-between border-b-2 border-blood-crimson bg-soot-black px-5 py-3">
-						<ZineKicker Tone="teal">EFFECTIVE CONFIG - WHO WINS</ZineKicker>
-						<span class="font-mono text-base text-zinc-dust">env &gt; toml &gt; compiled</span>
+				<!-- Resolution ladder pane: the same shell, one hairline row per tracked
+				     key, so the chain a value walked reads as a ledger rather than as 54
+				     boxed panels. -->
+				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+					<div class="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--tier-well-edge)] px-5 py-3">
+						<span class="telemetry-tag telemetry-tag--teal">
+							EFFECTIVE CONFIG - WHO WINS
+						</span>
+						<span class="type-meta text-zinc-dust">env &gt; toml &gt; compiled</span>
 					</div>
-					<div class="flex-1 space-y-4 p-5" data-ladder aria-live="polite">
+					<div class="flex-1 space-y-3 p-5" data-ladder aria-live="polite">
 						<!-- rendered client-side from the same Keys array the table uses -->
 					</div>
 				</div>
 			</div>
-		</section>
 
-		<!-- The resolution diagram -->
-		<section id="diagram" class="w-full" aria-label="The config-resolution diagram" data-reveal>
-			<figure class="border-4 border-blood-crimson bg-carbon-void p-4" data-diagram="config-resolution">
+			<figure id="diagram" class="well mt-12 p-4 sm:p-5" data-diagram="config-resolution">
 				<div class="overflow-x-auto" set:html={ConfigResolution} />
-				<figcaption class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+				<figcaption class="mt-4 type-meta font-black uppercase tracking-widest text-zinc-dust">
 					M7 // CONFIG RESOLUTION
 				</figcaption>
 			</figure>
 		</section>
 
-		<!-- THE KEYS: the page's one reference -->
-		<section id="keys" class="relative w-full" aria-label="Every configuration key" data-reveal>
-			<ZineTape Label="every key" Color="raw" Side="right" />
-			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
-				Every key, once
-			</h2>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				One row per key is the only reference the file gets: its type,
-				its compiled default, the env override, which parser reads it, when a change takes effect,
-				and what it does.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Where the shipped example sets a different value, both are shown - an installation using the
-				example sees the second, a bare binary sees the first.
-			</p>
-			<div class="mt-8 flex flex-wrap gap-3">
-				<ZineStamp Label="hot = /reload + watcher" Color="canary" />
-				<ZineStamp Label="startup = restart" Color="bone" />
-				<ZineStamp Label="load = read at dylib load" Color="bone" />
-				<ZineStamp Label="unwired = silent no-op" Color="raw" />
+		<!-- 03 // THE MATRIX - every key, once -->
+		<section
+			id="keys"
+			class="blueprint-section relative w-full"
+			aria-label="Every configuration key"
+			data-reveal
+		>
+			<p class="section-index">{Chapters.Keys}</p>
+			<h2 class="mt-3 type-section text-bone-white">Every key, once</h2>
+			<div class="prose-flow mt-6 max-w-[46rem]">
+				<p class="type-body text-bone-newsprint">
+					One row per key is the only reference the file gets: its type, its compiled
+					default, the env override, which parser reads it, when a change takes effect,
+					and what it does.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					Where the shipped example sets a different value, both are shown - an
+					installation using the example sees the second, a bare binary sees the first.
+				</p>
 			</div>
+
+			<!-- THE FOUR LIVE CLASSES - the legend the LIVE column is read against.
+			     Colour is identity (canary = hot, bone = startup and load, crimson =
+			     unwired), so the four fills never move; only the volume does. -->
+			<div class="mt-8 flex flex-wrap gap-3">
+				<span class="telemetry-tag telemetry-tag--canary">hot = /reload + watcher</span>
+				<span class="telemetry-tag telemetry-tag--bone">startup = restart</span>
+				<span class="telemetry-tag telemetry-tag--bone">load = read at dylib load</span>
+				<span class="telemetry-tag telemetry-tag--crimson">unwired = silent no-op</span>
+			</div>
+
 			<!-- THE FILTER: a plain input over the rows already in the table. The
 			     table below is complete without it - the control is not rendered
 			     at all when the head script never set html.js - so a reader
 			     without JavaScript reads every key, and a reader with it can
 			     narrow the 54 rows to the four they are chasing. -->
 			<div
-				class="mt-12 border-4 border-blood-crimson bg-carbon-void"
+				class="grunge shell-card mt-12"
 				data-key-filter-wrap
+				data-grunge
+				data-grunge-mode="edge"
 			>
-				<div
-					class="flex flex-wrap items-baseline justify-between gap-4 border-b-2 border-blood-crimson bg-soot-black px-5 py-3"
-				>
+				<div class="flex flex-wrap items-baseline justify-between gap-4 border-b border-[color:var(--tier-well-edge)] px-5 py-3">
 					<label
 						for="key-filter"
-						class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary"
+						class="type-meta font-black uppercase tracking-widest text-stamped-canary"
 					>
 						FILTER THE TABLE
 					</label>
 					<span
-						class="font-mono text-base uppercase tracking-widest text-zinc-dust"
+						class="type-meta uppercase tracking-widest text-zinc-dust"
 						data-key-filter-count
 						aria-live="polite"
 					>
 						{Keys.length} KEYS
 					</span>
 				</div>
-				<div class="px-5 py-4">
+				<div class="p-5">
 					<input
 						id="key-filter"
 						data-key-filter
@@ -431,431 +503,659 @@ const Sections = [
 						placeholder="threshold · APHRODITE_ · dylib · hot"
 						class="w-full border border-oxblood-dark bg-soot-black px-4 py-2 font-mono text-base text-bone-newsprint placeholder:text-zinc-dust"
 					/>
-					<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-						One field, matched against every column of every row: a key name
-						(<code class="text-bone-newsprint">threshold</code>), an env override
-						(<code class="text-bone-newsprint">APHRODITE_</code>), a reader
-						(<code class="text-bone-newsprint">dylib</code>), a live class
-						(<code class="text-bone-newsprint">hot</code>) or any word of an effect.
-					</p>
-					<p class="mt-2 max-w-3xl text-base text-zinc-dust">
-						A section whose every row is filtered out takes its heading with it, so what is
-						left is the answer and not the shape of the file.
-					</p>
-					<p class="mt-2 max-w-3xl text-base text-zinc-dust">
-						Clear the field to get the whole table back - the filter hides rows that are already in
-						the document and never asks the network for anything.
-					</p>
-					<p
-						class="mt-3 hidden font-mono text-base leading-relaxed text-stamped-canary"
-						data-key-filter-empty
-					>
-						No key matches that. Try a section name (<code class="text-bone-newsprint"
-							>[compression]</code
-						>), a reader (<code class="text-bone-newsprint">dylib</code>) or an env prefix
-						(<code class="text-bone-newsprint">APHRODITE_</code>) - and clear the field to
-						restore all {Keys.length} rows.
-					</p>
+					<div class="prose-flow mt-4 max-w-[46rem]">
+						<p class="type-body text-zinc-dust">
+							One field, matched against every column of every row: a key name (
+							<code class="font-mono text-code text-bone-newsprint">threshold</code>),
+							an env override (
+							<code class="font-mono text-code text-bone-newsprint">APHRODITE_</code>
+							), a reader (
+							<code class="font-mono text-code text-bone-newsprint">dylib</code>), a
+							live class (
+							<code class="font-mono text-code text-bone-newsprint">hot</code>) or any
+							word of an effect.
+						</p>
+						<p class="type-body text-zinc-dust">
+							A section whose every row is filtered out takes its heading with it, so
+							what is left is the answer and not the shape of the file.
+						</p>
+						<p class="type-body text-zinc-dust">
+							Clear the field to get the whole table back - the filter hides rows that
+							are already in the document and never asks the network for anything.
+						</p>
+						<p
+							class="hidden font-mono text-base leading-relaxed text-stamped-canary"
+							data-key-filter-empty
+						>
+							No key matches that. Try a section name (
+							<code class="text-bone-newsprint">[compression]</code>), a reader (
+							<code class="text-bone-newsprint">dylib</code>) or an env prefix (
+							<code class="text-bone-newsprint">APHRODITE_</code>) - and clear the
+							field to restore all {Keys.length} rows.
+						</p>
+					</div>
 				</div>
 			</div>
 
+			<!-- THE MATRIX ITSELF. `ConfigKeys` owns the rows and the section
+			     grouping; this page dresses each group as a shell with the table
+			     recessed into it as an inset well (see the <style> block below). The
+			     Default column is mono and canary there - a value, never prose. -->
 			<div class="mt-12">
 				<ConfigKeys Rows={Keys} Notes={SectionNotes} />
 			</div>
 		</section>
 
-		<!-- THE COMPRESSION KNOBS: what the [compression] rows above actually do -->
-		<section id="knobs" class="relative w-full" aria-label="The compression knobs" data-reveal>
-			<ZineTape Label="the knobs" Color="canary" Side="right" />
-			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
-				The compression knobs
-			</h2>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				The [compression] table is the one section a running proxy re-reads, and only part of it is
-				hot.
+		<!-- 04 // THE KNOBS - what the [compression] rows actually do -->
+		<section
+			id="knobs"
+			class="blueprint-section relative w-full"
+			aria-label="The compression knobs"
+			data-reveal
+		>
+			<p class="section-index">{Chapters.Knobs}</p>
+			<h2 class="mt-3 type-section text-bone-white">The compression knobs</h2>
+			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
+				The [compression] table is the one section a running proxy re-reads, and only part
+				of it is hot.
 			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Four rows are the hot set: <code class="text-bone-newsprint">tool_threshold_token</code>,
-				<code class="text-bone-newsprint">tool_threshold_cache</code>,
-				<code class="text-bone-newsprint">inline_threshold</code> and
-				<code class="text-bone-newsprint">code_multiplier</code>.
+
+			<!-- THE HOT SET - the two sentences that enumerate it, in a well, because
+			     they are a list the reader checks a key against. -->
+			<div class="well mt-8 p-5 sm:p-6">
+				<span class="telemetry-tag telemetry-tag--canary">THE HOT SET</span>
+				<div class="prose-flow mt-4">
+					<p class="type-body text-bone-newsprint">
+						Four rows are the hot set:{" "}
+						<code class="text-bone-white">tool_threshold_token</code>,
+						<code class="text-bone-white">tool_threshold_cache</code>,
+						<code class="text-bone-white">inline_threshold</code> and
+						<code class="text-bone-white">code_multiplier</code>.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						<code class="text-bone-white">auto_expand</code> and
+						<code class="text-bone-white">auto_expand_limit</code> are hot on the same
+						terms, and so are <code class="text-bone-white">preview_max_chars</code>,
+						the marker format and hint, and{" "}
+						<code class="text-bone-white">ccr_marker_hint</code>.
+					</p>
+				</div>
+			</div>
+
+			<p class="mt-8 max-w-[46rem] type-body text-bone-newsprint">
+				Everything else in the section is fixed at startup or read once when the dylib
+				loads, which is what the LIVE column records row by row.
 			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				<code class="text-bone-newsprint">auto_expand</code> and
-				<code class="text-bone-newsprint">auto_expand_limit</code> are hot on the same terms, and so
-				are <code class="text-bone-newsprint">preview_max_chars</code>, the marker format and hint,
-				and <code class="text-bone-newsprint">ccr_marker_hint</code>.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Everything else in the section is fixed at startup or read once when the dylib loads, which
-				is what the LIVE column records row by row.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				<code class="text-bone-newsprint">code_multiplier</code> is the only knob that is a
-				multiplier rather than a byte count: the code_* types get the base threshold times its
-				value, so 3.0 hands source three times the default patience and 1.0 hands it none.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				<code class="text-bone-newsprint">inline_threshold</code> decides where compressed content
-				lives: below it the bytes ride inline as zlib, above it they become a durable store entry
-				with a marker.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				<code class="text-bone-newsprint">engine_threshold_pct</code> is the context engine's fill
-				gate, and its two extremes are switches: 0 means never archive and 100 or more means the
-				engine is off.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				The two store retention caps are the deliberate exception, because a store cannot resize
-				while it is serving.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				<code class="text-bone-newsprint">store_max_entries</code> and
-				<code class="text-bone-newsprint">store_max_bytes</code> are read when the SQLite store is
-				opened, so a change to either takes effect on the next proxy restart, not on save.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				The dylib keys take a third route entirely: they ride
-				<code class="text-bone-newsprint">aphrodite_config_set</code> at runtime, so a session can
-				move them without a restart and without a file edit.
-			</p>
+
+			<!-- ONE ROW PER KNOB THAT NEEDS ITS OWN SENTENCE. The label column is the
+			     key in the mono voice; the sentence beside it is the same prose as
+			     before, now readable as a row instead of the sixth paragraph of a run. -->
+			<dl class="mt-8 border-t border-[color:var(--tier-shell-edge)]">
+				<div class="grid gap-x-8 gap-y-2 border-b border-[color:var(--tier-shell-edge)] py-5 sm:grid-cols-[16rem_1fr]">
+					<dt class="font-mono text-code text-stamped-canary">code_multiplier</dt>
+					<dd class="type-body text-bone-newsprint">
+						<code class="text-bone-white">code_multiplier</code> is the only knob that
+						is a multiplier rather than a byte count: the code_* types get the base
+						threshold times its value, so 3.0 hands source three times the default
+						patience and 1.0 hands it none.
+					</dd>
+				</div>
+				<div class="grid gap-x-8 gap-y-2 border-b border-[color:var(--tier-shell-edge)] py-5 sm:grid-cols-[16rem_1fr]">
+					<dt class="font-mono text-code text-stamped-canary">inline_threshold</dt>
+					<dd class="type-body text-bone-newsprint">
+						<code class="text-bone-white">inline_threshold</code> decides where
+						compressed content lives: below it the bytes ride inline as zlib, above it
+						they become a durable store entry with a marker.
+					</dd>
+				</div>
+				<div class="grid gap-x-8 gap-y-2 border-b border-[color:var(--tier-shell-edge)] py-5 sm:grid-cols-[16rem_1fr]">
+					<dt class="font-mono text-code text-stamped-canary">engine_threshold_pct</dt>
+					<dd class="type-body text-bone-newsprint">
+						<code class="text-bone-white">engine_threshold_pct</code> is the context
+						engine's fill gate, and its two extremes are switches: 0 means never archive
+						and 100 or more means the engine is off.
+					</dd>
+				</div>
+				<div class="grid gap-x-8 gap-y-2 border-b border-[color:var(--tier-shell-edge)] py-5 sm:grid-cols-[16rem_1fr]">
+					<dt class="font-mono text-code text-stamped-canary">store_max_entries</dt>
+					<dd class="prose-flow type-body text-bone-newsprint">
+						<p>
+							The two store retention caps are the deliberate exception, because a
+							store cannot resize while it is serving.
+						</p>
+						<p>
+							<code class="text-bone-white">store_max_entries</code> and
+							<code class="text-bone-white">store_max_bytes</code> are read when the
+							SQLite store is opened, so a change to either takes effect on the next
+							proxy restart, not on save.
+						</p>
+					</dd>
+				</div>
+				<div class="grid gap-x-8 gap-y-2 py-5 sm:grid-cols-[16rem_1fr]">
+					<dt class="font-mono text-code text-stamped-canary">aphrodite_config_set</dt>
+					<dd class="type-body text-bone-newsprint">
+						The dylib keys take a third route entirely: they ride
+						<code class="text-bone-white">aphrodite_config_set</code> at runtime, so a
+						session can move them without a restart and without a file edit.
+					</dd>
+				</div>
+			</dl>
 		</section>
 
-		<!-- THE PER-TURN CONTEXT: [flow] / [directives] / [previews] -->
-		<section id="flow" class="relative w-full" aria-label="Flow, directives and previews" data-reveal>
-			<ZineTape Label="per-turn context" Color="teal" Side="left" />
-			<h2 class="font-mono text-2xl font-black uppercase tracking-widest text-bone-white sm:text-3xl">
+		<!-- 05 // PER TURN - [flow] / [directives] / [previews] -->
+		<section
+			id="flow"
+			class="blueprint-section relative w-full"
+			aria-label="Flow, directives and previews"
+			data-reveal
+		>
+			<p class="section-index">{Chapters.Flow}</p>
+			<h2 class="mt-3 font-mono text-sub font-black uppercase tracking-widest text-bone-white">
 				[FLOW] / [DIRECTIVES] / [PREVIEWS]
 			</h2>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
 				Three sections decide what the model is handed each turn, and none of them touches
 				compression.
 			</p>
-			<div class="mt-8 grid gap-10 lg:grid-cols-3">
-				<ZineBox Tone="teal">
-					<ZineKicker As="h3" Tone="teal">[FLOW]</ZineKicker>
-					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">budget_chars = 2600</code> is the hard cap on ALL
-						per-turn injected context.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						The budget covers directives, nudges, the recall catalog and the retrieve hint
-						together, not each one separately.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						Sections drop bottom-up when the total goes over; directives and nudges never drop.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						Dylib only, overridable through
-						<code class="text-bone-newsprint">APHRODITE_FLOW_BUDGET_CHARS</code>.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						The compiled default is 4,000 characters, so the shipped example buys a leaner turn
-						than a bare binary does.
-					</p>
+			<div class="mt-10 grid gap-6 lg:grid-cols-3">
+				<ZineBox Accent="teal" Surface="shell">
+					<ZineKicker As="h3" Tone="teal">
+						[FLOW]
+					</ZineKicker>
+					<div class="prose-flow mt-3">
+						<p class="type-body text-bone-newsprint">
+							<code class="text-bone-white">budget_chars = 2600</code> is the hard cap
+							on ALL per-turn injected context.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							The budget covers directives, nudges, the recall catalog and the
+							retrieve hint together, not each one separately.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							Sections drop bottom-up when the total goes over; directives and nudges
+							never drop.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							Dylib only, overridable through
+							<code class="text-bone-white">APHRODITE_FLOW_BUDGET_CHARS</code>.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							The compiled default is 4,000 characters, so the shipped example buys a
+							leaner turn than a bare binary does.
+						</p>
+					</div>
 				</ZineBox>
-				<ZineBox Tone="subtle">
-					<ZineKicker As="h3" Tone="newsprint">[DIRECTIVES]</ZineKicker>
-					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">active = ["lazy", "lazy-eval", "foresight"]</code>
-						names which loaded directives start active.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						Names that are not in the loaded set are silently filtered out, and an empty list seeds
-						focus, foresight and lazy instead.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						The set is runtime-mutable, so a conversation can swap directives mid-flight through
-						<code class="text-bone-newsprint">aphrodite_directive</code>.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						The built-in set is focus, foresight, ccr-handling, cleanup, explore, lazy and
-						lazy-eval - seven files baked into the binary.
-					</p>
+				<ZineBox Accent="none" Surface="shell">
+					<ZineKicker As="h3" Tone="newsprint">
+						[DIRECTIVES]
+					</ZineKicker>
+					<div class="prose-flow mt-3">
+						<p class="type-body text-bone-newsprint">
+							<code class="text-bone-white">
+								active = ["lazy", "lazy-eval", "foresight"]
+							</code>
+							names which loaded directives start active.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							Names that are not in the loaded set are silently filtered out, and an
+							empty list seeds focus, foresight and lazy instead.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							The set is runtime-mutable, so a conversation can swap directives
+							mid-flight through
+							<code class="text-bone-white">aphrodite_directive</code>.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							The built-in set is focus, foresight, ccr-handling, cleanup, explore,
+							lazy and lazy-eval - seven files baked into the binary.
+						</p>
+					</div>
 				</ZineBox>
-				<ZineBox Tone="subtle">
-					<ZineKicker As="h3" Tone="newsprint">[PREVIEWS]</ZineKicker>
-					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">preview_max_chars = 0</code> caps the whole rendered
-						preview string, not per line, and 0 means unlimited.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">model_family = "code_first"</code> selects the
-						<code>[templates.preview.&lt;family&gt;.*]</code> family when
-						<code>[templates]</code> is configured.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">
-						The env var <code>APHRODITE_PREVIEW_MAX_CHARS</code> outranks the file, and the file
-						outranks unlimited.
-					</p>
-					<p class="mt-3 text-base text-zinc-dust">Re-applied by POST /reload.</p>
+				<ZineBox Accent="none" Surface="shell">
+					<ZineKicker As="h3" Tone="newsprint">
+						[PREVIEWS]
+					</ZineKicker>
+					<div class="prose-flow mt-3">
+						<p class="type-body text-bone-newsprint">
+							<code class="text-bone-white">preview_max_chars = 0</code> caps the
+							whole rendered preview string, not per line, and 0 means unlimited.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							<code class="text-bone-white">model_family = "code_first"</code> selects
+							the
+							<code>[templates.preview.&lt;family&gt;.*]</code> family when
+							<code>[templates]</code> is configured.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							The env var <code>APHRODITE_PREVIEW_MAX_CHARS</code> outranks the file,
+							and the file outranks unlimited.
+						</p>
+						<p class="type-body text-bone-newsprint">Re-applied by POST /reload.</p>
+					</div>
 				</ZineBox>
 			</div>
 		</section>
 
-		<!-- DOCUMENTED BUT UNWIRED: the honest ledger -->
-		<section id="unwired" class="relative w-full" aria-label="Documented but unwired keys" data-reveal>
-			<ZineTape Label="honest ledger" Color="bone" Side="right" />
-			<h2 class="font-mono text-2xl font-black uppercase tracking-widest text-bone-white sm:text-3xl">
+		<!-- 06 // UNWIRED - the honest ledger -->
+		<section
+			id="unwired"
+			class="blueprint-section relative w-full"
+			aria-label="Documented but unwired keys"
+			data-reveal
+		>
+			<p class="section-index">{Chapters.Unwired}</p>
+			<h2 class="mt-3 font-mono text-sub font-black uppercase tracking-widest text-bone-white">
 				DOCUMENTED BUT UNWIRED
 			</h2>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Five keys parse and do nothing, and every one of them is marked UNWIRED rather
-				than quietly omitted.
+			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
+				Five keys parse and do nothing, and every one of them is marked UNWIRED rather than
+				quietly omitted.
 			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				<code class="text-bone-newsprint">catalog_mode</code> lost its reader when the catalog layout
-				became compiled-in, so setting it changes nothing.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				<code class="text-bone-newsprint">classifier_poll</code> describes a poll interval the
-				classifier never had: classification runs per invocation.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				<code class="text-bone-newsprint">prefetch</code> is dead because the
-				<code class="text-bone-newsprint">aphrodite_prefetch</code> tool is registered
-				unconditionally.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				<code class="text-bone-newsprint">code_structure_map</code> and
-				<code class="text-bone-newsprint">rust_preview_lines</code> are reserved: they describe a
-				code preview that includes signatures and a line budget for Rust source, and no builder
-				reads either one yet.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				The ledger exists because a key that parses and does nothing is worse than an undocumented
-				one: it looks like a lever and behaves like a wall.
+
+			<!-- THE LEDGER, one row per dead key: the key in the mono voice, the reason
+			     beside it. The crimson tag is the same crimson the LIVE column uses for
+			     an unwired row, so the two surfaces cannot disagree about what
+			     "unwired" looks like. -->
+			<dl class="mt-8 border-t border-[color:var(--tier-shell-edge)]">
+				<div class="grid gap-x-8 gap-y-2 border-b border-[color:var(--tier-shell-edge)] py-5 sm:grid-cols-[16rem_1fr]">
+					<dt>
+						<code class="font-mono text-code text-bone-white">catalog_mode</code>
+						<span class="telemetry-tag telemetry-tag--crimson mt-2 block w-fit">
+							UNWIRED
+						</span>
+					</dt>
+					<dd class="type-body text-bone-newsprint">
+						<code class="text-bone-white">catalog_mode</code> lost its reader when the
+						catalog layout became compiled-in, so setting it changes nothing.
+					</dd>
+				</div>
+				<div class="grid gap-x-8 gap-y-2 border-b border-[color:var(--tier-shell-edge)] py-5 sm:grid-cols-[16rem_1fr]">
+					<dt>
+						<code class="font-mono text-code text-bone-white">classifier_poll</code>
+						<span class="telemetry-tag telemetry-tag--crimson mt-2 block w-fit">
+							UNWIRED
+						</span>
+					</dt>
+					<dd class="type-body text-bone-newsprint">
+						<code class="text-bone-white">classifier_poll</code> describes a poll
+						interval the classifier never had: classification runs per invocation.
+					</dd>
+				</div>
+				<div class="grid gap-x-8 gap-y-2 border-b border-[color:var(--tier-shell-edge)] py-5 sm:grid-cols-[16rem_1fr]">
+					<dt>
+						<code class="font-mono text-code text-bone-white">prefetch</code>
+						<span class="telemetry-tag telemetry-tag--crimson mt-2 block w-fit">
+							UNWIRED
+						</span>
+					</dt>
+					<dd class="type-body text-bone-newsprint">
+						<code class="text-bone-white">prefetch</code> is dead because the
+						<code class="text-bone-white">aphrodite_prefetch</code> tool is registered
+						unconditionally.
+					</dd>
+				</div>
+				<div class="grid gap-x-8 gap-y-2 py-5 sm:grid-cols-[16rem_1fr]">
+					<dt>
+						<code class="font-mono text-code text-bone-white">code_structure_map</code>
+						<code class="mt-1 block font-mono text-code text-bone-white">
+							rust_preview_lines
+						</code>
+						<span class="telemetry-tag telemetry-tag--crimson mt-2 block w-fit">
+							RESERVED
+						</span>
+					</dt>
+					<dd class="type-body text-bone-newsprint">
+						<code class="text-bone-white">code_structure_map</code> and
+						<code class="text-bone-white">rust_preview_lines</code> are reserved: they
+						describe a code preview that includes signatures and a line budget for Rust
+						source, and no builder reads either one yet.
+					</dd>
+				</div>
+			</dl>
+
+			<p class="mt-8 max-w-[46rem] type-body text-bone-newsprint">
+				The ledger exists because a key that parses and does nothing is worse than an
+				undocumented one: it looks like a lever and behaves like a wall.
 			</p>
 		</section>
 
-		<!-- THE OVERRIDE LEDGER: every environment variable the module documents -->
-		<section id="env" class="relative w-full" aria-label="Every environment variable" data-reveal>
-			<ZineTape Label="env" Color="canary" Side="right" />
-			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
-				Every override, live or not
-			</h2>
-			<p class="mt-4 max-w-3xl text-base text-bone-newsprint">
-				A TOML key is only half the story: the environment wins wherever it is set, and the module
-				documents {EnvVars.length} variables across three surfaces - the Rust proxy, the
-				<code class="text-bone-newsprint">aphrodite setup</code> subcommand, and the Hermes dylib
-				session.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				The last two groups are the ones that matter most: a variable with no reader is a silent
-				no-op, and a build-time variable exported at runtime changes nothing.
-			</p>
-			{
-				[...new Set(EnvVars.map((Entry) => Entry.Surface))].map((Surface) => (
-					<div class="mt-12">
-						<h3 class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-							{Surface}
-						</h3>
-						<div class="mt-4 overflow-x-auto">
-							<table class="w-full border-collapse font-mono text-base">
+		<!-- 07 // OVERRIDES - every environment variable the module documents -->
+		<section
+			id="env"
+			class="blueprint-section relative w-full"
+			aria-label="Every environment variable"
+			data-reveal
+		>
+			<p class="section-index">{Chapters.Env}</p>
+			<h2 class="mt-3 type-section text-bone-white">Every override, live or not</h2>
+			<div class="prose-flow mt-6 max-w-[46rem]">
+				<p class="type-body text-bone-newsprint">
+					A TOML key is only half the story: the environment wins wherever it is set, and
+					the module documents {EnvVars.length} variables across three surfaces - the Rust
+					proxy, the
+					<code class="text-bone-white">aphrodite setup</code> subcommand, and the Hermes
+					dylib session.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					The last two groups are the ones that matter most: a variable with no reader is
+					a silent no-op, and a build-time variable exported at runtime changes nothing.
+				</p>
+			</div>
+
+			{Surfaces.map(({ Surface, Rows }) => (
+				<div class="mt-12">
+					<h3 class="flex flex-wrap items-baseline gap-3">
+						<span class="telemetry-tag telemetry-tag--canary">{Surface}</span>
+						<span class="type-meta uppercase tracking-widest text-zinc-dust">
+							{Rows.length} variables
+						</span>
+					</h3>
+					<div class="grunge shell-card mt-4" data-grunge data-grunge-mode="edge">
+						<div class="overflow-x-auto">
+							<table class="w-full border-collapse text-left">
 								<thead>
-									<tr class="border-b-2 border-oxblood-dark text-left">
-										<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+									<tr class="border-b border-[color:var(--tier-well-edge)]">
+										<th
+											scope="col"
+											class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+										>
 											VARIABLE
 										</th>
-										<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+										<th
+											scope="col"
+											class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+										>
 											PRECEDENCE
 										</th>
-										<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+										<th
+											scope="col"
+											class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+										>
 											DEFAULT
 										</th>
-										<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">
+										<th
+											scope="col"
+											class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+										>
 											EFFECT
 										</th>
 									</tr>
 								</thead>
-								<tbody class="text-bone-newsprint">
-									{EnvVars.filter((Entry) => Entry.Surface === Surface).map((Entry) => (
-										<tr class="border-b border-oxblood-dark">
-											<td class="py-3 pr-4 align-top whitespace-nowrap text-weathered-teal">
+								<tbody>
+									{Rows.map((Entry) => (
+										<tr class="border-b border-[color:var(--tier-shell-edge)] align-top last:border-b-0">
+											<td class="whitespace-nowrap px-4 py-4 font-mono text-code text-weathered-teal sm:px-5">
 												{Entry.Variable}
 											</td>
-											<td class="py-3 pr-4 align-top text-zinc-dust">{Entry.Precedence ?? "-"}</td>
-											<td class="py-3 pr-4 align-top text-bone-white">{Entry.Default ?? "-"}</td>
-											<td class="py-3 align-top">{Entry.Effect}</td>
+											<td class="px-4 py-4 font-mono text-code text-zinc-dust sm:px-5">
+												{Entry.Precedence ?? "-"}
+											</td>
+											<td class="px-4 py-4 font-mono text-code text-bone-white sm:px-5">
+												{Entry.Default ?? "-"}
+											</td>
+											<td class="max-w-[30rem] px-4 py-4 type-body text-bone-newsprint sm:px-5">
+												{Entry.Effect}
+											</td>
 										</tr>
 									))}
 								</tbody>
 							</table>
 						</div>
 					</div>
-				))
-			}
-			<p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
-				SRC: docs/config/env-vars.md - every row is generated from it.
+				</div>
+			))}
+			<p class="mt-12 border-t border-[color:var(--tier-shell-edge)] pt-6 type-body text-zinc-dust">
+				SRC:{" "}
+				<code class="font-mono text-code text-bone-newsprint">docs/config/env-vars.md</code>{" "}
+				- every row is generated from it.
 			</p>
 		</section>
 
-		<!-- THE CLASSIFY MATRIX: one type, one threshold -->
-		<section id="classify" class="relative w-full" aria-label="The classify matrix" data-reveal>
-			<ZineTape Label="classify" Color="canary" Side="left" />
-			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
-				One type, one threshold
-			</h2>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				The gate is <code class="text-bone-newsprint">threshold_for</code> in
-				<code class="text-bone-newsprint">crates/aphrodite/src/proxy.rs</code>: the base threshold,
-				then one multiplier per content type.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				The base is the proxy's own mode threshold -
-				<code class="text-bone-newsprint">tool_threshold_token</code> on the token lane,
-				<code class="text-bone-newsprint">tool_threshold_cache</code> on the cache lane.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				The bytes column is computed from the edited file, so the matrix follows those values
-				instead of restating the defaults.
-			</p>
-			<div class="mt-8 flex flex-wrap items-center gap-4">
-				<ZineKicker Tone="canary">BASE</ZineKicker>
-				<span class="font-mono text-base text-bone-newsprint">
-					<span data-classify-base>{BaseBytes}</span> B
-				</span>
-				<ZineKicker Tone="teal">CODE_MULTIPLIER</ZineKicker>
-				<span class="font-mono text-base text-bone-newsprint">
-					×<span data-classify-mult>{CodeMultiplier}</span>
-				</span>
+		<!-- 08 // CLASSIFY - one type, one threshold -->
+		<section
+			id="classify"
+			class="blueprint-section relative w-full"
+			aria-label="The classify matrix"
+			data-reveal
+		>
+			<p class="section-index">{Chapters.Classify}</p>
+			<h2 class="mt-3 type-section text-bone-white">One type, one threshold</h2>
+			<div class="prose-flow mt-6 max-w-[46rem]">
+				<p class="type-body text-bone-newsprint">
+					The gate is <code class="text-bone-white">threshold_for</code> in
+					<code class="text-bone-white">crates/aphrodite/src/proxy.rs</code>: the base
+					threshold, then one multiplier per content type.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					The base is the proxy's own mode threshold -
+					<code class="text-bone-white">tool_threshold_token</code> on the token lane,
+					<code class="text-bone-white">tool_threshold_cache</code> on the cache lane.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					The bytes column is computed from the edited file, so the matrix follows those
+					values instead of restating the defaults.
+				</p>
 			</div>
-			<div class="mt-6 overflow-x-auto border-4 border-blood-crimson bg-carbon-void">
-				<table class="w-full min-w-[40rem] text-left text-base">
-					<thead>
-						<tr class="border-b-2 border-blood-crimson bg-soot-black font-mono text-base uppercase tracking-widest text-zinc-dust">
-							<th class="px-5 py-3">Type</th>
-							<th class="px-5 py-3">Multiplier</th>
-							<th class="px-5 py-3">At the editor's values</th>
-						</tr>
-					</thead>
-					<tbody class="divide-y divide-oxblood-dark/50">
-						{Types.map((Row) => (
-							<tr class="align-top text-zinc-dust">
-								<td class="px-5 py-3 font-mono text-base text-bone-newsprint">{Row.Type}</td>
-								<td class="px-5 py-3 font-mono text-base">{FactorLabel(Row)}</td>
-								<td class="px-5 py-3 font-mono text-base text-stamped-canary">
-									<span
-										data-effective
-										data-factor={Row.Factor === "code_multiplier" ? 1 : Row.Factor}
-										data-knob={Row.Factor === "code_multiplier" ? "code_multiplier" : undefined}
-									>
-										{Effective(Row)}
-									</span>
-									B
-								</td>
+
+			<!-- THE LIVE READOUT - the two numbers the matrix is solved from, read off
+			     the editor. A well, not a metric: this is an instrument panel, and the
+			     chapter spends no expressive assembly of its own. -->
+			<div class="well mt-8 flex flex-wrap items-end gap-x-12 gap-y-6 p-5 sm:p-6">
+				<div>
+					<p class="type-meta font-black uppercase tracking-widest text-zinc-dust">
+						BASE
+					</p>
+					<p class="mt-1 font-mono text-sub font-bold text-bone-white">
+						<span data-classify-base>{BaseBytes}</span>
+						<span class="type-meta text-zinc-dust">B</span>
+					</p>
+				</div>
+				<div>
+					<p class="type-meta font-black uppercase tracking-widest text-zinc-dust">
+						CODE_MULTIPLIER
+					</p>
+					<p class="mt-1 font-mono text-sub font-bold text-bone-white">
+						×<span data-classify-mult>{CodeMultiplier}</span>
+					</p>
+				</div>
+			</div>
+
+			<div class="grunge shell-card mt-6" data-grunge data-grunge-mode="edge">
+				<div class="overflow-x-auto">
+					<table class="w-full min-w-[40rem] text-left">
+						<thead>
+							<tr class="border-b border-[color:var(--tier-well-edge)]">
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
+									Type
+								</th>
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
+									Multiplier
+								</th>
+								<th
+									scope="col"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+								>
+									At the editor's values
+								</th>
 							</tr>
-						))}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							{Types.map((Row) => (
+								<tr class="border-b border-[color:var(--tier-shell-edge)] align-top last:border-b-0">
+									<td class="px-4 py-3 font-mono text-code text-bone-white sm:px-5">
+										{Row.Type}
+									</td>
+									<td class="px-4 py-3 font-mono text-code text-zinc-dust sm:px-5">
+										{FactorLabel(Row)}
+									</td>
+									<td class="px-4 py-3 font-mono text-code text-stamped-canary sm:px-5">
+										<span
+											data-effective
+											data-factor={
+												Row.Factor === "code_multiplier" ? 1 : Row.Factor
+											}
+											data-knob={
+												Row.Factor === "code_multiplier"
+													? "code_multiplier"
+													: undefined
+											}
+										>
+											{Effective(Row)}
+										</span>
+										B
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
 			</div>
-			<p class="mt-6 max-w-3xl text-base text-zinc-dust">
-				<code class="text-bone-newsprint">linter</code>,
-				<code class="text-bone-newsprint">build_output</code> and
-				<code class="text-bone-newsprint">log</code> return the base before any multiplier, so
+
+			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
+				<code class="text-bone-white">linter</code>,
+				<code class="text-bone-white">build_output</code> and
+				<code class="text-bone-white">log</code> return the base before any multiplier, so
 				those three never scale.
 			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+			<p class="mt-3 max-w-[46rem] type-body text-bone-newsprint">
 				Two runtime factors scale the result and neither can be read from the config file:
 			</p>
-			<ul class="mt-3 max-w-3xl space-y-2 text-base text-zinc-dust">
+			<ul class="mt-3 max-w-[46rem] space-y-2 type-body text-bone-newsprint">
 				<li class="border-l-2 border-oxblood-dark pl-3">
-					the compression-ratio auto-tune (×2 above a 20× ratio, ×0.5 below 3×) scales the base
+					the compression-ratio auto-tune (×2 above a 20× ratio, ×0.5 below 3×) scales the
+					base
 				</li>
 				<li class="border-l-2 border-oxblood-dark pl-3">
 					and the headroom budget (0.50 to 1.0) scales the result.
 				</li>
 			</ul>
-			<p class="mt-6 font-mono text-base uppercase tracking-widest text-zinc-dust">
-				SRC: crates/aphrodite/src/proxy.rs:613-644.
+			<p class="mt-6 type-body text-zinc-dust">
+				SRC:{" "}
+				<code class="font-mono text-code text-bone-newsprint">
+					crates/aphrodite/src/proxy.rs:613-644
+				</code>
+				.
 			</p>
 		</section>
 
-		<!-- The [[proxies]] pair -->
-		<section id="proxies" class="relative w-full" aria-label="The proxies pair" data-reveal>
-			<ZineTape Label="the pair" Color="bone" Side="left" />
-			<h2 class="font-mono text-2xl font-black uppercase tracking-widest text-bone-white sm:text-3xl">
+		<!-- 09 // THE PAIR - the two listeners -->
+		<section
+			id="proxies"
+			class="blueprint-section relative w-full"
+			aria-label="The proxies pair"
+			data-reveal
+		>
+			<p class="section-index">{Chapters.Proxies}</p>
+			<h2 class="mt-3 font-mono text-sub font-black uppercase tracking-widest text-bone-white">
 				[[PROXIES]] - CACHE :9797 + TOKEN :9798
 			</h2>
-			<div class="mt-8 grid gap-10 md:grid-cols-2">
-				<ZineBox Tone="subtle">
+			<div class="mt-10 grid gap-6 md:grid-cols-2">
+				<ZineBox Accent="none" Surface="shell">
 					<ZineKicker Tone="newsprint">cache &middot; 127.0.0.1:9797</ZineKicker>
-					<p class="mt-2 text-base text-zinc-dust">
+					<p class="mt-2 type-body text-bone-newsprint">
 						The lane for results that do not need to survive the process.
 					</p>
 				</ZineBox>
-				<ZineBox Tone="subtle">
+				<ZineBox Accent="none" Surface="shell">
 					<ZineKicker Tone="newsprint">token &middot; 127.0.0.1:9798</ZineKicker>
-					<p class="mt-2 text-base text-zinc-dust">
+					<p class="mt-2 type-body text-bone-newsprint">
 						The lane a retrieval survives a restart from.
 					</p>
 				</ZineBox>
 			</div>
-			<div class="mt-10 border-l-4 border-raw-blood bg-soot-black p-6">
-				<ZineKicker Tone="dust">WARNING - THE 0.0.0.0 LINES</ZineKicker>
-				<p class="mt-2 max-w-3xl text-base text-zinc-dust">
-					Listeners bind loopback-only by default, and the router rejects non-loopback peers (and
-					non-loopback Host headers) on every route except /health.
-				</p>
-				<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-					Uncommenting <code class="text-bone-newsprint">listen = "0.0.0.0:..."</code> exposes an
-					unauthenticated listener to your LAN: /retrieve, /history and /ccr/* have no authentication of
-					their own.
-				</p>
+
+			<!-- THE ONE ALERT ON THE PAGE: the critical tier, carrying its own glow and
+			     its bone ink, because a bare crimson fill is not an alert. -->
+			<div class="tier-critical mt-10 p-6 sm:p-8">
+				<ZineKicker Tone="newsprint">WARNING - THE 0.0.0.0 LINES</ZineKicker>
+				<div class="prose-flow mt-3">
+					<p class="type-body text-bone-white">
+						Listeners bind loopback-only by default, and the router rejects non-loopback
+						peers (and non-loopback Host headers) on every route except /health.
+					</p>
+					<p class="type-body text-bone-white">
+						Uncommenting <code class="text-bone-newsprint">listen = "0.0.0.0:..."</code>{" "}
+						exposes an unauthenticated listener to your LAN: /retrieve, /history and
+						/ccr/* have no authentication of their own.
+					</p>
+				</div>
 			</div>
 		</section>
 
-		<!-- One file, two parsers -->
-		<section id="parsers" class="relative w-full" aria-label="The two parser stacks" data-reveal>
-			<ZineTape Label="two stacks" Color="raw" Side="right" />
-			<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
-				One file, two parsers
-			</h2>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
+		<!-- 10 // TWO PARSERS - one file, two codepaths -->
+		<section
+			id="parsers"
+			class="blueprint-section relative w-full"
+			aria-label="The two parser stacks"
+			data-reveal
+		>
+			<p class="section-index">{Chapters.Parsers}</p>
+			<h2 class="mt-3 type-section text-bone-white">One file, two parsers</h2>
+			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
 				The READER column is the whole split - these are the two codepaths that own it.
 			</p>
-			<div class="mt-8 grid gap-10 lg:grid-cols-2">
-				<ZineBox Tone="crimson">
-					<ZineKicker As="h3" Tone="canary">THE RUST HTTP PROXY</ZineKicker>
-					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">config/proxy.rs</code>, active whenever an
-						aphrodite.toml is found: it reads every row marked PROXY or BOTH, resolving each one as
+			<div class="mt-10 grid gap-6 lg:grid-cols-2">
+				<ZineBox Accent="crimson" Surface="shell">
+					<ZineKicker As="h3" Tone="canary">
+						THE RUST HTTP PROXY
+					</ZineKicker>
+					<p class="mt-3 type-body text-bone-newsprint">
+						<code class="text-bone-white">config/proxy.rs</code>, active whenever an
+						aphrodite.toml is found: it reads every row marked PROXY or BOTH, resolving
+						each one as
 					</p>
-					<ul class="mt-3 space-y-2 text-base text-zinc-dust">
+					<ul class="mt-3 space-y-2 type-body text-bone-newsprint">
 						<li class="border-l-2 border-oxblood-dark pl-3">env var</li>
-						<li class="border-l-2 border-oxblood-dark pl-3">then the per-proxy entry</li>
-						<li class="border-l-2 border-oxblood-dark pl-3">then <code>[defaults]</code></li>
-						<li class="border-l-2 border-oxblood-dark pl-3">then the compiled default.</li>
+						<li class="border-l-2 border-oxblood-dark pl-3">
+							then the per-proxy entry
+						</li>
+						<li class="border-l-2 border-oxblood-dark pl-3">
+							then <code>[defaults]</code>
+						</li>
+						<li class="border-l-2 border-oxblood-dark pl-3">
+							then the compiled default.
+						</li>
 					</ul>
-					<p class="mt-3 text-base text-zinc-dust">
-						Three rows are the exceptions, and the ladder marks them: the API key is TOML-first,
-						and the bind address and the mode are per-entry by construction.
+					<p class="mt-3 type-body text-bone-newsprint">
+						Three rows are the exceptions, and the ladder marks them: the API key is
+						TOML-first, and the bind address and the mode are per-entry by construction.
 					</p>
 				</ZineBox>
-				<ZineBox Tone="teal">
-					<ZineKicker As="h3" Tone="teal">THE HERMES DYLIB SESSION</ZineKicker>
-					<p class="mt-3 text-base text-zinc-dust">
-						<code class="text-bone-newsprint">config_loader.rs</code>, read once at dylib load: it
-						reads every row marked DYLIB or BOTH, and the standalone HTTP proxy never reads a
-						dylib-only key.
+				<ZineBox Accent="teal" Surface="shell">
+					<ZineKicker As="h3" Tone="teal">
+						THE HERMES DYLIB SESSION
+					</ZineKicker>
+					<p class="mt-3 type-body text-bone-newsprint">
+						<code class="text-bone-white">config_loader.rs</code>, read once at dylib
+						load: it reads every row marked DYLIB or BOTH, and the standalone HTTP proxy
+						never reads a dylib-only key.
 					</p>
-					<p class="mt-3 text-base text-zinc-dust">
+					<p class="mt-3 type-body text-bone-newsprint">
 						The FFI runtime-override variant is the
-						<code class="text-bone-newsprint">aphrodite_config_get</code> /
-						<code class="text-bone-newsprint">aphrodite_config_set</code> pair on the C-ABI bridge -
-						it surfaces values and changes them mid-session.
+						<code class="text-bone-white">aphrodite_config_get</code> /
+						<code class="text-bone-white">aphrodite_config_set</code> pair on the C-ABI
+						bridge - it surfaces values and changes them mid-session.
 					</p>
 				</ZineBox>
 			</div>
 		</section>
 
-		<!-- The reload simulation -->
-		<section id="reload" class="relative w-full" aria-label="The reload simulation" data-reveal>
-			<ZineTape Label="simulation" Color="raw" Side="left" />
-			<div class="flex flex-wrap items-center justify-between gap-3">
-				<h2 class="font-headline text-2xl font-black tracking-tight text-bone-white sm:text-3xl">
-					What /reload would apply
-				</h2>
+		<!-- 11 // /RELOAD - the numbered chapter, with the page's one callout -->
+		<section
+			id="reload"
+			class="blueprint-section relative w-full"
+			aria-label="The reload simulation"
+			data-reveal
+		>
+			<p class="section-index">{Chapters.Reload}</p>
+			<div class="mt-3 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+				<h2 class="type-section text-bone-white">What /reload would apply</h2>
 				<button
 					type="button"
 					data-action="reload"
@@ -864,57 +1164,80 @@ const Sections = [
 					Send /reload
 				</button>
 			</div>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Simulated from your editor state: /reload answers
-				<code class="text-bone-newsprint">"applied": true </code> with the values that took effect, and
-				a <code>"parsed_only"</code> object for the fields that do not - the rows the table marks
-				startup or load.
-			</p>
+
+			<!-- THE CALLOUT - the page's one expressive stamp, carrying the sentence
+			     that says exactly what the reply below is and is not. -->
+			<div class="well mt-8 p-5 sm:p-6">
+				<ZineStamp Label="SIMULATED IN THE BROWSER" Color="canary" Class="mb-5" />
+				<p class="max-w-[46rem] type-body text-bone-newsprint">
+					Simulated from your editor state: /reload answers
+					<code class="text-bone-newsprint">"applied": true </code> with the values that
+					took effect, and a <code>"parsed_only"</code> object for the fields that do not
+					- the rows the table marks startup or load.
+				</p>
+			</div>
+
 			<div class="mt-8">
 				<div
 					data-reload-out
 					aria-live="polite"
-					class="border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust"
+					class="well p-4 font-mono text-code leading-relaxed text-zinc-dust"
 				>
 					<div class="opacity-40">// press SEND /RELOAD</div>
 				</div>
 			</div>
 		</section>
 
-		<!-- Simulation boundary -->
-		<footer class="w-full border-l-4 border-weathered-teal bg-carbon-void p-6">
-			<ZineKicker Tone="teal">SIMULATION BOUNDARY</ZineKicker>
-			<p class="mt-2 max-w-3xl text-base text-zinc-dust">
-				Real:
-			</p>
-			<ul class="mt-2 max-w-3xl space-y-1 text-base text-zinc-dust">
-				<li class="border-l-2 border-oxblood-dark pl-3">the pick chain</li>
-				<li class="border-l-2 border-oxblood-dark pl-3">the precedence rules</li>
-				<li class="border-l-2 border-oxblood-dark pl-3">the two-stack split</li>
-				<li class="border-l-2 border-oxblood-dark pl-3">the key table</li>
-				<li class="border-l-2 border-oxblood-dark pl-3">
-					and the unwired ledger - all quoted from aphrodite.toml.example, README.md:371-442 and
-					docs/config/aphrodite-toml.md.
-				</li>
-			</ul>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Simulated:
-			</p>
-			<ul class="mt-2 max-w-3xl space-y-1 text-base text-zinc-dust">
-				<li class="border-l-2 border-oxblood-dark pl-3">
-					the TOML parsing (a browser-side reader, not the Rust or dylib parser)
-				</li>
-				<li class="border-l-2 border-oxblood-dark pl-3">the resolution ladder</li>
-				<li class="border-l-2 border-oxblood-dark pl-3">and the POST /reload response.</li>
-			</ul>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				No network, no runtime - every number is computed in the browser.
-			</p>
-			<p class="mt-3 max-w-3xl text-base text-zinc-dust">
-				Sanitization: the editor ships the repository's example file - never a user's real toml,
-				never an api_key value; the key field appears only as its env-var name.
-			</p>
-		</footer>
+		<!-- 12 // SIMULATION BOUNDARY - what is real, what is simulated -->
+		<section
+			class="blueprint-section relative w-full"
+			aria-label="The simulation boundary"
+			data-reveal
+		>
+			<p class="section-index">{Chapters.Boundary}</p>
+			<h2 class="mt-3 type-section text-bone-white">What is real, what is simulated</h2>
+			<div class="mt-10 grid gap-6 lg:grid-cols-2">
+				<ZineBox Accent="teal" Surface="shell">
+					<ZineKicker As="h3" Tone="teal">
+						REAL
+					</ZineKicker>
+					<ul class="mt-3 space-y-2 type-body text-bone-newsprint">
+						<li class="border-l-2 border-oxblood-dark pl-3">the pick chain</li>
+						<li class="border-l-2 border-oxblood-dark pl-3">the precedence rules</li>
+						<li class="border-l-2 border-oxblood-dark pl-3">the two-stack split</li>
+						<li class="border-l-2 border-oxblood-dark pl-3">the key table</li>
+						<li class="border-l-2 border-oxblood-dark pl-3">
+							and the unwired ledger - all quoted from aphrodite.toml.example,
+							README.md:371-442 and docs/config/aphrodite-toml.md.
+						</li>
+					</ul>
+				</ZineBox>
+				<ZineBox Accent="none" Surface="shell">
+					<ZineKicker As="h3" Tone="newsprint">
+						SIMULATED
+					</ZineKicker>
+					<ul class="mt-3 space-y-2 type-body text-bone-newsprint">
+						<li class="border-l-2 border-oxblood-dark pl-3">
+							the TOML parsing (a browser-side reader, not the Rust or dylib parser)
+						</li>
+						<li class="border-l-2 border-oxblood-dark pl-3">the resolution ladder</li>
+						<li class="border-l-2 border-oxblood-dark pl-3">
+							and the POST /reload response.
+						</li>
+					</ul>
+				</ZineBox>
+			</div>
+			<div class="prose-flow mt-8 max-w-[46rem]">
+				<p class="type-body text-bone-newsprint">
+					No network, no runtime - every number is computed in the browser.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					Sanitization: the editor ships the repository's example file - never a user's
+					real toml, never an api_key value; the key field appears only as its env-var
+					name.
+				</p>
+			</div>
+		</section>
 
 		<!-- RELATED: the natural neighbors -->
 		<Related
@@ -940,6 +1263,44 @@ const Sections = [
 	   is server-rendered and complete in both cases. */
 	:global(html:not(.js)) [data-key-filter-wrap] {
 		display: none;
+	}
+
+	/* THE KEYS MATRIX, dressed from this page.
+
+	   `ConfigKeys` owns the rows, the section grouping and the columns, and it is
+	   not this card's file - so the elevation is applied HERE, scoped to `#keys`.
+	   One id plus one attribute outranks the single utility classes the component
+	   ships, so no `!important` is needed and no rule escapes this route.
+
+	   The grammar: each TOML section is a SHELL lifted off the canvas with its own
+	   hairline, and the table inside it is a WELL recessed into that shell - the
+	   lighter `--tier-well-edge` against the darker `--tier-shell-edge` is what
+	   makes the table read as depth rather than as one more panel. The group head
+	   keeps a bottom rule of its own so the shell has a title bar. */
+	:global(#keys [data-key-group]) {
+		position: relative;
+		border: 1px solid var(--tier-shell-edge);
+		background-color: var(--tier-shell);
+		padding: 1.25rem;
+	}
+
+	:global(#keys [data-key-group] > div:first-child) {
+		border-bottom: 1px solid var(--tier-shell-edge);
+		padding-bottom: 0.75rem;
+	}
+
+	:global(#keys [data-key-group] > div:last-child) {
+		border: 1px solid var(--tier-well-edge);
+		background-color: var(--tier-well);
+	}
+
+	:global(#keys [data-key-group] th) {
+		font-size: var(--type-meta);
+		letter-spacing: 0.08em;
+	}
+
+	:global(#keys [data-key-group] tbody > tr) {
+		border-color: var(--tier-shell-edge);
 	}
 </style>
 
@@ -1076,20 +1437,28 @@ const Sections = [
 		return Text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 	}
 
+	// The chip is the published telemetry tag, not a hand-rolled copy of it: the
+	// three states are three modifiers, so the ladder and the matrix above it
+	// read as one vocabulary. `dim` keeps the quiet default fill and drops its
+	// opacity - an absent value is a value the reader must still see.
 	function Chip(Text: string, State: "dim" | "live" | "fallback"): string {
 		const Style = {
-			dim: "border-oxblood-dark text-zinc-dust opacity-50",
-			live: "border-stamped-canary text-stamped-canary",
-			fallback: "border-weathered-teal text-weathered-teal",
+			dim: "opacity-60",
+			live: "telemetry-tag--canary",
+			fallback: "telemetry-tag--teal",
 		}[State];
-		return `<span class="inline-block border px-2 py-0.5 font-mono text-base uppercase tracking-widest ${Style}">${Escape(Text)}</span>`;
+		return `<span class="telemetry-tag ${Style}">${Escape(Text)}</span>`;
 	}
 
+	// One ladder row: the key in the telemetry voice, the chain it walked as
+	// chips, and the sentence naming which link won. The row is separated by a
+	// hairline rather than boxed, because the pane around it is already the
+	// shell and a second frame per row would read as fifty-four panels.
 	function Row(Label: string, Chips: string[], Note: string): string {
-		return `<div class="border-l-2 border-oxblood-dark pl-3">
-			<p class="font-mono text-base uppercase tracking-widest text-zinc-dust">${Escape(Label)}</p>
-			<div class="mt-1 flex flex-wrap items-center gap-2">${Chips.join('<span class="text-zinc-dust">&rarr;</span>')}</div>
-			<p class="mt-1 font-mono text-base text-zinc-dust">${Escape(Note)}</p>
+		return `<div class="border-t border-[color:var(--tier-shell-edge)] pt-3 first:border-t-0 first:pt-0">
+			<p class="type-meta font-bold uppercase text-bone-white">${Escape(Label)}</p>
+			<div class="mt-2 flex flex-wrap items-center gap-2">${Chips.join('<span class="text-zinc-dust">&rarr;</span>')}</div>
+			<p class="mt-2 font-mono text-code text-zinc-dust">${Escape(Note)}</p>
 		</div>`;
 	}
 
@@ -1127,7 +1496,9 @@ const Sections = [
 			if (Entry.Chain === "toml-only") {
 				const Holders = Parsed.Proxies.filter((Proxy) => Proxy[Entry.Key] !== undefined);
 				const Chips = Holders.length
-					? Holders.map((Proxy) => Chip(`proxy "${Proxy.name ?? "?"}": ${Proxy[Entry.Key]}`, "live"))
+					? Holders.map((Proxy) =>
+							Chip(`proxy "${Proxy.name ?? "?"}": ${Proxy[Entry.Key]}`, "live"),
+						)
 					: [Chip("proxy: absent", "dim")];
 				// The pair is the point of this key, so name which listener is
 				// missing instead of saying that some proxy is.
@@ -1155,8 +1526,12 @@ const Sections = [
 				const Proxy = Parsed.Proxies.find((Item) => Item[Entry.Key] !== undefined);
 				const Default = Parsed.Sections.defaults?.[Entry.Key];
 				const Chips = [
-					Proxy ? Chip(`proxy "${Proxy.name ?? "?"}": set`, "live") : Chip("proxy: absent", "dim"),
-					Default !== undefined ? Chip("defaults: set", "live") : Chip("defaults: absent", "dim"),
+					Proxy
+						? Chip(`proxy "${Proxy.name ?? "?"}": set`, "live")
+						: Chip("proxy: absent", "dim"),
+					Default !== undefined
+						? Chip("defaults: set", "live")
+						: Chip("defaults: absent", "dim"),
 					Chip(ApiKeyEnvChip, "dim"),
 				];
 				Parts.push(
@@ -1223,7 +1598,10 @@ const Sections = [
 		const Token = TrackedKeys().find((Entry) => Entry.Key === "tool_threshold_token");
 		const Multiplier = TrackedKeys().find((Entry) => Entry.Key === "code_multiplier");
 
-		const Base = Number_(Parsed.Sections.compression?.tool_threshold_token, Number_(Token?.Default, 1024));
+		const Base = Number_(
+			Parsed.Sections.compression?.tool_threshold_token,
+			Number_(Token?.Default, 1024),
+		);
 		const CodeMultiplier = Number_(
 			Parsed.Sections.compression?.code_multiplier,
 			Number_(Multiplier?.Default, 3),
@@ -1253,7 +1631,9 @@ const Sections = [
 		const Rows = TrackedKeys().filter((Entry) => Value(Entry) !== undefined);
 		const Quote = (Entry: TrackedKey): string => `"${Entry.Key}": ${Value(Entry)}`;
 		const Applied = Rows.filter((Entry) => Entry.Live === "hot").map(Quote);
-		const ParsedOnly = Rows.filter((Entry) => Entry.Live !== "hot").map((Entry) => `"${Entry.Key}"`);
+		const ParsedOnly = Rows.filter((Entry) => Entry.Live !== "hot").map(
+			(Entry) => `"${Entry.Key}"`,
+		);
 
 		const Lines = [
 			'<span class="text-weathered-teal">{</span>',
@@ -1333,14 +1713,16 @@ const Sections = [
 		const Empty = Root.querySelector<HTMLElement>("[data-key-filter-empty]");
 		const Groups = Array.from(Root.querySelectorAll<HTMLElement>("[data-key-group]"));
 		const Rows = Groups.flatMap((Group) =>
-			Array.from(Group.querySelectorAll<HTMLTableRowElement>("[data-key-row]")).map((Row) => ({
-				Group,
-				Row,
-				// The whole row, not one column: a reader searching "hot" wants the
-				// live column, searching "APHRODITE_" wants the env column, and both
-				// are the same gesture.
-				Text: (Row.textContent ?? "").toLowerCase(),
-			})),
+			Array.from(Group.querySelectorAll<HTMLTableRowElement>("[data-key-row]")).map(
+				(Row) => ({
+					Group,
+					Row,
+					// The whole row, not one column: a reader searching "hot" wants the
+					// live column, searching "APHRODITE_" wants the env column, and both
+					// are the same gesture.
+					Text: (Row.textContent ?? "").toLowerCase(),
+				}),
+			),
 		);
 
 		if (Rows.length === 0) {

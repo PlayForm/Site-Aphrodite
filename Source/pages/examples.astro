@@ -5,10 +5,15 @@ import ToolRelay from "../Content/Mermaid/tool-relay.svg?raw";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import ZineFlow from "@Component/ZineFlow.astro";
 import ZineFold from "@Component/ZineFold.astro";
-import ExampleCase from "@Component/ExampleCase.astro";
+import CodeFence from "@Component/CodeFence.astro";
+import ExamplePanels from "@Component/ExamplePanels.astro";
 import PageShell from "@Component/PageShell.astro";
 import SectionNav from "@Component/SectionNav.astro";
+import ZineBox from "@Component/ZineBox.astro";
+import ZinePreview from "@Component/ZinePreview.astro";
 import ZineSource from "@Component/ZineSource.astro";
+import ZineStream from "@Component/ZineStream.astro";
+import ZineTape from "@Component/ZineTape.astro";
 import Related from "@Component/Related.astro";
 import type { ExampleRecord } from "@Library/Records";
 import { Link, OurRepo, Routes } from "@Library/Links";
@@ -21,15 +26,21 @@ import { RunBytes, RunMarker, RunPreview } from "@Library/Motion";
 // source lines each fact came from. Mechanics-first histories - the
 // behavior-first examples live in Content/Showcase/Examples.json (/showcase).
 //
-// Every scenario below is ONE shape (ExampleCase): a claim, the command, the
-// real output, the marker it produced, then the scenario's own evidence. The
-// page used to hand-roll that frame seven times in four different layouts.
+// Every behaviour below is ONE shape, and the shape is this page's own: a
+// numbered chapter (`01 // RETRIEVE`), then TWO COLUMNS - the claim on the
+// left, ONE console pod on the right holding the command, the real output and
+// the preview + marker as hairline-divided rows of a single shell. It is
+// deliberately not four equal panels: one payload travels down one channel, so
+// the reader follows it instead of comparing boxes. The scenario's own
+// evidence (panels, diagram, note, citation) follows inside the same plate.
 //
-// `Cases` is typed by the record itself (`ExampleRecord`), so a scenario cannot
-// carry a field the renderer drops or omit one it requires - the array and
-// `ExampleCase` are one declaration, not two that happen to agree. `Sections`
-// is derived from that same array, so the sticky index can never name a
-// scenario the page does not render.
+// The frame lives here rather than in `ExampleCase` because the pod is a
+// page-level composition - a section rule, a chapter index, a two-column
+// console - and the shared component's two presentations are the compact
+// library state /showcase uses. `Cases` is still typed by the record itself
+// (`ExampleRecord`), so a scenario cannot carry a field the renderer drops or
+// omit one it requires; `Sections` is derived from that same array, so the
+// sticky index can never name a scenario the page does not render.
 
 /** A scenario plus the one line the hero index prints for it. */
 type CaseRecord = ExampleRecord & { Hero: string };
@@ -192,6 +203,40 @@ const VerdictTone: Record<string, string> = {
 };
 
 /**
+ * THE CHAPTERS. Each behaviour is one numbered chapter of the page, in the
+ * order the payload travels: it arrives (01), it is refused (02), a compound
+ * command is split (03), the thresholds that decide (04), what is injected
+ * before the call (05), the relay that answers later (06), and the store the
+ * bytes land in (07).
+ *
+ * Keyed by `Id` rather than added to the record: a chapter number is this
+ * page's presentation of a scenario, not a fact about the mechanism, and the
+ * record is shared with /showcase. `Sections` reads the same map, so the
+ * sticky index and the chapter rules cannot disagree.
+ */
+const Chapters: Record<string, string> = {
+	retrieval: "01 // RETRIEVE",
+	"skip-gate": "02 // PASS-THROUGH",
+	"chain-split": "03 // COMPOUND COMMANDS",
+	thresholds: "04 // THRESHOLDS",
+	directives: "05 // DIRECTIVES",
+	relay: "06 // RELAY",
+	"dual-listener": "07 // STORAGE",
+};
+
+/** The tape's ink, by the plate's own tone - the label never invents a fifth
+ *  colour, it reads the one the scenario already chose. */
+const TapeColor = { crimson: "raw", canary: "canary", teal: "teal" } as const;
+
+/**
+ * When the preview lands: the frame the last printed output line finishes.
+ * Documentation/Motion.md's `[data-stream]` beat - a 140ms lead, 70ms per line,
+ * a 160ms settle - read over a scenario's own line count, so the preview never
+ * arrives before the output it summarises has stopped arriving.
+ */
+const StreamBeat = (Lines: number): number => 140 + Math.max(0, Lines - 1) * 70 + 160;
+
+/**
  * The hot-path mechanics, moved VERBATIM out of the claim column and into the
  * disclosure under the comparison. The words are unchanged - a paragraph that
  * moves is not a paragraph that may be reworded - and the reader now meets the
@@ -283,8 +328,11 @@ const InjectionOrder = [
 	{ N: "05", Section: "RECALL CATALOG", Rule: "the first section dropped under budget" },
 ] as const;
 
-// The seven scenarios, one shape each. Id anchors the hero index; Hero is the
-// index line; the rest is what ExampleCase renders.
+// The seven behaviours, one record shape each. `Id` anchors the hero index and
+// the chapter map; `Hero` is the index line; `N` is the record's own scenario
+// number (the chapter number the page prints comes from `Chapters`, so a
+// scenario can be re-ordered without renumbering the record); the rest is what
+// the console pod and the evidence blocks below render.
 const Cases: CaseRecord[] = [
 	{
 		Id: "retrieval",
@@ -555,13 +603,13 @@ const Cases: CaseRecord[] = [
 ];
 
 // The page's own section list, derived from the same array: the seven
-// scenarios by number and title, then the two flows that close the page. Each
-// entry names a section the page really renders, because it is built from the
-// data that renders it.
+// behaviours by the chapter number the map assigns them, then the two flows
+// that close the page. Each entry names a section the page really renders,
+// because it is built from the data that renders it.
 const Sections = [
-	...Cases.map(({ Id, N, Title }) => ({ Id, Label: `${N} · ${Title}` })),
-	{ Id: "turn-cycle", Label: "VIII · The turn cycle" },
-	{ Id: "runtime-home", Label: "IX · One runtime home" },
+	...Cases.map(({ Id }) => ({ Id, Label: Chapters[Id] })),
+	{ Id: "turn-cycle", Label: "08 // TURN CYCLE" },
+	{ Id: "runtime-home", Label: "09 // RUNTIME HOME" },
 ];
 ---
 
@@ -593,19 +641,21 @@ const Sections = [
 				<p class="type-body mt-6 max-w-3xl text-bone-newsprint">
 					Not what the output looks like - what happens to it, step by step.
 				</p>
-				<!-- The index: the seven claims, each a jump link to its scenario -->
-				<ol class="mt-12 flex max-w-3xl flex-col gap-3">
+				<!-- The index: the seven behaviours, each a jump link to its chapter -->
+				<ol class="mt-12 flex max-w-3xl flex-col border-b border-oxblood-dark">
 					{
-						Cases.map(({ Id, N, Hero }) => (
-							<li>
+						Cases.map(({ Id, Hero }) => (
+							<li class="border-t border-oxblood-dark">
 								<a
-									class="type-body text-bone-newsprint transition-colors hover:text-stamped-canary"
+									class="group flex flex-col gap-1 py-3 transition-colors sm:flex-row sm:items-baseline sm:gap-6"
 									href={`#${Id}`}
 								>
-									<span class="type-meta mr-3 text-stamped-canary">
-										{N}
+									<span class="shrink-0 font-mono text-base font-bold uppercase tracking-widest text-stamped-canary transition-colors group-hover:text-bone-white">
+										{Chapters[Id]}
 									</span>
-									{Hero}
+									<span class="type-body text-bone-newsprint transition-colors group-hover:text-bone-white">
+										{Hero}
+									</span>
 								</a>
 							</li>
 						))
@@ -622,21 +672,125 @@ const Sections = [
 		<!-- THE PAGE'S OWN SECTIONS // sticky index, from the same data list -->
 		<SectionNav Sections={Sections} />
 
-		<!-- ============ I-VII // THE SEVEN SCENARIOS, ONE SHAPE ============ -->
+		<!-- ============ 01-07 // THE SEVEN BEHAVIOURS, ONE CONSOLE POD ============ -->
 		{
-			Cases.map(({ Hero: _Hero, ...Scenario }) => (
-				<>
-					<ExampleCase {...Scenario} Reveal Stream />
+			Cases.map(({ Hero: _Hero, ...Scenario }) => {
+				const Beat = StreamBeat(Scenario.Output.length);
+
+				return (
+					<section
+						id={Scenario.Id}
+						class="blueprint-section relative flex w-full scroll-mt-24 flex-col"
+						data-reveal
+					>
+						<p class="section-index">{Chapters[Scenario.Id]}</p>
+
+						<ZineBox Tone={Scenario.Tone} Rotate={Scenario.Rotate} Class="mt-4 w-full">
+							<ZineTape
+								Label={Scenario.Label}
+								Color={TapeColor[Scenario.Tone ?? "crimson"]}
+								Side="left"
+							/>
+
+							{/* TWO COLUMNS, ONE POD. The claim is the left column and the
+							    console pod the right, because the pod is ONE payload and not
+							    a set of findings: a reader follows command -> output ->
+							    preview down a single shell instead of comparing four panels
+							    that all weigh the same. The rows are hairline-divided, the
+							    command and the output sit in `.well` channels (recessed, so
+							    the pod reads as a console and not as a stack of cards), and
+							    the preview keeps the one asphalt result card the product's
+							    own output deserves. */}
+							<div class="mt-6 grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+								<!-- THE CLAIM -->
+								<div class="flex min-w-0 flex-col">
+									<h2 class="type-section uppercase text-bone-white">
+										{Scenario.Title}
+									</h2>
+									<div class="prose-flow type-body mt-[var(--space-tight)] text-bone-newsprint">
+										{Scenario.Claim.map((Sentence) => (
+											<p set:html={Sentence} />
+										))}
+									</div>
+								</div>
+
+								<!-- THE CONSOLE POD -->
+								<div class="shell-card flex min-w-0 flex-col">
+									<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b border-oxblood-dark px-4 py-3">
+										<span class="telemetry-tag">CONSOLE POD</span>
+										<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
+											COMMAND → OUTPUT → WHAT THE MODEL READS
+										</span>
+									</div>
+
+									<div class="p-4">
+										<p class="telemetry-tag">01 // THE COMMAND</p>
+										<div class="well mt-3 p-3" data-plate-flush>
+											<CodeFence
+												Code={Scenario.Command.Code}
+												Lang={Scenario.Command.Lang}
+												Copy
+											/>
+										</div>
+									</div>
+
+									<div class="border-t border-oxblood-dark p-4">
+										<p class="telemetry-tag">02 // THE OUTPUT</p>
+										<div class="mt-3">
+											<ZineStream Lines={Scenario.Output} Stream />
+										</div>
+									</div>
+
+									<div class="border-t border-oxblood-dark p-4">
+										<p class="telemetry-tag telemetry-tag--canary">
+											03 // PREVIEW + MARKER
+										</p>
+										<div class="mt-3">
+											<ZinePreview
+												Label="PREVIEW + MARKER"
+												Result={Scenario.Preview}
+												Hash={Scenario.Marker}
+												Enter={Beat}
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							{/* THE SCENARIO'S OWN EVIDENCE - the same five shapes, rendered
+							    by the one component that owns them. */}
+							<ExamplePanels Panels={Scenario.Panels} Class="mt-16" />
+
+							{Scenario.Diagram && (
+								<figure class="mt-16 border border-oxblood-dark bg-asphalt-panel p-4">
+									<div class="overflow-x-auto" set:html={Scenario.Diagram.Html} />
+									<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+										{Scenario.Diagram.Caption}
+									</figcaption>
+								</figure>
+							)}
+
+							{Scenario.Note?.length ? (
+								<div class="prose-flow mt-16 max-w-3xl">
+									{Scenario.Note.map((Sentence) => (
+										<p class="type-body text-bone-newsprint" set:html={Sentence} />
+									))}
+								</div>
+							) : null}
+
+							<ZineSource Lines={[Scenario.Src]} />
+						</ZineBox>
 					{/* THE THRESHOLDS COMPARISON - one question, one table, and the
-					    precision behind a disclosure. It is NOT a panel: `ExampleCase`'s
-					    panel shapes are a bordered row, a card and a lane pair, and none
-					    of them is a table or a fold. Rendering the same four doors in two
-					    panels (shipped, then alternate) is what made this section read as
-					    four answers to one question; a table compares the two settings in
-					    the row they belong to, and `ZineFold` holds the figures the table
-					    does not need to show. */}
+					    precision behind a disclosure. It is NOT a console pod row:
+					    the evidence shapes are rows, cards and lane pairs, and this
+					    comparison needs a real table a reader scans ACROSS plus a
+					    fold for the figures the table does not have to carry.
+					    Rendering the same four doors in two panels (shipped, then
+					    alternate) is what made this section read as four answers to
+					    one question; a table compares the two settings in the row
+					    they belong to, and `ZineFold` holds the rest. */}
 					{Scenario.Id === "thresholds" && (
-						<div class="relative flex w-full flex-col" data-reveal>
+						<div class="relative mt-16 flex w-full flex-col" data-reveal>
 							{/* At 390 the comparison is 768px wide in a 350px window, so the docs
 							    column and the SAME ANSWER verdict sit off-screen with nothing
 							    saying so. The hint states it (a reader must not have to discover
@@ -749,13 +903,19 @@ const Sections = [
 							</div>
 						</div>
 					)}
-				</>
-			))
+					</section>
+				);
+			})
 		}
 
-		<!-- ============ VIII // THE TURN CYCLE (INTERACTIVE) ============ -->
-		<section id="turn-cycle" class="relative flex w-full flex-col lg:w-11/12 lg:self-end" data-reveal>
-			<p class="section-kicker">VIII · IN FIRING ORDER</p>
+		<!-- ============ 08 // THE TURN CYCLE (INTERACTIVE) ============ -->
+		<section
+			id="turn-cycle"
+			class="blueprint-section relative flex w-full scroll-mt-24 flex-col lg:w-11/12 lg:self-end"
+			data-reveal
+		>
+			<p class="section-index">08 // TURN CYCLE</p>
+			<p class="section-kicker mt-3">IN FIRING ORDER</p>
 			<h2 class="type-section mt-2 text-bone-white">The turn cycle</h2>
 			<div class="prose-flow type-body mt-[var(--space-tight)] max-w-3xl text-bone-newsprint">
 				<p>Each scenario zooms into one mechanism.</p>
@@ -862,9 +1022,14 @@ const Sections = [
 			/>
 		</section>
 
-		<!-- ============ IX // ONE RUNTIME HOME (INTERACTIVE) ============ -->
-		<section id="runtime-home" class="relative flex w-full flex-col lg:w-11/12 lg:self-start" data-reveal>
-			<p class="section-kicker">IX · ISSUE #40, AS A DECISION WALK</p>
+		<!-- ============ 09 // ONE RUNTIME HOME (INTERACTIVE) ============ -->
+		<section
+			id="runtime-home"
+			class="blueprint-section relative flex w-full scroll-mt-24 flex-col lg:w-11/12 lg:self-start"
+			data-reveal
+		>
+			<p class="section-index">09 // RUNTIME HOME</p>
+			<p class="section-kicker mt-3">ISSUE #40, AS A DECISION WALK</p>
 			<h2 class="type-section mt-2 text-bone-white">One runtime home</h2>
 			<div class="prose-flow type-body mt-[var(--space-tight)] max-w-3xl text-bone-newsprint">
 				<p>

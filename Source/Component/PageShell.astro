@@ -11,6 +11,41 @@
  * content is wrapped in `<main>` BY THE PAGE" true, since the page is the one
  * that places it. The deep-HTML sweep greps the BUILT tree for `<main>`, so
  * verify in `Target/`, never in the page file.
+ *
+ * ── THE BLUEPRINT RULING (Stitch grammar) ────────────────────────────────
+ *
+ * The shell also owns the two things that make a page read as a drawing rather
+ * than as a stack of blocks:
+ *
+ *   1. THE RULING. A quiet grid behind the content column - 40px cells in
+ *      `--blueprint-rule` at 35% - so the eye can measure the page and the
+ *      space between plates stops being empty. It is drawn INSIDE the shell's
+ *      own box, not across the window: the ruling belongs to the content
+ *      measure (1440px), and a grid that ran to the window edge would end in a
+ *      seam on every wide monitor and cost a `100vw` box that clips a
+ *      scrollbar.
+ *
+ *   2. THE CHAPTER RULE. Every `<section>` that is a DIRECT child of the shell
+ *      opens with a full-width hairline and the short drop from that rule to
+ *      its first line. This is the numbered-divider rhythm: the rule is the
+ *      shell's, the NUMBER is the page's own `.section-index` tag
+ *      (`01 // POSITIONING`, Global.css), because a counter rendered here
+ *      would have to sit in the section's flow or on a `position: relative`
+ *      the section may not own - and forcing `relative` on a section re-anchors
+ *      every absolutely positioned decoration inside it, which is a layout
+ *      change across 64 routes to gain a digit.
+ *
+ * The ruling and the rules are ONE switch, `Blueprint`, and it defaults to ON
+ * for a document and OFF for a viewport: `Grow` is the workbench, whose panes
+ * are an application surface rather than a document, and chapter rules across
+ * an app read as chrome over the tool. A page may still say `Blueprint={false}`
+ * or `Blueprint` explicitly.
+ *
+ * BOTH SELECTORS ARE DELIBERATELY WEAK. The chapter rule is written
+ * `:where(.shell-main--blueprint) > section`, so it carries element-level
+ * specificity and every utility a page already puts on its own section wins
+ * (`border-t border-oxblood-dark` keeps its crimson hairline, `pt-24` keeps its
+ * padding). The shell supplies a rule only where a page states none.
  */
 import Breadcrumbs from "./Breadcrumbs.astro";
 
@@ -26,9 +61,16 @@ interface Props {
 	 * the only page that needs it: its panes are a viewport, not a document.
 	 */
 	Grow?: boolean;
+
+	/**
+	 * The blueprint ruling behind the content column plus the chapter rule that
+	 * opens every direct-child `<section>`. On for a document, off for a
+	 * viewport surface (`Grow`). See the header for why both are one switch.
+	 */
+	Blueprint?: boolean;
 }
 
-const { Rhythm = "wide", Crumbs = false, Grow = false } = Astro.props;
+const { Rhythm = "wide", Crumbs = false, Grow = false, Blueprint = !Grow } = Astro.props;
 
 /**
  * Byte-exact from the measured shells: wide is shell A (case-study, examples,
@@ -44,7 +86,8 @@ const RhythmClass = {
 
 <main
 	class:list={[
-		"relative z-10 mx-auto flex w-full max-w-[1440px] flex-col px-5 sm:px-8 lg:px-14",
+		"shell-main relative z-10 mx-auto flex w-full max-w-[1440px] flex-col px-5 sm:px-8 lg:px-14",
+		Blueprint && "shell-main--blueprint",
 		RhythmClass,
 		Grow && "flex-1",
 	]}
@@ -52,3 +95,41 @@ const RhythmClass = {
 	{Crumbs && <Breadcrumbs />}
 	<slot />
 </main>
+
+<style>
+	/* THE RULING. Two 1px gradients crossing at 40px - one hairline per cell edge,
+	   in the chapter-rule token so the grid and the rules are the same colour at
+	   two volumes. `opacity` is the volume knob rather than a second hex: 35% of
+	   #27272a over the page ground lands near #131315, a line the eye finds when
+	   it looks for it and never reads as a border.
+
+	   It is `pointer-events: none` and out of the accessibility tree by
+	   construction (an empty pseudo-element carries no text), and it paints at
+	   `z-index: -1` inside the shell's own stacking context (`z-10`), so it sits
+	   above the page ground and BELOW every plate - a filled surface covers the
+	   ruling, which is what a drawn sheet does. */
+	.shell-main--blueprint::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
+		background-image:
+			linear-gradient(to right, var(--blueprint-rule) 1px, transparent 1px),
+			linear-gradient(to bottom, var(--blueprint-rule) 1px, transparent 1px);
+		background-size: 40px 40px;
+		opacity: 0.35;
+	}
+
+	/* THE CHAPTER RULE. `:where()` keeps this at element-level specificity so a
+	   page's own `border-t` / `border-oxblood-dark` / `pt-*` utilities all win:
+	   the shell states a rule only where the page states none, and never
+	   repaints a crimson chapter boundary as a grey one. The inset is the label
+	   distance (`--blueprint-inset`), because the rule is a marker and the head
+	   follows it the way a value follows a label - the shell's own rhythm still
+	   owns the gap BETWEEN chapters. */
+	:where(.shell-main--blueprint) > :global(section) {
+		border-top: 1px solid var(--blueprint-rule);
+		padding-block-start: var(--blueprint-inset);
+	}
+</style>

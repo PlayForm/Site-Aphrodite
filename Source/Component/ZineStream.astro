@@ -1,7 +1,50 @@
 ---
+/**
+ * ZineStream - the raw pane: what the terminal keeps.
+ *
+ * THE CONSOLE GRAMMAR (Stitch direction). A stream is a CONSOLE, not a text
+ * box, so the component owns three parts of one:
+ *
+ *   a HEADER RIBBON   the command in amber mono on the left, the byte count as
+ *                     a telemetry tag on the right. The ribbon is where a
+ *                     reader learns what produced the bytes and how many there
+ *                     are, before reading one of them.
+ *   an INSET WELL     `.well` - the recessed channel of the elevation grammar
+ *                     (Global.css, BLUEPRINT GRAMMAR). Darker than the shell
+ *                     that holds it, with a LIGHTER 1px edge, which is what
+ *                     makes it read as depth rather than as one more panel.
+ *   SYNTAX ROLES      four roles, each carried by colour AND by shape, so a
+ *                     line's kind is legible before its text is read.
+ *
+ * The ribbon is OPT-IN (`Command` / `Label` / `Bytes`), so every existing call
+ * site renders exactly the pane it rendered before - a stream with nothing to
+ * put in a ribbon does not get an empty one.
+ */
+type Tone = "plain" | "dim" | "fade" | "mute" | "result" | "canary" | "teal";
+
+/**
+ * The syntax role of a line - IDENTITY, not emphasis.
+ *
+ * The two axes are separate and only one of them may be reduced: `Tone` is the
+ * volume knob (the suppression law: dim 70 / fade 40 / mute 25), `Role` is
+ * information (which kind of line this is). A muted warning is still a warning,
+ * so the two compose rather than compete.
+ *
+ *   command  what was run              amber
+ *   tree     the structure it printed  sand
+ *   tag      a name, type or address   cyan
+ *   warning  something to look at      crimson, carried by a rule and a tint
+ *                                      rather than by crimson type - `--raw-blood`
+ *                                      is 2.12:1 on the well and would be
+ *                                      unreadable as ink, so the identity moves
+ *                                      into the row and the words stay bone.
+ */
+type Role = "command" | "tree" | "tag" | "warning";
+
 interface Props {
 	/** Terminal lines; Tone maps to the suppression opacities or a highlight. */
-	Lines: { Text: string; Tone?: "plain" | "dim" | "fade" | "mute" | "result" | "canary" | "teal" }[];
+	Lines: { Text: string; Tone?: Tone; Role?: Role }[];
+
 	/**
 	 * Print the lines one after another instead of showing them at once.
 	 *
@@ -10,40 +53,135 @@ interface Props {
 	 * motion - so it belongs on a pane of real command output and nowhere else.
 	 * The pane's own entrance root (a `[data-reveal]` section) owns the beat:
 	 * the lines print when the panel arrives, not while it is still off-screen.
+	 *
+	 * The attribute sits on the BODY, never on the plate: the runtime staggers
+	 * the target's own children, so a ribbon among them would print like a log
+	 * line and shift the beat every caller computed from its line count.
 	 */
 	Stream?: boolean;
+
+	/** The ribbon's command line, e.g. `cargo build --release -p aphrodite`. */
+	Command?: string;
+
+	/** The ribbon's left label, for a stream with no command to name. */
+	Label?: string;
+
+	/**
+	 * The byte count of the plain stream, as the CALLER computed it from the
+	 * text it passed - never from this markup: a line may carry HTML entities,
+	 * and a count of markup is a count of nothing.
+	 */
+	Bytes?: number;
 }
 
-const { Lines, Stream = false } = Astro.props;
+const { Lines, Stream = false, Command, Label, Bytes } = Astro.props;
 
-const Tone = {
+/** The VOLUME a tone carries - the suppression law, and nothing else. */
+const VolumeClass: Record<Tone, string> = {
 	plain: "",
 	dim: "opacity-70",
 	fade: "opacity-40",
 	mute: "opacity-25",
+	result: "",
+	canary: "",
+	teal: "",
+};
+
+/** The tone's own ink, for a line that has no role to name it. */
+const ToneClass: Record<Tone, string> = {
+	...VolumeClass,
 	result: "text-bone-white",
 	canary: "text-stamped-canary",
 	teal: "text-weathered-teal",
 };
+
+/** The role's ink. An absent role keeps the pane's own muted voice. */
+const RoleInk: Record<Role, string> = {
+	command: "text-stamped-canary font-bold",
+	tree: "text-bone-newsprint",
+	tag: "text-weathered-teal",
+	warning: "text-bone-white",
+};
+
+/**
+ * A role owns the COLOUR and a tone owns the VOLUME, so the two never fight for
+ * one declaration: a `canary:warning:` line is still a warning, and the warning
+ * wins the ink while the caller's suppression still decides how loud it is.
+ */
+const Ink = (LineTone: Tone, LineRole: Role | undefined): string[] =>
+	LineRole === undefined ? [ToneClass[LineTone]] : [VolumeClass[LineTone], RoleInk[LineRole]];
+
+/**
+ * The role's row. Only the warning needs one: its identity is crimson, and
+ * crimson is not legible as type on this fill, so the ROW carries the colour
+ * and the ink stays bone.
+ *
+ * The tint is a `color-mix` against the well rather than `bg-raw-blood/15`:
+ * `--raw-blood` is a `var()` holding a hex, so Tailwind cannot apply an opacity
+ * modifier to it and silently emits no rule at all. The 2px rule is the part
+ * that always paints, which is why the identity does not depend on the tint.
+ */
+const RoleRow: Record<Role, string> = {
+	command: "",
+	tree: "",
+	tag: "",
+	warning:
+		"border-l-2 border-raw-blood bg-[color-mix(in_srgb,var(--raw-blood)_18%,var(--tier-well))] pl-2",
+};
+
+const Ribbon = Command !== undefined || Label !== undefined || Bytes !== undefined;
+
+const Count = `${Lines.length.toLocaleString("en-US")} ${Lines.length === 1 ? "LINE" : "LINES"}`;
+
+const Tally = Bytes === undefined ? Count : `${Count} · ${Bytes.toLocaleString("en-US")} B`;
 ---
 
-<div
-	class="ccr-marker border border-oxblood-dark bg-soot-black p-3.5 font-mono text-base leading-relaxed text-zinc-dust"
-	data-stream={Stream ? "" : undefined}
->
+<figure class="well ccr-marker m-0">
 	{
-		/*
-		 * The tone lives on an INNER span, never on the line itself. The stream
-		 * animation runs on the line and fills `opacity: 1` for good, which would
-		 * flatten the suppression law (dim 70 / fade 40 / mute 25) the moment the
-		 * log finished printing - the pane would lose the one thing it is there to
-		 * show. One wrapper div per line, one span inside it: the line animates,
-		 * the span keeps its tone, and the two opacities multiply.
-		 */
-		Lines.map(({ Text, Tone: LineTone = "plain" }) => (
-			<div>
-				<span class={Tone[LineTone]} set:html={Text} />
+		Ribbon && (
+			<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
+				<span class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5 font-mono text-base leading-snug">
+					{Command !== undefined && (
+						<span class="shrink-0 text-zinc-dust" aria-hidden="true">
+							$
+						</span>
+					)}
+					<span
+						class:list={[
+							"break-words",
+							Command === undefined
+								? "font-black uppercase tracking-widest text-zinc-dust"
+								: "font-bold text-stamped-canary",
+						]}
+					>
+						{Command ?? Label}
+					</span>
+				</span>
+				<span
+					class="telemetry-tag ml-auto shrink-0"
+					title={`${Lines.length} lines in this stream`}
+				>
+					{Tally}
+				</span>
 			</div>
-		))
+		)
 	}
-</div>
+
+	<div class="p-3.5 font-mono text-base leading-relaxed text-zinc-dust" data-stream={Stream ? "" : undefined}>
+		{
+			/*
+			 * The tone lives on an INNER span, never on the line itself. The stream
+			 * animation runs on the line and fills `opacity: 1` for good, which would
+			 * flatten the suppression law (dim 70 / fade 40 / mute 25) the moment the
+			 * log finished printing - the pane would lose the one thing it is there to
+			 * show. One wrapper div per line, one span inside it: the line animates,
+			 * the span keeps its tone, and the two opacities multiply.
+			 */
+			Lines.map(({ Text, Tone: LineTone = "plain", Role: LineRole }) => (
+				<div class={LineRole === undefined ? "" : RoleRow[LineRole]}>
+					<span class:list={Ink(LineTone, LineRole)} set:html={Text} />
+				</div>
+			))
+		}
+	</div>
+</figure>

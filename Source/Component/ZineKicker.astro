@@ -2,21 +2,41 @@
 /**
  * The mono kicker label - D5 of the restructure plan. The site hand-rolled
  * `text-base font-black uppercase tracking-widest` 222 times across 33 files
- * with six colour suffixes; this component owns the two forms and the six
- * voices, so the prop names ARE the voice law (site-development §3): canary =
- * the saved figure, teal = the ratio / mechanical voice, dust = a label,
- * white = a heading inside a panel, newsprint = a neutral paired value,
- * ink = a label sitting ON a canary chip.
+ * with six colour suffixes; this component owns the forms and the six voices,
+ * so the prop names ARE the voice law (site-development §3).
  *
- * The 13px tape floor does not apply here: a kicker is content text, so the
- * label form keeps the 16px floor (`text-base`) that the law gives it.
+ * THREE FORMS, and the form is chosen by what the label IS:
+ *
+ *   label  The mono tracking-widest voice at the 16px floor: a label that sits
+ *          above content the reader then reads. The default.
+ *   title  The font-headline form: a sub-head inside a panel.
+ *   tag    The TELEMETRY voice - the published `.telemetry-tag` chip
+ *          (Global.css): 11.5px, 700, 0.08em tracking, uppercase, oxblood
+ *          hairline on the sub-panel fill. For an identifier, a count, a unit or
+ *          a state - never for a sentence, because meta size is a label size.
+ *
+ * The 13px tape floor does not apply to `label`: a kicker is content text, so
+ * the label form keeps the 16px floor (`text-base`) that the law gives it.
+ * `tag` is the grammar's exception, and only because it carries a token rather
+ * than a sentence.
+ *
+ * THE TONE MAP. As TEXT: canary = the saved figure, teal = the ratio /
+ * mechanical voice, dust = a label, white = a heading inside a panel,
+ * newsprint = a neutral paired value, ink = a label sitting ON a canary chip.
+ * As a CHIP the FILL carries the identity, so the same tones land on the
+ * grammar's modifiers instead: `canary` and `ink` are the solid canary chip
+ * (the canary chip is exactly what `ink` was written for), `white` is the solid
+ * bone chip, `teal` is the teal OUTLINE - raw-blood text on the dark fills
+ * would fail 4.5:1, which is why the grammar's teal modifier is an outline and
+ * its crimson one is solid - and `dust` / `newsprint` are the unaccented chip.
  */
 interface Props {
 	/** The voice: dust (default) | white | canary | teal | ink | newsprint. */
 	Tone?: "dust" | "white" | "canary" | "teal" | "ink" | "newsprint";
 
-	/** "label" = the mono tracking-widest form; "title" = the font-headline form. */
-	Size?: "label" | "title";
+	/** "label" = the mono tracking-widest form; "title" = the font-headline
+	 * form; "tag" = the telemetry chip. */
+	Size?: "label" | "title" | "tag";
 
 	/** The rendered element - a span by default, so a kicker can sit inside a <p>. */
 	As?: "div" | "span" | "p";
@@ -33,12 +53,28 @@ const Palette = {
 	newsprint: "text-bone-newsprint",
 }[Tone];
 
+/** The chip modifier each tone lands on when the form is `tag`. An empty entry
+ * is the unaccented chip: asphalt fill, oxblood hairline, zinc-dust ink. */
+const TagAccent = {
+	dust: "",
+	newsprint: "",
+	white: "telemetry-tag--bone",
+	canary: "telemetry-tag--canary",
+	ink: "telemetry-tag--canary",
+	teal: "telemetry-tag--teal",
+}[Tone];
+
 const Form = {
 	label: "font-mono text-base font-black uppercase tracking-widest",
 	title: "font-headline text-lg font-black uppercase sm:text-xl",
+	tag: "telemetry-tag",
 }[Size];
+
+/** A chip carries its own ink, so the text palette would fight it: the `tag`
+ * form takes the modifier and drops the text colour entirely. */
+const Classes = Size === "tag" ? [Form, TagAccent] : [Form, Palette];
 
 const Element = As;
 ---
 
-<Element class={`${Form} ${Palette}`}><slot /></Element>
+<Element class:list={Classes}><slot /></Element>

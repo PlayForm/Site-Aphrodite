@@ -19,6 +19,31 @@ import { DocsRoute, Routes } from "@Library/Links";
 // subject: the knobs, the two topology diagrams, the measured arc, and the
 // simulation boundary. The SANITIZATION law holds: the samples are synthetic,
 // generated for the demo - never real session content, no user-home paths.
+//
+// THE CONSOLE GRAMMAR (blueprint, Global.css). This page is an instrument, so
+// it is laid out as one: every chapter opens on a full-width hairline with a
+// numbered index tag above its head (`.blueprint-section` + `.section-index`),
+// every panel picks an ELEVATION TIER instead of choosing a background, a
+// border and a shadow for itself, and the small labels speak the telemetry
+// voice (`.telemetry-tag`, `.metric`). Two rules follow from that and are
+// worth stating because they are easy to undo by accident:
+//
+//   1. A TIER SURFACE AND A TAILWIND BORDER UTILITY DO NOT GO ON THE SAME
+//      ELEMENT. `.shell-card` and `.well` set the `border` SHORTHAND, and
+//      Global.css loads after the utility layer, so `border-l-4
+//      border-weathered-teal` on a `.shell-card` is silently replaced by the
+//      tier's own 1px edge. Where a plate needs a custom edge, it takes a FILL
+//      (`.tier-shell` / `.tier-well`) and keeps the utilities for the frame.
+//   2. ONE EXPRESSIVE ASSEMBLY PER CHAPTER. The hard offset shadow, the skew
+//      and the ink sweep belong to the opening plate and to the console; every
+//      other plate in a chapter is a quiet tier. Emphasis is a budget, not a
+//      habit.
+//
+// The instrument itself (Component/ZinePipeline.astro, Mode="full") is shared
+// with /case-study/, so it is NOT re-skinned here: the page wraps it in the
+// console shell and tiers the readout region from outside through the hooks
+// the client engine binds (`[data-fact]`), which is the only treatment that
+// cannot drift out of the shared component's own stylesheet.
 
 // The page's own section list - SectionNav's only input, which is what keeps
 // the index truthful: a link can never name a section this page does not render.
@@ -92,6 +117,10 @@ const Knobs = [
 // dishonesty as a fabricated timing - and because wiring it into the
 // compression readout is exactly what made the old page contradict itself
 // ("compressed" in the verdict, "engine OFF, raw passes through" beside it).
+//
+// Its Default is the ONE figure on this page that is a metric rather than a
+// sentence: a single shipped value with its own unit, documented and never
+// turned, so it can carry `.metric` without contradicting a live control.
 const Compaction = {
 	Key: "engine_threshold_pct",
 	Default: 30,
@@ -112,10 +141,13 @@ const Compaction = {
 // which is a different dimension from the proxy thresholds and is not modelled
 // by this page's simulator. It stays here because a reader who meets
 // engine_threshold_pct anywhere else needs the vocabulary, and its note says
-// exactly which dimension it belongs to.
+// exactly which dimension it belongs to. The `Dimension` field is that
+// distinction made scannable - a chip on each card, so the reader does not have
+// to read three paragraphs to learn that one of them is a different axis.
 const States = [
 	{
 		Label: "below threshold, kept inline",
+		Dimension: "COMPRESSION",
 		When: "bytes <= tool_threshold_token (x code_multiplier for code_* types)",
 		Holds: "the bytes themselves - nothing to resolve",
 		Note: [
@@ -125,6 +157,7 @@ const States = [
 	},
 	{
 		Label: "preview enough, marker stored",
+		Dimension: "COMPRESSION",
 		When: "bytes > tool_threshold_token (x code_multiplier for code_* types)",
 		Holds: "the preview line, the address and the marker",
 		Note: [
@@ -134,6 +167,7 @@ const States = [
 	},
 	{
 		Label: "engine OFF - the 100+ escape hatch, nothing archived mid-session",
+		Dimension: "COMPACTION",
 		When: "engine_threshold_pct >= 100",
 		Holds: "the raw turn, un-archived by the engine - the proxy thresholds still compress tool output",
 		Note: [
@@ -180,6 +214,12 @@ const Diagrams = [
 // a `Count` part renders its own number and climbs to it once on first view.
 // The printed string is unchanged either way - "216 KB → 12 markers" is what
 // the markup carries before any script runs.
+//
+// `Display: "sheet"` promotes a plate to the printed-sheet tier (bone ground,
+// carbon ink, the chapter's one hard shadow) and gives its figure the largest
+// mono voice on the page. It is set on the real-world example because that is
+// the number the whole page exists to point at; the rest are receipts read at
+// reading size.
 type ArcPart = string | { Count: number };
 
 const Arc: readonly {
@@ -188,11 +228,13 @@ const Arc: readonly {
 	Note: string;
 	Size?: string;
 	Tone?: string;
+	Display?: "sheet";
 }[] = [
 	{
 		Label: "v1.2.2 · REAL-WORLD EXAMPLE",
 		Parts: [{ Count: 216 }, " KB → ", { Count: 12 }, " markers"],
 		Note: "54K → 240 tokens · the CHANGELOG entry prints the ratio as 225×",
+		Display: "sheet",
 	},
 	{
 		Label: "v1.2.2 · CLASSIFICATION & CCR STORE (APPLE M2 MAX)",
@@ -227,17 +269,28 @@ const Arc: readonly {
 		     The motion attribute always sits on a plain wrapper, never on a
 		     .wb-skew plate: an entrance animates `transform`, and a filled Web
 		     Animation outranks the author's transform, so a plate that was its
-		     own entrance root would lose its skew for good. -->
+		     own entrance root would lose its skew for good.
+
+		     This is the chapter's one expressive assembly: the skew, the
+		     crimson edge, the pasted shadow and the ink. Everything below it is
+		     a quiet tier. -->
 		<div data-enter>
-			<header class="wb-skew motion-wipe-host relative border-l-4 border-blood-crimson bg-carbon-void p-8 shadow-[6px_6px_0px_#7a0a1e]">
+			<header
+				class="wb-skew motion-wipe-host grunge tier-shell relative border-l-4 border-blood-crimson p-8 shadow-[6px_6px_0px_#7a0a1e]"
+				data-grunge
+				data-grunge-mode="edge"
+			>
 				<span class="motion-wipe" data-wipe aria-hidden="true" />
-				<ZineKicker Tone="canary">THE UNEXPLAINABLE BECOMES EFFORTLESS</ZineKicker>
+				<p class="section-index">00 // WORKBENCH</p>
+				<div class="mt-4">
+					<ZineKicker Tone="canary">THE UNEXPLAINABLE BECOMES EFFORTLESS</ZineKicker>
+				</div>
 				<h1
 					class="mt-6 font-headline text-3xl font-black uppercase tracking-tight text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-5xl"
 				>
 					The pipeline, live
 				</h1>
-				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				<p class="wb-prose mt-6">
 					A tool call's output is appended to the model's context, and the model reads every
 					line of it. Aphrodite runs four steps over that output before it arrives: the
 					enriched preview line the agent would read, the
@@ -245,12 +298,12 @@ const Arc: readonly {
 					pass-through, or preview plus marker. Any tool output can be put through those
 					steps: a build log, a test run, a grep result.
 				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				<p class="wb-prose mt-3">
 					The four live-reloadable compression thresholds are yours to turn. The engine's
 					compaction knob is documented further down rather than wired in, because the path
 					modelled is the tool-output path and nothing else.
 				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				<p class="wb-prose mt-3">
 					The thresholds the sliders move are the shipped ones, and
 					every figure is measured from the bytes of the input and recomputed
 					as they turn - so no number can disagree with the payload it describes.
@@ -260,18 +313,21 @@ const Arc: readonly {
 
 		<SectionNav Sections={Sections} />
 
-		<!-- THE INSTRUMENT LABEL + THE BOUNDARY, before the first interaction.
-		     The label is persistent and quiet - it is a caption on an
-		     instrument, not a warning - and the full boundary text sits one
+		<!-- 01 // THE CONTRACT - the simulation boundary, before the first
+		     interaction. The label is persistent and quiet - it is a caption on
+		     an instrument, not a warning - and the full boundary text sits one
 		     click away beside the controls it governs. Both used to live at the
 		     bottom of the page, under the hashes and the byte counts, which is
 		     the one order a reader should never be given. -->
-		<div data-reveal>
-			<section
-				id="boundary"
-				aria-label="What this simulates"
-				class="border-l-4 border-l-weathered-teal bg-asphalt-panel p-6"
-			>
+		<section
+			id="boundary"
+			aria-label="What this simulates"
+			class="blueprint-section"
+			style="--blueprint-rule: var(--weathered-teal)"
+			data-reveal
+		>
+			<p class="section-index !text-weathered-teal">01 // THE CONTRACT</p>
+			<div class="shell-card mt-4 p-6 sm:p-8">
 				<ZineKicker Tone="teal">SIMULATION BOUNDARY</ZineKicker>
 				<p class="wb-instrument">
 					Browser simulation · illustrative digest · no engine benchmark · no
@@ -280,393 +336,457 @@ const Arc: readonly {
 				<details class="wb-details mt-6">
 					<summary class="wb-details-summary">What this simulates</summary>
 					<div class="prose-flow mt-6 max-w-3xl">
-						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							Real:
-						</p>
-						<ul class="space-y-1 font-body text-base leading-relaxed text-bone-newsprint">
-							<li class="border-l-2 border-oxblood-dark pl-3">
+						<p class="telemetry-tag telemetry-tag--teal">Real</p>
+						<ul class="wb-list">
+							<li>
 								the classifier rules (README.md:153-176)
 							</li>
-							<li class="border-l-2 border-oxblood-dark pl-3">
+							<li>
 								the preview line shapes (README.md:108-133)
 							</li>
-							<li class="border-l-2 border-oxblood-dark pl-3">
+							<li>
 								the threshold semantics and defaults (README.md:395-420).
 							</li>
 						</ul>
-						<p class="font-body text-base leading-relaxed text-bone-newsprint">
-							Simulated:
-						</p>
-						<ul class="space-y-1 font-body text-base leading-relaxed text-bone-newsprint">
-							<li class="border-l-2 border-oxblood-dark pl-3">
+						<p class="telemetry-tag telemetry-tag--canary">Simulated</p>
+						<ul class="wb-list">
+							<li>
 								the BLAKE3 digest (a deterministic stand-in hash - the real 40-char
 								digest needs the Rust store, and no engine can resolve the marker it
 								prints)
 							</li>
-							<li class="border-l-2 border-oxblood-dark pl-3">
+							<li>
 								and aphrodite_retrieve (shown as the decision text, never executed).
 							</li>
 						</ul>
-						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+						<p class="wb-prose">
 							No timing is simulated at all: the 40-123 ns classify figure is the
 							engine's own historical measurement, printed on the rail and arc
 							exactly as the README and the CHANGELOG carry it, and /benchmarks/
 							prints it with its environment and its reproduce command.
 						</p>
-						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+						<p class="wb-prose">
 							No network and no runtime: the whole pipeline runs in the browser.
 						</p>
-						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+						<p class="wb-prose">
 							Not depicted: the context engine's auto-compaction pass and the injection
 							assembler's directive budget - only the tool-output path is modelled.
 						</p>
-						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+						<p class="wb-prose">
 							The full registry is larger - the 30-type content catalog lives in
 							docs/classification/content-types.md:118-151; only the README
 							tier is modelled.
 						</p>
 					</div>
 				</details>
-			</section>
-		</div>
+			</div>
+		</section>
 
-		<!-- THE FOUR STEPS: the rail, the pair, the readout. The component owns its
-		     own <section>, so the anchor the index links to is this wrapper.
+		<!-- 02 // THE INSTRUMENT. The component owns its own <section>, its rail,
+		     its switchboard and its panes; the page owns the console it sits in
+		     and the tier the readout region takes (see the page stylesheet).
 		     This page has no [data-stream]: its raw pane is a textarea the reader
 		     fills, so there is no fixed set of lines to print one at a time. The
 		     stagger belongs on a captured stream - the landing page's build log,
 		     the case study's flood, the showcase's twenty outputs - and putting
 		     it here would animate an empty box. -->
-		<div
+		<section
 			id="pipeline"
-			role="region"
 			aria-label="Raw stream and enriched preview"
+			class="blueprint-section wb-rule-raw"
 			data-reveal
 		>
-			<ZinePipeline Mode="full" />
-		</div>
+			<p class="section-index wb-index-raw">02 // THE INSTRUMENT</p>
+			<div class="wb-console grunge mt-4" data-grunge data-grunge-mode="edge">
+				<ZinePipeline Mode="full" />
+			</div>
 
-		<!-- THE CLASSIFIER, IN PROSE: what the rail above is naming, and why one
-		     name is enough for every stage downstream. -->
-		<div class="mt-16 border-l-4 border-raw-blood bg-asphalt-panel p-6" data-reveal>
-			<ZineKicker Tone="dust" As="div">CLASSIFIER FRAMING</ZineKicker>
-			<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The 16 pipeline types the rail renders follow the README catalog
-				(README.md:155-176); the full classification registry behind them is 30 types,
-				printed in docs/classification/content-types.md:118-151.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				A type is a routing decision, not a description: the first rule that matches wins,
-				and every later stage reads that one name.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				A generic bucket is not the end of the road - a conservative semantic detector
-				upgrades the git, gitlog, grep, ls and test shapes, and ordinary prose is never
-				mis-tagged.
-			</p>
-		</div>
+			<!-- THE CLASSIFIER, IN PROSE: what the rail above is naming, and why
+			     one name is enough for every stage downstream. A quiet tier - a
+			     hairline and a crimson edge, no fill, no shadow - because it is
+			     the chapter's explanation, not its exhibit. -->
+			<div class="wb-framing mt-12 pl-6">
+				<ZineKicker Tone="dust" As="div">CLASSIFIER FRAMING</ZineKicker>
+				<p class="wb-prose mt-4">
+					The 16 pipeline types the rail renders follow the README catalog
+					(README.md:155-176); the full classification registry behind them is 30 types,
+					printed in docs/classification/content-types.md:118-151.
+				</p>
+				<p class="wb-prose mt-3">
+					A type is a routing decision, not a description: the first rule that matches wins,
+					and every later stage reads that one name.
+				</p>
+				<p class="wb-prose mt-3">
+					A generic bucket is not the end of the road - a conservative semantic detector
+					upgrades the git, gitlog, grep, ls and test shapes, and ordinary prose is never
+					mis-tagged.
+				</p>
+			</div>
+		</section>
 
-		<!-- THE KNOBS: aphrodite.toml [compression], live. -->
-		<div data-reveal>
-			<section
-				id="knobs"
-				class="wb-skew motion-wipe-host relative border-4 border-blood-crimson bg-carbon-void p-8 shadow-[6px_6px_0px_#7a0a1e]"
-				aria-label="Threshold knobs"
-			>
-				<span class="motion-wipe" data-wipe aria-hidden="true" />
-				<div class="flex flex-wrap items-center justify-between gap-6">
-					{/* This panel's only heading used to be a ZineKicker inside a bare
-					    <h2>: the kicker's own voice is `text-base` (16px), so the
-					    heading of the section measured exactly the size of its body
-					    copy and the reader got no signal that the subject changed.
-					    `type-sub` is the documented role for a sub-head inside a
-					    chapter, and it renders 22-28px over 16px body. The wording is
-					    unchanged; only the voice is. */}
-					<h2 class="type-sub text-bone-white">THRESHOLD KNOBS</h2>
-					<!-- Named for what it does. The old label was "POST /RELOAD",
-					     which named an HTTP endpoint this button never calls. -->
-					<button type="button" class="wb-pill" data-action="reset-defaults">
-						Reset defaults
-					</button>
+		<!-- 03 // THE CONTROLS - aphrodite.toml [compression], live. The chapter
+		     opens on the canvas rather than on a plate: the four knob cards are
+		     the exhibit, and each one is a WELL (a channel recessed into the
+		     page) so the sliders read as instruments rather than as panels. The
+		     values they show are telemetry chips, because a number that changes
+		     as you drag it is a readout, not prose. -->
+		<section
+			id="knobs"
+			aria-label="Threshold knobs"
+			class="blueprint-section"
+			style="--blueprint-rule: var(--stamped-canary)"
+			data-reveal
+		>
+			<p class="section-index !text-stamped-canary">03 // THE CONTROLS</p>
+			<div class="mt-4 flex flex-wrap items-center justify-between gap-6">
+				{/* This chapter's heading used to be a ZineKicker inside a bare
+				    <h2>: the kicker's own voice is `text-base` (16px), so the
+				    heading measured exactly the size of its body copy and the
+				    reader got no signal that the subject changed. `type-sub` is
+				    the documented role for a sub-head inside a chapter, and it
+				    renders 22-28px over 16px body. The wording is unchanged; only
+				    the voice is. */}
+				<h2 class="type-sub text-bone-white">THRESHOLD KNOBS</h2>
+				<!-- Named for what it does. The old label was "POST /RELOAD",
+				     which named an HTTP endpoint this button never calls. It is a
+				     control, so it keeps the chip's silhouette and adds the two
+				     things a chip does not have: a pointer and a shadow. -->
+				<button type="button" class="wb-pill" data-action="reset-defaults">
+					Reset defaults
+				</button>
+			</div>
+			<p class="wb-mono mt-6">
+				aphrodite.toml [compression] - the four proxy thresholds are live-reloadable; edit +
+				save (or POST /reload) re-applies them immediately (README.md:389).
+			</p>
+			<p class="wb-prose mt-4">
+				Only four values are atomics the running engine swaps: cache, token, inline and
+				code_multiplier. Everything else in the file waits for a restart.
+			</p>
+			<p class="wb-prose mt-3">
+				The engine knob is an escape hatch rather than a dial - past 100 the context engine
+				stands down and the four proxy thresholds keep working alone.
+			</p>
+			<!-- The reference line the button needs: it restores this page's
+			     sliders, and the real reload behaviour lives in the config docs. -->
+			<p class="wb-ref mt-4">
+				Reset defaults restores the four sliders to the shipped [compression]
+				values and changes nothing else. It is not an HTTP reload: the engine's own
+				<code class="type-code text-stamped-canary">POST /reload</code> re-applies
+				aphrodite.toml to a running binary, and its behaviour is documented in
+				<a class="wb-ref-link" href={DocsRoute("config/aphrodite-toml")}>the aphrodite.toml
+					configuration reference</a>
+				and in <a class="wb-ref-link" href={Routes.Config}>/config/</a>.
+			</p>
+			<div class="mt-12 grid gap-8 md:grid-cols-2" data-enter="180">
+				{
+					Knobs.map((Knob) => (
+						/* min-w-0 + a wrapping label/value row: the row was nowrap, so its
+						   min-content (a 15-character mono key plus its value) set the
+						   CARD's min-content and the card measured 282px in a 278px grid
+						   track at 390 - it jutted 4px past the column while nothing
+						   inside it reported overflow. Letting the pair wrap fixes the
+						   cause; min-w-0 stops a longer key from doing it again. */
+						<div class="well min-w-0 p-6">
+							<div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-2">
+								<label class="wb-key" for={`wb-knob-${Knob.Key}`}>
+									{Knob.Key}
+								</label>
+								<output
+									class="telemetry-tag telemetry-tag--canary"
+									data-knob-value={Knob.Key}
+									for={`wb-knob-${Knob.Key}`}
+								>
+									{Knob.Default}
+									{Knob.Unit}
+								</output>
+							</div>
+							<input
+								id={`wb-knob-${Knob.Key}`}
+								data-knob={Knob.Key}
+								type="range"
+								min={Knob.Min}
+								max={Knob.Max}
+								step={Knob.Step}
+								value={Knob.Default}
+								class="wb-slider mt-8 w-full"
+							/>
+							<p class="wb-label mt-4">
+								{Knob.Note}
+							</p>
+							<p class="wb-prose mt-3">
+								{Knob.Line}
+							</p>
+						</div>
+					))
+				}
+			</div>
+			<!-- THE ENGINE KNOB, DOCUMENTED RATHER THAN RENDERED. It governs the
+			     context engine's compaction pass, which this page does not model:
+			     one blob, no session, so there are no middle turns to archive. The
+			     control is not a slider here because a slider that changed nothing
+			     would be the same dishonesty as a fabricated timing - and wiring it
+			     into the compression readout is what made the old page say
+			     "compressed" and "raw passes through" about the same sample.
+
+			     Its value is the chapter's one metric: a single shipped figure with
+			     its own unit, documented and never turned, so nothing about it can
+			     drift from a live control. -->
+			<div class="well mt-12 p-6" data-enter="240">
+				<div class="flex flex-wrap items-baseline justify-between gap-4">
+					<p class="wb-key">{Compaction.Key}</p>
+					<p class="metric">
+						{Compaction.Default}<span class="metric__unit">{Compaction.Unit}</span>
+					</p>
 				</div>
-				<p class="mt-6 font-mono text-base leading-relaxed text-zinc-dust">
-					aphrodite.toml [compression] - the four proxy thresholds are live-reloadable; edit +
-					save (or POST /reload) re-applies them immediately (README.md:389).
+				<p class="wb-note mt-4">
+					{Compaction.Note} · compaction, not compression · a context-engine pass the compression readout cannot report
 				</p>
-				<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Only four values are atomics the running engine swaps: cache, token, inline and
-					code_multiplier. Everything else in the file waits for a restart.
+				<p class="wb-prose mt-3">
+					{Compaction.Line}
 				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The engine knob is an escape hatch rather than a dial - past 100 the context engine
-					stands down and the four proxy thresholds keep working alone.
+				<p class="wb-prose mt-3">
+					{Compaction.Why}
 				</p>
-				<!-- The reference line the button needs: it restores this page's
-				     sliders, and the real reload behaviour lives in the config docs. -->
 				<p class="wb-ref mt-4">
-					Reset defaults restores the four sliders to the shipped [compression]
-					values and changes nothing else. It is not an HTTP reload: the engine's own
-					<code class="type-code text-stamped-canary">POST /reload</code> re-applies
-					aphrodite.toml to a running binary, and its behaviour is documented in
+					Compaction is documented with the rest of the configuration surface in
 					<a class="wb-ref-link" href={DocsRoute("config/aphrodite-toml")}>the aphrodite.toml
 						configuration reference</a>
-					and in <a class="wb-ref-link" href={Routes.Config}>/config/</a>.
+					and exercised on <a class="wb-ref-link" href={Routes.Config}>/config/</a>.
 				</p>
-				<div class="mt-12 grid gap-16 md:grid-cols-2" data-enter="180">
-					{
-						Knobs.map((Knob) => (
-							/* min-w-0 + a wrapping label/value row: the row was nowrap, so its
-							   min-content (a 15-character mono key plus its value) set the
-							   CARD's min-content and the card measured 282px in a 278px grid
-							   track at 390 - it jutted 4px past the column while nothing
-							   inside it reported overflow. Letting the pair wrap fixes the
-							   cause; min-w-0 stops a longer key from doing it again. */
-							<div class="min-w-0 border-2 border-blood-crimson/60 bg-soot-black p-6">
-								<div class="flex flex-wrap items-baseline justify-between gap-x-3">
-									<label
-										class="font-mono text-base font-bold text-bone-newsprint"
-										for={`wb-knob-${Knob.Key}`}
-									>
-										{Knob.Key}
-									</label>
-									<output
-										class="font-mono text-base font-black text-stamped-canary"
-										data-knob-value={Knob.Key}
-										for={`wb-knob-${Knob.Key}`}
-									>
-										{Knob.Default}
-										{Knob.Unit}
-									</output>
-								</div>
-								<input
-									id={`wb-knob-${Knob.Key}`}
-									data-knob={Knob.Key}
-									type="range"
-									min={Knob.Min}
-									max={Knob.Max}
-									step={Knob.Step}
-									value={Knob.Default}
-									class="wb-slider mt-8 w-full"
-								/>
-								<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
-									{Knob.Note}
-								</p>
-								<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-									{Knob.Line}
-								</p>
-							</div>
-						))
-					}
-				</div>
-				<!-- THE ENGINE KNOB, DOCUMENTED RATHER THAN RENDERED. It governs the
-				     context engine's compaction pass, which this page does not model:
-				     one blob, no session, so there are no middle turns to archive. The
-				     control is not a slider here because a slider that changed nothing
-				     would be the same dishonesty as a fabricated timing - and wiring it
-				     into the compression readout is what made the old page say
-				     "compressed" and "raw passes through" about the same sample. -->
-				<div class="mt-16 border-2 border-oxblood-dark bg-soot-black p-6" data-enter="240">
-					<div class="flex flex-wrap items-baseline justify-between gap-4">
-						<p class="font-mono text-base font-bold text-bone-newsprint">{Compaction.Key}</p>
-						<p class="font-mono text-base font-black text-zinc-dust">
-							{Compaction.Default}{Compaction.Unit}
-						</p>
-					</div>
-					<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
-						{Compaction.Note} · compaction, not compression · a context-engine pass the compression readout cannot report
-					</p>
-					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						{Compaction.Line}
-					</p>
-					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						{Compaction.Why}
-					</p>
-					<p class="wb-ref mt-4">
-						Compaction is documented with the rest of the configuration surface in
-						<a class="wb-ref-link" href={DocsRoute("config/aphrodite-toml")}>the aphrodite.toml
-							configuration reference</a>
-						and exercised on <a class="wb-ref-link" href={Routes.Config}>/config/</a>.
-					</p>
-				</div>
+			</div>
 
-				<!-- The verdict strip: what the current knob set would do. -->
-				<div class="mt-16 border-2 border-raw-blood bg-soot-black p-4" data-enter="300">
-					<ZineKicker Tone="canary">COMPRESSION, CACHE AND STORAGE</ZineKicker>
-					<p class="mt-4 font-mono text-base text-bone-newsprint" data-verdict>
-						turn the knobs, then RUN PIPELINE
-					</p>
-					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						Three independent decisions follow from the knob set: whether the result is
-						compressed, whether the cache lane answers it, and whether the store keeps the
-						blob inline or writes it durably. Aphrodite takes the three separately, and
-						reporting them side by side is what stops one being read as another.
-					</p>
-					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						The four thresholds are atomics the running engine swaps, so the same result is
-						inline under a 4 KB limit and stored under a 256 B one, with no restart between
-						the two.
-					</p>
-					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						Byte reduction is measured against the bytes the result actually carries rather
-						than against the knob set, so the routing decision and the saving it produces stay
-						two figures: the thresholds decide the first, and only the bytes decide the second.
-					</p>
-				</div>
-			</section>
-		</div>
+			<!-- The verdict strip: what the current knob set would do. A shell card,
+			     not a well: this is the answer the chapter produces, and an answer
+			     sits on a surface rather than in a channel. -->
+			<div class="shell-card mt-12 p-6" data-enter="300">
+				<ZineKicker Tone="canary">COMPRESSION, CACHE AND STORAGE</ZineKicker>
+				<p class="wb-verdict mt-4" data-verdict>
+					turn the knobs, then RUN PIPELINE
+				</p>
+				<p class="wb-prose mt-4">
+					Three independent decisions follow from the knob set: whether the result is
+					compressed, whether the cache lane answers it, and whether the store keeps the
+					blob inline or writes it durably. Aphrodite takes the three separately, and
+					reporting them side by side is what stops one being read as another.
+				</p>
+				<p class="wb-prose mt-3">
+					The four thresholds are atomics the running engine swaps, so the same result is
+					inline under a 4 KB limit and stored under a 256 B one, with no restart between
+					the two.
+				</p>
+				<p class="wb-prose mt-3">
+					Byte reduction is measured against the bytes the result actually carries rather
+					than against the knob set, so the routing decision and the saving it produces stay
+					two figures: the thresholds decide the first, and only the bytes decide the second.
+				</p>
+			</div>
+		</section>
 
-		<div data-reveal>
-			<section
-				id="states"
-				class="wb-skew motion-wipe-host relative border-4 border-weathered-teal bg-carbon-void p-8 shadow-[6px_6px_0px_#000]"
-				aria-label="Threshold states"
-			>
-				<span class="motion-wipe" data-wipe aria-hidden="true" />
+		<!-- 04 // THE STATES. Three cards, each carrying the DIMENSION it belongs
+		     to as a chip: two are compression states the readout prints, one is a
+		     compaction state it cannot. That distinction used to be legible only
+		     by reading every paragraph on the card. -->
+		<section
+			id="states"
+			aria-label="Threshold states"
+			class="blueprint-section"
+			style="--blueprint-rule: var(--weathered-teal)"
+			data-reveal
+		>
+			<p class="section-index !text-weathered-teal">04 // THE STATES</p>
+			<div class="mt-2">
 				<ZineKicker Tone="teal">THRESHOLD STATES</ZineKicker>
-				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Every run ends in one of three states, and a state is the whole contract: the name
-					says in one line whether the bytes stayed, whether a marker was minted, and whether
-					the engine was in the loop at all.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The first two are compression states, and the readout names them. The third is a
-					compaction state: the token threshold alone decides the first two, while the third
-					is the context engine standing down - which is why that knob is documented beside
-					the thresholds rather than wired into the readout, and why no readout can print it.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					None of the three is a judgement about the agent's question. Whether a preview
-					answers it is the agent's decision, taken with a task in hand: the engine reports
-					the state, and the judgement stays with the agent that holds the task.
-				</p>
-				<div class="mt-12 grid gap-8 lg:grid-cols-3" data-enter="180">
-					{
-						States.map((State) => (
-							/* min-w-0 + `.break-token` on the WHEN line: that line carries the
-							   TOML keys (tool_threshold_token, engine_threshold_pct) in mono
-							   with tracking-widest, so an unbreakable 21-character token set
-							   the card's min-content at 276px and the three cards ran 12px
-							   past a 320px viewport. `.break-token` is the utility Global.css
-							   documents for exactly this - a container whose min-content is a
-							   token - and this was its first caller. */
-							<div class="min-w-0 border-2 border-weathered-teal/60 bg-soot-black p-6">
-								<p class="font-mono text-base font-black text-bone-white">{State.Label}</p>
-								<p class="break-token mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
-									WHEN: {State.When}
-								</p>
-								{State.Note.map((Sentence) => (
-									<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-										{Sentence}
-									</p>
-								))}
-								<p class="mt-6 border-t-2 border-weathered-teal/40 pt-4 font-mono text-base text-weathered-teal">
-									HOLDS: {State.Holds}
-								</p>
-							</div>
-						))
-					}
-				</div>
-				<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The inputs are printed alongside the name - compression mode, cache lane and
-					storage - so a run that reads as surprising can be traced back to the threshold
-					that produced it.
-				</p>
-			</section>
-		</div>
+			</div>
+			<p class="wb-prose mt-6">
+				Every run ends in one of three states, and a state is the whole contract: the name
+				says in one line whether the bytes stayed, whether a marker was minted, and whether
+				the engine was in the loop at all.
+			</p>
+			<p class="wb-prose mt-3">
+				The first two are compression states, and the readout names them. The third is a
+				compaction state: the token threshold alone decides the first two, while the third
+				is the context engine standing down - which is why that knob is documented beside
+				the thresholds rather than wired into the readout, and why no readout can print it.
+			</p>
+			<p class="wb-prose mt-3">
+				None of the three is a judgement about the agent's question. Whether a preview
+				answers it is the agent's decision, taken with a task in hand: the engine reports
+				the state, and the judgement stays with the agent that holds the task.
+			</p>
+			<div class="mt-12 grid gap-8 lg:grid-cols-3" data-enter="180">
+				{
+					States.map((State) => (
+						/* min-w-0 + `.break-token` on the WHEN line: that line carries the
+						   TOML keys (tool_threshold_token, engine_threshold_pct) in mono
+						   with tracking-widest, so an unbreakable 21-character token set
+						   the card's min-content at 276px and the three cards ran 12px
+						   past a 320px viewport. `.break-token` is the utility Global.css
+						   documents for exactly this - a container whose min-content is a
+						   token - and this was its first caller. */
+						<div class="shell-card min-w-0 p-6">
+							<p
+								class:list={[
+									"telemetry-tag",
+									State.Dimension === "COMPACTION"
+										? "telemetry-tag--canary"
+										: "telemetry-tag--teal",
+								]}
+							>
+								{State.Dimension}
+							</p>
+							<p class="wb-key mt-4">{State.Label}</p>
+							<p class="wb-label break-token mt-3">
+								WHEN: {State.When}
+							</p>
+							{State.Note.map((Sentence) => (
+								<p class="wb-prose mt-3">{Sentence}</p>
+							))}
+							<p class="wb-holds mt-6 pl-4">
+								HOLDS: {State.Holds}
+							</p>
+						</div>
+					))
+				}
+			</div>
+			<p class="wb-prose mt-12">
+				The inputs are printed alongside the name - compression mode, cache lane and
+				storage - so a run that reads as surprising can be traced back to the threshold
+				that produced it.
+			</p>
+		</section>
 
-		<!-- THE TOPOLOGY: the store and the config surface. -->
-		<section id="topology" class="grid gap-20 lg:grid-cols-2" aria-label="Diagrams" data-reveal>
-			<p class="col-span-full max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+		<!-- 05 // THE TOPOLOGY: the store and the config surface. Two figures on
+		     the shell tier; the first carries the chapter's hard shadow and ink,
+		     the second stays quiet, so the pair reads as one exhibit and one
+		     companion rather than as two equal claims. -->
+		<section
+			id="topology"
+			aria-label="Diagrams"
+			class="blueprint-section"
+			data-reveal
+		>
+			<p class="section-index">05 // THE TOPOLOGY</p>
+			<p class="wb-prose mt-4">
 				Two parts of the pipeline have no place in a readout: where the store actually
 				lives, and where the thresholds come from.
 			</p>
-			{
-				Diagrams.map((Diagram) => (
-					<figure
-						class="wb-skew motion-wipe-host relative border-4 border-blood-crimson bg-carbon-void p-4 shadow-[6px_6px_0px_#7a0a1e]"
-						data-diagram={Diagram.Id}
-					>
-						<span class="motion-wipe" data-wipe aria-hidden="true" />
-						<div class="overflow-x-auto" set:html={Diagram.Svg} />
-						<figcaption class="mt-6">
-							<ZineKicker Tone="dust">{Diagram.Caption}</ZineKicker>
-						</figcaption>
-						{
-							Diagram.Note.map((Sentence, Index) => (
+			<div class="mt-10 grid gap-8 lg:grid-cols-2">
+				{
+					Diagrams.map((Diagram, Index) => (
+						<figure
+							class:list={[
+								"shell-card p-4 sm:p-6",
+								Index === 0 && "grunge shadow-[6px_6px_0px_#7a0a1e]",
+							]}
+							data-grunge={Index === 0 ? "" : undefined}
+							data-grunge-mode="edge"
+							data-diagram={Diagram.Id}
+						>
+							<div class="overflow-x-auto" set:html={Diagram.Svg} />
+							<figcaption class="mt-6">
+								<ZineKicker Tone="dust">{Diagram.Caption}</ZineKicker>
+							</figcaption>
+							{Diagram.Note.map((Sentence, NoteIndex) => (
 								<p
 									class:list={[
-										Index === 0 ? "mt-6" : "mt-3",
-										"max-w-3xl font-body text-base leading-relaxed text-bone-newsprint",
+										NoteIndex === 0 ? "mt-6" : "mt-3",
+										"wb-prose",
 									]}
 								>
 									{Sentence}
 								</p>
-							))
-						}
-					</figure>
-				))
-			}
+							))}
+						</figure>
+					))
+				}
+			</div>
 		</section>
 
-		<!-- THE ARC: the measured numbers this sim gestures at. -->
-		<div data-reveal>
-			<section
-				id="arc"
-				class="wb-skew motion-wipe-host relative border-l-4 border-stamped-canary bg-carbon-void p-8"
-				aria-label="Benchmark notes"
-			>
-				<span class="motion-wipe" data-wipe aria-hidden="true" />
+		<!-- 06 // THE RECEIPTS: the measured numbers this sim gestures at. The
+		     real-world example is promoted to the printed-sheet tier (bone
+		     ground, carbon ink, the chapter's one hard shadow) because it is the
+		     number the page exists to point at; the other three are receipts
+		     read at reading size on the shell tier. -->
+		<section
+			id="arc"
+			aria-label="Benchmark notes"
+			class="blueprint-section"
+			style="--blueprint-rule: var(--stamped-canary)"
+			data-reveal
+		>
+			<p class="section-index !text-stamped-canary">06 // THE RECEIPTS</p>
+			<div class="mt-2">
 				<ZineKicker Tone="canary">SIM NOTES · THE MEASURED ARC</ZineKicker>
-				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The numbers the simulation reaches for are real: each plate prints the figure the
-					CHANGELOG carried at that release, and the benchmarks page carries the reproduce
-					commands.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					None of them was measured for the simulation. They are historical engine
-					measurements, printed as receipts and labelled as such wherever they appear -
-					which is the difference between a citation and a claim.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					A plate is a receipt: the figure is what the release printed, and the note beside
-					it is what the number means for the design.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The figures count up once when they come into view, and the note underneath each
-					one is what makes the number mean something.
-				</p>
-				<div class="mt-12 grid gap-6 md:grid-cols-2" data-enter="180">
-					{
-						Arc.map((Plate) => (
-							<div class="border-2 border-blood-crimson/60 bg-soot-black p-5">
-								<ZineKicker Tone="dust" As="div">
-									{Plate.Label}
-								</ZineKicker>
-								<div
-									class={`mt-3 font-mono font-black ${Plate.Size ?? "text-2xl"} ${Plate.Tone ?? "text-bone-white"}`}
-								>
-									{Plate.Parts.map((Part) =>
-										typeof Part === "string" ? (
-											Part
-										) : (
-											<span data-count={Part.Count}>
-												{Part.Count.toLocaleString("en-US")}
-											</span>
-										),
-									)}
-								</div>
-								<p class="mt-2 font-mono text-base text-zinc-dust">{Plate.Note}</p>
+			</div>
+			<p class="wb-prose mt-6">
+				The numbers the simulation reaches for are real: each plate prints the figure the
+				CHANGELOG carried at that release, and the benchmarks page carries the reproduce
+				commands.
+			</p>
+			<p class="wb-prose mt-3">
+				None of them was measured for the simulation. They are historical engine
+				measurements, printed as receipts and labelled as such wherever they appear -
+				which is the difference between a citation and a claim.
+			</p>
+			<p class="wb-prose mt-3">
+				A plate is a receipt: the figure is what the release printed, and the note beside
+				it is what the number means for the design.
+			</p>
+			<p class="wb-prose mt-3">
+				The figures count up once when they come into view, and the note underneath each
+				one is what makes the number mean something.
+			</p>
+			<div class="mt-12 grid gap-6 md:grid-cols-2" data-enter="180">
+				{
+					Arc.map((Plate) => (
+						<div
+							class:list={[
+								Plate.Display === "sheet"
+									? "tier-inverted grunge grunge--oxblood border-l-4 border-stamped-canary p-6 shadow-[6px_6px_0px_#000] sm:p-8 md:col-span-2"
+									: "shell-card p-5 sm:p-6",
+							]}
+							data-grunge={Plate.Display === "sheet" ? "" : undefined}
+							data-grunge-mode="edge"
+						>
+							<ZineKicker Tone={Plate.Display === "sheet" ? "ink" : "dust"} As="div">
+								{Plate.Label}
+							</ZineKicker>
+							<div
+								class:list={[
+									Plate.Display === "sheet"
+										? "wb-sheet-figure mt-4"
+										: `mt-3 font-mono font-black ${Plate.Size ?? "text-2xl"} ${Plate.Tone ?? "text-bone-white"}`,
+								]}
+							>
+								{Plate.Parts.map((Part) =>
+									typeof Part === "string" ? (
+										Part
+									) : (
+										<span data-count={Part.Count}>
+											{Part.Count.toLocaleString("en-US")}
+										</span>
+									),
+								)}
 							</div>
-						))
-					}
-				</div>
-				<ZineSource
-					Lines={[
-						"SRC: CHANGELOG.md:962-973 (the ns/µs table) · CHANGELOG.md:983 (216 KB → 12 markers)",
-					]}
-				/>
-			</section>
-		</div>
+							<p
+								class:list={[
+									"mt-3 font-mono text-base",
+									Plate.Display === "sheet" ? "wb-sheet-note" : "text-zinc-dust",
+								]}
+							>
+								{Plate.Note}
+							</p>
+						</div>
+					))
+				}
+			</div>
+			<ZineSource
+				Lines={[
+					"SRC: CHANGELOG.md:962-973 (the ns/µs table) · CHANGELOG.md:983 (216 KB → 12 markers)",
+				]}
+			/>
+		</section>
 
 		<!-- THE BOUNDARY used to close the page here. It now opens it, as a
 		     disclosure beside the controls (#boundary, above) - the same text,
@@ -686,44 +806,107 @@ const Arc: readonly {
 </Base>
 
 <style is:global>
-	/* The page's own chrome: the skew, the pill and the slider. The pipeline's
-	   panes and the samples live in Component/ZinePipeline.astro, which is
-	   self-contained because /case-study/ renders it too. */
-	.wb-skew {
-		transform: skew(-1.2deg);
-		transition: transform 0.2s ease;
+	/* THE PAGE'S OWN CHROME. The instrument's panes and samples live in
+	   Component/ZinePipeline.astro, which is self-contained because /case-study/
+	   renders it too; everything here belongs to this page and nothing here
+	   reaches a shared component's markup except the readout hook documented
+	   below.
+
+	   VOICES. Four roles, taken from Global.css rather than invented: a reading
+	   sentence (`--type-body`), a technical line (mono, 16px), a label (mono,
+	   13px, uppercase, tracked), and an identifier (mono, 16px, bold). A
+	   sentence never renders at label size - the label voice exists for keys,
+	   units, counts and one-word annotations. */
+	.wb-prose {
+		max-width: 48rem;
+		font-family: "DM Sans", sans-serif;
+		font-size: var(--type-body);
+		line-height: 1.65;
+		color: var(--bone-newsprint);
 	}
-	.wb-skew:hover {
-		transform: rotate(0deg) skew(0deg);
-	}
-	.wb-pill {
-		border: 2px solid #7a0a1e;
-		background: #111014;
-		padding: 0.5rem 0.9rem;
-		font-family: var(--font-mono, "JetBrains Mono", monospace);
+
+	.wb-mono {
+		max-width: 48rem;
+		font-family: "JetBrains Mono", monospace;
 		font-size: 16px;
+		line-height: 1.6;
+		color: var(--zinc-dust);
+	}
+
+	.wb-label {
+		font-family: "JetBrains Mono", monospace;
+		font-size: 0.8125rem;
 		font-weight: 700;
+		line-height: 1.5;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
-		color: #dedbd2;
-		box-shadow: 3px 3px 0px #000;
+		color: var(--zinc-dust);
 	}
-	.wb-pill:hover,
-	.wb-pill[data-active] {
-		background: #931128;
-		color: #ece9e0;
+
+	.wb-key {
+		font-family: "JetBrains Mono", monospace;
+		font-size: 16px;
+		font-weight: 700;
+		color: var(--bone-newsprint);
 	}
-	.wb-slider {
-		accent-color: #931128;
-		height: 6px;
+
+	/* The pipeline chapter's identity is the RAW stage colour, which is 2.12:1
+	   on the page ground and unreadable as text - and near-invisible as a 1px
+	   rule. Same lift the rail's figures and the index stage cards use: the
+	   identity is the colour, the legibility is the mix.
+
+	   The index selector is `.section-index.wb-index-raw`, not `.wb-index-raw`,
+	   because `.section-index` declares a colour of its own at the same
+	   specificity and the source order between Global.css and this page's
+	   style block is not something a page should bet on. `.wb-rule-raw` sets
+	   the chapter hairline through the published `--blueprint-rule` knob, so
+	   both halves of the identity live beside each other. */
+	.section-index.wb-index-raw {
+		color: color-mix(in srgb, var(--raw-blood) 55%, var(--bone-newsprint));
 	}
+
+	.wb-rule-raw {
+		--blueprint-rule: color-mix(in srgb, var(--raw-blood) 55%, var(--bone-newsprint));
+	}
+
+	/* THE CONSOLE. A ruled frame on the page ground, not a lifted card: the
+	   instrument is a console, and the readout INSIDE it is the thing that
+	   lifts (shell fill, one tier up), so the two must not share a fill or the
+	   card stops reading as a card. The edge and the zero radius are
+	   `.shell-card`'s own values; only the fill differs, which is why this is
+	   a page-local class rather than a sixth tier. */
+	.wb-console {
+		position: relative;
+		border: 1px solid var(--tier-shell-edge);
+		border-radius: 0;
+		background-color: var(--tier-canvas);
+		padding: clamp(1.25rem, 2vw, 2rem);
+	}
+
+	/* A list inside the boundary disclosure: the rule is the left edge, so the
+	   items read as one argument rather than as four separate notes. */
+	.wb-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+		font-family: "DM Sans", sans-serif;
+		font-size: var(--type-body);
+		line-height: 1.6;
+		color: var(--bone-newsprint);
+	}
+
+	.wb-list > li {
+		border-left: 2px solid var(--oxblood-dark);
+		padding-left: 0.75rem;
+	}
+
 	/* THE INSTRUMENT LABEL: a caption on the machine, always visible, never a
 	   warning. Quiet on purpose - the h1 already carries the loud voice, and a
 	   second shouted label beside it is the "everything is emphasised" problem
 	   this page is being fixed for. */
 	.wb-instrument {
 		margin-top: 1rem;
-		max-width: 52ch;
+		max-width: 48rem;
 		padding-left: 0.75rem;
 		border-left: 2px solid var(--weathered-teal);
 		font-family: "JetBrains Mono", monospace;
@@ -734,6 +917,7 @@ const Arc: readonly {
 		text-transform: uppercase;
 		color: var(--zinc-dust);
 	}
+
 	/* The disclosure that holds the full boundary text. A native <details>, so
 	   it opens without JavaScript and its text is in the document either way -
 	   the reader chooses how much of the contract to read, and search engines
@@ -742,6 +926,7 @@ const Arc: readonly {
 		border-top: 1px solid var(--outline-oxblood);
 		padding-top: var(--space-reading);
 	}
+
 	.wb-details-summary {
 		display: inline-flex;
 		align-items: center;
@@ -755,36 +940,166 @@ const Arc: readonly {
 		text-transform: uppercase;
 		color: var(--stamped-canary);
 	}
+
 	.wb-details-summary::-webkit-details-marker {
 		display: none;
 	}
+
 	.wb-details-summary::before {
 		content: "+";
 		color: var(--weathered-teal);
 	}
+
 	.wb-details[open] .wb-details-summary::before {
 		content: "\2212";
 	}
+
 	.wb-details-summary:hover {
 		color: var(--bone-white);
 	}
+
 	/* A reference line: the sentence that tells a reader where the real
 	   behaviour lives, in the voice of a citation rather than of a claim. */
 	.wb-ref {
-		max-width: 62ch;
+		max-width: 48rem;
 		font-family: "DM Sans", sans-serif;
 		font-size: var(--type-body);
 		line-height: 1.6;
 		color: var(--zinc-dust);
 	}
+
 	.wb-ref-link {
 		color: var(--weathered-teal);
 		text-decoration: underline;
 		text-underline-offset: 0.18em;
 	}
+
 	.wb-ref-link:hover {
 		color: var(--bone-white);
 	}
+
+	/* THE CHAPTER'S EXPLANATION: a crimson edge, no fill and no shadow. The
+	   quiet tier, hand-built because it is a page-local block and not a ZineBox
+	   call site. */
+	.wb-framing {
+		border-left: 4px solid var(--raw-blood);
+	}
+
+	/* A CONTROL WEARING THE TELEMETRY CHIP. The chip's silhouette and voice,
+	   plus the two things a chip does not have: a pointer and a pasted shadow.
+	   Zero radius, like every other edge on the site. */
+	.wb-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		padding: 0.4rem 0.7rem;
+		border: 1px solid var(--oxblood-dark);
+		border-radius: 0;
+		background-color: var(--asphalt-panel);
+		font-family: "JetBrains Mono", monospace;
+		font-size: 0.75rem;
+		font-weight: 700;
+		line-height: 1.2;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--bone-newsprint);
+		box-shadow: 3px 3px 0px #000;
+		cursor: pointer;
+	}
+
+	.wb-pill:hover,
+	.wb-pill[data-active] {
+		border-color: #000;
+		background-color: var(--raw-blood);
+		color: var(--bone-white);
+	}
+
+	.wb-slider {
+		accent-color: #931128;
+		height: 6px;
+	}
+
+	/* THE VERDICT: a mono readout line, one step above the label voice so it
+	   reads as the answer the chapter produces rather than as a caption. */
+	.wb-verdict {
+		font-family: "JetBrains Mono", monospace;
+		font-size: 16px;
+		line-height: 1.6;
+		color: var(--bone-newsprint);
+	}
+
+	/* THE HOLDS LINE: the state card's payload, on a teal edge rather than
+	   behind a second border - `.shell-card` already owns the card's frame. */
+	.wb-holds {
+		border-left: 2px solid color-mix(in srgb, var(--weathered-teal) 45%, transparent);
+		font-family: "JetBrains Mono", monospace;
+		font-size: 16px;
+		line-height: 1.6;
+		color: var(--weathered-teal);
+	}
+
+	/* THE PRINTED SHEET. `.tier-inverted` carries the ground and the ink; these
+	   two classes carry what a printed receipt needs on top of it: a figure at
+	   poster scale, and a note at a weight that survives a bone ground. */
+	.wb-sheet-figure {
+		font-family: "JetBrains Mono", monospace;
+		font-size: clamp(2rem, 4.6vw, 3.5rem);
+		font-weight: 900;
+		line-height: 1.05;
+		letter-spacing: -0.02em;
+		font-variant-numeric: tabular-nums;
+		color: var(--tier-inverted-ink);
+	}
+
+	.wb-sheet-note {
+		color: color-mix(in srgb, var(--tier-inverted-ink) 70%, var(--tier-inverted));
+	}
+
+	/* THE READOUT REGION OF THE CONSOLE, tiered from the page.
+
+	   Component/ZinePipeline.astro is shared with /case-study/ and is not this
+	   page's to edit, so the readout is lifted here through the two hooks the
+	   client engine binds: the group's own aria-label (the region's identity)
+	   and `[data-fact]` (every figure the engine writes). Nothing structural is
+	   touched - no layout, no class names - so the shared component keeps
+	   rendering exactly as it does on the case study, and a restructure there
+	   degrades this treatment to nothing rather than breaking it.
+
+	   Why a shell card and a figure scale rather than `.metric`: `.metric` is
+	   ONE figure per section with a unit child, and these six are live values
+	   written by the engine ("not run yet" until the reader runs it). A static
+	   `.metric` beside a live control would be the contradiction this page
+	   exists to avoid; the readout card holds all six at a readout scale, and
+	   the chapter's single `.metric` is the documented compaction value above,
+	   which nothing can turn. */
+	#pipeline [role="group"][aria-label="This run, in figures"] {
+		position: relative;
+		margin-top: var(--space-group);
+		border: 1px solid var(--tier-shell-edge);
+		border-radius: 0;
+		background-color: var(--tier-shell);
+		padding: clamp(1.25rem, 2vw, 1.75rem);
+	}
+
+	#pipeline [data-fact] {
+		font-family: "JetBrains Mono", monospace;
+		font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+		font-weight: 700;
+		line-height: 1.05;
+		letter-spacing: -0.02em;
+		font-variant-numeric: tabular-nums;
+		color: var(--bone-white);
+	}
+
+	.wb-skew {
+		transform: skew(-1.2deg);
+		transition: transform 0.2s ease;
+	}
+
+	.wb-skew:hover {
+		transform: rotate(0deg) skew(0deg);
+	}
+
 	@media (max-width: 767px) {
 		.wb-skew {
 			transform: none;
@@ -793,6 +1108,7 @@ const Arc: readonly {
 			transform: none;
 		}
 	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.wb-skew {
 			transition: none;
