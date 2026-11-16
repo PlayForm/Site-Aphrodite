@@ -5,11 +5,7 @@ import Related from "../../Component/Related.astro";
 import ZineDiagramNav from "../../Component/ZineDiagramNav.astro";
 import { Link as RepoLink, OurRepo, Routes } from "../../Library/Links.ts";
 
-import CcrPipeline from "../../Content/Mermaid/ccr-pipeline.svg?raw";
-import ConfigResolution from "../../Content/Mermaid/config-resolution.svg?raw";
-import DualListener from "../../Content/Mermaid/dual-listener.svg?raw";
-import MarkerFormat from "../../Content/Mermaid/marker-format.svg?raw";
-import SessionLifecycle from "../../Content/Mermaid/session-lifecycle.svg?raw";
+import MermaidManifest from "../../Content/Mermaid/Diagrams.json";
 
 import { getCollection, render } from "astro:content";
 
@@ -165,27 +161,31 @@ const Next = Position > -1 && Position < Sequence.length - 1 ? Sequence[Position
 
 const Href = (Id: string) => (Id === "index" ? "/docs/" : `/docs/${Id}/`);
 
-// The pre-rendered Mermaid SVGs, embedded per the placement map. The markdown
-// sources keep their ```mermaid blocks (they render as plain stream panes);
-// the rendered diagram rides above the prose in a [data-diagram] figure.
-const Diagrams: Record<string, { Id: string; Label: string; Svg: string }> = {
-	"architecture/01-startup": { Id: "ccr-pipeline", Label: "M1 // CCR PIPELINE", Svg: CcrPipeline },
-	"ccr/lifecycle": { Id: "ccr-pipeline", Label: "M1 // CCR PIPELINE", Svg: CcrPipeline },
-	"ccr/marker-format": { Id: "marker-format", Label: "M6 // MARKER FORMAT", Svg: MarkerFormat },
-	"architecture/07-config-resolution": {
-		Id: "config-resolution",
-		Label: "M7 // CONFIG RESOLUTION",
-		Svg: ConfigResolution,
-	},
-	"architecture/05-ccr-lifecycle": {
-		Id: "session-lifecycle",
-		Label: "M8 // SESSION LIFECYCLE",
-		Svg: SessionLifecycle,
-	},
-	"proxy/architecture": { Id: "dual-listener", Label: "M5 // DUAL LISTENER", Svg: DualListener },
-};
+// The pre-rendered Mermaid SVGs, resolved from the manifest `Scripts/Diagrams.ts`
+// writes. The markdown sources keep their ```mermaid blocks (they render as
+// plain stream panes); every rendered diagram rides above the prose in its own
+// [data-diagram] figure, in source order.
+//
+// The manifest is the index, not a hand-written map: the previous six-entry map
+// embedded diagrams for six doc ids and left every other page's flowchart as a
+// code block, which is exactly what a reader sees as "the diagram does not
+// render". A page that gains a ```mermaid block gains a figure without a code
+// change.
+const MermaidSvgs = import.meta.glob("../../Content/Mermaid/*.svg", {
+	query: "?raw",
+	import: "default",
+	eager: true,
+}) as Record<string, string>;
 
-const Diagram = Diagrams[Doc.id];
+const PageDiagrams = (MermaidManifest as { Id: string; File: string; Index: number; Label: string }[])
+	.filter((Entry) => Entry.File === Doc.id)
+	.sort((A, B) => A.Index - B.Index)
+	.map((Entry) => ({
+		Id: Entry.Id,
+		Label: Entry.Label,
+		Svg: MermaidSvgs[`../../Content/Mermaid/${Entry.Id}.svg`] ?? "",
+	}))
+	.filter((Entry) => Entry.Svg !== "");
 
 // A section index page is a README-derived entry whose id matches its section
 // folder ("architecture", "guides", ...); the root entry is id "index".
@@ -559,18 +559,18 @@ const NextSteps = (() => {
 				</header>
 
 				{
-					Diagram && (
+					PageDiagrams.map((Figure) => (
 						<figure
 							class="relative z-10 mt-16 border border-oxblood-dark bg-soot-black p-4"
-							data-diagram={Diagram.Id}
+							data-diagram={Figure.Id}
 							data-reveal
 						>
-							<div class="overflow-x-auto [&_svg]:h-auto [&_svg]:max-w-full" set:html={Diagram.Svg} />
+							<div class="overflow-x-auto [&_svg]:h-auto [&_svg]:max-w-full" set:html={Figure.Svg} />
 							<figcaption class="mt-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-								{Diagram.Label}
+								{Figure.Label}
 							</figcaption>
 						</figure>
-					)
+					))
 				}
 
 				<!-- Index pages: the zine index cards with one-line purposes -->
@@ -959,6 +959,26 @@ const NextSteps = (() => {
 		color: var(--weathered-teal);
 	}
 
+	/* ...EXCEPT inside a table cell, where `anywhere` is the opposite of what the
+	   table is for. A reference matrix's whole job is that the key survives as
+	   one string (see TABLES BY CONTENT TYPE below), and the rule above quietly
+	   re-broke it: every `<code>` in a cell computed `anywhere`, which also
+	   collapses the cell's min-content to one character, so the column stayed
+	   narrow and `tool_threshold_token` was measured split three ways at 1440px
+	   and `APHRODITE_CONFIG_PATH` twice at 390px. The cell keeps the token's
+	   boundaries; a matrix wider than the reading column scrolls inside the
+	   labelled region BindTables builds around it. */
+	.docs-prose :global(td code),
+	.docs-prose :global(th code) {
+		overflow-wrap: normal;
+		word-break: normal;
+		/* A UAX#14 soft opportunity still exists after a `.` inside a bracketed
+		   key (`[templates.preview.<family>.*]` split after the dot at every
+		   width), so the carrier is pinned whole: the column sizes to the
+		   token and the table's scroll region takes the width. */
+		white-space: nowrap;
+	}
+
 	/* Code fences: the plate is defined ONCE - `body pre.astro-code` in
 	   Source/Stylesheet/Global.css (frame, padding, rhythm, overflow, scroll
 	   cue) over the palette in Source/Library/ShikiTheme.ts. A second frame
@@ -1023,8 +1043,11 @@ const NextSteps = (() => {
 	   the table keeps its boundaries and scrolls instead - see
 	   `.docs-table--scroll`. */
 	html:not(.js) .docs-prose :global(td),
-	html:not(.js) .docs-prose :global(th) {
+	html:not(.js) .docs-prose :global(th),
+	html:not(.js) .docs-prose :global(td code),
+	html:not(.js) .docs-prose :global(th code) {
 		overflow-wrap: anywhere;
+		white-space: normal;
 	}
 
 	/* The scroll region BindTables builds: a table wider than the reading

@@ -927,7 +927,6 @@ budget_chars = 2600 # hard cap per turn`;
 														<CodeFence
 															Class="mt-3 border border-oxblood-dark"
 															Copy
-															CopyLabel={Lane.Shell.toUpperCase()}
 															Lang={Lane.Lang}
 															Code={Step.Command}
 														/>
@@ -992,12 +991,12 @@ budget_chars = 2600 # hard cap per turn`;
 										</div>
 									)}
 
-									<div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-5">
-										<div class="border border-oxblood-dark bg-soot-black p-4 lg:col-span-2">
+									<div class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-5">
+										<div class="border border-oxblood-dark bg-soot-black p-4 xl:col-span-3">
 											<ZineKicker Tone="teal" As="div">WHAT IT WRITES</ZineKicker>
 											<p class="mt-2 type-body text-bone-newsprint" set:html={Route.Writes} />
 										</div>
-										<div class="border border-oxblood-dark bg-soot-black p-4 lg:col-span-3">
+										<div class="border border-oxblood-dark bg-soot-black p-4 xl:col-span-2">
 											<ZineKicker As="div">VERIFY IT WORKS</ZineKicker>
 											{Route.Verify.map((Line) => (
 												<p class="mt-2 type-body text-bone-newsprint" set:html={Line} />
@@ -1301,7 +1300,6 @@ budget_chars = 2600 # hard cap per turn`;
 				<CodeFence
 					Class="border border-oxblood-dark"
 					Copy
-					CopyLabel="BASH"
 					Code={`./aphrodite --api-key «redacted:sk-...» --listen 127.0.0.1:9798`}
 				/>
 				<p class="mt-2 type-body text-zinc-dust">
@@ -1311,7 +1309,7 @@ budget_chars = 2600 # hard cap per turn`;
 				<p class="mt-6 font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 					CHECK // the health endpoint
 				</p>
-				<CodeFence Class="border border-oxblood-dark" Copy CopyLabel="BASH" Code={`curl http://127.0.0.1:9798/health`} />
+				<CodeFence Class="border border-oxblood-dark" Copy Code={`curl http://127.0.0.1:9798/health`} />
 				<p class="mt-3 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
 					EXPECT // the health body
 				</p>
@@ -1386,7 +1384,7 @@ budget_chars = 2600 # hard cap per turn`;
 											</span>
 										</div>
 										<div class="mt-1 flex flex-wrap items-center gap-2">
-											<code class="type-code text-bone-newsprint">{Step.Command}</code>
+											<code class="type-code break-token text-bone-newsprint">{Step.Command}</code>
 											<ZineCopyChip
 												Label="COPY"
 												Copy={Step.Command}

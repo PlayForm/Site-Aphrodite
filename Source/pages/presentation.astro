@@ -348,5 +348,45 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 		.deck-ui-exit:focus-visible .deck-ui-exit-label {
 			color: var(--raw-blood);
 		}
+
+		/* The column layout's transport: these rules are scoped to this page, so
+		   the narrow-viewport overrides for the scrubber and the beat list live
+		   here, reading the same label step Deck.css declares. */
+		@media (max-width: 1023px) {
+			.deck-beats-panel {
+				max-width: min(22rem, calc(100vw - 2rem));
+			}
+
+			.deck-beats-list {
+				grid-template-columns: 1fr;
+			}
+
+			/* A beat name wraps in the column layout instead of running off the
+			   panel, and the row gets a thumb's height. */
+			.deck-beats-link {
+				padding-block: 0.3rem;
+				font-size: var(--deck-floor-label);
+				white-space: normal;
+			}
+
+			.deck-beats-name {
+				white-space: normal;
+			}
+
+			.deck-beats-keys {
+				font-size: calc(var(--deck-floor-label) - 1px);
+			}
+
+			/* A 4px-tall scrubber is not a control: give it a thumb's height. */
+			.deck-scrub {
+				flex: 1 1 100%;
+				min-width: 0;
+				height: 1.75rem;
+			}
+
+			.deck-ui-exit {
+				padding: 0.4rem 0.7rem;
+			}
+		}
 	</style>
 </Base>

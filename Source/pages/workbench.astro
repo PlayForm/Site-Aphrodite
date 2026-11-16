@@ -375,7 +375,14 @@ const Arc: readonly {
 			>
 				<span class="motion-wipe" data-wipe aria-hidden="true" />
 				<div class="flex flex-wrap items-center justify-between gap-6">
-					<h2><ZineKicker Tone="white">THRESHOLD KNOBS</ZineKicker></h2>
+					{/* This panel's only heading used to be a ZineKicker inside a bare
+					    <h2>: the kicker's own voice is `text-base` (16px), so the
+					    heading of the section measured exactly the size of its body
+					    copy and the reader got no signal that the subject changed.
+					    `type-sub` is the documented role for a sub-head inside a
+					    chapter, and it renders 22-28px over 16px body. The wording is
+					    unchanged; only the voice is. */}
+					<h2 class="type-sub text-bone-white">THRESHOLD KNOBS</h2>
 					<!-- Named for what it does. The old label was "POST /RELOAD",
 					     which named an HTTP endpoint this button never calls. -->
 					<button type="button" class="wb-pill" data-action="reset-defaults">

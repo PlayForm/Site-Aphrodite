@@ -582,7 +582,7 @@ const Sections = [
 					THE WORKED SCENARIOS // HOW IT ACTUALLY MOVES
 				</p>
 				<h1
-					class="type-display mt-8 uppercase text-bone-white drop-shadow-[4px_4px_0px_#520612]"
+					class="type-display mt-8 uppercase text-bone-white max-sm:!text-4xl drop-shadow-[4px_4px_0px_#520612]"
 				>
 					Seven scenarios,<br />one <span class="text-stamped-canary">lifecycle</span>
 				</h1>
@@ -637,7 +637,25 @@ const Sections = [
 					    does not need to show. */}
 					{Scenario.Id === "thresholds" && (
 						<div class="relative flex w-full flex-col" data-reveal>
-							<div class="overflow-x-auto">
+							{/* At 390 the comparison is 768px wide in a 350px window, so the docs
+							    column and the SAME ANSWER verdict sit off-screen with nothing
+							    saying so. The hint states it (a reader must not have to discover
+							    a scroll by accident) and the wrapper is a named, focusable
+							    region, so a keyboard can reach the same columns. It is a
+							    SENTENCE, so it takes the reading voice - a meta-sized
+							    instruction is the readability floor inverted. `lg:hidden`
+							    because the table only stops scrolling at a 1024px viewport,
+							    not at `sm`. */}
+							<p class="type-body mb-3 max-w-3xl text-zinc-dust lg:hidden">
+								Swipe the table sideways: the docs column and the same-answer verdict are
+								off-screen here.
+							</p>
+							<div
+								class="overflow-x-auto"
+								role="region"
+								tabindex="0"
+								aria-label="Threshold comparison: decision, shipped example, docs and examples, same answer"
+							>
 								<table class="w-full min-w-[48rem] border-collapse text-left">
 									<caption class="type-sub mb-[var(--space-tight)] text-left text-bone-white">
 										What happens to the same {PayloadBytes.toLocaleString("en-US")}-byte payload?

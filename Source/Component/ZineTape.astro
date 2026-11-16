@@ -63,7 +63,10 @@ const { Label, Variant = "corner", Color = "raw", Side = "left", Offset = "-top-
 const Palette = {
 	raw: "bg-raw-blood text-bone-white",
 	canary: "bg-stamped-canary text-soot-black",
-	teal: "bg-weathered-teal text-bone-white",
+	// Teal takes DARK ink, on the same measurement ZineStamp records: bone-white
+	// on weathered-teal is 3.06:1 at 16px (below the 4.5:1 floor), soot-black on
+	// the same fill is 5.36:1. The fill carries the identity; only the ink moves.
+	teal: "bg-weathered-teal text-soot-black",
 	bone: "bg-bone-newsprint text-soot-black",
 }[Color];
 

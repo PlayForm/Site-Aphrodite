@@ -102,7 +102,7 @@ const Claims = [
 		Body: "Nothing moves until the type is named - because the type is what decides whether content earns visibility or a squeeze.",
 	},
 	{
-		Stamp: "bg-weathered-teal text-bone-white",
+		Stamp: "bg-weathered-teal text-soot-black",
 		Subject: "THE THRESHOLDS",
 		Verb: "ARE THE KNOBS",
 		Body: "A handful of per-type multipliers and a fill threshold - each mapped to one question the agent asks, each tuned by what sessions prove.",
@@ -392,6 +392,13 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 		{ Label: "Mechanics today.", Sentences: [Arc.Today].flat() },
 	],
 }));
+// The monument figure below is rendered as comma-separated groups with a <wbr>
+// after each comma, because at 320px the 48px figure is wider than its own panel:
+// with no break opportunity at a comma the browser splits a DIGIT GROUP instead
+// ("156,342,81" / "7"), which reads as two different numbers on the page whose
+// pitch is measurement. A <wbr> is the only break opportunity inside the number,
+// so a wrap can land at a comma and nowhere else.
+const TokenGroups = Study.TokensSaved.split(",");
 ---
 
 <Base
@@ -432,7 +439,12 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					<div
 						class="mt-6 font-headline text-5xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-7xl"
 					>
-						<span>{Study.TokensSaved}</span>
+						{/* set:html, not a JSX map: Astro preserves the whitespace between
+						    sibling expressions in a multi-line template, so the mapped
+						    version rendered "156 , 342 , 817" with visible spaces around
+						    every comma. The string is built here, where a formatter
+						    cannot re-introduce one. */}
+						<span set:html={TokenGroups.join(",<wbr>")} />
 					</div>
 					<div class="mt-6 flex flex-wrap items-center gap-8 font-mono text-base font-bold">
 						<span class="text-stamped-canary"
@@ -830,7 +842,14 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 										</div>
 										<div class="truncate font-mono text-base text-zinc-dust">{Types}</div>
 									</div>
-									<div class="hidden shrink-0 text-right font-mono text-base text-weathered-teal sm:block">
+									{/* The note column must be allowed to shrink. `shrink-0` kept it
+									    at its max-content width (634px) inside a 549px row, so it
+									    painted 136px past the panel and the `truncate` column
+									    beside it collapsed to zero width - the type list for that
+									    tier rendered as nothing at all, with no ellipsis to show
+									    it had been cut. min-w-0 + the default shrink lets the note
+									    wrap onto its own second line instead. */}
+									<div class="hidden min-w-0 text-right font-mono text-base text-weathered-teal sm:block">
 										{Note}
 									</div>
 								</div>
@@ -958,7 +977,7 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 										<span class="flex items-baseline gap-3">
 											{
 												Kind === "simulated" && (
-													<span class="border border-raw-blood px-1.5 py-0.5 type-meta font-black text-raw-blood">
+													<span class="border border-raw-blood px-1.5 py-0.5 type-meta font-black text-stamped-canary">
 														SIMULATED
 													</span>
 												)

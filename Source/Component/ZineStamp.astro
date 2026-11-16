@@ -14,7 +14,11 @@ const { Label, Color = "raw", Rotate = "" } = Astro.props;
 const Palette = {
 	raw: "bg-raw-blood text-bone-white",
 	canary: "bg-stamped-canary text-soot-black",
-	teal: "bg-weathered-teal text-bone-white",
+	// A teal stamp takes DARK ink: bone-white on weathered-teal measures 3.06:1
+	// at the stamp's 16px, below the 4.5:1 floor for text under 18.66px bold,
+	// while soot-black on the same fill measures 5.36:1. The fill is the
+	// identity (teal = verified) and stays; only the ink moves.
+	teal: "bg-weathered-teal text-soot-black",
 	bone: "bg-bone-newsprint text-soot-black",
 }[Color];
 ---

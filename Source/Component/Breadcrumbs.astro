@@ -71,7 +71,15 @@ const ActiveGroup = !IsDocs && Active && Active.Href !== "/" ? Active.Group : un
 				{Trail.map((Crumb, Position) => (
 					<>
 						{Position > 0 && (
-							<span class="text-oxblood-dark" aria-hidden="true">
+							<span class="text-zinc-dust" aria-hidden="true">
+								{/* The separator is TEXT, so it takes a text colour.
+								    It carried `text-oxblood-dark`, the border token:
+								    at 1.32:1 against the void the slash was
+								    invisible and the trail read as two words with a
+								    gap instead of a path. `zinc-dust` is the muted
+								    text role (5.12:1) and is the colour the docs
+								    trail already uses for its own separator, so both
+								    trails divide a path the same way. */}
 								//
 							</span>
 						)}

@@ -161,7 +161,7 @@ interface Props {
 		<link rel="apple-touch-icon" href="/Brand/aphrodite-180.png" />
 		<ClientRouter />
 	</Head>
-	<body class="relative min-h-screen overflow-x-hidden">
+	<body class="site-body relative min-h-screen overflow-x-hidden">
 		<!-- SVG grunge noise filter (texture layer 3) -->
 		<svg aria-hidden="true" class="hidden">
 			<defs>
@@ -190,9 +190,15 @@ interface Props {
 		>
 		</div>
 
-		<!-- Site header (synthesized, zine skin) -->
+		<!-- Site header (synthesized, zine skin). The bar's HEIGHT is built from
+		     `--site-header-height`, the same token the sticky section index
+		     parks under and every anchor's `scroll-margin-top` clears - so the
+		     chrome cannot drift out of agreement with itself. Before this, the
+		     token said 3.5rem and the bar rendered 60px (a 34px MENU button
+		     inside `py-3` plus the 2px rule), which put the index's first 4px
+		     behind the header. -->
 		<header class="sticky top-0 z-40 w-full border-b-2 border-oxblood-dark bg-soot-black/95">
-			<nav aria-label="Site" class="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-3 sm:px-8">
+			<nav aria-label="Site" class="site-bar mx-auto flex max-w-[1440px] items-center justify-between px-5 sm:px-8">
 				<a class="flex items-center gap-2" href={Routes.Home}>
 					<img class="h-5 w-5" src="/Brand/aphrodite.svg" alt="" width="20" height="20" />
 					<span class="font-mono text-base font-bold tracking-widest text-bone-white"
@@ -261,10 +267,14 @@ interface Props {
 							}
 						</div>
 					</nav>
-					<!-- MORE: three labelled groups (Surface / Knobs / Record), not a
-					     flat ten-entry list. The grouping is the registry's `Group`
+					<!-- MORE: one labelled group per registry `Group`, not a flat
+					     ten-entry list. The grouping is the registry's `Group`
 					     field read through MenuGroups, so the MORE tree and the
-					     footer's columns cannot disagree. -->
+					     footer's columns cannot disagree - and each group prints
+					     its `Label`, never a name the site invented for itself:
+					     the retired taxonomy (Surface / Knobs / Record) survives
+					     only as each group's `Note`, where it explains the
+					     product instead of asking the reader to learn it. -->
 					<nav aria-label="More" class="flex flex-col gap-4">
 						<p
 							class="w-fit border border-black bg-stamped-canary px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[2px_2px_0px_#000] sm:rotate-1"
@@ -272,10 +282,10 @@ interface Props {
 							MORE
 						</p>
 						{
-							MenuGroups.map(({ Group, Links }) => (
+							MenuGroups.map(({ Label, Links }) => (
 								<div class="flex flex-col gap-2">
 									<p class="w-fit border border-black bg-raw-blood px-2 py-0.5 font-mono text-[13px] font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
-										THE {Group.toUpperCase()}
+										{Label.toUpperCase()}
 									</p>
 									<div class="grid grid-cols-2 gap-x-4">
 										{Links.map((Link) => {
@@ -302,6 +312,42 @@ interface Props {
 				</div>
 			</div>
 		</header>
+
+		<style>
+			/* THE PAGE IS AS TALL AS ITS CONTENT, NOT AS TALL AS THE WINDOW.
+			   `Global.css` carries `html, body { height: 100% }`, so the body
+			   box is exactly one viewport tall and the content overflows it.
+			   A sticky element can only travel within its containing block, so
+			   the header - a direct child of body - held the top for exactly
+			   `viewport - header` pixels and then scrolled away, leaving the
+			   section index pinned at `top: var(--site-header-height)` with
+			   nothing above it. Measured on /showcase/ at 1440 and 390: at
+			   scrollY 4000 the header sat at -3212px before this rule and at 0
+			   after it, with the document height, the footer's position and the
+			   horizontal overflow all unchanged.
+
+			   `min-h-screen` (on the body element) keeps the short-page case:
+			   the box never shrinks below the viewport. */
+			.site-body {
+				height: auto;
+			}
+
+			/* THE BAR'S HEIGHT IS THE TOKEN, NOT A SUM OF ITS CONTENT.
+			   The index parks at `top: var(--site-header-height)` and every
+			   anchor clears that token in its `scroll-margin-top`, so the bar
+			   has to BE that height - otherwise the tallest thing inside it
+			   (the MENU button, 34px) plus `py-3` plus the rule quietly made
+			   it taller and the index slid under it.
+
+			   `- 2px` is the header's own `border-b-2`: the token describes
+			   the whole bar, border included. The declaration is deliberately
+			   a bare `height` with no fallback - if the token is ever absent
+			   the whole rule is invalid and the bar falls back to its content
+			   height, which is the graceful direction. */
+			.site-bar {
+				height: calc(var(--site-header-height) - 2px);
+			}
+		</style>
 
 		<div class="relative z-10 flex grow flex-col">
 			<slot />

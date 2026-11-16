@@ -33,9 +33,14 @@ const Palette = {
 	canary: "bg-stamped-canary",
 }[Color];
 
+// The RATIO TEXT is a separate question from the fill. `--raw-blood` is a FILL
+// token (Global.css: "stamps, primary buttons, badges"); as text on soot-black it
+// measures 2.23:1 and fails the 4.5:1 floor, so a "raw" bar printed its figure in
+// a red no reader could read. The bar itself keeps the raw fill, which is where
+// the variant's identity lives, and the value takes the heading voice.
 const Text = {
 	teal: "text-weathered-teal",
-	raw: "text-raw-blood",
+	raw: "text-bone-white",
 	canary: "text-stamped-canary",
 }[Color];
 
@@ -45,9 +50,14 @@ const Width = Math.max(0, Math.min(100, Percent));
 ---
 
 <div>
-	<div class="mb-1 flex justify-between text-base font-bold">
-		<span class="text-bone-newsprint">{Label}</span>
-		<span class={Text}>{Ratio}</span>
+	{/* leading-none on the pair itself, because `text-base` sets a line-height
+	    alongside the font-size and wins over `leading-none` on the container - the
+	    row kept its 24px rhythm and the value sat 4px above the label (measured:
+	    glyph bottoms 4px apart). Set on the spans, both glyphs land on one baseline
+	    (measured: 0px apart). A one-line pair has nothing for the slack to hold. */}
+	<div class="mb-1 flex items-baseline justify-between text-base font-bold">
+		<span class="text-bone-newsprint leading-none">{Label}</span>
+		<span class={`${Text} leading-none`}>{Ratio}</span>
 	</div>
 	<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
 		{

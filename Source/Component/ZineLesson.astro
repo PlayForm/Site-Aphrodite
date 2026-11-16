@@ -18,7 +18,10 @@ const { Label, Text, Lines, Color = "canary" } = Astro.props;
 const Palette = {
 	canary: "bg-stamped-canary text-soot-black",
 	raw: "bg-raw-blood text-bone-white",
-	teal: "bg-weathered-teal text-bone-white",
+	// Teal takes DARK ink (ZineStamp documents the measurement: bone-white on
+	// weathered-teal is 3.06:1 at 16px, soot-black on the same fill is 5.36:1).
+	// The fill is the identity and stays; only the ink moves.
+	teal: "bg-weathered-teal text-soot-black",
 }[Color];
 ---
 

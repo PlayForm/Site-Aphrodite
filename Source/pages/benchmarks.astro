@@ -301,7 +301,11 @@ const BarColor = {
 const BarText = {
 	zinc: "text-zinc-dust",
 	teal: "text-weathered-teal",
-	raw: "text-raw-blood",
+	// raw-blood is a FILL token: as text on soot it is 2.23:1 and fails the 4.5:1
+	// floor, so a raw row would have printed its figure in an unreadable red. The
+	// bar keeps the raw fill; the value takes the heading voice (ZineStatBar's
+	// `Text` map makes the same call for the same reason).
+	raw: "text-bone-white",
 };
 
 // THE PROVENANCE TABLE - the chain behind every figure, in the order a reader
@@ -859,7 +863,13 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 				</div>
 
 				<div class="mt-10 border-l-4 border-raw-blood bg-asphalt-panel p-5">
-					<div class="type-meta font-black text-raw-blood">
+					{/* `--raw-blood` is a FILL token: as text on asphalt it measures
+					    2.03:1, so the qualifier that keeps this block honest was the
+					    least readable line in it. Canary is the site's accent-text
+					    token and measures 9.1:1 here. The left rule keeps the raw
+					    border, which is where the "not a recorded session" alarm
+					    lives as a shape. */}
+					<div class="type-meta font-black text-stamped-canary">
 						SIMULATED WORKLOAD // NOT A RECORDED SESSION
 					</div>
 					{
@@ -867,7 +877,7 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 							<div class="mt-4">
 								<div class="mb-1 flex flex-wrap justify-between gap-2 text-base font-bold">
 									<span class="text-bone-newsprint">{Label}</span>
-									<span class="text-raw-blood">{Range}</span>
+									<span class="text-stamped-canary">{Range}</span>
 								</div>
 								<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
 									<div class="h-full bg-raw-blood" style={`width: ${Percent}%;`} />

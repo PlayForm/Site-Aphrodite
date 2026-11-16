@@ -269,10 +269,12 @@ const ToneText = {
 	dust: "text-zinc-dust",
 };
 
-/** The group label chip's fill, one per changelog tone. */
+/** The group label chip's fill, one per changelog tone. Teal takes DARK ink -
+ *  bone-white on weathered-teal is 3.06:1 at 16px, soot-black is 5.36:1 (the
+ *  measurement ZineStamp records). The fill is the identity; only the ink moves. */
 const ToneStamp = {
 	canary: "bg-stamped-canary text-soot-black",
-	teal: "bg-weathered-teal text-bone-white",
+	teal: "bg-weathered-teal text-soot-black",
 	dust: "bg-raw-blood text-bone-white",
 };
 

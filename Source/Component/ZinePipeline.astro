@@ -391,7 +391,11 @@ const Exhibit = {
 					<p class="zp-kicker">WHAT THE AGENT HOLDS</p>
 					<div class="zp-result mt-4">
 						<p class="zp-line break-all">{Exhibit.Preview}</p>
-						<p class="ccr-marker mt-4 text-weathered-teal">{Exhibit.Marker}</p>
+						{/* `.zp-result` is a bone-white plate, and teal on bone-white is
+						    3.06:1 - the marker was the least readable line on the one
+						    surface that is printed rather than projected. A marker on a
+						    light ground takes the ink of a printed receipt. */}
+						<p class="ccr-marker mt-4 text-soot-black">{Exhibit.Marker}</p>
 					</div>
 					<p class="zp-note-block mt-4">
 						Three fields and a preview line. Retrieval is a choice, not a step.

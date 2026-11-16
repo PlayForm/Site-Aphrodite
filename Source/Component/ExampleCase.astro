@@ -224,7 +224,13 @@ const OutcomeChip = {
 											<span class="border border-oxblood-dark bg-raw-blood px-1.5 py-0.5 font-mono text-base font-black text-bone-white">
 												{String(Index + 1).padStart(2, "0")}
 											</span>
-											<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+											{/* `min-w-0 break-words`: a stage label can name a URL, and one
+											    unbreakable token sets the flex item's min-content width - so
+											    the item refused to shrink and the section's `overflow-x: clip`
+											    cut the label off mid-word at 390px. `min-w-0` lets the item
+											    take the row's width and `break-words` breaks the token only
+											    because it cannot fit; the label's own words never split. */}
+											<span class="min-w-0 break-words font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
 												{Stage.Label}
 											</span>
 										</div>

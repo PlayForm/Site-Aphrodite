@@ -440,7 +440,7 @@ const GridFold = `
 			<!-- Beat 01. The kicker is the page's folio: six of them number the
 			     six beats, and each one is quiet on purpose - a beat number is
 			     navigation, not decoration. -->
-			<p class="section-kicker mb-10">01 / POSITIONING</p>
+			<p class="section-kicker !mb-10">01 / POSITIONING</p>
 			<!-- Brand card: the red aphrodite.svg mark in the crimson module,
 			     oxblood offset underlay (user instruction: the red mark everywhere).
 			     The card's 24-unit drop to the wordmark was the ceremonial stack
@@ -530,7 +530,7 @@ const GridFold = `
 		     - and the right pane is recomputed from the stream so far, so the
 		     marker is never a lie about a flood that has not finished arriving. -->
 		<section class="relative w-full" data-reveal>
-			<p class="section-kicker mb-4">02 / DEMONSTRATION &middot; THE PAIR // STREAM + PREVIEW</p>
+			<p class="section-kicker !mb-4">02 / DEMONSTRATION &middot; THE PAIR // STREAM + PREVIEW</p>
 			<h2 class="type-section mb-6 text-bone-white">
 				The agent spends its budget reading noise
 			</h2>
@@ -579,7 +579,7 @@ const GridFold = `
 		     heading, the rule and the chip - and only those; the figure and
 		     the description stay bone so the reading text never competes. -->
 		<section class="relative w-full" data-reveal>
-			<p class="section-kicker mb-4">03 / MECHANISM &middot; PIPELINE // 4-STAGE ABSORPTION</p>
+			<p class="section-kicker !mb-4">03 / MECHANISM &middot; PIPELINE // 4-STAGE ABSORPTION</p>
 			<h2 class="type-section mb-4 text-bone-white">How it works</h2>
 			<p class="type-sub mb-6 text-weathered-teal">Four steps, one decision</p>
 			<div class="prose-flow max-w-3xl">
@@ -624,46 +624,46 @@ const GridFold = `
 			     shaved off. -->
 			<div class="emphasis-expressive mx-3 mt-12 p-5 sm:mx-4 sm:p-8 lg:p-10">
 				<div
-					class="grid grid-cols-1 items-start gap-8 sm:grid-cols-2 xl:grid-cols-4"
+					class="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-4"
 					data-enter="180"
 				>
 					<!-- Stage 01 // CLASSIFY - teal: the technical voice, the type
 					     that names the content. -->
-					<div class="emphasis-quiet stage-card stage-card--a p-5">
-						<div class="flex items-baseline justify-between gap-3">
+					<div class="emphasis-quiet stage-card stage-card--a flex flex-col p-5">
+						<div class="flex flex-col gap-1">
 							<h3 class="type-meta font-bold stage-ink">01 // CLASSIFY</h3>
 							<span class="type-meta stage-ink">STAGE // A</span>
 						</div>
-						<div class="mt-4 font-headline text-sub font-black tracking-tight text-bone-white">
+						<div class="mt-4 mb-4 font-headline text-sub font-black tracking-tight text-bone-white">
 							40 - 123 ns
 						</div>
-						<div class="stage-rule mt-4 border-t pt-3">
+						<div class="stage-rule mt-auto border-t pt-3">
 							<p class="type-body text-bone-newsprint">Type-aware classifier names the content.</p>
 							<p class="type-meta mt-2 stage-ink">SIMD BYTE</p>
 						</div>
 					</div>
 					<!-- Stage 02 // ENRICH & PREVIEW - canary: the result the reader
 					     acts on. -->
-					<div class="emphasis-quiet stage-card stage-card--b p-5">
-						<div class="flex items-baseline justify-between gap-3">
+					<div class="emphasis-quiet stage-card stage-card--b flex flex-col p-5">
+						<div class="flex flex-col gap-1">
 							<h3 class="type-meta font-bold stage-ink">02 // ENRICH &amp; PREVIEW</h3>
 							<span class="type-meta stage-ink">STAGE // B</span>
 						</div>
-						<div class="mt-4 font-headline text-sub font-black tracking-tight text-bone-white">~1 ms</div>
-						<div class="stage-rule mt-4 border-t pt-3">
+						<div class="mt-4 mb-4 font-headline text-sub font-black tracking-tight text-bone-white">~1 ms</div>
+						<div class="stage-rule mt-auto border-t pt-3">
 							<p class="type-body text-bone-newsprint">Enriched, type-aware preview rendering.</p>
 							<p class="type-meta mt-2 stage-ink">TYPE-AWARE</p>
 						</div>
 					</div>
 					<!-- Stage 03 // BLAKE3 STORE - blood: storage, and the marker it
 					     hands back. -->
-					<div class="emphasis-quiet stage-card stage-card--c p-5">
-						<div class="flex items-baseline justify-between gap-3">
+					<div class="emphasis-quiet stage-card stage-card--c flex flex-col p-5">
+						<div class="flex flex-col gap-1">
 							<h3 class="type-meta font-bold stage-ink">03 // BLAKE3 STORE</h3>
 							<span class="type-meta stage-ink">STAGE // C</span>
 						</div>
-						<div class="mt-4 font-headline text-sub font-black tracking-tight text-bone-white">SQLite</div>
-						<div class="stage-rule mt-4 border-t pt-3">
+						<div class="mt-4 mb-4 font-headline text-sub font-black tracking-tight text-bone-white">SQLite</div>
+						<div class="stage-rule mt-auto border-t pt-3">
 							<p class="type-body ccr-marker text-bone-newsprint">
 								CCR marker: &lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;
 							</p>
@@ -673,15 +673,15 @@ const GridFold = `
 					<!-- Stage 04 // AGENT DECIDES - bone: the one step that is the
 					     agent's own choice, so it carries the reading voice's colour
 					     rather than an engine accent. -->
-					<div class="emphasis-quiet stage-card stage-card--d p-5">
-						<div class="flex items-baseline justify-between gap-3">
+					<div class="emphasis-quiet stage-card stage-card--d flex flex-col p-5">
+						<div class="flex flex-col gap-1">
 							<h3 class="type-meta font-bold stage-ink">04 // AGENT DECIDES</h3>
 							<span class="type-meta stage-ink">STAGE // D</span>
 						</div>
-						<div class="mt-4 font-mono text-sub font-bold tracking-tight text-bone-white">
-							aphrodite_retrieve
+						<div class="mt-4 mb-4 font-mono text-sub font-bold tracking-tight text-bone-white">
+							aphrodite_<wbr />retrieve
 						</div>
-						<div class="stage-rule mt-4 border-t pt-3">
+						<div class="stage-rule mt-auto border-t pt-3">
 							<p class="type-body text-bone-newsprint">Full content only when needed.</p>
 							<p class="type-meta mt-2 stage-ink">ON DEMAND</p>
 						</div>
@@ -706,7 +706,7 @@ const GridFold = `
 			data-reveal
 		>
 			<ZineTape Variant="section" Label="EVIDENCE // 200 SESSIONS" Color="raw" />
-			<p class="section-kicker mb-4 !text-oxblood-dark">04 / EVIDENCE</p>
+			<p class="section-kicker !mb-4 !text-oxblood-dark">04 / EVIDENCE</p>
 			<h2 class="type-section mb-8 text-soot-black">One result, and the four figures beside it</h2>
 			<div class="flex flex-col gap-4 border-y-2 border-soot-black py-8 lg:flex-row lg:items-end lg:gap-12">
 				<div
@@ -738,7 +738,7 @@ const GridFold = `
 				latency, and the saved total is the session study rather than any single run.
 			</p>
 			<div
-				class="mt-8 flex max-w-4xl flex-wrap items-start justify-start gap-3 sm:gap-4"
+				class="mt-8 grid max-w-5xl grid-cols-1 items-start justify-items-center gap-4 sm:grid-cols-2 xl:grid-cols-4"
 				data-enter="260"
 			>
 				<div class="flex flex-col items-center gap-2">
@@ -792,7 +792,7 @@ const GridFold = `
 		     one - because the plugin is the lane this page installs and the proxy
 		     is the lane that extends it to other callers. -->
 		<section class="relative w-full" data-reveal>
-			<p class="section-kicker mb-4">05 / INTEGRATION</p>
+			<p class="section-kicker !mb-4">05 / INTEGRATION</p>
 			<h2 class="type-section mb-6 text-bone-white">Two ways to run it</h2>
 			<div class="prose-flow max-w-3xl">
 				<p class="type-body text-bone-newsprint">
@@ -801,13 +801,13 @@ const GridFold = `
 					where it can only see traffic that arrives over HTTP.
 				</p>
 			</div>
-			<div class="mt-12 grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
-				<article class="emphasis-standard p-6 sm:p-8">
+			<div class="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
+				<article class="emphasis-standard flex flex-col p-6 sm:p-8">
 					<p class="type-meta font-bold uppercase tracking-widest text-weathered-teal">
 						PATH 01 // NATIVE PLUGIN
 					</p>
 					<h3 class="type-sub mt-3 text-bone-white">Hermes plugin</h3>
-					<div class="prose-flow mt-4">
+					<div class="prose-flow mt-4 mb-6">
 						<p class="type-body text-bone-newsprint">
 							Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a
 							client at. It is the reason the interception lives inside the turn: tool output never
@@ -820,7 +820,7 @@ const GridFold = `
 							register them, so this lane works with Hermes only.
 						</p>
 					</div>
-					<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-oxblood-dark pt-4">
+					<div class="mt-auto flex flex-wrap gap-x-6 gap-y-2 border-t border-oxblood-dark pt-4">
 						<a class="type-code font-bold text-stamped-canary hover:underline" href={Routes.Hermes}>
 							THE INTEGRATION &rarr;
 						</a>
@@ -829,12 +829,12 @@ const GridFold = `
 						</a>
 					</div>
 				</article>
-				<article class="emphasis-quiet p-6 sm:p-8">
+				<article class="emphasis-quiet flex flex-col p-6 sm:p-8">
 					<p class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
 						PATH 02 // OPENAI-COMPATIBLE PROXY
 					</p>
 					<h3 class="type-sub mt-3 text-bone-white">Standalone proxy</h3>
-					<div class="prose-flow mt-4">
+					<div class="prose-flow mt-4 mb-6">
 						<p class="type-body text-bone-newsprint">
 							The plugin already spawns both listeners, so this lane runs without extra setup:
 							point <code class="type-code text-weathered-teal">base_url</code> at
@@ -852,7 +852,7 @@ const GridFold = `
 							it does not replace the hooks inside Hermes.
 						</p>
 					</div>
-					<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-oxblood-dark pt-4">
+					<div class="mt-auto flex flex-wrap gap-x-6 gap-y-2 border-t border-oxblood-dark pt-4">
 						<a class="type-code font-bold text-stamped-canary hover:underline" href={Anchor(Routes.Setup, "proxy")}>
 							THE PROXY LANE &rarr;
 						</a>
@@ -867,7 +867,7 @@ const GridFold = `
 		     reader takes from this page, and the outcome line is what makes it a
 		     procedure rather than a command list. -->
 		<section class="relative w-full" data-reveal>
-			<p class="section-kicker mb-4">06 / INSTALLATION</p>
+			<p class="section-kicker !mb-4">06 / INSTALLATION</p>
 			<h2 class="type-section mb-8 text-bone-white">Installing it</h2>
 			<div class="emphasis-standard max-w-4xl p-6 sm:p-8 lg:p-10">
 				<p class="type-meta font-bold uppercase tracking-widest text-stamped-canary">PREREQUISITE</p>
