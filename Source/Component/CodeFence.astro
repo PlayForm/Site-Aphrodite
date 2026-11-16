@@ -14,35 +14,74 @@
 // treats both identically - so `font-mono`/`text-base`/`[&>pre]:p-3.5` are
 // gone: they were a second, drifting definition of the same block.
 //
-// COPY: pass `Copy` to hang the site's one clipboard control on the block.
-// By default the payload IS `Code` - the fence never takes a second copy of the
-// command, so the button cannot copy something the reader is not looking at.
-// The plate gives every block a copy chip anyway; `Copy` asks for the louder,
-// always-on-screen one the seven command fences have always had, and the plate
-// MOVES that control into its own chip cluster rather than adding a second.
+// ONE COPY CONTROL, AND THE PLATE OWNS IT. Source/Script/CodePlate.ts builds
+// the `.zine-plate-bar` on every fence: the language tag (metadata) plus the
+// block's copy chip (the action). This component must therefore never render a
+// second control for the same payload. It used to, and the result was two
+// chips in one cluster - one of them labelled `BASH` because its label
+// defaulted to `Lang.toUpperCase()`, a language name sitting where an action
+// belongs, beside a plate chip that said `COPY`. There is now exactly one
+// control per fence; its label names the ACTION (`Copy`, or `Copy command`
+// where the clipboard payload differs from the transcript); and the language
+// appears only in the metadata tag, which is not a button and does not look
+// like one.
 //
-// `CopyPayload` is the one exception, and it exists because a fence is allowed
-// to be a TRANSCRIPT while its copy must be a COMMAND. An install block that
-// still carries `$` prompts and `//` annotations renders exactly as written,
-// and a reader who pastes it gets a shell that cannot run it. Pass the bare
-// line as `CopyPayload` and the block stays a faithful picture of a terminal
-// without the clipboard inheriting the picture. Prefer modelling the block as
-// data (Source/pages/setup.astro's InstallStep) so the two never have to
-// differ at all; this prop is for the fences that legitimately must show more
-// than they copy.
+// `Copy` is therefore a DECLARATION, not a control. The plate gives every
+// block a copy chip anyway, so `Copy` asks for what the plate already does and
+// cannot add a second one. It stays accepted because the call sites that pass
+// it are recording a real intent - this block is meant to be copied - and that
+// intent is worth reading at the page.
+//
+// `CopyLabel` is accepted and IGNORED, for the reason the label changed: every
+// call site passed a language (`"BASH"`, `Lane.Shell.toUpperCase()`), and a
+// language name on an action is the defect, not the configuration.
+//
+// ONE PAYLOAD, ONE TRUTH. The payload is a prop and there is exactly one of
+// it: `CopyPayload` when set, `Code` otherwise. It travels to the plate as
+// `data-plate-payload` on the wrapper, and the plate copies that string
+// instead of `pre.textContent` - so the one chip copies the one payload and
+// two controls can never disagree about what the block means. By default the
+// payload IS `Code`: the fence never takes a second copy of the command, so
+// the chip cannot copy something the reader is not looking at.
+//
+// `CopyPayload` exists because a fence is allowed to be a TRANSCRIPT while its
+// copy must be a COMMAND. An install block that still carries `$` prompts and
+// `//` annotations renders exactly as written, and a reader who pastes it gets
+// a shell that cannot run it. Pass the bare line as `CopyPayload` and the
+// block stays a faithful picture of a terminal without the clipboard
+// inheriting the picture - and the chip reads `Copy command`, because the
+// clipboard no longer holds the transcript on screen. Prefer modelling the
+// block as data (Source/pages/setup.astro's InstallStep) so the two never have
+// to differ at all; this prop is for the fences that legitimately must show
+// more than they copy.
+//
+// ONE FRAME PER REGION. The plate draws the frame, so `Class` is LAYOUT ONLY -
+// spacing and width. Frame utilities are dropped here rather than passed
+// through: a `border` on this wrapper painted a second border around the plate
+// with the plate's own margin showing between the two, which is exactly the
+// "extra padding inside the frame" a reader sees. The wrapper keeps a stable
+// `.zine-fence` name so a panel that already frames or pads can zero the
+// plate's margin for the fences inside it (Global.css, CODE PLATES).
 import { codeToHtml } from "shiki";
 
 import { ZineTheme } from "@Library/ShikiTheme";
-
-import CopyButton from "./CopyButton.astro";
 
 interface Props {
 	Code: string;
 	Lang?: string;
 	Class?: string;
-	/** Hang a CopyButton on the block, copying `Code` byte-exact. */
+	/**
+	 * Declare that this block is meant to be copied. The plate already gives
+	 * every fence a copy chip, so this adds no second control - it records the
+	 * intent at the call site.
+	 */
 	Copy?: boolean;
-	/** The copy button's label; defaults to the language, uppercased. */
+	/**
+	 * Accepted and ignored. A control's label names the action, never the
+	 * language; every call site passed a language name here.
+	 *
+	 * @deprecated The plate's chip owns the label.
+	 */
 	CopyLabel?: string;
 	/**
 	 * The clipboard payload when it must differ from the rendered text: the
@@ -51,7 +90,17 @@ interface Props {
 	CopyPayload?: string;
 }
 
-const { Code, Lang = "bash", Class = "", Copy = false, CopyLabel, CopyPayload } = Astro.props;
+const { Code, Lang = "bash", Class = "", CopyPayload } = Astro.props;
+
+// The plate owns the frame - border, radius, background, shadow, hover lift.
+// `Class` carries the layout half only, so the frame utilities that used to be
+// passed here are dropped: they were a second frame around a plate that
+// already has one.
+const Frame = /^(border|rounded|ring|shadow|outline|bg-)/;
+const Layout = Class.split(/\s+/)
+	.filter((Token) => Token !== "" && !Frame.test(Token))
+	.join(" ");
+
 // Astro's markdown pipeline renames shiki's `shiki` class to `astro-code` and
 // adds the data-language attribute; the component applies the same
 // normalization so the markup matches the docs' fences. The overflow hint is
@@ -61,20 +110,4 @@ const Html = (await codeToHtml(Code, { lang: Lang, theme: ZineTheme }))
 	.replace("<pre ", `<pre data-language="${Lang}" `);
 ---
 
-{
-	Copy ? (
-		<div class:list={["relative", Class]}>
-			<div class="absolute right-2 top-2 z-10">
-				<CopyButton
-					Label={CopyLabel ?? Lang.toUpperCase()}
-					Payload={CopyPayload ?? Code}
-					Tone="teal"
-					Size="sm"
-				/>
-			</div>
-			<div set:html={Html} />
-		</div>
-	) : (
-		<div class:list={[Class]} set:html={Html} />
-	)
-}
+<div class:list={["zine-fence", Layout]} data-plate-payload={CopyPayload} set:html={Html} />

@@ -83,6 +83,84 @@ sentences, and splitting it into two blocks is the flattening. A voice edit and
 a breakdown edit must never fight over the same paragraph: apply the voice
 first, then the line breaking, both byte-preserving.
 
+## 1b. The two rules that bind every layer
+
+The layer model decides what a block does. Two rules decide what it is ABOUT,
+and they hold in all six layers. Both are owner-mandated (2026-11). The second
+is the reason a page can be structurally perfect and still unreadable.
+
+**Rule 1 - the subject is the software, never the page.** Every sentence's
+grammatical subject is the product, the reader's system, or the reader's own
+situation: the model, the agent, the tool, the stored bytes, the session. Never
+the page, the pane, the grid, the replay, the widget, the tab. A site whose prose
+explains its own interface reads as a demo of a demo.
+
+Banned vocabulary, greppable: `this page`, `the page below`, `the pane`,
+`watch the`, `as you read`, `read it as`, `you will see`, `on this screen`,
+`nothing on this page is typed`, `the entry marked in`, `edit it there, never
+here`, `the grid left to right`, `this demo`, `this widget`, `the replay`.
+
+Bare deixis - `above`, `below`, `scroll`, `click` - is the same defect in one
+word, because it points at the furniture. Two exceptions, both narrow: keep
+`below`/`above` where they relate VALUES ("compresses above 1 KB", "below the
+4,096-character gate", "a ratio above 20"), because there they name a threshold
+and not a position; and keep `scroll` where it is the software's own word for
+what the model does to a raw log ("scrolling... error? no..."). A threshold
+relation and an interface position are different claims in the same word.
+
+Two shapes to convert. **Interface narration** - "Watch the left pane print:
+that is the flood arriving" - becomes the software fact it stands in for: "Each
+line a command prints is a line the agent would have paid for." **Trust asserted
+in prose** - "it is never a lie" - becomes the mechanism that makes it true:
+"The preview is computed from the bytes received so far, and the marker
+addresses exactly those bytes."
+
+**Rule 2 - anchor to the baseline the reader already runs, then show the
+delta.** The reader already operates a system: a tool call executes, its output
+is appended to the model's context, and that raw text is what the model reads
+and pays for. That is the baseline. Every explanation starts there, in the
+reader's words, and then states what Aphrodite changes IN THAT ORDER: what the
+tool prints -> what the model sees -> what it costs -> what it can ask for.
+
+Never open with the internal architecture. "Classify, enrich, store, mark,
+retrieve" is a tour of our modules; it answers a question the reader has not
+asked, and the question they do have is what changes for them compared with the
+tool call they already have.
+
+Same facts, reordered:
+
+- **Pipeline-first (wrong)** - "Aphrodite classifies the content, renders a
+  type-aware preview, stores the original under a blake3 address, and replaces
+  the result with a marker."
+- **Baseline-first (right)** - "When a tool runs in Hermes, its output is
+  appended to the model's context - a release build adds four thousand lines the
+  model reads, and pays for, before it can answer. Aphrodite intercepts that
+  result: the model receives one line naming the content and counting what is in
+  it, the four thousand lines are stored, and one retrieval call brings them back
+  when the preview is not enough."
+
+The rules that follow, and a writer will otherwise write the tour it knows best:
+name the baseline explicitly at least once per page; then the delta sentence by
+sentence in the baseline's order; use the reader's words (tool call, tool
+result, context window, the model, the agent, retrieval, the session) and let
+mechanism nouns (`blake3`, dual tier, marker, classify) appear only AFTER the
+baseline sentence and only where the reader must act on them; a mechanism
+section may stay, introduced as "what happens between the tool printing and the
+model reading"; keep the subject concrete (the model, the agent, the tool, the
+stored bytes), never "the pipeline decides" or "the system handles"; present
+tense for what the software does, past for what a recorded session did (§3).
+
+**The one sanctioned exception to never-reduce-copy, and its boundary.** A
+sentence may be rewritten or dropped only when its subject is the website
+itself. Every fact it carried must survive as a statement about the product;
+claims, numbers, units, limits and qualifications are untouched; and a paragraph
+left with no product claim is merged into its neighbour rather than shortened.
+The sweep must produce a mapping - removed sentence -> the product statement
+that replaces it - so a preservation audit can see that nothing factual went
+missing. State the exception wherever these rules are handed to a writer: one
+holding both "never reduce" and "delete the narration" resolves the
+contradiction by guessing, and half of them guess deletion.
+
 ## 2. The three laws (the detail layer's laws)
 
 Three laws, applied together, to every DETAIL block that narrates what the
@@ -156,24 +234,22 @@ could justify.
 
 ## 5. The anti-patterns (each with its reason)
 
-1. **A sentence that describes the layout** ("Read the grid left to right").
-   The reader can see the page, so a block spent on where things are is a block
-   spent on the interface instead of the product, and it goes stale the moment
-   the layout changes. Fix: move the observation into the caption as a claim
-   about the content.
-2. **Self-commentary about the illustration** ("The pane below is not a
-   screenshot of that idea"). A page explaining its own figure is defending the
-   figure, and the reader wanted the figure's claim. Fix: demote it - keep every
-   word, drop the negation, and state what the figure IS.
-3. **A first body sentence that restates the headline.** The headline already
+1. **A sentence about the layout or about the illustration** ("Read the grid
+   left to right"; "The pane below is not a screenshot of that idea"). Both spend
+   a block on the interface instead of the product, and both go stale the moment
+   the layout changes - the reader can already see the page, so an usher's
+   sentence is a sentence not spent on a claim. Fix: apply Rule 1 (§1b) - move
+   the observation into the caption as a claim about the content, or drop the
+   negation and state what the figure IS.
+2. **A first body sentence that restates the headline.** The headline already
    made the claim, so the restatement spends the reader's first block on nothing
    and pushes the demonstration down. Fix: the first body block is the lead -
    the subject and its stakes in the reader's terms - or the demonstration.
-4. **A caption that re-explains the mechanism.** The figure already shows the
+3. **A caption that re-explains the mechanism.** The figure already shows the
    mechanism, so explaining it in the caption's voice makes the reader meet it
    twice and makes the detail block read as repetition. Fix: the caption says
    what to notice; the mechanism sentence moves into the detail run.
-5. **A run of equal-weight paragraphs** - five two-sentence blocks of identical
+4. **A run of equal-weight paragraphs** - five two-sentence blocks of identical
    size and colour. The reader gets no signal about which block is the claim,
    which is the demonstration and which is the explanation, so they read all of
    it at one speed and keep none of it. Fix: give each block its layer, and let
@@ -261,7 +337,7 @@ reports an undeclared page as an orphan and leaves it in place.
 | The detail layer still governs technical accuracy | in each detail block, find the named acting component and its because; a mechanism sentence with neither is a defect |
 | A page's tense matches its content type | read the lead and the detail separately; the lead follows §3, a transient inside a detail block is past |
 | A caption describes what to notice, not the layout | the caption names no interface position ("left", "below", "right pane") and no mechanism |
-| The headline is not restated in the first body block | read the headline and the first block; a block that adds no fact is the restatement of §5 item 3 |
+| The headline is not restated in the first body block | read the headline and the first block; a block that adds no fact is the restatement of §5 item 2 |
 | A layer pass deleted nothing | diff the block set against the baseline and read every missing sentence against the new tree - relocated counts as kept, truncated does not |
 | Quoted strings, code, markers and figures are byte-exact | diff them; a voice pass changes verbs and actors only |
 | The docs mirror was edited upstream | re-run `pnpm run Docs` and confirm no diff in `Source/Content/Docs/` for the page |

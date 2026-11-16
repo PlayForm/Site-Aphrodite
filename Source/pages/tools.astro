@@ -243,7 +243,8 @@ const MarkerFields = (Marker: string): string[] =>
 			Tape="TOOLS // THE AGENT'S HANDLES"
 			Title="Thirteen tools"
 			Lead={[
-				`Every tool is a thin relay into the Rust dylib: the plugin registers each tool from the dylib's schema list, and every call dispatches through <code class="font-mono text-base text-weathered-teal">aphrodite_hermes_dispatch_tool</code>, returning the JSON result verbatim.`,
+				`A tool call's output becomes part of the model's context, and every one of these handles exists to decide what of it the model keeps.`,
+				`Each is a thin relay into the Rust dylib: the plugin registers each tool from the dylib's schema list, and every call dispatches through <code class="font-mono text-base text-weathered-teal">aphrodite_hermes_dispatch_tool</code>, returning the JSON result verbatim.`,
 				`It is the reason all handlers share one session store: content compressed by a hook or by <code class="font-mono text-base text-weathered-teal">aphrodite_compress</code> stays resolvable by <code class="font-mono text-base text-weathered-teal">aphrodite_retrieve</code> for the life of the session.`,
 			]}
 		/>
@@ -333,7 +334,7 @@ const MarkerFields = (Marker: string): string[] =>
 					classifier's verdict, and the size is the UTF-8 byte count of the bytes behind
 					the hash - which is what a retrieval of that marker puts back into the
 					transcript, not an estimate of it. The preview beside each one comes from the
-					engine's own builders, so its tallies are the payload's own: the build log above
+					engine's own builders, so its tallies are the payload's own: the build-log sample
 					counts four error lines, one warning line and every line it printed, and the test
 					run reports the exit code of the last line it printed.
 				</p>
@@ -381,8 +382,9 @@ const MarkerFields = (Marker: string): string[] =>
 				</h3>
 				<p class="mb-12 font-body text-base leading-relaxed text-bone-newsprint">
 					Each panel is the schema the agent is handed: the description it reads, then every
-					argument with its type and its own sentence. None of it is retyped here - the panels render
-					<code class="font-mono text-base text-weathered-teal">schemas.rs</code> directly, so an
+					argument with its type and its own sentence. None of it is retyped - the schema is
+					rendered straight from
+					<code class="font-mono text-base text-weathered-teal">schemas.rs</code>, so an
 					argument added to a tool appears without an edit.
 				</p>
 				<div class="grid grid-cols-1 gap-12 lg:grid-cols-2">

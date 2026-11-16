@@ -89,8 +89,10 @@ interface Props {
 	 * featured plate flat, or a side to lean a standard one. */
 	Tilt?: "none" | "left" | "right";
 
-	/** Opt-in hover motion: the plate straightens under the pointer. Off by
-	 * default - a reading panel must not suggest interactivity. */
+	/** Hover motion: the plate straightens under the pointer. **On by default
+	 * for a leaning plate** - a plate that leans and does not straighten reads
+	 * as broken, not as calm. Pass `false` for a plate that must stay static
+	 * (a dense reading column, or a tilted plate inside another tilted frame). */
 	Hover?: boolean;
 }
 
@@ -107,7 +109,7 @@ const {
 	Emphasis = "standard",
 	Accent = "crimson",
 	Tilt,
-	Hover = false,
+	Hover = true,
 } = Astro.props;
 
 const Pad = {
@@ -180,7 +182,7 @@ const Frame =
 				Fill,
 				Plane,
 				Transform,
-				Hover && "transition-transform duration-300 hover:rotate-0",
+				Lean !== "" && Hover && "transition-transform duration-300 hover:rotate-0",
 			];
 ---
 

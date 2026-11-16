@@ -187,9 +187,10 @@ const Dispatch = [
 			Tape="PLUGIN // THE THIN LOADER"
 			Title="The plugin"
 			Lead={[
+				`A tool call's output becomes part of the model's context, and the plugin is the only layer that sees that result before it becomes message history.`,
 				`Aphrodite ships as a Hermes Agent plugin: a thin Python registration shim over a Rust dylib.`,
 				`Six hooks, thirteen tools, and an opt-in context engine - all declared in <code class="font-mono text-base text-weathered-teal">plugin.yaml</code>, all logic living in <code class="font-mono text-base text-weathered-teal">libaphrodite_hermes.dylib</code>.`,
-				`This page documents the v${Versions.Plugin} plugin spec.`,
+				`What follows is the v${Versions.Plugin} plugin spec.`,
 			]}
 		/>
 
@@ -453,8 +454,8 @@ const Dispatch = [
 					One call, end to end
 				</h3>
 				<p class="mb-10 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The left pane is what the agent sees; the right pane is what the process does.
-					Step through it once and the split becomes obvious: every intervention is
+					Two views of one call: what the agent sees, and what the process does.
+					Following one call makes the split obvious - every intervention is
 					invisible on the agent's side, and every rewrite is decided on the system's
 					side.
 				</p>

@@ -456,6 +456,7 @@ const OutcomeCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => {
 			Tape="SHOWCASE // THE PLUGIN IN ACTION"
 			Title="The plugin, worked"
 			Lead={[
+				"A tool call's output is appended to the model's context, and the model reads every line of it. These are the entries where Aphrodite decides what arrives instead.",
 				"Anonymized throughout - no names, no secrets, no real sessions; every entry is a real behavior of the pipeline dressed in generic content.",
 			]}
 		/>
@@ -727,7 +728,7 @@ const OutcomeCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => {
 					</span>
 					<span class="grow font-normal text-zinc-dust">
 						the tape colours · the one answer every retrieval gives · the read rules · what the two
-						panes are
+						views hold
 					</span>
 					<span class="text-stamped-canary group-open:hidden" aria-hidden="true">OPEN +</span>
 					<span class="hidden text-zinc-dust group-open:inline" aria-hidden="true">CLOSE −</span>
@@ -781,7 +782,7 @@ const OutcomeCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => {
 						))}
 					</p>
 					<p class="mt-6 border-t border-oxblood-dark pt-4 font-body text-base leading-relaxed text-bone-newsprint">
-						These seven numbers decide every example above.
+						These seven numbers decide every example that precedes them.
 					</p>
 					<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
 						It is the reason compression is never a judgment call: it is a byte count against the
@@ -803,11 +804,11 @@ const OutcomeCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => {
 				<ZineTape Variant="section" Color="canary" Label="THE TRAVERSALS // AGENT-VIEW vs SYSTEM-PATH, STEP BY STEP" />
 				<h2 class="type-section uppercase text-bone-white">The traversals</h2>
 				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The five pipelines above are worked examples; these are the pipes they run
+					The five pipelines are worked examples; these are the pipes they run
 					through.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Each traversal steps through its hook or endpoint with two synchronized panes -
+					Each traversal steps through its hook or endpoint in two synchronized views -
 					what the agent sees, what the system does - and every step carries its source
 					anchor.
 				</p>

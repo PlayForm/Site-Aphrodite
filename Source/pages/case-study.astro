@@ -454,8 +454,8 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 										{Fact.Value}
 									</div>
 									<div class="mt-1 type-caption text-zinc-dust">{Unit}</div>
-									<div class="mt-1 type-caption text-zinc-dust">
-										{Fact.Kind.toUpperCase()} &bull; {Fact.Scope}
+									<div class="mt-1 type-body text-zinc-dust">
+										<span class="type-meta">{Fact.Kind.toUpperCase()}</span>{" "}&bull; {Fact.Scope}
 									</div>
 								</div>
 							))
@@ -470,7 +470,7 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 		<section id="claims" class="relative w-full" data-reveal>
 			<ZineTape Variant="tab" Label="THE THREE CLAIMS" Color="raw" />
 			<p class="mt-16 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The whole argument fits in three lines, and every section below is the evidence for one of
+				The whole argument fits in three lines, and every section that follows is the evidence for one of
 				them.
 			</p>
 			<!-- The three claims arrive as one plate on a delay of their own: they
@@ -956,11 +956,13 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 									<div class="flex flex-wrap items-baseline justify-between gap-4 font-mono text-base">
 										<span class="font-black uppercase tracking-widest text-bone-white">{Label}</span>
 										<span class="flex items-baseline gap-3">
-											<Kind === "simulated" && (
-												<span class="border border-raw-blood px-1.5 py-0.5 type-meta font-black text-raw-blood">
-													SIMULATED
-												</span>
-											)}
+											{
+												Kind === "simulated" && (
+													<span class="border border-raw-blood px-1.5 py-0.5 type-meta font-black text-raw-blood">
+														SIMULATED
+													</span>
+												)
+											}
 											<span class="text-stamped-canary">{Range}</span>
 										</span>
 									</div>
@@ -998,10 +1000,10 @@ const ArcsWithBeats = Arcs.map((Arc) => ({
 					Five incidents that set the laws
 				</h2>
 				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Every rule on this page was paid for once.
+					Every rule in the engine was paid for once.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Each arc below runs the same three beats: the incident, the fix, and the
+					Each arc runs the same three beats: the incident, the fix, and the
 					mechanic that still stands today.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">

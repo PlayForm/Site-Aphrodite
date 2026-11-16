@@ -554,7 +554,7 @@ const GridFold = `
 				read instead is recomputed as each line lands.
 			</p>
 			<div class="mt-10 max-w-3xl">
-				<ZineFold Tag="METHOD" Label="How this demonstration works" Body={MethodFold} />
+				<ZineFold Tag="METHOD" Label="How the demonstration works" Body={MethodFold} />
 			</div>
 		</section>
 
@@ -723,7 +723,7 @@ const GridFold = `
 						deflected, a median session saved ratio of {Study.MedianRatio}, and ~{Study.AvgPerCall} tokens
 						saved per API call. {Study.SessionsSaved} of the {Study.Sessions} sessions saved tokens.
 					</p>
-					<p class="type-caption mt-3 text-oxblood-dark">
+					<p class="type-body mt-3 text-oxblood-dark">
 						The sensitivity band is {Study.Band}: the estimate depends on the chars-per-token ratio,
 						which the study puts at {Study.CharsPerTok}.
 					</p>
@@ -919,7 +919,7 @@ const GridFold = `
 						2048 bytes by default) and <code class="type-code text-weathered-teal">:9798</code>
 						(the token proxy, threshold 256 bytes by default).
 					</p>
-					<p class="type-caption text-zinc-dust">
+					<p class="type-body text-zinc-dust">
 						If the binaries are missing, the plugin logs the setup command and stays disabled until
 						you run it.
 					</p>

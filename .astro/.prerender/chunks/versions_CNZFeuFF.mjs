@@ -1,0 +1,589 @@
+import { t as __exportAll } from "./rolldown-runtime_D8jQpDG7.mjs";
+import { _ as renderTemplate, u as renderComponent, v as maybeRenderHead, w as addAttribute } from "./server_DdG-dV1Z.mjs";
+import { _ as createComponent, a as Versions, g as createAstro, i as Stamps, n as $$ZineKicker, r as ReleaseNote, t as $$Base } from "./Base_DYyCOQNQ.mjs";
+import { n as $$PageShell, t as $$ZineTape } from "./ZineTape_CVpY0Eb1.mjs";
+import { t as $$PageHeader } from "./PageHeader_BrcAOhPj.mjs";
+import { a as $$Related } from "./DocsSidebar_BegnaZwP.mjs";
+import { t as $$SectionNav } from "./SectionNav_DVkttqpR.mjs";
+import { t as $$ZineBox } from "./ZineBox_Bx8tYYbD.mjs";
+import { t as $$ZineButton } from "./ZineButton_C8pWvzS9.mjs";
+import { t as $$ZineLedger } from "./ZineLedger_B_xO7fF4.mjs";
+import { t as $$ZineLesson } from "./ZineLesson_jOnxj05f.mjs";
+import { t as $$ZinePullQuote } from "./ZinePullQuote_CWKoI_lR.mjs";
+import { t as $$ZineSource } from "./ZineSource_Cgxm1vKC.mjs";
+import { t as $$ZineStamp } from "./ZineStamp_DfhrgJvn.mjs";
+import { t as $$ZineStatBar } from "./ZineStatBar_DXy-gPsS.mjs";
+// Source/Component/ZineDossier.astro
+createAstro("https://Aphrodite.PlayForm.Cloud");
+var $$ZineDossier = createComponent(($$result, $$props, $$slots) => {
+	const Astro = $$result.createAstro($$props, $$slots);
+	Astro.self = $$ZineDossier;
+	const { Title, Left, Right, Tone = "subtle", Rotate = "" } = Astro.props;
+	const Shadow = {
+		crimson: "zine-box-crimson",
+		subtle: "zine-box-subtle",
+		canary: "zine-box-canary",
+		teal: "zine-box-teal"
+	}[Tone];
+	return renderTemplate`${maybeRenderHead($$result)}<section${addAttribute(`relative border-4 border-blood-crimson bg-carbon-void p-6 sm:p-10 ${Shadow} ${Rotate} transition-transform duration-300 hover:rotate-0`, "class")}> <div class="mb-8 flex items-center gap-4"> <span class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"> ${Title} </span> <span class="h-0 grow border-t border-dashed border-oxblood-dark"></span> </div> <div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16"> ${[{
+		Caption: "EVIDENCE // A",
+		Items: Left
+	}, {
+		Caption: "EVIDENCE // B",
+		Items: Right
+	}].map((Column) => renderTemplate`<div> <div class="mb-4 border-b border-oxblood-dark pb-1 font-mono text-base font-black uppercase tracking-widest text-stamped-canary"> ${Column.Caption} </div> <dl class="space-y-6"> ${Column.Items.map((Item) => renderTemplate`<div class="border-l-2 border-oxblood-dark pl-4"> <dt class="font-mono text-base font-bold uppercase tracking-widest text-bone-white">${Item.Label}</dt> <dd class="mt-1 font-body text-base leading-relaxed text-bone-newsprint">${Item.Text}</dd> </div>`)} </dl> </div>`)} </div> </section>`;
+}, "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/Component/ZineDossier.astro", void 0);
+// Source/pages/versions.astro
+var versions_exports = /* @__PURE__ */ __exportAll({
+	default: () => $$Versions,
+	file: () => $$file,
+	url: () => $$url
+});
+var $$Versions = createComponent(($$result, $$props, $$slots) => {
+	const NoteFor = (Ver) => ReleaseNote(Ver.startsWith("v") ? Ver.slice(1) : Ver);
+	const Releases = [
+		{
+			Ver: "v0.7.0",
+			Date: "2026-06-17",
+			Pair: "PLUGIN: PYTHON ERA (PRE-2.0)",
+			Landed: "Atomization + live containers: the Python plugin split into 29 nested modules; terminal output streams instead of blocking.",
+			Why: "It is the release that gave the project a shape: once the plugin is 29 modules and terminal output streams, every later port has somewhere to land, and a long command stops being a page of silence.",
+			Tag: "THE FIRST ARCHITECTURE",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.2.2",
+			Date: "2026-07-13",
+			Pair: "PLUGIN v2.0.5",
+			Landed: "First crates.io publish: aphrodite-headroom-core 0.1.1 -> aphrodite 1.2.2 -> aphrodite-hermes 1.2.2; classification re-measured at 40-123 ns.",
+			Why: "Publishing is what turned a private tool into an install: the three crates resolve from crates.io in dependency order, and 40-123 ns is the first classification figure the project could point at instead of assert.",
+			Tag: "FIRST CRATES.IO",
+			Emphasis: true
+		},
+		{
+			Ver: "v1.3.2 -> v1.3.4",
+			Note: "v1.3.4",
+			Date: "2026-07-14",
+			Pair: "PLUGIN v2.0.x",
+			Landed: "Rust maturity: the losslessness sweep (hash the ORIGINAL, never the wrapper) and the lossy-arguments fix; then high-intelligibility previews at 132× overall.",
+			Why: "Hashing the ORIGINAL is the property the marker scheme rests on: hash the wrapper and the same bytes compress into two different markers, so a retrieval returns a copy that never matches the next turn.",
+			Tag: "RUST MATURITY",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.4.6",
+			Date: "2026-09-19",
+			Pair: "PLUGIN v2.1.4",
+			Landed: "Chain-split CCR + the first plugin-first release: the plugin tagged before the parent, so BINARY_VERSION 1.4.6 points at assets that already exist.",
+			Why: "Two changes in one tag. Chain-split gives each segment of a chained command its own marker, so one 40 KB output becomes several small retrievals; plugin-first ordering means the pin never points at an asset the release has not uploaded yet.",
+			Tag: "CHAIN-SPLIT + PLUGIN-FIRST",
+			Emphasis: true
+		},
+		{
+			Ver: "v1.5.0",
+			Date: "2026-09-20",
+			Pair: "PLUGIN v2.2.0",
+			Landed: "Edition-2024 + atomization: the flat src/*.rs promoted into per-item module trees; the aphrodite_debug tool lands.",
+			Why: "Edition 2024 and per-item module trees are the layout the rest of the port grows into, and aphrodite_debug arrives as the tool that reads a stored entry back when a marker and its content disagree.",
+			Tag: "EDITION-2024",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.5.1",
+			Date: "2026-09-21",
+			Pair: "PLUGIN v2.1.5",
+			Landed: "Headroom fork publication 0.1.3: the fork's accumulated changes finally reach crates.io, replacing the stale July 0.1.2.",
+			Why: "The fork is where the transforms live, so a stale fork on crates.io is a stale classifier in every install; 0.1.3 is the release that closed the gap between the tree and what the registry served.",
+			Tag: "FORK PUBLISHED",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.6.0",
+			Date: "2026-09-24",
+			Pair: "PLUGIN v2.2.0",
+			Landed: "Config diagnostics + opt-in auto-reload (issue #38): a broken aphrodite.toml can no longer fail silently to defaults.",
+			Why: "Falling back to defaults in silence is the worst thing a config layer can do - a typo reads as a deliberate setting. Diagnostics make the file answer for itself, and auto-reload stays opt-in because a running session should not change under the operator.",
+			Tag: "DIAGNOSTICS",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.6.3",
+			Date: "2026-09-25",
+			Pair: "PLUGIN v2.2.3",
+			Landed: "One runtime home (issue #40): the shim and the Rust half resolve one shared home instead of $HERMES_HOME vs $HOME.",
+			Why: "Two halves resolving two different homes is a bug that only shows on someone else's machine; one shared home retires the whole class instead of documenting a workaround for it.",
+			Tag: "ONE HOME",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.6.5",
+			Date: "2026-10-05",
+			Pair: "PLUGIN v2.2.5",
+			Landed: "Checksum law: the in-tree SHA256SUMS.txt is the only checksum source of truth; a missing file, version mismatch, or missing asset entry is a hard refusal.",
+			Why: "A checksum that can be skipped is not a checksum. Making a missing file, a version mismatch and a missing asset entry each a hard refusal is what lets a download be verified rather than hoped for.",
+			Tag: "CHECKSUM LAW",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.6.6",
+			Date: "2026-10-07",
+			Pair: "PLUGIN v2.2.6",
+			Landed: "Catalog review: aphrodite_prefetch refuses .env, auth.json, ~/.ssh, the Hermes home and non-file paths; setup treats the Hermes plugin dir as report-only; the dylib arm refuses an install without in-tree checksums.",
+			Why: "This is the release whose review groups appear further down the page: a prefetch that cannot read a secret, a setup that cannot write where it does not own, and a context engine described as opt-in because it is.",
+			Tag: "CATALOG REVIEW",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.7.0",
+			Date: "2026-10-13",
+			Pair: "PLUGIN v2.3.0",
+			Landed: "Feature port: TOML templates, auto-expand, the context engine, live containers, the Rhai micro-script engine, and recursion/body-size caps - plus a per-session state registry so multi-session gateways stop contending on one global lock.",
+			Why: "The Python era's behaviour arrives in Rust in one tag, and the shared-gateway lock wedge goes with it: a parent and its subagents no longer serialise on one state lock, and a debug build can log the path it took.",
+			Tag: "FEATURE PORT",
+			Emphasis: false
+		},
+		{
+			Ver: "v1.8.0",
+			Date: "2026-11-08",
+			Pair: "PLUGIN v2.3.1",
+			Landed: "Bounded CCR store: store_max_entries / store_max_bytes evict the least-recently-accessed rows past either cap, the expiry sweep turns debounced and index-driven (a missing-hash retrieve went 37.40 ms -> 0.22 ms on a 300k-row store), and fill_pct is relabelled as compression headroom; aphrodite-headroom-core 0.2.0 carries the fork-side store limits.",
+			Why: "Retention is the difference between a store that grows until the disk complains and one an operator can budget: two caps, one eviction rule, and a sweep that no longer runs on every single retrieve.",
+			Tag: "BOUNDED STORE",
+			Emphasis: false
+		},
+		{
+			Ver: `v${Versions.Binary}`,
+			Date: Versions.ChangelogDate,
+			Pair: `PLUGIN v${Versions.Plugin}`,
+			Landed: "Docs catch up to the engine: the docs tree stops pinning a version it does not own, preview and directive truncation markers go ASCII, and aphrodite_debug is gated at compile time instead of stripped by hand at staging.",
+			Why: "A release can be small and still change behaviour: the truncation marker now costs one byte instead of three, and the release profile registers exactly the 13 production tools because the compiler says so - not because a staging script remembered to delete one.",
+			Tag: "CURRENT PAIRING",
+			Emphasis: false
+		}
+	];
+	const CurrentChanges = [
+		{
+			Label: "FIX // DEPENDENCY SECURITY",
+			Tone: "canary",
+			Why: "The vendored fork is where SQLite actually lives, so the advisory has to close there and not in the parent crate that never sees it.",
+			Lines: [
+				"- rusqlite 0.40.2 -> 0.41 in the owned headroom fork; bundled SQLite 3.54.1; closes RUSTSEC-2026-0459",
+				"- no API reaches the parent: CcrStore, SqliteCcrStore and the retention surface are unchanged",
+				"- rustls 0.23.46 / rustls-webpki 0.103.17 / webpki-roots 1.0.12 resolve without constraint changes"
+			]
+		},
+		{
+			Label: "FIX // TOOL CATALOG",
+			Tone: "teal",
+			Why: "A staging step that removes a tool by hand is a step that can be forgotten; a cfg gate is enforced by the compiler on every build, in every profile.",
+			Lines: [
+				"- aphrodite_debug sits behind #[cfg(debug_assertions)] in schemas.rs, tools.rs and debug.rs",
+				"- cargo build --release registers exactly the 13 declared production tools; a debug build registers 14",
+				"- hermes plugins validate rule 6 holds for a release dylib without touching the tree"
+			]
+		},
+		{
+			Label: "CHORE // TRUNCATION",
+			Tone: "dust",
+			Why: "ASCII is one byte where U+2026 is three, and the cap arithmetic has to agree with what it emits or the marker overruns the budget it was sized for.",
+			Lines: [
+				"- U+2026 -> ... in the preview builders, the directive builders and loader, and the default marker hint",
+				"- apply_preview_cap takes max_chars - 4 and appends ...] so the closing bracket still fits",
+				"- the directive cap keeps MAX_DIRECTIVE_CHARS + 3 and MAX_COMBINED_CHARS + 4"
+			]
+		},
+		{
+			Label: "DOCS // README + TREE",
+			Tone: "teal",
+			Why: "A docs tree that pins a version it does not own drifts on the next release; pointing at the manifests makes it self-correcting instead of re-edited.",
+			Lines: [
+				"- README gains LLM provider configuration, Verify it's running, See It Work, session lifecycle, directives",
+				"- docs/README.md and docs/architecture/README.md stop pinning a binary/plugin version",
+				"- retention documented in sqlite, prometheus, lifecycle and aphrodite.toml.example"
+			]
+		},
+		{
+			Label: "CHORE // PLUGIN TRACK",
+			Tone: "dust",
+			Why: "Three commits landed past v2.3.1 with no tag, so the plugin version advances to match the binary it ships beside.",
+			Lines: ["- plugin.yaml 2.3.1 -> 2.3.2 with its install_message header and the plugin README badge", "- BINARY_VERSION 1.8.1, and the in-tree SHA256SUMS.txt regenerated to match"]
+		}
+	];
+	const PriorChanges = [
+		{
+			Label: "CATALOG REVIEW",
+			Tone: "canary",
+			Intro: "Catalog review: prefetch path guard, setup hardening, opt-in context engine.",
+			Lines: [
+				"- fix: aphrodite_prefetch refuses .env, auth.json, ~/.ssh, Hermes home, non-file paths",
+				"- fix: aphrodite setup treats Hermes-home plugin dir as report-only",
+				"- fix: dylib arm refuses install when in-tree SHA256SUMS.txt is missing"
+			]
+		},
+		{
+			Label: "FEATURES",
+			Tone: "teal",
+			Lines: [
+				"+ context engine opt-in at registration: APHRODITE_CONTEXT_ENGINE=1 (TOML default true)",
+				"+ non-destructive: should_compress always False; transcript unchanged",
+				"+ pre_tool_call behavior disclosed: auto-backgrounds long terminal commands",
+				"+ requires_hermes: >=0.20.2"
+			]
+		},
+		{
+			Label: "CHORE + DOCS",
+			Tone: "dust",
+			Lines: [
+				"- config 1:1 audit: dead [templates.*] subtree and compression.prefetch removed",
+				"- chain_split_min/max_segments and defaults.api_url/model added; unwired keys annotated",
+				"- 21 doc files fixed; version stamps 1.6.5 → 1.6.6"
+			]
+		}
+	];
+	const ToneText = {
+		canary: "text-stamped-canary",
+		teal: "text-weathered-teal",
+		dust: "text-zinc-dust"
+	};
+	const ToneStamp = {
+		canary: "bg-stamped-canary text-soot-black",
+		teal: "bg-weathered-teal text-bone-white",
+		dust: "bg-raw-blood text-bone-white"
+	};
+	const Sections = [
+		{
+			Id: "current",
+			Label: "CURRENT"
+		},
+		{
+			Id: "contract",
+			Label: "CONTRACT"
+		},
+		{
+			Id: "changelog",
+			Label: "CHANGELOG"
+		},
+		{
+			Id: "register",
+			Label: "REGISTER"
+		},
+		{
+			Id: "tape",
+			Label: "TAPE"
+		},
+		{
+			Id: "numbers",
+			Label: "NUMBERS"
+		}
+	];
+	const Holes = [
+		0,
+		1,
+		2,
+		3,
+		4,
+		5
+	];
+	return renderTemplate`${renderComponent($$result, "Base", $$Base, {
+		"Title": "VERSIONS // APHRODITE",
+		"Description": `Aphrodite v${Versions.Binary}, plugin v${Versions.Plugin} (${Versions.ChangelogDate}). The shipped pairing, how a pairing is cut, the current changelog, the full release register, and pointers to the benchmarks.`
+	}, { "default": ($$result) => renderTemplate` ${renderComponent($$result, "PageShell", $$PageShell, { "Rhythm": "wide" }, { "default": ($$result) => renderTemplate` ${renderComponent($$result, "PageHeader", $$PageHeader, {
+		"Tape": "VERSIONS // RELEASE LOG",
+		"Title": "Versions",
+		"Lead": [
+			`A tool call's output becomes part of the model's context, and every release in this log changes what of it Aphrodite keeps.`,
+			`Current release: binary <strong>${Stamps.Binary()}</strong>, plugin <strong>${Stamps.Plugin()}</strong> (v${Versions.Binary}, ${Versions.ChangelogDate}).`,
+			`Requires Rust 1.88+.`,
+			`Licensed CC0-1.0.`,
+			"Every stamp is read from the monorepo's own manifests at build time, so the register cannot claim a version the tree does not carry."
+		]
+	})} ${renderComponent($$result, "SectionNav", $$SectionNav, { "Sections": Sections })}  ${maybeRenderHead($$result)}<section id="current" class="relative w-full" data-reveal> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": "MONUMENT // THE SHIPPED PAIRING"
+	})} ${renderComponent($$result, "ZineBox", $$ZineBox, {
+		"Size": "lg",
+		"Rotate": "-rotate-[0.6deg]",
+		"Tape": "CURRENT // SHIPPED",
+		"TapeColor": "canary",
+		"TapeSide": "right"
+	}, { "default": ($$result) => renderTemplate` <h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+The pairing that ships today
+</h2> <div class="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end"> <div> ${renderComponent($$result, "ZineKicker", $$ZineKicker, {
+		"As": "div",
+		"Tone": "dust"
+	}, { "default": ($$result) => renderTemplate`BINARY RELEASE` })} <div class="font-headline text-5xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-7xl"> ${Stamps.Binary()} </div> </div> <div class="zine-box-subtle w-full border-[3px] border-raw-blood bg-soot-black p-5 lg:w-auto"> ${renderComponent($$result, "ZineKicker", $$ZineKicker, {
+		"As": "div",
+		"Tone": "dust"
+	}, { "default": ($$result) => renderTemplate`HERMES PLUGIN` })} <div class="font-headline text-3xl font-black tracking-tighter text-bone-white sm:text-5xl"> ${Stamps.Plugin()} </div> <div class="mt-1 text-base font-bold text-stamped-canary"> ${Versions.ChangelogDate} </div> </div> </div> <p class="mt-8 font-body text-base leading-relaxed text-bone-newsprint">
+Two numbers, one release:
+</p> <ul class="mt-3 space-y-2 font-body text-base leading-relaxed text-bone-newsprint"> <li class="border-l-4 border-raw-blood pl-4">
+the binary carries the proxy, the CCR store and the dylib the shim loads
+</li> <li class="border-l-4 border-raw-blood pl-4">
+the plugin spec carries the hook names, the tool schemas and the version floor
+						the dylib needs from Hermes.
+</li> </ul> <p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+They are released as a pair on purpose. A plugin that loads a dylib older than its
+					own schemas registers tools that do not exist, so the two versions travel together
+					and the changelog head declares the pairing in its first lines.
+</p> <div class="mt-8 border-t border-oxblood-dark pt-4 font-mono text-base text-zinc-dust"> ${`SRC: CHANGELOG.md v${Versions.ChangelogVersion} head; crates/aphrodite/Cargo.toml; plugins/aphrodite/plugin.yaml`} </div> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": "STAMPS // WHAT EACH NUMBER IS READ FROM"
+	})} <h3 id="stamps" class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+Five artifacts, five sources
+</h3> <p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
+Nothing is typed by hand. Each stamp is read from the file that
+					owns it, and the register renders whatever those files say on the day the site is
+					built - which is why a release that forgets to bump one of them surfaces here as a
+					disagreement rather than as a stale figure.
+</p> ${renderComponent($$result, "ZineLedger", $$ZineLedger, {
+		"Headers": [
+			"ARTIFACT",
+			"SOURCE OF TRUTH",
+			"STAMP"
+		],
+		"Rows": [
+			{ Cells: [
+				{ Text: "binary" },
+				{ Text: "crates/aphrodite/Cargo.toml" },
+				{ Text: `v${Versions.Binary}` }
+			] },
+			{ Cells: [
+				{ Text: "integration crate" },
+				{ Text: "crates/aphrodite-hermes/Cargo.toml" },
+				{ Text: `v${Versions.Hermes}` }
+			] },
+			{ Cells: [
+				{ Text: "plugin spec" },
+				{ Text: "plugins/aphrodite/plugin.yaml" },
+				{ Text: `v${Versions.Plugin}` }
+			] },
+			{ Cells: [
+				{ Text: "download pin" },
+				{ Text: "plugins/aphrodite/BINARY_VERSION" },
+				{ Text: `v${Versions.BinaryVersionFile}` }
+			] },
+			{ Cells: [
+				{ Text: "headroom fork" },
+				{ Text: "vendor/headroom/crates/headroom-core" },
+				{ Text: `v${Versions.Headroom}` }
+			] }
+		]
+	})} <div class="mt-8"> ${renderComponent($$result, "ZineLesson", $$ZineLesson, {
+		"Label": "THE PIN",
+		"Text": `The plugin never asks crates.io for the newest binary. It reads BINARY_VERSION - ${Versions.BinaryVersionFile} today - and downloads that release, which is what makes a plugin install reproducible a year after the tag.`
+	})} </div> ` })} ${renderComponent($$result, "ZineSource", $$ZineSource, { "Lines": ["SRC: crates/aphrodite/Cargo.toml; crates/aphrodite-hermes/Cargo.toml", "SRC: plugins/aphrodite/plugin.yaml; plugins/aphrodite/BINARY_VERSION"] })} </section>  <section id="contract" class="relative w-full" data-reveal> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": "CONTRACT // HOW A PAIRING IS CUT",
+		"Color": "canary"
+	})} <h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+Four files have to agree before a tag exists
+</h2> <p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+A release is not a tag on one repository. The binary, the plugin spec and the pin that
+				connects them are three files that must agree, the in-tree checksum list is the
+				fourth, and the changelog head is where the agreement is written down so a later
+				reader can check it without diffing manifests.
+</p> <p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+The order matters as much as the numbers. Since v1.4.6 the plugin is tagged before the
+				parent, so the pin resolves to an asset that already exists rather than to a release
+				page that is still uploading.
+</p> <div class="mt-12"> ${renderComponent($$result, "ZineDossier", $$ZineDossier, {
+		"Title": "THE PAIRING // BOTH HALVES",
+		"Rotate": "rotate-[0.5deg]",
+		"Left": [
+			{
+				Label: "THE BINARY",
+				Text: `v${Versions.Binary}, from crates/aphrodite/Cargo.toml: the proxy, the CCR store, and the cdylib the shim loads.`
+			},
+			{
+				Label: "THE CHANGELOG HEAD",
+				Text: "Names the version, the date and the one-line title on its first line, and states the pairing the release was cut against - the two manifests are what that sentence is checked against."
+			},
+			{
+				Label: "THE CHECKSUM",
+				Text: "SHA256SUMS.txt ships in the tree and is the only checksum source of truth: a missing file, a version mismatch or a missing asset entry is a hard refusal."
+			}
+		],
+		"Right": [
+			{
+				Label: "THE PLUGIN SPEC",
+				Text: `v${Versions.Plugin}, from plugins/aphrodite/plugin.yaml: hook names, tool schemas, and the requires_hermes floor that decides which Hermes can load it.`
+			},
+			{
+				Label: "THE PIN",
+				Text: `BINARY_VERSION reads ${Versions.BinaryVersionFile}. The downloader fetches the binary release that file names, never the newest tag on the repository.`
+			},
+			{
+				Label: "THE ORDER",
+				Text: "Since v1.4.6 the plugin is tagged first and the binary second, so the pin a reader finds at tag time is already resolvable."
+			}
+		]
+	})} </div> <div class="mt-16"> ${renderComponent($$result, "ZinePullQuote", $$ZinePullQuote, {
+		"Text": Versions.ChangelogTitle,
+		"Attribution": `CHANGELOG.md v${Versions.ChangelogVersion}`,
+		"Rotate": "-rotate-[0.8deg]"
+	})} </div> <p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+The release's own one-line title, taken from the changelog
+				head rather than paraphrased. It is the shortest honest summary a release can
+				carry: one sentence a reader can hold while working through the register.
+</p> ${renderComponent($$result, "ZineSource", $$ZineSource, { "Lines": ["SRC: plugins/aphrodite/BINARY_VERSION; plugins/aphrodite/plugin.yaml", "SRC: CHANGELOG.md v1.4.6 (plugin-first ordering); v1.6.5 (checksum law)"] })} </section>  <section id="changelog" class="relative w-full" data-reveal> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": `CHANGELOG // V${Versions.ChangelogVersion}`
+	})} ${renderComponent($$result, "ZineBox", $$ZineBox, {
+		"Size": "lg",
+		"Rotate": "rotate-[0.8deg]"
+	}, { "default": ($$result) => renderTemplate` <h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+What this release changed
+</h2> <p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+The changelog is grouped by what a change is for, not by which file it touched:
+</p> <ul class="mt-3 max-w-3xl space-y-2 font-body text-base leading-relaxed text-bone-newsprint"> <li class="border-l-4 border-raw-blood pl-4">a fix that closes an advisory</li> <li class="border-l-4 border-raw-blood pl-4">a fix that closes a class of drift</li> <li class="border-l-4 border-raw-blood pl-4">and the chores that keep the tree honest about itself.</li> </ul> <p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+Each group carries its entries verbatim and one line on why the group exists.
+</p> <div class="mt-10"> ${CurrentChanges.map(({ Label, Tone, Intro, Lines, Why }) => renderTemplate`<div class="relative mt-8 border-2 border-oxblood-dark bg-soot-black p-5"> <div${addAttribute(`inline-block border border-black px-3 py-0.5 font-mono text-base font-black uppercase tracking-widest ${ToneStamp[Tone]}`, "class")}> ${Label} </div> ${Intro && renderTemplate`<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint"> ${Intro} </p>`} <div class="mt-3 space-y-1 border border-oxblood-dark bg-carbon-void p-3.5 font-mono text-base text-zinc-dust"> ${Lines.map((Line) => renderTemplate`<div>${Line}</div>`)} </div> ${Why && renderTemplate`<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust"> ${renderComponent($$result, "ZineKicker", $$ZineKicker, { "Tone": "canary" }, { "default": ($$result) => renderTemplate`WHY // ` })} ${Why} </p>`} </div>`)} </div> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": "PRIOR // V1.6.6, THE CATALOG REVIEW",
+		"Color": "teal"
+	})} <h3 id="catalog-review" class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+The review groups, at their own version
+</h3> <p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+These groups belong to v1.6.6 and are labelled with it. They stay on the page
+					because the catalog review is where the prefetch guard, the report-only setup and
+					the opt-in context engine were decided - and a changelog group pinned to the
+					release that shipped it never has to be re-read against a newer head.
+</p> <div class="mt-10"> ${PriorChanges.map(({ Label, Tone, Intro, Lines }) => renderTemplate`<div class="relative mt-8 border-2 border-oxblood-dark bg-soot-black p-5"> <div${addAttribute(`inline-block border border-black px-3 py-0.5 font-mono text-base font-black uppercase tracking-widest ${ToneStamp[Tone]}`, "class")}> ${Label} </div> ${Intro && renderTemplate`<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint"> ${Intro} </p>`} <div${addAttribute(`mt-3 space-y-1 border border-oxblood-dark bg-carbon-void p-3.5 font-mono text-base ${ToneText[Tone]}`, "class")}> ${Lines.map((Line) => renderTemplate`<div>${Line}</div>`)} </div> </div>`)} </div> ` })} ${renderComponent($$result, "ZineSource", $$ZineSource, { "Lines": [`SRC: CHANGELOG.md v${Versions.ChangelogVersion}`, "SRC: CHANGELOG.md v1.6.6 (catalog review groups)"] })} </section>  <section id="register" class="relative w-full" data-reveal> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": `RELEASE REGISTER // v0.7.0 -> v${Versions.Binary}`
+	})} ${renderComponent($$result, "ZineBox", $$ZineBox, {
+		"Size": "lg",
+		"Rotate": "-rotate-[1deg]"
+	}, { "default": ($$result) => renderTemplate` <h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+Every release on one line
+</h2> <p class="mb-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+One row per release, oldest first: the version, the plugin it paired with, the date
+					it was tagged, and the one-line record of what landed. Each row links to its own
+					GitHub release note, which is the long form of the same fact.
+</p> <div class="overflow-x-auto"> <table class="w-full border-collapse font-mono text-base"> <thead> <tr class="border-b-2 border-oxblood-dark text-left"> <th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+VERSION
+</th> <th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+DATE
+</th> <th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+PAIRED WITH
+</th> <th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">
+WHAT LANDED
+</th> </tr> </thead> <tbody> ${Releases.map(({ Ver, Date, Pair, Landed, Tag, Emphasis, Note }) => renderTemplate`<tr class="border-b border-oxblood-dark transition-colors hover:bg-raw-blood/10"> <td class="py-3 pr-4 align-top whitespace-nowrap"> <div class="text-base font-black text-weathered-teal">${Ver}</div> <div${addAttribute(`mt-1 text-base font-black uppercase tracking-widest ${Emphasis ? "text-stamped-canary" : "text-zinc-dust"}`, "class")}> ${Tag} </div> <a class="mt-1 inline-block text-base font-black uppercase tracking-widest text-weathered-teal transition-colors hover:text-bone-white"${addAttribute(NoteFor(Note ?? Ver), "href")}>
+RELEASE NOTE ↗
+</a> </td> <td class="py-3 pr-4 align-top whitespace-nowrap text-base text-zinc-dust"> ${Date} </td> <td class="py-3 pr-4 align-top whitespace-nowrap text-base text-zinc-dust"> ${Pair} </td> <td class="py-3 align-top text-base text-bone-newsprint">${Landed}</td> </tr>`)} </tbody> </table> </div> <p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
+THE CANARY TAGS MARK THE TWO RELEASES THAT CHANGED THE PROJECT'S SHAPE: THE FIRST
+					CRATES.IO PUBLISH, AND THE CHAIN-SPLIT CCR.
+</p> <p class="mt-3 text-base leading-relaxed text-zinc-dust">
+The register is the ledger; the tape is the same history told once per stamp,
+					with the reason each release mattered. The table finds a version; the
+					tape explains why the project looks the way it does.
+</p> ` })} ${renderComponent($$result, "ZineSource", $$ZineSource, { "Lines": [`SRC: README.md:12; CHANGELOG.md v${Versions.ChangelogVersion}`, `SRC: CHANGELOG.md v${Versions.ChangelogVersion} (pairing v${Versions.Binary}, plugin v${Versions.Plugin})`] })} </section>  <section id="tape" class="relative w-full" data-reveal> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": `TIMELINE TAPE // v0.7.0 -> v${Versions.Binary}`,
+		"Color": "canary"
+	})} <h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+The tape, one stamp per release
+</h2> <p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+Each strip is one release stamp: the binary and the plugin version it paired, the
+				one-line "what landed", and the release note.
+</p> <p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+The tape runs top to bottom in release order - the enlarged perforations mark the
+				two stamps that changed the project's shape (the first crates.io publish, the
+				chain-split CCR).
+</p> <p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+Every stamp also carries the line the register has no room for: why the release
+				mattered. A version number records that something happened; the reason is what a
+				reader can actually use a year later.
+</p> <div class="mt-10 flex flex-wrap items-center gap-4"> ${renderComponent($$result, "ZineStamp", $$ZineStamp, {
+		"Label": "ENLARGED = SHAPE CHANGE",
+		"Color": "canary",
+		"Rotate": "sm:-rotate-1"
+	})} ${renderComponent($$result, "ZineStamp", $$ZineStamp, {
+		"Label": "THIN = ORDINARY RELEASE",
+		"Color": "teal",
+		"Rotate": "sm:rotate-1"
+	})} ${renderComponent($$result, "ZineStamp", $$ZineStamp, {
+		"Label": `${Releases.length} STAMPS`,
+		"Color": "bone"
+	})} </div> <div class="mt-16 flex flex-col gap-16"> ${Releases.map(({ Ver, Date, Pair, Landed, Why, Tag, Emphasis, Note }, Index) => renderTemplate`<article${addAttribute(`relative flex items-stretch gap-5 ${Emphasis ? "border-4 border-stamped-canary bg-carbon-void p-6 shadow-[6px_6px_0px_#000] sm:p-8" : "border-2 border-oxblood-dark bg-carbon-void p-5 shadow-[4px_4px_0px_#000] sm:p-6"} transition-transform duration-300 hover:rotate-0 hover:-translate-y-0.5 ${Emphasis ? "-rotate-[0.6deg]" : "rotate-[0.3deg]"}`, "class")}>  <div aria-hidden="true"${addAttribute(`flex w-8 shrink-0 flex-col items-center justify-center gap-2.5 border-r-2 border-dashed border-oxblood-dark pr-3 ${Emphasis ? "text-stamped-canary" : "text-zinc-dust"}`, "class")}> ${Holes.map(() => renderTemplate`<span${addAttribute(`rounded-full bg-current ${Emphasis ? "h-3 w-3" : "h-2 w-2 opacity-60"}`, "class")}></span>`)} </div> <div class="flex min-w-0 flex-1 flex-col gap-4"> <div class="flex flex-wrap items-baseline gap-x-4 gap-y-2"> <span class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust"> ${`STAMP ${String(Index + 1).padStart(2, "0")} / ${String(Releases.length).padStart(2, "0")}`} </span> <span class="font-mono text-base font-bold text-zinc-dust">${Date}</span> <span${addAttribute(`border border-black px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest ${Emphasis ? "bg-stamped-canary text-soot-black" : "bg-raw-blood text-bone-white"}`, "class")}> ${Pair} </span> <span${addAttribute(`font-mono text-base font-bold uppercase tracking-widest ${Emphasis ? "text-stamped-canary" : "text-weathered-teal"}`, "class")}> ${Tag} </span> </div> <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8"> <div class="min-w-0 flex-1"> <div${addAttribute(`font-headline font-black tracking-tighter text-bone-white ${Emphasis ? "text-4xl sm:text-5xl" : "text-2xl sm:text-3xl"}`, "class")}> ${Ver} </div> <div class="mt-3"> ${renderComponent($$result, "ZineKicker", $$ZineKicker, {
+		"As": "div",
+		"Tone": "dust"
+	}, { "default": ($$result) => renderTemplate`WHAT LANDED` })} <p class="mt-1 max-w-2xl font-body text-base leading-relaxed text-bone-newsprint"> ${Landed} </p> </div> <div${addAttribute(`mt-4 border-l-2 pl-4 ${Emphasis ? "border-stamped-canary" : "border-oxblood-dark"}`, "class")}> ${renderComponent($$result, "ZineKicker", $$ZineKicker, {
+		"As": "div",
+		"Tone": "canary"
+	}, { "default": ($$result) => renderTemplate`WHY IT MATTERED` })} <p class="mt-1 max-w-2xl font-body text-base leading-relaxed text-bone-newsprint"> ${Why} </p> </div> </div> <a class="shrink-0 self-start border border-black bg-soot-black px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-weathered-teal shadow-[3px_3px_0px_#000] transition-colors hover:bg-raw-blood hover:text-bone-white"${addAttribute(NoteFor(Note ?? Ver), "href")}>
+RELEASE NOTE ↗
+</a> </div> </div> </article>`)} </div> ${renderComponent($$result, "ZineSource", $$ZineSource, { "Lines": ["SRC: CHANGELOG.md release headers (v0.7.0:1219, v1.2.2:1066, v1.3.2:777, v1.3.4:724, v1.5.0:318, v1.5.1:309, v1.6.0:293, v1.6.3:222, v1.6.5:157, v1.6.6:121, v1.8.0:3) + the GitHub release notes (Aphrodite/v*, incl. v1.4.6's chain-split + plugin-first note)", "SRC: CHANGELOG.md v1.6.6:192, v1.7.0:151, v1.8.0:74, v1.8.1:3 (the rows the first register did not carry)"] })} </section>  <section id="numbers" class="relative w-full lg:w-8/12 lg:self-end" data-reveal> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": "POINTER // THE MEASUREMENTS"
+	})} ${renderComponent($$result, "ZineBox", $$ZineBox, {
+		"Size": "lg",
+		"Rotate": "-rotate-[1.4deg]",
+		"Tape": "POINTER",
+		"TapeColor": "raw",
+		"TapeSide": "right"
+	}, { "default": ($$result) => renderTemplate` <h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+Full numbers
+</h2> <p class="max-w-2xl font-body text-base leading-relaxed text-bone-newsprint">
+The complete telemetry -
+<span class="text-stamped-canary" data-count="610">610</span>&times;/<span class="text-stamped-canary" data-count="132">132</span>&times;, 8-40 ms, the per-type bars, and the 200-session study - lives on the
+					benchmarks page.
+</p> <div class="mt-8 space-y-5"> ${renderComponent($$result, "ZineStatBar", $$ZineStatBar, {
+		"Label": "OVERALL // STANDARD CORPUS",
+		"Ratio": "132×",
+		"Percent": 22,
+		"Color": "teal"
+	})} ${renderComponent($$result, "ZineStatBar", $$ZineStatBar, {
+		"Label": "CEILING // ONE LONG DOCUMENT",
+		"Ratio": "610×",
+		"Percent": 100,
+		"Color": "canary"
+	})} </div> <p class="mt-3 text-base leading-relaxed text-zinc-dust">
+Both bars share one scale: 610&times; is the ceiling on a single long
+					low-entropy document.
+</p> <p class="mt-3 text-base leading-relaxed text-zinc-dust">
+132&times; is the standard corpus overall (106 KB to 800 B).
+</p> <p class="mt-3 text-base leading-relaxed text-zinc-dust">
+Quote the ceiling only with the corpus attached.
+</p> <div class="mt-8 flex flex-wrap items-center gap-3"> ${renderComponent($$result, "ZineStamp", $$ZineStamp, {
+		"Label": "8-40 ms END TO END",
+		"Color": "teal",
+		"Rotate": "sm:-rotate-1"
+	})} ${renderComponent($$result, "ZineStamp", $$ZineStamp, {
+		"Label": "40-123 ns CLASSIFY",
+		"Color": "bone",
+		"Rotate": "sm:rotate-1"
+	})} ${renderComponent($$result, "ZineStamp", $$ZineStamp, {
+		"Label": "200 SESSIONS",
+		"Color": "raw"
+	})} </div> <p class="mt-8 max-w-2xl font-body text-base leading-relaxed text-bone-newsprint">
+The register records what changed; the benchmarks record what it cost and what
+					it saved. Keeping the two apart is deliberate - a release note that also argues
+					about throughput is a release note nobody can cite.
+</p> <div class="mt-8"> ${renderComponent($$result, "ZineButton", $$ZineButton, {
+		"Label": "OPEN BENCHMARKS",
+		"Href": "/benchmarks/"
+	})} </div> ` })} ${renderComponent($$result, "ZineSource", $$ZineSource, { "Lines": ["SRC: README.md:446-463; crates/aphrodite/examples/ (corpus + per-type benches)", "SRC: CHANGELOG.md v1.3.2 (high-intelligibility previews at 132× overall)"] })} </section>  ${renderComponent($$result, "Related", $$Related, { "Links": [
+		{
+			Href: "/crates/",
+			Label: "CRATES"
+		},
+		{
+			Href: "/benchmarks/",
+			Label: "BENCHMARKS"
+		},
+		{
+			Href: "/setup/",
+			Label: "SETUP"
+		},
+		{
+			Href: "/case-study/",
+			Label: "CASE STUDY"
+		}
+	] })} ` })} ` })}`;
+}, "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/pages/versions.astro", void 0);
+var $$file = "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/pages/versions.astro";
+var $$url = "/versions";
+// \0virtual:astro:page:Source/pages/versions@_@astro
+var page = () => versions_exports;
+export { page };

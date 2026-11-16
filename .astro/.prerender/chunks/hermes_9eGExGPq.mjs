@@ -1,0 +1,234 @@
+import { t as __exportAll } from "./rolldown-runtime_D8jQpDG7.mjs";
+import { E as unescapeHTML, _ as renderTemplate, u as renderComponent, v as maybeRenderHead, w as addAttribute } from "./server_DdG-dV1Z.mjs";
+import { _ as createComponent, t as $$Base } from "./Base_B3YGMVwW.mjs";
+import { a as $$Related } from "./DocsSidebar_DfVitkgG.mjs";
+import { n as $$PageShell, t as $$ZineTape } from "./ZineTape_SD5UQe0y.mjs";
+import { t as $$PageHeader } from "./PageHeader_D7477rfZ.mjs";
+import { t as $$ZineBox } from "./ZineBox_CagEU9Nk.mjs";
+import { t as $$ZineSource } from "./ZineSource_B5XPnKZs.mjs";
+import { t as $$ZineDiagramNav } from "./ZineDiagramNav_CN7ukSrg.mjs";
+import { t as session_lifecycle_default } from "./session-lifecycle_DbtfiSbV.mjs";
+import { l as ToolNames } from "./Roster_DWXQuOMb.mjs";
+// Source/pages/hermes.astro
+var hermes_exports = /* @__PURE__ */ __exportAll({
+	default: () => $$Hermes,
+	file: () => $$file,
+	url: () => $$url
+});
+var $$Hermes = createComponent(($$result, $$props, $$slots) => {
+	const Previews = [
+		"[build:1E 1W 142L | error[E0432]: unresolved import ...]",
+		"[diff:4F +7/-3 12L | src/main.rs Cargo.toml +2 more]",
+		"[git:2M 2A 1D 3?? | src/x.rs src/y.rs +6 more]",
+		"[gitlog:2 commits | abc1234 fix... → def5678 feat...]",
+		"[ls:3 files 2 dirs | .rs×2 .md×1]",
+		"[test:220 pass 0 fail 1 ignored | 0.31s]",
+		"[grep:4 hits in 3 files | src/preview.rs:12 ...]",
+		"[code:3fns|2structs fn main() 414L]",
+		"[search:4 hits in 3 files | src/x.rs:12 ...]",
+		"[json:5items 3L]",
+		"[terminal:14L exit code: 0]",
+		"[text:3L 50B | some unrecognizable prose here]"
+	];
+	const ProxyRows = [
+		{
+			F: "Tool output compression",
+			Plugin: "transform_tool_result intercepts",
+			Proxy: "proxy only sees HTTP traffic"
+		},
+		{
+			F: "Terminal compression",
+			Plugin: "transform_terminal_output",
+			Proxy: "no visibility"
+		},
+		{
+			F: "Context engine",
+			Plugin: "opt-in; catalog injected via pre_llm_call",
+			Proxy: "unavailable"
+		},
+		{
+			F: "Auto-launch",
+			Plugin: "proxies spawn at plugin load",
+			Proxy: "manual aphrodite command"
+		},
+		{
+			F: "aphrodite_* tools",
+			Plugin: `${ToolNames.length} tools in agent namespace`,
+			Proxy: "agent doesn't know about them"
+		},
+		{
+			F: "Prompt injection",
+			Plugin: "directives, nudges, catalog",
+			Proxy: "unavailable"
+		},
+		{
+			F: "CCR storage",
+			Plugin: "token + cache proxy",
+			Proxy: "token + cache proxy"
+		}
+	];
+	return renderTemplate`${renderComponent($$result, "Base", $$Base, {
+		"Title": "HERMES // APHRODITE",
+		"Description": "How Hermes loads the Aphrodite plugin: the hook chain around a turn, the session lifecycle, the dual proxies on :9797 and :9798, and what the agent actually sees - type-aware previews instead of raw output."
+	}, { "default": ($$result) => renderTemplate` ${renderComponent($$result, "PageShell", $$PageShell, { "Rhythm": "wide" }, { "default": ($$result) => renderTemplate` ${renderComponent($$result, "PageHeader", $$PageHeader, {
+		"Tape": "HERMES // THE INTEGRATION",
+		"Title": "Living inside Hermes",
+		"Lead": [
+			`A tool call's output becomes part of the model's context, and the model reads and pays for every line of it.`,
+			`Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a client at.`,
+			`It is the reason the interception lives inside the turn: tool output never hits a wire, so only hook-level registration can catch it before it becomes message history - six hooks, thirteen tools, and an optional context engine, every call forwarded into the Rust dylib.`,
+			`Two proxy processes still run alongside as subprocesses, and a canonical runtime home under <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code> holds the binaries, config, CCR database, directives, and logs.`
+		]
+	})}  ${maybeRenderHead($$result)}<section class="relative w-full" data-reveal> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": "COMPARISON // WHY NOT JUST A PROXY"
+	})} ${renderComponent($$result, "ZineBox", $$ZineBox, {
+		"Size": "lg",
+		"Rotate": "-rotate-[1deg]"
+	}, { "default": ($$result) => renderTemplate` <div class="overflow-x-auto"> <table class="w-full border-collapse font-mono text-base"> <thead> <tr class="border-b-2 border-oxblood-dark text-left"> <th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+CAPABILITY
+</th> <th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">
+NATIVE HERMES PLUGIN
+</th> <th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">
+GENERIC PROXY
+</th> </tr> </thead> <tbody> ${ProxyRows.map((Row, I) => renderTemplate`<tr${addAttribute(I < ProxyRows.length - 1 ? "border-b border-oxblood-dark" : "", "class")}> <td class="py-3 pr-4 align-top text-bone-white">${Row.F}</td> <td class="py-3 pr-4 align-top text-weathered-teal"> ${Row.Plugin} </td> <td class="py-3 align-top text-zinc-dust line-through decoration-raw-blood/60"> ${Row.Proxy} </td> </tr>`)} </tbody> </table> </div> <div class="mt-12 space-y-8 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust"> <p> <span class="font-bold text-bone-white">HERMES ALONE -</span> nothing stands
+						between a tool and the model.
+</p> <p>
+Every file read, build log, and JSON blob enters the message history raw,
+						because nothing intercepts it - the agent spends its token budget reading noise
+						instead of reasoning.
+</p> <p>That is the baseline cost the other two configurations exist to remove.</p> <p> <span class="font-bold text-weathered-teal">HERMES + APHRODITE -</span> the
+						plugin lane intercepts output before it becomes message history.
+</p> <p>
+The hooks classify, store, and replace raw output with a type-aware marker of
+						~15 tokens instead of hundreds, the agent retrieves the full content only when
+						it actually needs it, and the injection assembler adds directives, nudges, and
+						the recall catalog to every turn under a hard byte budget.
+</p> <p>
+Measured over 200 real Hermes sessions: 26.9% of all context tokens deflected, a
+						median session saved ratio of 22.9%, and ~22,921 tokens saved per API call.
+</p> <p>
+THE TRADE-OFF IS STATED PLAINLY: the hooks are Hermes' contract - no other
+						client can register them, so this lane works with Hermes only.
+</p> <p> <span class="font-bold text-stamped-canary">
+HERMES + APHRODITE + THE PROXY -
+</span>
+the plugin already spawns both listeners, so the third configuration is running
+						without extra setup: point${" "} <code class="font-mono text-weathered-teal">base_url</code>
+at <code class="font-mono text-weathered-teal">:9798</code> and any
+						OpenAI-compatible client gets the same CCR compression over plain HTTP.
+</p> <p>
+That is the agent-to-agent path - a second agent, a script, or an external tool
+						can converse through the same compressed channel, share the persistent SQLite
+						store (which survives a restart; the plugin lane's inline store is
+						session-scoped), and call the tool relay to retrieve or create CCR entries.
+</p> <p>
+THE LIMIT IS REAL TOO: the proxy only sees HTTP traffic.
+</p> <ul class="mt-3 flex flex-col gap-2"> <li class="border-l-4 border-raw-blood pl-4">no tool-output interception</li> <li class="border-l-4 border-raw-blood pl-4">no terminal compression</li> <li class="border-l-4 border-raw-blood pl-4">no directives</li> <li class="border-l-4 border-raw-blood pl-4">no context engine</li> <li class="border-l-4 border-raw-blood pl-4">and SSE streams pass through uncompressed.</li> </ul> <p>
+Because of that the proxy extends the stack to other callers; it does not replace
+						the hooks inside Hermes.
+</p> </div> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": "LIFECYCLE // SESSION TO SESSION"
+	})} <h3 id="lifecycle" class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+What happens when you launch Hermes
+</h3> <div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed"> <div class="text-bone-white">hermes starts</div> <div class="pl-4 text-bone-newsprint">
+→ plugin loads · dylib resolved once per process, smoke-tested in a subprocess
+</div> <div class="pl-4 text-bone-newsprint">
+→ a faulting image degrades to "plugin disabled" instead of killing the gateway
+</div> <div class="pl-4 text-bone-newsprint">
+→ two proxies spawn - a healthy pair is reused, never duplicated
+</div> <div class="pl-4 text-stamped-canary">
+→ on_session_start resets all per-session state
+</div> <div class="pl-4 text-weathered-teal">
+→ turn loop: pre_tool_call → transforms → pre_llm_call → post_llm_call
+</div> <div class="pl-4 text-zinc-dust">
+→ session ends · markers do not survive a restart - a new session starts a
+						fresh store
+</div> </div> <p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
+THE DUAL PROXIES: TOKEN ON :9798 (SQLITE, PERSISTENT, COMPRESSES ABOVE 1 KB) AND
+					CACHE ON :9797 (IN-MEMORY, COMPRESSES ABOVE 8 KB).
+</p> <p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
+NO HOT-RELOAD - RESTART THE SESSION TO PICK UP A NEW BUILD.
+</p> <figure class="mt-16 border border-oxblood-dark bg-soot-black p-4" data-diagram="session-lifecycle"> <div class="overflow-x-auto">${unescapeHTML(session_lifecycle_default)}</div> <figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+M8 // SESSION LIFECYCLE
+</figcaption> </figure> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": "EVIDENCE // WHAT THE AGENT SEES"
+	})} <h3 id="previews" class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+The twelve preview shapes
+</h3> <div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed"> ${Previews.map((Line) => renderTemplate`<div class="text-bone-newsprint"> <span class="text-stamped-canary"> ${Line.slice(0, Line.indexOf(":") + 1)} </span> ${Line.slice(Line.indexOf(":") + 1)} </div>`)} </div> <p class="mt-8 font-body text-base leading-relaxed text-bone-newsprint">
+Each line is the format string its own arm prints, character for character: the
+					tallies come first, then whatever the arm could add about them. The extension
+					counts in an <code class="font-mono text-base text-weathered-teal">ls</code> line
+					are joined with <code class="font-mono text-base text-weathered-teal">×</code>
+rather than a letter x, a JSON item count is set tight against the word it counts
+					(<code class="font-mono text-base text-weathered-teal">5items</code>), a code map
+					joins its structure parts with a pipe, and a search line reports hits, distinct
+					files and the first match location. The numbers are representative; the shapes
+					are the code's, which is what makes them checkable against
+<code class="font-mono text-base text-weathered-teal">preview/builders/*.rs</code>
+rather than taken on trust.
+</p> <div class="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-2"> <div> <div class="mb-6 text-base font-black uppercase tracking-widest text-zinc-dust">
+WITHOUT APHRODITE:
+</div> <div class="border border-oxblood-dark bg-asphalt-panel p-4 font-mono text-base text-zinc-dust">
+500 tokens of build output... scrolling... error? no... warning? no... ok it
+							passed. That was 500 tokens I'll never get back.
+</div> </div> <div> <div class="mb-6 text-base font-black uppercase tracking-widest text-weathered-teal">
+WITH NATIVE INTEGRATION:
+</div> <div class="border border-oxblood-dark bg-asphalt-panel p-4 font-mono text-base"> <span class="text-bone-white">[build:0E 0W 44L]</span> <span class="text-zinc-dust"> ${" "}
+← a few tokens. The agent knows: build passed. The line count is the same
+								log the left pane spends 500 tokens on: five hundred tokens is about two
+								thousand characters, which is what forty-four lines of compiler output
+								measure.
+</span> </div> </div> </div> <p class="mt-12 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
+SANITIZED, GENERALIZED SHAPES - REPRESENTATIVE PREVIEW FORMS FROM THE PUBLIC DOCS,
+					NOT SESSION CONTENT.
+</p> <p class="mt-3 text-base leading-relaxed text-zinc-dust">
+THE AGENT RETRIEVES FULL OUTPUT WITH aphrodite_retrieve(hash) ONLY WHEN IT ACTUALLY
+					NEEDS IT.
+</p> ${renderComponent($$result, "ZineTape", $$ZineTape, {
+		"Variant": "section",
+		"Label": "OPT-IN // CONTEXT ENGINE"
+	})} <h3 id="context-engine" class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
+The optional third integration point
+</h3> <p class="mb-3 font-body text-base leading-relaxed text-bone-newsprint">
+Enable with${" "} <code class="font-mono text-base text-weathered-teal">APHRODITE_CONTEXT_ENGINE=1</code>.
+</p> <p class="mb-3 font-body text-base leading-relaxed text-bone-newsprint">
+The engine is the session's middle-turn archiver: when the conversation index fills
+					past <code class="font-mono text-base text-weathered-teal">engine_threshold_pct</code>,
+					it packs the middle turns (keeping
+<code class="font-mono text-base text-weathered-teal">engine_protect_first</code>
+at the start and
+<code class="font-mono text-base text-weathered-teal">engine_protect_last</code>
+at the end, once
+<code class="font-mono text-base text-weathered-teal">engine_min_msgs</code>
+turns exist) into one compact CCR entry and replaces them with a single marker, so
+					the model sees a short head + marker + tail history.
+</p> <p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
+The archive is in-place but recoverable via
+<code class="font-mono text-base text-weathered-teal">aphrodite_retrieve</code>.
+</p> <div class="space-y-4 border border-oxblood-dark bg-soot-black p-5 font-mono text-base text-bone-newsprint"> <div> <span class="text-zinc-dust">engine_threshold_pct</span>${" "} <span class="text-stamped-canary">30</span>${" "} <span class="text-zinc-dust"># archive middle turns at % context fill</span> </div> <div> <span class="text-zinc-dust">engine_protect_first</span>${" "} <span class="text-stamped-canary">2</span>${" "} <span class="text-zinc-dust"># messages kept at the start</span> </div> <div> <span class="text-zinc-dust">engine_protect_last</span>${" "} <span class="text-stamped-canary">5</span>${" "} <span class="text-zinc-dust"># messages kept at the end</span> </div> <div> <span class="text-zinc-dust">engine_min_msgs</span>${" "} <span class="text-stamped-canary">8</span>${" "} <span class="text-zinc-dust"># minimum messages before activating</span> </div> </div> ` })} ${renderComponent($$result, "ZineSource", $$ZineSource, { "Lines": ["SRC: README.md:91-99, 219-299, 467-482; docs/guides/hermes-integration.md:115-141; docs/proxy/architecture.md:12-31; docs/tool-relay/callbacks.md:89-92.", "SRC: README.md:298-299; docs/guides/hermes-integration.md:107-108."] })} </section>  ${renderComponent($$result, "Related", $$Related, { "Links": [
+		{
+			Href: "/plugin/",
+			Label: "PLUGIN"
+		},
+		{
+			Href: "/tools/",
+			Label: "TOOLS"
+		},
+		{
+			Href: "/flavors/",
+			Label: "FLAVORS"
+		},
+		{
+			Href: "/setup/",
+			Label: "SETUP"
+		}
+	] })} ` })} ${renderComponent($$result, "ZineDiagramNav", $$ZineDiagramNav, {})} ` })}`;
+}, "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/pages/hermes.astro", void 0);
+var $$file = "/Volumes/CORSAIR/Developer/macOS/Application/PlayForm/Aphrodite/Site/Source/pages/hermes.astro";
+var $$url = "/hermes";
+// \0virtual:astro:page:Source/pages/hermes@_@astro
+var page = () => hermes_exports;
+export { page };

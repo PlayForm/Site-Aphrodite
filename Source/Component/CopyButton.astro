@@ -20,6 +20,17 @@
  * is a different size, not a different mechanism. Use this one wherever the
  * copy is an ACTION in a panel or beside a code fence.
  *
+ * NOT FOR A FENCE'S OWN PAYLOAD. A code block's copy control is the plate's
+ * chip (`Source/Script/CodePlate.ts`), which already exists on every fence and
+ * copies the one payload the block declares. `Component/CodeFence.astro` used
+ * to render this button too, and the result was two controls for one payload
+ * with the second one labelled `BASH` - the fence's language, because the
+ * label defaulted to `Lang.toUpperCase()`. That is the rule this component
+ * carries everywhere now: A LABEL NAMES THE ACTION, NEVER THE LANGUAGE OR THE
+ * FORMAT. `COPY TOML` and `COPY ALL 7` name what the reader gets; `BASH` names
+ * what the block is written in and belongs on the fence's metadata tag, where
+ * nothing is clickable.
+ *
  *   <CopyButton Payload={InstallSequence} />
  *   <CopyButton Label="COPY TOML" Payload={Toml} Tone="teal" Size="sm" />
  */

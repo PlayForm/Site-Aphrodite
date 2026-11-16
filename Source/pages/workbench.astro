@@ -220,7 +220,7 @@ const Arc: readonly {
 
 <Base
 	Title="Workbench - Aphrodite"
-	Description="A browser simulation of the Aphrodite preview workbench: paste any tool output and watch the preview line, the illustrative marker and the threshold knobs behave - client-side, illustrative, with no engine benchmark and no server-side retrieval."
+	Description="A browser simulation of the Aphrodite preview workbench: paste any tool output and the preview line, the illustrative marker and the threshold knobs respond - client-side, illustrative, with no engine benchmark and no server-side retrieval."
 >
 	<PageShell Rhythm="dense" Grow>
 		<!-- THE HEAD: the h1 opens the page, not the sample switchboard.
@@ -460,7 +460,7 @@ const Arc: readonly {
 						</p>
 					</div>
 					<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
-						{Compaction.Note} · compaction, not compression · not modelled on this page
+						{Compaction.Note} · compaction, not compression · a context-engine pass the compression readout cannot report
 					</p>
 					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 						{Compaction.Line}
@@ -483,20 +483,20 @@ const Arc: readonly {
 						turn the knobs, then RUN PIPELINE
 					</p>
 					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						The strip reports what the current knob set does to the sample loaded in the rail
-						above: the compression mode, the cache lane's own answer, and whether the store
-						routed the blob inline or durably. Three dimensions, printed side by side so one
-						can never be read as another.
+						Three independent decisions follow from the knob set: whether the result is
+						compressed, whether the cache lane answers it, and whether the store keeps the
+						blob inline or writes it durably. Aphrodite takes the three separately, and
+						reporting them side by side is what stops one being read as another.
 					</p>
 					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						Move a slider and the strip changes without a reload, because the four thresholds
-						are atomics the running engine swaps - the same sample is inline under a 4 KB
-						limit and stored under a 256 B one.
+						The four thresholds are atomics the running engine swaps, so the same result is
+						inline under a 4 KB limit and stored under a 256 B one, with no restart between
+						the two.
 					</p>
 					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						The byte reduction those decisions produce is printed in the pipeline's own
-						readout above, where it is measured against the bytes actually in the pane - not
-						here, where nothing is measured and only the routing is reported.
+						Byte reduction is measured against the bytes the result actually carries rather
+						than against the knob set, so the routing decision and the saving it produces stay
+						two figures: the thresholds decide the first, and only the bytes decide the second.
 					</p>
 				</div>
 			</section>
@@ -516,16 +516,15 @@ const Arc: readonly {
 					the engine was in the loop at all.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The first two are compression states, and the readout in the pipeline above names
-					them. The third is a compaction state: the token threshold alone decides the first
-					two, while the third is the context engine standing down - which is why that knob is
-					documented beside the thresholds rather than wired into the readout, and why the
-					readout can never print it.
+					The first two are compression states, and the readout names them. The third is a
+					compaction state: the token threshold alone decides the first two, while the third
+					is the context engine standing down - which is why that knob is documented beside
+					the thresholds rather than wired into the readout, and why no readout can print it.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					None of the three is a judgement about the agent's question. Whether a preview
-					answers it is the agent's decision, taken with a task in hand; this page has no task
-					to give it, so it reports the state and leaves the judgement where it belongs.
+					answers it is the agent's decision, taken with a task in hand: the engine reports
+					the state, and the judgement stays with the agent that holds the task.
 				</p>
 				<div class="mt-12 grid gap-8 lg:grid-cols-3" data-enter="180">
 					{
@@ -548,9 +547,9 @@ const Arc: readonly {
 					}
 				</div>
 				<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The strip in the knobs panel prints the inputs alongside the name - compression
-					mode, cache lane and storage - so a run that reads as surprising can be traced back
-					to the threshold that produced it.
+					The inputs are printed alongside the name - compression mode, cache lane and
+					storage - so a run that reads as surprising can be traced back to the threshold
+					that produced it.
 				</p>
 			</section>
 		</div>
@@ -558,8 +557,8 @@ const Arc: readonly {
 		<!-- THE TOPOLOGY: the store and the config surface. -->
 		<section id="topology" class="grid gap-20 lg:grid-cols-2" aria-label="Diagrams" data-reveal>
 			<p class="col-span-full max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Two diagrams carry the parts of the pipeline the rail above cannot show: where the
-				store actually lives, and where the thresholds come from.
+				Two parts of the pipeline have no place in a readout: where the store actually
+				lives, and where the thresholds come from.
 			</p>
 			{
 				Diagrams.map((Diagram) => (
@@ -599,22 +598,22 @@ const Arc: readonly {
 				<span class="motion-wipe" data-wipe aria-hidden="true" />
 				<ZineKicker Tone="canary">SIM NOTES · THE MEASURED ARC</ZineKicker>
 				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The numbers this sim gestures at are real: each plate prints the figure the CHANGELOG
-					carried at that release, and the benchmarks page carries the reproduce commands.
+					The numbers the simulation reaches for are real: each plate prints the figure the
+					CHANGELOG carried at that release, and the benchmarks page carries the reproduce
+					commands.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					None of them is measured by this page. They are historical engine measurements,
-					printed here as receipts, and the boundary above says so before a reader meets
-					them - which is the difference between a citation and a claim.
+					None of them was measured for the simulation. They are historical engine
+					measurements, printed as receipts and labelled as such wherever they appear -
+					which is the difference between a citation and a claim.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Read a plate as a receipt - the figure is what the release printed, the note is what
-					the number means for the design.
+					A plate is a receipt: the figure is what the release printed, and the note beside
+					it is what the number means for the design.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The figures climb to their values once, on the view that brings them in: a receipt
-					that counts up is a receipt being read, and the note underneath is what makes it
-					mean something.
+					The figures count up once when they come into view, and the note underneath each
+					one is what makes the number mean something.
 				</p>
 				<div class="mt-12 grid gap-6 md:grid-cols-2" data-enter="180">
 					{
@@ -754,7 +753,7 @@ const Arc: readonly {
 	.wb-ref {
 		max-width: 62ch;
 		font-family: "DM Sans", sans-serif;
-		font-size: var(--type-caption);
+		font-size: var(--type-body);
 		line-height: 1.6;
 		color: var(--zinc-dust);
 	}

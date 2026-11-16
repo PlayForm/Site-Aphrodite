@@ -32,7 +32,11 @@ const { Entries, Placeholder = "FILTER..." } = Astro.props;
 				<li data-registry-tags={[Entry.Label, ...(Entry.Tags ?? [])].join(" ").toLowerCase()}>
 					<a class="block px-3 py-2 font-mono text-base text-bone-newsprint hover:bg-raw-blood/20 hover:text-bone-white" href={Entry.Href}>
 						<span class="font-bold">{Entry.Label}</span>
-						{Entry.Note && <span class="text-zinc-dust"> - {Entry.Note}</span>}
+						{/* The note is PROSE, not part of the label: it reads at `type-body`
+						    (17px), never at the row's `text-base`, because sentence-length
+						    text never renders below the reading voice. The label above it
+						    stays in the row's mono voice, so the gap between the two grows. */}
+						{Entry.Note && <span class="type-body text-zinc-dust"> - {Entry.Note}</span>}
 					</a>
 				</li>
 			))

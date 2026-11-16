@@ -12,7 +12,7 @@
 	"Module": {
 		"Name": "@playform/aphrodite",
 		"Version": "1.8.1",
-		"Commit": "a03481bc7e82922f20669582bb7f6dbec81dcfc7",
+		"Commit": "60002211a686fee8e6ed0d95e4d6f3a35c3698d1",
 		"Branch": "Current",
 		"Nested": [
 			{
@@ -23,14 +23,14 @@
 			},
 			{
 				"Path": "vendor/headroom",
-				"Commit": "5ddb2355147c0711a829d893d58d9299e87f764e",
-				"Describe": "aphrodite-v0.12.0-1-g5ddb23551",
+				"Commit": "d425dac1bba2fb65da2bae756a634b56f6494736",
+				"Describe": "aphrodite-v0.12.0-3-gd425dac1b",
 				"State": "clean"
 			},
 			{
 				"Path": "vendor/rtk",
-				"Commit": "b240ae9b6a89cb7ffd8cd3be92b67903ed956780",
-				"Describe": "dev-0.43.0-rc.278-6-gb240ae9",
+				"Commit": "1b2c07c7cea817541992995753acdab7ffd4a831",
+				"Describe": "dev-0.43.0-rc.278-7-g1b2c07c",
 				"State": "clean"
 			}
 		]

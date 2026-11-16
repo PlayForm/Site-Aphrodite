@@ -34,8 +34,8 @@
 	--type-section: clamp(2.25rem, 4.4vw, 3.5rem);
 	--type-sub: clamp(1.375rem, 2.4vw, 1.75rem);
 	--type-body: clamp(1.0625rem, 0.4vw + 1rem, 1.125rem);
-	--type-caption: 0.84375rem;
-	--type-meta: 0.71875rem;
+	--type-caption: 0.84375rem; /* a short annotation - never a sentence */
+	--type-meta: 0.71875rem; /* a label, unit or count - never a sentence */
 	--type-code: 0.90625rem;
 
 	/* Spacing roles - four distances, each MEANING a different relationship
@@ -400,6 +400,21 @@ main > section {
    the content). Every rule below also matches a bare `<pre class="astro-code">`
    so a block is framed and padded before - and without - JavaScript.
 
+   TWO RULES THE CHIPS AND THE FRAME OBEY, both learned from the running site:
+
+   ONE COPY CONTROL PER PLATE. The bar holds a language tag and a copy chip,
+   and the copy chip is the block's ONLY copy control - `Component/
+   CodeFence.astro` no longer renders a second one. The tag is metadata:
+   uppercase, zinc-dust, not clickable. The chip is the action: sentence case
+   (`Copy`, or `Copy command` when the clipboard holds a bare command), canary
+   on hover, a pointer. Two chips of equal weight in one corner read as two
+   language tags, which is how a `BASH` label ended up sitting where an action
+   belongs.
+
+   ONE FRAME PER REGION. The plate draws the frame and the padding; a panel
+   that already draws its own does not get a second one, and the plate drops
+   its rhythm inside it (see the flush rule below).
+
    Specificity note: `body pre.astro-code` (0,1,2) deliberately outranks the
    docs reading column's own `pre` rule (0,1,1) without `!important`, so one
    definition of the plate holds on every page. */
@@ -409,7 +424,13 @@ body .zine-plate > pre.astro-code {
 	position: relative;
 	max-width: 100%;
 	margin: 1.75rem 0;
-	padding: 1.6rem 1.35rem 1.25rem;
+	/* SYMMETRIC. The chip cluster floats inside the top padding, so the band it
+	   needs is the same 1.35rem the other three sides get - a taller top band
+	   is a gap between the frame and the code that the bottom edge does not
+	   have, and at rest (the cluster is hidden until hover) it is empty space
+	   above the first line. The cluster is sized to fit inside this band, so no
+	   fence needs a reserved strip of its own. */
+	padding: 1.35rem;
 	border: 1px solid var(--oxblood-dark);
 	border-left: 3px solid var(--blood-crimson);
 	border-radius: 0;
@@ -482,7 +503,42 @@ body .zine-plate:focus-within > pre.astro-code {
 	margin: 1.75rem 0;
 }
 
-.zine-plate > pre.astro-code {
+/* ONE FRAME PER REGION. A plate inside a container that already draws a frame
+   or an inset contributes no RHYTHM of its own: the container's padding is the
+   inset, so the fence's border sits the same distance from the panel's border
+   on all four sides instead of that inset PLUS 1.75rem on two of them - the
+   gap a reader reports as "extra padding between the fence and its border".
+
+   The one gap the plate keeps is 0.5rem on every side, which is the lift's
+   clearance rather than spacing: the hover state throws a 3px hard shadow, and
+   at a zero inset that shadow paints over the panel's own border. It is the
+   same on all four sides, so the inset stays even.
+
+   Two ways in, because the plate is built at runtime and cannot be given a
+   class by the page that lays it out:
+     `.zine-plate--flush`  set by Source/Script/CodePlate.ts when the host
+                           declares `data-plate-flush`;
+     the panel rule       the containers this tree already uses for a framed
+                           code region - a soot inset or an asphalt panel,
+                           with the fence's `.zine-fence` wrapper between
+                           them. Exactly one wrapper level, so a fence merely
+                           *nested* somewhere inside a panel keeps its rhythm.
+   The bare `<pre>` forms carry the same rule so a no-JS fence inside a panel
+   is inset the same way as its plated twin. */
+.zine-plate--flush,
+:is(.bg-asphalt-panel, .bg-soot-black) > .zine-fence > .zine-plate,
+:is(.bg-asphalt-panel, .bg-soot-black) > .zine-fence > pre.astro-code,
+:is(.bg-asphalt-panel, .bg-soot-black) > pre.astro-code {
+	margin: 0.5rem;
+}
+
+/* The FIGURE owns the plate's rhythm, so the pre inside it carries none. This
+   must repeat the full `body`-prefixed selector: the group above declares
+   `margin: 1.75rem 0` on `body .zine-plate > pre.astro-code` (0,2,2), which
+   outranks a bare `.zine-plate > pre.astro-code` (0,2,1) - the shorthand form
+   silently lost, the pre kept its margin, and the flush rule below was
+   cancelled by the larger of the two collapsed margins. */
+body .zine-plate > pre.astro-code {
 	margin: 0;
 }
 
@@ -490,10 +546,14 @@ body .zine-plate:focus-within > pre.astro-code {
    band so revealing it moves nothing. Hidden at rest (the plate is clean
    print), revealed on hover or keyboard focus; always shown where hover does
    not exist, because a hidden control with no way to reveal it is a dead
-   control. */
+   control.
+
+   The cluster is sized to sit inside the symmetric 1.35rem band: 0.3rem offset
+   + a 0.975rem chip = 1.275rem, so it clears the first code line instead of
+   reserving a taller top padding for itself. */
 .zine-plate-bar {
 	position: absolute;
-	top: 0.5rem;
+	top: 0.3rem;
 	right: 0.55rem;
 	z-index: 2;
 	display: flex;
@@ -514,12 +574,17 @@ body .zine-plate:focus-within > pre.astro-code {
 	}
 }
 
-.zine-plate-lang,
-.zine-plate-copy {
+/* The two chips share a SHAPE - same frame, same mono face, same metrics - and
+   differ in VOICE, because they are two different kinds of thing. The direct-
+   child specificity (0,2,0) is deliberate: an adopted control can arrive with
+   utility classes of its own, and the bar's metrics must win without
+   `!important`. */
+.zine-plate-bar > .zine-plate-lang,
+.zine-plate-bar > .zine-plate-copy {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.3rem;
-	padding: 0.1rem 0.45rem;
+	padding: 0.05rem 0.4rem;
 	border: 1px solid var(--outline-oxblood);
 	border-radius: 0;
 	background: var(--soot-black);
@@ -527,24 +592,28 @@ body .zine-plate:focus-within > pre.astro-code {
 	font-size: 0.625rem;
 	font-weight: 700;
 	letter-spacing: 0.18em;
-	line-height: 1.6;
+	line-height: 1.2;
+}
+
+/* The LANGUAGE TAG is metadata: uppercase, zinc-dust, no pointer, no hover. It
+   must not look like, or act as, a copy button - a language name on an action
+   is a defect, and a language name dressed as an action is the same defect
+   wearing a chip. */
+.zine-plate-bar > .zine-plate-lang {
+	color: var(--zinc-dust);
 	text-transform: uppercase;
 }
 
-.zine-plate-lang {
-	color: var(--zinc-dust);
-}
-
-/* The overflow mark: the scrollbar is the persistent cue, this is the explicit
-   one - it only exists when the block actually scrolls. */
-.zine-plate--scroll .zine-plate-lang::after {
-	content: " ⇥";
-	color: var(--stamped-canary);
-}
-
-.zine-plate-copy {
+/* The COPY CHIP is the action, and it says so: sentence case (`Copy`, or
+   `Copy command` when the clipboard holds a bare command), the canary accent
+   on hover, a pointer. The case difference is what separates it from the
+   language tag beside it at a glance - uppercase is the label voice on this
+   site, sentence case is the verb. */
+.zine-plate-bar > .zine-plate-copy {
 	border-color: var(--oxblood-dark);
 	color: var(--bone-newsprint);
+	letter-spacing: 0.02em;
+	text-transform: none;
 	cursor: pointer;
 	transition:
 		color 0.12s steps(2),
@@ -552,9 +621,16 @@ body .zine-plate:focus-within > pre.astro-code {
 		background-color 0.12s steps(2);
 }
 
-.zine-plate-copy:hover {
+.zine-plate-bar > .zine-plate-copy:hover {
 	border-color: var(--stamped-canary);
 	background: var(--carbon-void);
+	color: var(--stamped-canary);
+}
+
+/* The overflow mark: the scrollbar is the persistent cue, this is the explicit
+   one - it only exists when the block actually scrolls. */
+.zine-plate--scroll .zine-plate-lang::after {
+	content: " ⇥";
 	color: var(--stamped-canary);
 }
 
@@ -592,10 +668,48 @@ body .zine-plate:focus-within > pre.astro-code {
                       a section head sat 2px above body copy.
      .type-sub        A sub-head inside a chapter, for a list of like things.
      .type-body       The reading voice. Every paragraph a reader must study.
-     .type-caption    The words under a figure - it belongs to the figure.
-     .type-meta       The mono label voice: eyebrows, counts, versions, units.
+     .type-caption    Short annotations that belong to a thing instead of
+                      standing on their own: a figure's own words, a unit, a
+                      qualifier, a value's name. Never a sentence.
+     .type-meta       The mono label voice: eyebrows, counts, versions, units,
+                      chips, table headers, source lines. Never a sentence.
      .type-code       Inline code inside prose. Fenced plates keep their own
                       size - the CODE PLATES section above owns those.
+
+   THE READABILITY FLOOR - a rule, not a preference.
+
+   SENTENCE-LENGTH TEXT NEVER RENDERS BELOW `--type-body`. Everything else in
+   this section follows from that one sentence.
+
+   Caption and meta are LABEL voices, and they are small on purpose: a label is
+   skimmed, and its size is what makes the gap between a label and the sentence
+   beside it read as hierarchy. A sentence set in a label's size inverts that
+   hierarchy twice over. At 13.5px on soot-black the line sits under the size at
+   which text resolves without effort - the reader's eye has to work for the one
+   sentence that says what the page is for. And a description rendered like a
+   caption reads as a footnote to the thing it is supposed to introduce, so the
+   reader skips it entirely. The site's own explanation of a page is the last
+   text that may be made small.
+
+   The corollary is the fix, and it is never "shrink it back": if a description
+   cannot afford body size where it sits, the SENTENCE is too long for that
+   place, and the sentence is what gets shortened.
+
+   Two consequences a caller must respect:
+     - Promoting a sentence does not flatten the page. Labels stay at meta and
+       caption, so the distance between a label and its description GROWS. That
+       growth is the point of the rule, not a side effect to be compensated for
+       by shrinking something else.
+     - Dense UI is not prose. A nav label, a count, a unit, a language chip, a
+       table header or a source line stays small: it is a label, and inflating
+       it costs rows without helping anyone read. Inflate sentences, never
+       controls.
+
+   A promoted sentence that no longer fits its container WRAPS. The breadcrumb
+   strip is the worked case: the registry's Promise is a sentence, so it takes
+   its own line under the trail (`flex-col`, not `flex-wrap`) rather than
+   competing for width with the crumb labels and losing its size to the
+   contest.
 
    None of the roles sets a colour or a margin. Colour is the caller's
    (bone-white for a head, bone-newsprint for the reading voice, zinc-dust for
@@ -731,15 +845,19 @@ body .zine-plate:focus-within > pre.astro-code {
 	margin-block-start: var(--space-group);
 }
 
-/* The words under a figure. Quieter than the reading voice and stopped at a
-   readable measure, because a caption set as wide as the page reads as body
-   copy that lost its paragraph. */
+/* The words under a figure: a SENTENCE, so it reads at `--type-body` like any
+   other sentence - see the readability floor above. A caption is made quieter
+   than the reading voice by its MEASURE and its COLOUR, never by shrinking its
+   type: 62ch stops a caption set as wide as the page from reading as body copy
+   that lost its paragraph, and zinc-dust steps it back from the argument it
+   belongs to. Sized down instead, the one visible caption on the homepage
+   became the smallest text in the hero it exists to explain. */
 .figure-caption {
 	max-width: 62ch;
 	font-family: "DM Sans", sans-serif;
-	font-size: var(--type-caption);
+	font-size: var(--type-body);
 	font-weight: 400;
-	line-height: 1.5;
+	line-height: 1.6;
 	color: var(--zinc-dust);
 }
 

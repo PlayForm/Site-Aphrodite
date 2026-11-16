@@ -44,6 +44,7 @@ const Hooks = Roster.map((Hook) => {
 			Tape="HOOKS // THE CHAIN"
 			Title="Six hooks, one turn"
 			Lead={[
+				"A tool call's output becomes part of the model's context, and the hooks are the points where Aphrodite sees that output first.",
 				"Every hook is a thin dispatch that forwards its arguments to the Rust dylib and hands the JSON reply back to Hermes.",
 				"It is the reason the shim registers one callback per name: on plugin load it asks the dylib for its hook names, and the six hooks are always registered together.",
 				`The chain is the whole integration: each seam fires in turn order, and nothing reaches the model that a seam did not first see.`,

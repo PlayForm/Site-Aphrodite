@@ -48,6 +48,7 @@ const BothCrates =
 			Tape="CRATES // WORKSPACE MANIFEST"
 			Title="Crates"
 			Lead={[
+				"A tool call's output becomes part of the model's context, and one crate in this workspace is the code that transforms it before the model reads it.",
 				"Two workspace crates plus the vendored Headroom fork that carries the content transforms.",
 				`It is the reason the fork stays separate: Aphrodite adds the preview pipeline, CCR storage, Hermes integration, and dual-proxy architecture on top of Headroom, instead of rewriting the transforms.`,
 				`The binary links the fork's <code class="font-mono text-base text-weathered-teal">headroom-core</code> library only, published as <code class="font-mono text-base text-weathered-teal">aphrodite-headroom-core v${Versions.Headroom}</code>: upstream's proxy surface does not ship in Aphrodite.`,

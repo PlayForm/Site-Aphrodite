@@ -580,6 +580,10 @@ const NextSteps = (() => {
 							<h2 class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 								{IsSectionIndex ? "IN THIS SECTION" : "THE SECTIONS"}
 							</h2>
+							<p class="mt-4 max-w-[62ch] type-body text-bone-newsprint">
+								Aphrodite works on one thing: the output a tool call appends to the
+								model's context. Every section documents a part of that work.
+							</p>
 							<div class="mt-8 grid gap-10 sm:grid-cols-2 sm:gap-x-12">
 								{IndexEntries.map(({ Name, Entries }) => (
 									<div class="border-l-2 border-oxblood-dark pl-5">
@@ -640,9 +644,9 @@ const NextSteps = (() => {
 							</summary>
 							<p
 								id="docs-outline-note"
-								class="type-caption border-t border-oxblood-dark px-5 pb-1 pt-3 text-zinc-dust"
+								class="type-body border-t border-oxblood-dark px-5 pb-1 pt-3 text-zinc-dust"
 							>
-								The section being read is marked in crimson; the list is the
+								Crimson marks the heading currently in view; every entry is one of the
 								document's own headings.
 							</p>
 							<ul class="flex flex-col gap-1 px-5 py-4">
@@ -749,8 +753,8 @@ const NextSteps = (() => {
 							<p class="type-meta uppercase tracking-widest text-zinc-dust">
 								Suggest an edit
 							</p>
-							<p class="type-caption mt-2 max-w-[62ch] text-zinc-dust">
-								<span class="uppercase tracking-widest">Generated from</span>{" "}
+							<p class="type-body mt-2 max-w-[62ch] text-zinc-dust">
+								<span class="uppercase tracking-widest type-meta">Generated from</span>{" "}
 								<a
 									class="text-stamped-canary underline decoration-2 underline-offset-4 hover:text-bone-white"
 									href={RepoLink(OurRepo, Doc.data.source)}
@@ -783,7 +787,7 @@ const NextSteps = (() => {
 								</p>
 								<p
 									id="docs-rail-note"
-									class="type-caption mt-2 border-b border-oxblood-dark pb-3 text-zinc-dust"
+									class="type-body mt-2 border-b border-oxblood-dark pb-3 text-zinc-dust"
 								>
 									The section being read is marked in crimson; the rail follows the
 									document's own headings.

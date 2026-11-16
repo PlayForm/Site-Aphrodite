@@ -97,8 +97,8 @@ const KindTag = {
 			Across {Sessions.Value} recorded sessions, with a sensitivity band of {Band.Value}. The band is the
 			result: {SavedTokens.Value} tokens is the same reconstruction counted at the centre of that range.
 		</p>
-		<p class="mt-2 max-w-2xl type-caption text-zinc-dust">
-			{Reduction.Kind.toUpperCase()} &bull; {Reduction.Scope}
+		<p class="mt-2 max-w-2xl type-body text-zinc-dust">
+			<span class="type-meta">{Reduction.Kind.toUpperCase()}</span>{" "}&bull; {Reduction.Scope}
 		</p>
 	</div>
 
@@ -124,7 +124,7 @@ const KindTag = {
 							<td class={`px-3 py-2 text-left font-black uppercase tracking-wider ${KindTag[Fact.Kind].Class}`}>
 								{KindTag[Fact.Kind].Tag}
 							</td>
-							<td class="px-3 py-2 text-left type-caption text-zinc-dust">{Fact.Scope}</td>
+							<td class="px-3 py-2 text-left type-body text-zinc-dust">{Fact.Scope}</td>
 						</tr>
 					))
 				}
@@ -146,7 +146,7 @@ const KindTag = {
 			success nor universal cost savings. What it measures is how much context the markers replaced in these
 			sessions, and what that reconstruction cost in tokens.
 		</p>
-		<p class="mt-3 max-w-3xl type-caption text-zinc-dust">
+		<p class="mt-3 max-w-3xl type-body text-zinc-dust">
 			Every figure above carries its own method and the pinned revision it was extracted from - the register on
 			the benchmarks page lists all of them with their IDs.
 		</p>

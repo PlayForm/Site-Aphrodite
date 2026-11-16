@@ -58,6 +58,7 @@ const ProxyRows = [
 			Tape="HERMES // THE INTEGRATION"
 			Title="Living inside Hermes"
 			Lead={[
+				`A tool call's output becomes part of the model's context, and the model reads and pays for every line of it.`,
 				`Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a client at.`,
 				`It is the reason the interception lives inside the turn: tool output never hits a wire, so only hook-level registration can catch it before it becomes message history - six hooks, thirteen tools, and an optional context engine, every call forwarded into the Rust dylib.`,
 				`Two proxy processes still run alongside as subprocesses, and a canonical runtime home under <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code> holds the binaries, config, CCR database, directives, and logs.`,
@@ -260,7 +261,7 @@ const ProxyRows = [
 							<span class="text-zinc-dust">
 								{" "}
 								← a few tokens. The agent knows: build passed. The line count is the same
-								log the left pane spends 500 tokens on: five hundred tokens is about two
+								log that costs 500 tokens raw: five hundred tokens is about two
 								thousand characters, which is what forty-four lines of compiler output
 								measure.
 							</span>

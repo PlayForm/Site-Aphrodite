@@ -701,6 +701,7 @@ budget_chars = 2600 # hard cap per turn`;
 			Tape="SETUP"
 			Title="Install Aphrodite"
 			Lead={[
+				`A tool call's output becomes part of the model's context, so Aphrodite is installed where that output is produced.`,
 				`Aphrodite is installed as a Hermes Agent plugin (recommended) or run as a standalone proxy for OpenAI-compatible APIs.`,
 				`Two things to know first: the plugin never downloads anything on its own - you run one setup command, and it fetches the Aphrodite binary and library from GitHub Releases, verifies them with SHA-256, and stores them in <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>. And you need no Rust toolchain for the two plugin routes: the catalog and the clone install prebuilt binaries. The Cargo and from-source routes do build with Rust, and need 1.88+.`,
 				`Not sure which to choose? Use the plugin catalog (Option 1).`,
@@ -916,8 +917,8 @@ budget_chars = 2600 # hard cap per turn`;
 															<h3 class="type-sub text-bone-white">{Step.Title}</h3>
 														</div>
 														{Step.Prerequisite !== undefined && (
-															<p class="mt-2 type-caption text-zinc-dust">
-																<span class="font-mono font-black uppercase tracking-widest text-weathered-teal">
+															<p class="mt-2 type-body text-zinc-dust">
+																<span class="font-mono font-black uppercase tracking-widest text-weathered-teal type-meta">
 																	BEFORE //{" "}
 																</span>
 																<span set:html={Step.Prerequisite} />
@@ -934,8 +935,8 @@ budget_chars = 2600 # hard cap per turn`;
 															<p class="mt-3 type-body text-bone-newsprint" set:html={Step.Explanation} />
 														)}
 														{Step.Expected !== undefined && (
-															<p class="mt-2 type-caption text-zinc-dust">
-																<span class="font-mono font-black uppercase tracking-widest text-weathered-teal">
+															<p class="mt-2 type-body text-zinc-dust">
+																<span class="font-mono font-black uppercase tracking-widest text-weathered-teal type-meta">
 																	EXPECT //{" "}
 																</span>
 																<span set:html={Step.Expected} />
@@ -943,7 +944,7 @@ budget_chars = 2600 # hard cap per turn`;
 														)}
 														{Step.Troubleshooting?.map((Note) => (
 															<p
-																class="mt-2 border-l-2 border-raw-blood pl-3 type-caption text-bone-newsprint"
+																class="mt-2 border-l-2 border-raw-blood pl-3 type-body text-bone-newsprint"
 																set:html={Note}
 															/>
 														))}
@@ -1001,8 +1002,8 @@ budget_chars = 2600 # hard cap per turn`;
 											{Route.Verify.map((Line) => (
 												<p class="mt-2 type-body text-bone-newsprint" set:html={Line} />
 											))}
-											<p class="mt-3 border-t border-oxblood-dark pt-2 type-caption text-zinc-dust">
-												<span class="font-mono font-black uppercase tracking-widest text-stamped-canary">
+											<p class="mt-3 border-t border-oxblood-dark pt-2 type-body text-zinc-dust">
+												<span class="font-mono font-black uppercase tracking-widest text-stamped-canary type-meta">
 													EXPECT //{" "}
 												</span>
 												{Route.Expect}
@@ -1303,7 +1304,7 @@ budget_chars = 2600 # hard cap per turn`;
 					CopyLabel="BASH"
 					Code={`./aphrodite --api-key «redacted:sk-...» --listen 127.0.0.1:9798`}
 				/>
-				<p class="mt-2 type-caption text-zinc-dust">
+				<p class="mt-2 type-body text-zinc-dust">
 					The key is redacted here on purpose: a placeholder is enough, because the flag is a
 					startup requirement rather than a credential the binary verifies.
 				</p>

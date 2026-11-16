@@ -1,4 +1,21 @@
 ---
+/**
+ * ZineCopyChip - the small inline copy chip: a visible label plus the clipboard
+ * glyph, riding the site's one clipboard runtime (`[data-copy]`, bound in
+ * `Layout/Base.astro`). Same mechanism as `CopyButton`, a quieter shape - it
+ * sits inside a row of metadata rather than standing alone as a CTA.
+ *
+ * A LABEL NAMES THE ACTION, NEVER THE LANGUAGE OR THE FORMAT. `COPY PATH`,
+ * `COPY` and `MARKER` all tell the reader what they are about to get; `BASH`
+ * would tell them what a block is written in, which is metadata and belongs on
+ * the fence's own tag. This chip is also NOT used for a code block's payload:
+ * a fence's copy control is the plate's chip (`Source/Script/CodePlate.ts`),
+ * which already exists on every fence, so a chip here would be a second
+ * control for the same bytes.
+ *
+ * `Aria` exists for the chips whose visible label is a short verb over an
+ * invisible payload - `COPY` beside a shell line names nothing on its own.
+ */
 interface Props {
 	/** The chip text; clicking copies this exact string (defaults to Label). */
 	Label: string;
