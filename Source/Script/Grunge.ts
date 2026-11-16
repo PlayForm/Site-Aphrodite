@@ -190,11 +190,12 @@ const Group = (Seed: number, GroupIndex: number): string => {
 export const PaintGrunge = (): void => {
 	for (const Element of document.querySelectorAll<HTMLElement>("[data-grunge]")) {
 		if (Element.dataset.grungePainted === "1") continue;
-		// A plate that carries a code fence stays clean. Ink behind a translucent
-		// panel still bleeds through the plate's own plate, and a command block has
-		// to read sharp; the texture belongs to prose plates, not to code.
-		if (Element.querySelector("pre, figure.zine-plate, .zine-plate")) continue;
 		try {
+			// A plate carrying a code fence keeps the ink, but faint and strictly
+			// behind: a command block must read sharp, and the texture is there to
+			// edge the sheet, not to sit under the type at full weight.
+			if (Element.querySelector("pre, figure.zine-plate, .zine-plate")) Element.classList.add("grunge--faint");
+			const Faint = Element.classList.contains("grunge--faint") ? 0.5 : 1;
 			const Seed = (Math.random() * 0x7fffffff) | 0;
 
 			for (let GroupIndex = 0; GroupIndex < GroupsPerCard; GroupIndex += 1) {
@@ -230,7 +231,7 @@ export const PaintGrunge = (): void => {
 				Svg.style.setProperty("--grunge-z", "-1");
 				// Per-group weight. The floor is 0.16, not 0.10: on a near-black page
 				// a 0.10 deposit reads as haze rather than ink.
-				Svg.style.setProperty("--grunge-opacity", (0.16 + Ride(GroupIndex * 0.91, Phase) * 0.14).toFixed(3));
+				Svg.style.setProperty("--grunge-opacity", ((0.16 + Ride(GroupIndex * 0.91, Phase) * 0.14) * Faint).toFixed(3));
 				Element.prepend(Svg);
 			}
 
