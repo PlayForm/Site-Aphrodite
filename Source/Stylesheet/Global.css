@@ -105,6 +105,82 @@
 	box-shadow: 5px 5px 0px #000000, 8px 8px 0px #134643;
 }
 
+/* ---- SPLAT FRAME // the asymmetric edge -------------------------------
+
+   Every plate on the site has a square border. That is the grammar of a
+   printed sheet, and it is also why a row of dark panels reads as a row of
+   identical boxes: the frame is always the same shape, centred, on all four
+   sides. This layer adds the thing the language was missing - an edge that is
+   NOT a rectangle and NOT centred.
+
+   The shape is a duplicate of the plate, displaced by the `#splat-edge`
+   turbulence filter (defined once in Layout/Base.astro), blurred a touch and
+   tinted to a grey wash, then rotated a fraction and pushed off-centre so the
+   halo is heavier on one side. It reads as photocopier bleed - the plate was
+   pressed onto the page and the toner spread - rather than as a fourth border.
+
+   Asymmetry is the point, so the offset is a four-value inset, not a uniform
+   one: top / right / bottom / left differ on purpose. `--right` mirrors it so
+   two adjacent plates do not bleed the same way, which is what makes a cluster
+   read as composed rather than repeated. */
+
+:root {
+	/* Oxblood ink, not neutral grey: a grey wash on a near-black page reads as a
+	   drop shadow from a component library. Toner from this press is red-black,
+	   so the bleed is the same family as the frame it surrounds. */
+	--splat-ink: rgba(147, 17, 40, 0.42);
+	--splat-ink-strong: rgba(147, 17, 40, 0.62);
+	/* top right bottom left - deliberately unequal, and unequal enough to read
+	   at row scale. A 2-3px difference is invisible on a 1400px page. */
+	--splat-inset: -0.9rem -2.6rem -1.9rem -1.1rem;
+	--splat-inset-right: -2.6rem -0.95rem -1.15rem -2.2rem;
+}
+
+.splat-frame {
+	position: relative;
+	isolation: isolate;
+}
+
+.splat-frame::before {
+	content: "";
+	position: absolute;
+	inset: var(--splat-inset);
+	background: var(--splat-ink);
+	/* No blur. The displacement IS the edge; blurring it turns a torn silhouette
+	   back into the soft glow a box-shadow already produces, which is exactly
+	   what the first pass looked like. */
+	filter: url(#splat-edge);
+	transform: rotate(-0.6deg);
+	z-index: -1;
+	pointer-events: none;
+}
+
+.splat-frame--right::before {
+	inset: var(--splat-inset-right);
+	transform: rotate(0.6deg);
+}
+
+.splat-frame--strong::before {
+	background: var(--splat-ink-strong);
+}
+
+/* A dark bleed vanishes against a dark or coloured band. Where the plate sits on
+   the crimson band (the four-stage row), the halo has to go the other way: bone
+   ink at low alpha, which reads as toner that lightened the sheet rather than a
+   shadow that darkened it. Same layer, opposite value. */
+.splat-frame--bone::before {
+	background: rgba(236, 233, 224, 0.1);
+}
+
+/* The filter is a decoration, never a carrier of meaning: where motion is
+   reduced the shape stays, but the displacement is flattened to a plain wash
+   so nothing depends on an animated-looking artefact. */
+@media (prefers-reduced-motion: reduce) {
+	.splat-frame::before {
+		filter: blur(2px);
+	}
+}
+
 .tape-staple {
 	position: relative;
 }
