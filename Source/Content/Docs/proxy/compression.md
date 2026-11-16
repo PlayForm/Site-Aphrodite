@@ -23,7 +23,7 @@ of everything flowing through the proxy.
 | Exempt content                    | Why                                                                                                                                                                                                                                 |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `tool_calls[].function.arguments` | Client-executable JSON, not model-facing prose - a real OpenAI-tools client (no Aphrodite plugin) can't parse a CCR marker as JSON, so compressing it broke every tool call it made. Only `message.content` is a compression target |
-| SSE streams (`text/event-stream`) | Forwarded chunk-by-chunk, never buffered - markers can't be spliced into a live stream. See [Architecture: Streaming (SSE)](https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/architecture.md#streaming-sse)            |
+| SSE streams (`text/event-stream`) | Forwarded chunk-by-chunk, never buffered - markers can't be spliced into a live stream. See [Architecture: Streaming (SSE)](https://github.com/PlayForm/Aphrodite/tree/Current/docs/proxy/architecture.md#streaming-sse)        |
 
 ## Full Pipeline
 
