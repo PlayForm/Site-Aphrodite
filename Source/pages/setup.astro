@@ -18,6 +18,7 @@ import CopyButton from "@Component/CopyButton.astro";
 
 import { DocsRoute, ExternalLinks, Routes } from "@Library/Links";
 import "@Stylesheet/Page/Setup.css";
+import ZineSurface from "@Component/ZineSurface.astro";
 
 // THE INSTALL MODEL - the shape is the point.
 //
@@ -1167,11 +1168,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 			<!-- THE CONTAINER. One terminal, eight lanes, four records - all in
 			     the document, one of each shown. The plate is the whole region: the
 			     lane ribbon is its top edge and the verification gate its footer. -->
-			<div
-				class="workflow__terminal grunge shell-card"
-				data-grunge
-				data-grunge-mode="edge"
-			>
+			<ZineSurface Class="workflow__terminal" Mode="edge">
 				{InstallRoutes.map((Route) => (
 					<div class="workflow__route" data-route={Route.ID}>
 						{Route.Lanes.map((Lane) => (
@@ -1353,15 +1350,14 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 						DAEMON LISTENING // :9797 cache proxy · :9798 token proxy
 					</span>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<!-- THE CALLOUT BANNER. Stitch's bottom terminal callout, and the band's
 			     closing line: the claim, the two facts that decide whether the install
 			     worked, and the two places a reader goes when it did not. -->
-			<div
-				class="grunge shell-card mt-10 flex flex-wrap items-center justify-between gap-6 p-6 sm:p-8"
-				data-grunge
-				data-grunge-mode="edge"
+			<ZineSurface
+				Class="mt-10 flex flex-wrap items-center justify-between gap-6 p-6 sm:p-8"
+				Mode="edge"
 			>
 				<div class="min-w-0 max-w-[46rem]">
 					<div class="flex items-center gap-3">
@@ -1388,7 +1384,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 						Role="ghost"
 					/>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<p class="mt-8 font-mono text-base text-zinc-dust">
 				All four routes converge on the same two directories -
@@ -1507,7 +1503,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 
 			<!-- THE PERSISTENCE BLOCK: the same layout read as records - every
 			     path a route writes, what writes it, and what it holds. -->
-			<div class="grunge shell-card mt-10" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-10" Mode="edge">
 				<div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[color:var(--tier-shell-edge)] px-5 py-4">
 					<span class="telemetry-tag telemetry-tag--bone">PERSISTENCE</span>
 					<span class="telemetry-tag">{Persistence.length} PATHS</span>
@@ -1543,7 +1539,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<div class="mt-10">
 				<ZineFold
@@ -1574,7 +1570,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 				enabling the plugin.
 			</p>
 
-			<div class="grunge shell-card mt-8 p-5 sm:p-8" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-8 p-5 sm:p-8" Mode="edge">
 				<CodeFence Lang="toml" Code={Config} />
 				<div class="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[color:var(--tier-shell-edge)] pt-3 text-base text-zinc-dust">
 					<span>TEMPLATES IN THE REPO:</span>
@@ -1670,7 +1666,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 					</a>
 					.
 				</p>
-			</div>
+			</ZineSurface>
 			<ZineSource
 				Lines={[
 					"SRC: aphrodite.toml.example (the annotated reference)",
@@ -1694,7 +1690,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 				- read that file before anything else.
 			</p>
 
-			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-8" Mode="edge">
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse font-mono text-base">
 						<thead>
@@ -1779,7 +1775,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<p class="mt-8 max-w-[46rem] type-body text-zinc-dust">
 				Before launching, the plugin probes both ports' /health endpoints and skips the
@@ -1824,7 +1820,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 				</p>
 			</div>
 
-			<div class="grunge shell-card mt-8 p-5 sm:p-8" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-8 p-5 sm:p-8" Mode="edge">
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse font-mono text-base">
 						<thead>
@@ -1937,7 +1933,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 						.
 					</p>
 				</div>
-			</div>
+			</ZineSurface>
 			<ZineSource
 				Lines={[
 					"SRC: docs/install/troubleshooting.md (verify the proxy without Hermes)",
@@ -1958,7 +1954,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 				command.
 			</p>
 
-			<div class="grunge shell-card mt-8 p-5 sm:p-8" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-8 p-5 sm:p-8" Mode="edge">
 				<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 					{Uninstall.map((Lane) => (
 						<div class="well p-4">
@@ -2012,7 +2008,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 					</code>
 					.
 				</p>
-			</div>
+			</ZineSurface>
 			<ZineSource
 				Lines={[
 					"SRC: docs/install/macos-linux.md (uninstall); docs/install/windows.md (uninstall)",

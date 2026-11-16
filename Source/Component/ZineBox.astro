@@ -72,6 +72,11 @@ interface Props {
 	/** Extra classes for the plate itself. */
 	Class?: string;
 
+	/** An anchor id for the plate. `ZineSplit` needs one so `#hero-run` (and any
+	 *  deep link) has something to land on - the id was previously computed but
+	 *  only emitted as `data-run`, so every in-page anchor to a split did nothing. */
+	Id?: string;
+
 	/**
 	 * Sweep the plate's edge once, on the beat of the entrance root that owns
 	 * it (`[data-wipe]` in Documentation/Motion.md). The plate becomes the
@@ -135,6 +140,7 @@ const {
 	TapeColor = "raw",
 	TapeSide = "left",
 	Class = "",
+	Id,
 	Wipe = false,
 	Surface = "plain",
 	Emphasis = "standard",
@@ -272,6 +278,7 @@ const Frame =
 		Class,
 	]}
 	data-emphasis={Emphasis}
+	id={Id}
 	data-surface={Surface}
 	data-grunge={Grunge ? "" : undefined}
 	data-grunge-surface={Grunge ? GrungeSurface : undefined}

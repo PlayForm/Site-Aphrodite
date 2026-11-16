@@ -79,6 +79,15 @@ $photocopy-pitch: 8px;
 .grunge {
 	position: relative;
 	isolation: isolate;
+	/* THE HOST NEVER CLIPS ITS OWN INK. A grunge host is an ANCESTOR of every
+	   group painted into it, so `overflow: hidden` here - or on a wrapper
+	   between it and the viewport - shaves the bleed at the box edge and a
+	   splat comes back as a rectangle with one straight side. Stated rather
+	   than left to the default so it is a rule a future utility has to beat:
+	   this class selector wins against a same-element `overflow-hidden`
+	   utility, because the site's stylesheets load after the utility layer.
+	   The one clip in the document is `html, body` in `_base`. */
+	overflow: visible;
 }
 
 /* The ink is a REAL SVG element in the document, not a mask over a pseudo-element.
@@ -88,10 +97,21 @@ $photocopy-pitch: 8px;
    the DOM, and takes its colour from `color`, so one drawing serves every ink. */
 .grunge__ink {
 	position: absolute;
-	left: var(--grunge-x, -10%);
-	top: var(--grunge-y, -10%);
-	width: var(--grunge-w, 70%);
-	height: var(--grunge-h, 70%);
+	/* THE EXTENT CAP. The painter places a group by centre and size
+	   (`Script/Grunge.ts`: `--grunge-x/y` = centre% - size%/2, centre clamped
+	   to 0..100, size = (0.3 + 0.5·noise) · Scale, Scale 1.18 on a transparent
+	   surface), so the widest group is 94.4% of the host and its worst offset
+	   is -47.2%..52.8%: the drawing reaches at most 47.2% of the host's width
+	   past either edge - inside the one-plate-width budget, and that is the
+	   bleed the layer exists for. These bounds only ever bite if the painter
+	   grows past it, because a group that ran a full host width out would meet
+	   the page clip and come back as a straight edge. They are CSS, not a
+	   second copy of the painter: the inline `--grunge-*` values stay the one
+	   source of placement. */
+	left: clamp(-100%, var(--grunge-x, -10%), 100%);
+	top: clamp(-100%, var(--grunge-y, -10%), 100%);
+	width: min(var(--grunge-w, 70%), 100%);
+	height: min(var(--grunge-h, 70%), 100%);
 	z-index: var(--grunge-z, -1);
 	pointer-events: none;
 	color: var(--grunge-ink-color, #{$ink-body});

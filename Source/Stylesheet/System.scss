@@ -25,6 +25,15 @@
    against one global scope and reference each other's variables directly.
    Migrating them to namespaced `@use` is a later, mechanical pass - doing it now
    would mean rewriting every variable reference in nine files at once.
+
+   THE COMPONENT SIDE IS A SEPARATE CONTRACT. This file answers "where does this
+   RULE live". `Documentation/DesignSystem.md` answers "which PRIMITIVE is this
+   SHAPE": the atomic layers (tokens / atoms / molecules / organisms / pages),
+   the component catalogue, the register of shapes still hand-built on two or
+   more pages, and the four facts every route shares - gutter, title scale, band
+   rhythm, plate grammar. Read it before adding a class to a route. A shape two
+   pages render without a shared component is a defect there, and the fix is a
+   component, never a second copy of the markup.
    ============================================================================ */
 
 @import "contract";

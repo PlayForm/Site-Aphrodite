@@ -12,6 +12,7 @@ import { ToolProse } from "@Library/Prose/Tools";
 import type { ToolRecord } from "@Library/Records";
 import ToolRelay from "../Content/Mermaid/tool-relay.svg?raw";
 import MarkerFormat from "../Content/Mermaid/marker-format.svg?raw";
+import ZineSurface from "@Component/ZineSurface.astro";
 
 // THE THIRTEEN - never typed here. `plugin.yaml` decides which tools exist and
 // in what order; `schemas.rs` supplies each one's description and every
@@ -345,7 +346,7 @@ const MarkerFields = (Marker: string): string[] =>
 			    align on their digits. The family chip is a FIXED column - a reader
 			    scans one column of statuses instead of hunting a colour across four
 			    places in the row. */}
-			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-8" Mode="edge">
 				<div class="overflow-x-auto">
 					<table class="w-full min-w-[52rem] border-collapse text-left">
 						<thead class="bg-asphalt-panel">
@@ -419,7 +420,7 @@ const MarkerFields = (Marker: string): string[] =>
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<p class="mt-8 max-w-[46rem] border-t border-oxblood-dark pt-6 font-body text-body leading-relaxed text-zinc-dust">
 				THERE IS AN INTERNAL 14TH REGISTRY ENTRY, context_engine_pre_llm - THE CONTEXT
@@ -611,12 +612,7 @@ const MarkerFields = (Marker: string): string[] =>
 
 			<div class="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-2">
 				{Tools.map((Tool) => (
-					<div
-						id={Tool.Name}
-						class="grunge shell-card scroll-mt-24"
-						data-grunge
-						data-grunge-mode="edge"
-					>
+					<ZineSurface Id={Tool.Name} Class="scroll-mt-24" Mode="edge">
 						<div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[color:var(--tier-shell-edge)] px-5 py-4">
 							<span class="font-mono text-meta font-bold text-zinc-dust">
 								{Tool.N}
@@ -660,7 +656,7 @@ const MarkerFields = (Marker: string): string[] =>
 								</p>
 							))}
 						</div>
-					</div>
+					</ZineSurface>
 				))}
 			</div>
 		</section>

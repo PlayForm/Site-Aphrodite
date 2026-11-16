@@ -22,6 +22,7 @@ import { ExternalLinks, Routes } from "@Library/Links";
 import { Assert, HookNames, Hooks as Roster } from "@Library/Roster";
 import { PluginHookCard, PluginSequence as Sequence } from "@Library/Prose/Hooks";
 import { ToolNames } from "@Library/Roster";
+import ZineSurface from "@Component/ZineSurface.astro";
 
 /**
  * THE BLUEPRINT GRAMMAR, in six named voices.
@@ -341,7 +342,7 @@ const Essential = [
 			<!-- THE FILE ITSELF: one shell card, two wells. The left well is the
 			     header the manifest declares, the right one the two lists it
 			     promises - the same file, read in the order Hermes reads it. -->
-			<div class="grunge shell-card mt-10" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-10" Mode="edge">
 				<div class={CardHead}>
 					<span class="telemetry-tag telemetry-tag--bone">plugin.yaml</span>
 					<span class="telemetry-tag">{HookNames.length} hooks</span>
@@ -392,13 +393,13 @@ const Essential = [
 						</div>
 					</div>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<!-- TWO BARS, TWO DIFFERENT QUESTIONS. The first compares two lists, so
 			     it is full; the second is the shim's share of the logic, so it is
 			     empty. Each keeps the sentence that says why. -->
 			<div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-				<div class="grunge shell-card p-5" data-grunge data-grunge-mode="edge">
+				<ZineSurface Class="p-5" Mode="edge">
 					<ZineStatBar
 						Label="DECLARED SURFACE = RUNNING SURFACE"
 						Ratio="13 / 13"
@@ -413,8 +414,8 @@ const Essential = [
 						list and the schemas the release dylib reports are held to the same thirteen
 						names.
 					</p>
-				</div>
-				<div class="grunge shell-card p-5" data-grunge data-grunge-mode="edge">
+				</ZineSurface>
+				<ZineSurface Class="p-5" Mode="edge">
 					<ZineStatBar
 						Label="LOGIC IN THE PYTHON SHIM"
 						Ratio="0%"
@@ -425,7 +426,7 @@ const Essential = [
 						The bar is empty on purpose. Nothing in the shim decides anything - a Python
 						traceback means a load failure, never a compression bug.
 					</p>
-				</div>
+				</ZineSurface>
 			</div>
 
 			<div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -518,7 +519,7 @@ const Essential = [
 			<div class="mt-8 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
 				<!-- LANE A: the hook path - Hermes fires a seam, the dylib decides.
 				     Same weight as lane B: same frame, same ribbon, same channel. -->
-				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+				<ZineSurface Class="flex flex-col" Mode="edge">
 					<div class:list={["h-0.5 w-full", Accent.raw]} />
 					<div class={CardHead}>
 						<span class="telemetry-tag telemetry-tag--crimson">A</span>
@@ -561,12 +562,12 @@ const Essential = [
 							process, so to pick up a new build you restart the Hermes session.
 						</p>
 					</div>
-				</div>
+				</ZineSurface>
 
 				<!-- LANE B: the proxy path - the same engine, one hop from the client.
 				     The two listeners are the lane's whole surface, so they are the
 				     body of the channel rather than a paragraph about it. -->
-				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+				<ZineSurface Class="flex flex-col" Mode="edge">
 					<div class:list={["h-0.5 w-full", Accent.teal]} />
 					<div class={CardHead}>
 						<span class="telemetry-tag telemetry-tag--teal">B</span>
@@ -604,7 +605,7 @@ const Essential = [
 							Without a key it refuses to start: there is no keyless mode.
 						</p>
 					</div>
-				</div>
+				</ZineSurface>
 			</div>
 
 			<div class="prose-flow mt-8 max-w-[46rem]">
@@ -620,7 +621,7 @@ const Essential = [
 			</h3>
 			<div class="mt-8 grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
 				{Layers.map(({ N, Name, Role, Fails }) => (
-					<div class="grunge shell-card" data-grunge data-grunge-mode="edge">
+					<ZineSurface Mode="edge">
 						<div class:list={["h-0.5 w-full", Accent.raw]} />
 						<div class={CardHead}>
 							<span class="telemetry-tag telemetry-tag--crimson">{N}</span>
@@ -635,7 +636,7 @@ const Essential = [
 								</p>
 							</div>
 						</div>
-					</div>
+					</ZineSurface>
 				))}
 			</div>
 
@@ -700,7 +701,7 @@ const Essential = [
 			</div>
 
 			<h3 class={`mt-12 ${Head}`}>The turn, in order</h3>
-			<div class="grunge shell-card mt-6" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-6" Mode="edge">
 				<div class={CardHead}>
 					<span class="telemetry-tag telemetry-tag--bone">ONE TURN</span>
 					<span class="telemetry-tag">session start → next turn</span>
@@ -722,7 +723,7 @@ const Essential = [
 						</div>
 					))}
 				</div>
-			</div>
+			</ZineSurface>
 
 			<p class="mt-8 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
 				The loop closes on itself, so the state a turn leaves behind is the state the next
@@ -742,7 +743,7 @@ const Essential = [
 			</h3>
 			<div class="mt-8 grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
 				{Hooks.map(({ N, Name, Tape, Body: Paragraphs }) => (
-					<div class="grunge shell-card" data-grunge data-grunge-mode="edge">
+					<ZineSurface Mode="edge">
 						<div class:list={["h-0.5 w-full", Accent[Tape]]} />
 						<div class={CardHead}>
 							<span class:list={["telemetry-tag", TagTone[Tape]]}>{N}</span>
@@ -759,7 +760,7 @@ const Essential = [
 								/>
 							))}
 						</div>
-					</div>
+					</ZineSurface>
 				))}
 			</div>
 
@@ -790,7 +791,7 @@ const Essential = [
 			<h3 id="thresholds" class={`mt-20 ${Head}`}>
 				The numbers that decide
 			</h3>
-			<div class="grunge shell-card mt-6" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-6" Mode="edge">
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse text-left">
 						<thead>
@@ -881,7 +882,7 @@ const Essential = [
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<p class="mt-8 max-w-[46rem] border-t border-oxblood-dark pt-6 font-mono text-base leading-relaxed text-zinc-dust">
 				PRECEDENCE: ENVIRONMENT &gt; TOML &gt; DEFAULT (APHRODITE_TOOL_THRESHOLD_TOKEN ·
@@ -981,7 +982,7 @@ const Essential = [
 				<!-- THE PLAYBOOK. One shell card: a session ribbon, the seven lines in
 				     a recessed well, and a footer callout - the shape a reader follows
 				     with a terminal open beside it. -->
-				<div class="grunge shell-card self-start" data-grunge data-grunge-mode="edge">
+				<ZineSurface Class="self-start" Mode="edge">
 					<div class={CardHead}>
 						<span class="telemetry-tag telemetry-tag--teal">SESSION // BASH</span>
 						<span class="telemetry-tag">ROUTE 01 // GIT CLONE</span>
@@ -1006,7 +1007,7 @@ const Essential = [
 							the COPY tab on the fence copies all seven lines
 						</span>
 					</div>
-				</div>
+				</ZineSurface>
 			</div>
 
 			<p class="mt-8 max-w-[46rem] font-mono text-base leading-relaxed text-zinc-dust">
@@ -1016,7 +1017,7 @@ const Essential = [
 			</p>
 
 			<!-- ROUTE 02 - the same install, from the catalog. -->
-			<div class="grunge shell-card mt-12" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-12" Mode="edge">
 				<div class={CardHead}>
 					<span class="telemetry-tag telemetry-tag--bone">
 						ROUTE 02 // PLUGIN CATALOG
@@ -1062,7 +1063,7 @@ const Essential = [
 						.
 					</p>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<h3 id="key" class={`mt-16 ${Head}`}>
 				The proxy needs its own key
@@ -1189,7 +1190,7 @@ const Essential = [
 			</div>
 
 			<div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-				<div class="grunge shell-card" data-grunge data-grunge-mode="edge">
+				<ZineSurface Mode="edge">
 					<div class={CardHead}>
 						<span class="telemetry-tag telemetry-tag--crimson">binaries/</span>
 					</div>
@@ -1203,8 +1204,8 @@ const Essential = [
 							that was already there.
 						</p>
 					</div>
-				</div>
-				<div class="grunge shell-card" data-grunge data-grunge-mode="edge">
+				</ZineSurface>
+				<ZineSurface Mode="edge">
 					<div class={CardHead}>
 						<span class="telemetry-tag telemetry-tag--crimson">directives/</span>
 					</div>
@@ -1215,8 +1216,8 @@ const Essential = [
 							changed one stays changed.
 						</p>
 					</div>
-				</div>
-				<div class="grunge shell-card" data-grunge data-grunge-mode="edge">
+				</ZineSurface>
+				<ZineSurface Mode="edge">
 					<div class={CardHead}>
 						<span class="telemetry-tag telemetry-tag--crimson">ccr.db</span>
 					</div>
@@ -1227,7 +1228,7 @@ const Essential = [
 							store can be dropped without losing the conversation.
 						</p>
 					</div>
-				</div>
+				</ZineSurface>
 			</div>
 
 			<h3 id="selfheal" class={`mt-16 ${Head}`}>
@@ -1300,7 +1301,7 @@ const Essential = [
 			</h3>
 			<div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
 				{Lanes.map(({ Hook, When, Does }) => (
-					<div class="grunge shell-card" data-grunge data-grunge-mode="edge">
+					<ZineSurface Mode="edge">
 						<div class={CardHead}>
 							<h4 class="font-mono text-code font-bold text-bone-white">{Hook}</h4>
 						</div>
@@ -1310,7 +1311,7 @@ const Essential = [
 								{Does}
 							</p>
 						</div>
-					</div>
+					</ZineSurface>
 				))}
 			</div>
 			<p class="mt-8 max-w-[46rem] font-mono text-base leading-relaxed text-zinc-dust">
@@ -1318,7 +1319,7 @@ const Essential = [
 				Rust dylib; the dylib holds all the behavior.
 			</p>
 
-			<div class="grunge shell-card mt-16" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-16" Mode="edge">
 				<div class:list={["h-0.5 w-full", Accent.raw]} />
 				<div class={CardHead}>
 					<span class="telemetry-tag telemetry-tag--crimson">
@@ -1380,9 +1381,9 @@ const Essential = [
 						exist")
 					</p>
 				</div>
-			</div>
+			</ZineSurface>
 
-			<div class="grunge shell-card mt-12" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-12" Mode="edge">
 				<div class:list={["h-0.5 w-full", Accent.canary]} />
 				<div class={CardHead}>
 					<span class="telemetry-tag telemetry-tag--canary">
@@ -1432,7 +1433,7 @@ const Essential = [
 						release note
 					</p>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<ZineSource
 				Lines={[

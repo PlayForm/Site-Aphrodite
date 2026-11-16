@@ -13,6 +13,7 @@ import ZineFold from "@Component/ZineFold.astro";
 import ZineReveal from "@Component/ZineReveal.astro";
 import StudyLedger from "@Component/StudyLedger.astro";
 import CodeFence from "@Component/CodeFence.astro";
+import ZineSurface from "@Component/ZineSurface.astro";
 
 import { Routes } from "@Library/Links";
 import {
@@ -1358,7 +1359,7 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 			     figure is right-aligned in tabular figures so the column of numbers
 			     aligns on its digits, and the notes that explain each reading follow
 			     the plate as prose. -->
-			<div class="grunge shell-card mt-10" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-10" Mode="edge">
 				<div class="overflow-x-auto">
 					<table class="w-full min-w-[46rem] border-collapse font-mono text-base">
 						<thead class="bg-asphalt-panel">
@@ -1411,7 +1412,7 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<!-- THE NOTES: one block per family of reading, in the matrix's own order,
 			     each introduced by the same chip its row carries - so a paragraph

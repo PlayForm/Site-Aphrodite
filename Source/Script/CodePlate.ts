@@ -270,7 +270,12 @@ const BuildPlate = (Pre: HTMLPreElement): void => {
 		const Button = document.createElement("button");
 
 		Button.type = "button";
-		Button.className = "zine-plate-copy";
+		// `group` is what makes the confirmation below resolve: the swap is
+		// written as `group-data-[copy-state=copied]:*` variants, which
+		// Tailwind scopes under `.group[data-copy-state="copied"]`, and
+		// `data-copy-state` is set ON THIS BUTTON by the reflector that
+		// `Component/CopyButton.astro` / `Component/ZineCopyChip.astro` ship.
+		Button.className = "zine-plate-copy group";
 		Button.dataset["copy"] = Payload(Pre, Declared);
 		// The label names the ACTION. `Copy command` where the clipboard holds
 		// a bare command and the block holds a transcript: the reader is told
@@ -281,7 +286,13 @@ const BuildPlate = (Pre: HTMLPreElement): void => {
 				? "Copy this block's command to the clipboard"
 				: "Copy this code block to the clipboard",
 		);
-		Button.innerHTML = `<span aria-hidden="true">⧉</span><span>${Command ? "Copy command" : "Copy"}</span>`;
+		// THE CONFIRMATION IS THE CHIP - the same two-span shape the adopted
+		// path above carries (`Component/ZineCopyChip.astro`'s header says
+		// why: glyph first, label second, one shape in one ribbon). The action
+		// label is unchanged at rest; `COPIED` is a SECOND span, so the
+		// control never renames its own action. The reflector removes
+		// `data-copy-state` when the toast hides and the label comes back.
+		Button.innerHTML = `<span aria-hidden="true">⧉</span><span class="group-data-[copy-state=copied]:hidden">${Command ? "Copy command" : "Copy"}</span><span class="hidden group-data-[copy-state=copied]:inline" aria-live="polite">COPIED</span>`;
 		Bar.appendChild(Button);
 	}
 

@@ -10,6 +10,7 @@ import CodeFence from "@Component/CodeFence.astro";
 import { Versions } from "@Library/Versions";
 import { Assert, CrateNames, Crates as Roster } from "@Library/Roster";
 import { CrateNote } from "@Library/Prose/Crates";
+import ZineSurface from "@Component/ZineSurface.astro";
 
 // THE WORKSPACE - never typed here. `Cargo.toml` decides which crates exist;
 // each crate's own manifest supplies its name, version and description. A
@@ -112,7 +113,7 @@ const Chain = [
 				the roster with no edit anywhere, and a crate removed from it leaves the same way.
 			</p>
 
-			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-8" Mode="edge">
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse text-left">
 						<thead>
@@ -171,7 +172,7 @@ const Chain = [
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<ZineSource
 				Lines={[

@@ -8,6 +8,7 @@ import ZineBox from "@Component/ZineBox.astro";
 import ZineStamp from "@Component/ZineStamp.astro";
 import ZineSource from "@Component/ZineSource.astro";
 import { HookNames, ToolNames } from "@Library/Roster";
+import ZineSurface from "@Component/ZineSurface.astro";
 
 /* ═══ THE DECISION MATRIX ═══════════════════════════════════════════════════
  *
@@ -278,7 +279,7 @@ const [Plugin, ...Others] = Hosts;
 				</div>
 			</div>
 
-			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-8" Mode="edge">
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse text-left">
 						<thead>
@@ -339,7 +340,7 @@ const [Plugin, ...Others] = Hosts;
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</ZineSurface>
 		</section>
 
 		<!-- 02 // RECOMMENDED - the one dominant plate, at the page's single

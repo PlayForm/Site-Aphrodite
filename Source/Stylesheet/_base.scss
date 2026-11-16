@@ -19,9 +19,13 @@
                      `:where()` - element-level specificity only, so every
                      carrier beats it without `!important` - the carriers, and
                      the table-cell exception
-     the page clip   `main > section { overflow-x: clip }`: a tilted plate's
-                     BOUNDING box is wider than its layout box, and `clip`
-                     rather than `hidden` because it creates no scroll container
+     the page clip   `html, body { overflow-x: clip }`: ONE guard, on the page.
+                     A tilted plate's BOUNDING box is wider than its layout box,
+                     and `clip` rather than `hidden` because it creates no
+                     scroll container (so `scrollWidth === innerWidth`, and
+                     sticky keeps working). It is NOT on `main > section`: a
+                     section is an ancestor of every grunge host in its band,
+                     and clipping there shaved the ink's bleed flat
 
    WHY `break-word` AND NOT `anywhere` ON THE BODY. `anywhere` also collapses an
    element's min-content contribution to one character, so a flex or grid track
@@ -201,18 +205,41 @@ th {
 	overflow-wrap: normal;
 }
 
-/* A tilted plate's BOUNDING box is wider than its layout box: the tilt is
-   1.2deg, so a 6.5k-px-tall plate adds height·sin(1.2deg) - 137px - to its
-   width, and /plugin/ poked 12px past a 1440px viewport (no scrollbar, since
-   body clips; the viewport still kept a 12px scroll area, so scrollWidth was
-   1452). The section is the tilt's frame: `clip` - not `hidden` - because
-   clip creates no scroll container, so position:sticky and the tape corners
-   keep behaving exactly as before. */
-main > section {
-	overflow-x: clip;
-}
-/* ---- THE PAGE CLIP ------------------------------------------------------ */
+/* ---- THE PAGE CLIP ------------------------------------------------------
 
-main > section {
+   ONE horizontal guard for the whole document, at the PAGE - never at a
+   section or a plate.
+
+   WHY IT EXISTS AT ALL. A tilted plate's BOUNDING box is wider than its layout
+   box: the tilt is 1.2deg, so a 6.5k-px-tall plate adds height·sin(1.2deg) -
+   137px - to its width, and /plugin/ poked 12px past a 1440px viewport
+   (scrollWidth 1452). Something has to stop that from becoming a sideways
+   scroll.
+
+   WHY NOT ON `main > section` (where it used to be). A section is an ancestor
+   of every grunge host in its band, so the clip shaved the ink at the band's
+   own box edge: `Script/Grunge` draws each group to BLEED past its plate - up
+   to 47.2% of the host's width on either side - and a clip anywhere between
+   the ink and the viewport turns a splat back into a rectangle with one
+   straight side. The band was never the right frame for the tilt either: a
+   band is full-bleed, so the tilt's overflow reached the viewport edge anyway
+   and the section clip only ever removed the ink.
+
+   WHY `clip` AND NOT `hidden`. `hidden` creates a scroll container, so the
+   overflow still exists as scrollable overflow: `documentElement.scrollWidth`
+   stays 1452 against a 1440 viewport (programmatic sideways scroll included).
+   `clip` creates no scroll container and no scrollable overflow region, so
+   `scrollWidth === innerWidth` holds, `position: sticky` and the tape corners
+   keep behaving exactly as before, and `overflow-y: visible` stays visible -
+   the pair `visible`/`clip` is the one combination the two axes may hold.
+
+   The invariant this buys, and the one every new container must keep: a
+   container may clip its own children, but it must not be an ancestor of a
+   `[data-grunge]` element. A scroller that has to clip puts the ink outside it
+   or the scroller inside the plate (`.ledger__scroll` in Component/Data is the
+   worked example: the scroll box is INNER, the grunge host is the plate). */
+html,
+body {
 	overflow-x: clip;
+	overflow-y: visible;
 }

@@ -1,0 +1,60 @@
+---
+/**
+ * ZineSurface - the QUIET plate grammar: a card lifted off the page with a 1px
+ * zinc edge, carrying the grunge ink at its edge.
+ *
+ * THE SECOND PLATE GRAMMAR. `ZineBox` is the LOUD one - a 4px crimson module
+ * boundary and a hard offset shadow. This is the quiet one: the ground a module
+ * sits on rather than the frame around it. They are not variants of each other,
+ * and neither is a substitute for the other.
+ *
+ * Why the idiom is a component and not a class pair: `.shell-card` (the surface)
+ * and `.grunge` (the texture) are two published atoms, but the SHAPE is three
+ * facts that must agree - the surface, the texture, and the painter hook
+ * (`data-grunge` + `data-grunge-mode`) the grunge script reads. A page that
+ * writes the two classes and forgets the hook gets an empty plate with no ink
+ * and no error anywhere, which is why the combination is stated once, here.
+ *
+ * WHAT IT REPLACED. Fifty-four sites across ten pages hand-wrote
+ * `<div class="grunge shell-card ..." data-grunge data-grunge-mode="edge">` before
+ * this file existed, and forty-seven of them now render through it. Each one
+ * renders identically: the class list is `grunge shell-card` plus whatever
+ * `Class` carries, in that order, and the two data attributes are the ones the
+ * pages already wrote.
+ *
+ * NOT FOR AN `<article>`. The element this renders is a `<div>`, because Astro
+ * cannot render a dynamic tag name (`<Tag>` compiles to a component lookup, not
+ * an element). A surface that is a self-contained composition - a card whose
+ * semantics matter to a reader or an outline - keeps its own `<article>` and
+ * composes `.grunge .shell-card` itself. The seven sites still literal are
+ * exactly those; see `Documentation/DesignSystem.md` for the register.
+ */
+interface Props {
+	/** Extra classes for the surface itself: spacing, width, flex, a shadow. */
+	Class?: string;
+
+	/** The grunge painter's mode. `edge` rings the plate's border (the default
+	 *  the pages wrote); `scatter` sprinkles the ink across it. Omitted leaves
+	 *  the painter on its own default. */
+	Mode?: "edge" | "scatter";
+
+	/** An anchor id, for a surface the section index links to. */
+	Id?: string;
+
+	/** A one-off inline style. RESERVED for a data-driven value (a custom
+	 *  property the page computes); a fixed value belongs in the sheet. */
+	Style?: string;
+}
+
+const { Class = "", Mode, Id, Style } = Astro.props;
+---
+
+<div
+	class:list={["grunge", "shell-card", Class]}
+	id={Id}
+	style={Style}
+	data-grunge
+	data-grunge-mode={Mode}
+>
+	<slot />
+</div>

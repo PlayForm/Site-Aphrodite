@@ -204,7 +204,14 @@ interface Props {
 		<link rel="apple-touch-icon" href="/Brand/aphrodite-180.png" />
 		<ClientRouter />
 	</Head>
-	<body class="site-body relative min-h-screen overflow-x-hidden">
+	<!-- THE BODY CARRIES NO OVERFLOW CLASS. The one horizontal guard is
+	     `html, body { overflow-x: clip }` in Stylesheet/_base (System.scss ->
+	     _base, "THE PAGE CLIP"), because a `overflow-x-hidden` utility here
+	     would beat that element selector AND create a scroll container, which
+	     leaves the tilt's overflow as scrollable overflow - `scrollWidth` then
+	     reports the plate's bounding box rather than the viewport. It also
+	     clipped nothing useful: the ink is drawn to bleed past its plate. -->
+	<body class="site-body relative min-h-screen">
 		<!-- SVG grunge noise filter (texture layer 3) -->
 		<svg aria-hidden="true" class="hidden">
 			<defs>

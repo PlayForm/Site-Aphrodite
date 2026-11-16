@@ -152,6 +152,7 @@ const Example = [
 // Records.ts, and the rows are generated - see the roster below.
 import { Assert, ConfigKeys as GeneratedKeys, ConfigNames, EnvVars } from "@Library/Roster";
 import { ConfigProse } from "@Library/Prose/Config";
+import ZineSurface from "@Component/ZineSurface.astro";
 // THE KEY ROSTER - generated, never typed here.
 //
 // `Source/Generated/Facts/Config.json` is built from
@@ -391,7 +392,7 @@ const Chapters = {
 
 			<div class="mt-10 grid gap-6 lg:grid-cols-2">
 				<!-- Editor pane: a shell with the buffer recessed into it -->
-				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+				<ZineSurface Class="flex flex-col" Mode="edge">
 					<div class="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--tier-well-edge)] px-5 py-3">
 						<span class="telemetry-tag telemetry-tag--canary">aphrodite.toml</span>
 						<span
@@ -412,12 +413,12 @@ const Chapters = {
 						class="h-[36rem] w-full resize-y bg-transparent p-5 font-mono text-code leading-relaxed text-bone-newsprint"
 						placeholder="The shipped example is loaded by the browser; every key, default and override below is server-rendered."
 					></textarea>
-				</div>
+				</ZineSurface>
 
 				<!-- Resolution ladder pane: the same shell, one hairline row per tracked
 				     key, so the chain a value walked reads as a ledger rather than as 54
 				     boxed panels. -->
-				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+				<ZineSurface Class="flex flex-col" Mode="edge">
 					<div class="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--tier-well-edge)] px-5 py-3">
 						<span class="telemetry-tag telemetry-tag--teal">
 							EFFECTIVE CONFIG - WHO WINS
@@ -438,7 +439,7 @@ const Chapters = {
 							env override.
 						</p>
 					</div>
-				</div>
+				</ZineSurface>
 			</div>
 
 			<figure id="diagram" class="well mt-12 p-4 sm:p-5" data-diagram="config-resolution">
@@ -485,12 +486,7 @@ const Chapters = {
 			     at all when the head script never set html.js - so a reader
 			     without JavaScript reads every key, and a reader with it can
 			     narrow the 54 rows to the four they are chasing. -->
-			<div
-				class="grunge shell-card mt-12"
-				data-key-filter-wrap
-				data-grunge
-				data-grunge-mode="edge"
-			>
+			<ZineSurface Class="mt-12" Mode="edge">
 				<div class="flex flex-wrap items-baseline justify-between gap-4 border-b border-[color:var(--tier-well-edge)] px-5 py-3">
 					<label
 						for="key-filter"
@@ -548,7 +544,7 @@ const Chapters = {
 						</p>
 					</div>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<!-- THE MATRIX ITSELF. `ConfigKeys` owns the rows and the section
 			     grouping; this page dresses each group as a shell with the table
@@ -864,7 +860,7 @@ const Chapters = {
 							{Rows.length} variables
 						</span>
 					</h3>
-					<div class="grunge shell-card mt-4" data-grunge data-grunge-mode="edge">
+					<ZineSurface Class="mt-4" Mode="edge">
 						<div class="overflow-x-auto">
 							<table class="w-full border-collapse text-left">
 								<thead>
@@ -915,7 +911,7 @@ const Chapters = {
 								</tbody>
 							</table>
 						</div>
-					</div>
+					</ZineSurface>
 				</div>
 			))}
 			<p class="mt-12 border-t border-[color:var(--tier-shell-edge)] pt-6 type-body text-zinc-dust">
@@ -974,7 +970,7 @@ const Chapters = {
 				</div>
 			</div>
 
-			<div class="grunge shell-card mt-6" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-6" Mode="edge">
 				<div class="overflow-x-auto">
 					<table class="w-full min-w-[40rem] text-left">
 						<thead>
@@ -1029,7 +1025,7 @@ const Chapters = {
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
 				<code class="text-bone-white">linter</code>,

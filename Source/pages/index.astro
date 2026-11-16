@@ -15,6 +15,7 @@ import { Benchmark, Narrative, Study } from "@Library/Numbers";
 import { Versions } from "@Library/Versions";
 
 import type { RunScript } from "@Library/Motion";
+import ZineSurface from "@Component/ZineSurface.astro";
 
 // THE RUNNING TERMINAL - the product's whole argument, moving. The left pane is
 // a terminal that never stops: five commands, each streaming its real output on
@@ -1283,7 +1284,7 @@ const Guarantees = [
 					step and fails fast with a clear error, before anything is written.
 				</p>
 			</div>
-			<div class="grunge shell-card max-w-4xl" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="max-w-4xl" Mode="edge">
 				<!-- The ribbon: what this transcript is, and that it is ready to run.
 				     It carries no control of its own - the copy chip belongs to the
 				     command block below it, and one payload gets one control. -->
@@ -1382,7 +1383,7 @@ hermes`}
 						:9798 token proxy (threshold 256 bytes by default)
 					</span>
 				</div>
-			</div>
+			</ZineSurface>
 			<!-- ONWARD // one install line, then the routing block. The install
 			     harness that used to sit here is /setup/'s story (install-surfaces 1)
 			     and the telemetry module that used to sit above it is /benchmarks/'. -->

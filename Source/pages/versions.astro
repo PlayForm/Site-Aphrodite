@@ -16,6 +16,7 @@ import ZineStamp from "@Component/ZineStamp.astro";
 import ZineStatBar from "@Component/ZineStatBar.astro";
 import ZineTape from "@Component/ZineTape.astro";
 import { ReleaseNote, Stamps, Versions } from "@Library/Versions";
+import ZineSurface from "@Component/ZineSurface.astro";
 
 /**
  * VERSIONS - the release ledger, drawn as a telemetry sheet.
@@ -547,11 +548,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 				than as a stale figure.
 			</p>
 
-			<div
-				class="grunge shell-card mt-8 shadow-[6px_6px_0px_#000]"
-				data-grunge
-				data-grunge-mode="edge"
-			>
+			<ZineSurface Class="mt-8 shadow-[6px_6px_0px_#000]" Mode="edge">
 				<div class="overflow-x-auto">
 					<table class="w-full min-w-[44rem] border-collapse text-left">
 						<thead class="bg-asphalt-panel">
@@ -599,7 +596,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</ZineSurface>
 			<div class="mt-8">
 				<ZineLesson
 					Label="THE PIN"
@@ -645,14 +642,14 @@ const Holes = [0, 1, 2, 3, 4, 5];
 			</p>
 			<div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 				{Agreement.map((Cell) => (
-					<div class="grunge shell-card flex flex-col" data-grunge>
+					<ZineSurface Class="flex flex-col">
 						<div class:list={["h-[2px] w-full", Cell.Accent]} />
 						<div class="flex flex-1 flex-col px-5 py-5">
 							<p class="section-index">{Cell.Index}</p>
 							<div class="metric metric--compact mt-4">{Cell.Value}</div>
 							<p class="mt-4 type-body text-bone-newsprint">{Cell.Note}</p>
 						</div>
-					</div>
+					</ZineSurface>
 				))}
 			</div>
 
@@ -829,11 +826,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 			    container so a narrow viewport scrolls the matrix instead of widening
 			    the page, and `min-w` holds the columns at a readable width rather
 			    than squeezing the prose column to a ribbon. */}
-			<div
-				class="grunge shell-card mt-8 shadow-[6px_6px_0px_#000]"
-				data-grunge
-				data-grunge-mode="edge"
-			>
+			<ZineSurface Class="mt-8 shadow-[6px_6px_0px_#000]" Mode="edge">
 				<div class="overflow-x-auto">
 					<table class="w-full min-w-[58rem] border-collapse text-left">
 						<thead class="bg-asphalt-panel">
@@ -959,7 +952,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</ZineSurface>
 
 			<p class="mt-8 max-w-[46rem] border-t border-oxblood-dark pt-6 type-body text-zinc-dust">
 				THE CANARY TAGS MARK THE TWO RELEASES THAT CHANGED THE PROJECT'S SHAPE: THE FIRST

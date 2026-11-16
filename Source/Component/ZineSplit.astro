@@ -291,7 +291,7 @@ const FrameRows = Tail.map(
     a caption and never a sentence. */}
 {
 	Run === undefined ? (
-		<ZineBox Size="lg" Rotate="-rotate-[1deg]" Wipe={Wipe}>
+		<ZineBox Size="lg" Rotate="-rotate-[1deg]" Wipe={Wipe} Id={Slug}>
 			<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
 				{/* PANEL ONE - the stored original, as a console: title bar over a
 				    recessed well. The bar names the panel, quotes the command the
@@ -370,7 +370,7 @@ const FrameRows = Tail.map(
 			</div>
 		</ZineBox>
 	) : (
-		<ZineBox Size="lg" Rotate="-rotate-[1deg]" Wipe={Wipe}>
+		<ZineBox Size="lg" Rotate="-rotate-[1deg]" Wipe={Wipe} Id={Slug}>
 			{/* `data-run` is on the GRID, not on the terminal panel: the runtime
 			    owns both halves of the pair, because the right one is a function of
 			    the left one. The terminal is the left column's panel; the preview,

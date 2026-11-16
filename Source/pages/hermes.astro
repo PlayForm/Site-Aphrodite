@@ -10,6 +10,7 @@ import ZineSource from "@Component/ZineSource.astro";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import SessionLifecycle from "../Content/Mermaid/session-lifecycle.svg?raw";
 import { HookNames, ToolNames } from "@Library/Roster";
+import ZineSurface from "@Component/ZineSurface.astro";
 
 const Previews = [
 	"[build:1E 1W 142L | error[E0432]: unresolved import ...]",
@@ -211,7 +212,7 @@ const Ribbon =
 			    cards, four stage accents, the count as the anchor in each. */}
 			<div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 				{Surface.map((Cell) => (
-					<div class="grunge shell-card flex flex-col" data-grunge>
+					<ZineSurface Class="flex flex-col">
 						<div class:list={["h-[2px] w-full", Cell.Accent]} />
 						<div class="flex flex-1 flex-col px-5 py-5">
 							<p class="section-index">{Cell.Index}</p>
@@ -221,7 +222,7 @@ const Ribbon =
 							</div>
 							<p class="mt-4 type-body text-bone-newsprint">{Cell.Note}</p>
 						</div>
-					</div>
+					</ZineSurface>
 				))}
 			</div>
 
@@ -254,7 +255,7 @@ const Ribbon =
 			{/* THE DECISION MATRIX - one row per capability, one column per lane.
 			    The plugin column carries the interception; the proxy column is
 			    struck through where the capability simply does not exist. */}
-			<div class="grunge shell-card mt-12" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-12" Mode="edge">
 				<div class={Ribbon}>
 					<span class="telemetry-tag telemetry-tag--canary">
 						COMPARISON // WHY NOT JUST A PROXY
@@ -298,7 +299,7 @@ const Ribbon =
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</ZineSurface>
 		</section>
 
 		<!-- 03 // TWO LANES - the plugin and the proxy, as two dominant cards -->
@@ -467,7 +468,7 @@ const Ribbon =
 			    five lines it produces in a recessed channel. The stage accents in
 			    the channel are the ladder's own: canary for the session reset, teal
 			    for the turn loop, dust for the ending. */}
-			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-8" Mode="edge">
 				<div class={Ribbon}>
 					<span class="telemetry-tag telemetry-tag--bone">hermes starts</span>
 					<span class="telemetry-tag">ONCE PER PROCESS</span>
@@ -496,7 +497,7 @@ const Ribbon =
 						fresh store
 					</div>
 				</div>
-			</div>
+			</ZineSurface>
 
 			{/* THE DUAL PROXIES - the sentence the docs print, split into the two
 			    pods it describes: each carries its port and its compression
@@ -505,7 +506,7 @@ const Ribbon =
 				THE DUAL PROXIES
 			</p>
 			<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
-				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+				<ZineSurface Class="flex flex-col" Mode="edge">
 					<div class={Ribbon}>
 						<span class="telemetry-tag telemetry-tag--canary">TOKEN</span>
 						<span class="telemetry-tag">:9798</span>
@@ -514,8 +515,8 @@ const Ribbon =
 					<div class="well flex-1 p-4 font-mono text-base leading-relaxed text-bone-newsprint sm:p-5">
 						SQLite. Persistent. Compresses above 1 KB.
 					</div>
-				</div>
-				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+				</ZineSurface>
+				<ZineSurface Class="flex flex-col" Mode="edge">
 					<div class={Ribbon}>
 						<span class="telemetry-tag telemetry-tag--teal">CACHE</span>
 						<span class="telemetry-tag">:9797</span>
@@ -524,7 +525,7 @@ const Ribbon =
 					<div class="well flex-1 p-4 font-mono text-base leading-relaxed text-bone-newsprint sm:p-5">
 						In-memory. Compresses above 8 KB.
 					</div>
-				</div>
+				</ZineSurface>
 			</div>
 
 			<div class="mt-8 flex flex-wrap items-start gap-4">
@@ -545,7 +546,7 @@ const Ribbon =
 			<p class="section-index">06 // EVIDENCE // WHAT THE AGENT SEES</p>
 			<h2 class="mt-3 type-section text-bone-white">The twelve preview shapes</h2>
 
-			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-8" Mode="edge">
 				<div class={Ribbon}>
 					<span class="telemetry-tag telemetry-tag--canary">PREVIEW SHAPES</span>
 					<span class="telemetry-tag">{Previews.length} ARMS</span>
@@ -561,7 +562,7 @@ const Ribbon =
 						</div>
 					))}
 				</div>
-			</div>
+			</ZineSurface>
 
 			<div class="prose-flow mt-8">
 				<p class="type-body text-bone-newsprint">
@@ -587,7 +588,7 @@ const Ribbon =
 			    recessed well beneath it, so the two are compared at a glance
 			    instead of through two paragraphs. */}
 			<div class="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
-				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+				<ZineSurface Class="flex flex-col" Mode="edge">
 					<div class={Ribbon}>
 						<span class="telemetry-tag">WITHOUT APHRODITE</span>
 						<span class="telemetry-tag telemetry-tag--crimson">500 TOKENS</span>
@@ -597,8 +598,8 @@ const Ribbon =
 						500 tokens of build output... scrolling... error? no... warning? no... ok it
 						passed. That was 500 tokens I'll never get back.
 					</div>
-				</div>
-				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+				</ZineSurface>
+				<ZineSurface Class="flex flex-col" Mode="edge">
 					<div class={Ribbon}>
 						<span class="telemetry-tag telemetry-tag--teal">
 							WITH NATIVE INTEGRATION
@@ -616,7 +617,7 @@ const Ribbon =
 							measure.
 						</span>
 					</div>
-				</div>
+				</ZineSurface>
 			</div>
 
 			<div class="prose-flow mt-12 border-t border-oxblood-dark pt-8">
@@ -675,7 +676,7 @@ const Ribbon =
 
 			{/* THE FOUR KEYS - each key with its value and the comment it shipped
 			    with, so the number and its meaning stay on one row. */}
-			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
+			<ZineSurface Class="mt-8" Mode="edge">
 				<div class={Ribbon}>
 					<span class="telemetry-tag telemetry-tag--teal">ENGINE KEYS</span>
 					<span class="telemetry-tag">4 DEFAULTS</span>
@@ -707,7 +708,7 @@ const Ribbon =
 						</dd>
 					</div>
 				</dl>
-			</div>
+			</ZineSurface>
 
 			<ZineSource
 				Lines={[
