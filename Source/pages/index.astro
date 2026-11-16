@@ -4,10 +4,10 @@ import Base from "@Layout/Base.astro";
 import Related from "@Component/Related.astro";
 
 import PageShell from "@Component/PageShell.astro";
+import CodeFence from "@Component/CodeFence.astro";
 import ZineButton from "@Component/ZineButton.astro";
 import ZineFold from "@Component/ZineFold.astro";
 import ZineSplit from "@Component/ZineSplit.astro";
-import ZineTape from "@Component/ZineTape.astro";
 
 import { Anchor, Routes } from "@Library/Links";
 import { Benchmark, Narrative, Study } from "@Library/Numbers";
@@ -473,7 +473,12 @@ const GridFold = `
 					</div>
 				</div>
 			</div>
-			<!-- Stamped wordmark -->
+			<!-- Stamped wordmark. THE HERO'S EXPRESSIVE BUDGET IS THE BRAND CARD
+			     above; the wordmark carries the scale jump and nothing else. The
+			     red rule that used to sit under it was the beat's fourth device
+			     (card, wordmark, rule, chip), and a 2px bar cannot add emphasis
+			     to a 144px word - it only spends the section's budget. Its 56px
+			     of vertical space is kept as spacing, so nothing else moves. -->
 			<div class="relative flex flex-col items-center">
 				<!-- The wordmark clamps at the small breakpoints: at 320px the
 				     fixed 72px measures ~346px wide and clips both edges against
@@ -484,16 +489,17 @@ const GridFold = `
 				>
 					Aphrodite
 				</h1>
-				<div
-					class="mb-10 mt-2 h-2 w-full max-w-xl -rotate-1 border border-black bg-raw-blood shadow-[3px_3px_0px_#000]"
-				>
-				</div>
 			</div>
-			<div
-				class="mb-8 inline-block -rotate-1 border border-black bg-carbon-void px-3 py-1 text-base font-black uppercase tracking-widest text-weathered-teal shadow-[3px_3px_0px_#000]"
+			<!-- The positioning line is a SUBTITLE, not a chip. Boxed, shadowed
+			     and tilted, it made the page's third-strongest element out of one
+			     sentence - and its teal made the hero carry two accents against
+			     the card's crimson. As a line of type under the wordmark it still
+			     states the product, and the hero speaks one colour. -->
+			<p
+				class="mb-8 mt-14 text-center font-mono text-base font-black uppercase tracking-widest text-bone-newsprint"
 			>
 				CONTEXT MANAGEMENT FOR TOOL-USING AI AGENTS
-			</div>
+			</p>
 			<!-- THE LEAD: one sentence states the product, and the two actions are
 			     the only two things a reader can do from here - install it, or
 			     watch it work. The justification that used to follow the lead is
@@ -501,7 +507,7 @@ const GridFold = `
 			     04's: four figures with four different measurement domains belong
 			     beside the study that qualifies them, not between the reader and
 			     the demonstration. -->
-			<p class="type-body max-w-3xl text-bone-newsprint">
+			<p class="type-body max-w-[40rem] text-bone-newsprint">
 				A tool call's output becomes part of the model's context, and a release build adds
 				thousands of lines the model reads - and pays for - before it can answer. Aphrodite
 				intercepts that result: logs, diffs, files,
@@ -534,7 +540,7 @@ const GridFold = `
 			<h2 class="type-section mb-6 text-bone-white">
 				The agent spends its budget reading noise
 			</h2>
-			<div class="prose-flow max-w-3xl">
+			<div class="prose-flow max-w-[62ch]">
 				<p class="type-body text-bone-newsprint">
 					Every file read, build, code search, or browser open floods the agent's context
 					with raw output - compilation logs, accessibility trees, JSON blobs.
@@ -553,7 +559,7 @@ const GridFold = `
 				The flood arrives one line at a time; the line the agent would have
 				read instead is recomputed as each line lands.
 			</p>
-			<div class="mt-10 max-w-3xl">
+			<div class="mt-10 max-w-[62ch]">
 				<ZineFold Tag="METHOD" Label="How the demonstration works" Body={MethodFold} />
 			</div>
 		</section>
@@ -581,8 +587,8 @@ const GridFold = `
 		<section class="relative w-full" data-reveal>
 			<p class="section-kicker !mb-4">03 / MECHANISM &middot; PIPELINE // 4-STAGE ABSORPTION</p>
 			<h2 class="type-section mb-4 text-bone-white">How it works</h2>
-			<p class="type-sub mb-6 text-weathered-teal">Four steps, one decision</p>
-			<div class="prose-flow max-w-3xl">
+			<p class="type-sub mb-6 text-bone-newsprint">Four steps, one decision</p>
+			<div class="prose-flow max-w-[62ch]">
 				<p class="type-body text-bone-newsprint">
 					A tool result is appended to the model's context the moment the tool returns, so a
 					build log the agent never needed is read in full, and paid for in full.
@@ -610,21 +616,28 @@ const GridFold = `
 					before the reasoning starts.
 				</p>
 			</div>
-			<div class="mt-10 max-w-3xl">
+			<div class="mt-10 max-w-[62ch]">
 				<ZineFold Tag="GUIDE" Label="How to read the four stages" Body={GridFold} />
 			</div>
-			<!-- The section's one expressive assembly. The grid keeps its 2x2 shape
-			     through the tablet/wide range - at 4-across the stage labels squish
-			     against the chips between 1024-1279px - and returns to 4-across only
-			     at xl, where each card gets ~330px+.
+			<!-- The section's one expressive assembly. BENTO GRAMMAR: the four
+			     stages are not four equal boxes - 01 and 04 take 45% more width
+			     than 02 and 03, because those are the two whose figure needs the
+			     room (`40 - 123 ns`, `aphrodite_retrieve`) and because a cluster
+			     of four identical tiles reads as a list, not as a mechanism with
+			     a shape. Weighted TRACKS rather than column spans: a span of
+			     2-of-6 put the narrow cards at 163px and wrapped every sentence
+			     in them; 1.45fr against 1fr gives the same two-size read at 308
+			     against 212 and keeps the cards readable. The grid keeps its 2x2
+			     shape through the tablet range and only splits into weighted
+			     tracks at xl, where each track has room to mean something.
 			     The plate is inset (`mx-3`/`sm:mx-4`) because a tilted plate's
 			     BOUNDING box is wider than its layout box: at -1.2deg a 500px-tall
 			     plate adds ~10px per side, and `main > section` clips that overflow,
 			     so a full-bleed plate would have its corners and its shadow plane
 			     shaved off. -->
-			<div class="emphasis-expressive mx-3 mt-12 p-5 sm:mx-4 sm:p-8 lg:p-10">
+			<div class="emphasis-quiet mx-3 mt-12 p-5 sm:mx-4 sm:p-8 lg:p-10">
 				<div
-					class="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-4"
+					class="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-[1.45fr_1fr_1fr_1.45fr]"
 					data-enter="180"
 				>
 					<!-- Stage 01 // CLASSIFY - teal: the technical voice, the type
@@ -702,11 +715,21 @@ const GridFold = `
 		     average them into one outcome, so every figure keeps the qualifier
 		     that names its domain - and the qualifier is part of the number. -->
 		<section
-			class="relative w-full bg-bone-newsprint p-6 text-soot-black sm:p-10 lg:p-14"
+			class="relative w-full bg-bone-newsprint py-6 text-soot-black sm:py-10 lg:py-14"
 			data-reveal
 		>
-			<ZineTape Variant="section" Label="EVIDENCE // 200 SESSIONS" Color="raw" />
-			<p class="section-kicker !mb-4 !text-oxblood-dark">04 / EVIDENCE</p>
+			<!-- ONE EXPRESSIVE DEVICE IN THIS BAND: the giant numeral. The ribbon
+			     that used to stamp the section is gone - a tape label AND a
+			     kicker are two things introducing one section, which is the same
+			     defect the mechanism band already answered by demoting its tape
+			     to a kicker. The tape's one fact (how many sessions the study
+			     covers) moves into the kicker, so nothing is lost but a second
+			     device. The four chips below are flat for the same reason: with
+			     the numeral as the band's one expressive assembly, a shadowed,
+			     tilted chip is a second and third. -->
+			<p class="section-kicker !mb-4 !text-oxblood-dark">
+				04 / EVIDENCE &middot; {Study.Sessions} SESSIONS
+			</p>
 			<h2 class="type-section mb-8 text-soot-black">One result, and the four figures beside it</h2>
 			<div class="flex flex-col gap-4 border-y-2 border-soot-black py-8 lg:flex-row lg:items-end lg:gap-12">
 				<div
@@ -732,28 +755,37 @@ const GridFold = `
 			<p class="type-meta mt-10 font-bold uppercase tracking-widest text-oxblood-dark">
 				THE OTHER FOUR MEASUREMENTS
 			</p>
-			<p class="type-body mt-2 max-w-3xl text-soot-black">
+			<p class="type-body mt-2 max-w-[62ch] text-soot-black">
 				Each of these is a different measurement in a different domain, and the qualifier under
 				each one is part of the number. The ceiling is not the average, the average is not the
 				latency, and the saved total is the session study rather than any single run.
 			</p>
+			<!-- BENTO, ONE DOMINANT + THREE SUPPORTING: the ceiling is the page's
+			     headline figure, so it takes 1.5fr of a weighted track set while
+			     the other three take 1fr each - a two-size cluster instead of a
+			     row of four equals. ONE ACCENT PER CLUSTER: all four chips are
+			     raw blood, because they are four measurements of one study and
+			     colour is not what separates them - the qualifier under each one
+			     is. Amber stays stage 02's identity, and teal means retrieval;
+			     nothing in this band retrieves. No shadow and no tilt: the giant
+			     numeral above is the band's one expressive assembly. -->
 			<div
-				class="mt-8 grid max-w-5xl grid-cols-1 items-start justify-items-center gap-4 sm:grid-cols-2 xl:grid-cols-4"
+				class="mt-8 grid max-w-5xl grid-cols-1 items-start justify-items-center gap-4 sm:grid-cols-2 xl:grid-cols-[1.5fr_1fr_1fr_1fr]"
 				data-enter="260"
 			>
 				<div class="flex flex-col items-center gap-2">
 					<span
-						class="-rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000] sm:text-base"
+						class="border-4 border-black bg-raw-blood px-6 py-3 font-mono text-lg font-black uppercase tracking-widest text-bone-white"
 					>
 						<span data-count={Benchmark.Ceiling.replace("×", "")}>{Benchmark.Ceiling.replace("×", "")}</span>&times; COMPRESSION
 					</span>
-					<span class="max-w-[15rem] text-pretty text-base leading-relaxed text-oxblood-dark">
+					<span class="max-w-[18rem] text-pretty text-base leading-relaxed text-oxblood-dark">
 						Best case, on large low-entropy prose.
 					</span>
 				</div>
 				<div class="flex flex-col items-center gap-2">
 					<span
-						class="rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000] sm:text-base"
+						class="border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-weathered-teal"
 					>
 						<span data-count={Benchmark.Overall.replace("×", "")}>{Benchmark.Overall.replace("×", "")}</span>&times; OVERALL
 					</span>
@@ -763,7 +795,7 @@ const GridFold = `
 				</div>
 				<div class="flex flex-col items-center gap-2">
 					<span
-						class="rotate-2 border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[4px_4px_0px_#000] sm:text-base"
+						class="border-2 border-black bg-raw-blood px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white"
 					>
 						{Benchmark.LatencyHeadline.toUpperCase().replace(" ", "")} E2E OVERHEAD
 					</span>
@@ -773,7 +805,7 @@ const GridFold = `
 				</div>
 				<div class="flex flex-col items-center gap-2">
 					<span
-						class="-rotate-1 border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[4px_4px_0px_#000] sm:text-base"
+						class="border-2 border-black bg-stamped-canary px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest text-soot-black"
 					>
 						<span data-count={Study.SavedMillions.replace("M+", "")}>{Study.SavedMillions.replace("M+", "")}</span>M+ TOKENS SAVED
 					</span>
@@ -787,23 +819,30 @@ const GridFold = `
 		<!-- BEAT 05 // INTEGRATION - two paths, and the difference between them is
 		     stated rather than implied: one lives inside the turn, the other speaks
 		     HTTP. The wording is /hermes/'s and /plugin/'s own, not a second
-		     description of the same thing. The two plates are differentiated by
-		     TIER - the native lane is the standard plate, the proxy is the hairline
-		     one - because the plugin is the lane this page installs and the proxy
-		     is the lane that extends it to other callers. -->
+		     description of the same thing.
+
+		     THE PAGE'S QUIET BAND. 02 and 03 are the two dense bands (a plate
+		     plus prose plus a fold; five paragraphs plus a card cluster) and 06
+		     is the panel the reader acts on. Drawn as two filled plates, this
+		     band was a third and fourth heavy box in a row, so the page had no
+		     valley between the evidence spread and the install panel. The lanes
+		     are the same two lanes with the same words and the same links -
+		     drawn as ruled columns instead of plates, with the chapter distance
+		     above them. Nothing was cut to buy the air; the band simply stops
+		     filling its own background. -->
 		<section class="relative w-full" data-reveal>
 			<p class="section-kicker !mb-4">05 / INTEGRATION</p>
 			<h2 class="type-section mb-6 text-bone-white">Two ways to run it</h2>
-			<div class="prose-flow max-w-3xl">
+			<div class="prose-flow max-w-[62ch]">
 				<p class="type-body text-bone-newsprint">
 					Both lanes run the same engine over the same CCR store. One is a native plugin inside
 					Hermes, where the interception lives inside the turn; the other is a listener on a port,
 					where it can only see traffic that arrives over HTTP.
 				</p>
 			</div>
-			<div class="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
-				<article class="emphasis-standard flex flex-col p-6 sm:p-8">
-					<p class="type-meta font-bold uppercase tracking-widest text-weathered-teal">
+			<div class="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
+				<article class="flex flex-col border-t-2 border-oxblood-dark pt-6">
+					<p class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
 						PATH 01 // NATIVE PLUGIN
 					</p>
 					<h3 class="type-sub mt-3 text-bone-white">Hermes plugin</h3>
@@ -829,7 +868,7 @@ const GridFold = `
 						</a>
 					</div>
 				</article>
-				<article class="emphasis-quiet flex flex-col p-6 sm:p-8">
+				<article class="flex flex-col border-t-2 border-oxblood-dark pt-6">
 					<p class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
 						PATH 02 // OPENAI-COMPATIBLE PROXY
 					</p>
@@ -879,6 +918,20 @@ const GridFold = `
 					fails fast with a clear error, before anything is written.
 				</p>
 				<p class="type-meta mt-8 font-bold uppercase tracking-widest text-stamped-canary">FOUR STEPS</p>
+				<!-- The commands as a block, not as inline prose: a reader who wants
+				     to install needs something to copy, and an inline <code> inside a
+				     sentence both hides the sequence and breaks mid-token on a narrow
+				     viewport (`hermes --version` split across two lines). The prose
+				     beside each step explains it; this is the thing itself. -->
+				<CodeFence
+					Lang="bash"
+					Copy
+					CopyLabel="Copy commands"
+					Code={`hermes plugins install aphrodite
+hermes plugins enable aphrodite
+cd ~/.hermes/plugins/aphrodite && bash download.sh
+hermes`}
+				/>
 				<ol class="prose-flow mt-3 list-decimal pl-5">
 					<li class="type-body text-bone-newsprint">
 						<code class="type-code text-bone-white">hermes plugins install aphrodite</code> - the
@@ -951,6 +1004,61 @@ const GridFold = `
 </Base>
 
 <style>
+	/* ONE GUTTER FOR EVERY BAND. The shell (`PageShell`) insets its `<main>` by
+	   `px-5 sm:px-8 lg:px-14`; a band that wants its own breathing room used to
+	   add a second padding on top of it, so the evidence spread's text started
+	   at 112px while the other five bands started at 56 - measured at 1440:
+	   section 02/03/05/06 first text x=56, section 04 first text x=112, its
+	   right edge 56px short of the column. Every band now reads the SAME value,
+	   so all six share one gutter and the page's left edge is one line from the
+	   hero to the colophon.
+
+	   The value is the shell's own padding scale, restated here because a band
+	   cannot inherit a Tailwind utility from its parent. It is page-scoped: the
+	   sixteen other routes keep their own composition, and no shared component
+	   gained a margin. */
+	:global(:root) {
+		--band-gutter: 1.25rem;
+	}
+
+	@media (min-width: 40rem) {
+		:global(:root) {
+			--band-gutter: 2rem;
+		}
+	}
+
+	@media (min-width: 64rem) {
+		:global(:root) {
+			--band-gutter: 3.5rem;
+		}
+	}
+
+	/* `nav` and `p` are here because Related and the colophon are direct
+	   children of `<main>` too: aligning the six bands and leaving the page's
+	   last two elements on the old edge would trade one break for another. */
+	:global(main > header),
+	:global(main > section),
+	:global(main > nav),
+	:global(main > p) {
+		padding-inline: var(--band-gutter);
+	}
+
+	/* One measure for every prose line on the page. Per-container classes were
+	   not enough: the install panel is 896px wide, so its paragraphs measured
+	   808px (~90 characters) even after the outer blocks were capped. 40rem is
+	   ~71 characters at this body size - `ch` is useless here because it
+	   measures the "0" glyph, which in DM Sans is far wider than average
+	   lowercase (62ch computed to 763px). */
+	:global(main p.type-body),
+	:global(main li.type-body) {
+		max-width: 40rem;
+	}
+	/* An inline identifier inside a sentence must not break mid-token:
+	   `hermes --version` split across two lines reads as `hermes -` / `-version`.
+	   A code span is one word, so it wraps as one word or not at all. */
+	:global(main code.type-code) {
+		white-space: nowrap;
+	}
 	/* STAGE IDENTITY // the four stages are four different operations, and a
 	   reader has to be able to tell stage 03 from stage 01 at a glance and to
 	   match it to the same stage on the case study. The accent is therefore one
@@ -975,17 +1083,20 @@ const GridFold = `
 	   specificity - a bare `.stage-card` would tie with `.emphasis-quiet` and
 	   the winner would depend on stylesheet order. `.emphasis-quiet.stage-card`
 	   is one class heavier, so the accent wins wherever the sheets land. */
-	/* The plate is a RECESSED surface, not a transparent one. On the soot page
-	   (#09090b) a transparent card is indistinguishable from the section it
-	   sits in - the four stages read as one continuous slab with four borders
-	   floating on it. --void-inset is deliberately darker than the page ground:
-	   a plate cut into the page, with the accent edge as its only colour. */
+	/* The plate is a TINTED surface, not a transparent one and not a flat dark
+	   one. Two failures taught this: transparent made the cards inherit the
+	   page (#09090b) so they read as borders on nothing, and a #050506 fill was
+	   a 4-level step nobody can see. The fill is the stage accent at 7% over
+	   --carbon-void: every card separates from the page AND from its siblings,
+	   so the row reads as four plates with four identities before any border
+	   is noticed. */
 	.emphasis-quiet.stage-card {
 		--stage-accent: var(--blood-crimson);
 		--stage-ink: var(--stage-accent);
-		background: var(--void-inset);
+		--stage-tint: 7%;
+		background: color-mix(in srgb, var(--stage-accent) var(--stage-tint), var(--carbon-void));
 		border-width: 1px;
-		border-color: var(--oxblood-dark);
+		border-color: color-mix(in srgb, var(--stage-accent) 30%, var(--oxblood-dark));
 		border-left-width: 3px;
 		border-left-color: var(--stage-accent);
 	}
@@ -1003,8 +1114,15 @@ const GridFold = `
 		--stage-ink: color-mix(in srgb, var(--raw-blood) 55%, var(--bone-newsprint));
 	}
 
+	/* Stage 04 is the agent's own decision, which sits outside the engine's
+	   three-hue language - so it takes the lightest neutral the palette owns and
+	   carries it at a stronger tint (16% vs 7%). At 7% the bone accent was
+	   achromatic AND low-contrast: the plate needed a second look to separate.
+	   Raised, it reads as the fourth plate of the set rather than as default
+	   foreground. */
 	.emphasis-quiet.stage-card--d {
-		--stage-accent: var(--bone-newsprint);
+		--stage-accent: var(--bone-white);
+		--stage-tint: 16%;
 	}
 
 	.stage-ink {

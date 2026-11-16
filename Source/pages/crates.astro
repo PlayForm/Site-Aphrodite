@@ -119,6 +119,7 @@ const BothCrates =
 								<CodeFence
 									Class="border border-oxblood-dark"
 									Code={`$ cargo install ${Crate.Name}`}
+									CopyPayload={`cargo install ${Crate.Name}`}
 								/>
 								{Crate.Marker ? (
 									<div class="ccr-marker mt-2 font-mono text-base font-bold text-weathered-teal">

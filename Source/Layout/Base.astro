@@ -15,6 +15,21 @@ const { Title = "Aphrodite", Description = "" } = Astro.props;
 const DescriptionText =
 	Description || "CCR compression proxy + absorptive preview pipeline for Hermes Agent.";
 
+// `content={Value}` cannot carry a `>`: the expression serializer writes the
+// value unescaped, the tag is cut at the first `>` inside it, and the attribute
+// arrives empty. Measured on the dev server's own HTML with a probe page - a
+// literal `content="env > TOML"` renders correctly while `content={Same}`
+// renders `content="env >` and nothing else - and it had already emptied the
+// description on the two pages whose summary contains an angle bracket
+// (/tools/ and docs/architecture/07-config-resolution). The text-carrying meta
+// tags are therefore emitted from an escaped string, so a description survives
+// angle brackets, quotes and ampersands alike.
+const Escaped = (Value: string): string =>
+	Value.replaceAll("&", "&amp;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;");
+
 // The canonical origin, from `site` in astro.config.ts. Absolute URLs are
 // required for canonical links, og:url and the social image; when `site` is
 // unset the paths stay relative rather than resolving to a wrong origin.
@@ -90,23 +105,23 @@ interface Props {
 		</script>
 
 		<!-- Meta -->
-		<title>{Title}</title>
+		<Fragment set:html={`<title>${Escaped(Title)}</title>`} />
 		<meta charset="utf-8" />
 
-		<meta name="description" content={DescriptionText} />
+		<Fragment set:html={`<meta name="description" content="${Escaped(DescriptionText)}" />`} />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="theme-color" content="#09090b" />
 		<meta name="format-detection" content="telephone=no" />
 		<meta name="twitter:dnt" content="on" />
 		<meta name="twitter:card" content="summary_large_image" />
-		<meta name="twitter:title" content={Title} />
-		<meta name="twitter:description" content={DescriptionText} />
+		<Fragment set:html={`<meta name="twitter:title" content="${Escaped(Title)}" />`} />
+		<Fragment set:html={`<meta name="twitter:description" content="${Escaped(DescriptionText)}" />`} />
 		<meta name="twitter:image" content={Absolute("/Brand/OG.png?v=2")} />
 
 		<!-- Open Graph -->
 		<meta property="og:type" content="website" />
-		<meta property="og:title" content={Title} />
-		<meta property="og:description" content={DescriptionText} />
+		<Fragment set:html={`<meta property="og:title" content="${Escaped(Title)}" />`} />
+		<Fragment set:html={`<meta property="og:description" content="${Escaped(DescriptionText)}" />`} />
 		<meta property="og:image" content={Absolute("/Brand/OG.png?v=2")} />
 		<meta property="og:url" content={Absolute(Astro.url.pathname)} />
 		<link rel="canonical" href={Absolute(Astro.url.pathname)} />
