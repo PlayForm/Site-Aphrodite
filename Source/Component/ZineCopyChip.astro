@@ -90,28 +90,9 @@ const HoverText = {
 	<span aria-hidden="true" class="text-base opacity-40 group-hover:opacity-90">
 		⧉
 	</span>
-	<span class="copy__verb opacity-60 group-hover:opacity-100">{Label}</span>
-	<span class="copy__done opacity-60 group-hover:opacity-100" aria-live="polite">COPIED</span>
+	<span class="opacity-60 group-hover:opacity-100 group-data-[copy-state=copied]:hidden">{Label}</span>
+	<span class="hidden opacity-60 group-hover:opacity-100 group-data-[copy-state=copied]:inline" aria-live="polite">COPIED</span>
 </button>
-
-<style>
-	/* THE CONFIRMATION IS THE CHIP, in the chip's own metrics: the label swaps
-	   where it sits, so the row of metadata keeps its rhythm and the control
-	   never grows a second surface. `data-copy-state` is set on this button by
-	   the reflector below for exactly as long as the site's toast is on
-	   screen. */
-	.copy__done {
-		display: none;
-	}
-
-	[data-copy-state] .copy__done {
-		display: inline;
-	}
-
-	[data-copy-state] .copy__verb {
-		display: none;
-	}
-</style>
 
 <script>
 	// THE COPY CONFIRMATION, INSIDE THE CONTROL.

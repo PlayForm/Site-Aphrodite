@@ -151,16 +151,22 @@ const {
 	GrungeCorner,
 } = Astro.props;
 
+/** Whether this plate paints no ground of its own: `quiet` paints nothing, and
+ *  a page that overrides with `bg-transparent` has taken the fill away. ONE
+ *  fact with two readers - the ink painter below, and the fill class, which has
+ *  to DECLARE the absence rather than hope a utility outranks the sheet. */
+const Fillless =
+	Emphasis === "quiet" || /(^|\s)bg-transparent(\s|$)/.test(Class);
+
 /** The surface the ink is painted on, as this component composes it.
  *
  *  The painter MEASURES the computed background first and only falls back to
  *  this declaration, for the one case a measurement cannot see: a fill painted
  *  by a pseudo-element. So it has to agree with the fill actually composed, and
- *  it is derived from the same facts - `quiet` paints nothing, and a page that
- *  overrides with `bg-transparent` has taken the fill away. Every other value
- *  here carries a real `background-color`. */
-const GrungeSurface: "transparent" | "filled" =
-	Emphasis === "quiet" || /(^|\s)bg-transparent(\s|$)/.test(Class) ? "transparent" : "filled";
+ *  it is derived from `Fillless` for exactly that reason - one fact, so the
+ *  class list and the painter cannot disagree. Every other value here carries a
+ *  real `background-color`. */
+const GrungeSurface: "transparent" | "filled" = Fillless ? "transparent" : "filled";
 
 const Pad = {
 	md: "plate--size-md",
@@ -172,20 +178,23 @@ const Pad = {
  *  classes, which set a background and nothing else, so the frame composed
  *  above stays intact.
  *
- *  The first three are `:where()`-scoped in `Plate.scss`, so a call site that
- *  passes its own `bg-*` still wins there - the `GrungeSurface` derivation
- *  below exists for exactly that case, and the utility it reads has to keep
- *  beating the modifier or the ink would be drawn for a fill that is no longer
- *  there. The tier fills stay plain classes: `Surface="shell"` is the surface
- *  the page asked for, and it is already a fill class and nothing more. */
-const Fill = {
-	plain: "plate--surface-plain",
-	inset: "plate--surface-inset",
-	paper: "plate--surface-paper",
-	canvas: "tier-canvas",
-	shell: "tier-shell",
-	well: "tier-well",
-}[Surface];
+ *  All six are plain class selectors in `Plate.scss`, so a utility no longer
+ *  beats a plate's ground - which is the point, since a fill that silently
+ *  loses leaves a bordered box with nothing behind it. A call site that MEANS
+ *  to remove the fill says `bg-transparent`, and `Fillless` turns that into the
+ *  declared opt-out `plate--surface-none` instead of relying on the utility
+ *  winning a specificity argument. The tier fills are already fill classes and
+ *  nothing more: `Surface="shell"` is the surface the page asked for. */
+const Fill = Fillless
+	? "plate--surface-none"
+	: {
+			plain: "plate--surface-plain",
+			inset: "plate--surface-inset",
+			paper: "plate--surface-paper",
+			canvas: "tier-canvas",
+			shell: "tier-shell",
+			well: "tier-well",
+		}[Surface];
 
 const Boundary = {
 	none: "plate--accent-none",

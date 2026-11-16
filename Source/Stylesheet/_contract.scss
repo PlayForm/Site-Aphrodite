@@ -264,7 +264,9 @@
    ---------------------------------------------------------------------------- */
 
 /*   .shell            the <main> measure, gutter and rhythm
-   .shell--wide      no measure: a full-bleed application surface
+   .shell--wide      the default page rhythm: 4rem gap and 4rem padding,
+                     5rem and 6rem at lg. NOT a measure override - the
+                     1440px max-width on `.shell` stands for every rhythm
    .shell--dense     the tight rhythm
    .shell--hero      the opening rhythm
    .shell--grow      fills the viewport's remaining height

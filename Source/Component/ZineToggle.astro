@@ -27,6 +27,17 @@
  * The switch bar is hidden until it can work: a two-button control that does
  * nothing is a promise the page cannot keep. Its listeners belong to an
  * AbortController that is aborted on astro:before-swap.
+ *
+ * THE TAB BAR GRAMMAR, and where else it is spent. A switch is a framed TRACK
+ * with flush SEGMENTS: the frame is one border, the segments divide it with
+ * hairlines, and the selected segment is the only one that carries a FILL. The
+ * fill is the selected thing's IDENTITY, not decoration - so `Tone` exists.
+ * `/setup/`'s playbook spends the same grammar twice in one control bar (the
+ * platform selector, then the four route pills) and cannot import this
+ * component, because its switch is a pair of radios driven by `:has()` and has
+ * to work with JavaScript off. Two implementations, one grammar: a page that
+ * needs a third switch copies the geometry from this bar rather than inventing
+ * a fourth chip shape.
  */
 interface Props {
 	/** Label of the first state (default "BEFORE"). */
@@ -46,6 +57,19 @@ interface Props {
 
 	/** Pane labels above the content. */
 	RightLabel?: string;
+
+	/**
+	 * The selected segment's fill - colour as identity. `raw` is the default
+	 * because it is what every existing call site renders: a comparison whose
+	 * two sides are not identities of their own. A toggle that selects a thing
+	 * the page already colours (a stage, a route, an evidence class) passes that
+	 * thing's accent instead, so four switches on one page do not all claim the
+	 * same crimson.
+	 */
+	Tone?: "raw" | "canary" | "teal" | "bone";
+
+	/** Extra classes on the frame - layout belongs to the caller. */
+	Class?: string;
 }
 
 const {
@@ -55,7 +79,21 @@ const {
 	RightPane,
 	LeftLabel,
 	RightLabel,
+	Tone = "raw",
+	Class = "",
 } = Astro.props;
+
+/** The selected segment's fill AND its ink, in one string: the two travel
+ *  together, because a fill without its readable foreground is half a choice.
+ *  `raw` reproduces the call sites' own `bg-raw-blood` + `text-bone-white`
+ *  byte for byte; the other three take soot ink, the same pairing the solid
+ *  `.telemetry-tag` modifiers use. */
+const ToneClass = {
+	raw: "bg-raw-blood text-bone-white",
+	canary: "bg-stamped-canary text-soot-black",
+	teal: "bg-weathered-teal text-soot-black",
+	bone: "bg-bone-newsprint text-soot-black",
+}[Tone];
 
 /** The ribbon geometry, one string for the whole set. */
 const Ribbon =
@@ -63,9 +101,13 @@ const Ribbon =
 ---
 
 <div
-	class="grunge zine-box-subtle border-[3px] border-oxblood-dark bg-carbon-void p-4 sm:p-5"
+	class:list={[
+		"grunge zine-box-subtle border-[3px] border-oxblood-dark bg-carbon-void p-4 sm:p-5",
+		Class,
+	]}
 	data-grunge
 	data-zine-toggle
+	data-toggle-active={ToneClass}
 >
 	<div
 		class="zine-toggle-bar mb-3 flex border-2 border-black bg-asphalt-panel shadow-[3px_3px_0px_#000]"
@@ -73,7 +115,10 @@ const Ribbon =
 		aria-label="Toggle the before and after panes"
 	>
 		<button
-			class="grow bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase tracking-widest text-bone-white"
+			class:list={[
+				"grow px-3 py-1.5 font-mono text-base font-black uppercase tracking-widest",
+				ToneClass,
+			]}
 			data-toggle-side="left"
 			type="button"
 			aria-pressed="true"
@@ -151,13 +196,32 @@ const Ribbon =
 			right: Root.querySelector<HTMLElement>("[data-toggle-pane='right']"),
 		};
 
+		/** The selected segment's fill, read off the frame so the tone is decided
+		 *  once, in the frontmatter: the script applies classes, it never chooses
+		 *  a colour. The fallback is the `raw` pair the component shipped before
+		 *  `Tone` existed, so an older serialised frame still toggles correctly. */
+		const Fill = (Root.dataset["toggleActive"] ?? "bg-raw-blood text-bone-white")
+			.split(/\s+/)
+			.filter(Boolean);
+
+		/** The idle segment's voice: the two classes the unselected tab carries,
+		 *  and both have to come off when the tab is selected - `text-zinc-dust`
+		 *  because the fill brings its own ink, and the hover colour because a
+		 *  bone-white hover over a canary or bone fill is unreadable. */
+		const Idle = ["text-zinc-dust", "hover:text-bone-white"];
+
 		function Select(Side: "left" | "right"): void {
 			for (const Button of Buttons) {
 				const Active = Button.dataset["toggleSide"] === Side;
 
-				Button.classList.toggle("bg-raw-blood", Active);
-				Button.classList.toggle("text-bone-white", Active);
-				Button.classList.toggle("text-zinc-dust", !Active);
+				for (const Name of Fill) {
+					Button.classList.toggle(Name, Active);
+				}
+
+				for (const Name of Idle) {
+					Button.classList.toggle(Name, !Active);
+				}
+
 				Button.setAttribute("aria-pressed", String(Active));
 			}
 

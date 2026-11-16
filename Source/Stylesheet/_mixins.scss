@@ -1,0 +1,106 @@
+/* ============================================================================
+   MIXINS - the repeated declaration blocks, declared once.
+
+   THE LAYER. `_mixins` in `System.scss`'s order, after `_tokens` and before
+   `_base`. It emits NOTHING: a mixin is a definition, not a rule, so loading
+   this file costs no bytes and takes no cascade position - it only publishes
+   the vocabulary below to every partial that follows it.
+
+   `System.scss` loads this file ONCE, globally, so no partial needs its own
+   `@import`. A partial that repeats one of these five inlines is a missing
+   import, not a local decision.
+
+   WHAT IS PUBLISHED
+     hard-shadow($x, $y, $colour, $depth-x, $depth-y)
+         The print-misregistration plane: a black layer at the offset and a
+         coloured layer further out. The depth is a parameter because the site
+         ships two families - 6/6 with a 10/10 plane, and 5/5 with an 8/8 one -
+         and a mixin that assumed one of them would silently change the other.
+     plate-frame($border, $colour, $fill)
+         The boxed plate: a crimson boundary, square corners, the carbon
+         ground, and the stacked plane. This is the `.emphasis-standard` /
+         `.emphasis-expressive` frame.
+     mono-label($size, $weight, $tracking, $leading)
+         The mono label voice. The wrap law is part of the voice, not something
+         a caller remembers: a label breaks at its spaces or not at all, so
+         `overflow-wrap: normal` and `word-break: keep-all` travel with the
+         type. `$leading` is null by default because a chip states its own
+         leading and a footnote does not - emitting one anyway would add a
+         declaration the caller never chose.
+     inset-well($edge, $fill)
+         A channel recessed INTO a surface. The edge is LIGHTER than the
+         surface's own, which is what makes it read as depth rather than as one
+         more panel.
+     telemetry-tag($size)
+         The mono micro-label chip: the shape of `.telemetry-tag` without its
+         modifiers. The modifiers carry their own ink (crimson and canary are
+         solid, teal is an outline) because `--raw-blood` as text on the dark
+         fills fails 4.5:1 - a chip is never crimson-on-asphalt text.
+
+   THE VALUES ARE THE LIVE ONES. Every default below is the value already
+   rendering on the site, so a partial that adopts a mixin emits exactly the
+   declarations it replaces. That is the property that makes an adoption safe
+   to verify: compile, compare, and the output must be identical.
+   ========================================================================= */
+
+/* The plane. `0px` and not `0`: a length keeps the shadow's syntax identical to
+   the inline form it replaces, so a diff of the compiled output is empty. */
+@mixin hard-shadow($x, $y, $colour, $depth-x: $x + 4px, $depth-y: $y + 4px) {
+	box-shadow:
+		$x $y 0px #000000,
+		$depth-x $depth-y 0px $colour;
+}
+
+/* The boxed plate. The frame is a BORDER, not a shadow: it holds the plate's
+   own box, so a tilt or a grunge layer behind it never reads as a second edge. */
+@mixin plate-frame($border: 4px, $colour: var(--blood-crimson), $fill: var(--carbon-void)) {
+	border: $border solid $colour;
+	border-radius: 0;
+	background-color: $fill;
+
+	@include hard-shadow(6px, 6px, var(--oxblood-dark));
+}
+
+/* The label voice. Order matters only to a reader: size, weight, leading,
+   tracking, case, then the wrap law that keeps the label from shredding. */
+@mixin mono-label($size, $weight: 700, $tracking: 0.08em, $leading: null) {
+	font-family: "JetBrains Mono", monospace;
+	font-size: $size;
+	font-weight: $weight;
+
+	@if $leading {
+		line-height: $leading;
+	}
+
+	letter-spacing: $tracking;
+	text-transform: uppercase;
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+}
+
+/* The recessed channel. `position: relative` is part of the mixin because the
+   grunge ink is absolutely positioned and must resolve against the plate it
+   bleeds out of; with `z-index: auto` that gives a containing block and changes
+   no paint order. */
+@mixin inset-well($edge: var(--tier-well-edge), $fill: var(--tier-well)) {
+	position: relative;
+	border: 1px solid $edge;
+	border-radius: 0;
+	background-color: $fill;
+}
+
+/* The chip. Padding is the chip's own, not the caller's: a tag that inherits a
+   block's padding stops reading as a chip. */
+@mixin telemetry-tag($size: var(--type-meta)) {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	padding: 0.25rem 0.625rem;
+	border: 1px solid var(--oxblood-dark);
+	border-radius: 0;
+	background-color: var(--asphalt-panel);
+	color: var(--zinc-dust);
+
+	@include mono-label($size, 700, 0.08em, 1.2);
+}

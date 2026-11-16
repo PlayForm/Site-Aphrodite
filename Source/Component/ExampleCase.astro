@@ -219,12 +219,15 @@ const OutcomeChip = {
 										<span class="telemetry-tag telemetry-tag--crimson tabular-nums">
 											{String(Index + 1).padStart(2, "0")}
 										</span>
-										{/* `min-w-0 break-words`: a stage label can name a URL, and one
-										    unbreakable token sets the flex item's min-content width - so
-										    the item refused to shrink and the section's `overflow-x: clip`
-										    cut the label off mid-word at 390px. `min-w-0` lets the item
-										    take the row's width and `break-words` breaks the token only
-										    because it cannot fit; the label's own words never split. */}
+										{/* `.example__stagename` carries `min-width: 0` and
+										    `overflow-wrap: break-word` because a stage label can
+										    name a URL, and one unbreakable token sets the flex
+										    item's min-content width - so the item refused to
+										    shrink and the section's `overflow-x: clip` cut the
+										    label off mid-word at 390px. `min-width: 0` lets the
+										    item take the row's width and `break-word` breaks the
+										    token only because it cannot fit; the label's own
+										    words never split. */}
 										<span class="example__stagename">
 											{Stage.Label}
 										</span>

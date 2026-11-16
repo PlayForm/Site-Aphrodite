@@ -401,3 +401,162 @@ a.code-link:hover code {
 	hyphens: none;
 	word-break: keep-all;
 }
+
+/* ---- THE TELEMETRY VOICE ------------------------------------------------
+
+   The mono micro-label chip and the giant mono figure: the two ends of the
+   telemetry scale. They sit with the other label voices (`.section-index`,
+   `.section-kicker`, `.type-meta`) because they are the same vocabulary at
+   different volumes - a chip is a label with a frame, a metric is a reading
+   with no sentence around it.
+
+   THE CHIP'S SHAPE COMES FROM `_mixins`. The mono face, the tracking, the wrap
+   law, the asphalt fill and the oxblood hairline travel together, so a page
+   that wants a chip gets the layer's chip instead of a fourth hand-rolled
+   copy of it.
+
+   THE MODIFIERS FOLLOW ONE CONTRAST DECISION: crimson and canary are SOLID
+   with their own ink, teal is an OUTLINE. `--raw-blood` as text on the dark
+   fills fails 4.5:1, so a crimson tag can never be crimson-on-asphalt text;
+   `--weathered-teal` was lifted until it passes, so the teal variant can stay
+   an outline. Do not invent a fifth modifier - a chip that needs a new colour
+   is a chip whose meaning has not been decided. */
+
+.telemetry-tag {
+	@include telemetry-tag;
+}
+
+.telemetry-tag--crimson {
+	border-color: #000000;
+	background-color: var(--raw-blood);
+	color: var(--bone-white);
+}
+
+.telemetry-tag--canary {
+	border-color: #000000;
+	background-color: var(--stamped-canary);
+	color: var(--soot-black);
+}
+
+.telemetry-tag--bone {
+	border-color: #000000;
+	background-color: var(--bone-newsprint);
+	color: var(--soot-black);
+}
+
+.telemetry-tag--teal {
+	border-color: var(--weathered-teal);
+	background-color: transparent;
+	color: var(--weathered-teal);
+}
+
+/* THE METRIC - the giant mono figure. One number a section is built around, so
+   it is the largest thing in its block and the only element at this size: a
+   second metric beside it halves both. Tabular figures because two metrics
+   stacked in a column must align their digits.
+
+   The unit is a CHILD (`.metric__unit`), not a sibling, so the figure and its
+   unit stay on one line while the unit keeps the telemetry voice. */
+.metric {
+	display: block;
+	margin: 0;
+	font-family: "JetBrains Mono", monospace;
+	font-size: clamp(2.5rem, 6vw, 4.5rem);
+	font-weight: 700;
+	line-height: 0.95;
+	letter-spacing: -0.03em;
+	font-variant-numeric: tabular-nums;
+	color: var(--bone-white);
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+}
+
+/* The unit reads at `--type-meta` and takes no leading of its own: it sits on
+   the figure's baseline, so a leading here would push it off. */
+.metric__unit {
+	display: inline-block;
+	margin-inline-start: 0.375rem;
+	color: var(--zinc-dust);
+
+	@include mono-label(var(--type-meta), 700, 0.08em);
+}
+
+/* THE COMPACT METRIC. `.metric` is the one giant figure a section is built
+   around; this is the same figure in a telemetry footnote, where the block is
+   a line inside another reading rather than a section of its own. The figure,
+   the tabular digits and the unit-as-child are unchanged - only the scale
+   steps down, because two 4.5rem numbers on one page halve each other. */
+.metric--compact {
+	font-size: clamp(1.75rem, 3.6vw, 2.5rem);
+}
+
+/* ---- MOTION -------------------------------------------------------------
+
+   Three primitives, and the grammar they obey: hard steps, no easing curve.
+   The zine's motion is a printing artefact - a spin that advances in six
+   positions, a bar that fills in eight - so an ease would read as a different
+   press.
+
+   EVERY ONE OF THEM DEGRADES TO ITS FINAL STATE. The collapse lives at the
+   bottom of this section, in its own `prefers-reduced-motion` block rather
+   than in `_base`'s document guard, because a class rule that cancels an
+   animation must load AFTER the rule that starts it: a media query adds no
+   specificity, so `animation: none` only wins by coming later.
+
+   `.zine-exec-spin` and `.zine-stat-fill` are named by three and four call
+   sites respectively; `.zine-diagram-*` are toggled by JS on the embedded
+   Mermaid SVG's node and edge groups. */
+
+/* Exec-demo spin: hard stepped rotation, no easing curve (the grammar: hard offsets only). */
+.zine-exec-spin {
+	animation: zine-exec-spin 0.42s steps(6) infinite;
+}
+
+@keyframes zine-exec-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* MONUMENT scroll-fill: the bar width snaps in hard steps when it enters the viewport. */
+.zine-stat-fill {
+	transition: width 0.8s steps(8);
+}
+
+/* DiagramNav (the Mermaid hover-highlight, re-skinned in the blood family):
+   JS toggles these on the embedded SVG's node/edge groups. */
+.zine-diagram-node {
+	cursor: pointer;
+	transition: opacity 0.15s steps(2);
+}
+
+.zine-diagram-dim {
+	opacity: 0.22;
+}
+
+.zine-diagram-hot {
+	cursor: pointer;
+}
+
+.zine-diagram-hot path,
+.zine-diagram-hot circle,
+.zine-diagram-hot polygon {
+	stroke: var(--raw-blood) !important;
+}
+
+.zine-diagram-linkable:hover rect,
+.zine-diagram-linkable:hover circle,
+.zine-diagram-linkable:hover polygon {
+	stroke: var(--stamped-canary) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.zine-exec-spin {
+		animation: none;
+	}
+
+	.zine-stat-fill {
+		transition: none;
+	}
+}

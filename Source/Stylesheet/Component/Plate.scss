@@ -34,16 +34,22 @@
    the block carries that step's resolved value. Nothing is rounded, nothing is
    re-chosen - the proof of the extraction is that the page renders identically.
 
-   THE CASCADE, AND WHY THREE SELECTORS ARE `:where()`. `Global.css` loads
-   AFTER the Tailwind utility layer (stated at `.section-index` in that file),
-   so a class here beats a utility of equal specificity. That is right for a
-   value the sheet decides and wrong for the three a CALL SITE still decides:
-   the fill, the padding and the lean. Those stay overridable, so
-   `.plate--surface-*` and `.plate--size-*` are `:where()`-scoped (specificity
-   zero) and any `bg-*` / `p-*` utility a page passes still wins, exactly as it
-   did when the component carried utilities. The lean is not a class here at
-   all: `Rotate` accepts a free-form angle per call site, so the component
-   composes that utility itself (see the note in `ZineBox.astro`).
+   THE CASCADE, AND WHERE `:where()` STILL APPLIES. `Global.css` loads AFTER the
+   Tailwind utility layer (stated at `.section-index` in that file), so a class
+   here beats a utility of equal specificity. That is right for a value the
+   sheet decides, and it is now the rule for the FILL too: a plate's ground is
+   not something a stray `bg-*` in a component's class string may delete, so
+   `.plate--surface-*` are plain class selectors, and taking the fill away is
+   DECLARED with `.plate--surface-none` rather than won by a utility.
+
+   One value is still a CALL SITE's to decide: the padding. `.plate--size-*`
+   stays `:where()`-scoped (specificity zero) so a page that passes its own
+   `p-*` / `lg:p-*` still wins, exactly as it did when the component carried
+   utilities - `case-study.astro`'s manifesto open adds `lg:p-16` to a
+   `Size="lg"` plate and would silently drop to 3rem at that breakpoint
+   otherwise. The lean is not a class here at all: `Rotate` accepts a
+   free-form angle per call site, so the component composes that utility
+   itself (see the note in `ZineBox.astro`).
 
    THE PRESS BLACK is the one colour with no token. `#000000` is not a palette
    entry - it is the shadow plane of a press misregistration, already spelled
@@ -294,26 +300,42 @@ $duration: 150ms;
    ground, so the plate reads as a hole in it; `paper` = one sheet above the
    module surface (asphalt-panel).
 
-   `:where()` because the fill is the one value a call site may still take away:
-   `ZineBox`'s `GrungeSurface` derivation reads a `bg-transparent` class on the
-   caller's `Class` prop and tells the painter the plate has no fill, so that
-   utility must keep winning here or the ink would be drawn for a surface that
-   is no longer transparent.
+   `:where()` is deliberately NOT used here. `Global.css` loads after the
+   Tailwind utility layer, so at (0,1,0) a fill declared in this sheet beats any
+   `bg-*` utility of equal specificity - which is the point. A plate's ground is
+   the sheet's decision: a bordered box with no fill is not a card, it is an
+   outline floating on the page, and that failure is silent - nothing errors, no
+   contrast check catches it (text contrast is measured against the page BEHIND
+   the card), and the composition is simply gone.
+
+   TAKING THE FILL AWAY IS THEREFORE DECLARED, NOT WON. `plate--surface-none`
+   is the opt-out, and `ZineBox` emits it instead of the surface modifier for
+   the one call site that says `bg-transparent` - the same fact its
+   `GrungeSurface` derivation reads to tell the painter the plate has no fill,
+   so the class list and the painter cannot disagree. The intent lives in the
+   class list, where it survives any later cascade change, instead of depending
+   on a zero-specificity accident.
 
    The three elevation fills (`canvas`, `shell`, `well`) stay the published
    `.tier-*` classes, emitted by the component, because those set a background
    and nothing else and a second spelling of them would be a second place the
    depth values live. */
-:where(.plate--surface-plain) {
+.plate--surface-plain {
 	background-color: var(--carbon-void);
 }
 
-:where(.plate--surface-inset) {
+.plate--surface-inset {
 	background-color: var(--soot-black);
 }
 
-:where(.plate--surface-paper) {
+.plate--surface-paper {
 	background-color: var(--asphalt-panel);
+}
+
+/* THE OPT-OUT. Declared after the three fills, and `ZineBox` never composes it
+   alongside one, so the two branches cannot both apply. */
+.plate--surface-none {
+	background-color: transparent;
 }
 
 /* THE BOUNDARY. `Accent` names the frame colour and, through the plane, the

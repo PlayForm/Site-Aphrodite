@@ -1165,177 +1165,176 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 			</div>
 
 			<!-- THE CONTAINER. One terminal, eight lanes, four records - all in
-				     the document, one of each shown. -->
-			<div>
-				<div
-					class="workflow__terminal grunge shell-card"
-					data-grunge
-					data-grunge-mode="edge"
-				>
-					{InstallRoutes.map((Route) => (
-						<div class="workflow__route" data-route={Route.ID}>
-							{Route.Lanes.map((Lane) => (
-								<div class="workflow__lane" data-os={Platform(Lane)}>
-									<div class="workflow__bar">
-										<span class="flex gap-1.5" aria-hidden="true">
-											<span class="block h-2 w-2 bg-[color:var(--tier-well-edge)]" />
-											<span class="block h-2 w-2 bg-[color:var(--tier-well-edge)]" />
-											<span class="block h-2 w-2 bg-[color:var(--tier-well-edge)]" />
-										</span>
-										<span class="telemetry-tag telemetry-tag--teal">
-											SESSION // {Lane.Shell.toUpperCase()} - {Lane.Platform}
-										</span>
-										<h3 class="type-sub text-bone-white">{Route.Title}</h3>
-										<span
-											class:list={[
-												"telemetry-tag",
-												TagTone[Route.BadgeColor],
-											]}
-										>
-											{Route.Badge}
-										</span>
-										<span class="font-mono text-base text-zinc-dust">
-											{Lane.Steps.length} STEPS
-										</span>
-										<CopyButton
-											Class="ml-auto"
-											Label={`COPY ALL ${Lane.Steps.length}`}
-											Payload={Executable(Lane.Steps)}
-											Tone="teal"
-											Size="sm"
-										/>
-										<span class="telemetry-tag">READY</span>
-									</div>
-
-									<ol class="workflow__steps list-none px-4 pb-6 pt-2 sm:px-5">
-										{Lane.Steps.map((Step, StepIndex) => (
-											<li class="mt-6 border-l-2 border-[color:var(--tier-well-edge)] pl-4 sm:pl-5">
-												<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-													<span class="font-mono text-base font-black tracking-widest text-stamped-canary">
-														{String(StepIndex + 1).padStart(2, "0")}
-													</span>
-													<h4 class="type-sub text-bone-white">
-														{Step.Title}
-													</h4>
-												</div>
-												{Step.Prerequisite !== undefined && (
-													<p class="mt-2 type-body text-zinc-dust">
-														<span class="telemetry-tag">BEFORE</span>{" "}
-														<span set:html={Step.Prerequisite} />
-													</p>
-												)}
-												<CodeFence
-													Class="mt-3"
-													Copy
-													Lang={Lane.Lang}
-													Code={Step.Command}
-												/>
-												{Step.Explanation !== undefined && (
-													<p
-														class="mt-3 type-body text-bone-newsprint"
-														set:html={Step.Explanation}
-													/>
-												)}
-												{Step.Expected !== undefined && (
-													<p class="mt-2 type-body text-zinc-dust">
-														<span class="telemetry-tag">EXPECT</span>{" "}
-														<span set:html={Step.Expected} />
-													</p>
-												)}
-												{Step.Troubleshooting?.map((Note) => (
-													<p
-														class="mt-2 border-l-2 border-raw-blood pl-3 type-body text-bone-newsprint"
-														set:html={Note}
-													/>
-												))}
-											</li>
-										))}
-									</ol>
+			     the document, one of each shown. The plate is the whole region: the
+			     lane ribbon is its top edge and the verification gate its footer. -->
+			<div
+				class="workflow__terminal grunge shell-card"
+				data-grunge
+				data-grunge-mode="edge"
+			>
+				{InstallRoutes.map((Route) => (
+					<div class="workflow__route" data-route={Route.ID}>
+						{Route.Lanes.map((Lane) => (
+							<div class="workflow__lane" data-os={Platform(Lane)}>
+								<div class="workflow__bar">
+									<span class="flex gap-1.5" aria-hidden="true">
+										<span class="block h-2 w-2 bg-[color:var(--tier-well-edge)]" />
+										<span class="block h-2 w-2 bg-[color:var(--tier-well-edge)]" />
+										<span class="block h-2 w-2 bg-[color:var(--tier-well-edge)]" />
+									</span>
+									<span class="telemetry-tag telemetry-tag--teal">
+										SESSION // {Lane.Shell.toUpperCase()} - {Lane.Platform}
+									</span>
+									<h3 class="type-sub text-bone-white">{Route.Title}</h3>
+									<span
+										class:list={[
+											"telemetry-tag",
+											TagTone[Route.BadgeColor],
+										]}
+									>
+										{Route.Badge}
+									</span>
+									<span class="font-mono text-base text-zinc-dust">
+										{Lane.Steps.length} STEPS
+									</span>
+									<CopyButton
+										Class="ml-auto"
+										Label={`COPY ALL ${Lane.Steps.length}`}
+										Payload={Executable(Lane.Steps)}
+										Tone="teal"
+										Size="sm"
+									/>
+									<span class="telemetry-tag">READY</span>
 								</div>
+
+								<ol class="workflow__steps list-none px-4 pb-6 pt-2 sm:px-5">
+									{Lane.Steps.map((Step, StepIndex) => (
+										<li class="mt-6 border-l-2 border-[color:var(--tier-well-edge)] pl-4 sm:pl-5">
+											<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+												<span class="font-mono text-base font-black tracking-widest text-stamped-canary">
+													{String(StepIndex + 1).padStart(2, "0")}
+												</span>
+												<h4 class="type-sub text-bone-white">
+													{Step.Title}
+												</h4>
+											</div>
+											{Step.Prerequisite !== undefined && (
+												<p class="mt-2 type-body text-zinc-dust">
+													<span class="telemetry-tag">BEFORE</span>{" "}
+													<span set:html={Step.Prerequisite} />
+												</p>
+											)}
+											<CodeFence
+												Class="mt-3"
+												Copy
+												Lang={Lane.Lang}
+												Code={Step.Command}
+											/>
+											{Step.Explanation !== undefined && (
+												<p
+													class="mt-3 type-body text-bone-newsprint"
+													set:html={Step.Explanation}
+												/>
+											)}
+											{Step.Expected !== undefined && (
+												<p class="mt-2 type-body text-zinc-dust">
+													<span class="telemetry-tag">EXPECT</span>{" "}
+													<span set:html={Step.Expected} />
+												</p>
+											)}
+											{Step.Troubleshooting?.map((Note) => (
+												<p
+													class="mt-2 border-l-2 border-raw-blood pl-3 type-body text-bone-newsprint"
+													set:html={Note}
+												/>
+											))}
+										</li>
+									))}
+								</ol>
+							</div>
+						))}
+
+						<!-- THE RECORD for this route: the `//` notes, the outcome, the one
+							     destructive warning, the aside, and the verification. -->
+						<div class="workflow__dossier border-t border-[color:var(--tier-shell-edge)] px-4 pb-6 pt-5 sm:px-5">
+							{Route.Notes?.map((Note) => (
+								<p class="mb-4 type-body text-zinc-dust" set:html={Note} />
 							))}
 
-							<!-- THE RECORD for this route: the `//` notes, the outcome, the one
-								     destructive warning, the aside, and the verification. -->
-							<div class="workflow__dossier border-t border-[color:var(--tier-shell-edge)] px-4 pb-6 pt-5 sm:px-5">
-								{Route.Notes?.map((Note) => (
-									<p class="mb-4 type-body text-zinc-dust" set:html={Note} />
-								))}
-
-								<div class="border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-well)] p-4">
-									<ZineKicker Tone="canary" As="div">
-										{Route.OutcomeTag}
-									</ZineKicker>
-									<p class="mt-2 border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-canvas)] p-3 font-mono text-base font-bold leading-relaxed text-bone-white">
-										{Route.Outcome}
+							<div class="border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-well)] p-4">
+								<ZineKicker Tone="canary" As="div">
+									{Route.OutcomeTag}
+								</ZineKicker>
+								<p class="mt-2 border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-canvas)] p-3 font-mono text-base font-bold leading-relaxed text-bone-white">
+									{Route.Outcome}
+								</p>
+								{Route.Guide === true && (
+									<p class="mt-2 font-mono text-base text-zinc-dust">
+										SRC:{" "}
+										<a
+											class="text-weathered-teal underline transition-colors hover:text-bone-white"
+											href={ExternalLinks.HermesGuide}
+										>
+											the Hermes plugin guide
+										</a>{" "}
+										- Installing from the catalog.
 									</p>
-									{Route.Guide === true && (
-										<p class="mt-2 font-mono text-base text-zinc-dust">
-											SRC:{" "}
-											<a
-												class="text-weathered-teal underline transition-colors hover:text-bone-white"
-												href={ExternalLinks.HermesGuide}
-											>
-												the Hermes plugin guide
-											</a>{" "}
-											- Installing from the catalog.
-										</p>
-									)}
-								</div>
-
-								{Route.Warning !== undefined && (
-									<div class="mt-6 border-l-4 border-stamped-canary bg-[color:var(--tier-canvas)] p-4">
-										<ZineKicker Tone="canary" As="div">
-											{Route.Warning.Label}
-										</ZineKicker>
-										{Route.Warning.Lines.map((Line) => (
-											<p
-												class="mt-2 type-body text-bone-newsprint"
-												set:html={Line}
-											/>
-										))}
-									</div>
 								)}
+							</div>
 
-								{Route.Lesson !== undefined && (
-									<div class="mt-6">
-										<ZineLesson
-											Label={Route.Lesson.Label}
-											Text={Route.Lesson.Text}
-											Color="teal"
-										/>
-									</div>
-								)}
-
-								<div class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-5">
-									<div class="border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-well)] p-4 xl:col-span-3">
-										<ZineKicker Tone="teal" As="div">
-											WHAT IT WRITES
-										</ZineKicker>
+							{Route.Warning !== undefined && (
+								<div class="mt-6 border-l-4 border-stamped-canary bg-[color:var(--tier-canvas)] p-4">
+									<ZineKicker Tone="canary" As="div">
+										{Route.Warning.Label}
+									</ZineKicker>
+									{Route.Warning.Lines.map((Line) => (
 										<p
 											class="mt-2 type-body text-bone-newsprint"
-											set:html={Route.Writes}
+											set:html={Line}
 										/>
-									</div>
-									<div class="border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-well)] p-4 xl:col-span-2">
-										<ZineKicker As="div">VERIFY IT WORKS</ZineKicker>
-										{Route.Verify.map((Line) => (
-											<p
-												class="mt-2 type-body text-bone-newsprint"
-												set:html={Line}
-											/>
-										))}
-										<p class="mt-3 border-t border-[color:var(--tier-well-edge)] pt-2 type-body text-zinc-dust">
-											<span class="telemetry-tag telemetry-tag--canary">
-												EXPECT
-											</span>{" "}
-											{Route.Expect}
-										</p>
-									</div>
+									))}
+								</div>
+							)}
+
+							{Route.Lesson !== undefined && (
+								<div class="mt-6">
+									<ZineLesson
+										Label={Route.Lesson.Label}
+										Text={Route.Lesson.Text}
+										Color="teal"
+									/>
+								</div>
+							)}
+
+							<div class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-5">
+								<div class="border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-well)] p-4 xl:col-span-3">
+									<ZineKicker Tone="teal" As="div">
+										WHAT IT WRITES
+									</ZineKicker>
+									<p
+										class="mt-2 type-body text-bone-newsprint"
+										set:html={Route.Writes}
+									/>
+								</div>
+								<div class="border border-[color:var(--tier-well-edge)] bg-[color:var(--tier-well)] p-4 xl:col-span-2">
+									<ZineKicker As="div">VERIFY IT WORKS</ZineKicker>
+									{Route.Verify.map((Line) => (
+										<p
+											class="mt-2 type-body text-bone-newsprint"
+											set:html={Line}
+										/>
+									))}
+									<p class="mt-3 border-t border-[color:var(--tier-well-edge)] pt-2 type-body text-zinc-dust">
+										<span class="telemetry-tag telemetry-tag--canary">
+											EXPECT
+										</span>{" "}
+										{Route.Expect}
+									</p>
 								</div>
 							</div>
 						</div>
-					))}
-				</div>
+					</div>
+				))}
 
 				<!-- THE VERIFICATION GATE, once across the container's footer. The
 				     fact is true of all four routes, so it does not repeat under every

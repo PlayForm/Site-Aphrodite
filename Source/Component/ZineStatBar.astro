@@ -283,8 +283,8 @@ const Width = Math.max(0, Math.min(100, Percent ?? 0));
 	document.addEventListener("astro:page-load", BindStatFills);
 </script>
 
-<!-- No <style> block here on purpose: the fill's pre-hide is part of the readout's
-     own state contract and lives in `Stylesheet/Component/Data.scss` beside the
-     geometry it hides, while the hard-step snap stays in Global.css behind the
-     `.zine-stat-fill` motion hook the fill element still carries. A component
-     that carries a style block is the extraction reversing itself. -->
+<!-- No stylesheet block here on purpose: the fill's pre-hide is part of the
+     readout's own state contract and lives in `Stylesheet/Component/Data.scss`
+     beside the geometry it hides, while the hard-step snap stays in Global.css
+     behind the `.zine-stat-fill` motion hook the fill element still carries. A
+     component that carries its own rules is the extraction reversing itself. -->

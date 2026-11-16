@@ -8,7 +8,8 @@
 //
 // PRESENTATION lives in two places, neither of them here: the palette is the
 // theme (inline styles a stylesheet cannot outrank), and the frame, padding,
-// rhythm, hover and copy chip are the plate in Source/Stylesheet/Global.css +
+// rhythm, hover and copy chip are the plate in
+// Source/Stylesheet/Component/Console.scss +
 // Source/Script/CodePlate.ts. This component therefore emits the same bare
 // `<pre class="astro-code">` Astro's markdown pipeline emits, and the plate
 // treats both identically - so `font-mono`/`text-base`/`[&>pre]:p-3.5` are
@@ -61,7 +62,7 @@
 // with the plate's own margin showing between the two, which is exactly the
 // "extra padding inside the frame" a reader sees. The wrapper keeps a stable
 // `.zine-fence` name so a panel that already frames or pads can zero the
-// plate's margin for the fences inside it (Global.css, CODE PLATES).
+// plate's margin for the fences inside it (Component/Console.scss, CODE PLATE).
 //
 // THE RIBBON HAS THREE SLOTS AND ALL THREE ARE ALWAYS FILLED. The ribbon is a
 // row of METADATA with one action at its right edge - leading field, language,
@@ -100,7 +101,7 @@
 // edge: the region's frame belongs to the page (a `.shell-card`, a
 // `border-2 border-oxblood-dark bg-soot-black` body), and a banner with four
 // edges under a well would be a second frame around the same region - the
-// defect the flush rule in Global.css exists to prevent. Inside such a body the
+// defect the flush rule in Component/Console.scss exists to prevent. Inside such a body the
 // banner spans the body's full width and the well's own 0.5rem inset is the gap
 // above the hairline, which is the footer-callout shape the pages already use
 // (Source/pages/plugin.astro).
@@ -211,9 +212,9 @@ const Html = (await codeToHtml(Code, { lang: Lang, theme: ZineTheme }))
 	     banner below as the block's last row. -->
 	<Fragment set:html={Html} />
 	{Result && (
-		<div class="zine-callout flex min-w-0 flex-col gap-2 border-t border-[color:var(--tier-well-edge)] px-3 py-3 sm:flex-row sm:items-baseline sm:gap-4">
+		<div class="flex min-w-0 flex-col gap-2 border-t border-[color:var(--tier-well-edge)] px-3 py-3 sm:flex-row sm:items-baseline sm:gap-4">
 			<span class="telemetry-tag shrink-0">{ResultLabel}</span>
-			<code class="type-code min-w-0 break-words whitespace-pre-wrap text-bone-newsprint">{Result}</code>
+			<code class="type-code min-w-0 whitespace-pre-wrap text-bone-newsprint">{Result}</code>
 		</div>
 	)}
 </div>

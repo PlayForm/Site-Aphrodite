@@ -111,28 +111,9 @@ const Metrics = {
 	aria-label={Label === "COPY" ? "Copy to the clipboard" : `Copy ${Label} to the clipboard`}
 >
 	<span aria-hidden="true">⧉</span>
-	<span class="copy__verb">{Label}</span>
-	<span class="copy__done" aria-live="polite">COPIED</span>
+	<span class="group-data-[copy-state=copied]:hidden">{Label}</span>
+	<span class="hidden group-data-[copy-state=copied]:inline" aria-live="polite">COPIED</span>
 </button>
-
-<style>
-	/* THE CONFIRMATION IS THE CONTROL, so it costs no second surface: the verb
-	   swaps where it already sits. `data-copy-state` is set on this button by
-	   the reflector below for exactly as long as the site's toast is on
-	   screen, and the two labels share the button's padding - the shorter one
-	   simply takes less width, so the control does not jump. */
-	.copy__done {
-		display: none;
-	}
-
-	[data-copy-state] .copy__done {
-		display: inline;
-	}
-
-	[data-copy-state] .copy__verb {
-		display: none;
-	}
-</style>
 
 <script>
 	// THE COPY CONFIRMATION, INSIDE THE CONTROL.

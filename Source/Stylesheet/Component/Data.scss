@@ -35,10 +35,21 @@
    sheet is not the place a second spelling of it is invented.
 
    WHAT IS DELIBERATELY NOT HERE
-   Motion. A plate's rotation, its hover settle and a stat bar's pre-hide are
-   states of the page, not the geometry of a reading, so they stay with the
-   component that binds them (and the pre-hide with the script that releases it).
-   A surface that moves is not a different surface. */
+   Motion, with one exception. A plate's rotation and its hover settle are the
+   caller's (a `Rotate` prop plus the utilities that carry it), and a fill's
+   hard-step snap stays in `Global.css` behind the `.zine-stat-fill` hook the
+   element carries. The ONE motion rule that lives here is the stat bar's
+   PRE-HIDE - the rule that holds a fill at zero until the script above it
+   releases it - because that is the readout's own state contract, and the sheet
+   that owns the fill is the only place it cannot drift from the element it
+   hides. A surface that moves is not a different surface.
+
+   HOW IT REACHES A PAGE
+   The components that render these surfaces import this file in their own
+   frontmatter, which is the house convention: a sheet is imported by the
+   component that owns it, so a page never lists stylesheets. When `System.scss`
+   is wired as the single entry point, that import becomes the entry point's job
+   and the component imports can go - no rule moves either way. */
 
 /* ---- MEASUREMENT ACCENTS ----------------------------------------------- */
 
@@ -66,6 +77,13 @@ $ink-muted: var(--zinc-dust);
 
 /* The body ink of a cell a reader studies. */
 $ink-body: var(--bone-newsprint);
+
+/* Pure black is the PRINT idiom, not a palette colour: it is the absence of ink
+   (the same black the house hard shadows are drawn in), so it is stated once here
+   rather than as a literal at three call sites. It is deliberately not a `:root`
+   token - a palette that carries black invites a surface to reach for it as a
+   ground, which is what `--soot-black` and `--carbon-void` are for. */
+$hard-black: #000000;
 
 /* ========================================================================
    THE MATRIX - .ledger
@@ -277,7 +295,7 @@ $ink-body: var(--bone-newsprint);
 /* The stamp: the dossier's own name, printed as a stamp rather than a heading,
    because it names the evidence rather than introducing a section. */
 .dossier__stamp {
-	border: 2px solid #000000;
+	border: 2px solid $hard-black;
 	background-color: $raw-fill;
 	padding: 0.25rem 0.75rem;
 	font-family: "JetBrains Mono", monospace;
@@ -287,7 +305,7 @@ $ink-body: var(--bone-newsprint);
 	text-transform: uppercase;
 	letter-spacing: 0.1em;
 	color: $figure;
-	box-shadow: 3px 3px 0px #000000;
+	box-shadow: 3px 3px 0px $hard-black;
 }
 
 /* The dashed rule that carries the band from the stamp to its far edge. */
@@ -523,7 +541,7 @@ $ink-body: var(--bone-newsprint);
 	height: 100%;
 	flex-direction: column;
 	gap: 0.5rem;
-	border: 2px solid #000000;
+	border: 2px solid $hard-black;
 	padding: 0.75rem 1rem;
 }
 
@@ -589,17 +607,12 @@ $ink-body: var(--bone-newsprint);
 	padding: 0.375rem 0.75rem;
 }
 
-/* A ribbon whose contents do not need pushing apart (a single label, or a
-   coordinate and its name). */
-.example__ribbon--packed {
-	justify-content: flex-start;
-	gap: 0.75rem;
-}
-
 /* The channel a pod holds. A pod body is one frame with its ribbon above it, so
    the body's own top edge is suppressed. */
 .example__panel {
+	display: flex;
 	min-width: 0;
+	flex-direction: column;
 	border: 1px solid var(--oxblood-dark);
 	border-top-width: 0;
 	background-color: var(--carbon-void);

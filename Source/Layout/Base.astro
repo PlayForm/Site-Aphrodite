@@ -185,9 +185,15 @@ interface Props {
 
 		<!-- SYSTEM // the SCSS layer, loaded once for every route. It is a second
 		     block on purpose: the CSS `@import` above is resolved by PostCSS with
-		     the `@Stylesheet` alias, while Sass needs a real relative path. -->
+		     the `@Stylesheet` alias, while Sass needs a real relative path.
+
+		     `@use`, not `@import`: an `@import` inside a `lang="scss"` block is
+		     deprecated in Dart Sass 3 and emits a warning on every build. Nothing
+		     here reads a Sass member from the entry point - it only needs the CSS
+		     the module emits - so no `as *` is warranted; the partials' own
+		     flattened scope is `System.scss`'s business, not this block's. -->
 		<style is:global lang="scss">
-			@import "../Stylesheet/System.scss";
+			@use "../Stylesheet/System.scss";
 		</style>
 
 		<slot name="Head" />
