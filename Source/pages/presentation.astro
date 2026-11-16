@@ -20,6 +20,14 @@
 // document. The wrapper is display:contents - it carries the id and generates
 // no box, so the scene keeps positioning against .deck-frame exactly as before.
 //
+// The transport's BEATS disclosure is the deck's index, and it is a MATRIX: one
+// numbered cell per scene, three to a row, carrying the ordinal and the beat's
+// own span on its top line, the scene's claim in the middle, and the page that
+// carries the argument named at the foot. The cells are the same anchors the
+// player seeks on (data-beat), so the index navigates the film rather than
+// describing it; the arrangement is the page's own, in the deck's container
+// units, and the film itself is untouched.
+//
 // The route already has its <h1>: DeckScene renders the opening beat's title as
 // one (DeckScene.astro:213). A second, sr-only heading here would give the page
 // two <h1>s, which is a worse defect than the one it would fix.
@@ -253,7 +261,7 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 			margin: 0 0 0.8cqw;
 			border-bottom: 1px solid var(--oxblood-dark);
 			padding-bottom: 0.55cqw;
-			font-size: calc(0.56cqw * var(--type-scale));
+			font-size: max(11px, calc(0.56cqw * var(--type-scale)));
 			font-weight: 400;
 			letter-spacing: 0.14em;
 			text-transform: uppercase;
@@ -278,7 +286,7 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 			display: grid;
 			grid-template-columns: repeat(3, minmax(0, 1fr));
 			gap: 0.5cqw;
-			max-height: 52cqh;
+			max-height: 58cqh;
 			margin: 0;
 			padding: 0;
 			overflow-y: auto;
@@ -317,26 +325,33 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 
 		.deck-beats-ordinal {
 			color: var(--weathered-teal);
+			font-size: max(12px, calc(0.6cqw * var(--type-scale)));
 			font-variant-numeric: tabular-nums;
 		}
 
 		.deck-beats-span {
 			color: var(--zinc-dust);
-			font-size: calc(0.54cqw * var(--type-scale));
+			font-size: max(11px, calc(0.54cqw * var(--type-scale)));
 			font-variant-numeric: tabular-nums;
 			letter-spacing: 0.08em;
 		}
 
+		/* The scene's claim takes the deck's display voice - the same face and
+		   uppercase setting the frame gives it - and the readable floor, because
+		   a cell holds a whole sentence, not a label. */
 		.deck-beats-name {
 			color: var(--bone-newsprint);
-			letter-spacing: 0.04em;
-			line-height: 1.35;
+			font-family: "Space Grotesk", sans-serif;
+			font-size: max(var(--deck-floor), calc(0.78cqw * var(--type-scale)));
+			font-weight: 700;
+			letter-spacing: -0.01em;
+			line-height: 1.1;
 			overflow-wrap: break-word;
 		}
 
 		.deck-beats-exit {
 			color: var(--stamped-canary);
-			font-size: calc(0.54cqw * var(--type-scale));
+			font-size: max(11px, calc(0.54cqw * var(--type-scale)));
 			letter-spacing: 0.16em;
 			white-space: nowrap;
 			overflow: hidden;
@@ -455,19 +470,18 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 			}
 
 			.deck-beats-index {
-				font-size: calc(var(--deck-floor-label) - 2px);
+				font-size: calc(var(--deck-floor-label) - 1px);
 			}
 
 			/* A beat cell wraps in the column layout instead of running off the
 			   panel, and the row gets a thumb's height. */
 			.deck-beats-link {
 				padding: 0.5rem 0.65rem;
-				font-size: var(--deck-floor-label);
 			}
 
 			.deck-beats-span,
 			.deck-beats-exit {
-				font-size: calc(var(--deck-floor-label) - 2px);
+				font-size: var(--deck-floor-label);
 			}
 
 			.deck-beats-keys {

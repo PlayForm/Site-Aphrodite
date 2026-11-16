@@ -157,12 +157,13 @@ const OutcomeCopy: Record<
 	},
 };
 
-/** The provenance label's colour REINFORCES the words; it never carries them. */
+/** The provenance chip. The colour REINFORCES the words; it never carries them,
+ * which is why every variant also spells its provenance out in the chip. */
 const ProvenanceTone: Record<ExampleProvenance, string> = {
-	Illustrative: "border-zinc-dust text-zinc-dust",
-	"Catalog-exact": "border-weathered-teal text-weathered-teal",
-	Captured: "border-stamped-canary text-stamped-canary",
-	"Engine-verified": "border-bone-white text-bone-white",
+	Illustrative: "telemetry-tag",
+	"Catalog-exact": "telemetry-tag telemetry-tag--teal",
+	Captured: "telemetry-tag telemetry-tag--canary",
+	"Engine-verified": "telemetry-tag telemetry-tag--bone",
 };
 
 /** The resting state's excerpt: enough to see the shape, not the whole stream. */
@@ -172,12 +173,14 @@ const ExcerptMore = Math.max(0, Output.length - ExcerptLines.length);
 /** A sequential mechanism renders its own order; the others render the pair. */
 const Sequential = Outcome === "injected" || Outcome === "callback";
 
-/** The outcome's own label chip, so the mechanism is named in text. */
+/** The outcome's own label chip, so the mechanism is named in text. Colour is
+ * identity here: canary is compression, teal is a passthrough, bone is an
+ * injection, crimson is a callback - the same mapping the preview panes use. */
 const OutcomeChip = {
-	compressed: "border-stamped-canary text-stamped-canary",
-	passthrough: "border-weathered-teal text-weathered-teal",
-	injected: "border-bone-newsprint text-bone-newsprint",
-	callback: "border-raw-blood text-bone-white",
+	compressed: "telemetry-tag telemetry-tag--canary",
+	passthrough: "telemetry-tag telemetry-tag--teal",
+	injected: "telemetry-tag telemetry-tag--bone",
+	callback: "telemetry-tag telemetry-tag--crimson",
 }[Outcome];
 ---
 
@@ -189,22 +192,8 @@ const OutcomeChip = {
 				<div class="mt-6 flex flex-col">
 					<!-- ============ THE RESTING STATE ============ -->
 					<div class="flex flex-wrap items-center gap-2">
-						<span
-							class:list={[
-								"border px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest",
-								ProvenanceTone[Provenance],
-							]}
-						>
-							{Provenance}
-						</span>
-						<span
-							class:list={[
-								"border px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest",
-								OutcomeChip,
-							]}
-						>
-							{OutcomeCopy[Outcome].Label}
-						</span>
+						<span class:list={[ProvenanceTone[Provenance]]}>{Provenance}</span>
+						<span class:list={[OutcomeChip]}>{OutcomeCopy[Outcome].Label}</span>
 					</div>
 
 					<h3 class="type-sub mt-5 uppercase text-bone-white">{Title}</h3>
@@ -219,9 +208,9 @@ const OutcomeChip = {
 									{OutcomeCopy[Outcome].Original}
 								</ZineKicker>
 								{Stages.map((Stage, Index) => (
-									<div class="border border-oxblood-dark bg-asphalt-panel p-4">
+									<div class="well p-4">
 										<div class="flex flex-wrap items-baseline gap-3">
-											<span class="border border-oxblood-dark bg-raw-blood px-1.5 py-0.5 font-mono text-base font-black text-bone-white">
+											<span class="telemetry-tag telemetry-tag--crimson tabular-nums">
 												{String(Index + 1).padStart(2, "0")}
 											</span>
 											{/* `min-w-0 break-words`: a stage label can name a URL, and one
@@ -284,7 +273,7 @@ const OutcomeChip = {
 										/>
 									</div>
 								) : (
-									<div class="mt-3 border-2 border-oxblood-dark bg-asphalt-panel p-4">
+									<div class="mt-3 well p-4">
 										<ul class="flex flex-col gap-2 font-mono text-base leading-relaxed">
 											<li>
 												<span class="text-zinc-dust">bytes</span>{" "}
@@ -303,7 +292,7 @@ const OutcomeChip = {
 											<p class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 												THE PREVIEW THE CLASSIFIER WOULD HAVE WRITTEN - NEVER EMITTED
 											</p>
-											<div class="mt-2 border border-oxblood-dark bg-soot-black p-2 font-mono text-base text-bone-newsprint">
+											<div class="mt-2 well p-2 font-mono text-base text-bone-newsprint">
 												{Preview}
 											</div>
 										</div>
@@ -314,15 +303,11 @@ const OutcomeChip = {
 					)}
 
 					<!-- ============ THE INSPECT FOLD ============ -->
-					<details class="group mt-10 border-2 border-oxblood-dark bg-carbon-void">
+					<details class="group mt-10 well">
 						<summary
-							class="flex cursor-pointer list-none flex-wrap items-center gap-3 border-b border-transparent bg-soot-black px-4 py-3 font-mono text-base text-bone-newsprint transition-colors group-open:border-oxblood-dark hover:text-bone-white"
+							class="flex cursor-pointer list-none flex-wrap items-center gap-3 border-b border-transparent tier-shell px-4 py-3 font-mono text-base text-bone-newsprint transition-colors group-open:border-[var(--tier-well-edge)] hover:text-bone-white"
 						>
-							<span
-								class="border border-oxblood-dark bg-raw-blood px-2 py-0.5 font-black uppercase tracking-widest text-bone-white"
-							>
-								INSPECT EXAMPLE
-							</span>
+							<span class="telemetry-tag telemetry-tag--crimson">INSPECT EXAMPLE</span>
 							<span class="grow font-normal text-zinc-dust">
 								full output · retrieval call and answer · threshold decision · configuration ·
 								sources
@@ -368,7 +353,9 @@ const OutcomeChip = {
 										<div class="mt-3 border-2 border-oxblood-dark bg-soot-black">
 											<CodeFence Code={Retrieval.Call} Lang="text" Copy />
 										</div>
-										<ul class="mt-3 flex flex-col gap-2 border border-oxblood-dark bg-asphalt-panel p-4 font-mono text-base leading-relaxed">
+										<ul
+											class="mt-3 well flex flex-col gap-2 p-4 font-mono text-base leading-relaxed"
+										>
 											<li>
 												<span class="text-zinc-dust">found</span>{" "}
 												<span class="text-bone-white">{Retrieval.Found ? "true" : "false"}</span>
@@ -398,10 +385,8 @@ const OutcomeChip = {
 								</p>
 								{
 									Object.keys(Defaults).length > 0 && (
-										<div class="mt-6 border border-oxblood-dark bg-asphalt-panel p-4">
-											<p class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-												THE CONFIGURATION IN PLAY
-											</p>
+										<div class="mt-6 well p-4">
+											<p class="section-index">THE CONFIGURATION IN PLAY</p>
 											<p class="type-body mt-2 max-w-3xl text-bone-newsprint">
 												These are the numbers every decision on this page is made against, read
 												from the example bank rather than typed into the markup.
@@ -429,7 +414,7 @@ const OutcomeChip = {
 							<!-- THE DIAGRAM -->
 							{
 								Diagram && (
-									<figure class="border border-oxblood-dark bg-asphalt-panel p-4">
+									<figure class="well p-4">
 										<div class="overflow-x-auto" set:html={Diagram.Html} />
 										<figcaption class="mt-6 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 											{Diagram.Caption}

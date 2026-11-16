@@ -772,8 +772,8 @@ const Chapters = {
 				<div class="grid gap-x-8 gap-y-2 border-b border-[color:var(--tier-shell-edge)] py-5 sm:grid-cols-[16rem_1fr]">
 					<dt>
 						<code class="font-mono text-code text-bone-white">catalog_mode</code>
-						<span class="telemetry-tag telemetry-tag--crimson mt-2 block w-fit">
-							UNWIRED
+						<span class="mt-2 block">
+							<span class="telemetry-tag telemetry-tag--crimson">UNWIRED</span>
 						</span>
 					</dt>
 					<dd class="type-body text-bone-newsprint">
@@ -784,8 +784,8 @@ const Chapters = {
 				<div class="grid gap-x-8 gap-y-2 border-b border-[color:var(--tier-shell-edge)] py-5 sm:grid-cols-[16rem_1fr]">
 					<dt>
 						<code class="font-mono text-code text-bone-white">classifier_poll</code>
-						<span class="telemetry-tag telemetry-tag--crimson mt-2 block w-fit">
-							UNWIRED
+						<span class="mt-2 block">
+							<span class="telemetry-tag telemetry-tag--crimson">UNWIRED</span>
 						</span>
 					</dt>
 					<dd class="type-body text-bone-newsprint">
@@ -796,8 +796,8 @@ const Chapters = {
 				<div class="grid gap-x-8 gap-y-2 border-b border-[color:var(--tier-shell-edge)] py-5 sm:grid-cols-[16rem_1fr]">
 					<dt>
 						<code class="font-mono text-code text-bone-white">prefetch</code>
-						<span class="telemetry-tag telemetry-tag--crimson mt-2 block w-fit">
-							UNWIRED
+						<span class="mt-2 block">
+							<span class="telemetry-tag telemetry-tag--crimson">UNWIRED</span>
 						</span>
 					</dt>
 					<dd class="type-body text-bone-newsprint">
@@ -812,8 +812,8 @@ const Chapters = {
 						<code class="mt-1 block font-mono text-code text-bone-white">
 							rust_preview_lines
 						</code>
-						<span class="telemetry-tag telemetry-tag--crimson mt-2 block w-fit">
-							RESERVED
+						<span class="mt-2 block">
+							<span class="telemetry-tag telemetry-tag--crimson">RESERVED</span>
 						</span>
 					</dt>
 					<dd class="type-body text-bone-newsprint">
@@ -1471,7 +1471,7 @@ const Chapters = {
 		return `<div class="border-t border-[color:var(--tier-shell-edge)] pt-3 first:border-t-0 first:pt-0">
 			<p class="type-meta font-bold uppercase text-bone-white">${Escape(Label)}</p>
 			<div class="mt-2 flex flex-wrap items-center gap-2">${Chips.join('<span class="text-zinc-dust">&rarr;</span>')}</div>
-			<p class="mt-2 font-mono text-code text-zinc-dust">${Escape(Note)}</p>
+			<p class="mt-2 font-mono text-base text-zinc-dust">${Escape(Note)}</p>
 		</div>`;
 	}
 

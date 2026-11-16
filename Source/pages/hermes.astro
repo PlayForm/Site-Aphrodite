@@ -51,7 +51,7 @@ const ProxyRows = [
 /**
  * THE TWO LANES - the decision the matrix above resolves, stated as two cards.
  *
- * Colour is identity on this page, and it is the colour the prose already
+ * Colour is identity here, and it is the colour the prose already
  * carried: the plugin lane is weathered teal, the proxy lane is stamped
  * canary, and the baseline both are measured against is bone. Each card's tape
  * repeats its lane name, because a colour alone cannot be read - every identity
@@ -79,7 +79,7 @@ const Lanes = [
 ];
 
 /** The surface inventory counts are the manifest's, never typed: a hook or a
- * tool added upstream changes the strip with no edit to this page. */
+ * tool added upstream changes the strip with no edit to this file. */
 const SurfaceCount = {
 	Hooks: String(HookNames.length),
 	Tools: String(ToolNames.length),
@@ -136,7 +136,7 @@ const Surface = [
 
 /**
  * THE SHELL CARD'S RIBBON - a row of telemetry metadata over the tier's own
- * hairline. It is the only card header shape this page uses, so no two cards
+ * hairline. It is the only card header shape the page uses, so no two cards
  * invent two of them. The stream beneath it sits in a `well`, which is what
  * makes a panel read as a channel cut into the page rather than as a plate.
  */
@@ -256,7 +256,9 @@ const Ribbon =
 			    struck through where the capability simply does not exist. */}
 			<div class="grunge shell-card mt-12" data-grunge data-grunge-mode="edge">
 				<div class={Ribbon}>
-					<span class="telemetry-tag telemetry-tag--canary">DECISION MATRIX</span>
+					<span class="telemetry-tag telemetry-tag--canary">
+						COMPARISON // WHY NOT JUST A PROXY
+					</span>
 					<span class="telemetry-tag">CAPABILITY × LANE</span>
 					<span class="telemetry-tag ml-auto">{ProxyRows.length} CAPABILITIES</span>
 				</div>
@@ -438,8 +440,8 @@ const Ribbon =
 
 			{/* THE SECONDARY FIGURES as value → value pairs. They sit on dark `well`
 			    cells rather than inside the sheet: an inverted ground would have
-			    made their teal and canary accents unreadable, and colour on this
-			    page is identity, not decoration. */}
+			    made their teal and canary accents unreadable, and colour here is
+			    identity, not decoration. */}
 			<div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
 				<div class="well p-5">
 					<p class="font-mono text-2xl font-bold text-stamped-canary">22.9%</p>

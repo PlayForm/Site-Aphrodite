@@ -18,11 +18,17 @@ import { CrateNote } from "@Library/Prose/Crates";
 // not declare.
 Assert("Source/Library/Prose/Crates.ts", CrateNote, CrateNames);
 
-const Crates = Roster.map((Crate) => {
+/** A manifest description already ends in a period; a card's role adds one. */
+const Sentence = (Text: string): string => Text.replace(/\.$/, "");
+
+const Crates = Roster.map((Crate, Index) => {
 	const Note = CrateNote[Crate.Name] ?? {};
 
 	return {
 		...Crate,
+		// The case number is the roster's own order, zero-padded - the ordinal
+		// a card is filed under, computed rather than typed.
+		N: String(Index + 1).padStart(2, "0"),
 		Role: Note.Role ?? Crate.Description,
 		Ships: Note.Ships ?? (Crate.Vendored ? "a library only" : "its own crate"),
 		Body: Note.Body ?? [],
@@ -36,6 +42,11 @@ const Crates = Roster.map((Crate) => {
 		Chip: Crate.Vendored ? "telemetry-tag--teal" : "telemetry-tag--canary",
 		// What an install does with it, in the ribbon's telemetry voice.
 		Kind: Crate.Vendored ? "VENDORED // DEPENDENCY" : "WORKSPACE // INSTALLABLE",
+		// A LIBRARY HAS NO BINARY, so `cargo install` has nothing to place on
+		// disk and a card that printed the command would print a command that
+		// fails. The vendored card renders the line that pulls it in instead:
+		// the same declaration its consumer's manifest carries.
+		Installs: !Crate.Vendored,
 		Version: `v${Crate.Version}`,
 	};
 });
@@ -87,21 +98,18 @@ const Chain = [
 			]}
 		/>
 
-		<!-- 01 // MANIFEST - the roster, read from the manifests, one row per name -->
+		<!-- 01 // WORKSPACE - the decision matrix: one row per published name -->
 		<section class="blueprint-section relative w-full" data-reveal>
-			<p class="section-index">01 // WORKSPACE // THREE PUBLISHED NAMES</p>
-			<h2
-				id="manifest"
-				class="mt-3 scroll-mt-24 font-headline text-sub font-black uppercase text-bone-white"
-			>
+			<p class="section-index">01 // WORKSPACE // {Crates.length} PUBLISHED NAMES</p>
+			<h2 id="manifest" class="mt-3 scroll-mt-24 type-section text-bone-white">
 				What the workspace publishes
 			</h2>
 			<p class="mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
-				Three names leave this workspace, and none of them is typed on this page: the workspace
-				<code class="font-mono text-base text-weathered-teal">Cargo.toml</code> decides which crates
-				exist, and every row below is read from that crate's own manifest - its name, its version,
-				its description. A crate added to the workspace appears in this table with no edit to the
-				page, and a crate removed from it leaves the same way.
+				{Crates.length} names leave this workspace, and none of them is typed by hand: the
+				workspace <code class="font-mono text-base text-weathered-teal">Cargo.toml</code> decides
+				which crates exist, and every entry is read from that crate's own manifest - its name, its
+				version, its description. A crate added to the workspace appears in the roster with no
+				edit anywhere, and a crate removed from it leaves the same way.
 			</p>
 
 			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
@@ -175,69 +183,92 @@ const Chain = [
 		<!-- 02 // CASES - one shell card per crate, ribbon first -->
 		<section class="blueprint-section relative w-full" data-reveal>
 			<p class="section-index">02 // CASES // ONE CARD PER CRATE</p>
-			<h2
-				id="cases"
-				class="mt-3 scroll-mt-24 font-headline text-sub font-black uppercase text-bone-white"
-			>
+			<h2 id="cases" class="mt-3 scroll-mt-24 type-section text-bone-white">
 				Each crate, one card
 			</h2>
 			<p class="mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
-				A card per published name. The ribbon is what the manifest declares - the case number, the
-				name, the version and the role - and the body is what a reader needs before installing it:
-				the paragraphs this page adds, the install command, the marker the crate leaves behind, and
-				the manifest the row was read from. The chip's colour is the crate's kind and not its rank:
-				canary is a workspace crate a reader installs, teal is the vendored fork that arrives as a
-				dependency.
+				Each name declares itself once, in its own manifest: the version is that file's version and
+				the role is that file's description, so the roster cannot drift from the crates it
+				describes. What each one puts on disk is the difference that matters before an install - a
+				<code class="font-mono text-base text-weathered-teal">cargo install</code> for the two
+				workspace crates, and for the vendored fork the dependency line that pulls it in, because a
+				library has no binary to place. Colour is the crate's kind and not its rank: canary is a
+				workspace crate a reader installs, teal is the vendored fork that arrives as a dependency.
 			</p>
 
-			<div class="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
+			<div class="mt-10 grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
 				{
-					Crates.map((Crate, Index) => (
-						<div
+					Crates.map((Crate) => (
+						<article
 							id={Crate.Name}
-							class="grunge shell-card scroll-mt-24"
+							class="grunge shell-card flex scroll-mt-24 flex-col"
 							data-grunge
 							data-grunge-mode="edge"
 						>
-							<div class="border-b border-[color:var(--tier-shell-edge)] px-5 py-4">
+							<header class="border-b border-[color:var(--tier-shell-edge)] px-5 py-4">
 								<div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-									<span class="type-meta uppercase text-zinc-dust">{`CASE #0${Index + 1}`}</span>
+									<span class="type-meta uppercase text-zinc-dust">{`CASE #${Crate.N}`}</span>
 									<h3 class="font-mono text-code font-bold text-bone-white">{Crate.Name}</h3>
 									<span class:list={["telemetry-tag ml-auto", Crate.Chip]}>
 										{Crate.Version}
 									</span>
 								</div>
 								<p class="mt-3 font-body text-body leading-relaxed text-bone-newsprint">
-									{Crate.Role}.
+									{Sentence(Crate.Role)}.
 								</p>
 								<p class="type-meta mt-2 uppercase text-zinc-dust">{Crate.Kind}</p>
-							</div>
+							</header>
 
-							<div class="prose-flow px-5 py-5">
+							<div class="prose-flow flex-1 px-5 py-5">
+								<p>
+									<span class="type-meta block uppercase text-zinc-dust">SHIPS</span>
+									<span class="mt-1 block font-body text-body leading-relaxed text-bone-newsprint">
+										{Crate.Ships}
+									</span>
+								</p>
 								{Crate.Body.map((Line) => (
-									<p class="font-body text-body leading-relaxed text-bone-newsprint">{Line}</p>
+									<p class="font-body text-body leading-relaxed text-bone-newsprint">
+										{Line}
+									</p>
 								))}
 
-								<div class="well p-4">
-									<div class="type-meta mb-2 uppercase text-stamped-canary">
-										INSTALL // CARGO:
+								{Crate.Installs ? (
+									<div>
+										<p class="type-meta uppercase text-stamped-canary">INSTALL // CARGO:</p>
+										<CodeFence
+											Class="mt-2"
+											Code={`$ cargo install ${Crate.Name}`}
+											CopyPayload={`cargo install ${Crate.Name}`}
+										/>
+										{Crate.Marker ? (
+											<div class="ccr-marker mt-3 font-mono text-code font-bold text-weathered-teal">
+												{`<<<CCR:${Crate.Marker}|${Crate.Version.replace(/^v/, "")}|axum-0.8.9+tokio-1.53.1>>>`}
+											</div>
+										) : null}
 									</div>
-									<CodeFence
-										Code={`$ cargo install ${Crate.Name}`}
-										CopyPayload={`cargo install ${Crate.Name}`}
-									/>
-									{Crate.Marker ? (
-										<div class="ccr-marker mt-3 font-mono text-base font-bold text-weathered-teal">
-											{`<<<CCR:${Crate.Marker}|${Crate.Version.replace(/^v/, "")}|axum-0.8.9+tokio-1.53.1>>>`}
+								) : (
+									<div>
+										<p class="type-meta uppercase text-zinc-dust">
+											ARRIVES AS // A DEPENDENCY, NOT A COMMAND:
+										</p>
+										<div class="well mt-2 px-4 py-3 font-mono text-code leading-relaxed">
+											<span class="text-weathered-teal">aphrodite</span>
+											<span class="text-zinc-dust"> → </span>
+											<span class="text-stamped-canary">{Crate.Name}</span>
 										</div>
-									) : null}
-								</div>
-
-								<p class="font-mono text-code leading-relaxed text-zinc-dust">
-									SRC: {Crate.Path}
-								</p>
+										<p class="mt-2 font-body text-body leading-relaxed text-zinc-dust">
+											A library only, so <code class="font-mono text-base">cargo install</code>
+											has no binary to place on disk: the proxy crate declares it, and the
+											transforms compile into the binary.
+										</p>
+									</div>
+								)}
 							</div>
-						</div>
+
+							<p class="border-t border-[color:var(--tier-shell-edge)] px-5 py-3 font-mono text-meta text-zinc-dust">
+								SRC: {Crate.Path}
+							</p>
+						</article>
 					))
 				}
 			</div>
@@ -246,10 +277,7 @@ const Chain = [
 		<!-- 03 // DEPENDENCY - the whole story in one wide card -->
 		<section class="blueprint-section relative w-full" data-reveal>
 			<p class="section-index">03 // DEPENDENCY // ONE CHAIN, THREE LINKS</p>
-			<h2
-				id="dependency"
-				class="mt-3 scroll-mt-24 font-headline text-sub font-black uppercase text-bone-white"
-			>
+			<h2 id="dependency" class="mt-3 scroll-mt-24 type-section text-bone-white">
 				Who pulls whom
 			</h2>
 			<p class="mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
@@ -303,19 +331,16 @@ const Chain = [
 					core carries the content transforms and nothing else, the proxy adds the preview pipeline,
 					the CCR store, the tool relay and the dual-proxy architecture around it, and Hermes adds
 					the tool schemas, the hook dispatch and the skill registration on top of the proxy. Each
-					layer stays installable, testable and replaceable on its own, and the boundary between
-					them is a manifest line rather than a convention.
+					layer is installable on its own, and the boundary between them is a manifest line rather
+					than a convention.
 				</p>
 			</ZineBox>
 		</section>
 
-		<!-- 04 // CONFIGURATION - what both parsers read at runtime -->
+		<!-- 04 // CONFIGURATION - what both halves read at runtime -->
 		<section class="blueprint-section relative w-full" data-reveal>
 			<p class="section-index">04 // CONFIGURATION SURFACE // APHRODITE.TOML.EXAMPLE</p>
-			<h2
-				id="config"
-				class="mt-3 scroll-mt-24 font-headline text-sub font-black uppercase text-bone-white"
-			>
+			<h2 id="config" class="mt-3 scroll-mt-24 type-section text-bone-white">
 				What the crates read at runtime
 			</h2>
 			<p class="mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">

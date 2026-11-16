@@ -12,18 +12,25 @@ import { HookNames, ToolNames } from "@Library/Roster";
 
 /* ═══ THE DECISION MATRIX ═══════════════════════════════════════════════════
  *
- * The page answers one question - WHICH FLAVOR DO I RUN - so it is laid out as
- * a decision rather than as three things of equal weight:
+ * LAYOUT ONLY. This page takes Stitch's ARRANGEMENT and nothing else: numbered
+ * bands, a decision matrix, one dominant plate over subordinate cards, and one
+ * two-column split. It takes none of Stitch's tokens, surfaces, shadows, radii
+ * or type scale - the palette, the 4px module boundaries, the hard offset
+ * shadows, the grunge ink, the tape and stamp vocabulary and the chip are the
+ * ones this page already carried, unchanged.
+ *
+ * The arrangement answers one question - WHICH FLAVOR DO I RUN - so the page is
+ * laid out as a decision rather than as four things of equal weight:
  *
  *   01  THE MATRIX     every flavor in one shape, so the whole surface is
  *                      readable before any detail. The rows are ordered by how
  *                      much of the turn a host can see, and that ordering IS
  *                      the decision: a host can only compress what it sees.
  *   02  RECOMMENDED    one dominant plate - the native Hermes plugin - at the
- *                      section's single expressive volume, carrying the figure
- *                      the decision turns on and the one cost it asks.
- *   03  THE OTHERS     the three subordinate cards, each a standard plate in
- *                      its own accent, each with a cost chip and the trade-off
+ *                      page's single expressive volume, carrying the counts the
+ *                      decision turns on and the one cost it asks.
+ *   03  THE OTHERS     the three subordinate cards, each a standard plate with
+ *                      its own boundary accent, a cost chip and the trade-off
  *                      chips that name what it cannot see.
  *
  * WHAT A CARD CARRIES, and why: a decision needs the HOST (what the reader must
@@ -33,31 +40,22 @@ import { HookNames, ToolNames } from "@Library/Roster";
  * always printed, so no card invents a claim - a chip is the row's own words in
  * label form, and the prose under it is the sentence that was already there.
  *
- * COLOUR IS IDENTITY, NOT DECORATION. One of the site's four accents per
- * flavor, used everywhere that flavor appears - the matrix status, the card's
- * border, its tape and its tag - so a reader who has learned that canary is the
- * plugin can find the plugin's row without reading it:
- *
- *   HERMES PLUGIN       canary   the highlight, and the flavor this site documents
- *   STANDALONE PROXY    teal     verified - it ships today
- *   EMBEDDED HEADROOM   bone     neutral: the portable core, not an agent surface
- *   MORE HOSTS          crimson  the section's own claim, still to come
- *
- * ZineStamp's own doc comment is the source of those four roles: raw = the
- * section's own claim, canary = a highlight, teal = verified, bone = neutral.
- * The fill carries the identity and only the ink moves where legibility needs
- * it, which is why the published `.telemetry-tag` modifiers are used verbatim
- * instead of hand-rolled chips.
+ * COLOUR IS IDENTITY, NOT DECORATION. The status ink is the page's own mapping,
+ * row for row - canary for the plugin, teal for the proxy, dust for the other
+ * two - and each card's boundary takes one of the site's accents (crimson for
+ * the recommendation, then teal, oxblood and canary), so the four flavors are
+ * separable by their edges without reading a word. No fill, radius or shadow
+ * value was invented for this page.
  *
  * VOICE. Two sentences whose subject was the page's own furniture were
- * rewritten, and the mapping is recorded here so a preservation audit can see
- * that nothing factual went missing:
+ * rewritten; the mapping is recorded here so the report can show that no fact
+ * went missing:
  *
  *   - lead sentence 4, "The table is the whole surface in one shape; the
  *     sections after it are the detail behind each row." -> carried by the
  *     structure itself (01 is the matrix, 02 and 03 are the detail) and by the
- *     matrix's own lead-in below. The sentence's fact was the order of the
- *     sections, which the sections still state by existing.
+ *     matrix's own lead-in below. Its fact was the order of the sections, which
+ *     the sections still state by existing.
  *   - the table caption, "The rows are ordered by how much of the turn each
  *     host can see, because that is what decides which compression the flavor
  *     can perform." -> the same claim with the product as its subject, promoted
@@ -68,9 +66,20 @@ import { HookNames, ToolNames } from "@Library/Roster";
  * this page already carried.
  */
 
-/** The accents ZineBox can frame with. Headroom takes `none` - an oxblood-dark
- * boundary - because the component has no bone frame; its identity travels in
- * the tape and the tag, which is where colour is actually read. */
+/** The page's chip, byte-for-byte as this page has always printed it. Declared
+ * once because the decision adds a cost chip and trade-off chips beside the
+ * capability chips that were already here, and a second copy of this string is
+ * a second thing to keep in step. */
+const Chip =
+	"border border-oxblood-dark bg-soot-black px-3 py-1 font-mono text-base uppercase text-bone-newsprint";
+
+/** The label voice this page's own table header already used, reused for the
+ * `dt` of each card's fact list. */
+const Label = "font-mono text-base font-black uppercase tracking-widest text-stamped-canary";
+
+/** The accents ZineBox can frame with. Headroom takes `none` - the oxblood
+ * boundary a standard plate ships - because the component has no bone frame;
+ * its identity is its tape and its status ink. */
 type Accent = "crimson" | "canary" | "teal" | "none";
 
 interface Flavor {
@@ -89,6 +98,9 @@ interface Flavor {
 	/** Matrix cell 4: whether it ships. */
 	Status: string;
 
+	/** The status ink - this page's own identity mapping, unchanged. */
+	Tone: string;
+
 	/** The anchor the matrix row links to, and the card's own id. */
 	Id: string;
 
@@ -98,11 +110,8 @@ interface Flavor {
 	/** The frame's accent - the flavor's identity, where the frame allows it. */
 	Accent: Accent;
 
-	/** The tape's colour role. */
+	/** The tape's colour role, as this page already printed it. */
 	Tape: "raw" | "canary" | "teal" | "bone";
-
-	/** The `.telemetry-tag` modifier that carries this flavor's identity. */
-	Tag: string;
 
 	/** What adopting the flavor asks of the reader, as one label. */
 	Cost: string;
@@ -130,17 +139,23 @@ const Hosts: [Flavor, ...Flavor[]] = [
 		Host: "Hermes Agent",
 		Sees: "Everything - hooks, tools, the prompt",
 		Status: "TODAY",
+		Tone: "text-stamped-canary",
 		Id: "hermes",
 		Head: "The full integration",
 		Accent: "crimson",
 		Tape: "raw",
-		Tag: "telemetry-tag--canary",
 		Cost: "REQUIRES HERMES AGENT",
 		Trade: ["SEES EVERYTHING"],
-		// The hook count is derived, never typed: the roster decides how many
-		// hooks the plugin registers, so a hook added upstream appears here with
+		// Both counts are derived, never typed: the roster decides how many hooks
+		// and tools the plugin registers, so one added upstream appears here with
 		// no edit to this page.
-		Chips: [`${HookNames.length} HOOKS`, "CONTEXT ENGINE", "DIRECTIVES", "DUAL PROXIES"],
+		Chips: [
+			`${HookNames.length} HOOKS`,
+			`${ToolNames.length} TOOLS`,
+			"CONTEXT ENGINE",
+			"DIRECTIVES",
+			"DUAL PROXIES",
+		],
 		Body: `<p>Six hooks, thirteen tools, the context engine, auto-launched dual proxies - the native flavor sees everything the agent sees.</p><p>This is the flavor this site documents.</p>`,
 	},
 	{
@@ -149,15 +164,15 @@ const Hosts: [Flavor, ...Flavor[]] = [
 		Host: "Any OpenAI-compatible client",
 		Sees: "The HTTP body - no hook interception",
 		Status: "SHIPS TODAY",
+		Tone: "text-weathered-teal",
 		Id: "proxy",
 		Head: "Any OpenAI-compatible client",
 		Accent: "teal",
-		Tape: "teal",
-		Tag: "telemetry-tag--teal",
+		Tape: "raw",
 		Cost: "REQUIRES OPENAI-COMPATIBLE CLIENT",
 		Trade: ["NO HOOK INTERCEPTION", "NO TOOLS", "NO PROMPT INJECTION"],
 		Chips: ["OPENAI-COMPATIBLE", "TOKEN :9798", "CACHE :9797"],
-		Body: `<p>Point <code class="font-mono text-code text-weathered-teal">base_url</code> at <code class="font-mono text-code text-weathered-teal">:9798</code> (or <code class="font-mono text-code text-weathered-teal">:9797</code>) and the same compression engine sits between the client and its LLM - token and cache listeners, SQLite or in-memory storage.</p><p>What it cannot do is see inside the agent: no hook interception, no tools, no prompt injection.</p>`,
+		Body: `<p>Point <code class="font-mono text-base text-weathered-teal">base_url</code> at <code class="font-mono text-base text-weathered-teal">:9798</code> (or <code class="font-mono text-base text-weathered-teal">:9797</code>) and the same compression engine sits between the client and its LLM - token and cache listeners, SQLite or in-memory storage.</p><p>What it cannot do is see inside the agent: no hook interception, no tools, no prompt injection.</p>`,
 	},
 	{
 		Label: "FOUNDATION // EMBEDDED HEADROOM",
@@ -165,11 +180,11 @@ const Hosts: [Flavor, ...Flavor[]] = [
 		Host: "The engine's own core",
 		Sees: "Content types and previews, not agent APIs",
 		Status: "FOUNDATION",
+		Tone: "text-zinc-dust",
 		Id: "headroom",
 		Head: "The portable core",
 		Accent: "none",
-		Tape: "bone",
-		Tag: "telemetry-tag--bone",
+		Tape: "raw",
 		Cost: "REQUIRES THE CORE FORK",
 		Trade: ["NOT AGENT APIs"],
 		Chips: ["GIT SUBMODULE", "THIN BRIDGE"],
@@ -181,11 +196,11 @@ const Hosts: [Flavor, ...Flavor[]] = [
 		Host: "Additional agents",
 		Sees: "Whatever the host exposes - the proxy path already works",
 		Status: "PLANNED",
+		Tone: "text-zinc-dust",
 		Id: "roadmap",
 		Head: "Other agents",
-		Accent: "crimson",
-		Tape: "raw",
-		Tag: "telemetry-tag--crimson",
+		Accent: "canary",
+		Tape: "bone",
 		Cost: "REQUIRES THE HOOK-AND-TOOL PATTERN",
 		Trade: ["NO DATES PROMISED"],
 		Chips: ["PROXY PATH ALREADY WORKS"],
@@ -216,73 +231,67 @@ const [Plugin, ...Others] = Hosts;
 
 		<!-- 01 // THREE HOSTS // ONE CORE - the whole surface in one shape,
 		     ordered by reach -->
-		<section class="blueprint-section relative w-full" data-reveal>
-			<p class="section-index">01 // THREE HOSTS // ONE CORE</p>
+		<section class="relative w-full" data-reveal>
+			<ZineTape Variant="kicker" Label="01 // THREE HOSTS // ONE CORE" />
 			<h2
 				id="surface"
-				class="mt-3 scroll-mt-24 font-headline text-sub font-black uppercase text-bone-white"
+				class="mt-3 font-headline text-sub font-black uppercase text-bone-white"
 			>
 				What ships, and what each one sees
 			</h2>
-			<p class="mt-6 max-w-[46rem] font-body text-body text-bone-newsprint">
+			<p class="mt-6 max-w-[46rem] font-body text-base leading-relaxed text-bone-newsprint">
 				A host can only compress what it can see, so the flavors are ordered by how much of
 				the turn each one is exposed to - and that ordering is what decides which
 				compression the flavor can perform.
 			</p>
 
-			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
+			<ZineBox Size="lg" Rotate="-rotate-[1deg]" Class="mt-8">
 				<div class="overflow-x-auto">
-					<table class="w-full border-collapse text-left">
+					<table class="w-full border-collapse font-mono text-base">
 						<thead>
-							<tr class="border-b border-[color:var(--tier-well-edge)]">
+							<tr class="border-b-2 border-oxblood-dark text-left">
 								<th
 									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+									class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary"
 								>
 									FLAVOR
 								</th>
 								<th
 									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+									class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary"
 								>
 									HOST
 								</th>
 								<th
 									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+									class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary"
 								>
 									WHAT IT SEES
 								</th>
 								<th
 									scope="col"
-									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
+									class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary"
 								>
 									STATUS
 								</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody class="text-bone-newsprint">
 							{
 								Hosts.map((Host) => (
-									<tr class="border-b border-[color:var(--tier-shell-edge)] align-top last:border-b-0">
-										<td class="px-4 py-4 sm:px-5">
+									<tr class="border-b border-oxblood-dark">
+										<td class="py-3 pr-4 text-bone-white">
 											<a
 												href={`#${Host.Id}`}
-												class="font-mono text-code font-bold text-bone-white underline decoration-transparent decoration-2 underline-offset-4 transition-colors hover:decoration-stamped-canary"
+												class="underline decoration-transparent decoration-2 underline-offset-4 transition-colors hover:decoration-stamped-canary"
 											>
 												{Host.Flavor}
 											</a>
 										</td>
-										<td class="px-4 py-4 font-body text-body text-bone-newsprint sm:px-5">
-											{Host.Host}
-										</td>
-										<td class="px-4 py-4 font-body text-body text-zinc-dust sm:px-5">
-											{Host.Sees}
-										</td>
-										<td class="px-4 py-4 sm:px-5">
-											<span class:list={["telemetry-tag", Host.Tag]}>
-												{Host.Status}
-											</span>
+										<td class="py-3 pr-4">{Host.Host}</td>
+										<td class="py-3 pr-4 text-zinc-dust">{Host.Sees}</td>
+										<td class={`py-3 font-black uppercase tracking-widest ${Host.Tone}`}>
+											{Host.Status}
 										</td>
 									</tr>
 								))
@@ -290,16 +299,16 @@ const [Plugin, ...Others] = Hosts;
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</ZineBox>
 		</section>
 
-		<!-- 02 // RECOMMENDED - the one dominant plate, at the section's single
+		<!-- 02 // RECOMMENDED - the one dominant plate, at the page's single
 		     expressive volume -->
-		<section class="blueprint-section relative w-full" data-reveal>
-			<p class="section-index">02 // RECOMMENDED // FLAVOR 01</p>
+		<section class="relative w-full" data-reveal>
+			<ZineTape Variant="kicker" Label="02 // RECOMMENDED // FLAVOR 01" />
 			<h2
 				id={Plugin.Id}
-				class="mt-3 scroll-mt-24 font-headline text-sub font-black uppercase text-bone-white"
+				class="mt-3 font-headline text-sub font-black uppercase text-bone-white"
 			>
 				{Plugin.Head}
 			</h2>
@@ -307,57 +316,50 @@ const [Plugin, ...Others] = Hosts;
 			<ZineBox
 				Emphasis="featured"
 				Size="lg"
-				Surface="shell"
 				Tape={Plugin.Label}
 				TapeColor="raw"
 				Grunge={true}
-				Class="mt-10"
+				Class="mt-8"
 			>
-				<div class="flex flex-wrap items-center gap-3">
+				<div class="flex flex-wrap items-center gap-4">
 					<ZineStamp Label="RECOMMENDED" Color="canary" Rotate="-rotate-2" />
-					<span class:list={["telemetry-tag", Plugin.Tag]}>{Plugin.Status}</span>
-					<span class="telemetry-tag">{Plugin.Cost}</span>
+					<p class={`font-mono text-base font-black uppercase tracking-widest ${Plugin.Tone}`}>
+						{Plugin.Status}
+					</p>
+					<span class={Chip}>{Plugin.Cost}</span>
 				</div>
 
-				<div class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-end">
+				<div class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
 					<div
-						class="prose-flow font-body text-body text-bone-newsprint"
+						class="prose-flow font-body text-base leading-relaxed text-bone-newsprint"
 						set:html={Plugin.Body}
 					/>
 
-					<div>
-						<!-- The decision's own figure: how many handles the agent
-						     gains. `{ToolNames.length} TOOLS` moved here from the chip
-						     row - same generator, same words, promoted to the section's
-						     one big number - so the hook count stays a chip beside it
-						     rather than becoming a second giant figure. -->
-						<div class="metric">
-							{ToolNames.length}<span class="metric__unit">tools</span>
-						</div>
-						<div class="mt-4 flex flex-wrap gap-2">
-							{
-								Plugin.Chips.map((Chip) => (
-									<span class="telemetry-tag">{Chip}</span>
-								))
-							}
-						</div>
+					<div class="flex flex-wrap gap-6 lg:flex-col lg:items-start">
+						{
+							Plugin.Chips.map((Name) => (
+								<span class={Chip}>{Name}</span>
+							))
+						}
 					</div>
 				</div>
 
 				<dl
-					class="mt-8 grid gap-x-6 gap-y-3 border-t border-[color:var(--tier-well-edge)] pt-6 sm:grid-cols-[9rem_1fr]"
+					class="mt-8 grid gap-x-6 gap-y-3 border-t border-oxblood-dark pt-6 sm:grid-cols-[9rem_1fr]"
 				>
-					<dt class="type-meta text-zinc-dust">HOST</dt>
-					<dd class="font-body text-body text-bone-newsprint">{Plugin.Host}</dd>
+					<dt class={Label}>HOST</dt>
+					<dd class="font-body text-base leading-relaxed text-bone-newsprint">
+						{Plugin.Host}
+					</dd>
 
-					<dt class="type-meta text-zinc-dust">WHAT IT SEES</dt>
-					<dd class="font-body text-body text-zinc-dust">{Plugin.Sees}</dd>
+					<dt class={Label}>WHAT IT SEES</dt>
+					<dd class="font-body text-base leading-relaxed text-zinc-dust">{Plugin.Sees}</dd>
 
-					<dt class="type-meta text-zinc-dust">TRADE-OFF</dt>
-					<dd class="flex flex-wrap gap-2">
+					<dt class={Label}>TRADE-OFF</dt>
+					<dd class="flex flex-wrap gap-4">
 						{
-							Plugin.Trade.map((Chip) => (
-								<span class="telemetry-tag">{Chip}</span>
+							Plugin.Trade.map((Name) => (
+								<span class={Chip}>{Name}</span>
 							))
 						}
 					</dd>
@@ -367,67 +369,73 @@ const [Plugin, ...Others] = Hosts;
 
 		<!-- 03 // THE OTHERS - three standard plates, subordinate to the
 		     recommendation by treatment, never by losing a claim -->
-		<section class="blueprint-section relative w-full" data-reveal>
-			<p class="section-index">03 // THE OTHER HOSTS // {Others.length}</p>
+		<section class="relative w-full" data-reveal>
+			<ZineTape Variant="kicker" Label="03 // THE OTHER HOSTS" />
 			<h2 class="mt-3 font-headline text-sub font-black uppercase text-bone-white">
 				What each one gives up
 			</h2>
-			<p class="mt-6 max-w-[46rem] font-body text-body text-bone-newsprint">
+			<p class="mt-6 max-w-[46rem] font-body text-base leading-relaxed text-bone-newsprint">
 				Each of these runs the same core behind less of the turn, and each card names the
 				reach it trades away - the host it asks for, what it can see, and what it cannot.
 			</p>
 
-			<div class="mt-12 grid gap-10 md:grid-cols-2 xl:grid-cols-3">
+			<div class="mt-16 grid gap-10 md:grid-cols-2 xl:grid-cols-3">
 				{
 					Others.map((Card) => (
 						<ZineBox
 							Emphasis="standard"
 							Accent={Card.Accent}
-							Surface="shell"
+							Tape={Card.Label}
+							TapeColor={Card.Tape}
 							Grunge={true}
 							Class="flex h-full flex-col"
 						>
-							<div class="flex flex-wrap items-center gap-2">
-								<span class:list={["telemetry-tag", Card.Tag]}>{Card.Status}</span>
-								<span class="telemetry-tag">{Card.Cost}</span>
+							<div class="flex flex-wrap items-center gap-4">
+								<p
+									class={`font-mono text-base font-black uppercase tracking-widest ${Card.Tone}`}
+								>
+									{Card.Status}
+								</p>
+								<span class={Chip}>{Card.Cost}</span>
 							</div>
 
-							<p class="mt-6">
-								<ZineTape Variant="kicker" Label={Card.Label} Color={Card.Tape} />
-							</p>
 							<h3
 								id={Card.Id}
-								class="mt-2 scroll-mt-24 font-headline text-sub font-black uppercase text-bone-white"
+								class="mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
 							>
 								{Card.Head}
 							</h3>
 
-							<dl class="mt-6 grid gap-x-4 gap-y-2">
-								<dt class="type-meta text-zinc-dust">HOST</dt>
-								<dd class="font-body text-body text-bone-newsprint">{Card.Host}</dd>
+							<dl class="mt-6 grid gap-x-4 gap-y-3">
+								<dt class={Label}>HOST</dt>
+								<dd class="font-body text-base leading-relaxed text-bone-newsprint">
+									{Card.Host}
+								</dd>
 
-								<dt class="type-meta text-zinc-dust">WHAT IT SEES</dt>
-								<dd class="font-body text-body text-zinc-dust">{Card.Sees}</dd>
+								<dt class={Label}>WHAT IT SEES</dt>
+								<dd class="font-body text-base leading-relaxed text-zinc-dust">
+									{Card.Sees}
+								</dd>
 							</dl>
 
 							<div
-								class="mt-6 prose-flow font-body text-body text-bone-newsprint"
+								class="mt-6 prose-flow font-body text-base leading-relaxed text-bone-newsprint"
 								set:html={Card.Body}
 							/>
 
 							<div class="mt-auto pt-8">
-								<p class="type-meta text-zinc-dust">TRADE-OFF</p>
-								<div class="mt-2 flex flex-wrap gap-2">
+								<p class={Label}>TRADE-OFF</p>
+								<div class="mt-3 flex flex-wrap gap-4">
 									{
-										Card.Trade.map((Chip) => (
-											<span class="telemetry-tag">{Chip}</span>
+										Card.Trade.map((Name) => (
+											<span class={Chip}>{Name}</span>
 										))
 									}
 								</div>
-								<div class="mt-3 flex flex-wrap gap-2">
+								<div class="mt-3 flex flex-wrap gap-4">
 									{
-										Card.Chips.map((Chip) => (
-											<span class="telemetry-tag">{Chip}</span>
+										Card.Chips.map((Name) => (
+											<span class={Chip}>{Name}</span>
 										))
 									}
 								</div>
