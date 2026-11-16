@@ -190,6 +190,10 @@ const Group = (Seed: number, GroupIndex: number): string => {
 export const PaintGrunge = (): void => {
 	for (const Element of document.querySelectorAll<HTMLElement>("[data-grunge]")) {
 		if (Element.dataset.grungePainted === "1") continue;
+		// A plate that carries a code fence stays clean. Ink behind a translucent
+		// panel still bleeds through the plate's own plate, and a command block has
+		// to read sharp; the texture belongs to prose plates, not to code.
+		if (Element.querySelector("pre, figure.zine-plate, .zine-plate")) continue;
 		try {
 			const Seed = (Math.random() * 0x7fffffff) | 0;
 
@@ -220,10 +224,10 @@ export const PaintGrunge = (): void => {
 				Svg.style.setProperty("--grunge-w", `${(Width * 100).toFixed(1)}%`);
 				Svg.style.setProperty("--grunge-h", `${(Height * 100).toFixed(1)}%`);
 				Svg.style.setProperty("--grunge-rot", `${Turn.toFixed(1)}deg`);
-				// Depth is part of the arrangement: some groups sit BEHIND the plate,
-				// some inside it (above its fill, under its text). Which is which is
-				// noise, so a row of plates does not stack the same way twice.
-				Svg.style.setProperty("--grunge-z", Ride(GroupIndex * 0.77, Phase) > 0.55 ? "0" : "-1");
+				// Always BEHIND the plate. A group sitting inside the box put ink over
+				// code fences and body text, which blurred them - ink belongs under the
+				// sheet, never on top of what is printed on it.
+				Svg.style.setProperty("--grunge-z", "-1");
 				// Per-group weight. The floor is 0.16, not 0.10: on a near-black page
 				// a 0.10 deposit reads as haze rather than ink.
 				Svg.style.setProperty("--grunge-opacity", (0.16 + Ride(GroupIndex * 0.91, Phase) * 0.14).toFixed(3));
