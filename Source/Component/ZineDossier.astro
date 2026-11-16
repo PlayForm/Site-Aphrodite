@@ -1,4 +1,26 @@
 ---
+/**
+ * ZineDossier - TWO EVIDENCE COLUMNS READ AS ONE COMPARISON.
+ *
+ * A dossier is not two panels of prose that happen to sit side by side: it is
+ * one comparison, and the reader's job is to move between the columns. So the
+ * blueprint treatment is a single two-column field rather than two cards:
+ *
+ *   the HEADER BAND   the stamp names the dossier and a hairline closes the
+ *                     band, so both columns start from one line instead of
+ *                     from the plate's own padding.
+ *   the INDEX         each column is numbered (`01`, `02`) in the section-index
+ *                     voice, which is what makes the pair read as one record
+ *                     with two parts rather than as two independent blocks.
+ *   the SHARED RULE   on a wide viewport the second column is separated by a
+ *                     hairline in the gutter - one field, one divider - instead
+ *                     of by a gap the eye has to measure.
+ *
+ * Every label and every sentence in `Left` and `Right` renders exactly as
+ * before; only the field around them changed. `Tone` still selects the shadow
+ * plane and `Rotate` the lean, because the plate's own identity is not part of
+ * the layout question.
+ */
 interface Props {
 	/** The heading over the whole dossier. */
 	Title: string;
@@ -26,27 +48,45 @@ const Shadow = {
 }[Tone];
 ---
 
-<section class={`relative border-4 border-blood-crimson bg-carbon-void p-6 sm:p-10 ${Shadow} ${Rotate} transition-transform duration-300 hover:rotate-0`}>
-	<div class="mb-8 flex items-center gap-4">
-		<span class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
+<section
+	class={`relative border-4 border-blood-crimson bg-carbon-void p-6 sm:p-10 ${Shadow} ${Rotate} transition-transform duration-300 hover:rotate-0`}
+>
+	<!-- THE HEADER BAND -->
+	<div class="mb-8 flex items-center gap-4 border-b border-[var(--tier-shell-edge)] pb-3">
+		<span
+			class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]"
+		>
 			{Title}
 		</span>
 		<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
 	</div>
-	<div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
+
+	<!-- ONE FIELD, TWO COLUMNS: the divider lives in the gutter on a wide
+	     viewport and disappears when the columns stack. -->
+	<div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-0">
 		{
 			[
-				{ Caption: "EVIDENCE // A", Items: Left },
-				{ Caption: "EVIDENCE // B", Items: Right },
+				{ Index: "01", Caption: "EVIDENCE // A", Items: Left, Edge: "" },
+				{
+					Index: "02",
+					Caption: "EVIDENCE // B",
+					Items: Right,
+					Edge: "lg:border-l lg:border-[var(--tier-shell-edge)] lg:pl-16",
+				},
 			].map((Column) => (
-				<div>
-					<div class="mb-4 border-b border-oxblood-dark pb-1 font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-						{Column.Caption}
+				<div class={`min-w-0 ${Column.Edge}`}>
+					<div class="mb-4 flex items-baseline gap-3 border-b border-oxblood-dark pb-1">
+						<span class="section-index">{Column.Index}</span>
+						<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+							{Column.Caption}
+						</span>
 					</div>
 					<dl class="space-y-6">
 						{Column.Items.map((Item) => (
 							<div class="border-l-2 border-oxblood-dark pl-4">
-								<dt class="font-mono text-base font-bold uppercase tracking-widest text-bone-white">{Item.Label}</dt>
+								<dt class="type-meta !font-black uppercase tracking-widest text-bone-white">
+									{Item.Label}
+								</dt>
 								<dd class="mt-1 font-body text-base leading-relaxed text-bone-newsprint">{Item.Text}</dd>
 							</div>
 						))}

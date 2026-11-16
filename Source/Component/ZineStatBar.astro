@@ -15,9 +15,17 @@ interface Props {
 	 *  viewport, then snaps to Percent in hard steps (.zine-stat-fill).
 	 *  Default "static" renders the width immediately (the existing form). */
 	Fill?: "static" | "scroll";
+
+	/**
+	 * The ratio's scale. `metric` is the giant mono figure a section is built
+	 * around; `compact` is the same figure in a dense stack, where several
+	 * readouts share one column and two 4.5rem numbers would halve each other.
+	 * The page that owns the stack is the only thing that knows which it is.
+	 */
+	Scale?: "metric" | "compact";
 }
 
-const { Label, Ratio, Percent, Color = "teal", Fill = "static" } = Astro.props;
+const { Label, Ratio, Percent, Color = "teal", Fill = "static", Scale = "metric" } = Astro.props;
 
 // The palette is resolved HERE, on the server, and rendered as a class on the
 // fill element. It used to be resolved inside the <script>, which is a separate
@@ -38,11 +46,18 @@ const Palette = {
 // measures 2.23:1 and fails the 4.5:1 floor, so a "raw" bar printed its figure in
 // a red no reader could read. The bar itself keeps the raw fill, which is where
 // the variant's identity lives, and the value takes the heading voice.
+//
+// The `!` is the house override idiom, not decoration: `.metric` declares its own
+// colour and Global.css loads after the utility layer, so an unprefixed
+// `text-weathered-teal` would lose to it and every readout would print bone-white.
 const Text = {
-	teal: "text-weathered-teal",
-	raw: "text-bone-white",
-	canary: "text-stamped-canary",
+	teal: "!text-weathered-teal",
+	raw: "!text-bone-white",
+	canary: "!text-stamped-canary",
 }[Color];
+
+/** The figure's scale: the giant metric, or the compact one for a dense stack. */
+const MetricScale = Scale === "compact" ? "metric metric--compact" : "metric";
 
 // Clamped once, server-side: a caller that passes 140 or -5 gets a bar that
 // cannot overflow its track, and the script never has to guess what it meant.
@@ -50,16 +65,16 @@ const Width = Math.max(0, Math.min(100, Percent));
 ---
 
 <div>
-	{/* The label and the value look 4px apart when you compare the BOX bottoms of
-	    their glyph ranges, but the offset is identical under align-items stretch,
-	    baseline, center and inline-block (measured), so it is the two faces'
-	    different descents, not a misaligned pair: the "×" is set from a fallback
-	    whose box is a pixel shorter. Left as the plain row. */}
-	<div class="mb-1 flex justify-between text-base font-bold">
-		<span class="text-bone-newsprint">{Label}</span>
-		<span class={Text}>{Ratio}</span>
+	{/* The readout: a micro-label, then the figure at metric scale, then the
+	    track it measures. The label and the figure share one baseline row so the
+	    number is read as the answer to the label rather than as a separate line;
+	    the track sits under both, full width, because a bar whose length encodes
+	    a percentage must not be sized by the figure above it. */}
+	<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+		<span class="section-index">{Label}</span>
+		<span class={`${MetricScale} ${Text}`}>{Ratio}</span>
 	</div>
-	<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+	<div class="mt-2 flex h-4 w-full overflow-hidden well">
 		{
 			Fill === "scroll" ? (
 				<div

@@ -661,7 +661,12 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 		     names the three axes every row is filed on, in the order the cards'
 		     header ribbons print them. The rows themselves live in the registry
 		     below, because the filter is what turns a bank into a gallery. -->
-		<section id="examples" class="blueprint-section scroll-mt-24" data-examples data-reveal>
+		<section
+			id="examples"
+			class="blueprint-section relative w-full scroll-mt-24"
+			data-examples
+			data-reveal
+		>
 			<p class="section-index">01 // THE EXAMPLES // ONE RECORD SHAPE, FOUR MECHANISMS</p>
 			<h2 class="mt-3 type-section text-bone-white">{Bank.examples.length} worked examples</h2>
 			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
@@ -726,14 +731,19 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 		     telemetry chips rather than as a row of buttons: every chip states its
 		     own count, the field states what it searches, and the count line under
 		     it states what is showing. -->
-		<section id="registry" class="blueprint-section mt-16 scroll-mt-24" data-registry data-reveal>
+		<section
+			id="registry"
+			class="blueprint-section relative w-full scroll-mt-24"
+			data-registry
+			data-reveal
+		>
 			<p class="section-index">02 // THE REGISTRY // FILTER BY CATEGORY, SEARCH BY KEYWORD</p>
 			<h2 class="mt-3 type-section text-bone-white">The gallery</h2>
 			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
-				Every entry is the same record shape, so the filter is a query over the three axes above
-				rather than a list of pages. A chip narrows the bank to one category; the field searches
-				the full text of every row - the raw stream, the preview, the retrieval call and the error
-				codes included.
+				Every entry is the same record shape, so the filter is a query over the three axes the
+				matrix names: a chip narrows the bank to one category, and the field searches the full
+				text of every row - the raw stream, the preview, the retrieval call and the error codes
+				included.
 			</p>
 
 			<!-- THE SECTION'S ONE EXPRESSIVE ASSEMBLY: the plate leans, it wipes,
@@ -907,7 +917,7 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 		     The numbers are demoted deliberately: they decide every row, but a
 		     reader meets the rows first. The fold keeps every sentence and every
 		     key; only its position and its voice change. -->
-		<section id="defaults" class="blueprint-section scroll-mt-24" data-reveal>
+		<section id="defaults" class="blueprint-section relative w-full scroll-mt-24" data-reveal>
 			<p class="section-index">03 // THE DEFAULTS // APHRODITE.TOML</p>
 			<h2 class="mt-3 type-section text-bone-white">The defaults every decision reads</h2>
 			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
@@ -960,7 +970,7 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 		<!-- ============ 04 // THE TRAVERSALS ============ -->
 		<section
 			id="traversals"
-			class="blueprint-section flex w-full scroll-mt-24 flex-col gap-24 lg:gap-32"
+			class="blueprint-section relative flex w-full scroll-mt-24 flex-col gap-24 lg:gap-32"
 			data-reveal
 		>
 			<div class="w-full">
@@ -1447,7 +1457,7 @@ const CategoryCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => 
 		</section>
 
 		<!-- ============ 05 // CROSS-LINKS ============ -->
-		<section id="deeper" class="blueprint-section scroll-mt-24" data-reveal>
+		<section id="deeper" class="blueprint-section relative w-full scroll-mt-24" data-reveal>
 			<p class="section-index">05 // GO DEEPER // THE SURFACES THESE EXAMPLES EXERCISE</p>
 			<h2 class="mt-3 type-section text-bone-white">Where each mechanism lives</h2>
 			<ZineBox

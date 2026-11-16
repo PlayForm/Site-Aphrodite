@@ -266,6 +266,7 @@ const Sections = [
 	{ Id: "proxies", Label: "THE PAIR" },
 	{ Id: "parsers", Label: "TWO PARSERS" },
 	{ Id: "reload", Label: "/RELOAD" },
+	{ Id: "boundary", Label: "BOUNDARY" },
 ];
 
 // The override ledger, grouped by the surface that reads each variable, with
@@ -408,7 +409,7 @@ const Chapters = {
 						data-editor
 						spellcheck="false"
 						class="h-[36rem] w-full resize-y bg-transparent p-5 font-mono text-code leading-relaxed text-bone-newsprint"
-						placeholder="loading the shipped example..."
+						placeholder="The shipped example is loaded by the browser; every key, default and override below is server-rendered."
 					></textarea>
 				</div>
 
@@ -423,7 +424,18 @@ const Chapters = {
 						<span class="type-meta text-zinc-dust">env &gt; toml &gt; compiled</span>
 					</div>
 					<div class="flex-1 space-y-3 p-5" data-ladder aria-live="polite">
-						<!-- rendered client-side from the same Keys array the table uses -->
+						<!-- Rendered client-side from the same Keys array the table
+						     uses. The sentence below is what a reader without
+						     JavaScript sees: a shell with a header and nothing under
+						     it reads as a broken page rather than as a simulation
+						     that needs a browser. Recompute() replaces it on its
+						     first pass, so it never appears twice. -->
+						<p class="type-body text-zinc-dust">
+							This pane resolves each tracked key against the file as it is
+							edited, so it needs JavaScript. The matrix below is server-rendered
+							and complete without it: every key, its compiled default and its
+							env override.
+						</p>
 					</div>
 				</div>
 			</div>
@@ -1190,6 +1202,7 @@ const Chapters = {
 
 		<!-- 12 // SIMULATION BOUNDARY - what is real, what is simulated -->
 		<section
+			id="boundary"
 			class="blueprint-section relative w-full"
 			aria-label="The simulation boundary"
 			data-reveal
@@ -1579,7 +1592,13 @@ const Chapters = {
 			Parts.push(Row(Entry.Key, Chips, Note));
 		}
 
-		Ladder.innerHTML = Parts.join("");
+		// An empty roster is a load failure, not a resolved file: say so in the
+		// pane instead of leaving the shell blank and letting the reader read a
+		// missing payload as a config with nothing to report.
+		Ladder.innerHTML =
+			Parts.length > 0
+				? Parts.join("")
+				: `<p class="type-body text-zinc-dust">The key roster did not load, so this pane cannot resolve a value. The matrix below still lists every key with its compiled default and env override.</p>`;
 	}
 
 	// The compiled default is the leading number of a Default cell ("1024

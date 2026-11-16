@@ -61,6 +61,13 @@ const { Label = "COPY", Payload, Tone = "crimson", Size = "md", Class = "" } = A
 // a hard 3px offset shadow, and a press that collapses both - law 2, nothing
 // floats. raw-blood is a FILL with bone-white text (the AA-LIFT raw-blood law:
 // raw-blood is chrome, never a text colour); the light fills take soot-black.
+//
+// The label takes the TELEMETRY VOICE (`text-meta` - the same 11.5px tracked
+// mono as every other label on the site) rather than body size. A control's
+// label is a label: at body size it read as a sentence that happened to be
+// sitting in a box, which is also what made a copy chip and a language tag
+// compete for the same corner. Padding and the offset shadow are unchanged, so
+// the target is exactly as large as it was.
 const Base =
 	"inline-flex items-center gap-2 border border-black font-mono font-black uppercase tracking-widest transition-colors active:translate-x-0.5 active:translate-y-0.5 active:shadow-none";
 
@@ -71,8 +78,8 @@ const Fill = {
 }[Tone];
 
 const Metrics = {
-	md: "px-4 py-2 text-base shadow-[3px_3px_0px_#000]",
-	sm: "px-2 py-1 text-base shadow-[2px_2px_0px_#000]",
+	md: "px-4 py-2 text-meta shadow-[3px_3px_0px_#000]",
+	sm: "px-2 py-1 text-meta shadow-[2px_2px_0px_#000]",
 }[Size];
 ---
 

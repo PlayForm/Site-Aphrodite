@@ -5,6 +5,7 @@ import Related from "@Component/Related.astro";
 import PageShell from "@Component/PageShell.astro";
 import PageHeader from "@Component/PageHeader.astro";
 import ZineBox from "@Component/ZineBox.astro";
+import ZineKicker from "@Component/ZineKicker.astro";
 import ZineSource from "@Component/ZineSource.astro";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import SessionLifecycle from "../Content/Mermaid/session-lifecycle.svg?raw";
@@ -63,6 +64,8 @@ const Lanes = [
 		TapeColor: "teal" as const,
 		Accent: "teal" as const,
 		Rotate: "-rotate-[0.8deg]",
+		Tags: ["INSIDE THE TURN", "HOOK-LEVEL"],
+		TagTone: "telemetry-tag--teal",
 	},
 	{
 		Id: "proxy",
@@ -70,6 +73,8 @@ const Lanes = [
 		TapeColor: "canary" as const,
 		Accent: "canary" as const,
 		Rotate: "rotate-[0.6deg]",
+		Tags: ["BESIDE THE TURN", "HTTP ONLY"],
+		TagTone: "telemetry-tag--canary",
 	},
 ];
 
@@ -79,6 +84,64 @@ const SurfaceCount = {
 	Hooks: String(HookNames.length),
 	Tools: String(ToolNames.length),
 };
+
+/**
+ * THE SURFACE, COUNTED - the stage row that opens chapter 02.
+ *
+ * Four cards, one per thing the plugin registers, each with the top accent
+ * line, the coordinate, the count as the anchor and one line of description.
+ * The metric is the anchor, not the paragraph, which is why the count is the
+ * largest thing in the cell.
+ *
+ * The four accent lines are the page's four stage accents in their fixed
+ * order - teal, canary, raw blood, bone - and they are IDENTITY, not
+ * decoration: the same teal is the plugin lane's colour in chapter 03, the
+ * same canary is the proxy lane's. A quietening pass may drop a shadow; it may
+ * not move a card off its colour.
+ *
+ * `Hooks` and `Tools` come from the manifest. The two proxy processes and the
+ * single optional context engine are documented facts with no manifest
+ * constant behind them, so they are typed here and nowhere else.
+ */
+const Surface = [
+	{
+		Index: "01 // HOOKS",
+		Value: SurfaceCount.Hooks,
+		Unit: "hooks",
+		Accent: "bg-weathered-teal",
+		Note: "Around every turn: pre_tool_call → transforms → pre_llm_call → post_llm_call.",
+	},
+	{
+		Index: "02 // TOOLS",
+		Value: SurfaceCount.Tools,
+		Unit: "tools",
+		Accent: "bg-stamped-canary",
+		Note: "In agent namespace - through the proxy the agent doesn't know about them.",
+	},
+	{
+		Index: "03 // PROXIES",
+		Value: "2",
+		Unit: "proxies",
+		Accent: "bg-raw-blood",
+		Note: "Two proxy processes still run alongside as subprocesses.",
+	},
+	{
+		Index: "04 // ENGINE",
+		Value: "1",
+		Unit: "engine",
+		Accent: "bg-bone-newsprint",
+		Note: "Optional third integration point: APHRODITE_CONTEXT_ENGINE=1 turns it on.",
+	},
+];
+
+/**
+ * THE SHELL CARD'S RIBBON - a row of telemetry metadata over the tier's own
+ * hairline. It is the only card header shape this page uses, so no two cards
+ * invent two of them. The stream beneath it sits in a `well`, which is what
+ * makes a panel read as a channel cut into the page rather than as a plate.
+ */
+const Ribbon =
+	"flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[color:var(--tier-shell-edge)] px-4 py-3 sm:px-5";
 ---
 
 <Base
@@ -102,22 +165,33 @@ const SurfaceCount = {
 			<p class="section-index">01 // THE BASELINE // HERMES ALONE</p>
 			<h2 class="mt-3 type-section text-bone-white">What a raw turn costs</h2>
 
-			<ZineBox Class="mt-8" Size="md" Accent="none" Tape="NO INTERCEPTION" TapeColor="bone">
-				<div class="prose-flow">
-					<p class="type-body text-bone-newsprint">
-						<span class="font-bold text-bone-white">HERMES ALONE -</span> nothing stands
-						between a tool and the model.
+			{/* TWO COLUMNS, NOT ONE STACK: the claim and the cost it produces sit
+			    side by side, so the second column is read as the consequence of
+			    the first rather than as a third paragraph of the same thought. */}
+			<div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+				<ZineBox Size="md" Accent="none" Surface="shell" Tape="NO INTERCEPTION" TapeColor="bone">
+					<div class="prose-flow">
+						<p class="type-body text-bone-newsprint">
+							<span class="font-bold text-bone-white">HERMES ALONE -</span> nothing stands
+							between a tool and the model.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							That is the baseline cost the other two configurations exist to remove.
+						</p>
+					</div>
+				</ZineBox>
+
+				<div class="well p-6 sm:p-8">
+					<p class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
+						WHAT ENTERS THE HISTORY
 					</p>
-					<p class="type-body text-bone-newsprint">
+					<p class="mt-4 type-body text-bone-newsprint">
 						Every file read, build log, and JSON blob enters the message history raw,
 						because nothing intercepts it - the agent spends its token budget reading noise
 						instead of reasoning.
 					</p>
-					<p class="type-body text-bone-newsprint">
-						That is the baseline cost the other two configurations exist to remove.
-					</p>
 				</div>
-			</ZineBox>
+			</div>
 		</section>
 
 		<!-- 02 // THE SURFACE - what the plugin registers, capability by capability -->
@@ -127,10 +201,30 @@ const SurfaceCount = {
 				The integration surface, capability by capability
 			</h2>
 
+			{/* THE STAGE ROW - the surface counted before it is decided about. Four
+			    cards, four stage accents, the count as the anchor in each. */}
+			<div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+				{
+					Surface.map((Cell) => (
+						<div class="grunge shell-card flex flex-col" data-grunge>
+							<div class:list={["h-[2px] w-full", Cell.Accent]} />
+							<div class="flex flex-1 flex-col px-5 py-5">
+								<p class="section-index">{Cell.Index}</p>
+								<div class="metric mt-4">
+									{Cell.Value}
+									<span class="metric__unit">{Cell.Unit}</span>
+								</div>
+								<p class="mt-4 type-body text-bone-newsprint">{Cell.Note}</p>
+							</div>
+						</div>
+					))
+				}
+			</div>
+
 			{/* THE INVENTORY - the manifest's own names, so the matrix below is read
 			    against the surface it decides about. Recessed into the page: it is
 			    the seam list's machinery, not a claim of its own. */}
-			<dl class="well mt-8 grid gap-y-6 p-4 sm:p-5">
+			<dl class="well mt-10 grid gap-y-6 p-4 sm:p-5">
 				<div>
 					<dt class="type-meta font-bold uppercase text-zinc-dust">
 						HOOKS // {SurfaceCount.Hooks}
@@ -160,8 +254,13 @@ const SurfaceCount = {
 			{/* THE DECISION MATRIX - one row per capability, one column per lane.
 			    The plugin column carries the interception; the proxy column is
 			    struck through where the capability simply does not exist. */}
-			<div class="shell-card mt-12 p-4 sm:p-6">
-				<div class="overflow-x-auto">
+			<div class="grunge shell-card mt-12" data-grunge data-grunge-mode="edge">
+				<div class={Ribbon}>
+					<span class="telemetry-tag telemetry-tag--canary">DECISION MATRIX</span>
+					<span class="telemetry-tag">CAPABILITY × LANE</span>
+					<span class="telemetry-tag ml-auto">{ProxyRows.length} CAPABILITIES</span>
+				</div>
+				<div class="overflow-x-auto p-4 sm:p-6">
 					<table class="w-full border-collapse font-mono text-base">
 						<thead>
 							<tr class="border-b-2 border-oxblood-dark text-left">
@@ -218,6 +317,14 @@ const SurfaceCount = {
 							Tape={Lane.Tape}
 							TapeColor={Lane.TapeColor}
 						>
+							<div class="mb-5 flex flex-wrap gap-2">
+								{Lane.Tags.map((Tag, I) => (
+									<span class:list={["telemetry-tag", I === 0 ? Lane.TagTone : ""]}>
+										{Tag}
+									</span>
+								))}
+							</div>
+
 							{Lane.Id === "plugin" ? (
 								<div class="prose-flow">
 									<p class="type-body text-bone-newsprint">
@@ -300,27 +407,52 @@ const SurfaceCount = {
 			<p class="section-index">04 // THE RESULT // SAVED AND PAID FOR</p>
 			<h2 class="mt-3 type-section text-bone-white">What it saved, and what it costs</h2>
 
-			<div class="shell-card mt-8 p-6 sm:p-8">
-				<p class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
-					MEASURED OVER 200 REAL HERMES SESSIONS
-				</p>
-				<div class="metric mt-4">
-					26.9<span class="metric__unit">% deflected</span>
+			{/* THE PAGE'S ONE INVERTED TIER - the printed sheet laid on the dark
+			    table. It carries the single dominant result with its measurement
+			    and its qualifier inside it, because a result separated from its
+			    qualifier is the dishonest version of the same number. The ground
+			    is re-tinted to bone newsprint so it reads as a proof pulled off a
+			    press, and the ink swaps with it. */}
+			<aside
+				class="tier-inverted grunge grunge--oxblood zine-box-subtle relative mt-10 border-[3px] border-raw-blood p-8 sm:p-10"
+				style="--tier-inverted: var(--bone-newsprint)"
+				data-grunge
+				data-grunge-mode="edge"
+			>
+				<ZineKicker Tone="ink">MEASURED OVER 200 REAL HERMES SESSIONS</ZineKicker>
+				<div class="metric mt-6 !text-soot-black drop-shadow-[3px_3px_0px_#520612]">
+					26.9<span class="metric__unit !text-carbon-void">% deflected</span>
 				</div>
-			</div>
-
-			<div class="prose-flow mt-8">
-				<p class="type-body text-bone-newsprint">
+				<p class="mt-6 max-w-3xl type-body text-carbon-void">
 					Measured over 200 real Hermes sessions: 26.9% of all context tokens deflected, a
 					median session saved ratio of 22.9%, and ~22,921 tokens saved per API call.
 				</p>
-				<p class="type-body text-bone-newsprint">
-					<span class="font-bold text-stamped-canary">
-						THE TRADE-OFF IS STATED PLAINLY:
-					</span>{" "}
-					the hooks are Hermes' contract - no other client can register them, so this lane
-					works with Hermes only.
-				</p>
+				<div class="mt-8 flex flex-wrap items-start gap-4 border-t border-raw-blood/40 pt-6">
+					<span class="telemetry-tag telemetry-tag--crimson">THE TRADE-OFF IS STATED PLAINLY</span>
+					<p class="max-w-2xl type-body text-carbon-void">
+						the hooks are Hermes' contract - no other client can register them, so this
+						lane works with Hermes only.
+					</p>
+				</div>
+			</aside>
+
+			{/* THE SECONDARY FIGURES as value → value pairs. They sit on dark `well`
+			    cells rather than inside the sheet: an inverted ground would have
+			    made their teal and canary accents unreadable, and colour on this
+			    page is identity, not decoration. */}
+			<div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
+				<div class="well p-5">
+					<p class="font-mono text-2xl font-bold text-stamped-canary">22.9%</p>
+					<p class="mt-2 type-meta text-zinc-dust">MEDIAN SESSION SAVED RATIO</p>
+				</div>
+				<div class="well p-5">
+					<p class="font-mono text-2xl font-bold text-weathered-teal">~22,921</p>
+					<p class="mt-2 type-meta text-zinc-dust">TOKENS SAVED PER API CALL</p>
+				</div>
+				<div class="well p-5">
+					<p class="font-mono text-2xl font-bold text-bone-white">200</p>
+					<p class="mt-2 type-meta text-zinc-dust">REAL HERMES SESSIONS</p>
+				</div>
 			</div>
 		</section>
 
@@ -331,36 +463,72 @@ const SurfaceCount = {
 				What happens when you launch Hermes
 			</h2>
 
-			<div class="well mt-8 p-4 font-mono text-base leading-relaxed sm:p-5">
-				<div class="text-bone-white">hermes starts</div>
-				<div class="pl-4 text-bone-newsprint">
-					→ plugin loads · dylib resolved once per process, smoke-tested in a subprocess
+			{/* THE BOOT SEQUENCE - a ribbon carrying the head of the ladder, then the
+			    five lines it produces in a recessed channel. The stage accents in
+			    the channel are the ladder's own: canary for the session reset, teal
+			    for the turn loop, dust for the ending. */}
+			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
+				<div class={Ribbon}>
+					<span class="telemetry-tag telemetry-tag--bone">hermes starts</span>
+					<span class="telemetry-tag">ONCE PER PROCESS</span>
+					<span class="telemetry-tag ml-auto">BOOT SEQUENCE</span>
 				</div>
-				<div class="pl-4 text-bone-newsprint">
-					→ a faulting image degrades to "plugin disabled" instead of killing the gateway
-				</div>
-				<div class="pl-4 text-bone-newsprint">
-					→ two proxies spawn - a healthy pair is reused, never duplicated
-				</div>
-				<div class="pl-4 text-stamped-canary">
-					→ on_session_start resets all per-session state
-				</div>
-				<div class="pl-4 text-weathered-teal">
-					→ turn loop: pre_tool_call → transforms → pre_llm_call → post_llm_call
-				</div>
-				<div class="pl-4 text-zinc-dust">
-					→ session ends · markers do not survive a restart - a new session starts a fresh
-					store
+				<div class="well p-4 font-mono text-base leading-relaxed sm:p-5">
+					<div class="pl-4 text-bone-newsprint">
+						→ plugin loads · dylib resolved once per process, smoke-tested in a subprocess
+					</div>
+					<div class="pl-4 text-bone-newsprint">
+						→ a faulting image degrades to "plugin disabled" instead of killing the gateway
+					</div>
+					<div class="pl-4 text-bone-newsprint">
+						→ two proxies spawn - a healthy pair is reused, never duplicated
+					</div>
+					<div class="pl-4 text-stamped-canary">
+						→ on_session_start resets all per-session state
+					</div>
+					<div class="pl-4 text-weathered-teal">
+						→ turn loop: pre_tool_call → transforms → pre_llm_call → post_llm_call
+					</div>
+					<div class="pl-4 text-zinc-dust">
+						→ session ends · markers do not survive a restart - a new session starts a
+						fresh store
+					</div>
 				</div>
 			</div>
 
-			<div class="prose-flow mt-8">
-				<p class="type-body uppercase text-zinc-dust">
-					THE DUAL PROXIES: TOKEN ON :9798 (SQLITE, PERSISTENT, COMPRESSES ABOVE 1 KB) AND
-					CACHE ON :9797 (IN-MEMORY, COMPRESSES ABOVE 8 KB).
-				</p>
-				<p class="type-body uppercase text-zinc-dust">
-					NO HOT-RELOAD - RESTART THE SESSION TO PICK UP A NEW BUILD.
+			{/* THE DUAL PROXIES - the sentence the docs print, split into the two
+			    pods it describes: each carries its port and its compression
+			    threshold on the ribbon, and its store in the channel beneath. */}
+			<p class="mt-10 type-meta font-bold uppercase tracking-widest text-zinc-dust">
+				THE DUAL PROXIES
+			</p>
+			<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
+				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+					<div class={Ribbon}>
+						<span class="telemetry-tag telemetry-tag--canary">TOKEN</span>
+						<span class="telemetry-tag">:9798</span>
+						<span class="telemetry-tag ml-auto">1 KB</span>
+					</div>
+					<div class="well flex-1 p-4 font-mono text-base leading-relaxed text-bone-newsprint sm:p-5">
+						SQLite. Persistent. Compresses above 1 KB.
+					</div>
+				</div>
+				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+					<div class={Ribbon}>
+						<span class="telemetry-tag telemetry-tag--teal">CACHE</span>
+						<span class="telemetry-tag">:9797</span>
+						<span class="telemetry-tag ml-auto">8 KB</span>
+					</div>
+					<div class="well flex-1 p-4 font-mono text-base leading-relaxed text-bone-newsprint sm:p-5">
+						In-memory. Compresses above 8 KB.
+					</div>
+				</div>
+			</div>
+
+			<div class="mt-8 flex flex-wrap items-start gap-4">
+				<span class="telemetry-tag telemetry-tag--crimson">NO HOT-RELOAD</span>
+				<p class="type-body text-zinc-dust">
+					RESTART THE SESSION TO PICK UP A NEW BUILD.
 				</p>
 			</div>
 
@@ -377,15 +545,22 @@ const SurfaceCount = {
 			<p class="section-index">06 // EVIDENCE // WHAT THE AGENT SEES</p>
 			<h2 class="mt-3 type-section text-bone-white">The twelve preview shapes</h2>
 
-			<div class="well mt-8 space-y-0 p-4 font-mono text-base leading-relaxed sm:p-5">
-				{Previews.map((Line) => (
-					<div class="text-bone-newsprint">
-						<span class="text-stamped-canary">
-							{Line.slice(0, Line.indexOf(":") + 1)}
-						</span>
-						{Line.slice(Line.indexOf(":") + 1)}
-					</div>
-				))}
+			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
+				<div class={Ribbon}>
+					<span class="telemetry-tag telemetry-tag--canary">PREVIEW SHAPES</span>
+					<span class="telemetry-tag">{Previews.length} ARMS</span>
+					<span class="telemetry-tag ml-auto">REPRESENTATIVE NUMBERS</span>
+				</div>
+				<div class="well p-4 font-mono text-base leading-relaxed sm:p-5">
+					{Previews.map((Line) => (
+						<div class="text-bone-newsprint">
+							<span class="text-stamped-canary">
+								{Line.slice(0, Line.indexOf(":") + 1)}
+							</span>
+							{Line.slice(Line.indexOf(":") + 1)}
+						</div>
+					))}
+				</div>
 			</div>
 
 			<div class="prose-flow mt-8">
@@ -404,17 +579,29 @@ const SurfaceCount = {
 				</p>
 			</div>
 
-			<div class="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-2">
-				<div>
-					<span class="telemetry-tag">WITHOUT APHRODITE</span>
-					<div class="well mt-4 p-4 font-mono text-base text-zinc-dust">
+			{/* THE DUAL CONSOLE PODS - the same build, read two ways. Each pod's
+			    ribbon carries what the reading costs, and the stream sits in a
+			    recessed well beneath it, so the two are compared at a glance
+			    instead of through two paragraphs. */}
+			<div class="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
+				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+					<div class={Ribbon}>
+						<span class="telemetry-tag">WITHOUT APHRODITE</span>
+						<span class="telemetry-tag telemetry-tag--crimson">500 TOKENS</span>
+						<span class="telemetry-tag ml-auto">≈ 2,000 CHARS</span>
+					</div>
+					<div class="well flex-1 p-4 font-mono text-base leading-relaxed text-zinc-dust sm:p-5">
 						500 tokens of build output... scrolling... error? no... warning? no... ok it
 						passed. That was 500 tokens I'll never get back.
 					</div>
 				</div>
-				<div>
-					<span class="telemetry-tag telemetry-tag--teal">WITH NATIVE INTEGRATION</span>
-					<div class="well mt-4 p-4 font-mono text-base">
+				<div class="grunge shell-card flex flex-col" data-grunge data-grunge-mode="edge">
+					<div class={Ribbon}>
+						<span class="telemetry-tag telemetry-tag--teal">WITH NATIVE INTEGRATION</span>
+						<span class="telemetry-tag telemetry-tag--canary">A FEW TOKENS</span>
+						<span class="telemetry-tag ml-auto">44 LINES</span>
+					</div>
+					<div class="well flex-1 p-4 font-mono text-base leading-relaxed sm:p-5">
 						<span class="text-bone-white">[build:0E 0W 44L]</span>
 						<span class="text-zinc-dust">
 							{" "}
@@ -427,14 +614,20 @@ const SurfaceCount = {
 			</div>
 
 			<div class="prose-flow mt-12 border-t border-oxblood-dark pt-8">
-				<p class="type-body uppercase text-zinc-dust">
-					SANITIZED, GENERALIZED SHAPES - REPRESENTATIVE PREVIEW FORMS FROM THE PUBLIC DOCS,
-					NOT SESSION CONTENT.
-				</p>
-				<p class="type-body uppercase text-zinc-dust">
-					THE AGENT RETRIEVES FULL OUTPUT WITH aphrodite_retrieve(hash) ONLY WHEN IT ACTUALLY
-					NEEDS IT.
-				</p>
+				<div class="flex flex-wrap items-start gap-4">
+					<span class="telemetry-tag telemetry-tag--bone">SANITIZED · GENERALIZED</span>
+					<p class="type-body uppercase text-zinc-dust">
+						SANITIZED, GENERALIZED SHAPES - REPRESENTATIVE PREVIEW FORMS FROM THE PUBLIC
+						DOCS, NOT SESSION CONTENT.
+					</p>
+				</div>
+				<div class="flex flex-wrap items-start gap-4">
+					<span class="telemetry-tag telemetry-tag--teal">RETRIEVAL ON DEMAND</span>
+					<p class="type-body uppercase text-zinc-dust">
+						THE AGENT RETRIEVES FULL OUTPUT WITH aphrodite_retrieve(hash) ONLY WHEN IT
+						ACTUALLY NEEDS IT.
+					</p>
+				</div>
 			</div>
 		</section>
 
@@ -471,28 +664,35 @@ const SurfaceCount = {
 
 			{/* THE FOUR KEYS - each key with its value and the comment it shipped
 			    with, so the number and its meaning stay on one row. */}
-			<dl class="well mt-8 grid gap-y-4 p-4 font-mono text-base text-bone-newsprint sm:p-5">
-				<div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4">
-					<dt class="text-zinc-dust">engine_threshold_pct</dt>
-					<dd class="text-stamped-canary">30</dd>
-					<dd class="col-span-2 text-zinc-dust"># archive middle turns at % context fill</dd>
+			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
+				<div class={Ribbon}>
+					<span class="telemetry-tag telemetry-tag--teal">ENGINE KEYS</span>
+					<span class="telemetry-tag">4 DEFAULTS</span>
+					<span class="telemetry-tag ml-auto">aphrodite.toml</span>
 				</div>
-				<div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4">
-					<dt class="text-zinc-dust">engine_protect_first</dt>
-					<dd class="text-stamped-canary">2</dd>
-					<dd class="col-span-2 text-zinc-dust"># messages kept at the start</dd>
-				</div>
-				<div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4">
-					<dt class="text-zinc-dust">engine_protect_last</dt>
-					<dd class="text-stamped-canary">5</dd>
-					<dd class="col-span-2 text-zinc-dust"># messages kept at the end</dd>
-				</div>
-				<div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4">
-					<dt class="text-zinc-dust">engine_min_msgs</dt>
-					<dd class="text-stamped-canary">8</dd>
-					<dd class="col-span-2 text-zinc-dust"># minimum messages before activating</dd>
-				</div>
-			</dl>
+				<dl class="well grid gap-y-4 p-4 font-mono text-base text-bone-newsprint sm:p-5">
+					<div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4">
+						<dt class="text-zinc-dust">engine_threshold_pct</dt>
+						<dd class="text-stamped-canary">30</dd>
+						<dd class="col-span-2 text-zinc-dust"># archive middle turns at % context fill</dd>
+					</div>
+					<div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4">
+						<dt class="text-zinc-dust">engine_protect_first</dt>
+						<dd class="text-stamped-canary">2</dd>
+						<dd class="col-span-2 text-zinc-dust"># messages kept at the start</dd>
+					</div>
+					<div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4">
+						<dt class="text-zinc-dust">engine_protect_last</dt>
+						<dd class="text-stamped-canary">5</dd>
+						<dd class="col-span-2 text-zinc-dust"># messages kept at the end</dd>
+					</div>
+					<div class="grid grid-cols-[1fr_auto] items-baseline gap-x-4">
+						<dt class="text-zinc-dust">engine_min_msgs</dt>
+						<dd class="text-stamped-canary">8</dd>
+						<dd class="col-span-2 text-zinc-dust"># minimum messages before activating</dd>
+					</div>
+				</dl>
+			</div>
 
 			<ZineSource
 				Lines={[

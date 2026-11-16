@@ -74,20 +74,12 @@ const PreviewLabel = {
 
 <div class={`relative ${Rotate} transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.8deg]`}>
 	<ZineTape Label={Title} Color="raw" Side="center" />
-	<div class="zine-box-subtle border-[3px] border-oxblood-dark bg-carbon-void p-4 pt-7 sm:p-6 sm:pt-8">
+	<div class="zine-box-subtle well p-4 pt-7 sm:p-6 sm:pt-8">
 		{
 			(Outcome !== undefined || Provenance !== undefined) && (
 				<div class="mb-4 flex flex-wrap items-center gap-2">
-					{Provenance && (
-						<span class="border border-zinc-dust px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-							{Provenance}
-						</span>
-					)}
-					{Outcome && (
-						<span class="border border-weathered-teal px-2 py-0.5 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
-							{OutcomeLabel[Outcome]}
-						</span>
-					)}
+					{Provenance && <span class="telemetry-tag">{Provenance}</span>}
+					{Outcome && <span class="telemetry-tag telemetry-tag--teal">{OutcomeLabel[Outcome]}</span>}
 				</div>
 			)
 		}
@@ -104,9 +96,11 @@ const PreviewLabel = {
 			Color="canary"
 		/>
 		{Retrieval && (
-			<div class="mt-3 border border-oxblood-dark bg-asphalt-panel-dark px-3 py-2 font-mono text-base leading-relaxed text-weathered-teal">
-				<span class="mr-1 font-black text-stamped-canary">RETRIEVAL</span>
-				{Retrieval}
+			<div
+				class="mt-3 well flex flex-wrap items-baseline gap-2 px-3 py-2 font-mono text-base leading-relaxed text-weathered-teal"
+			>
+				<span class="telemetry-tag telemetry-tag--canary">RETRIEVAL</span>
+				<span class="min-w-0">{Retrieval}</span>
 			</div>
 		)}
 	</div>

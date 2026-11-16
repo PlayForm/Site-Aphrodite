@@ -237,6 +237,87 @@
 	}
 }
 
+/* ---- LAYOUT BANDS // the Stitch composition, our surface ----------------
+
+   These are ARRANGEMENT only: grid, gap, ordering, measure. No background, no
+   border, no shadow, no colour, no font - those stay with ZineBox, .emphasis-*
+   and .grunge. The point is to take Stitch's positioning (numbered bands, a
+   decision matrix with a dominant lead, dual pods, two-column splits) without
+   importing its token system over ours. */
+
+.band {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-group);
+	width: 100%;
+	padding-block-start: var(--space-group);
+	/* The hairline is the section grammar itself, not decoration: Stitch divides
+	   every content domain with a full-width 1px rule. Nothing else here paints. */
+	border-top: 1px solid var(--oxblood-dark);
+}
+
+/* A row of cards where one child is visibly dominant. Collapses to a stack. */
+.matrix {
+	display: grid;
+	gap: var(--space-group);
+	grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+	.matrix {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1280px) {
+	.matrix {
+		grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+	}
+
+	.matrix > .matrix-lead {
+		grid-column: span 2;
+	}
+}
+
+/* Two panels in one band: header ribbon slot over a well slot. */
+.pods {
+	display: grid;
+	gap: var(--space-group);
+	grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+	.pods {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+/* Prose left, figure right - the split Stitch uses for explanation + evidence. */
+.split {
+	display: grid;
+	gap: var(--space-group);
+	grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+	.split {
+		grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+		align-items: start;
+	}
+
+	.split--even {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+/* A telemetry chip row: status, version, prerequisites. */
+.chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-tight);
+}
+
 .tape-staple {
 	position: relative;
 }

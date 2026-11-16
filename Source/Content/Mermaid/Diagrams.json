@@ -129,13 +129,13 @@
 		"Id": "docs-architecture-10-component-1",
 		"File": "architecture/10-component",
 		"Index": 1,
-		"Label": "COMPONENT ARCHITECTURE"
+		"Label": "ARCHITECTURE/10-COMPONENT"
 	},
 	{
 		"Id": "docs-architecture-11-data-model-1",
 		"File": "architecture/11-data-model",
 		"Index": 1,
-		"Label": "CORE DATA MODEL"
+		"Label": "ARCHITECTURE/11-DATA-MODEL"
 	},
 	{
 		"Id": "docs-examples-llm-view-1",
@@ -153,12 +153,12 @@
 		"Id": "docs-guides-hermes-integration-1",
 		"File": "guides/hermes-integration",
 		"Index": 1,
-		"Label": "HERMES INTEGRATION"
+		"Label": "GUIDES/HERMES-INTEGRATION"
 	},
 	{
 		"Id": "docs-plugin-hooks-1",
 		"File": "plugin/hooks",
 		"Index": 1,
-		"Label": "PLUGIN HOOKS"
+		"Label": "PLUGIN/HOOKS"
 	}
 ]

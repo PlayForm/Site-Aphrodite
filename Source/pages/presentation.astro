@@ -80,21 +80,33 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 				<details class="deck-beats" data-beats data-control data-js-only>
 					<summary class="deck-ui-button deck-beats-summary">BEATS</summary>
 					<div class="deck-beats-panel">
+						<p class="deck-beats-index">
+							<span class="deck-beats-index-tag">BEAT INDEX</span>
+							<span class="deck-beats-index-count">
+								{`${String(Total).padStart(2, "0")} SCENES // ${Span}`}
+							</span>
+						</p>
 						<nav aria-label="Beats">
-							<ol class="deck-beats-list">
+							<ol class="deck-beats-matrix">
 								{
 									Scenes.map((Scene, Index) => (
-										<li>
+										<li class="deck-beats-cell">
 											<a
 												class="deck-beats-link"
 												href={`#${Scene.Identifier}`}
 												data-beat={Index}
 												aria-current={Index === 0 ? "true" : undefined}
 											>
-												<span class="deck-beats-ordinal">
-													{String(Index + 1).padStart(2, "0")}
+												<span class="deck-beats-head">
+													<span class="deck-beats-ordinal">
+														{String(Index + 1).padStart(2, "0")}
+													</span>
+													<span class="deck-beats-span">
+														{`${Scene.Duration.toFixed(1)}s`}
+													</span>
 												</span>
 												<span class="deck-beats-name">{Scene.Title}</span>
+												<span class="deck-beats-exit">{Scene.Exit.Label}</span>
 											</a>
 										</li>
 									))
@@ -220,7 +232,7 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 			bottom: calc(100% + 0.8cqw);
 			left: 0;
 			z-index: 2;
-			width: max-content;
+			width: 46cqw;
 			max-width: 46cqw;
 			border: 2px solid var(--oxblood-dark);
 			border-radius: 0;
@@ -229,46 +241,78 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 			padding: 1.1cqw 1.3cqw;
 		}
 
-		.deck-beats-list {
+		/* The index head is the blueprint chapter rule, in the deck's own units:
+		   a hairline across the panel, the tag at its left, the count at its
+		   right. Both values are the ones the film already prints - the scene
+		   count the transport steps through and the span it runs for. */
+		.deck-beats-index {
+			display: flex;
+			align-items: baseline;
+			justify-content: space-between;
+			gap: 1.2cqw;
+			margin: 0 0 0.8cqw;
+			border-bottom: 1px solid var(--oxblood-dark);
+			padding-bottom: 0.55cqw;
+			font-size: calc(0.56cqw * var(--type-scale));
+			font-weight: 400;
+			letter-spacing: 0.14em;
+			text-transform: uppercase;
+		}
+
+		.deck-beats-index-tag {
+			color: var(--weathered-teal);
+			font-weight: 700;
+		}
+
+		.deck-beats-index-count {
+			color: var(--zinc-dust);
+			font-variant-numeric: tabular-nums;
+		}
+
+		/* The index is a MATRIX: one numbered cell per scene, three to a row.
+		   The ordinal and the beat's own span sit on the cell's top line, the
+		   scene's claim in the middle, and the page that carries the argument
+		   named at the foot - the same anchor, the same data-beat wiring the
+		   player seeks on, only the arrangement changed. */
+		.deck-beats-matrix {
 			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 0.35cqw 1.6cqw;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 0.5cqw;
+			max-height: 52cqh;
 			margin: 0;
 			padding: 0;
+			overflow-y: auto;
+			overscroll-behavior: contain;
 			list-style: none;
 		}
 
-		.deck-beats-link {
+		.deck-beats-cell {
 			display: flex;
-			gap: 0.7cqw;
-			align-items: baseline;
-			border-left: 3px solid transparent;
-			padding: 0.22cqw 0 0.22cqw 0.7cqw;
+		}
+
+		.deck-beats-link {
+			display: grid;
+			grid-template-rows: auto 1fr auto;
+			gap: 0.35cqw;
+			width: 100%;
+			border: 1px solid var(--oxblood-dark);
+			padding: 0.5cqw 0.7cqw 0.55cqw;
+			background: var(--void-inset);
 			color: var(--zinc-dust);
-			font-size: calc(0.66cqw * var(--type-scale));
+			font-size: calc(0.62cqw * var(--type-scale));
 			letter-spacing: 0.1em;
 			text-decoration: none;
 			text-transform: uppercase;
-			white-space: nowrap;
 			/* Deck.css makes every anchor in the deck inert for recording; a beat
 			   link is the exception, and so is the exit below. */
 			pointer-events: auto;
 		}
 
-		.deck-beats-link:hover,
-		.deck-beats-link:focus-visible {
-			color: var(--bone-white);
-			background: rgba(147, 17, 40, 0.18);
-		}
-
-		.deck-beats-link:focus-visible {
-			outline: 2px solid var(--stamped-canary);
-			outline-offset: 1px;
-		}
-
-		.deck-beats-link[aria-current="true"] {
-			border-left-color: var(--raw-blood);
-			color: var(--bone-white);
+		.deck-beats-head {
+			display: flex;
+			align-items: baseline;
+			justify-content: space-between;
+			gap: 0.6cqw;
 		}
 
 		.deck-beats-ordinal {
@@ -276,9 +320,55 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 			font-variant-numeric: tabular-nums;
 		}
 
+		.deck-beats-span {
+			color: var(--zinc-dust);
+			font-size: calc(0.54cqw * var(--type-scale));
+			font-variant-numeric: tabular-nums;
+			letter-spacing: 0.08em;
+		}
+
 		.deck-beats-name {
+			color: var(--bone-newsprint);
+			letter-spacing: 0.04em;
+			line-height: 1.35;
+			overflow-wrap: break-word;
+		}
+
+		.deck-beats-exit {
+			color: var(--stamped-canary);
+			font-size: calc(0.54cqw * var(--type-scale));
+			letter-spacing: 0.16em;
+			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
+		}
+
+		.deck-beats-link:hover,
+		.deck-beats-link:focus-visible {
+			border-color: var(--raw-blood);
+			background: rgba(147, 17, 40, 0.18);
+		}
+
+		.deck-beats-link:hover .deck-beats-name,
+		.deck-beats-link:focus-visible .deck-beats-name {
+			color: var(--bone-white);
+		}
+
+		.deck-beats-link:focus-visible {
+			outline: 2px solid var(--stamped-canary);
+			outline-offset: 1px;
+		}
+
+		/* The beat being played keeps its identity in the matrix: the crimson
+		   edge moves inside the cell, so the current scene reads as the same
+		   stamp it wears in the frame. */
+		.deck-beats-link[aria-current="true"] {
+			border-color: var(--raw-blood);
+			box-shadow: inset 3px 0 0 var(--raw-blood);
+		}
+
+		.deck-beats-link[aria-current="true"] .deck-beats-name {
+			color: var(--bone-white);
 		}
 
 		.deck-beats-keys {
@@ -354,23 +444,30 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 		   here, reading the same label step Deck.css declares. */
 		@media (max-width: 1023px) {
 			.deck-beats-panel {
+				width: min(22rem, calc(100vw - 2rem));
 				max-width: min(22rem, calc(100vw - 2rem));
 			}
 
-			.deck-beats-list {
+			/* One column on a phone: three 7rem cells are not a matrix, they are
+			   a grid of unreadable columns. */
+			.deck-beats-matrix {
 				grid-template-columns: 1fr;
 			}
 
-			/* A beat name wraps in the column layout instead of running off the
-			   panel, and the row gets a thumb's height. */
-			.deck-beats-link {
-				padding-block: 0.3rem;
-				font-size: var(--deck-floor-label);
-				white-space: normal;
+			.deck-beats-index {
+				font-size: calc(var(--deck-floor-label) - 2px);
 			}
 
-			.deck-beats-name {
-				white-space: normal;
+			/* A beat cell wraps in the column layout instead of running off the
+			   panel, and the row gets a thumb's height. */
+			.deck-beats-link {
+				padding: 0.5rem 0.65rem;
+				font-size: var(--deck-floor-label);
+			}
+
+			.deck-beats-span,
+			.deck-beats-exit {
+				font-size: calc(var(--deck-floor-label) - 2px);
 			}
 
 			.deck-beats-keys {

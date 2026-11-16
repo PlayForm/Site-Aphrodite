@@ -247,6 +247,16 @@ const Chapter = (Id: string): string => {
  *  colour, it reads the one the scenario already chose. */
 const TapeColor = { crimson: "raw", canary: "canary", teal: "teal" } as const;
 
+/** The chapter RULE's colour, by the scenario's own stage accent. Identity is
+ *  carried by the 1px line and not by the label, because `--raw-blood` is a
+ *  chrome colour and never a text colour (the AA-lift law) - a hairline owes no
+ *  contrast, so all three accents can be themselves on it. */
+const ChapterRule = {
+	crimson: "var(--raw-blood)",
+	canary: "var(--stamped-canary)",
+	teal: "var(--weathered-teal)",
+} as const;
+
 /**
  * When the preview lands: the frame the last printed output line finishes.
  * Documentation/Motion.md's `[data-stream]` beat - a 140ms lead, 70ms per line,
@@ -700,11 +710,12 @@ const Sections = [
 					<section
 						id={Scenario.Id}
 						class="blueprint-section relative flex w-full scroll-mt-24 flex-col"
+						style={`--blueprint-rule: ${ChapterRule[Scenario.Tone ?? "crimson"]}`}
 						data-reveal
 					>
 						<p class="section-index">{Chapter(Scenario.Id)}</p>
 
-						<ZineBox Tone={Scenario.Tone} Rotate={Scenario.Rotate} Class="mt-4 w-full">
+						<ZineBox Tone={Scenario.Tone} Rotate={Scenario.Rotate} Class="mt-10 w-full">
 							<ZineTape
 								Label={Scenario.Label}
 								Color={TapeColor[Scenario.Tone ?? "crimson"]}

@@ -1071,30 +1071,38 @@ const NextSteps = (() => {
 	   greyed out the tokenless `text`/`plaintext` fences, which carry no
 	   spans of their own to colour. */
 
-	/* CODE IN THE WELL TIER. The frame, padding, rhythm, overflow and scroll cue
-	   stay Global.css's - none of them is repeated here. What this page chooses
-	   is the TIER the plate sits on: the well ground with the well's LIGHTER
-	   edge, which is the pair that makes a channel read as recessed instead of
-	   as one more raised panel. The crimson left edge stays: it is the site's
-	   identity, not the tier's.
+	/* CODE IN THE WELL TIER - THE PRE-PLATE PATH ONLY.
 
-	   `background-color` carries the flag because Shiki writes the theme's
-	   ground as an INLINE style on the <pre> (`editor.background` in
-	   Source/Library/ShikiTheme.ts), and an inline declaration outranks every
-	   sheet rule however specific it is.
+	   A fence on this site is a CHANNEL, and the channel is published once, in
+	   Global.css's `DATA SURFACES` block: `Source/Script/CodePlate.ts` wraps
+	   every `pre.astro-code` in `figure.zine-plate.well`, and the sheet scopes
+	   the well ground, the LIGHTER edge and the header ribbon to that figure.
+	   When the plate exists it OWNS the frame and the tier - the `<pre>` inside
+	   it keeps only the crimson spine - so a page rule repainting those same
+	   properties would be a second frame on one region, and a
+	   `background-color: ... !important` here would additionally overrule the
+	   theme ground Shiki writes as an inline style (`editor.background` in
+	   Source/Library/ShikiTheme.ts), which is the one wash the vocabulary
+	   deliberately leaves to the renderer.
 
-	   The hover state is restated for the same reason the base rule is scoped
-	   here: `.docs-prose[scope] pre.astro-code:hover` outranks Global.css's
-	   `body pre.astro-code:hover`, so without it the plate would stop turning
-	   crimson under the pointer. The values are Global.css's own - the shadow
-	   and the wash still come from there and are not duplicated. */
-	.docs-prose :global(pre.astro-code) {
+	   So this rule applies only where the plate cannot exist: `html:not(.js)`,
+	   a reader with scripting off (`Layout/Base.astro` adds `js` to
+	   `<html>` before first paint). There the fence is still a bare
+	   `<pre class="astro-code">` on Global.css's own plate, and the page gives
+	   it the recessed tier rather than leaving the documentation's channels
+	   raised above the prose around them. The `!important` is needed only in
+	   that path, for the same inline-style reason.
+
+	   Nothing here repeats Global.css's frame, padding, rhythm, overflow or
+	   scroll cue - the shadow and the crimson wash still come from there, and
+	   the hover state keeps both of the signals that carry meaning. */
+	html:not(.js) .docs-prose :global(pre.astro-code) {
 		border-color: var(--tier-well-edge);
 		border-left-color: var(--blood-crimson);
 		background-color: var(--tier-well) !important;
 	}
 
-	.docs-prose :global(pre.astro-code:hover) {
+	html:not(.js) .docs-prose :global(pre.astro-code:hover) {
 		border-color: var(--raw-blood);
 		border-left-color: var(--stamped-canary);
 	}

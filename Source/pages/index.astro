@@ -420,6 +420,39 @@ const GridFold = `
 	</p>
 </div>
 `.trim();
+
+/**
+ * The two-lane decision matrix, as rows of one axis each.
+ *
+ * Every cell is a fact the lane's own prose states below it, said once in the
+ * matrix's voice: WHERE IT RUNS, WHAT IT SEES, WHAT IT SHARES, THE LIMIT. The
+ * matrix is the summary and the prose is the source, so a cell may compress a
+ * sentence but may never carry a claim the lane's prose does not already make.
+ * Laid out as three ruled columns rather than a <table>: the cells hold
+ * sentences, and a sentence in a table cell wraps against a fixed track.
+ */
+const Decision = [
+	{
+		Axis: "WHERE IT RUNS",
+		One: "Inside the turn, as a native Hermes plugin - not a proxy you point a client at.",
+		Two: "On a port, as an OpenAI-compatible listener the plugin already spawns.",
+	},
+	{
+		Axis: "WHAT IT SEES",
+		One: "Tool output, before it becomes message history: six hooks, thirteen tools, and an optional context engine, every call forwarded into the Rust dylib.",
+		Two: "HTTP traffic only. SSE streams pass through uncompressed.",
+	},
+	{
+		Axis: "WHAT IT SHARES",
+		One: "The turn's own context. The inline store is session-scoped.",
+		Two: "A persistent SQLite store that survives a restart, shared with any client that speaks HTTP, and the tool relay that retrieves or creates CCR entries.",
+	},
+	{
+		Axis: "THE LIMIT",
+		One: "The hooks are Hermes' contract - no other client can register them, so this lane works with Hermes only.",
+		Two: "No tool-output interception, no terminal compression, no directives, no context engine. It extends the stack to other callers; it does not replace the hooks inside Hermes.",
+	},
+];
 ---
 
 <Base
@@ -434,13 +467,13 @@ const GridFold = `
 		     ship two h1s and shrink the wordmark from 144px to 48px. The lead below
 		     keeps PageHeader's rhythm - one sentence, one <p>. -->
 		<header
-			class="relative flex w-full flex-col items-center justify-center pt-4 text-center"
+			class="relative flex w-full flex-col items-start justify-start pt-4 text-start"
 			data-enter
 		>
-			<!-- Beat 01. The kicker is the page's folio: six of them number the
-			     six beats, and each one is quiet on purpose - a beat number is
-			     navigation, not decoration. -->
-			<p class="section-kicker !mb-10">01 / POSITIONING</p>
+			<!-- Beat 01. The folio, in the published blueprint voice: six of these
+			     number the six chapters, and each is quiet on purpose - a chapter
+			     number is navigation, not decoration. -->
+			<p class="section-index !mb-10">01 // POSITIONING</p>
 			<!-- Brand card: the red aphrodite.svg mark in the crimson module,
 			     oxblood offset underlay (user instruction: the red mark everywhere).
 			     The card's 24-unit drop to the wordmark was the ceremonial stack
@@ -532,6 +565,18 @@ const GridFold = `
 				<ZineButton Label="Install for Hermes" Href="/setup/" />
 				<ZineButton Label="See the before / after" Href="#hero-run" Role="secondary" />
 			</div>
+			<!-- TELEMETRY STRIP - the hero's standing claims in the voice every
+			     later chapter speaks. The chips carry the three facts the sentence
+			     below states plus the one the lead states, and the sentence stays:
+			     a hero that ends on prose reads as a publication, a hero that ends
+			     on a chip row reads as a spec sheet. Both, in that order, so the
+			     reader meets the claim twice and never has to choose a register. -->
+			<ul class="mt-10 flex flex-wrap items-center justify-center gap-2">
+				<li class="telemetry-tag telemetry-tag--bone">One binary</li>
+				<li class="telemetry-tag telemetry-tag--teal">Zero dependencies</li>
+				<li class="telemetry-tag telemetry-tag--canary">Millions of tokens saved</li>
+				<li class="telemetry-tag telemetry-tag--crimson">One retrieval away</li>
+			</ul>
 			<p class="mt-8 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 				One binary. Zero dependencies. Millions of tokens saved.
 			</p>
@@ -549,7 +594,7 @@ const GridFold = `
 		     commands in a cycle, each streaming its real output on its own rhythm
 		     - and the right pane is recomputed from the stream so far, so the
 		     marker is never a lie about a flood that has not finished arriving. -->
-		<section class="relative w-full" data-reveal>
+		<section class="band relative w-full" data-reveal>
 			<p class="section-kicker !mb-4">02 / DEMONSTRATION &middot; THE PAIR // STREAM + PREVIEW</p>
 			<h2 class="type-section mb-6 text-bone-white">
 				The agent spends its budget reading noise
@@ -598,7 +643,7 @@ const GridFold = `
 		     its own accent through the left edge, the corner stamp, the
 		     heading, the rule and the chip - and only those; the figure and
 		     the description stay bone so the reading text never competes. -->
-		<section class="relative w-full" data-reveal>
+		<section class="band relative w-full" data-reveal>
 			<p class="section-kicker !mb-4">03 / MECHANISM &middot; PIPELINE // 4-STAGE ABSORPTION</p>
 			<h2 class="type-section mb-4 text-bone-white">How it works</h2>
 			<p class="type-sub mb-6 text-bone-newsprint">Four steps, one decision</p>
@@ -859,7 +904,7 @@ const GridFold = `
 		     drawn as ruled columns instead of plates, with the chapter distance
 		     above them. Nothing was cut to buy the air; the band simply stops
 		     filling its own background. -->
-		<section class="relative w-full" data-reveal>
+		<section class="band relative w-full" data-reveal>
 			<p class="section-kicker !mb-4">05 / INTEGRATION</p>
 			<h2 class="type-section mb-6 text-bone-white">Two ways to run it</h2>
 			<div class="prose-flow max-w-[62ch]">
@@ -934,7 +979,7 @@ const GridFold = `
 		     clone, cargo, source) is /setup/'s story; this panel is the one path a
 		     reader takes from this page, and the outcome line is what makes it a
 		     procedure rather than a command list. -->
-		<section class="relative w-full" data-reveal>
+		<section class="band relative w-full" data-reveal>
 			<p class="section-kicker !mb-4">06 / INSTALLATION</p>
 			<h2 class="type-section mb-8 text-bone-white">Installing it</h2>
 			<div class="grunge emphasis-standard max-w-4xl p-6 sm:p-8 lg:p-10" data-grunge>

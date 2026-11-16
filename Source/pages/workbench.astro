@@ -328,7 +328,11 @@ const Arc: readonly {
 		>
 			<p class="section-index !text-weathered-teal">01 // THE CONTRACT</p>
 			<div class="shell-card mt-4 p-6 sm:p-8">
-				<ZineKicker Tone="teal">SIMULATION BOUNDARY</ZineKicker>
+				{/* The chapter's head, in the sub-head role. It was a kicker at
+				    16px - the size of the body copy under it - so the page's
+				    heading outline skipped chapter 01 altogether and the card
+				    gave no signal that it opened a new subject. Same words. */}
+				<h2 class="type-sub text-bone-white">SIMULATION BOUNDARY</h2>
 				<p class="wb-instrument">
 					Browser simulation · illustrative digest · no engine benchmark · no
 					server-side retrieval
@@ -595,9 +599,13 @@ const Arc: readonly {
 			data-reveal
 		>
 			<p class="section-index !text-weathered-teal">04 // THE STATES</p>
-			<div class="mt-2">
-				<ZineKicker Tone="teal">THRESHOLD STATES</ZineKicker>
-			</div>
+			{/* The chapter head is an <h2> in the sub-head role, not a kicker: a
+			    kicker renders at 16px, which is the size of the body copy under
+			    it, so the chapter gave the reader no signal that the subject
+			    changed. Same words, promoted voice - the fix 03 already carries,
+			    and the reason it has to be an element change rather than a
+			    colour one. */}
+			<h2 class="type-sub mt-3 text-bone-white">THRESHOLD STATES</h2>
 			<p class="wb-prose mt-6">
 				Every run ends in one of three states, and a state is the whole contract: the name
 				says in one line whether the bytes stayed, whether a marker was minted, and whether
@@ -667,6 +675,7 @@ const Arc: readonly {
 			data-reveal
 		>
 			<p class="section-index">05 // THE TOPOLOGY</p>
+			<h2 class="type-sub mt-3 text-bone-white">THE STORE AND THE CONFIG SURFACE</h2>
 			<p class="wb-prose mt-4">
 				Two parts of the pipeline have no place in a readout: where the store actually
 				lives, and where the thresholds come from.
@@ -716,9 +725,7 @@ const Arc: readonly {
 			data-reveal
 		>
 			<p class="section-index !text-stamped-canary">06 // THE RECEIPTS</p>
-			<div class="mt-2">
-				<ZineKicker Tone="canary">SIM NOTES · THE MEASURED ARC</ZineKicker>
-			</div>
+			<h2 class="type-sub mt-3 text-bone-white">SIM NOTES · THE MEASURED ARC</h2>
 			<p class="wb-prose mt-6">
 				The numbers the simulation reaches for are real: each plate prints the figure the
 				CHANGELOG carried at that release, and the benchmarks page carries the reproduce
@@ -812,11 +819,12 @@ const Arc: readonly {
 	   reaches a shared component's markup except the readout hook documented
 	   below.
 
-	   VOICES. Four roles, taken from Global.css rather than invented: a reading
-	   sentence (`--type-body`), a technical line (mono, 16px), a label (mono,
-	   13px, uppercase, tracked), and an identifier (mono, 16px, bold). A
-	   sentence never renders at label size - the label voice exists for keys,
-	   units, counts and one-word annotations. */
+	   VOICES. Five roles, taken from Global.css rather than invented: a reading
+	   sentence (`--type-body`), a technical line (mono, 16px), a long label
+	   line (mono, 16px, uppercase, tracked), a label (mono, 13px, uppercase,
+	   tracked), and an identifier (mono, 16px, bold). A sentence never renders
+	   at label size - the label voice exists for keys, units, counts and
+	   one-word annotations. */
 	.wb-prose {
 		max-width: 48rem;
 		font-family: "DM Sans", sans-serif;
@@ -838,6 +846,18 @@ const Arc: readonly {
 		font-size: 0.8125rem;
 		font-weight: 700;
 		line-height: 1.5;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--zinc-dust);
+	}
+
+	/* A long label LINE - the engine knob's note carries three clauses, so it
+	   keeps the 16px technical voice instead of dropping to the label size.
+	   The label voice is for a key, a unit or a count, never for a clause. */
+	.wb-note {
+		font-family: "JetBrains Mono", monospace;
+		font-size: 16px;
+		line-height: 1.6;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
 		color: var(--zinc-dust);
@@ -1058,27 +1078,29 @@ const Arc: readonly {
 	/* THE READOUT REGION OF THE CONSOLE, tiered from the page.
 
 	   Component/ZinePipeline.astro is shared with /case-study/ and is not this
-	   page's to edit, so the readout is lifted here through the two hooks the
+	   page's to edit, so the region is named here through the two hooks the
 	   client engine binds: the group's own aria-label (the region's identity)
 	   and `[data-fact]` (every figure the engine writes). Nothing structural is
 	   touched - no layout, no class names - so the shared component keeps
 	   rendering exactly as it does on the case study, and a restructure there
 	   degrades this treatment to nothing rather than breaking it.
 
-	   Why a shell card and a figure scale rather than `.metric`: `.metric` is
-	   ONE figure per section with a unit child, and these six are live values
-	   written by the engine ("not run yet" until the reader runs it). A static
-	   `.metric` beside a live control would be the contradiction this page
-	   exists to avoid; the readout card holds all six at a readout scale, and
-	   the chapter's single `.metric` is the documented compaction value above,
-	   which nothing can turn. */
+	   The region is a RULE and a figure scale, not a card: the instrument
+	   already tiers each of the six figures as a shell card of its own, so a
+	   second card around them would be a card inside a card and the elevation
+	   would stop meaning anything. What the page adds is the separation from
+	   the instrument above and the readout scale the figures take.
+
+	   Why a figure scale rather than `.metric`: `.metric` is ONE figure per
+	   section with a unit child, and these six are live values written by the
+	   engine ("not run yet" until the reader runs it). A static `.metric`
+	   beside a live control would be the contradiction this page exists to
+	   avoid; the chapter's single `.metric` is the documented compaction value
+	   above, which nothing can turn. */
 	#pipeline [role="group"][aria-label="This run, in figures"] {
-		position: relative;
 		margin-top: var(--space-group);
-		border: 1px solid var(--tier-shell-edge);
-		border-radius: 0;
-		background-color: var(--tier-shell);
-		padding: clamp(1.25rem, 2vw, 1.75rem);
+		border-top: 1px solid var(--tier-shell-edge);
+		padding-top: var(--space-group);
 	}
 
 	#pipeline [data-fact] {
