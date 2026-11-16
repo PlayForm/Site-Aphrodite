@@ -4,9 +4,12 @@ import Base from "@Layout/Base.astro";
 import Related from "@Component/Related.astro";
 
 import PageShell from "@Component/PageShell.astro";
+import ZineButton from "@Component/ZineButton.astro";
+import ZineFold from "@Component/ZineFold.astro";
 import ZineSplit from "@Component/ZineSplit.astro";
 import ZineTape from "@Component/ZineTape.astro";
 
+import { Anchor, Routes } from "@Library/Links";
 import { Benchmark, Narrative, Study } from "@Library/Numbers";
 import { Versions } from "@Library/Versions";
 
@@ -361,6 +364,62 @@ const Cycle: RunScript[] = [
 		Pace: { Beat: 110, Jitter: 45, Every: 3, Stall: 220, Turn: 0 },
 	},
 ];
+
+/**
+ * The demonstration's method, as one disclosure.
+ *
+ * These five paragraphs used to stand between the reader and the plate: a
+ * reader had to get through the instructions before seeing the thing they
+ * describe. Moved here VERBATIM, they are still readable on demand, and the
+ * plate is the first thing the eye lands on. Nothing was cut - the fold holds
+ * the same sentences, in the same order, and the reader opens it when the
+ * demonstration has raised the question it answers.
+ *
+ * `ZineFold` renders `Body` through `set:html`, so the payload is the markup
+ * rather than a second string the component would have to parse.
+ */
+const MethodFold = `
+<div class="prose-flow">
+	<p>
+		A tool call's output arrives in exactly this order and at this pace: a release build,
+		then a code search, then a directory listing, then a test run, then a
+		JSON body, then back to the build - indefinitely, each at the pace its own tool really
+		prints at. Every line is output the named command produces,
+		and the preview is recomputed from those lines as they land.
+	</p>
+	<p>
+		Each line the tool prints is budget: the model reads it, and pays for it. As the lines
+		land, the counts climb, the
+		marker's size grows, and the preview settles on the one line the agent would
+		actually have read. A marker only means something once there is a flood behind it to
+		address, which is why Aphrodite draws it from the flood rather than beside it.
+	</p>
+	<p>
+		Five commands, five shapes of answer: the build counts errors, warnings and lines; the
+		search counts hits and files; the listing counts entries and extensions; the test run
+		counts passes and failures; the JSON body counts items and keys. That is one engine
+		reading five kinds of output - the tool naming the type, and the preview rendering
+		the answer that name earns.
+	</p>
+	<p>The marker is the address of the original bytes.</p>
+	<p>The agent pays for them only when the preview fails to answer the question.</p>
+</div>
+`.trim();
+
+/**
+ * The grid's reading instruction, demoted to a disclosure above the plate.
+ * A reader who needs to be told how to read four cards is already lost; the
+ * sentence stays because it is true and useful, one click away from the grid
+ * it describes.
+ */
+const GridFold = `
+<div class="prose-flow">
+	<p>
+		The four stages run in order: each card is one step, the figure
+		on it is what that step costs, and the line under the rule is what it decides.
+	</p>
+</div>
+`.trim();
 ---
 
 <Base
@@ -378,10 +437,17 @@ const Cycle: RunScript[] = [
 			class="relative flex w-full flex-col items-center justify-center pt-4 text-center"
 			data-enter
 		>
+			<!-- Beat 01. The kicker is the page's folio: six of them number the
+			     six beats, and each one is quiet on purpose - a beat number is
+			     navigation, not decoration. -->
+			<p class="section-kicker mb-10">01 / POSITIONING</p>
 			<!-- Brand card: the red aphrodite.svg mark in the crimson module,
-			     oxblood offset underlay (user instruction: the red mark everywhere) -->
+			     oxblood offset underlay (user instruction: the red mark everywhere).
+			     The card's 24-unit drop to the wordmark was the ceremonial stack
+			     this beat was paying for: the product's own name now follows its
+			     mark at reading distance. -->
 			<div
-				class="group relative mb-24 -rotate-[2.5deg] cursor-pointer transition-transform duration-300 hover:rotate-0"
+				class="group relative mb-10 -rotate-[2.5deg] cursor-pointer transition-transform duration-300 hover:rotate-0"
 			>
 				<div
 					class="pointer-events-none absolute -inset-2 translate-x-3 translate-y-3 border border-black bg-oxblood-dark opacity-80"
@@ -428,24 +494,251 @@ const Cycle: RunScript[] = [
 			>
 				CONTEXT MANAGEMENT FOR TOOL-USING AI AGENTS
 			</div>
-			<!-- THE LEAD: one sentence states the product. The justification that
-			     used to follow it here is the pair's, and reads below it. -->
-			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint sm:text-base">
-				Aphrodite keeps noisy tool output out of your agent's context - it turns logs, diffs, files,
-				searches, JSON, and browser snapshots into compact previews the agent can act on,
+			<!-- THE LEAD: one sentence states the product, and the two actions are
+			     the only two things a reader can do from here - install it, or
+			     watch it work. The justification that used to follow the lead is
+			     beat 03's, and the stat grid that used to sit under it is beat
+			     04's: four figures with four different measurement domains belong
+			     beside the study that qualifies them, not between the reader and
+			     the demonstration. -->
+			<p class="type-body max-w-3xl text-bone-newsprint">
+				A tool call's output becomes part of the model's context, and a release build adds
+				thousands of lines the model reads - and pays for - before it can answer. Aphrodite
+				intercepts that result: logs, diffs, files,
+				searches, JSON, and browser snapshots arrive as compact previews the agent can act on,
 				with the original always one retrieval away.
 			</p>
+			<div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+				<ZineButton Label="Install for Hermes" Href="/setup/" />
+				<ZineButton Label="See the before / after" Href="#hero-run" Role="secondary" />
+			</div>
 			<p class="mt-8 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
 				One binary. Zero dependencies. Millions of tokens saved.
 			</p>
-			<!-- Rotated stat badges: the hook, kept (plan 3.3), and each one now
-			     carries its own one-line reading. A figure without its qualifier is
-			     a poster; the caption is what makes it a measurement. The grid lands
-			     after the lead rather than with it, and each figure climbs to its
-			     value once ([data-count]) - the three exact counts, not the ~10ms
-			     estimate, because a count-up on an approximation is false precision. -->
+		</header>
+
+		<!-- BEAT 02 // DEMONSTRATION - the product's whole argument, and the second
+		     thing on the page. ZineSplit owns the plate and the two panes; above
+		     it there is one claim and one introduction, and nothing else, because
+		     a demonstration that needs to be explained first is not a
+		     demonstration. The instructions did not go anywhere: they are the
+		     fold under the plate, verbatim, for the reader the plate has already
+		     convinced. `Cycle` above holds the scripts.
+		     The section is the entrance root: it reveals on first view and its
+		     plate wipes once. The left pane is a terminal that never stops - five
+		     commands in a cycle, each streaming its real output on its own rhythm
+		     - and the right pane is recomputed from the stream so far, so the
+		     marker is never a lie about a flood that has not finished arriving. -->
+		<section class="relative w-full" data-reveal>
+			<p class="section-kicker mb-4">02 / DEMONSTRATION &middot; THE PAIR // STREAM + PREVIEW</p>
+			<h2 class="type-section mb-6 text-bone-white">
+				The agent spends its budget reading noise
+			</h2>
+			<div class="prose-flow max-w-3xl">
+				<p class="type-body text-bone-newsprint">
+					Every file read, build, code search, or browser open floods the agent's context
+					with raw output - compilation logs, accessibility trees, JSON blobs.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					The agent spends its budget reading noise instead of reasoning.
+				</p>
+			</div>
+			<div class="mt-12">
+				<ZineSplit Run={Cycle} Label="ONE LINE, ONE MARKER" Id="hero-run" />
+			</div>
+			<!-- The one visible caption. It belongs to the plate - it names what
+			     the two panes are, so a reader who scrolled straight to the image
+			     knows what they are looking at without opening anything. -->
+			<p class="figure-caption mt-6">
+				The flood arrives one line at a time; the line the agent would have
+				read instead is recomputed as each line lands.
+			</p>
+			<div class="mt-10 max-w-3xl">
+				<ZineFold Tag="METHOD" Label="How this demonstration works" Body={MethodFold} />
+			</div>
+		</section>
+
+		<!-- BEAT 03 // MECHANISM - below the pair, because the pair is the argument
+		     and this is the machinery behind it. The tape that used to stamp this
+		     section is the quiet kicker now: `PIPELINE // 4-STAGE ABSORPTION` is
+		     a plate label, and a plate label that is also a stamped tape is two
+		     things claiming to introduce one section.
+		     ONE EXPRESSIVE ASSEMBLY: the stage grid sits inside a single tilted
+		     crimson plate, and the four cards inside it stay at the quiet tier -
+		     hairline rules, no per-card tilt, no per-card shadow, no tape -
+		     because four emphasised cards is four sections pretending to be one.
+
+		     EMPHASIS AND IDENTITY ARE DIFFERENT AXES. Emphasis is the volume
+		     knob (shadow, tilt, tape, fill, rotation) and it is turned down
+		     here. Identity is the information (accent, stage letter, figure,
+		     chip label) and it is not part of the knob: a reader has to be able
+		     to tell stage 03 from stage 01 at a glance, and to match it to the
+		     same stage on the case study. Flattening the accents to one would
+		     have lowered identity, not emphasis. Each card therefore carries
+		     its own accent through the left edge, the corner stamp, the
+		     heading, the rule and the chip - and only those; the figure and
+		     the description stay bone so the reading text never competes. -->
+		<section class="relative w-full" data-reveal>
+			<p class="section-kicker mb-4">03 / MECHANISM &middot; PIPELINE // 4-STAGE ABSORPTION</p>
+			<h2 class="type-section mb-4 text-bone-white">How it works</h2>
+			<p class="type-sub mb-6 text-weathered-teal">Four steps, one decision</p>
+			<div class="prose-flow max-w-3xl">
+				<p class="type-body text-bone-newsprint">
+					A tool result is appended to the model's context the moment the tool returns, so a
+					build log the agent never needed is read in full, and paid for in full.
+					Aphrodite intercepts that output before it reaches the LLM and replaces it with a compact,
+					structured preview - because the agent's reasoning budget is the context budget,
+					and raw noise spends both.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					What happens between the tool printing and the model reading is four steps, run in
+					the same order every time, and only one of them
+					costs anything measurable.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					The first two are the engine's: name the content, then render the one line that
+					describes it. The third is storage, and it is deliberately boring. The fourth is
+					not the engine's at all - it is the agent's, and it is the only step that spends
+					the budget the other three just saved.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					The agent sees {Narrative.PreviewTokens} of metadata instead of hundreds - and retrieves the full content
+					only when it actually needs it.
+				</p>
+				<p class="type-body text-bone-newsprint">
+					It is the reason tool-heavy agents keep working: the context window stops paying for noise
+					before the reasoning starts.
+				</p>
+			</div>
+			<div class="mt-10 max-w-3xl">
+				<ZineFold Tag="GUIDE" Label="How to read the four stages" Body={GridFold} />
+			</div>
+			<!-- The section's one expressive assembly. The grid keeps its 2x2 shape
+			     through the tablet/wide range - at 4-across the stage labels squish
+			     against the chips between 1024-1279px - and returns to 4-across only
+			     at xl, where each card gets ~330px+.
+			     The plate is inset (`mx-3`/`sm:mx-4`) because a tilted plate's
+			     BOUNDING box is wider than its layout box: at -1.2deg a 500px-tall
+			     plate adds ~10px per side, and `main > section` clips that overflow,
+			     so a full-bleed plate would have its corners and its shadow plane
+			     shaved off. -->
+			<div class="emphasis-expressive mx-3 mt-12 p-5 sm:mx-4 sm:p-8 lg:p-10">
+				<div
+					class="grid grid-cols-1 items-start gap-8 sm:grid-cols-2 xl:grid-cols-4"
+					data-enter="180"
+				>
+					<!-- Stage 01 // CLASSIFY - teal: the technical voice, the type
+					     that names the content. -->
+					<div class="emphasis-quiet stage-card stage-card--a p-5">
+						<div class="flex items-baseline justify-between gap-3">
+							<h3 class="type-meta font-bold stage-ink">01 // CLASSIFY</h3>
+							<span class="type-meta stage-ink">STAGE // A</span>
+						</div>
+						<div class="mt-4 font-headline text-sub font-black tracking-tight text-bone-white">
+							40 - 123 ns
+						</div>
+						<div class="stage-rule mt-4 border-t pt-3">
+							<p class="type-body text-bone-newsprint">Type-aware classifier names the content.</p>
+							<p class="type-meta mt-2 stage-ink">SIMD BYTE</p>
+						</div>
+					</div>
+					<!-- Stage 02 // ENRICH & PREVIEW - canary: the result the reader
+					     acts on. -->
+					<div class="emphasis-quiet stage-card stage-card--b p-5">
+						<div class="flex items-baseline justify-between gap-3">
+							<h3 class="type-meta font-bold stage-ink">02 // ENRICH &amp; PREVIEW</h3>
+							<span class="type-meta stage-ink">STAGE // B</span>
+						</div>
+						<div class="mt-4 font-headline text-sub font-black tracking-tight text-bone-white">~1 ms</div>
+						<div class="stage-rule mt-4 border-t pt-3">
+							<p class="type-body text-bone-newsprint">Enriched, type-aware preview rendering.</p>
+							<p class="type-meta mt-2 stage-ink">TYPE-AWARE</p>
+						</div>
+					</div>
+					<!-- Stage 03 // BLAKE3 STORE - blood: storage, and the marker it
+					     hands back. -->
+					<div class="emphasis-quiet stage-card stage-card--c p-5">
+						<div class="flex items-baseline justify-between gap-3">
+							<h3 class="type-meta font-bold stage-ink">03 // BLAKE3 STORE</h3>
+							<span class="type-meta stage-ink">STAGE // C</span>
+						</div>
+						<div class="mt-4 font-headline text-sub font-black tracking-tight text-bone-white">SQLite</div>
+						<div class="stage-rule mt-4 border-t pt-3">
+							<p class="type-body ccr-marker text-bone-newsprint">
+								CCR marker: &lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;
+							</p>
+							<p class="type-meta mt-2 stage-ink">DUAL TIER</p>
+						</div>
+					</div>
+					<!-- Stage 04 // AGENT DECIDES - bone: the one step that is the
+					     agent's own choice, so it carries the reading voice's colour
+					     rather than an engine accent. -->
+					<div class="emphasis-quiet stage-card stage-card--d p-5">
+						<div class="flex items-baseline justify-between gap-3">
+							<h3 class="type-meta font-bold stage-ink">04 // AGENT DECIDES</h3>
+							<span class="type-meta stage-ink">STAGE // D</span>
+						</div>
+						<div class="mt-4 font-mono text-sub font-bold tracking-tight text-bone-white">
+							aphrodite_retrieve
+						</div>
+						<div class="stage-rule mt-4 border-t pt-3">
+							<p class="type-body text-bone-newsprint">Full content only when needed.</p>
+							<p class="type-meta mt-2 stage-ink">ON DEMAND</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- BEAT 04 // EVIDENCE - the chapter break, and the only surface change on
+		     the page. Dark wall, one bone clipping: a result pasted onto the
+		     publication rather than another panel in it, which is what makes the
+		     subject change legible without a single extra word.
+		     ONE DOMINANT RESULT - the session study. The four benchmark badges
+		     that used to sit under the hero are here beside it, because they are
+		     four DIFFERENT measurements: the ceiling is one corpus, the overall
+		     is the whole standard corpus, the latency is the engine's own
+		     overhead, the saved total is the study. A reader must not be able to
+		     average them into one outcome, so every figure keeps the qualifier
+		     that names its domain - and the qualifier is part of the number. -->
+		<section
+			class="relative w-full bg-bone-newsprint p-6 text-soot-black sm:p-10 lg:p-14"
+			data-reveal
+		>
+			<ZineTape Variant="section" Label="EVIDENCE // 200 SESSIONS" Color="raw" />
+			<p class="section-kicker mb-4 !text-oxblood-dark">04 / EVIDENCE</p>
+			<h2 class="type-section mb-8 text-soot-black">One result, and the four figures beside it</h2>
+			<div class="flex flex-col gap-4 border-y-2 border-soot-black py-8 lg:flex-row lg:items-end lg:gap-12">
+				<div
+					class="font-headline text-[clamp(3.5rem,11vw,8rem)] font-black leading-[0.85] tracking-tighter text-raw-blood"
+				>
+					{Study.SavedPct}
+				</div>
+				<div class="max-w-xl">
+					<p class="type-meta font-bold uppercase tracking-widest text-oxblood-dark">
+						CONTEXT TOKENS DEFLECTED
+					</p>
+					<p class="type-body mt-2 text-soot-black">
+						Measured over {Study.Sessions} real Hermes sessions: {Study.SavedPct} of all context tokens
+						deflected, a median session saved ratio of {Study.MedianRatio}, and ~{Study.AvgPerCall} tokens
+						saved per API call. {Study.SessionsSaved} of the {Study.Sessions} sessions saved tokens.
+					</p>
+					<p class="type-caption mt-3 text-oxblood-dark">
+						The sensitivity band is {Study.Band}: the estimate depends on the chars-per-token ratio,
+						which the study puts at {Study.CharsPerTok}.
+					</p>
+				</div>
+			</div>
+			<p class="type-meta mt-10 font-bold uppercase tracking-widest text-oxblood-dark">
+				THE OTHER FOUR MEASUREMENTS
+			</p>
+			<p class="type-body mt-2 max-w-3xl text-soot-black">
+				Each of these is a different measurement in a different domain, and the qualifier under
+				each one is part of the number. The ceiling is not the average, the average is not the
+				latency, and the saved total is the session study rather than any single run.
+			</p>
 			<div
-				class="mt-20 flex max-w-4xl flex-wrap items-start justify-center gap-3 sm:gap-4"
+				class="mt-8 flex max-w-4xl flex-wrap items-start justify-start gap-3 sm:gap-4"
 				data-enter="260"
 			>
 				<div class="flex flex-col items-center gap-2">
@@ -454,7 +747,7 @@ const Cycle: RunScript[] = [
 					>
 						<span data-count={Benchmark.Ceiling.replace("×", "")}>{Benchmark.Ceiling.replace("×", "")}</span>&times; COMPRESSION
 					</span>
-					<span class="max-w-[13rem] text-base leading-relaxed text-zinc-dust">
+					<span class="max-w-[13rem] text-base leading-relaxed text-oxblood-dark">
 						Best case, on large low-entropy prose.
 					</span>
 				</div>
@@ -464,7 +757,7 @@ const Cycle: RunScript[] = [
 					>
 						<span data-count={Benchmark.Overall.replace("×", "")}>{Benchmark.Overall.replace("×", "")}</span>&times; OVERALL
 					</span>
-					<span class="max-w-[13rem] text-base leading-relaxed text-zinc-dust">
+					<span class="max-w-[13rem] text-base leading-relaxed text-oxblood-dark">
 						The whole standard corpus: {Benchmark.CorpusIn} to {Benchmark.CorpusOut}.
 					</span>
 				</div>
@@ -474,7 +767,7 @@ const Cycle: RunScript[] = [
 					>
 						{Benchmark.LatencyHeadline.toUpperCase().replace(" ", "")} E2E OVERHEAD
 					</span>
-					<span class="max-w-[13rem] text-base leading-relaxed text-zinc-dust">
+					<span class="max-w-[13rem] text-base leading-relaxed text-oxblood-dark">
 						Including the HTTP round-trip; the spread is {Benchmark.Latency}.
 					</span>
 				</div>
@@ -484,220 +777,161 @@ const Cycle: RunScript[] = [
 					>
 						<span data-count={Study.SavedMillions.replace("M+", "")}>{Study.SavedMillions.replace("M+", "")}</span>M+ TOKENS SAVED
 					</span>
-					<span class="max-w-[13rem] text-base leading-relaxed text-zinc-dust">
+					<span class="max-w-[13rem] text-base leading-relaxed text-oxblood-dark">
 						{Study.Sessions} real sessions, {Study.ApiCalls} API calls, {Study.Measured}.
 					</span>
 				</div>
 			</div>
-		</header>
-
-		<!-- THE PAIR // STREAM + PREVIEW - the product's whole argument, and the
-		     second thing on the page. ZineSplit owns the plate and the two panes;
-		     the prose above it is the section's claim, the notes below it the one
-		     caption. The section is the entrance root: it reveals on first view
-		     and its plate wipes once. The left pane is a terminal that never
-		     stops - five commands in a cycle, each streaming its real output on
-		     its own rhythm - and the right pane is recomputed from the stream so
-		     far, so the marker is never a lie about a flood that has not finished
-		     arriving. `Cycle` above holds the scripts. -->
-		<section class="relative w-full" data-reveal>
-			<!-- The tape keeps its fitted width: ZineTape's section shape is in
-			     flow without `w-fit`, and the 103 hand-rolled section stamps this
-			     replaces were all fitted. -->
-			<div class="w-fit">
-				<ZineTape Variant="section" Label="THE PAIR // STREAM + PREVIEW" />
-			</div>
-			<h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-				The agent spends its budget reading noise
-			</h2>
-			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Every file read, build, code search, or browser open floods the agent's context
-				with raw output - compilation logs, accessibility trees, JSON blobs.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The agent spends its budget reading noise instead of reasoning.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Aphrodite intercepts output before it reaches the LLM and replaces it with a compact,
-				structured preview - because the agent's reasoning budget is the context budget,
-				and raw noise spends both.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The agent sees {Narrative.PreviewTokens} of metadata instead of hundreds - and retrieves the full content
-				only when it actually needs it.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				It is the reason tool-heavy agents keep working: the context window stops paying for noise
-				before the reasoning starts.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-				The pane below is not a screenshot of that idea. It is a terminal that keeps running:
-				a release build, then a code search, then a directory listing, then a test run, then a
-				JSON body, then back to the build - indefinitely, each at the pace its own tool really
-				prints at. Nothing in it is invented: every line is the output that command produces,
-				and the one line on the right is recomputed from those lines as they land.
-			</p>
-			<div class="mt-12">
-				<ZineSplit Run={Cycle} Label="ONE LINE, ONE MARKER" Id="hero-run" />
-			</div>
-			<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-				The marker is the address of the original bytes.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-				The agent pays for them only when the preview fails to answer the question.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-				Watch the left pane print: that is the flood arriving, one line at a time, and every
-				line of it is budget. Watch the right pane while it prints - the counts climb, the
-				marker's size grows, and the whole thing settles on the one line the agent would
-				actually have read. A marker only means something once there is a flood behind it to
-				address, which is why it is drawn from the flood and not beside it.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-				Five commands, five shapes of answer: the build counts errors, warnings and lines; the
-				search counts hits and files; the listing counts entries and extensions; the test run
-				counts passes and failures; the JSON body counts items and keys. That is one engine
-				reading five kinds of output - the tool naming the type, and the preview rendering
-				the answer that name earns.
-			</p>
 		</section>
 
-		<!-- THE HOW // 4-STAGE ABSORPTION - below the pair, because the pair is
-		     the argument and this is the mechanism behind it. -->
+		<!-- BEAT 05 // INTEGRATION - two paths, and the difference between them is
+		     stated rather than implied: one lives inside the turn, the other speaks
+		     HTTP. The wording is /hermes/'s and /plugin/'s own, not a second
+		     description of the same thing. The two plates are differentiated by
+		     TIER - the native lane is the standard plate, the proxy is the hairline
+		     one - because the plugin is the lane this page installs and the proxy
+		     is the lane that extends it to other callers. -->
 		<section class="relative w-full" data-reveal>
-			<div class="w-fit">
-				<ZineTape Variant="section" Label="PIPELINE // 4-STAGE ABSORPTION" />
+			<p class="section-kicker mb-4">05 / INTEGRATION</p>
+			<h2 class="type-section mb-6 text-bone-white">Two ways to run it</h2>
+			<div class="prose-flow max-w-3xl">
+				<p class="type-body text-bone-newsprint">
+					Both lanes run the same engine over the same CCR store. One is a native plugin inside
+					Hermes, where the interception lives inside the turn; the other is a listener on a port,
+					where it can only see traffic that arrives over HTTP.
+				</p>
 			</div>
-			<h2 class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-				Four steps, one decision
-			</h2>
-			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Every tool result runs the same four steps in the same order, and only one of them
-				costs anything measurable.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The first two are the engine's: name the content, then render the one line that
-				describes it. The third is storage, and it is deliberately boring. The fourth is
-				not the engine's at all - it is the agent's, and it is the only step that spends
-				the budget the other three just saved.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-				Read the grid left to right, then top to bottom: each card is one step, the figure
-				on it is what that step costs, and the line under the rule is what it decides.
-			</p>
-			<!-- The stage grid: 2x2 through the tablet/wide range - at 4-across
-			     the enlarged stage labels ("STAGE // B 02 // ENRICH") squished
-			     against the stamp chips between 1024-1279px. 4-across returns
-			     only at xl, where each card gets ~330px+. It follows the heading
-			     on a delay of its own rather than arriving with it. -->
-			<div
-				class="mt-16 grid grid-cols-1 items-start gap-12 sm:grid-cols-2 sm:gap-14 xl:grid-cols-4 xl:gap-14"
-				data-enter="180"
-			>
-				<!-- Stage 01 -->
-				<div
-					class="zine-box-subtle isolate relative border-[3px] border-oxblood-dark bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.8deg] lg:-translate-y-2"
-				>
-					<div
-						class="absolute -top-2.5 left-4 z-10 border border-zinc-dust/40 bg-zinc-dust/20 px-2 py-0.5 text-base font-bold uppercase text-bone-newsprint"
-					>
-						STAGE // A
+			<div class="mt-12 grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
+				<article class="emphasis-standard p-6 sm:p-8">
+					<p class="type-meta font-bold uppercase tracking-widest text-weathered-teal">
+						PATH 01 // NATIVE PLUGIN
+					</p>
+					<h3 class="type-sub mt-3 text-bone-white">Hermes plugin</h3>
+					<div class="prose-flow mt-4">
+						<p class="type-body text-bone-newsprint">
+							Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a
+							client at. It is the reason the interception lives inside the turn: tool output never
+							hits a wire, so only hook-level registration can catch it before it becomes message
+							history - six hooks, thirteen tools, and an optional context engine, every call
+							forwarded into the Rust dylib.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							The trade-off is stated plainly: the hooks are Hermes' contract - no other client can
+							register them, so this lane works with Hermes only.
+						</p>
 					</div>
-					<div class="mb-3 mt-1 flex items-center justify-between">
-						<h3 class="text-base font-bold tracking-wider text-weathered-teal">01 // CLASSIFY</h3>
-						<span
-							class="border border-weathered-teal/30 bg-weathered-teal/10 px-2 py-0.5 text-base font-black text-weathered-teal"
-						>
-							SIMD BYTE
-						</span>
+					<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-oxblood-dark pt-4">
+						<a class="type-code font-bold text-stamped-canary hover:underline" href={Routes.Hermes}>
+							THE INTEGRATION &rarr;
+						</a>
+						<a class="type-code font-bold text-stamped-canary hover:underline" href={Routes.Plugin}>
+							THE PLUGIN &rarr;
+						</a>
 					</div>
-					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">
-						40 - 123 ns
+				</article>
+				<article class="emphasis-quiet p-6 sm:p-8">
+					<p class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
+						PATH 02 // OPENAI-COMPATIBLE PROXY
+					</p>
+					<h3 class="type-sub mt-3 text-bone-white">Standalone proxy</h3>
+					<div class="prose-flow mt-4">
+						<p class="type-body text-bone-newsprint">
+							The plugin already spawns both listeners, so this lane runs without extra setup:
+							point <code class="type-code text-weathered-teal">base_url</code> at
+							<code class="type-code text-weathered-teal">:9798</code> and any OpenAI-compatible
+							client gets the same CCR compression over plain HTTP. That is the agent-to-agent
+							path - a second agent, a script, or an external tool can converse through the same
+							compressed channel, share the persistent SQLite store (which survives a restart;
+							the plugin lane's inline store is session-scoped), and call the tool relay to
+							retrieve or create CCR entries.
+						</p>
+						<p class="type-body text-bone-newsprint">
+							The limit is real too: the proxy only sees HTTP traffic - no tool-output interception,
+							no terminal compression, no directives, no context engine, and SSE streams pass
+							through uncompressed. Because of that the proxy extends the stack to other callers;
+							it does not replace the hooks inside Hermes.
+						</p>
 					</div>
-					<div class="mt-4 border-t border-oxblood-dark pt-3 text-base text-zinc-dust">
-						Type-aware classifier names the content.
+					<div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-oxblood-dark pt-4">
+						<a class="type-code font-bold text-stamped-canary hover:underline" href={Anchor(Routes.Setup, "proxy")}>
+							THE PROXY LANE &rarr;
+						</a>
 					</div>
-				</div>
-				<!-- Stage 02 -->
-				<div
-					class="zine-box-canary isolate relative border-[3px] border-stamped-canary/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[2.2deg] lg:translate-y-4"
-				>
-					<div
-						class="absolute -top-2.5 left-4 z-10 border border-black bg-stamped-canary px-2 py-0.5 text-base font-black uppercase text-soot-black"
-					>
-						STAGE // B
-					</div>
-					<div class="mb-3 mt-1 flex items-center justify-between">
-						<h3 class="text-base font-bold tracking-wider text-stamped-canary">
-							02 // ENRICH &amp; PREVIEW
-						</h3>
-						<span
-							class="border border-stamped-canary/30 bg-stamped-canary/10 px-2 py-0.5 text-base font-black text-stamped-canary"
-						>
-							TYPE-AWARE
-						</span>
-					</div>
-					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">~1 ms</div>
-					<div class="mt-4 border-t border-oxblood-dark pt-3 text-base text-stamped-canary">
-						Enriched, type-aware preview rendering.
-					</div>
-				</div>
-				<!-- Stage 03 -->
-				<div
-					class="zine-box-crimson isolate relative border-[3px] border-raw-blood bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1deg]"
-				>
-					<div
-						class="absolute -top-2.5 left-4 z-10 border border-black bg-raw-blood px-2 py-0.5 text-base font-black uppercase text-bone-white"
-					>
-						STAGE // C
-					</div>
-					<div class="mb-3 mt-1 flex items-center justify-between">
-						<h3 class="text-base font-bold tracking-wider text-zinc-dust">03 // BLAKE3 STORE</h3>
-						<span class="border border-raw-blood/40 bg-raw-blood/10 px-2 py-0.5 text-base font-black text-zinc-dust">
-							DUAL TIER
-						</span>
-					</div>
-					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">SQLite</div>
-					<div class="ccr-marker mt-4 border-t border-oxblood-dark pt-3 text-base text-zinc-dust">
-						CCR marker: &lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;
-					</div>
-				</div>
-				<!-- Stage 04 -->
-				<div
-					class="zine-box-subtle isolate relative border-[3px] border-zinc-dust/40 bg-carbon-void p-5 transition-transform duration-200 hover:rotate-0 sm:rotate-[2.5deg] lg:translate-y-3"
-				>
-					<div
-						class="absolute -top-2.5 left-4 z-10 border border-black bg-bone-newsprint px-2 py-0.5 text-base font-black uppercase text-soot-black"
-					>
-						STAGE // D
-					</div>
-					<div class="mb-3 mt-1 flex items-center justify-between">
-						<h3 class="text-base font-bold tracking-wider text-bone-newsprint">
-							04 // AGENT DECIDES
-						</h3>
-						<span class="border border-bone-newsprint/30 bg-bone-newsprint/10 px-2 py-0.5 text-base font-black text-bone-newsprint">
-							ON DEMAND
-						</span>
-					</div>
-					<div class="font-headline text-2xl font-black tracking-tight text-bone-white">
-						aphrodite_retrieve
-					</div>
-					<div class="mt-4 truncate border-t border-oxblood-dark pt-3 text-base text-weathered-teal">
-						Full content only when needed.
-					</div>
-				</div>
+				</article>
 			</div>
 		</section>
 
-		<!-- ONWARD // one install line, then the routing block. The install
-		     harness that used to sit here is /setup/'s story (install-surfaces 1)
-		     and the telemetry module that used to sit above it is /benchmarks/'. -->
-		<p
-			class="w-full border-t border-oxblood-dark pt-8 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust"
-			data-reveal
-		>
-			FULL INSTRUCTIONS ON THE <a class="text-stamped-canary" href="/setup/">SETUP PAGE</a>
-		</p>
+		<!-- BEAT 06 // INSTALLATION - one focused procedural panel: what you need,
+		     four steps, what you should see. The full matrix of lanes (catalog,
+		     clone, cargo, source) is /setup/'s story; this panel is the one path a
+		     reader takes from this page, and the outcome line is what makes it a
+		     procedure rather than a command list. -->
+		<section class="relative w-full" data-reveal>
+			<p class="section-kicker mb-4">06 / INSTALLATION</p>
+			<h2 class="type-section mb-8 text-bone-white">Installing it</h2>
+			<div class="emphasis-standard max-w-4xl p-6 sm:p-8 lg:p-10">
+				<p class="type-meta font-bold uppercase tracking-widest text-stamped-canary">PREREQUISITE</p>
+				<p class="type-body mt-3 text-bone-newsprint">
+					Hermes Agent, with <code class="type-code text-weathered-teal">hermes</code> on
+					<code class="type-code text-weathered-teal">PATH</code> and a route to GitHub Releases.
+					<code class="type-code text-weathered-teal">aphrodite setup</code> runs
+					<code class="type-code text-weathered-teal">hermes --version</code> as its first step and
+					fails fast with a clear error, before anything is written.
+				</p>
+				<p class="type-meta mt-8 font-bold uppercase tracking-widest text-stamped-canary">FOUR STEPS</p>
+				<ol class="prose-flow mt-3 list-decimal pl-5">
+					<li class="type-body text-bone-newsprint">
+						<code class="type-code text-bone-white">hermes plugins install aphrodite</code> - the
+						catalog entry: a reviewed pinned checkout of
+						<code class="type-code text-weathered-teal">plugin.yaml</code> plus the
+						<code class="type-code text-weathered-teal">__init__.py</code> shim, in
+						<code class="type-code text-weathered-teal">~/.hermes/plugins/aphrodite</code>.
+					</li>
+					<li class="type-body text-bone-newsprint">
+						<code class="type-code text-bone-white">hermes plugins enable aphrodite</code> - or
+						answer yes at the Enable now? prompt. Enabling is a separate write to Hermes's own
+						<code class="type-code text-weathered-teal">config.yaml</code>, so a finished download
+						alone does not register the hooks.
+					</li>
+					<li class="type-body text-bone-newsprint">
+						<code class="type-code text-bone-white">bash download.sh</code> - run from inside
+						<code class="type-code text-weathered-teal">~/.hermes/plugins/aphrodite</code>. It
+						fetches the binary and the dylib into
+						<code class="type-code text-weathered-teal">~/.hermes/aphrodite/binaries/</code>,
+						validated against the in-tree
+						<code class="type-code text-weathered-teal">SHA256SUMS.txt</code> and magic-byte
+						checked. On Windows: <code class="type-code text-weathered-teal">pwsh ./download.ps1</code>.
+					</li>
+					<li class="type-body text-bone-newsprint">
+						<code class="type-code text-bone-white">hermes</code> - start it.
+					</li>
+				</ol>
+				<p class="type-meta mt-8 font-bold uppercase tracking-widest text-stamped-canary">EXPECTED RESULT</p>
+				<div class="prose-flow mt-3">
+					<p class="type-body text-bone-newsprint">
+						Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256 verified,
+						plugin enabled. Start <code class="type-code text-weathered-teal">hermes</code> and the
+						plugin logs that Aphrodite is enabled.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						Two proxy listeners come up with it:
+						<code class="type-code text-weathered-teal">:9797</code> (the cache proxy, threshold
+						2048 bytes by default) and <code class="type-code text-weathered-teal">:9798</code>
+						(the token proxy, threshold 256 bytes by default).
+					</p>
+					<p class="type-caption text-zinc-dust">
+						If the binaries are missing, the plugin logs the setup command and stays disabled until
+						you run it.
+					</p>
+				</div>
+			</div>
+			<!-- ONWARD // one install line, then the routing block. The install
+			     harness that used to sit here is /setup/'s story (install-surfaces 1)
+			     and the telemetry module that used to sit above it is /benchmarks/'. -->
+			<p class="mt-12 w-full border-t border-oxblood-dark pt-8 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">
+				FULL INSTRUCTIONS ON THE <a class="text-stamped-canary" href={Routes.Setup}>SETUP PAGE</a>
+			</p>
+		</section>
 
 		<!-- RELATED: the natural neighbors -->
 		<Related
@@ -707,5 +941,69 @@ const Cycle: RunScript[] = [
 				{ Href: "/docs/", Label: "DOCS" },
 			]}
 		/>
+
+		<!-- COLOPHON // the print line the page closes on. -->
+		<p class="w-full border-t border-oxblood-dark pt-6 font-mono text-base uppercase tracking-widest text-zinc-dust">
+			APHRODITE // CCR CORE &middot; CONTEXT MANAGEMENT FOR TOOL-USING AI AGENTS &middot; ONE BINARY,
+			ZERO DEPENDENCIES
+		</p>
 	</PageShell>
 </Base>
+
+<style>
+	/* STAGE IDENTITY // the four stages are four different operations, and a
+	   reader has to be able to tell stage 03 from stage 01 at a glance and to
+	   match it to the same stage on the case study. The accent is therefore one
+	   custom property per card: the left edge, the rule, the corner stamp, the
+	   heading and the chip all read it, so the five cannot drift apart.
+
+	   01 CLASSIFY           teal     the technical voice: naming the content
+	   02 ENRICH & PREVIEW   canary   the result the reader acts on
+	   03 BLAKE3 STORE       blood    storage, and the marker it hands back
+	   04 AGENT DECIDES      bone     the one step that is the agent's own choice
+
+	   Emphasis is untouched: no shadow, no tilt, no tape, straight edges. The
+	   identity is colour + stage letter + figure; the volume stays low.
+
+	   The ink is the accent everywhere except stage 03, where the accent cannot
+	   be read as text: --raw-blood measures 2.12:1 on --carbon-void, so its
+	   labels are the same hue lifted toward --bone-newsprint (55/45 = 4.85:1).
+	   The edge and the rule keep the full raw blood - only the words are
+	   lifted. */
+	/* The selectors name the tier they override (`.emphasis-quiet`) because
+	   Astro scopes page styles with `:where(.astro-...)`, which contributes NO
+	   specificity - a bare `.stage-card` would tie with `.emphasis-quiet` and
+	   the winner would depend on stylesheet order. `.emphasis-quiet.stage-card`
+	   is one class heavier, so the accent wins wherever the sheets land. */
+	.emphasis-quiet.stage-card {
+		--stage-accent: var(--blood-crimson);
+		--stage-ink: var(--stage-accent);
+		border-left-width: 3px;
+		border-left-color: var(--stage-accent);
+	}
+
+	.emphasis-quiet.stage-card--a {
+		--stage-accent: var(--weathered-teal);
+	}
+
+	.emphasis-quiet.stage-card--b {
+		--stage-accent: var(--stamped-canary);
+	}
+
+	.emphasis-quiet.stage-card--c {
+		--stage-accent: var(--raw-blood);
+		--stage-ink: color-mix(in srgb, var(--raw-blood) 55%, var(--bone-newsprint));
+	}
+
+	.emphasis-quiet.stage-card--d {
+		--stage-accent: var(--bone-newsprint);
+	}
+
+	.stage-ink {
+		color: var(--stage-ink);
+	}
+
+	.stage-rule {
+		border-top-color: var(--stage-accent);
+	}
+</style>

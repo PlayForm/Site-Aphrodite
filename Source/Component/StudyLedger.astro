@@ -1,170 +1,164 @@
 ---
 /**
- * StudyLedger - the canonical real-world study block. One structured form
- * for every occurrence of the Sep 2026 measured study (the index telemetry
- * module, the /benchmarks study module, the case-study evidence section):
- * a header row (the period + the scope), key-value ledger rows with the
- * grammar's voice colors (canary = the saved figure, teal = the ratio,
- * raw-blood = the band), optional session-shape stat bars, the caveat as
- * its own bordered note, and the SRC citation.
+ * StudyLedger - the canonical real-world study block. One structured form for
+ * every occurrence of the Sep 2026 measured study: a header row (the period and
+ * the scope), ONE primary result, a quiet details table, the method note as its
+ * own bordered block, the caveat, and the SRC citation.
  *
- * The facts are the generated primaries - every number stays
- * byte-exact, never reworded or rounded. The SRC citation is written as a
- * plain prose token ("README.md:467-511") and the CodeMentions pass wraps
- * it at build time into the real tree/Current link with the #L467-L511
- * fragment (the registry composes SourceLinks -> OurRepo; the fragment is
- * emitted only when the range exists in the local checkout), so no anchor
- * is hand-built here.
+ * WHY ONE PRIMARY RESULT AND NOT A LEDGER OF EQUALS
+ *
+ * The first version gave every row the same shape - a fixed label, a heavy
+ * value, a right-aligned note - so a reader met nine numbers with equal weight
+ * and had to work out which one was the result. A row of three roles also makes
+ * every multi-value row fight for width. The answer is not fewer figures: it is
+ * one result stated at reading size, and everything a reader checks it against
+ * in a table underneath, each row carrying its own unit, its own kind and its
+ * own scope.
+ *
+ * OBSERVED ONLY. The study's fourth session shape is a SIMULATED pure-tool
+ * workload, and it never happened. It is deliberately absent here: a simulated
+ * workload in the same table as recorded sessions reads as a fourth observation.
+ * The page that wants it prints it in its own block, tagged simulated.
+ *
+ * The facts are the generated primaries, reached through `Figure(Id)` - every
+ * number stays byte-exact, never reworded or rounded, and a page joins it by a
+ * stable ID rather than by a position in a list. The SRC citation is written as
+ * a plain prose token ("README.md:694-740") and the CodeMentions pass wraps it
+ * at build time into the real tree/Current link with the #L fragment, so no
+ * anchor is hand-built here.
  */
+import { Cite, Figure, Study } from "@Library/Numbers";
 
 interface Props {
 	/** "full" = the /benchmarks primary (larger numerals); "compact" = the
 	 *  index telemetry footnote and the case-study variants. */
 	Scale?: "compact" | "full";
-
-	/** Show the session-shape stat bars (the ratio presentation). */
-	ShowBars?: boolean;
 }
 
-const { Scale = "compact", ShowBars = false } = Astro.props;
+const { Scale = "compact" } = Astro.props;
 
-import { AssertBands, Cite, Study } from "@Library/Numbers";
+/** The one result the block leads with. */
+const Reduction = Figure("study.reduction.center");
+const Band = Figure("study.reduction.band");
+const Sessions = Figure("study.sessions");
+const SavedTokens = Figure("study.tokens.saved");
 
-const ValueSize =
-	Scale === "full"
-		? "text-2xl sm:text-3xl"
-		: "text-xl sm:text-2xl";
+const LeadSize = Scale === "full" ? "text-3xl sm:text-5xl" : "text-2xl sm:text-3xl";
 
-// The session-shape bands (README.md, "Real-world savings"): savings track the
-// session shape, from the chat-only floor to the pure-tool stress test. The
-// RANGES are the study's - generated, in the README's own order - and the
-// LABELS are this page's voice. `AssertBands` is the contract between them: a
-// README that states a different number of shapes stops the build here rather
-// than letting a label sit beside the wrong range.
-const Shape = [
-	{ Label: "CHAT-ONLY SESSIONS", Color: "zinc" as const, Note: "" },
-	{ Label: "LIGHT DEVELOPER SESSIONS", Color: "teal" as const, Note: "" },
-	{ Label: "TOOL-HEAVY SESSIONS", Color: "teal" as const, Note: "" },
-	{
-		Label: "SIMULATED PURE-TOOL LOOP",
-		Color: "raw" as const,
-		Note: "a simulated diff+ls+build+search workload - a stress test, not real usage",
-	},
+/**
+ * The details table: what the result is computed from, one question per row.
+ * `Id` is the join - the label is this component's voice, the value, unit,
+ * kind and scope are the record's, and `Figure` throws when an ID is unknown.
+ */
+const Measures: { Id: string; Label: string }[] = [
+	{ Id: "study.tokens.recorded", Label: "Recorded context" },
+	{ Id: "study.tokens.expanded", Label: "Expanded reconstruction" },
+	{ Id: "study.tokens.saved", Label: "Estimated tokens saved" },
+	{ Id: "study.reduction.percent", Label: "Estimated context reduction (point estimate)" },
+	{ Id: "study.reduction.band", Label: "Sensitivity band" },
+	{ Id: "study.api-calls", Label: "Calls analysed" },
+	{ Id: "study.sessions.saved", Label: "Sessions with nonzero estimated reduction" },
+	{ Id: "study.sessions.unsaved", Label: "Sessions with no estimated reduction" },
+	{ Id: "study.median-ratio", Label: "Median session ratio" },
+	{ Id: "study.average-per-call", Label: "Average saved per call" },
+	{ Id: "study.retrieval.tokens", Label: "Tokens returned by retrieval (the re-entry toll)" },
+	{ Id: "study.retrieval.calls", Label: "Retrieval calls" },
+	{ Id: "study.retrieval.share", Label: "Retrieval as a share of the saving" },
+	{ Id: "study.retrieval.factor", Label: "Full output paid again instead would have cost" },
 ];
 
-const Bands = AssertBands(Shape).map(({ Label, Color, Note }, Index) => ({
-	Label,
-	Color,
-	Note,
-	Range: Study.Bands[Index]!.Range,
-	Percent: Study.Bands[Index]!.Percent,
-}));
+const Rows = Measures.map(({ Id, Label }) => ({ Label, Fact: Figure(Id) }));
 
-const BarColor = {
-	zinc: "bg-zinc-dust",
-	teal: "bg-weathered-teal",
-	raw: "bg-raw-blood",
-};
-
-const BarText = {
-	zinc: "text-zinc-dust",
-	teal: "text-weathered-teal",
-	raw: "text-raw-blood",
-};
-
-// The ledger: five rows, every value a generated figure. The labels and the
-// explanatory notes are this page's; the numbers are the study's, and a note
-// that repeats a number (the saved percentage, the median, the tax share)
-// reads it from the same record the value column does.
-const Rows = [
-	{
-		Label: "TOKENS SAVED",
-		Value: Study.TokensSaved,
-		Accent: "text-stamped-canary",
-		Note: `${Study.SavedPct} of the expanded context budget deflected`,
-	},
-	{
-		Label: "WITH MARKERS / EXPANDED",
-		Value: `${Study.TokensWithMarkers} / ${Study.TokensExpanded}`,
-		Accent: "text-bone-newsprint",
-		Note: "tokens as stored vs the same payload with every marker expanded (stock Hermes)",
-	},
-	{
-		Label: "SESSIONS SAVED",
-		Value: Study.SessionsSaved,
-		Accent: "text-weathered-teal",
-		Note: `median session ratio ${Study.MedianRatio}; avg ${Study.AvgPerCall} saved per call`,
-	},
-	{
-		Label: "SESSION-SHAPE BAND",
-		Value: `${Bands[2]!.Range} tool-heavy · ${Bands[3]!.Range} pure-tool`,
-		Accent: "text-zinc-dust",
-		Note: "the same engine, four payoffs - savings track tool-output volume",
-	},
-	{
-		Label: "RETRIEVAL TAX",
-		Value: `${Study.TaxCalls} calls / ${Study.TaxTokens} tokens`,
-		Accent: "text-zinc-dust",
-		Note: `the re-entry toll, roughly ${Study.TaxPct} of the tokens saved`,
-	},
-];
-
+/** The kind tag. A reader must be able to tell a reconstruction from a count. */
+const KindTag = {
+	measured: { Tag: "MEASURED", Class: "text-weathered-teal" },
+	estimated: { Tag: "ESTIMATED", Class: "text-stamped-canary" },
+	simulated: { Tag: "SIMULATED", Class: "text-raw-blood" },
+	derived: { Tag: "DERIVED", Class: "text-zinc-dust" },
+} as const;
 ---
 
 <div class="border-t-2 border-oxblood-dark pt-6">
-		<!-- HEADER row: the period + the scope -->
-		<div class="flex flex-wrap items-baseline justify-between gap-2">
-			<div class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-				MEASURED, {Study.Measured.toUpperCase()}
-			</div>
-			<div class="font-mono text-base font-bold uppercase tracking-wider text-zinc-dust">
-				{Study.Sessions} HERMES SESSIONS &bull; {Study.ApiCalls} API CALLS &bull; {Study.Period.toUpperCase()}
-			</div>
+	<!-- HEADER row: the period + the scope -->
+	<div class="flex flex-wrap items-baseline justify-between gap-2">
+		<div class="type-meta font-bold text-zinc-dust">MEASURED, {Study.Measured.toUpperCase()}</div>
+		<div class="type-meta font-bold text-zinc-dust">
+			{Study.Sessions} HERMES SESSIONS &bull; {Study.ApiCalls} API CALLS &bull; {Study.Period.toUpperCase()}
 		</div>
-		<!-- KEY-VALUE ledger rows -->
-		<div class="mt-4 divide-y divide-oxblood-dark/60 border border-oxblood-dark bg-soot-black">
-			{
-				Rows.map(({ Label, Value, Accent, Note }) => (
-					<div class="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-						<div class="shrink-0 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust sm:w-64">
-							{Label}
-						</div>
-						<div class={`font-mono font-black ${ValueSize} ${Accent}`}>{Value}</div>
-						<div class="font-body text-base text-zinc-dust sm:flex-1 sm:text-right">{Note}</div>
-					</div>
-				))
-			}
-		</div>
-		<!-- Provenance: the study is the author's own work -->
-		<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-			The study is the author's own work - multi-agent atomization fan-outs, merge/PR
-			work, plugin integration - reconstructed payload-by-payload from the session
-			transcripts.
-		</p>
-		{
-			ShowBars && (
-				<div class="mt-4 space-y-3">
-					{Bands.map(({ Label, Range, Percent, Color, Note }) => (
-						<div>
-							<div class="mb-1 flex justify-between text-base font-bold">
-								<span class="text-bone-newsprint">{Label}</span>
-								<span class={BarText[Color]}>{Range}</span>
-							</div>
-							<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
-								<div class={`h-full ${BarColor[Color]}`} style={`width: ${Percent}%;`} />
-							</div>
-							{Note && <div class="mt-1 font-body text-base text-zinc-dust">{Note}</div>}
-						</div>
-					))}
-				</div>
-			)
-		}
-		<!-- CAVEAT: its own bordered note, visually distinct -->
-		<div class="mt-4 border-l-4 border-stamped-canary bg-asphalt-panel p-4 font-mono text-base leading-relaxed text-bone-newsprint">
-			<span class="font-black uppercase tracking-widest text-stamped-canary">CAVEAT &bull; </span>
-			THE EXACT PERCENTAGE IS A BAND: {Study.Band} ACROSS A {Study.CharsPerTok} CHARS/TOKEN SENSITIVITY
-			RANGE, CENTERED {Study.BandCenter}.
-		</div>
-		<!-- SRC: the plain citation token the CodeMentions pass links at build time -->
-		<div class="mt-3 font-mono text-base text-zinc-dust">SRC: {Cite(Study.From)}.</div>
 	</div>
+
+	<!-- THE PRIMARY RESULT: one figure, at reading size, with its scope beside it -->
+	<div class="mt-8 border-l-2 border-blood-crimson pl-5">
+		<div class="type-meta font-bold text-zinc-dust">ESTIMATED CONTEXT REDUCTION</div>
+		<div class={`mt-2 font-headline font-black tracking-tighter text-stamped-canary ${LeadSize}`}>
+			{Reduction.Value}
+		</div>
+		<p class="mt-3 max-w-2xl type-body text-bone-newsprint">
+			Across {Sessions.Value} recorded sessions, with a sensitivity band of {Band.Value}. The band is the
+			result: {SavedTokens.Value} tokens is the same reconstruction counted at the centre of that range.
+		</p>
+		<p class="mt-2 max-w-2xl type-caption text-zinc-dust">
+			{Reduction.Kind.toUpperCase()} &bull; {Reduction.Scope}
+		</p>
+	</div>
+
+	<!-- THE DETAILS: one question per row, every row carrying its own unit and scope -->
+	<div class="mt-10 overflow-x-auto border border-oxblood-dark bg-soot-black">
+		<table class="w-full border-collapse font-mono text-base">
+			<thead>
+				<tr class="border-b-2 border-blood-crimson">
+					<th class="px-3 py-2 text-left type-meta font-black text-zinc-dust">MEASURE</th>
+					<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">VALUE</th>
+					<th class="px-3 py-2 text-left type-meta font-black text-zinc-dust">UNIT</th>
+					<th class="px-3 py-2 text-left type-meta font-black text-zinc-dust">KIND</th>
+					<th class="px-3 py-2 text-left type-meta font-black text-zinc-dust">SCOPE</th>
+				</tr>
+			</thead>
+			<tbody>
+				{
+					Rows.map(({ Label, Fact }) => (
+						<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
+							<td class="px-3 py-2 text-left text-bone-newsprint">{Label}</td>
+							<td class="px-3 py-2 text-right font-black text-bone-white">{Fact.Value}</td>
+							<td class="px-3 py-2 text-left text-zinc-dust">{Fact.Unit}</td>
+							<td class={`px-3 py-2 text-left font-black uppercase tracking-wider ${KindTag[Fact.Kind].Class}`}>
+								{KindTag[Fact.Kind].Tag}
+							</td>
+							<td class="px-3 py-2 text-left type-caption text-zinc-dust">{Fact.Scope}</td>
+						</tr>
+					))
+				}
+			</tbody>
+		</table>
+	</div>
+
+	<!-- HOW IT WAS MEASURED: the method as a block, not a footnote. The study is
+	     a reconstruction by the author, and a reconstruction establishes nothing
+	     about task success or about anyone else's sessions. -->
+	<div class="mt-8 border-l-4 border-stamped-canary bg-asphalt-panel p-4">
+		<div class="type-meta font-black text-stamped-canary">HOW THIS WAS MEASURED</div>
+		<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
+			The study is the author's own work - multi-agent atomization fan-outs, merge/PR work, plugin
+			integration - reconstructed payload-by-payload from the session transcripts.
+		</p>
+		<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
+			It is an author-run reconstruction, not a randomised comparison: it establishes neither better task
+			success nor universal cost savings. What it measures is how much context the markers replaced in these
+			sessions, and what that reconstruction cost in tokens.
+		</p>
+		<p class="mt-3 max-w-3xl type-caption text-zinc-dust">
+			Every figure above carries its own method and the pinned revision it was extracted from - the register on
+			the benchmarks page lists all of them with their IDs.
+		</p>
+	</div>
+
+	<!-- CAVEAT: its own bordered note, visually distinct -->
+	<div class="mt-4 border-l-4 border-stamped-canary bg-asphalt-panel p-4 font-mono text-base leading-relaxed text-bone-newsprint">
+		<span class="font-black uppercase tracking-widest text-stamped-canary">CAVEAT &bull; </span>
+		THE EXACT PERCENTAGE IS A BAND: {Study.Band} ACROSS A {Study.CharsPerTok} CHARS/TOKEN SENSITIVITY RANGE,
+		CENTERED {Study.BandCenter}.
+	</div>
+
+	<!-- SRC: the plain citation token the CodeMentions pass links at build time -->
+	<div class="mt-3 type-meta text-zinc-dust">SRC: {Cite(Study.From)}.</div>
+</div>

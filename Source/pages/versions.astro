@@ -303,7 +303,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 				`Current release: binary <strong>${Stamps.Binary()}</strong>, plugin <strong>${Stamps.Plugin()}</strong> (v${Versions.Binary}, ${Versions.ChangelogDate}).`,
 				`Requires Rust 1.88+.`,
 				`Licensed CC0-1.0.`,
-				"Every stamp below is read from the monorepo's own manifests at build time, so the page cannot claim a version the tree does not carry.",
+				"Every stamp is read from the monorepo's own manifests at build time, so the register cannot claim a version the tree does not carry.",
 			]}
 		/>
 
@@ -378,10 +378,10 @@ const Holes = [0, 1, 2, 3, 4, 5];
 					Five artifacts, five sources
 				</h3>
 				<p class="mb-8 font-body text-base leading-relaxed text-bone-newsprint">
-					Nothing on this page is typed by hand. Each stamp below is read from the file that
-					owns it, and the page renders whatever those files say on the day the site is
-					built - which is why a release that forgets to bump one of them shows up here as a
-					disagreement rather than as a stale page.
+					Nothing is typed by hand. Each stamp is read from the file that
+					owns it, and the register renders whatever those files say on the day the site is
+					built - which is why a release that forgets to bump one of them surfaces here as a
+					disagreement rather than as a stale figure.
 				</p>
 				<ZineLedger
 					Headers={["ARTIFACT", "SOURCE OF TRUTH", "STAMP"]}
@@ -499,9 +499,9 @@ const Holes = [0, 1, 2, 3, 4, 5];
 				/>
 			</div>
 			<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The quote above is the current release's own one-line title, taken from the changelog
-				head rather than paraphrased here. It is the shortest honest summary a release can
-				carry: one sentence that a reader can hold while scrolling the register below.
+				The release's own one-line title, taken from the changelog
+				head rather than paraphrased. It is the shortest honest summary a release can
+				carry: one sentence a reader can hold while working through the register.
 			</p>
 			<ZineSource
 				Lines={[
@@ -532,7 +532,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 					<li class="border-l-4 border-raw-blood pl-4">and the chores that keep the tree honest about itself.</li>
 				</ul>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Each group below carries its entries verbatim and one line on why the group exists.
+					Each group carries its entries verbatim and one line on why the group exists.
 				</p>
 				<div class="mt-10">
 					{
@@ -686,9 +686,9 @@ const Holes = [0, 1, 2, 3, 4, 5];
 					CRATES.IO PUBLISH, AND THE CHAIN-SPLIT CCR.
 				</p>
 				<p class="mt-3 text-base leading-relaxed text-zinc-dust">
-					The register is the ledger; the tape below is the same history told once per stamp,
-					with the reason each release mattered. Read the table to find a version, read the
-					tape to understand why the project looks the way it does.
+					The register is the ledger; the tape is the same history told once per stamp,
+					with the reason each release mattered. The table finds a version; the
+					tape explains why the project looks the way it does.
 				</p>
 			</ZineBox>
 			<ZineSource
@@ -879,7 +879,7 @@ const Holes = [0, 1, 2, 3, 4, 5];
 					<ZineStamp Label="200 SESSIONS" Color="raw" />
 				</div>
 				<p class="mt-8 max-w-2xl font-body text-base leading-relaxed text-bone-newsprint">
-					This page records what changed; the benchmarks page records what it cost and what
+					The register records what changed; the benchmarks record what it cost and what
 					it saved. Keeping the two apart is deliberate - a release note that also argues
 					about throughput is a release note nobody can cite.
 				</p>

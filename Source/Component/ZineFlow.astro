@@ -1,26 +1,38 @@
 ---
 /**
  * ZineFlow - the interactive traversal stepper, UI-native (no static mermaid).
- * Each step carries two synchronized views that advance together:
- * AGENT-VIEW (what the agent sees) and SYSTEM-PATH (what Aphrodite does),
- * a per-step detail line (hover-to-reveal on desktop, always dim), a SRC
- * anchor chip, stage ticks in the header (clickable), PREV/NEXT/PLAY
- * controls with autoplay, and a completion stamp on the last step.
+ * Each stage carries two synchronized views: AGENT-VIEW (what the agent sees)
+ * and SYSTEM-PATH (what Aphrodite does), a per-stage detail line, and a SRC
+ * anchor chip naming the file the stage is described in.
  *
- * Without JS the first step renders and the NEXT button is a no-op-safe
- * (progressive: all steps are in the DOM, hidden ones removed by the script).
+ * READABLE WITHOUT JAVASCRIPT, WHICH IS THE DEFAULT IT IS BUILT FROM.
+ * Every stage is server-rendered with both panes, its own stage number, its
+ * SRC chip and its detail line, in document order - so a reader with no
+ * script, a reader printing the page, and browser-find all see the whole
+ * walkthrough. The script collapses that into the one-stage-at-a-time
+ * presentation and sets `data-flow-ready`, which is the ONLY signal the
+ * stylesheet uses to switch layouts (Motion.css, "Readable without
+ * JavaScript"). Initialisation therefore adds a presentation; it never adds
+ * content.
  *
- * Content source: the traversal material (steps + SRC anchors); the
- * presentation is this component's.
+ * Manual stepping is primary: Previous / Next / Read all steps. Autoplay is
+ * opt-in behind Replay, and it stops on any manual interaction, when the
+ * module leaves the viewport, when the document is hidden, and before a route
+ * swap. The endpoint is honest - Next is disabled on the last stage rather
+ * than wrapping to the first under a button that still says NEXT; Replay is
+ * the separate action that starts over.
+ *
+ * Every listener belongs to an AbortController owned by this module and is
+ * aborted on astro:before-swap, so no timer and no listener outlives the page.
  */
 interface Props {
 	/** The traversal title, rendered on the header tape. */
 	Title: string;
 
-	/** The completion-stamp label shown after the last step. */
+	/** The completion-stamp label shown after the last stage. */
 	Complete?: string;
 
-	/** The steps, in order. Each pane value is either one paragraph or a
+	/** The stages, in order. Each pane value is either one paragraph or a
 	 *  list of mono lines - the conversation-view excerpt (Agent) or the
 	 *  file-system/backend journey (System). A line containing a CCR
 	 *  marker renders as the marker chip; a "· " line fades, a "→ "
@@ -31,9 +43,9 @@ interface Props {
 		Agent: string | string[];
 		/** SYSTEM-PATH pane text: what Aphrodite does at this stage. */
 		System: string | string[];
-		/** Optional per-step detail line, revealed on hover. */
+		/** Optional per-stage detail line. */
 		Detail?: string;
-		/** Optional SRC anchor route or URL for this step. */
+		/** Optional SRC anchor route or URL for this stage. */
 		Anchor?: string;
 		/** Label for the anchor chip (defaults to "SRC"). */
 		AnchorLabel?: string;
@@ -41,6 +53,11 @@ interface Props {
 }
 
 const { Title, Complete = "FLOW COMPLETE", Steps } = Astro.props;
+
+const Total = Steps.length;
+
+/** Two digits, so the count and the stage labels never shift width. */
+const Pad = (Value: number) => String(Value).padStart(2, "0");
 
 /** One pane value -> the mono lines it renders as. */
 const PaneLines = (Text: string | string[]) => (Array.isArray(Text) ? Text : [Text]);
@@ -56,94 +73,165 @@ const PaneLineClass = (Line: string) =>
 				: Line.startsWith("→ ")
 					? "opacity-70"
 					: "";
+
+/** The two panes, named once: the same pair renders inside every stage. */
+const Panes = ["agent", "system"] as const;
+
+const PaneLabel = (Pane: (typeof Panes)[number]) =>
+	Pane === "agent" ? "AGENT-VIEW · CONVERSATION" : "SYSTEM-PATH · BACKEND";
+
+const PaneText = (Step: Props["Steps"][number], Pane: (typeof Panes)[number]) =>
+	PaneLines(Pane === "agent" ? Step.Agent : Step.System);
 ---
 
-<div class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-5 sm:p-8" data-zine-flow>
-	<div class="absolute -top-3.5 left-6 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]">
+<div
+	class="zine-box-crimson relative border-4 border-blood-crimson bg-carbon-void p-5 sm:p-8"
+	data-zine-flow
+>
+	<div
+		class="absolute -top-3.5 left-6 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+	>
 		{Title}
 	</div>
 
-	<!-- Stage ticks: one per step, clickable, the current one lit. Plain
+	<!-- The stage index: one 44px hit area per stage with a restrained bar
+	     inside it, then the current stage's short name and its position.
+	     Hidden until the script has bound - the bars are a control, and a
+	     control that cannot work is a promise the page cannot keep. Plain
 	     buttons (not a tablist): the panes are not tabpanels, so a tabs ARIA
-	     pattern would be broken here - the labels carry the semantics. -->
-	<div class="mt-2 flex items-center gap-1.5" data-flow-ticks aria-label="Traversal stages">
+	     pattern would be broken here - the labels carry the semantics, and
+	     aria-current="step" marks the stage being read. -->
+	<div
+		class="mt-2 flex flex-wrap items-center gap-1"
+		data-flow-ticks
+		role="group"
+		aria-label={`Traversal stages, ${Total} in order`}
+	>
 		{
 			Steps.map((Step, I) => (
 				<button
-					class="h-2.5 w-8 border border-black bg-soot-black font-mono transition-colors"
+					class="zine-flow-tick flex h-11 items-center px-0.5"
 					data-flow-tick={I}
 					type="button"
-					aria-label={`Go to stage ${I + 1}: ${Step.Title}`}
-				/>
+					aria-label={`Go to stage ${I + 1} of ${Total}: ${Step.Title}`}
+				>
+					<span
+						class="zine-flow-tick-bar block h-2.5 w-8 border border-black bg-soot-black"
+						aria-hidden="true"
+					/>
+				</button>
 			))
 		}
-		<span class="ml-2 font-mono text-base font-bold text-zinc-dust" data-flow-count>
-			01 / {String(Steps.length).padStart(2, "0")}
+		<span class="ml-2 flex flex-wrap items-baseline gap-x-2 font-mono text-base font-bold">
+			<span class="text-zinc-dust" data-flow-stage>{Steps[0]?.Title ?? ""}</span>
+			<span class="text-bone-white" data-flow-count>{Pad(1)} / {Pad(Total)}</span>
 		</span>
 	</div>
 
-	<!-- The synchronized panes: every step rendered, the script shows one.
-	     The steps stack in one grid cell (col/row 1), so the pane AUTO-GROWS
-	     with the visible step's content - never clipped, never overflowing.
-	     .ccr-marker lets long unbroken marker strings wrap mid-token. -->
-	<div class="mt-4 grid gap-4 lg:grid-cols-2">
+	<!-- The one live region on this module, and it says one sentence: which
+	     stage is on screen. Announcing the whole root made every repaint a
+	     screen-reader event; announcing the stage makes the change the
+	     message. -->
+	<p
+		class="sr-only"
+		data-flow-status
+		role="status"
+		aria-live="polite"
+		aria-atomic="true"
+	>
+		Step 1 of {Total}: {Steps[0]?.Title ?? ""}.
+	</p>
+
+	<!-- Every stage, in order, with both panes. This is what a reader without
+	     JavaScript sees, what print sees, and what browser-find reaches. -->
+	<div class="mt-4 flex flex-col gap-4">
 		{
-			["agent", "system"].map((Pane) => (
-				<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5">
-					<div class={`mb-1 text-base font-black uppercase tracking-widest ${Pane === "agent" ? "text-stamped-canary" : "text-weathered-teal"}`}>
-						{Pane === "agent" ? "AGENT-VIEW · CONVERSATION" : "SYSTEM-PATH · BACKEND"}
-					</div>
-					<div class="grid min-h-[5.5rem]">
-						{Steps.map((Step, I) => (
-							<div
-								class="col-start-1 row-start-1 border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold leading-relaxed text-bone-white"
-								data-flow-pane={Pane}
-								data-flow-step={I}
-								hidden={I > 0}
+			Steps.map((Step, I) => (
+				<div class="zine-flow-step" data-flow-step={I}>
+					<div class="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+						<span
+							class="zine-flow-step-index font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
+						>
+							STEP {Pad(I + 1)} / {Pad(Total)}
+						</span>
+						<span
+							class="font-mono text-base font-black uppercase tracking-widest text-bone-white"
+							data-flow-title
+						>
+							{Step.Title}
+						</span>
+						{Step.Anchor && (
+							<a
+								class="border border-oxblood-dark bg-soot-black px-2 py-0.5 font-mono text-base font-bold text-weathered-teal hover:bg-weathered-teal hover:text-bone-white"
+								href={Step.Anchor}
+								rel={Step.Anchor.startsWith("http") ? "noreferrer" : undefined}
 							>
-								{(Pane === "agent" ? PaneLines(Step.Agent) : PaneLines(Step.System)).map((Line) => (
-									<div class={PaneLineClass(Line)}>{Line}</div>
-								))}
+								{Step.AnchorLabel ?? "SRC"} ↗
+							</a>
+						)}
+					</div>
+
+					<div class="grid min-h-[5.5rem] gap-4 lg:grid-cols-2">
+						{Panes.map((Pane) => (
+							<div
+								class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5"
+								data-flow-pane={Pane}
+							>
+								<div class="zine-flow-pane-label mb-1 text-base font-black uppercase tracking-widest">
+									{PaneLabel(Pane)}
+								</div>
+								<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold leading-relaxed text-bone-white">
+									{PaneText(Step, Pane).map((Line) => (
+										<div class={PaneLineClass(Line)}>{Line}</div>
+									))}
+								</div>
 							</div>
 						))}
 					</div>
+
+					{Step.Detail && (
+						<p class="zine-flow-detail mt-1.5 font-body text-base leading-relaxed text-bone-newsprint opacity-70 transition-opacity hover:opacity-100">
+							{Step.Detail}
+						</p>
+					)}
 				</div>
 			))
 		}
 	</div>
 
-	<!-- The stage title + detail line + anchor chip -->
-	<div class="mt-4 flex flex-wrap items-center gap-3">
-		<span class="font-mono text-base font-black uppercase tracking-widest text-bone-white" data-flow-title>
-			{Steps[0].Title}
-		</span>
-		{
-			Steps[0].Anchor && (
-				<a
-					class="border border-oxblood-dark bg-soot-black px-2 py-0.5 font-mono text-base font-bold text-weathered-teal hover:bg-weathered-teal hover:text-bone-white"
-					href={Steps[0].Anchor}
-					data-flow-anchor
-					rel={Steps[0].Anchor.startsWith("http") ? "noreferrer" : undefined}
-				>
-					{Steps[0].AnchorLabel ?? "SRC"} ↗
-				</a>
-			)
-		}
-	</div>
-	<p class="mt-1.5 font-body text-base leading-relaxed text-bone-newsprint opacity-70 transition-opacity hover:opacity-100" data-flow-detail>
-		{Steps[0].Detail}
-	</p>
-
-	<!-- Controls: PREV / PLAY / NEXT; the stamp appears at the end -->
-	<div class="mt-5 flex items-center gap-3">
-		<button class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson disabled:opacity-40" data-flow-prev type="button">
+	<!-- Controls: manual first, autoplay behind Replay, and the stamp that
+	     only appears on the last stage. -->
+	<div class="mt-5 flex flex-wrap items-center gap-3" data-flow-controls>
+		<button
+			class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson disabled:opacity-40"
+			data-flow-prev
+			type="button"
+			disabled
+		>
 			◀ PREV
 		</button>
-		<button class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson" data-flow-play type="button" aria-pressed="false">
-			▶ PLAY
-		</button>
-		<button class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson" data-flow-next type="button">
+		<button
+			class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson disabled:opacity-40"
+			data-flow-next
+			type="button"
+		>
 			NEXT ▶
+		</button>
+		<button
+			class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson"
+			data-flow-play
+			type="button"
+			aria-pressed="false"
+		>
+			▶ REPLAY
+		</button>
+		<button
+			class="border border-black bg-raw-blood px-3 py-1.5 font-mono text-base font-black uppercase text-bone-white shadow-[2px_2px_0px_#000] transition-colors hover:bg-blood-crimson"
+			data-flow-all
+			type="button"
+			aria-pressed="false"
+		>
+			READ ALL STEPS
 		</button>
 		<span
 			class="hidden -rotate-2 border-2 border-black bg-stamped-canary px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]"
@@ -152,149 +240,297 @@ const PaneLineClass = (Line: string) =>
 			{Complete}
 		</span>
 	</div>
-
-	<script type="application/json" data-flow-steps set:html={JSON.stringify(Steps)} />
 </div>
 
 <script>
-	function BindFlows() {
-		for (const Root of document.querySelectorAll("[data-zine-flow]")) {
-			if (Root.dataset.flowBound) {
-				continue;
+	/** The autoplay beat. Manual stepping never waits on it. */
+	const Cadence = 2600;
+
+	/** Two digits, so the count never shifts width as it climbs. */
+	const Pad = (Value: number): string => String(Value).padStart(2, "0");
+
+	/**
+	 * One controller per bound module. A second bind of the same module is
+	 * refused while its controller is live, so astro:page-load firing twice
+	 * cannot double-bind; astro:before-swap aborts every controller, which is
+	 * what takes the listeners, the observer and the interval with it.
+	 */
+	const Bound = new WeakMap<HTMLElement, AbortController>();
+
+	function BindFlow(Root: HTMLElement): void {
+		const Live = Bound.get(Root);
+
+		if (Live !== undefined && !Live.signal.aborted) {
+			return;
+		}
+
+		const Controller = new AbortController();
+		const { signal } = Controller;
+
+		Bound.set(Root, Controller);
+
+		const Blocks = [...Root.querySelectorAll<HTMLElement>("[data-flow-step]")];
+		const Total = Blocks.length;
+
+		// A module with no stages has nothing to present: the markup is
+		// already the whole story, and binding it would only hide it.
+		if (Total === 0) {
+			return;
+		}
+
+		const Ticks = [...Root.querySelectorAll<HTMLElement>("[data-flow-tick]")];
+		const Stage = Root.querySelector<HTMLElement>("[data-flow-stage]");
+		const Count = Root.querySelector<HTMLElement>("[data-flow-count]");
+		const Status = Root.querySelector<HTMLElement>("[data-flow-status]");
+		const Prev = Root.querySelector<HTMLButtonElement>("[data-flow-prev]");
+		const Next = Root.querySelector<HTMLButtonElement>("[data-flow-next]");
+		const Play = Root.querySelector<HTMLButtonElement>("[data-flow-play]");
+		const All = Root.querySelector<HTMLButtonElement>("[data-flow-all]");
+		const Stamp = Root.querySelector<HTMLElement>("[data-flow-stamp]");
+
+		// The stage titles come from the DOM the page already renders, so the
+		// script can never announce a name the markup does not carry.
+		const Titles = Blocks.map(
+			(Block) =>
+				Block.querySelector<HTMLElement>("[data-flow-title]")?.textContent?.trim() ?? "",
+		);
+
+		let Index = 0;
+		let Timer = 0;
+		let Reading = false;
+
+		const Stop = (): void => {
+			if (Timer !== 0) {
+				window.clearInterval(Timer);
+				Timer = 0;
 			}
 
-			Root.dataset.flowBound = "1";
-
-			const Data = Root.querySelector('script[type="application/json"][data-flow-steps]');
-			const Steps: { Title: string; Agent: string | string[]; System: string | string[]; Detail?: string; Anchor?: string; AnchorLabel?: string }[] = Data ? JSON.parse(Data.textContent ?? "[]") : [];
-			const Total = Steps.length;
-
-			if (Total === 0) {
-				continue;
+			if (Play) {
+				Play.textContent = "▶ REPLAY";
+				Play.setAttribute("aria-pressed", "false");
 			}
+		};
 
-			let Index = 0;
-			let Timer: ReturnType<typeof setInterval> | undefined;
-
-			const Panes = (Pane: string) => Root.querySelectorAll<HTMLElement>(`[data-flow-pane='${Pane}']`);
-			const Ticks = Root.querySelectorAll<HTMLElement>("[data-flow-tick]");
-			const TitleNode = Root.querySelector<HTMLElement>("[data-flow-title]");
-			const DetailNode = Root.querySelector<HTMLElement>("[data-flow-detail]");
-			const AnchorNode = Root.querySelector<HTMLAnchorElement>("[data-flow-anchor]");
-			const CountNode = Root.querySelector<HTMLElement>("[data-flow-count]");
-			const Prev = Root.querySelector<HTMLButtonElement>("[data-flow-prev]");
-			const Next = Root.querySelector<HTMLButtonElement>("[data-flow-next]");
-			const Play = Root.querySelector<HTMLButtonElement>("[data-flow-play]");
-			const Stamp = Root.querySelector<HTMLElement>("[data-flow-stamp]");
-
-			function Render() {
-				for (const Pane of ["agent", "system"]) {
-					Panes(Pane).forEach((Node, I) => {
-						Node.hidden = I !== Index;
-					});
-				}
-
-				Ticks.forEach((Tick, I) => {
-					Tick.classList.toggle("bg-stamped-canary", I <= Index);
-					Tick.classList.toggle("bg-soot-black", I > Index);
-				});
-
-				const Step = Steps[Index];
-				if (TitleNode) TitleNode.textContent = Step.Title;
-				if (DetailNode) {
-					DetailNode.textContent = Step.Detail ?? "";
-					DetailNode.hidden = !Step.Detail;
-				}
-
-				if (AnchorNode) {
-					if (Step.Anchor) {
-						AnchorNode.hidden = false;
-						AnchorNode.href = Step.Anchor;
-						AnchorNode.textContent = `${Step.AnchorLabel ?? "SRC"} ↗`;
-					} else {
-						AnchorNode.hidden = true;
-					}
-				}
-
-				if (CountNode) CountNode.textContent = `${String(Index + 1).padStart(2, "0")} / ${String(Total).padStart(2, "0")}`;
-				if (Prev) Prev.disabled = Index === 0;
-				if (Stamp) Stamp.classList.toggle("hidden", Index < Total - 1);
-			}
-
-			function GoTo(I: number) {
-				Index = Math.max(0, Math.min(Total - 1, I));
-				Render();
-			}
-
-			function Stop() {
-				if (Timer) {
-					clearInterval(Timer);
-					Timer = undefined;
-				}
-				if (Play) {
-					Play.textContent = "▶ PLAY";
-					Play.setAttribute("aria-pressed", "false");
-				}
-			}
-
-			Prev?.addEventListener("click", () => {
-				Stop();
-				GoTo(Index - 1);
+		const Render = (): void => {
+			Blocks.forEach((Block, At) => {
+				Block.hidden = !Reading && At !== Index;
 			});
-			Next?.addEventListener("click", () => {
-				Stop();
-				GoTo(Index === Total - 1 ? 0 : Index + 1);
-			});
-			Play?.addEventListener("click", () => {
-				if (Timer) {
-					Stop();
-					return;
+
+			Ticks.forEach((Tick, At) => {
+				if (!Reading && At === Index) {
+					Tick.setAttribute("aria-current", "step");
+				} else {
+					Tick.removeAttribute("aria-current");
 				}
-				GoTo(Index === Total - 1 ? 0 : Index);
+
+				if (At <= Index) {
+					Tick.setAttribute("data-flow-done", "1");
+				} else {
+					Tick.removeAttribute("data-flow-done");
+				}
+			});
+
+			if (Stage) {
+				Stage.textContent = Titles[Index] ?? "";
+			}
+
+			if (Count) {
+				Count.textContent = `${Pad(Index + 1)} / ${Pad(Total)}`;
+			}
+
+			if (Status) {
+				Status.textContent = `Step ${Index + 1} of ${Total}: ${Titles[Index] ?? ""}.`;
+			}
+
+			if (Prev) {
+				Prev.disabled = Reading || Index === 0;
+			}
+
+			if (Next) {
+				Next.disabled = Reading || Index === Total - 1;
+			}
+
+			if (Play) {
+				Play.disabled = Reading;
+			}
+
+			if (All) {
+				All.setAttribute("aria-pressed", String(Reading));
+				All.textContent = Reading ? "STEP THROUGH" : "READ ALL STEPS";
+			}
+
+			if (Stamp) {
+				Stamp.classList.toggle("hidden", Reading || Index < Total - 1);
+			}
+
+			Root.toggleAttribute("data-flow-all", Reading);
+
+			// Last, because this is the signal the stylesheet reads to switch
+			// from the readable list to the presentation: it must be set with
+			// the first frame already rendered, never before it.
+			Root.dataset.flowReady = "1";
+		};
+
+		const GoTo = (At: number): void => {
+			Index = Math.max(0, Math.min(Total - 1, At));
+			Render();
+		};
+
+		/** The endpoint is a wall, not a wrap: NEXT on the last stage does nothing. */
+		const Step = (Delta: number): void => {
+			if (Index === Total - 1 && Delta > 0) {
+				Stop();
+
+				return;
+			}
+
+			GoTo(Index + Delta);
+		};
+
+		const Replay = (): void => {
+			Stop();
+			GoTo(0);
+
+			if (Play) {
 				Play.textContent = "❚❚ PAUSE";
 				Play.setAttribute("aria-pressed", "true");
-				Timer = setInterval(() => {
-					if (Index === Total - 1) {
-						Stop();
-						return;
-					}
-					GoTo(Index + 1);
-				}, 2600);
-			});
+			}
 
-			Ticks.forEach((Tick, I) => {
-				Tick.addEventListener("click", () => {
+			Timer = window.setInterval(() => {
+				if (Index >= Total - 1) {
 					Stop();
-					GoTo(I);
-				});
-			});
 
-			// The stepper keys: Left/Right walk the stages when focus is inside
-			// the module (the buttons already reach it with Tab).
-			Root.addEventListener("keydown", (Event) => {
-				if (!(Event instanceof KeyboardEvent)) {
 					return;
 				}
 
-				if (Event.key === "ArrowRight") {
+				GoTo(Index + 1);
+			}, Cadence);
+		};
+
+		// Every manual action stops autoplay first: the reader has taken the
+		// wheel, and a timer that keeps advancing under their hands is the
+		// defect this module used to have.
+		Prev?.addEventListener(
+			"click",
+			() => {
+				Stop();
+				Step(-1);
+			},
+			{ signal },
+		);
+
+		Next?.addEventListener(
+			"click",
+			() => {
+				Stop();
+				Step(1);
+			},
+			{ signal },
+		);
+
+		Play?.addEventListener(
+			"click",
+			() => {
+				if (Timer !== 0) {
 					Stop();
-					GoTo(Index === Total - 1 ? 0 : Index + 1);
-					Event.preventDefault();
-				} else if (Event.key === "ArrowLeft") {
-					Stop();
-					GoTo(Index - 1);
-					Event.preventDefault();
+
+					return;
 				}
-			});
 
-			// The panes announce stage changes to screen readers; the autoplay
-			// timer pauses the announcements' noise by its own cadence.
-			Root.setAttribute("aria-live", "polite");
+				Replay();
+			},
+			{ signal },
+		);
 
-			Render();
+		All?.addEventListener(
+			"click",
+			() => {
+				Stop();
+				Reading = !Reading;
+				Render();
+			},
+			{ signal },
+		);
+
+		Ticks.forEach((Tick, At) => {
+			Tick.addEventListener(
+				"click",
+				() => {
+					Stop();
+					Reading = false;
+					GoTo(At);
+				},
+				{ signal },
+			);
+		});
+
+		Root.addEventListener(
+			"keydown",
+			(Event) => {
+				if (Event.key !== "ArrowRight" && Event.key !== "ArrowLeft") {
+					return;
+				}
+
+				Stop();
+				Reading = false;
+				Step(Event.key === "ArrowRight" ? 1 : -1);
+				Event.preventDefault();
+			},
+			{ signal },
+		);
+
+		// A walkthrough that plays to an empty room is a timer nobody watches:
+		// leaving the viewport and hiding the document both stop it. Neither
+		// changes the stage the reader left on screen.
+		if ("IntersectionObserver" in window) {
+			const Observer = new IntersectionObserver(
+				(Entries) => {
+					for (const Entry of Entries) {
+						if (!Entry.isIntersecting) {
+							Stop();
+						}
+					}
+				},
+				{ threshold: 0 },
+			);
+
+			Observer.observe(Root);
+			signal.addEventListener("abort", () => Observer.disconnect(), { once: true });
 		}
+
+		document.addEventListener(
+			"visibilitychange",
+			() => {
+				if (document.hidden) {
+					Stop();
+				}
+			},
+			{ signal },
+		);
+
+		// The swap's half of the contract: aborting the controller removes
+		// every listener above, but an interval is not a listener - it has to
+		// be cleared by name, or it keeps ticking against a detached module.
+		signal.addEventListener("abort", Stop, { once: true });
+
+		Render();
 	}
 
-	BindFlows();
-	document.addEventListener("astro:page-load", BindFlows);
+	const BindAll = (): void => {
+		for (const Root of document.querySelectorAll<HTMLElement>("[data-zine-flow]")) {
+			BindFlow(Root);
+		}
+	};
+
+	/** Before a swap: every timer, listener and observer this module owns goes. */
+	const StopAll = (): void => {
+		for (const Root of document.querySelectorAll<HTMLElement>("[data-zine-flow]")) {
+			Bound.get(Root)?.abort();
+			Bound.delete(Root);
+		}
+	};
+
+	BindAll();
+	document.addEventListener("astro:page-load", BindAll);
+	document.addEventListener("astro:before-swap", StopAll);
 </script>

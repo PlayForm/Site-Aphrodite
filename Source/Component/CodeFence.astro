@@ -15,11 +15,21 @@
 // gone: they were a second, drifting definition of the same block.
 //
 // COPY: pass `Copy` to hang the site's one clipboard control on the block.
-// The payload IS `Code` - the fence never takes a second copy of the command,
-// so the button cannot copy something the reader is not looking at. The plate
-// gives every block a copy chip anyway; `Copy` asks for the louder, always-
-// on-screen one the seven command fences have always had, and the plate MOVES
-// that control into its own chip cluster rather than adding a second.
+// By default the payload IS `Code` - the fence never takes a second copy of the
+// command, so the button cannot copy something the reader is not looking at.
+// The plate gives every block a copy chip anyway; `Copy` asks for the louder,
+// always-on-screen one the seven command fences have always had, and the plate
+// MOVES that control into its own chip cluster rather than adding a second.
+//
+// `CopyPayload` is the one exception, and it exists because a fence is allowed
+// to be a TRANSCRIPT while its copy must be a COMMAND. An install block that
+// still carries `$` prompts and `//` annotations renders exactly as written,
+// and a reader who pastes it gets a shell that cannot run it. Pass the bare
+// line as `CopyPayload` and the block stays a faithful picture of a terminal
+// without the clipboard inheriting the picture. Prefer modelling the block as
+// data (Source/pages/setup.astro's InstallStep) so the two never have to
+// differ at all; this prop is for the fences that legitimately must show more
+// than they copy.
 import { codeToHtml } from "shiki";
 
 import { ZineTheme } from "@Library/ShikiTheme";
@@ -34,9 +44,14 @@ interface Props {
 	Copy?: boolean;
 	/** The copy button's label; defaults to the language, uppercased. */
 	CopyLabel?: string;
+	/**
+	 * The clipboard payload when it must differ from the rendered text: the
+	 * bare command for a block that displays a transcript. Unset = `Code`.
+	 */
+	CopyPayload?: string;
 }
 
-const { Code, Lang = "bash", Class = "", Copy = false, CopyLabel } = Astro.props;
+const { Code, Lang = "bash", Class = "", Copy = false, CopyLabel, CopyPayload } = Astro.props;
 // Astro's markdown pipeline renames shiki's `shiki` class to `astro-code` and
 // adds the data-language attribute; the component applies the same
 // normalization so the markup matches the docs' fences. The overflow hint is
@@ -50,7 +65,12 @@ const Html = (await codeToHtml(Code, { lang: Lang, theme: ZineTheme }))
 	Copy ? (
 		<div class:list={["relative", Class]}>
 			<div class="absolute right-2 top-2 z-10">
-				<CopyButton Label={CopyLabel ?? Lang.toUpperCase()} Payload={Code} Tone="teal" Size="sm" />
+				<CopyButton
+					Label={CopyLabel ?? Lang.toUpperCase()}
+					Payload={CopyPayload ?? Code}
+					Tone="teal"
+					Size="sm"
+				/>
 			</div>
 			<div set:html={Html} />
 		</div>

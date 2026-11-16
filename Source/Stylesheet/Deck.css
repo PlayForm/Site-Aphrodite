@@ -540,14 +540,40 @@ body:has([data-deck]) footer {
 	gap: 1.2cqw;
 }
 
+/* The deck's four stages keep ONE frame - blood-crimson border, canary metric,
+   the same 2px box on all four - and take their identity from a single accent
+   bar on the left edge, driven by --deck-accent. One accent per stage, no fifth
+   colour: teal / canary / raw / bone is the stamp vocabulary ZineTape already
+   declares, so stage 03 reads as the same stage here as on the index cards and
+   the case study layer list. The bar is an inset shadow, not a border, so the
+   frame's geometry stays identical across the four. */
 .deck-stage {
+	--deck-accent: var(--raw-blood);
 	display: grid;
 	align-content: start;
 	gap: 0.5cqw;
 	border: 2px solid var(--blood-crimson);
 	background: var(--carbon-void);
-	box-shadow: 0.25cqw 0.25cqw 0 #000;
+	box-shadow:
+		inset 0.3cqw 0 0 var(--deck-accent),
+		0.25cqw 0.25cqw 0 #000;
 	padding: 1.1cqw 1.2cqw;
+}
+
+.deck-stage[data-stage="01"] {
+	--deck-accent: var(--weathered-teal);
+}
+
+.deck-stage[data-stage="02"] {
+	--deck-accent: var(--stamped-canary);
+}
+
+.deck-stage[data-stage="03"] {
+	--deck-accent: var(--raw-blood);
+}
+
+.deck-stage[data-stage="04"] {
+	--deck-accent: var(--bone-newsprint);
 }
 
 .deck-stage-index {

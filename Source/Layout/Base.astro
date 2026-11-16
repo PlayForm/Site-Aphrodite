@@ -5,7 +5,7 @@ import "@Stylesheet/Motion.css";
 import { Head } from "astro-capo";
 import { ClientRouter } from "astro:transitions";
 
-import { ExternalLinks, FooterGroups, IsActive, MenuGroups, PrimaryLinks } from "@Library/Links";
+import { ExternalLinks, FooterGroups, IsActive, MenuGroups, PrimaryLinks, Routes } from "@Library/Links";
 import { Stamps, Versions } from "@Library/Versions";
 
 import ZineKicker from "@Component/ZineKicker.astro";
@@ -38,8 +38,55 @@ interface Props {
 <html lang="en" class="no-js dark" dir="ltr">
 	<Head>
 		<script is:inline>
+			// The no-js/js switch is set before the first paint, because the
+			// stylesheet reads it: the reveal pre-hide and the stepper's
+			// collapsed frame both apply only under `html.js`, so a reader
+			// without JavaScript never has content hidden from them.
 			document.documentElement.classList.remove("no-js");
 			document.documentElement.classList.add("js");
+
+			// That switch is only safe while the runtimes actually mount, so
+			// this arms a failsafe that is re-armed on every page-load. It
+			// lives HERE, inline and dependency-free, because it has to
+			// outlive exactly the failure it guards against: a bundled module
+			// that fails to load or throws before its mount never runs a line
+			// of its own recovery.
+			//
+			// Three promises, each a content guarantee:
+			//   .motion-fallback      the reveal pre-hide is released
+			//   data-flow-stalled     every stepper shows all of its stages
+			//   data-toggle-stalled   every toggle shows both of its panes
+			(function () {
+				var Failsafe = 0;
+
+				var Release = function () {
+					var Html = document.documentElement;
+
+					if (Html.getAttribute("data-motion-ready") !== "1") {
+						Html.classList.add("motion-fallback");
+					}
+
+					document
+						.querySelectorAll("[data-zine-flow]:not([data-flow-ready])")
+						.forEach(function (Root) {
+							Root.setAttribute("data-flow-stalled", "1");
+						});
+
+					document
+						.querySelectorAll("[data-zine-toggle]:not([data-toggle-ready])")
+						.forEach(function (Root) {
+							Root.setAttribute("data-toggle-stalled", "1");
+						});
+				};
+
+				var Arm = function () {
+					window.clearTimeout(Failsafe);
+					Failsafe = window.setTimeout(Release, 2500);
+				};
+
+				Arm();
+				document.addEventListener("astro:page-load", Arm);
+			})();
 		</script>
 
 		<!-- Meta -->
@@ -146,7 +193,7 @@ interface Props {
 		<!-- Site header (synthesized, zine skin) -->
 		<header class="sticky top-0 z-40 w-full border-b-2 border-oxblood-dark bg-soot-black/95">
 			<nav aria-label="Site" class="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-3 sm:px-8">
-				<a class="flex items-center gap-2" href="/">
+				<a class="flex items-center gap-2" href={Routes.Home}>
 					<img class="h-5 w-5" src="/Brand/aphrodite.svg" alt="" width="20" height="20" />
 					<span class="font-mono text-base font-bold tracking-widest text-bone-white"
 						>APHRODITE</span
@@ -375,31 +422,105 @@ interface Props {
 			COPIED TO SPOOL
 		</div>
 		<script>
-			// The runtimes below share one rebind pattern: a data-*-bound guard
-			// on each element, mounted now and again on every astro:page-load,
-			// with the observer-backed one torn down on astro:before-swap so a
-			// discarded page leaves nothing running.
+			// ONE MOUNT CONTRACT for the page's interactive runtimes.
+			//
+			// Every binder runs once now and again on every astro:page-load, and
+			// every listener it adds belongs to the AbortController of the
+			// current mount. astro:before-swap aborts that controller and tears
+			// the motion runtime down, so a discarded page leaves no listener,
+			// no observer and no timer behind - and the next page-load starts
+			// from a clean controller rather than on top of the old one.
+			//
+			// A per-element data-*-bound guard stays where an element can
+			// legitimately be seen twice in one mount (a binder run twice for
+			// the same DOM); it is not a substitute for the controller, because
+			// a guard cannot remove a listener.
 			import Mount, { Teardown } from "@Library/Motion";
 			import { BindPlates } from "@Script/CodePlate";
 
-			function BindCopy() {
-				for (const Element of document.querySelectorAll("[data-copy]")) {
+			/** The listeners of the current mount. Aborted before every swap. */
+			let Session: AbortController | null = null;
+
+			/** The copy toast's hide timer, so a swap cannot leave it pending. */
+			let ToastTimer = 0;
+
+			function BindCopy(Signal: AbortSignal) {
+				for (const Element of document.querySelectorAll<HTMLElement>("[data-copy]")) {
 					if (Element.dataset.copyBound) {
 						continue;
 					}
 
 					Element.dataset.copyBound = "1";
-					Element.addEventListener("click", async () => {
-						await navigator.clipboard.writeText(Element.dataset["copy"] ?? "");
+					Element.addEventListener(
+						"click",
+						async () => {
+							// A clipboard write can be refused (an insecure
+							// origin, a denied permission, no API at all). The
+							// chip is decoration on a plate whose text is still
+							// selectable, so a refusal is a warning, never a
+							// broken page.
+							try {
+								await navigator.clipboard.writeText(Element.dataset["copy"] ?? "");
+							} catch (Error) {
+								console.warn("aphrodite: the clipboard refused the copy", Error);
 
-						const Toast = document.getElementById("copy-toast");
+								return;
+							}
 
-						if (Toast) {
+							const Toast = document.getElementById("copy-toast");
+
+							if (!Toast) {
+								return;
+							}
+
 							Toast.classList.remove("hidden");
-							setTimeout(() => Toast.classList.add("hidden"), 1500);
-						}
-					});
+							window.clearTimeout(ToastTimer);
+							ToastTimer = window.setTimeout(() => Toast.classList.add("hidden"), 1500);
+						},
+						{ signal: Signal },
+					);
 				}
+			}
+
+			// The hamburger: a per-element guard (one click listener per toggle
+			// element) and exactly ONE document-level Escape listener per
+			// mount. It used to add an Escape listener per binding and never
+			// remove it, so every navigation stacked another handler on the
+			// document - each one holding a detached menu and toggle.
+			function BindNav(Signal: AbortSignal) {
+				const Toggle = document.getElementById("nav-toggle") as HTMLButtonElement | null;
+				const Menu = document.getElementById("nav-menu");
+
+				if (!Toggle || !Menu || Toggle.dataset.toggleBound) {
+					return;
+				}
+
+				Toggle.dataset.toggleBound = "1";
+
+				Toggle.addEventListener(
+					"click",
+					() => {
+						const Open = Menu.classList.contains("hidden");
+
+						Menu.classList.toggle("hidden");
+						Toggle.setAttribute("aria-expanded", String(Open));
+					},
+					{ signal: Signal },
+				);
+
+				document.addEventListener(
+					"keydown",
+					(Event) => {
+						if (Event.key !== "Escape" || Menu.classList.contains("hidden")) {
+							return;
+						}
+
+						Menu.classList.add("hidden");
+						Toggle.setAttribute("aria-expanded", "false");
+						Toggle.focus();
+					},
+					{ signal: Signal },
+				);
 			}
 
 			// The code plates are built BEFORE the copy binding: the chip they add
@@ -410,9 +531,18 @@ interface Props {
 			// because a module is missing) must never take the rest of this script
 			// down with it. A bare call in here once aborted the whole inline
 			// script and silently killed the nav toggle and the motion runtime.
-			const Binders: ReadonlyArray<() => void> = [BindPlates, BindCopy];
-
 			const BindRuntime = (): void => {
+				Session ??= new AbortController();
+
+				const { signal } = Session;
+
+				const Binders: ReadonlyArray<() => void> = [
+					BindPlates,
+					() => BindCopy(signal),
+					() => BindNav(signal),
+					Mount,
+				];
+
 				for (const Bind of Binders) {
 					try {
 						Bind();
@@ -422,48 +552,23 @@ interface Props {
 				}
 			};
 
-			BindRuntime();
 			document.addEventListener("astro:page-load", BindRuntime);
 
-			// The hamburger: same rebind pattern as the copy runtime - the
-			// view-transitions router swaps the body, so the binding re-runs on
-			// each astro:page-load under a bound guard. Escape closes the menu
-			// (and hands focus back to the toggle) when it is open.
-			function BindToggle() {
-				const Toggle = document.getElementById("nav-toggle") as HTMLButtonElement | null;
-				const Menu = document.getElementById("nav-menu");
+			// The swap: abort every listener of this mount, drop the timers and
+			// tear the motion runtime down (its observer, its running terminals
+			// and its counter generations). Teardown also clears the ready flag,
+			// so the next page's failsafe can tell its own runtime's absence
+			// from the previous page's arrival.
+			document.addEventListener("astro:before-swap", () => {
+				Session?.abort();
+				Session = null;
 
-				if (!Toggle || !Menu || Toggle.dataset.toggleBound) {
-					return;
-				}
+				window.clearTimeout(ToastTimer);
 
-				Toggle.dataset.toggleBound = "1";
+				Teardown();
+			});
 
-				Toggle.addEventListener("click", () => {
-					const Open = Menu.classList.contains("hidden");
-
-					Menu.classList.toggle("hidden");
-					Toggle.setAttribute("aria-expanded", String(Open));
-				});
-
-				document.addEventListener("keydown", (Event) => {
-					if (Event.key === "Escape" && !Menu.classList.contains("hidden")) {
-						Menu.classList.add("hidden");
-						Toggle.setAttribute("aria-expanded", "false");
-						Toggle.focus();
-					}
-				});
-			}
-
-			BindToggle();
-			document.addEventListener("astro:page-load", BindToggle);
-
-			// The motion runtime: one mount for the whole document, re-run on
-			// each page-load (the per-element bound guard makes that
-			// idempotent), torn down before the router swaps the body.
-			Mount();
-			document.addEventListener("astro:page-load", Mount);
-			document.addEventListener("astro:before-swap", Teardown);
+			BindRuntime();
 		</script>
 	</body>
 </html>

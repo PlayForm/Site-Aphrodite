@@ -9,13 +9,25 @@ import ZineFlow from "@Component/ZineFlow.astro";
 import ZineToggle from "@Component/ZineToggle.astro";
 import Related from "@Component/Related.astro";
 import ExampleCase from "@Component/ExampleCase.astro";
-import { Link, OurRepo } from "@Library/Links";
-import type { ExampleOutputLine, ExampleRecord } from "@Library/Records";
+import { Link, OurRepo, Routes } from "@Library/Links";
+import type {
+	ExampleOutcome,
+	ExampleOutputLine,
+	ExampleProvenance,
+	ExampleRecord,
+	ExampleStage,
+} from "@Library/Records";
 import Examples from "../Content/Showcase/Examples.json";
+import { RunMarker } from "@Library/Motion";
 
 // ---- The bank, typed at the annotation (the Astro compiler's frontmatter
 // parser accepts object-literal types in annotation position but not inside
-// `as` casts - probe-verified). ----
+// `as` casts - probe-verified). `provenance` is optional on purpose: an entry
+// that names its own provenance wins over the `corpus` flag, so a captured or
+// engine-verified example can be added to the data without touching this file.
+// ---- The bank is also the ONLY source for the outcome and the provenance the
+// page renders: both are read off each entry's own fields, so the page cannot
+// claim a mechanism the data does not describe. ----
 const Bank: {
 	defaults: Record<string, number | string>;
 	examples: {
@@ -23,6 +35,7 @@ const Bank: {
 		title: string;
 		category: string;
 		corpus: boolean;
+		provenance?: string;
 		raw: string | null;
 		preview: string | null;
 		marker: string | null;
@@ -35,6 +48,70 @@ const Bank: {
 	}[];
 } = Examples;
 
+// ---- THE TRAVERSALS' ONE FIXTURE. Traversal B follows a FAILING test run: its
+// first step records a non-zero exit code as the failure that feeds the
+// error-loop detector, its fourth names the type the failure was given, and its
+// last expects the poll-worker nudge for that same failed task. A
+// `[terminal:14L exit code: 0]` preview printed under those sentences described
+// a passing run - the preview, the marker and the prose could not all be true
+// of one payload. Both figures are now computed from these lines, so one
+// scenario object carries the whole traversal. ----
+
+/** `builders/terminal.rs`'s summary: the last exit-code or `Error:` line, clipped to 60. */
+const TerminalSummary = (Lines: readonly string[]): string =>
+	(
+		[...Lines].reverse().find((Line) => Line.includes("exit code:") || Line.includes("Error:")) ??
+		Lines[0] ??
+		""
+	)
+		.trim()
+		.slice(0, 60);
+
+/**
+ * `[terminal:NL <summary>]`. `Motion.ts`'s `RunPreview` mirrors the build, grep,
+ * ls, test and json arms and falls back to `[type:NL]` for every other type, so
+ * the terminal arm is mirrored here against `builders/terminal.rs` - the same
+ * helper `tools.astro` carries, so both pages print one terminal preview shape.
+ */
+const TerminalPreview = (Lines: readonly string[]): string =>
+	`[terminal:${Lines.length}L ${TerminalSummary(Lines)}]`;
+
+/** A release test run that fails: eight tests pass, one fails, and the exit code says so. */
+const FailureLines: readonly string[] = [
+	"$ cargo test --release -p aphrodite preview::builders",
+	"   Compiling aphrodite-core v0.4.2 (/workspace/crates/aphrodite-core)",
+	"   Compiling aphrodite v0.4.2 (/workspace/crates/aphrodite)",
+	"    Finished `release` profile [optimized] target(s) in 18.72s",
+	"     Running unittests src/lib.rs (/workspace/target/release/deps/aphrodite-3b81c4d9e07a2f16)",
+	"test preview::builders::build::test::build_counts_error_lines_not_occurrences ... ok",
+	"test preview::builders::build::test::build_surfaces_the_first_error_message ... ok",
+	"test preview::builders::grep::test::grep_reports_hits_and_distinct_files ... ok",
+	"test preview::builders::ls::test::ls_lists_extension_counts ... ok",
+	"test preview::builders::test::test::test_reports_pass_fail_ignored ... ok",
+	"test preview::builders::json::test::json_counts_items_and_keys ... ok",
+	"test preview::builders::terminal::test::terminal_reads_the_exit_code_line ... FAILED",
+	"test preview::builders::search::test::search_reports_hits_and_first_location ... ok",
+	"test preview::builders::code::test::code_maps_structure_and_signature ... ok",
+	"",
+	"failures:",
+	"",
+	"---- preview::builders::terminal::test::terminal_reads_the_exit_code_line stdout ----",
+	"thread 'preview::builders::terminal::test::terminal_reads_the_exit_code_line' panicked at crates/aphrodite/src/preview/builders/terminal.rs:31:9:",
+	"the summary must be the LAST exit-code line, not the first",
+	"note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace",
+	"",
+	"failures:",
+	"    preview::builders::terminal::test::terminal_reads_the_exit_code_line",
+	"",
+	"test result: FAILED. 8 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s",
+	"",
+	"error: test failed, to rerun pass `-p aphrodite --lib`",
+	"   exit code: 101",
+];
+
+const FailurePreview = TerminalPreview(FailureLines);
+const FailureMarker = RunMarker("3f9a2c7e", "terminal", FailureLines);
+
 // ---- The section label is now ZineTape's `section` variant (the site's one
 // tape shape). The traversals keep the canary accent through its `Color` prop,
 // so the page no longer carries a second class string that can drift. ----
@@ -44,7 +121,7 @@ const Bank: {
 // change to the bank (Source/Content/Showcase/Examples.json) and never a
 // change to this file. ----
 
-// The three record fields that carry markup (`Claim`, `Output`, `Marker`) are
+// The record fields that carry markup (`Claim`, `Output`, `Marker`) are
 // rendered through `set:html`, so a `<` in a compiler's own output has to be
 // escaped or the browser reads it as a tag. The ampersand goes first: escaping
 // it last would rewrite the entities the other two replacements produce.
@@ -80,22 +157,209 @@ function OutputLines(Raw: string | null): ExampleOutputLine[] {
 	}));
 }
 
-// The CCR marker contract, taken from the bank's own marker string instead of
-// rebuilt from parsed parts: <<<CCR:hash|type|size>>>.
-function MarkerLine(Marker: string | null): string {
-	const Match = Marker?.match(/<<<CCR:[^>]+>>>/);
-	return Match ? Escape(Match[0]) : "(stays raw - no marker stored)";
+// One block of text as stream lines, with the same escaping every other pane
+// gets. Used by the sequential mechanisms, whose stages are cut out of the raw
+// stream rather than authored beside it.
+function ToLines(Block: string): ExampleOutputLine[] {
+	return Block.split("\n").map((Text) => ({ Text: Escape(Text) || "&nbsp;" }));
+}
+
+// The CCR marker block, taken from the bank's own marker string instead of
+// rebuilt from parsed parts. Every line of it is rendered - the token alone is
+// the address, but the `[type: ...]` and `[meta: ...]` lines beside it are the
+// marker the agent actually sees, and dropping them would show the address
+// without the receipt.
+function MarkerBlock(Marker: string | null): string | undefined {
+	if (!Marker) {
+		return undefined;
+	}
+	return Marker.split("\n").map(Escape).join("<br />");
 }
 
 // The round-trip is the entry's command: the call the agent made. What the call
-// answers is invariant across all twenty entries, so the answer - and the
-// store's read rules - are stated once on the page, under the gallery heading,
-// instead of repeated inside every entry.
+// answers is invariant across every entry that makes one, so the answer - and
+// the store's read rules - are stated once on the page, under the gallery
+// heading, instead of repeated inside every entry.
 function CommandCode(Retrieval: { tool: string; args: { hash: string } } | null): string {
 	if (!Retrieval) {
 		return "(stays raw - no retrieval call)";
 	}
 	return `${Retrieval.tool}(hash: "${Retrieval.args.hash}")`;
+}
+
+/**
+ * The outcome an entry's own data describes. Read off the entry, never typed
+ * per example:
+ *
+ *   category `tool-relay`  -> `callback`  the relay answers once and delivers later
+ *   category `directives`  -> `injected`  an assembled prompt block, not a result
+ *   a marker in the data   -> `compressed` the output crossed a threshold
+ *   anything else          -> `passthrough` it did not, and nothing was stored
+ *
+ * The order matters: the relay entry DOES carry a marker (on its queued reply),
+ * so a marker-first test would file the callback exchange under `compressed`
+ * and lose the two deliveries that make it a different mechanism.
+ */
+function OutcomeOf(Example: {
+	category: string;
+	marker: string | null;
+}): ExampleOutcome {
+	if (Example.category === "tool-relay") {
+		return "callback";
+	}
+	if (Example.category === "directives") {
+		return "injected";
+	}
+	return Example.marker ? "compressed" : "passthrough";
+}
+
+/**
+ * Where an entry's words come from, as a claim printed in text beside the
+ * title. The bank's `corpus` flag is the authored/catalog split its own
+ * authoring rules define; an entry that names its provenance explicitly wins,
+ * and an unrecognised value falls back to the flag rather than rendering a
+ * label the page cannot explain.
+ */
+function ProvenanceOf(Example: { corpus: boolean; provenance?: string }): ExampleProvenance {
+	const Named = Example.provenance;
+	if (
+		Named === "Illustrative" ||
+		Named === "Catalog-exact" ||
+		Named === "Captured" ||
+		Named === "Engine-verified"
+	) {
+		return Named;
+	}
+	return Example.corpus ? "Catalog-exact" : "Illustrative";
+}
+
+/**
+ * The three stages of a callback exchange: the request, the immediate reply and
+ * the later delivery. The bank writes all three into ONE raw stream, separated
+ * by `--- label ---` rules, so the stages are cut from the entry's own data -
+ * the order shown is the order recorded, not an order authored here.
+ */
+function ExchangeStages(Raw: string | null): ExampleStage[] {
+	if (!Raw) {
+		return [];
+	}
+	const Stages: ExampleStage[] = [];
+	let Label = "THE REQUEST";
+	let Buffer: string[] = [];
+	const Flush = (): void => {
+		const Block = Buffer.join("\n").trim();
+		if (Block !== "") {
+			Stages.push({ Label, Lines: ToLines(Block) });
+		}
+		Buffer = [];
+	};
+	for (const Line of Raw.split("\n")) {
+		const Rule = Line.match(/^---\s*(.+?)\s*---$/);
+		if (Rule) {
+			Flush();
+			Label = Rule[1].toUpperCase();
+			continue;
+		}
+		Buffer.push(Line);
+	}
+	Flush();
+	return Stages;
+}
+
+/** The name of one block of an injected assembly, from its own first line. */
+function StageLabel(Block: string, Index: number): string {
+	if (Index === 0) {
+		return "THE ENVELOPE";
+	}
+	if (Block.startsWith("[directives:")) {
+		return "THE DIRECTIVES";
+	}
+	if (Block.startsWith("[nudge:")) {
+		return "THE NUDGES AND THE RECALL CATALOG";
+	}
+	if (Block.startsWith("[recall:")) {
+		return "THE RECALL CATALOG";
+	}
+	if (/^sections drop/i.test(Block)) {
+		return "THE DROP RULE";
+	}
+	return `SECTION ${String(Index + 1).padStart(2, "0")}`;
+}
+
+/**
+ * The ordered assembly of an injected block: the envelope, then each section in
+ * the order it lands, then the drop rule. Read from the raw stream's
+ * blank-line-separated blocks, so the order shown is the order the entry
+ * records.
+ */
+function AssemblyStages(Raw: string | null): ExampleStage[] {
+	if (!Raw) {
+		return [];
+	}
+	return Raw.split(/\n\s*\n/)
+		.map((Block) => Block.trim())
+		.filter((Block) => Block !== "")
+		.map((Block, Index) => ({ Label: StageLabel(Block, Index), Lines: ToLines(Block) }));
+}
+
+/**
+ * The search index, and it is deliberately WIDER than the visible text. A
+ * reader looking for a failure is looking for `E0432` or `EXIT:1`; one looking
+ * for a surface is looking for `aphrodite_retrieve`; one looking for a knob is
+ * looking for `terminal_threshold`; one looking for a language is looking for
+ * `.rs`. None of those appear in a title, so an index built from title, claim
+ * and preview answers "no such example" to every one of them.
+ *
+ * Every term below is READ from the entry - nothing is added that the entry
+ * does not carry - so the index cannot promise a search hit the card does not
+ * support.
+ */
+function SearchIndex(
+	Example: {
+		category: string;
+		raw: string | null;
+		note: string;
+		retrieval: {
+			tool: string;
+			args: { hash: string };
+			returns: { content: string };
+		} | null;
+	},
+	Scenario: ExampleRecord,
+): string {
+	const Raw = Example.raw ?? "";
+	const Claim = Scenario.Claim.join(" ");
+	const Terms = [
+		Scenario.Title,
+		Scenario.Label,
+		Scenario.Preview,
+		Scenario.Marker ?? "",
+		Claim,
+		Raw,
+		Example.retrieval?.tool ?? "",
+		Example.retrieval?.args.hash ?? "",
+		Example.retrieval?.returns.content ?? "",
+		// failure codes: compiler error codes, shell exit codes
+		...(Raw.match(/\bE\d{4}\b/g) ?? []),
+		...(Raw.match(/\bEXIT:\s?\d+\b/g) ?? []),
+		...(Raw.match(/\bexit code:\s?\d+/gi) ?? []),
+		// tool names, in the output and in the prose
+		...(Raw.match(/\baphrodite_[a-z_]+\b/g) ?? []),
+		...(Claim.match(/\baphrodite_[a-z_]+\b/g) ?? []),
+		// configuration keys: snake_case identifiers assigned a value
+		...(Raw.match(/^[a-z][a-z0-9_]{4,}(?=\s*=)/gm) ?? []),
+		// file extensions
+		...(Raw.match(/\.[a-z]{1,4}\b/g) ?? []),
+		// the two labels the card prints, so they are searchable as words. The
+		// passthrough chip reads "PASSED THROUGH" while the union member is one
+		// word, so that label's spelling is carried beside it - the only member
+		// whose visible wording differs from its token.
+		Scenario.Outcome === "passthrough"
+			? "passthrough passed through pass-through"
+			: (Scenario.Outcome ?? ""),
+		Scenario.Provenance ?? "",
+	];
+	return Terms.filter(Boolean).join(" ").toLowerCase();
 }
 
 // The scenario number the tape carries, computed from the entry's position so
@@ -119,32 +383,70 @@ function Roman(Value: number): string {
 	return Out;
 }
 
-const Cases: ExampleRecord[] = Bank.examples.map(
-	(Example, Index): ExampleRecord => ({
+const Cases: ExampleRecord[] = Bank.examples.map((Example, Index): ExampleRecord => {
+	const Outcome = OutcomeOf(Example);
+	return {
 		Id: Example.id,
 		N: Roman(Index + 1),
 		Label: Example.category.toUpperCase(),
 		Title: Example.title,
 		Tone: Example.corpus ? "teal" : "crimson",
-		Rotate: Index % 2 === 0 ? "rotate-[0.5deg]" : "-rotate-[0.5deg]",
+		// Twenty tilted plates is twenty emphases, so the library presentation is
+		// flat: the plate keeps the frame and the shadow plane (the site's
+		// identity) and spends its tilt nowhere. The section's one expressive
+		// assembly is the registry plate below.
+		Rotate: "",
 		Claim: Sentences(Example.note).map(Escape),
 		Command: { Lang: "text", Code: CommandCode(Example.retrieval) },
 		Output: OutputLines(Example.raw),
 		Preview: Example.preview ?? "(stays raw - no preview line)",
-		Marker: MarkerLine(Example.marker),
+		Marker: MarkerBlock(Example.marker),
+		Outcome,
+		Provenance: ProvenanceOf(Example),
+		Stages:
+			Outcome === "callback"
+				? ExchangeStages(Example.raw)
+				: Outcome === "injected"
+					? AssemblyStages(Example.raw)
+					: [],
+		Retrieval: Example.retrieval
+			? {
+					Call: CommandCode(Example.retrieval),
+					Tool: Example.retrieval.tool,
+					Hash: Example.retrieval.args.hash,
+					Found: Example.retrieval.returns.found,
+					Source: Example.retrieval.returns.source,
+					Content: Example.retrieval.returns.content,
+				}
+			: undefined,
 		Src: `SRC: Source/Content/Showcase/Examples.json · ${Example.id}`,
-	}),
-);
+	};
+});
+
+// One search key per record, computed beside it so the two cannot drift.
+const Searches: string[] = Bank.examples.map((Example, Index) => SearchIndex(Example, Cases[Index]));
 
 // The category registry for the filter bar, in first-appearance order, read off
 // the records the gallery renders so the buttons cannot list a category no
 // entry carries.
 const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCase()))];
+
+// The categories as one readable line, for the zero-result panel: a reader who
+// has filtered everything away is told what the bank actually holds.
+const CategoryList = Categories.map((Category) => Category.toUpperCase()).join(" · ");
+
+// How many entries each outcome has, so the legend states the bank's shape
+// instead of a number someone has to remember to update.
+const OutcomeCount = Cases.reduce<Record<string, number>>((Tally, Scenario) => {
+	const Key = Scenario.Outcome ?? "compressed";
+	Tally[Key] = (Tally[Key] ?? 0) + 1;
+	return Tally;
+}, {});
 ---
 
 <Base
 	Title="SHOWCASE // APHRODITE"
-	Description="The plugin in action: 20 anonymized worked examples - build, test, terminal, code, grep, git, diff, json, error, log, the tool relay, the directives, the chain split, and the threshold tiers - each showing the raw stream, the enriched preview, the retrieval round-trip and the threshold decision."
+	Description="The plugin in action: 20 anonymized worked examples - build, test, terminal, code, grep, git, diff, json, error, log, the tool relay, the directives, the chain split, and the threshold tiers - each showing what the agent saw, how the bytes came home, and why the thresholds made that decision."
 >
 	<!-- The four slots the rest of the site renders: shell, header, sections,
 	     one Related. The gallery inside them is unchanged - one Cases array,
@@ -154,124 +456,341 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 			Tape="SHOWCASE // THE PLUGIN IN ACTION"
 			Title="The plugin, worked"
 			Lead={[
-				"Every example below is a real behavior of the pipeline dressed in generic content: what the agent sends (the raw stream), what it sees back (the enriched preview), how the bytes come home (the retrieval round-trip), and why the thresholds made that decision.",
-				"All previews marked as corpus lines are byte-identical to the docs catalog; the rest are faithful fragments.",
-				"That catalog is the enriched-preview table in docs/proxy/compression.md together with the preview-form table in the repository README - both are public, so every corpus line on this page can be checked against them, character for character.",
-				"Anonymized throughout - no names, no secrets, no real sessions.",
+				"Anonymized throughout - no names, no secrets, no real sessions; every entry is a real behavior of the pipeline dressed in generic content.",
 			]}
 		/>
 
+		<!-- ============ HOW THESE EXAMPLES WERE PRODUCED ============
+		     The four introductory paragraphs lived as four equal blocks under the
+		     title, above everything a reader came for. They are all here, word for
+		     word - the fold holds the account, the one quiet line above holds the
+		     claim, and the first example is now the first thing below the fold. -->
+		<details class="group w-full border-2 border-oxblood-dark bg-carbon-void">
+			<summary
+				class="flex cursor-pointer list-none flex-wrap items-center gap-3 border-b border-transparent bg-soot-black px-4 py-3 font-mono text-base text-bone-newsprint transition-colors group-open:border-oxblood-dark hover:text-bone-white"
+			>
+				<span
+					class="border border-oxblood-dark bg-raw-blood px-2 py-0.5 font-black uppercase tracking-widest text-bone-white"
+				>
+					HOW THESE EXAMPLES WERE PRODUCED
+				</span>
+				<span class="grow font-normal text-zinc-dust">
+					provenance · what the corpus lines are checked against · the four labels
+				</span>
+				<span class="text-stamped-canary group-open:hidden" aria-hidden="true">OPEN +</span>
+				<span class="hidden text-zinc-dust group-open:inline" aria-hidden="true">CLOSE −</span>
+			</summary>
+			<div class="prose-flow p-4 sm:p-6">
+				<p class="type-body max-w-3xl text-bone-newsprint">
+					Every example is a real behavior of the pipeline dressed in generic content: what
+					the agent sends (the raw stream), what it sees back (the enriched preview), how the bytes
+					come home (the retrieval round-trip), and why the thresholds made that decision.
+				</p>
+				<p class="type-body max-w-3xl text-bone-newsprint">
+					All previews marked as corpus lines are byte-identical to the docs catalog; the rest are
+					faithful fragments.
+				</p>
+				<p class="type-body max-w-3xl text-bone-newsprint">
+					That catalog is the enriched-preview table in
+					<code class="type-code text-weathered-teal">docs/proxy/compression.md</code> together with
+					the preview-form table in the repository README - both are public, so every corpus line can
+					be checked against them, character for character.
+				</p>
+				<p class="type-body max-w-3xl text-bone-newsprint">
+					Anonymized throughout - no names, no secrets, no real sessions.
+				</p>
+
+				<div class="border-t border-oxblood-dark pt-6">
+					<p class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+						THE FOUR PROVENANCE LABELS
+					</p>
+					<p class="type-body mt-3 max-w-3xl text-bone-newsprint">
+						"Anonymized" and "illustrative" are not the same claim, so every entry names its own
+						provenance in text beside its title. Colour reinforces the label; it never carries the
+						distinction on its own.
+					</p>
+					<ul class="mt-5 flex flex-col gap-3">
+						<li class="border-l-2 border-weathered-teal pl-4">
+							<span class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal"
+								>Catalog-exact</span
+							>
+							<span class="type-body block text-bone-newsprint"
+								>- the preview line is byte-identical to the documented enriched-preview catalog,
+								so it can be checked character for character.</span
+							>
+						</li>
+						<li class="border-l-2 border-zinc-dust pl-4">
+							<span class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
+								>Illustrative</span
+							>
+							<span class="type-body block text-bone-newsprint"
+								>- authored: a faithful fragment of the shape with varied generic numbers, not a
+								capture and not a catalog line.</span
+							>
+						</li>
+						<li class="border-l-2 border-stamped-canary pl-4">
+							<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary"
+								>Captured</span
+							>
+							<span class="type-body block text-bone-newsprint"
+								>- recorded from a real run and then anonymized. No entry claims it
+								today; the label exists so a real capture can be published without being called
+								illustrative.</span
+							>
+						</li>
+						<li class="border-l-2 border-bone-white pl-4">
+							<span class="font-mono text-base font-black uppercase tracking-widest text-bone-white"
+								>Engine-verified</span
+							>
+							<span class="type-body block text-bone-newsprint"
+								>- checked against a named engine version, so the behavior is pinned to a release
+								rather than to a reading of the code.</span
+							>
+						</li>
+					</ul>
+				</div>
+
+				<div class="border-t border-oxblood-dark pt-6">
+					<p class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+						THE FOUR OUTCOMES
+					</p>
+					<p class="type-body mt-3 max-w-3xl text-bone-newsprint">
+						An example says how its bytes reached the transcript, because four different mechanisms
+						that render identically are four mechanisms a reader cannot tell apart. The counts are
+						read off the bank.
+					</p>
+					<ul class="mt-5 flex flex-col gap-3">
+						<li class="border-l-2 border-stamped-canary pl-4">
+							<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary"
+								>Compressed · {OutcomeCount.compressed ?? 0}</span
+							>
+							<span class="type-body block text-bone-newsprint"
+								>- the output crossed the surface's threshold: hashed, stored, and replaced by a
+								preview line plus a marker.</span
+							>
+						</li>
+						<li class="border-l-2 border-weathered-teal pl-4">
+							<span class="font-mono text-base font-black uppercase tracking-widest text-weathered-teal"
+								>Passed through · {OutcomeCount.passthrough ?? 0}</span
+							>
+							<span class="type-body block text-bone-newsprint"
+								>- under the threshold, or stopped by a skip gate: the bytes reach the transcript
+								unchanged and nothing is stored.</span
+							>
+						</li>
+						<li class="border-l-2 border-bone-newsprint pl-4">
+							<span class="font-mono text-base font-black uppercase tracking-widest text-bone-newsprint"
+								>Injected · {OutcomeCount.injected ?? 0}</span
+							>
+							<span class="type-body block text-bone-newsprint"
+								>- never a tool result: behavioural text assembled in a fixed order and placed into
+								the prompt.</span
+							>
+						</li>
+						<li class="border-l-2 border-raw-blood pl-4">
+							<span class="font-mono text-base font-black uppercase tracking-widest text-bone-white"
+								>Callback · {OutcomeCount.callback ?? 0}</span
+							>
+							<span class="type-body block text-bone-newsprint"
+								>- a relay call that answers immediately and delivers the real result later, at a
+								callback URL.</span
+							>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</details>
+
 		<SectionNav
 			Sections={[
-				{ Id: "defaults", Label: "DEFAULTS" },
-				{ Id: "registry", Label: "REGISTRY" },
 				{ Id: "examples", Label: "EXAMPLES" },
+				{ Id: "registry", Label: "REGISTRY" },
+				{ Id: "defaults", Label: "DEFAULTS" },
 				{ Id: "traversals", Label: "TRAVERSALS" },
 				{ Id: "deeper", Label: "GO DEEPER" },
 			]}
 		/>
 
-		<!-- THE DEFAULTS IN PLAY -->
-		<section id="defaults" class="relative w-full scroll-mt-24" data-reveal>
-			<ZineTape Variant="section" Label="THE DEFAULTS // APHRODITE.TOML" />
-			<ZineBox Tone="crimson" Rotate="rotate-[0.8deg]" Wipe>
-				<p class="font-mono text-base leading-loose text-bone-newsprint">
-					{Object.entries(Bank.defaults).map(([Key, Value]) => (
-						<span class="mr-6 inline-block whitespace-nowrap">
-							<span class="text-zinc-dust">{Key}</span>
-							<span class="text-weathered-teal"> = {String(Value)}</span>
-						</span>
-					))}
-				</p>
-				<p class="mt-6 border-t border-oxblood-dark pt-4 font-body text-base leading-relaxed text-bone-newsprint">
-					These seven numbers decide every example below.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					It is the reason compression is never a judgment call: it is a byte count against
-					the surface's threshold, and the essential tools plus the
-					<code class="font-mono text-base text-weathered-teal">aphrodite_*</code>
-					tools themselves are always raw regardless of size.
-				</p>
-			</ZineBox>
-		</section>
-
-		<!-- FILTER BAR -->
-		<section id="registry" class="relative w-full scroll-mt-24" data-registry data-reveal>
-			<ZineTape Variant="section" Label="THE REGISTRY // FILTER BY CATEGORY, SEARCH BY KEYWORD" />
-			<ZineBox Tone="crimson" Rotate="-rotate-[0.6deg]" Wipe>
-				<div class="flex flex-wrap items-center gap-2" data-filters>
-					<button
-						type="button"
-						data-filter="*"
-						class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
-					>
-						ALL · {Bank.examples.length}
-					</button>
-					{Categories.map((Category) => (
-						<button
-							type="button"
-							data-filter={Category}
-							class="border-2 border-black bg-soot-black px-3 py-1 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust shadow-[2px_2px_0px_#000] transition-colors hover:text-bone-white"
-						>
-							{Category}
-						</button>
-					))}
-				</div>
-				<input
-					type="search"
-					placeholder="SEARCH THE EXAMPLES..."
-					aria-label="Search the examples"
-					data-search
-					class="mt-5 w-full border-2 border-oxblood-dark bg-soot-black px-4 py-2 font-mono text-base tracking-widest text-bone-white placeholder:text-zinc-dust focus:border-weathered-teal focus:outline-none"
-				/>
-				<p class="mt-4 font-mono text-base tracking-widest text-zinc-dust" data-count>
-					SHOWING {Bank.examples.length} OF {Bank.examples.length}
-				</p>
-			</ZineBox>
-		</section>
-
-		<!-- THE EXAMPLES // ONE SHAPE EACH -->
+		<!-- ============ THE EXAMPLES // FIRST, BECAUSE THEY ARE THE ARGUMENT ============
+		     The configuration and the methodology used to sit above this list: a
+		     reader met seven numbers and five paragraphs before the first worked
+		     example. The examples come first now, and everything that explains
+		     them follows - in folds, word for word. -->
 		<section id="examples" class="relative flex w-full scroll-mt-24 flex-col" data-examples data-reveal>
 			<div class="w-full">
-				<ZineTape Variant="section" Label="THE EXAMPLES // ONE SHAPE EACH" />
-				<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-					{Bank.examples.length} worked examples
-				</h2>
-				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					A teal tape marks a corpus-exact preview; a blood-red one marks a faithful
-					fragment.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Every retrieval answers the same way:
-				</p>
-				<p class="mt-3 max-w-3xl font-mono text-base leading-relaxed text-bone-newsprint">
-					→ {'{ found: true, source: "ccr", content: the original bytes, byte-for-byte }'}
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Reads are workspace-confined and capped at 10 MiB; a hash resolves
-					only by exact match - truncated hashes never resolve.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Every entry below is the same argument in a different costume: the raw output
-					prints line by line on the left, the preview lands on the right once the last
-					line has finished, and the marker underneath it is the address of everything
-					the left column did not have to buy.
+				<ZineTape Variant="section" Label="THE EXAMPLES // ONE RECORD SHAPE, FOUR MECHANISMS" />
+				<h2 class="type-section uppercase text-bone-white">{Bank.examples.length} worked examples</h2>
+				<p class="prose-flow mt-6 max-w-3xl type-body text-bone-newsprint">
+					Each entry names the mechanism that carried its bytes - compressed, passed through,
+					injected or delivered by callback - and each one opens to the full output, the retrieval
+					call and answer, the threshold decision and its source.
 				</p>
 			</div>
-			<div class="mt-24 flex w-full flex-col gap-28 lg:gap-36">
+
+			<!-- ============ THE REGISTRY // THE SECTION'S ONE EXPRESSIVE ASSEMBLY ============ -->
+			<div id="registry" class="mt-14 w-full scroll-mt-24" data-registry>
+				<p class="section-kicker">THE REGISTRY // FILTER BY CATEGORY, SEARCH BY KEYWORD</p>
+				<ZineBox Tone="crimson" Rotate="-rotate-[0.6deg]" Wipe Class="mt-4">
+					<div class="flex flex-wrap items-center gap-2" data-filters>
+						<button
+							type="button"
+							data-filter="*"
+							aria-pressed="true"
+							class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+						>
+							ALL · {Bank.examples.length}
+						</button>
+						{Categories.map((Category) => (
+							<button
+								type="button"
+								data-filter={Category}
+								aria-pressed="false"
+								class="border-2 border-black bg-soot-black px-3 py-1 font-mono text-base font-bold uppercase tracking-widest text-zinc-dust shadow-[2px_2px_0px_#000] transition-colors hover:text-bone-white"
+							>
+								{Category}
+							</button>
+						))}
+					</div>
+					<input
+						type="search"
+						placeholder="SEARCH THE EXAMPLES..."
+						aria-label="Search the examples"
+						aria-describedby="registry-scope"
+						data-search
+						class="mt-5 w-full border-2 border-oxblood-dark bg-soot-black px-4 py-2 font-mono text-base tracking-widest text-bone-white placeholder:text-zinc-dust focus:border-weathered-teal focus:outline-none"
+					/>
+					<p id="registry-scope" class="mt-3 font-mono text-base leading-relaxed text-zinc-dust">
+						SEARCH READS: TITLE · CATEGORY · CLAIM · PREVIEW · RAW OUTPUT · RETRIEVAL CALL · ERROR
+						CODES · TOOL NAMES · CONFIGURATION KEYS · FILE EXTENSIONS
+					</p>
+					<p
+						role="status"
+						aria-live="polite"
+						class="mt-4 font-mono text-base tracking-widest text-bone-white"
+						data-count
+					>
+						SHOWING {Bank.examples.length} OF {Bank.examples.length}
+					</p>
+
+					<!-- THE ZERO-RESULT STATE // rendered always, shown only when the count
+					     reaches zero, so the filter can explain itself instead of leaving
+					     an empty page with no way back. -->
+					<div data-empty class="mt-6 hidden border-2 border-oxblood-dark bg-soot-black p-5">
+						<p class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+							NOTHING MATCHES
+						</p>
+						<p class="type-body mt-3 max-w-3xl text-bone-newsprint">
+							No example in the bank matches <span class="text-bone-white" data-empty-query
+								>this filter</span
+							>. The bank holds {Bank.examples.length} entries across {Categories.length}
+							categories - {CategoryList} - so a narrower word is usually the problem, not a missing
+							example.
+						</p>
+						<button
+							type="button"
+							data-reset
+							class="mt-5 border-2 border-black bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
+						>
+							RESET THE FILTER
+						</button>
+					</div>
+				</ZineBox>
+			</div>
+
+			<!-- THE GALLERY // ONE RECORD SHAPE, FOUR MECHANISMS -->
+			<div class="mt-20 flex w-full flex-col gap-20 lg:gap-28">
 				{
 					Cases.map((Scenario, Index) => (
 						<div
 							data-example
 							data-category={Scenario.Label.toLowerCase()}
-							data-search={`${Scenario.Title} ${Scenario.Label} ${Scenario.Preview} ${Scenario.Claim.join(" ")}`.toLowerCase()}
+							data-outcome={Scenario.Outcome}
+							data-provenance={Scenario.Provenance}
+							data-search={Searches[Index]}
 							class={`w-full lg:w-11/12 ${Index % 2 === 0 ? "lg:self-start" : "lg:self-end"}`}
 						>
-							<ExampleCase {...Scenario} Reveal Stream />
+							<ExampleCase {...Scenario} Reveal Stream Library Defaults={Bank.defaults} />
 						</div>
 					))
 				}
 			</div>
+
+			<!-- ============ THE METHODOLOGY // MOVED BELOW THE EXAMPLES, WORD FOR WORD ============ -->
+			<details class="group mt-24 w-full border-2 border-oxblood-dark bg-carbon-void">
+				<summary
+					class="flex cursor-pointer list-none flex-wrap items-center gap-3 border-b border-transparent bg-soot-black px-4 py-3 font-mono text-base text-bone-newsprint transition-colors group-open:border-oxblood-dark hover:text-bone-white"
+				>
+					<span
+						class="border border-oxblood-dark bg-raw-blood px-2 py-0.5 font-black uppercase tracking-widest text-bone-white"
+					>
+						HOW TO READ THESE EXAMPLES
+					</span>
+					<span class="grow font-normal text-zinc-dust">
+						the tape colours · the one answer every retrieval gives · the read rules · what the two
+						panes are
+					</span>
+					<span class="text-stamped-canary group-open:hidden" aria-hidden="true">OPEN +</span>
+					<span class="hidden text-zinc-dust group-open:inline" aria-hidden="true">CLOSE −</span>
+				</summary>
+				<div class="prose-flow p-4 sm:p-6">
+					<p class="type-body max-w-3xl text-bone-newsprint">
+						A teal tape marks a corpus-exact preview; a blood-red one marks a faithful fragment.
+					</p>
+					<p class="type-body max-w-3xl text-bone-newsprint">Every retrieval answers the same way:</p>
+					<p class="type-code max-w-3xl text-bone-newsprint">
+						→ {'{ found: true, source: "ccr", content: the original bytes, byte-for-byte }'}
+					</p>
+					<p class="type-body max-w-3xl text-bone-newsprint">
+						Reads are workspace-confined and capped at 10 MiB; a hash resolves only by exact match -
+						truncated hashes never resolve.
+					</p>
+					<p class="type-body max-w-3xl text-bone-newsprint">
+						Every entry is the same argument in a different costume: the raw output prints
+						line by line on the left, the preview lands on the right once the last line has
+						finished, and the marker underneath it is the address of everything the left column did
+						not have to buy.
+					</p>
+				</div>
+			</details>
+		</section>
+
+		<!-- ============ THE DEFAULTS IN PLAY // BELOW THE EXAMPLES, IN A FOLD ============ -->
+		<section id="defaults" class="relative w-full scroll-mt-24" data-reveal>
+			<details class="group w-full border-2 border-oxblood-dark bg-carbon-void">
+				<summary
+					class="flex cursor-pointer list-none flex-wrap items-center gap-3 border-b border-transparent bg-soot-black px-4 py-3 font-mono text-base text-bone-newsprint transition-colors group-open:border-oxblood-dark hover:text-bone-white"
+				>
+					<span
+						class="border border-oxblood-dark bg-raw-blood px-2 py-0.5 font-black uppercase tracking-widest text-bone-white"
+					>
+						THE DEFAULTS // APHRODITE.TOML
+					</span>
+					<span class="grow font-normal text-zinc-dust">
+						the seven numbers every decision was made against
+					</span>
+					<span class="text-stamped-canary group-open:hidden" aria-hidden="true">OPEN +</span>
+					<span class="hidden text-zinc-dust group-open:inline" aria-hidden="true">CLOSE −</span>
+				</summary>
+				<div class="p-4 sm:p-6">
+					<p class="font-mono text-base leading-loose text-bone-newsprint">
+						{Object.entries(Bank.defaults).map(([Key, Value]) => (
+							<span class="mr-6 inline-block whitespace-nowrap">
+								<span class="text-zinc-dust">{Key}</span>
+								<span class="text-weathered-teal"> = {String(Value)}</span>
+							</span>
+						))}
+					</p>
+					<p class="mt-6 border-t border-oxblood-dark pt-4 font-body text-base leading-relaxed text-bone-newsprint">
+						These seven numbers decide every example above.
+					</p>
+					<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+						It is the reason compression is never a judgment call: it is a byte count against the
+						surface's threshold, and the essential tools plus the
+						<code class="font-mono text-base text-weathered-teal">aphrodite_*</code>
+						tools themselves are always raw regardless of size.
+					</p>
+				</div>
+			</details>
 		</section>
 
 		<!-- THE TRAVERSALS: the interactive flows, agent view vs system path -->
@@ -282,9 +801,7 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 		>
 			<div class="w-full">
 				<ZineTape Variant="section" Color="canary" Label="THE TRAVERSALS // AGENT-VIEW vs SYSTEM-PATH, STEP BY STEP" />
-				<h2 class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl">
-					The traversals
-				</h2>
+				<h2 class="type-section uppercase text-bone-white">The traversals</h2>
 				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The five pipelines above are worked examples; these are the pipes they run
 					through.
@@ -383,11 +900,13 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 							Agent: [
 								"the tool output is now a preview line plus a marker - roughly fifteen tokens",
 								"» [build:1E 1W 142L | error[E0432]: unresolved import ...]",
-								"» <<<CCR:abc123|build_error|67097>>>",
+								"» <<<CCR:abc12345|build_error|48213>>>",
 								"· the 48,213 characters are gone from the transcript - retrievable by hash",
 							],
 							System: [
 								"Hermes swaps the tool output for the marker; the transcript carries hash, type, size instead of the bytes",
+								"the third field is the UTF-8 byte count of the bytes the hash addresses - 48,213 here, the same number as the character count because a compiler log is ASCII, and the same number a retrieval puts back",
+								"the hash is a BLAKE3 digest, so the marker carries at least its first eight hex digits; a shorter one is a display truncation and would not resolve",
 							],
 							Anchor: Link(OurRepo, "docs/plugin/hooks.md"),
 							AnchorLabel: "hooks.md:89-91",
@@ -396,7 +915,7 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 							Title: "DECIDE / RETRIEVE",
 							Agent: [
 								"the agent - not the engine - spends the budget: call aphrodite_retrieve only if the preview did not answer the question",
-								"» aphrodite_retrieve(hash: \"abc123...\")",
+								"» aphrodite_retrieve(hash: \"abc12345...\")",
 								"→ { found: true, source: \"ccr\", content: the original bytes, truncated: false }",
 							],
 							System: [
@@ -454,7 +973,8 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 							Title: "CLASSIFY",
 							Agent: [
 								"a failed run is named terminal - the type keeps errors visible longest",
-								"» [terminal:14L exit code: 0]",
+								`» ${FailurePreview}`,
+								"· the exit code reads 101, not 0: this is the failing run the traversal follows, and the summary line reports the failure the type was chosen for",
 							],
 							System: [
 								"output containing 'exit code:' or 'Error:' is typed terminal; other output gets the normal content-type detection with the same semantic upgrade as tool results",
@@ -466,6 +986,7 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 							Title: "STORE + THE NUDGE LOOP",
 							Agent: [
 								"next turn opens with a nudge, not a surprise",
+								`» ${FailureMarker}`,
 								"→ a poll-worker status nudge for the failed task surfaces at the next pre_llm_call",
 							],
 							System: [
@@ -489,7 +1010,7 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 							Title: "THE CALL",
 							Agent: [
 								"the agent hands back the marker it kept - or just the hash",
-								"» aphrodite_retrieve(hash: \"abc123...\")",
+								"» aphrodite_retrieve(hash: \"abc12345...\")",
 								"· truncated hashes never resolve - exact match only",
 							],
 							System: [
@@ -689,7 +1210,7 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 
 			<!-- The truthful context engine pane -->
 			<div class="w-full lg:w-10/12 lg:self-end" data-reveal>
-				<ZineBox Tone="crimson" Rotate="-rotate-[0.5deg]" Wipe>
+				<ZineBox Tone="crimson" Wipe>
 					<ZineTape Label="THE CONTEXT ENGINE // WHAT IT DOES NOT DO" Color="teal" Side="left" />
 					<h3 class="mt-4 font-headline text-xl font-black uppercase text-bone-white sm:text-2xl">
 						Compress returns the transcript unchanged
@@ -760,25 +1281,25 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 			<ZineBox Tone="crimson" Rotate="rotate-[-0.8deg]" Wipe>
 				<ul class="grid gap-5 font-body text-base text-bone-newsprint sm:grid-cols-2">
 					<li class="border-l-4 border-weathered-teal pl-4">
-						<a class="font-bold text-bone-white underline decoration-raw-blood" href="/tools/"
+						<a class="font-bold text-bone-white underline decoration-raw-blood" href={Routes.Tools}
 							>THE THIRTEEN TOOLS</a
 						>
-						- the registry behind every retrieval chip above.
+						- the registry behind every retrieval chip.
 					</li>
 					<li class="border-l-4 border-weathered-teal pl-4">
-						<a class="font-bold text-bone-white underline decoration-raw-blood" href="/workbench/"
+						<a class="font-bold text-bone-white underline decoration-raw-blood" href={Routes.Workbench}
 							>THE WORKBENCH</a
 						>
-						- paste your own output and watch the preview build live.
+						- run any tool output through the preview pipeline yourself.
 					</li>
 					<li class="border-l-4 border-weathered-teal pl-4">
-						<a class="font-bold text-bone-white underline decoration-raw-blood" href="/plugin/"
+						<a class="font-bold text-bone-white underline decoration-raw-blood" href={Routes.Plugin}
 							>THE HOOK CHAIN</a
 						>
 						- where in the turn each raw stream was classified.
 					</li>
 					<li class="border-l-4 border-weathered-teal pl-4">
-						<a class="font-bold text-bone-white underline decoration-raw-blood" href="/plugin/"
+						<a class="font-bold text-bone-white underline decoration-raw-blood" href={Routes.Plugin}
 							>THE PLUGIN</a
 						>
 						- the shim and the dylib that make all of it run.
@@ -803,20 +1324,54 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 	// ---- The registry filter: category buttons + keyword search over the
 	// server-rendered example modules. The examples' search keys arrive by DOM
 	// (data-search attributes), so no JSON island is needed here. ----
+	//
+	// The filter is STATE, so it says so: `aria-pressed` on the category
+	// buttons, a `role="status"` count that announces itself, a zero-result
+	// panel that explains the bank instead of leaving an empty page, and the
+	// filter and the query in the URL so a filtered view is a link someone can
+	// send. Every one of those is a degradation of the same variable - a reader
+	// who never touches the filter sees the unfiltered page.
 	function BindRegistry() {
-		const Root = document.querySelector("[data-registry]");
+		const Root = document.querySelector<HTMLElement>("[data-registry]");
 		if (!Root || Root.dataset.registryBound) {
 			return;
 		}
 		Root.dataset.registryBound = "1";
 
 		const Modules = Array.from(document.querySelectorAll<HTMLElement>("[data-example]"));
-		const Counter = Root.querySelector("[data-count]");
+		const Counter = Root.querySelector<HTMLElement>("[data-count]");
 		const Search = Root.querySelector<HTMLInputElement>("[data-search]");
 		const Buttons = Array.from(Root.querySelectorAll<HTMLButtonElement>("[data-filter]"));
+		const Empty = Root.querySelector<HTMLElement>("[data-empty]");
+		const EmptyQuery = Root.querySelector<HTMLElement>("[data-empty-query]");
+		const Reset = Root.querySelector<HTMLButtonElement>("[data-reset]");
 		let Category = "*";
 
-		const Apply = () => {
+		/** The zero-result panel names what was asked for, in the reader's words. */
+		const Describe = (Needle: string): string => {
+			const Quoted = (Search?.value ?? "").trim();
+			if (Quoted !== "") {
+				return `"${Quoted}"`;
+			}
+			if (Needle === "*") {
+				return "this filter";
+			}
+			return `the "${Needle}" category`;
+		};
+
+		/** Paint the pressed state on every button: the class AND the attribute. */
+		const Paint = (Active: HTMLButtonElement | undefined): void => {
+			for (const Button of Buttons) {
+				const On = Button === Active;
+				Button.setAttribute("aria-pressed", On ? "true" : "false");
+				Button.classList.toggle("bg-raw-blood", On);
+				Button.classList.toggle("text-bone-white", On);
+				Button.classList.toggle("bg-soot-black", !On);
+				Button.classList.toggle("text-zinc-dust", !On);
+			}
+		};
+
+		const Apply = (Write: boolean): void => {
 			const Needle = (Search?.value ?? "").trim().toLowerCase();
 			let Visible = 0;
 			for (const Module of Modules) {
@@ -824,28 +1379,70 @@ const Categories = [...new Set(Cases.map((Scenario) => Scenario.Label.toLowerCas
 				const MatchSearch = Needle === "" || (Module.dataset.search ?? "").includes(Needle);
 				const Show = MatchCategory && MatchSearch;
 				Module.classList.toggle("hidden", !Show);
-				if (Show) Visible += 1;
+				if (Show) {
+					Visible += 1;
+				}
 			}
 			if (Counter) {
 				Counter.textContent = `SHOWING ${Visible} OF ${Modules.length}`;
+			}
+			if (Empty) {
+				Empty.classList.toggle("hidden", Visible > 0);
+			}
+			if (EmptyQuery) {
+				EmptyQuery.textContent = Describe(Category);
+			}
+			if (Write) {
+				// The URL is the state: a filtered view is a link someone can send.
+				const Next = new URLSearchParams();
+				if (Category !== "*") {
+					Next.set("category", Category);
+				}
+				if ((Search?.value ?? "").trim() !== "") {
+					Next.set("q", (Search?.value ?? "").trim());
+				}
+				const Query = Next.toString();
+				window.history.replaceState(
+					null,
+					"",
+					`${window.location.pathname}${Query === "" ? "" : `?${Query}`}`,
+				);
 			}
 		};
 
 		for (const Button of Buttons) {
 			Button.addEventListener("click", () => {
 				Category = Button.dataset.filter ?? "*";
-				for (const Other of Buttons) {
-					const Active = Other === Button;
-					Other.classList.toggle("bg-raw-blood", Active);
-					Other.classList.toggle("text-bone-white", Active);
-					Other.classList.toggle("bg-soot-black", !Active);
-					Other.classList.toggle("text-zinc-dust", !Active);
-				}
-				Apply();
+				Paint(Button);
+				Apply(true);
 			});
 		}
 
-		Search?.addEventListener("input", Apply);
+		Search?.addEventListener("input", () => Apply(true));
+
+		Reset?.addEventListener("click", () => {
+			Category = "*";
+			if (Search) {
+				Search.value = "";
+			}
+			Paint(Buttons.find((Button) => Button.dataset.filter === "*"));
+			Apply(true);
+			Search?.focus();
+		});
+
+		// A shared link opens in the state it was shared in. An unknown category
+		// falls back to ALL rather than to an empty page.
+		const Wanted = new URLSearchParams(window.location.search);
+		const Shared = Wanted.get("category");
+		const Start =
+			Buttons.find((Button) => Button.dataset.filter === Shared) ??
+			Buttons.find((Button) => Button.dataset.filter === "*");
+		Category = Start?.dataset.filter ?? "*";
+		if (Search) {
+			Search.value = Wanted.get("q") ?? "";
+		}
+		Paint(Start);
+		Apply(false);
 	}
 
 	BindRegistry();

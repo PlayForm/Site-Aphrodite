@@ -1,45 +1,59 @@
 ---
 import type { InternalLink } from "@Library/Links";
 
+/**
+ * NEXT STEPS - the continuation module at the foot of a page.
+ *
+ * It used to be RELATED: a flat row of destination names, framed like
+ * everything else on the page, which a reader could only use if they already
+ * knew why they would want any of them. A next step carries its REASON: one
+ * line saying what the reader gets by continuing, written by the page's
+ * author. A link without a reason still renders - the sixteen pages that pass
+ * a plain `InternalLink[]` keep working unchanged - but a page that wants the
+ * module to mean something gives each step its `Reason`.
+ *
+ * The frame is deliberately quiet (a single hairline rule, no plate, no
+ * shadow, no tape): this is the last thing on a page, and the reader has
+ * already been carried by whatever expressive assembly the page spent.
+ */
 interface Props {
-	/** The natural neighbors of the page - truthful links only, never forced. */
-	Links?: InternalLink[];
+	/** The natural neighbours of the page - truthful links only, never forced. */
+	Links?: (InternalLink & { Reason?: string })[];
+
+	/** The module's heading. Overridable so a surface can name its own verb. */
+	Title?: string;
 }
 
-const { Links = [] } = Astro.props;
+const { Links = [], Title = "NEXT STEPS" } = Astro.props;
 
-// A page without neighbors renders NO module: an empty RELATED plate is a
+// A page without neighbors renders NO module: an empty NEXT STEPS plate is a
 // promise the page cannot keep. Links missing a destination are dropped for
 // the same reason - the box only ever ships targets that resolve.
 const Entries = Links.filter(({ Href, Label }) => Boolean(Href) && Boolean(Label));
 ---
 
-<!-- RELATED module: the cross-link web node. Rendered at the foot of each
-     page's content; the links are the page's natural neighbors, curated
-     per page from the registry. -->
 {
 	Entries.length > 0 && (
 		<nav
-			aria-label="Related pages"
-			class="relative w-full border-2 border-oxblood-dark bg-asphalt-panel p-5"
+			aria-label="Next steps"
+			class="w-full border-t border-oxblood-dark pt-6"
 		>
-			<div class="mb-3 flex items-center gap-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-				<span class="h-2 w-2 bg-raw-blood" />
-				RELATED
-			</div>
-			<div class="flex flex-wrap gap-x-6 gap-y-2">
+			<p class="type-meta uppercase tracking-widest text-zinc-dust">{Title}</p>
+			<ul class="mt-3 flex flex-col gap-4">
 				{Entries.map((Link) => (
-					<a
-						class="font-mono text-base tracking-widest text-zinc-dust transition-colors hover:text-bone-white"
-						href={Link.Href}
-					>
-						<span class="text-oxblood-dark" aria-hidden="true">
-							■
-						</span>
-						{Link.Label}
-					</a>
+					<li class="flex flex-col gap-1">
+						<a
+							class="w-fit font-mono text-base text-bone-white underline decoration-stamped-canary decoration-2 underline-offset-4 transition-colors hover:bg-raw-blood hover:text-bone-white"
+							href={Link.Href}
+						>
+							{Link.Label}
+						</a>
+						{Link.Reason && (
+							<p class="type-caption max-w-[62ch] text-zinc-dust">{Link.Reason}</p>
+						)}
+					</li>
 				))}
-			</div>
+			</ul>
 		</nav>
 	)
 }

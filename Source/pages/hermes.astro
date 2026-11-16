@@ -13,15 +13,15 @@ import { ToolNames } from "@Library/Roster";
 
 const Previews = [
 	"[build:1E 1W 142L | error[E0432]: unresolved import ...]",
-	"[diff:2F +7/-3 12L | src/main.rs Cargo.toml +N more]",
-	"[git:2M 2A 1D 3?? | src/x.rs src/y.rs +5 more]",
+	"[diff:4F +7/-3 12L | src/main.rs Cargo.toml +2 more]",
+	"[git:2M 2A 1D 3?? | src/x.rs src/y.rs +6 more]",
 	"[gitlog:2 commits | abc1234 fix... → def5678 feat...]",
-	"[ls:3 files 2 dirs | .rs x2 .md x1]",
+	"[ls:3 files 2 dirs | .rs×2 .md×1]",
 	"[test:220 pass 0 fail 1 ignored | 0.31s]",
 	"[grep:4 hits in 3 files | src/preview.rs:12 ...]",
-	"[code:3fns 2structs fn main() 414L]",
-	"[search:Nhits ML]",
-	"[json:5 items 3L]",
+	"[code:3fns|2structs fn main() 414L]",
+	"[search:4 hits in 3 files | src/x.rs:12 ...]",
+	"[json:5items 3L]",
 	"[terminal:14L exit code: 0]",
 	"[text:3L 50B | some unrecognizable prose here]",
 ];
@@ -228,6 +228,19 @@ const ProxyRows = [
 						</div>
 					))}
 				</div>
+				<p class="mt-8 font-body text-base leading-relaxed text-bone-newsprint">
+					Each line is the format string its own arm prints, character for character: the
+					tallies come first, then whatever the arm could add about them. The extension
+					counts in an <code class="font-mono text-base text-weathered-teal">ls</code> line
+					are joined with <code class="font-mono text-base text-weathered-teal">×</code>
+					rather than a letter x, a JSON item count is set tight against the word it counts
+					(<code class="font-mono text-base text-weathered-teal">5items</code>), a code map
+					joins its structure parts with a pipe, and a search line reports hits, distinct
+					files and the first match location. The numbers are representative; the shapes
+					are the code's, which is what makes them checkable against
+					<code class="font-mono text-base text-weathered-teal">preview/builders/*.rs</code>
+					rather than taken on trust.
+				</p>
 				<div class="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-2">
 					<div>
 						<div class="mb-6 text-base font-black uppercase tracking-widest text-zinc-dust">
@@ -243,10 +256,13 @@ const ProxyRows = [
 							WITH NATIVE INTEGRATION:
 						</div>
 						<div class="border border-oxblood-dark bg-asphalt-panel p-4 font-mono text-base">
-							<span class="text-bone-white">[build:0E 0W 1L]</span>
+							<span class="text-bone-white">[build:0E 0W 44L]</span>
 							<span class="text-zinc-dust">
 								{" "}
-								← a few tokens. The agent knows: build passed.
+								← a few tokens. The agent knows: build passed. The line count is the same
+								log the left pane spends 500 tokens on: five hundred tokens is about two
+								thousand characters, which is what forty-four lines of compiler output
+								measure.
 							</span>
 						</div>
 					</div>

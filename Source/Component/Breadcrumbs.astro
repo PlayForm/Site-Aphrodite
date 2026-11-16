@@ -7,6 +7,25 @@ import { DocsTrail } from "./DocsSidebar.astro";
 // the sidebar renders (DocsSidebar's DocsTrail), so a crumb can never name a
 // page the rail does not show in that position. Every other route resolves
 // through the link registry, which is where its own page lives.
+//
+// The trail says WHERE you are. The line under it says WHAT this shelf is for:
+// the registry's `Promise` for the page you are on, with the registry's group
+// as its kicker - so the header, the footer and this trail all read the same
+// two fields from the same entry instead of each phrasing the distinction
+// themselves. That matters most for the two confusable pairs (EXAMPLES vs
+// SHOWCASE, HERMES vs PLUGIN), where the only thing separating them was the
+// site's internal taxonomy.
+//
+// The line under the trail is PROSE, so it reads at `type-body` and never at
+// `type-caption`. A page's only description of itself set at 13.5px on
+// soot-black is under the floor at which a line resolves without effort, and a
+// description rendered like a caption reads as a footnote to the thing it is
+// supposed to introduce - the reader skips the one sentence that says what the
+// page is for. The group stays at `type-meta`: promoting the sentence is what
+// CREATES the gap between the label and the description, so the two roles move
+// apart rather than together. The sentence takes its own line (`flex-col`, not
+// `flex-wrap`) so it never competes for width with the label; the rule is
+// documented at the type roles in `Global.css`.
 
 interface Crumb {
 	Label: string;
@@ -20,6 +39,10 @@ const DocsId = (Path: string) => {
 	return Rest === "" ? "index" : Rest;
 };
 
+/** The promise of a registry route, for a crumb that names one. */
+const PromiseOf = (Href?: string) =>
+	Href === undefined ? undefined : AllLinks.find((Link) => Link.Href === Href)?.Promise;
+
 const IsDocs = /^\/docs(\/|$)/.test(Astro.url.pathname);
 
 const Active = AllLinks.find((Link) => IsActive(Astro.url.pathname, Link));
@@ -29,33 +52,53 @@ const Trail: Crumb[] = IsDocs
 	: Active && Active.Href !== "/"
 		? [{ Label: "OVERVIEW", Href: "/" }, { Label: Active.Label }]
 		: [];
+
+// Only a registry-owned leaf page has a shelf of its own: a docs subpage
+// inherits the tree's trail, and the home page has no trail at all.
+const ActivePromise = !IsDocs && Active && Active.Href !== "/" ? Active.Promise : undefined;
+
+const ActiveGroup = !IsDocs && Active && Active.Href !== "/" ? Active.Group : undefined;
 ---
 
 {
 	// The docs root and the home page each match only themselves: no trail.
 	Trail.length > 1 && (
-		<nav
-			aria-label="Breadcrumb"
-			class="flex flex-wrap items-center gap-2 font-mono text-base uppercase tracking-widest text-zinc-dust"
-		>
-			{Trail.map((Crumb, Position) => (
-				<>
-					{Position > 0 && (
-						<span class="text-oxblood-dark" aria-hidden="true">
-							//
-						</span>
+		<div class="flex flex-col gap-2">
+			<nav
+				aria-label="Breadcrumb"
+				class="type-meta flex flex-wrap items-center gap-2 uppercase text-zinc-dust"
+			>
+				{Trail.map((Crumb, Position) => (
+					<>
+						{Position > 0 && (
+							<span class="text-oxblood-dark" aria-hidden="true">
+								//
+							</span>
+						)}
+						{Crumb.Href ? (
+							<a
+								class="transition-colors hover:text-bone-white"
+								href={Crumb.Href}
+								title={PromiseOf(Crumb.Href)}
+							>
+								{Crumb.Label}
+							</a>
+						) : (
+							<span class="text-bone-newsprint" aria-current="page">
+								{Crumb.Label}
+							</span>
+						)}
+					</>
+				))}
+			</nav>
+			{ActivePromise && (
+				<p class="flex max-w-3xl flex-col gap-1">
+					{ActiveGroup && (
+						<span class="type-meta uppercase text-weathered-teal">{ActiveGroup}</span>
 					)}
-					{Crumb.Href ? (
-						<a class="transition-colors hover:text-bone-white" href={Crumb.Href}>
-							{Crumb.Label}
-						</a>
-					) : (
-						<span class="text-bone-newsprint" aria-current="page">
-							{Crumb.Label}
-						</span>
-					)}
-				</>
-			))}
-		</nav>
+					<span class="type-body text-pretty text-zinc-dust">{ActivePromise}</span>
+				</p>
+			)}
+		</div>
 	)
 }

@@ -24,6 +24,27 @@
 	/* Accents */
 	--stamped-canary: #e5a93b;
 	--weathered-teal: #2a938d; /* lifted from the prior weathered teal: passes 4.5:1 on all surfaces */
+
+	/* Type roles - the reader's chapter signal. A section heading today is
+	   `text-lg` (18px) against 16px body copy: 2px of separation, so a reader
+	   gets no signal that the subject changed. The GAP between roles - not any
+	   single size - is what creates rhythm, so these are read as a scale and
+	   never re-invented per page. */
+	--type-display: clamp(4rem, 9vw, 7.5rem);
+	--type-section: clamp(2.25rem, 4.4vw, 3.5rem);
+	--type-sub: clamp(1.375rem, 2.4vw, 1.75rem);
+	--type-body: clamp(1.0625rem, 0.4vw + 1rem, 1.125rem);
+	--type-caption: 0.84375rem;
+	--type-meta: 0.71875rem;
+	--type-code: 0.90625rem;
+
+	/* Spacing roles - four distances, each MEANING a different relationship
+	   rather than being four sizes. A block that reaches for --space-chapter
+	   where it means --space-reading has mis-stated its own structure. */
+	--space-tight: 0.5rem; /* label -> value, heading -> its own context */
+	--space-reading: 0.875rem; /* paragraph -> paragraph */
+	--space-group: 2.5rem; /* explanation -> figure, figure -> caption */
+	--space-chapter: clamp(4rem, 7vw, 7rem); /* a genuinely new subject */
 }
 
 /* Self-hosted variable fonts (latin subset, OFL - see Public/Font/LICENSE.md) */
@@ -188,19 +209,91 @@ a.code-link:hover code {
 	overflow-wrap: anywhere;
 }
 
-/* Long unbreakable tokens - repository paths, 40-hex hashes, TOML keys,
+/* ── LONG TOKENS AND THE LABEL VOICE ──────────────────────────────────────
+   Long unbreakable tokens - repository paths, 40-hex hashes, TOML keys,
    dotted identifiers - carry no break opportunity, so they set the
    min-content width of every box that holds them. On a 375px viewport that
    min-content width BECAME the page's scrollWidth: the docs PREV/NEXT links,
    the prose file citations, the mono chips and the SRC footer lines pushed
-   12 routes 12-226px past the viewport. `anywhere` (not `break-word`) is
-   required here: only `anywhere` also shrinks the min-content contribution,
-   which is what lets a grid or flex item stay inside its own track instead
-   of widening its container. Fenced code is untouched (`white-space: pre`
-   never wraps), and table cells keep `normal` so a wide table scrolls in its
-   own box rather than shredding its paths mid-token. */
+   12 routes 12-226px past the viewport.
+
+   The escape hatch is SCOPED, not global. `overflow-wrap: anywhere` at the
+   root fixed those twelve routes and shredded every label on the site -
+   `REPRO_PROOF #001` broke as `REPRO_PROO` / `F` - because `anywhere`, unlike
+   `break-word`, also collapses an element's min-content contribution to a
+   single character: a flex or grid track may then shrink BELOW the width of
+   the longest word, and the word breaks mid-token to fit it. The overflow was
+   real; the trade was made in the wrong place.
+
+   So the page carries the prose value and only the token carriers opt in:
+
+   - `break-word` on the body: a genuinely oversized token still wraps rather
+     than overflowing, while an ordinary word is never split. It does NOT
+     shrink min-content, which is exactly why the containers below have to opt
+     in explicitly instead of inheriting it.
+   - `.break-token` is the reusable opt-in for a CONTAINER whose min-content
+     width used to be absorbed by the body rule.
+   - the rest are the named carriers: a marker line, a code chip, a docs
+     prev/next path line.
+
+   Fenced code is untouched (`white-space: pre` never wraps), and table cells
+   keep `normal` so a wide table scrolls in its own box rather than shredding
+   its paths mid-token. */
 body {
+	overflow-wrap: break-word;
+}
+
+/* The label voice never breaks mid-word: a tape, stamp, badge, kicker or mono
+   chip wraps at its spaces or not at all. `REPRO_PROOF #001` is one label, not
+   two lines of one.
+
+   The list is the site's label vocabulary. `.font-black.uppercase` is there
+   because the tape and stamp shapes emit no class of their own - ZineTape's
+   corner/section/hero/tab variants and ZineStamp are Tailwind utilities only -
+   so the VOICE is the hook, and it is the same voice in every one of them.
+   Headings are excluded on purpose: a display line keeps `break-word` as the
+   safety valve for a word that genuinely cannot fit its column.
+
+   The group sits in `:where()` so it carries element-level specificity only
+   (the `:not()` chain contributes element selectors; `:where()` itself
+   contributes none) - so every carrier below, every Tailwind `break-all` chip
+   and every `.break-token` container beats it without an `!important`, and
+   `body` never competes (a declaration always wins over an inherited value).
+
+   `hyphens: none` because auto-hyphenation in a technical label invents a
+   break the content does not have. No `white-space: nowrap` anywhere: a long
+   label must still be able to wrap at a space on a narrow viewport - it must
+   never be clipped. */
+:where(
+	.tape-strip,
+	.tape-staple,
+	.zine-plate-lang,
+	.section-kicker,
+	.type-meta,
+	.font-black.uppercase
+):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+}
+
+/* The carriers. Each one is an element that actually holds a token with no
+   break opportunity, so each one takes the min-content collapse the body no
+   longer gives it. */
+.ccr-marker,
+.break-token,
+a.code-link,
+a.code-link code,
+a[rel="prev"] .font-mono.uppercase,
+a[rel="next"] .font-mono.uppercase {
 	overflow-wrap: anywhere;
+}
+
+/* `.break-token` is the utility a container opts into when the token lives in
+   a child it does not control: the wrap plus the zero min-width that lets a
+   flex or grid item stay inside its own track. */
+.break-token {
+	min-width: 0;
 }
 
 td,
@@ -476,4 +569,216 @@ body .zine-plate:focus-within > pre.astro-code {
 .zine-comment {
 	color: var(--zinc-dust);
 	font-style: italic;
+}
+
+/* ---- READING SCALE: type roles, spacing roles, emphasis tiers ----
+
+   APPENDED AND ADDITIVE. Every selector below is a new name. No selector,
+   token or colour above this line was changed or removed, so a page that
+   ignores this section renders exactly as it did before.
+
+   WHY THIS SECTION EXISTS
+   The publication already has an abundant vocabulary - tapes, stamps, offset
+   shadows, rotations - worn by nearly every element, so nothing reads as
+   emphasised. The missing ingredient was never more decoration: it is
+   controlled contrast. Three roles follow - how big a thing is, how far it
+   sits from the thing beside it, and how loudly it is framed - and each one
+   is CHOSEN rather than accumulated.
+
+   TYPE ROLES (`.type-*`) - one scale, read from the `:root` table above.
+     .type-display    The page's one claim. One per page, never a section head.
+     .type-section    A chapter head: the reader's signal that the subject
+                      changed. This is the role that was missing - at `text-lg`
+                      a section head sat 2px above body copy.
+     .type-sub        A sub-head inside a chapter, for a list of like things.
+     .type-body       The reading voice. Every paragraph a reader must study.
+     .type-caption    The words under a figure - it belongs to the figure.
+     .type-meta       The mono label voice: eyebrows, counts, versions, units.
+     .type-code       Inline code inside prose. Fenced plates keep their own
+                      size - the CODE PLATES section above owns those.
+
+   None of the roles sets a colour or a margin. Colour is the caller's
+   (bone-white for a head, bone-newsprint for the reading voice, zinc-dust for
+   a caption) and the distance between blocks is the next set's job, so a role
+   composes with anything instead of fighting it.
+
+   SPACING ROLES - the distance STATES the relationship, so a block never has
+   to invent one. Read them from the `:root` table above.
+     --space-tight    A label and its value; a heading and its own context.
+     --space-reading  Paragraph to paragraph - the same voice, continuing.
+     --space-group    Explanation to figure, figure to caption: one argument
+                      carried by two media.
+     --space-chapter  A genuinely new subject. Nothing smaller separates two
+                      chapters, and nothing larger may be spent inside one.
+
+   PROSE FLOW (`.prose-flow`, `.prose-flow--group`) - ONE mechanism, not two.
+   The pages stack `flex flex-col gap-6` AND put `mt-3` on the children, so
+   splitting a passage into two paragraphs adds height twice and a reader
+   cannot tell a new idea from a new line. `.prose-flow` owns the only
+   vertical distance between its children; do NOT combine it with
+   `flex flex-col gap-*` or a per-child `mt-*`.
+
+   EMPHASIS TIERS - the three budgets. A section spends ONE expressive
+   assembly; everything else in that section is quiet or standard.
+     .emphasis-quiet       A hairline rule. No shadow, no tilt, no fill.
+     .emphasis-standard    The boxed plate: 4px crimson boundary plus the hard
+                           offset shadow, flat.
+     .emphasis-expressive  The full budget: the plate, tilted, on the tape and
+                           shadow grammar.
+
+   THE RULE, IN ONE LINE: ONE EXPRESSIVE ASSEMBLY PER SECTION. A second one
+   does not add emphasis - it takes emphasis away from the first, and from
+   everything the reader actually has to study. */
+
+/* Type roles. Space Grotesk is the headline voice, DM Sans the reading voice,
+   JetBrains Mono the technical voice - the three already self-hosted above. */
+.type-display,
+.type-section,
+.type-sub {
+	font-family: "Space Grotesk", sans-serif;
+	font-weight: 700;
+}
+
+.type-display {
+	font-size: var(--type-display);
+	line-height: 0.92;
+	letter-spacing: -0.03em;
+}
+
+.type-section {
+	font-size: var(--type-section);
+	line-height: 1.05;
+	letter-spacing: -0.02em;
+}
+
+.type-sub {
+	font-size: var(--type-sub);
+	font-weight: 600;
+	line-height: 1.2;
+	letter-spacing: -0.01em;
+}
+
+.type-body {
+	font-family: "DM Sans", sans-serif;
+	font-size: var(--type-body);
+	font-weight: 400;
+	line-height: 1.7;
+}
+
+.type-caption {
+	font-family: "DM Sans", sans-serif;
+	font-size: var(--type-caption);
+	font-weight: 400;
+	line-height: 1.5;
+}
+
+.type-meta {
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 500;
+	line-height: 1.4;
+	letter-spacing: 0.08em;
+}
+
+.type-code {
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-code);
+	font-weight: 400;
+	line-height: 1.6;
+}
+
+/* The quiet eyebrow. Deliberately bare - no border, no shadow, no rotation,
+   no fill - because its job is to sit still above a chapter head that is now
+   large enough to carry the section on its own. A kicker that is also a tape
+   is the old problem in miniature: two things claiming to introduce one
+   section. */
+.section-kicker {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	box-shadow: none;
+	transform: none;
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 700;
+	line-height: 1.4;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--zinc-dust);
+}
+
+/* Prose flow: the only vertical distance between the children of a prose
+   block. `row-gap: 0` is the guard rather than decoration - a block that
+   still carries the old `flex flex-col gap-6` would otherwise stack that gap
+   on top of `--space-reading` and re-introduce the very double height this
+   class removes. The column gap is left alone, so a two-column block keeps
+   its own. */
+.prose-flow {
+	row-gap: 0;
+}
+
+.prose-flow > * + * {
+	margin-block-start: var(--space-reading);
+}
+
+/* The same mechanism one relationship out: a figure and the argument it
+   carries are one group, so the caption sits at the group distance from the
+   figure, never at the reading distance. Works standalone or as a modifier of
+   `.prose-flow` (same specificity, later declaration wins). */
+.prose-flow--group > * + * {
+	margin-block-start: var(--space-group);
+}
+
+/* The words under a figure. Quieter than the reading voice and stopped at a
+   readable measure, because a caption set as wide as the page reads as body
+   copy that lost its paragraph. */
+.figure-caption {
+	max-width: 62ch;
+	font-family: "DM Sans", sans-serif;
+	font-size: var(--type-caption);
+	font-weight: 400;
+	line-height: 1.5;
+	color: var(--zinc-dust);
+}
+
+/* Emphasis tiers. The frame and shadow values mirror `.zine-box-crimson` and
+   ZineBox's `crimson` tone, so a tier and the component read as the same
+   plate rather than two near-identical ones.
+
+   The tape is NOT synthesized here on purpose: the zine tape is ZineTape's
+   component (it carries a label, a tone and a side), and a CSS pseudo-strip
+   would double the tape on every plate that already renders one. The tier
+   owns the frame, the shadow plane and the tilt; the tape is the assembly's
+   choice. */
+.emphasis-quiet {
+	border: 1px solid var(--outline-oxblood);
+	border-left: 2px solid var(--blood-crimson);
+	border-radius: 0;
+	background-color: transparent;
+	box-shadow: none;
+	transform: none;
+}
+
+.emphasis-standard,
+.emphasis-expressive {
+	border: 4px solid var(--blood-crimson);
+	border-radius: 0;
+	background-color: var(--carbon-void);
+	box-shadow:
+		6px 6px 0px #000000,
+		10px 10px 0px var(--oxblood-dark);
+}
+
+.emphasis-expressive {
+	transform: rotate(-1.2deg);
+}
+
+/* Grammar law 3, mobile flattens: a tilt is a desktop reading cue, and on a
+   narrow viewport it spends horizontal room the copy needs. */
+@media (max-width: 639px) {
+	.emphasis-expressive {
+		transform: none;
+	}
 }

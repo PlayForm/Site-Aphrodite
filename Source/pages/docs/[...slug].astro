@@ -1,8 +1,9 @@
 ---
 import Base from "@Layout/Base.astro";
 import DocsSidebar from "../../Component/DocsSidebar.astro";
+import Related from "../../Component/Related.astro";
 import ZineDiagramNav from "../../Component/ZineDiagramNav.astro";
-import { Link as RepoLink, OurRepo } from "../../Library/Links.ts";
+import { Link as RepoLink, OurRepo, Routes } from "../../Library/Links.ts";
 
 import CcrPipeline from "../../Content/Mermaid/ccr-pipeline.svg?raw";
 import ConfigResolution from "../../Content/Mermaid/config-resolution.svg?raw";
@@ -74,6 +75,38 @@ const GroupLabels = new Map(
 	]),
 );
 
+// ── THE EDITORIAL READING ORDER ───────────────────────────────────────────
+// The collection's id order is deterministic, not a learning path: it is
+// alphabetical inside a section and it says nothing about which section a
+// reader should meet first. This table is the missing editorial layer - the
+// stages of the documentation, in the order the product is learned. It orders
+// only; every destination still comes from the collection, so a new page joins
+// the sequence without an edit here and nothing can be added or lost by it.
+//
+// A section the table does not name keeps alphabetical position after the
+// named ones. Troubleshooting is not a section of its own (install/troubleshooting
+// sits inside Install), which is why the stage list names nine stages for
+// thirteen sections.
+const ReadingStages: readonly { Stage: string; Sections: readonly string[] }[] = [
+	{ Stage: "Start here", Sections: ["Overview"] },
+	{ Stage: "Installation", Sections: ["Install"] },
+	{ Stage: "Core concepts", Sections: ["CCR", "Classification"] },
+	{ Stage: "Hermes integration", Sections: ["Plugin", "Guides", "Tool Relay"] },
+	{ Stage: "Proxy integration", Sections: ["Proxy"] },
+	{ Stage: "Configuration", Sections: ["Config"] },
+	{ Stage: "API reference", Sections: ["API", "Metrics"] },
+	{ Stage: "Architecture", Sections: ["Architecture"] },
+	{ Stage: "Examples", Sections: ["Examples"] },
+];
+
+const ReadingOrder = ReadingStages.flatMap(({ Sections: Names }) => Names);
+
+const OrderOf = (Section: string) => {
+	const Position = ReadingOrder.indexOf(Section);
+
+	return Position === -1 ? ReadingOrder.length : Position;
+};
+
 // A section's own page opens it: the docs root opens Overview, and a section
 // index page (architecture/index.md, which the collection serves as the id
 // "architecture") opens its section. Id order alone would put "centers" ahead
@@ -84,32 +117,33 @@ const RankOf = (Name: string, Id: string) =>
 
 const Sections = [
 	...Pages.sort((A, B) => A.id.localeCompare(B.id))
-	.reduce(
-		(Groups, Page) => {
-			const Key = GroupKeyOf(Page.id);
+		.reduce(
+			(Groups, Page) => {
+				const Key = GroupKeyOf(Page.id);
 
-			Groups.set(Page.data.section, [
-				...(Groups.get(Page.data.section) ?? []),
-				{
-					Id: Page.id,
-					Title: Page.data.title,
-					Wip: WipDocs.has(Page.id),
-					Group: Key === undefined ? undefined : (GroupLabels.get(Key) ?? Key),
-				},
-			]);
+				Groups.set(Page.data.section, [
+					...(Groups.get(Page.data.section) ?? []),
+					{
+						Id: Page.id,
+						Title: Page.data.title,
+						Wip: WipDocs.has(Page.id),
+						Group: Key === undefined ? undefined : (GroupLabels.get(Key) ?? Key),
+					},
+				]);
 
-			return Groups;
-		},
-		new Map<
-			string,
-			{ Id: string; Title: string; Wip: boolean; Group?: string }[]
-		>(),
-	)
-	.entries(),
+				return Groups;
+			},
+			new Map<
+				string,
+				{ Id: string; Title: string; Wip: boolean; Group?: string }[]
+			>(),
+		)
+		.entries(),
 ]
-	.sort(([A], [B]) =>
-		A === "Overview" ? -1 : B === "Overview" ? 1 : A.localeCompare(B),
-	)
+	// The editorial order, not Overview-then-alphabetical: the rail, the
+	// prev/next sequence and the next steps all read this one array, so a
+	// reader can never be sent backwards through the stage list.
+	.sort(([A], [B]) => OrderOf(A) - OrderOf(B) || A.localeCompare(B))
 	.map(([Name, Entries]) => ({
 		// The group's own page opens it, then id order - the docs tree's numeric
 		// prefixes (architecture/01-startup) ARE its reading order. Same rank
@@ -173,25 +207,146 @@ const IndexEntries = IsSectionIndex
 		]
 	: Sections.filter(({ Name }) => Name !== "Overview");
 
-// One-line purpose pulled from the page body: the first prose sentence, with
-// the markdown syntax stripped. The generated content itself is untouched.
+// ── AUTHORED SUMMARIES ────────────────────────────────────────────────────
+// One line per page, written for the reader: what the page is for, in the
+// voice the page itself uses. This is the text behind the index cards, the
+// page's meta description and the next-step reasons.
+//
+// It is authored HERE, not in the generated frontmatter, because the docs
+// pages are OUTPUT: `Scripts/Docs/Generate.ts` rewrites each page's
+// frontmatter (title, section, source) on every `pnpm run Docs`, so a
+// `summary:` written into Source/Content/Docs/*.md is reverted by the next
+// generation - silently, with no diff and no error. Moving these into the
+// frontmatter is a two-file change outside this route (the collection schema
+// in Source/content.config.ts plus the generator that writes the field); until
+// that lands, this table is the durable home and `Purpose()` below is the
+// fallback for a page with no entry.
+const Summaries: Record<string, string> = {
+	"api/ccr-endpoints":
+		"The loopback-only CCR endpoints that let external tools and scripts create, list and resolve stored entries.",
+	"api/health": "GET /health - the public liveness check for load balancers and monitoring systems.",
+	"api/metrics-endpoint":
+		"GET /metrics - the proxy's counters, gauges and latency histogram, as Prometheus metrics.",
+	"api/retrieve":
+		"POST /retrieve resolves a CCR hash back to its original content, with optional line filtering.",
+	"architecture/01-startup":
+		"The two halves of the Aphrodite startup path, traced end to end.",
+	"architecture/02-chat-compression":
+		"The token and cache proxies' central flow, from the upstream response to the compressed reply.",
+	"architecture/03-retrieve":
+		"The two retrieval paths that turn a CCR marker back into its original content.",
+	"architecture/04-hook-ffi":
+		"The Hermes plugin path - a hook fires, the Python ctypes shim resolves the dylib, and the call crosses the FFI boundary.",
+	"architecture/05-ccr-lifecycle":
+		"The state machine of one CCR entry, from creation through storage, preview and retrieval.",
+	"architecture/06-sse-streaming":
+		"Why server-sent-event (text/event-stream) responses bypass compression, and what the proxy does instead.",
+	"architecture/07-config-resolution":
+		"The two independent resolution stacks - the proxy's and the dylib's - and how each reads env > TOML > default.",
+	"architecture/08-dylib-loading":
+		"The Python shim loads the Rust dylib exactly once per process, and this is where that load happens.",
+	"architecture/09-release-ci":
+		"The two GitHub Actions workflows that fire on an Aphrodite/v tag push, and what each one publishes.",
+	"architecture/10-component":
+		"The top-level components and the two boundaries that matter between them.",
+	"architecture/11-data-model":
+		"The principal data structures behind the compression engine, and what each one holds.",
+	architecture: "Flow traces of every runtime path in Aphrodite, one page per path.",
+	"ccr/backends/in-memory":
+		"The in-memory backend - a process-local, sharded concurrent store for cache-mode deployments.",
+	"ccr/backends":
+		"The CCR (Compress-Cache-Retrieve) store's two full backends, and which deployment mode selects each.",
+	"ccr/backends/inline":
+		"Tiny entries bypass the CCR backend round-trip entirely; this is the inline path they take.",
+	"ccr/backends/sqlite":
+		"The SQLite backend - the production CCR store, persistent across worker restarts.",
+	"ccr/lifecycle":
+		"CCR (Compress-Cache-Retrieve), the lossless end-to-end compression path, from compression to retrieval.",
+	"ccr/marker-format":
+		"The compact marker strings that stand in for compressed content in an agent's context, and how to read each field.",
+	centers:
+		"A roadmap page: only v1 is implemented; v2 to v4 are design sketches for where the centers go.",
+	"classification/content-types":
+		"The content types the classifier labels every payload with before it enters the compression pipeline.",
+	classification:
+		"How the compression pipeline labels content before storage, and what each label decides.",
+	"config/aphrodite-toml":
+		"The single TOML file that configures Aphrodite's proxy listeners and compression engine.",
+	"config/env-vars":
+		"The APHRODITE_ environment variables (plus a few non-prefixed ones) that override the TOML.",
+	examples:
+		"Real tool results captured from live sessions against the Aphrodite 1.4.6 binary.",
+	"examples/llm-view":
+		"The LLM's view of the captured examples: what the model receives once compression has run.",
+	"guides/hermes-integration":
+		"Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a client at.",
+	"guides/hermes-tool-output-schemas":
+		"Every Hermes tool returns output with its own shape - diffs, JSON envelopes and the rest - and this is how each one is classified.",
+	guides:
+		"Walkthrough-style pages that connect the parts of Aphrodite the way you actually use them.",
+	index: "Aphrodite compresses context before it hits the LLM.",
+	install: "Four correct answers to \"how do I install this\", one per platform.",
+	"install/macos-linux":
+		"The macOS and Linux install path - and everything that also works on Windows under Git Bash or WSL.",
+	"install/troubleshooting":
+		"What to check when Hermes loads the plugin and the proxy binary does not come up.",
+	"install/windows":
+		"Native Windows through PowerShell - download.ps1 as the direct install path.",
+	"metrics/prometheus":
+		"Every proxy operation exposed as counters, gauges and histograms at GET /metrics.",
+	"metrics/queries":
+		"PromQL reference for monitoring and alerting on the Aphrodite proxy metrics.",
+	"plugin/context-engine":
+		"The context engine - the dylib session's middle-turn archiver.",
+	"plugin/directives":
+		"Directives - short behavioural instruction files, one .md each - and what each one changes.",
+	"plugin/hooks": "The six hooks the plugin registers with Hermes, and what each one is for.",
+	"proxy/architecture":
+		"The local reverse proxy that sits between any OpenAI-compatible client and the upstream API.",
+	"proxy/compression":
+		"How the proxy decides whether to compress each piece of Chat Completions response content.",
+	"proxy/handlers":
+		"The HTTP handlers the proxy exposes for LLM requests, CCR entries and more.",
+	"proxy/retry":
+		"Transient upstream failures do not fail the request; this is how the retry path works.",
+	"tool-relay/callbacks": "The two distinct callback surfaces around the tool relay.",
+	"tool-relay/tools":
+		"The 13 tools Aphrodite exposes to the Hermes agent for compression, retrieval and stats.",
+};
+
+// The fallback, unchanged in contract: the first prose line of the page body,
+// with the markdown syntax stripped. It is a fallback and not the source of
+// truth, so it only has to be safe - and it is now fence-aware (a ``` block's
+// first line is not prose) and link-aware (a `[label](href)` keeps its label
+// and drops the destination, which used to be concatenated into the text).
 const Purpose = (Body?: string) => {
+	let Fenced = false;
+
 	for (const Line of (Body ?? "").split("\n")) {
 		const Trimmed = Line.trim();
 
+		if (Trimmed.startsWith("```")) {
+			Fenced = !Fenced;
+
+			continue;
+		}
+
 		if (
+			Fenced ||
 			!Trimmed ||
 			Trimmed.startsWith("#") ||
 			Trimmed.startsWith("|") ||
 			Trimmed.startsWith("<") ||
-			Trimmed.startsWith("```") ||
-			Trimmed.startsWith(">")
+			Trimmed.startsWith(">") ||
+			Trimmed.startsWith("![") ||
+			Trimmed.startsWith("---")
 		) {
 			continue;
 		}
 
 		const Text = Trimmed
-			.replace(/[*`_[\]()]/g, "")
+			.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+			.replace(/[*`_[\]]/g, "")
 			.replace(/\s+/g, " ")
 			.trim();
 		const Cut = Text.indexOf(". ");
@@ -202,11 +357,112 @@ const Purpose = (Body?: string) => {
 	return "";
 };
 
-const Purposes = new Map(Pages.map((Page) => [Page.id, Purpose(Page.body)]));
+// One description per page: authored first, `Purpose()` where none was written.
+const Purposes = new Map(
+	Pages.map((Page) => [Page.id, Summaries[Page.id] ?? Purpose(Page.body)]),
+);
 
 // This page's own one-line purpose - the unique per-page meta description.
 // The section template stays as the fallback for entries without prose.
 const SelfPurpose = Purposes.get(Doc.id) ?? "";
+
+// ── DENSITY ───────────────────────────────────────────────────────────────
+// A narrative page earns the generous chapter break: the reader is being
+// carried through an argument and a 7rem gap is the signal that the subject
+// changed. A reference page is consulted, not read - its rhythm is heading,
+// explanation, command or table, qualification - so the same 7rem turns it
+// into a stack of landing-page sections. The mode is a property of the
+// SECTION, because that is what the documentation's own taxonomy already says
+// about the page; the stylesheet reads it as `[data-density]` on the article.
+const ReferenceSections = new Set([
+	"API",
+	"Config",
+	"Metrics",
+	"Proxy",
+	"CCR",
+	"Classification",
+	"Tool Relay",
+	"Plugin",
+]);
+
+const Density = ReferenceSections.has(Doc.data.section) ? "reference" : "narrative";
+
+// ── NEXT STEPS ────────────────────────────────────────────────────────────
+// The foot of a page used to be prev/next alone: two destination names and no
+// reason to follow either. These are the continuations a reader actually
+// needs, each with the reason to take it - and all of them are read from the
+// collection, so the editorial order is the only thing written by hand here.
+const EntryOf = (Name: string) => {
+	const Section = Sections.find(({ Name: Section }) => Section === Name);
+
+	if (!Section) {
+		return undefined;
+	}
+
+	return (
+		Section.Entries.find((Entry) => Entry.Id.toLowerCase() === Name.toLowerCase()) ??
+		Section.Entries[0]
+	);
+};
+
+const NextStage = () => {
+	const Position = ReadingStages.findIndex(({ Sections: Names }) =>
+		Names.includes(Doc.data.section),
+	);
+
+	if (Position === -1) {
+		return undefined;
+	}
+
+	for (const Stage of ReadingStages.slice(Position + 1)) {
+		for (const Name of Stage.Sections) {
+			const Entry = EntryOf(Name);
+
+			if (Entry) {
+				return { Entry, Stage: Stage.Stage };
+			}
+		}
+	}
+
+	return undefined;
+};
+
+const NextSteps = (() => {
+	const Steps: { Href: string; Label: string; Reason?: string }[] = [];
+	const SectionIndex = EntryOf(Doc.data.section);
+
+	// The rest of this section: the section's own page names the cluster, so a
+	// reader who finished one page can see what the other pages in it are.
+	if (SectionIndex && SectionIndex.Id !== Doc.id) {
+		Steps.push({
+			Href: Href(SectionIndex.Id),
+			Label: SectionIndex.Title,
+			Reason: `The rest of ${Doc.data.section}, in reading order - one step of many in that section.`,
+		});
+	}
+
+	const Following = NextStage();
+
+	if (Following) {
+		Steps.push({
+			Href: Href(Following.Entry.Id),
+			Label: Following.Entry.Title,
+			Reason: `The reading order continues with ${Following.Stage}.`,
+		});
+	}
+
+	// The index, for every page that is not the index: the one destination that
+	// shows the whole tree rather than the next branch of it.
+	if (Doc.id !== "index") {
+		Steps.push({
+			Href: "/docs/",
+			Label: "Aphrodite Documentation",
+			Reason: "Every section of the documentation, in the order a reader should meet them.",
+		});
+	}
+
+	return Steps;
+})();
 ---
 
 <Base
@@ -219,7 +475,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 		<!-- Mobile: the docs index opens as a full-screen drawer -->
 		<button
 			id="docs-nav-toggle"
-			class="mb-8 flex w-full items-center justify-between border-4 border-blood-crimson bg-carbon-void px-4 py-2.5 font-mono text-base font-black uppercase tracking-widest text-bone-newsprint shadow-[4px_4px_0px_#000] lg:hidden"
+			class="mb-8 flex w-full items-center justify-between border-4 border-blood-crimson bg-carbon-void px-4 py-2.5 font-mono text-base font-black uppercase tracking-widest text-bone-newsprint shadow-[4px_4px_0px_#000] xl:hidden"
 			aria-expanded="false"
 			aria-controls="docs-drawer"
 		>
@@ -230,7 +486,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 		<nav aria-label="Breadcrumb" class="flex flex-wrap items-center gap-2 font-mono text-base">
 			<a
 				class="text-stamped-canary underline decoration-2 underline-offset-4 hover:text-bone-white"
-				href="/docs/"
+				href={Routes.Docs}
 			>
 				DOCS
 			</a>
@@ -248,22 +504,27 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 			}
 		</nav>
 
-		<!-- Three tracks once the outline has a home: the docs index, the
-		     reading column, and the page's own outline. Without an outline the
-		     third track is not reserved, so a short page keeps its full measure. -->
+		<!-- Two tracks from xl (the docs index and the reading column), three
+		     only from 2xl. The reading column is the point of the page, and at
+		     1280px a 17rem index plus a 15rem outline plus two 3rem gaps left it
+		     roughly 608px - a narrow strip between two framed panels. The
+		     outline therefore waits until all three tracks genuinely fit (96rem
+		     and up) and stays a disclosure below that; the index waits until xl,
+		     so a 1024px reader gets the full measure and the drawer. -->
 		<div
-			class={`mt-10 flex flex-col gap-16 lg:grid lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-x-20 ${
-				HasToc ? "xl:grid-cols-[17rem_minmax(0,1fr)_15rem] xl:gap-x-12" : ""
+			class={`mt-10 flex flex-col gap-16 xl:grid xl:grid-cols-[17rem_minmax(0,1fr)] xl:gap-x-16 ${
+				HasToc ? "2xl:grid-cols-[17rem_minmax(0,1fr)_15rem] 2xl:gap-x-12" : ""
 			}`}
 		>
 			<!-- Desktop: sticky sidebar. The index only - the page's outline
-			     lives in the right rail (xl) and the disclosure (below xl), so
+			     lives in the right rail (2xl) and the disclosure (below 2xl), so
 			     no viewport ever shows the same list twice. -->
-			<aside class="hidden lg:block">
+			<aside class="hidden xl:block">
 				<div class="sticky top-24">
 					<DocsSidebar
 						Sections={Sections}
 						CurrentId={Doc.id}
+						Order={ReadingOrder}
 						Label="Documentation sections"
 					/>
 				</div>
@@ -297,27 +558,6 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 					</h1>
 				</header>
 
-				<!-- Provenance: the page IS a module file, generated on every build.
-				     Naming the source here is the whole point of the extraction - a
-				     reader can check the claim, and the next editor knows that a
-				     change belongs in the repository, not in this page. -->
-				{
-					Doc.data.source && (
-						<p class="mt-6 border-l-2 border-oxblood-dark pl-4 font-mono text-base text-zinc-dust">
-							<span class="uppercase tracking-widest">Generated from</span>{" "}
-							<a
-								class="text-stamped-canary underline decoration-2 underline-offset-4 hover:text-bone-white"
-								href={RepoLink(OurRepo, Doc.data.source)}
-							>
-								{Doc.data.source}
-							</a>{" "}
-							<span class="uppercase tracking-widest">
-								in the Aphrodite repository - edit it there, never here
-							</span>
-						</p>
-					)
-				}
-
 				{
 					Diagram && (
 						<figure
@@ -340,19 +580,13 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 							<h2 class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 								{IsSectionIndex ? "IN THIS SECTION" : "THE SECTIONS"}
 							</h2>
-							<div class="mt-8 grid gap-16 sm:grid-cols-2 sm:gap-x-8">
-								{IndexEntries.map(({ Name, Entries }, GridIndex) => (
-									<div
-										class={`relative border-4 border-blood-crimson bg-carbon-void p-6 ${
-											GridIndex % 2 === 0 ? "zine-box-subtle" : "zine-box-crimson"
-										}`}
-									>
-										<span
-											class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
-										>
+							<div class="mt-8 grid gap-10 sm:grid-cols-2 sm:gap-x-12">
+								{IndexEntries.map(({ Name, Entries }) => (
+									<div class="border-l-2 border-oxblood-dark pl-5">
+										<h3 class="font-mono text-base font-bold tracking-normal text-bone-white">
 											{Name}
-										</span>
-										<ul class="mt-2 flex flex-col gap-4">
+										</h3>
+										<ul class="mt-3 flex flex-col gap-4">
 											{Entries.filter((Entry) => Entry.Id !== Doc.id).map((Entry) => (
 												<li class="flex flex-col gap-1">
 													<a
@@ -365,14 +599,14 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 														}`}
 													>
 														{Entry.Title}
-															{Entry.Wip && (
-																<span
-																	class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black"
-																	title="Roadmap: partly unimplemented"
-																>
-																	WIP
-																</span>
-															)}
+														{Entry.Wip && (
+															<span
+																class="ml-2 inline-block border border-black bg-stamped-canary px-1.5 align-middle font-mono text-[13px] font-black uppercase leading-tight tracking-widest text-soot-black"
+																title="Roadmap: partly unimplemented"
+															>
+																WIP
+															</span>
+														)}
 													</a>
 													{Purposes.get(Entry.Id) && (
 														<p class="font-body text-base leading-relaxed text-zinc-dust">
@@ -394,16 +628,22 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 				     and presents it twice, and only one is ever visible. -->
 				{
 					HasToc && (
-						<details class="group mt-16 border-4 border-blood-crimson bg-carbon-void xl:hidden">
-							<summary class="flex cursor-pointer list-none items-center justify-between px-5 py-3 font-mono text-base font-black uppercase tracking-widest text-stamped-canary [&::-webkit-details-marker]:hidden">
-								ON THIS PAGE
+						<details class="group mt-16 border border-oxblood-dark bg-carbon-void 2xl:hidden">
+							<summary
+								aria-describedby="docs-outline-note"
+								class="flex cursor-pointer list-none items-center justify-between px-5 py-3 font-mono text-base font-black uppercase tracking-widest text-stamped-canary [&::-webkit-details-marker]:hidden"
+							>
+								IN THIS DOCUMENT
 								<span aria-hidden="true" class="transition-transform group-open:rotate-45">
 									+
 								</span>
 							</summary>
-							<p class="border-t border-oxblood-dark px-5 pb-1 pt-3 font-body text-base leading-relaxed text-zinc-dust">
-								The entry marked in crimson is the section you are reading - the list is the
-								page's own headings, and it follows you down the page.
+							<p
+								id="docs-outline-note"
+								class="type-caption border-t border-oxblood-dark px-5 pb-1 pt-3 text-zinc-dust"
+							>
+								The section being read is marked in crimson; the list is the
+								document's own headings.
 							</p>
 							<ul class="flex flex-col gap-1 px-5 py-4">
 								{Toc.map(({ Depth, Id, Label }) => (
@@ -424,10 +664,24 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 
 				<!-- The reading column. One entrance for the whole column: the
 				     generated markdown cannot carry attributes of its own, so the
-				     column is the content root the shared runtime animates. -->
-				<article class="docs-prose mt-16 min-w-0" data-reveal>
+				     column is the content root the shared runtime animates.
+				     72ch is the measure: a reader's line stops where the eye can
+				     return from, and the column never stretches to fill a track
+				     just because the track is wide. -->
+				<article
+					class="docs-prose mt-16 min-w-0 max-w-[72ch]"
+					data-density={Density}
+					data-reveal
+				>
 					<Content />
 				</article>
+
+				<!-- NEXT STEPS: two or three contextual continuations, each with
+				     the reason to take it. Renders nothing when the collection
+				     offers none. -->
+				<div class="mt-24">
+					<Related Links={NextSteps} />
+				</div>
 
 				<!-- Prev / next: the zine cards at the bottom of the reading column -->
 				{
@@ -477,6 +731,39 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 						</nav>
 					)
 				}
+
+				<!-- Provenance, demoted to a "suggest an edit" block at the foot of
+				     the page. The words are unchanged and the source is still one
+				     click away: the page IS a module file, generated on every
+				     build, so a reader can check the claim and the next editor
+				     knows that a change belongs in the repository, not here. What
+				     changed is the volume - an instruction about the site's own
+				     construction sat above the article, where it competed with the
+				     page's own lead. -->
+				{
+					Doc.data.source && (
+						<aside
+							aria-label="Suggest an edit"
+							class="mt-24 border-t border-oxblood-dark pt-6"
+						>
+							<p class="type-meta uppercase tracking-widest text-zinc-dust">
+								Suggest an edit
+							</p>
+							<p class="type-caption mt-2 max-w-[62ch] text-zinc-dust">
+								<span class="uppercase tracking-widest">Generated from</span>{" "}
+								<a
+									class="text-stamped-canary underline decoration-2 underline-offset-4 hover:text-bone-white"
+									href={RepoLink(OurRepo, Doc.data.source)}
+								>
+									{Doc.data.source}
+								</a>{" "}
+								<span class="uppercase tracking-widest">
+									in the Aphrodite repository - edit it there, not the generated copy
+								</span>
+							</p>
+						</aside>
+					)
+				}
 			</div>
 
 			<!-- Wide viewports: the in-page outline as a sticky right rail. The
@@ -484,20 +771,24 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 			     drift from the anchors the renderer emitted. -->
 			{
 				HasToc && (
-					<aside class="hidden xl:block">
+					<aside class="hidden 2xl:block">
 						<div class="sticky top-24">
 							<nav
-								aria-label="On this page"
-								class="relative border-4 border-blood-crimson bg-carbon-void p-5 zine-box-subtle"
+								aria-label="In this document"
+								aria-describedby="docs-rail-note"
+								class="border-l border-oxblood-dark pl-4"
 							>
 								<p class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-									ON THIS PAGE
+									IN THIS DOCUMENT
 								</p>
-								<p class="mt-2 border-b border-oxblood-dark pb-3 font-body text-base leading-relaxed text-zinc-dust">
-									The entry marked in crimson is the section you are reading - the rail marks
-									it as you go, from the page's own headings.
+								<p
+									id="docs-rail-note"
+									class="type-caption mt-2 border-b border-oxblood-dark pb-3 text-zinc-dust"
+								>
+									The section being read is marked in crimson; the rail follows the
+									document's own headings.
 								</p>
-								<ul class="mt-3 flex max-h-[calc(100vh-16rem)] flex-col gap-1 overflow-y-auto border-l border-oxblood-dark pl-3">
+								<ul class="mt-3 flex max-h-[calc(100vh-16rem)] flex-col gap-1 overflow-y-auto">
 									{Toc.map(({ Depth, Id, Label }) => (
 										<li class={Depth === 3 ? "pl-3" : undefined}>
 											<a
@@ -521,7 +812,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 	<!-- Mobile drawer: the sidebar in a fixed overlay above everything -->
 	<div
 		id="docs-drawer"
-		class="fixed inset-0 z-50 hidden lg:hidden"
+		class="fixed inset-0 z-50 hidden xl:hidden"
 		role="dialog"
 		aria-modal="true"
 		aria-label="Documentation index"
@@ -539,6 +830,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 			<DocsSidebar
 				Sections={Sections}
 				CurrentId={Doc.id}
+				Order={ReadingOrder}
 				Label="Documentation sections (mobile)"
 			/>
 		</div>
@@ -549,7 +841,14 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 <style>
 	/* The markdown presentation layer, scoped to the reading column. The
 	   rendered <Content /> tree is generated, so the element selectors are
-	   global under the hashed .docs-prose wrapper. */
+	   global under the hashed .docs-prose wrapper.
+
+	   TWO DENSITIES, ONE STYLESHEET. The rules below are the NARRATIVE
+	   rhythm: the generous chapter break a reader being carried through an
+	   argument needs. `[data-density="reference"]` tightens the same roles
+	   into heading -> explanation -> command/table -> qualification, because a
+	   reference page is consulted rather than read and the chapter break turns
+	   it into a stack of landing-page sections. */
 	.docs-prose :global(h1:first-child) {
 		display: none; /* the page title already lives in the header */
 	}
@@ -561,7 +860,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 	}
 
 	.docs-prose :global(h2) {
-		margin-top: 7rem;
+		margin-top: var(--space-chapter);
 		margin-bottom: 2rem;
 		padding-bottom: 0.75rem;
 		border-bottom: 2px solid var(--blood-crimson);
@@ -574,7 +873,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 	}
 
 	.docs-prose :global(h3) {
-		margin-top: 4.5rem;
+		margin-top: var(--space-group);
 		margin-bottom: 1.5rem;
 		font-family: "Space Grotesk", sans-serif;
 		font-size: 1.15rem;
@@ -663,18 +962,32 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 	   greyed out the tokenless `text`/`plaintext` fences, which carry no
 	   spans of their own to colour. */
 
-	/* Tables: the ledger rows. display:table (not block) + table-layout:
-	   fixed - the block form spanned the container but left the inner table
-	   box content-width, so the rows never reached the borders. The fixed
-	   layout distributes the columns across the full width and can never
-	   overflow horizontally; cells wrap their content instead. */
+	/* ── TABLES BY CONTENT TYPE ────────────────────────────────────────────
+	   A table is three different objects on this site and `table-layout: fixed`
+	   treated all three as one:
+
+	   - a SHORT COMPARISON, where the columns should size to their content;
+	   - a REFERENCE MATRIX (a config key, a path, a command fragment), where
+	     the cell's whole job is that the token survives as one string;
+	   - a KEY -> VALUE EXPLANATION, which is a definition list wearing a
+	     table's clothes.
+
+	   So: `auto` layout lets a short table fit its content, `overflow-wrap:
+	   normal` keeps an identifier's token boundaries intact, a genuinely wide
+	   matrix scrolls inside the wrapper this page's runtime builds around it
+	   (BindTables), and a two-column table is set as the definition list it
+	   actually is.
+
+	   `fixed` + `anywhere` was the opposite of all three: it forced every
+	   column to an equal share of the width and then broke `APHRODITE_HOME`
+	   and `crates/aphrodite/src/...` wherever the letter count ran out. */
 	.docs-prose :global(table) {
 		margin: 2.5rem 0;
 		width: 100%;
 		border: 1px solid var(--oxblood-dark);
 		border-collapse: collapse;
 		display: table;
-		table-layout: fixed;
+		table-layout: auto;
 	}
 
 	.docs-prose :global(th) {
@@ -687,7 +1000,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
 		text-align: left;
-		overflow-wrap: anywhere;
+		overflow-wrap: normal;
 		color: var(--stamped-canary);
 	}
 
@@ -696,12 +1009,74 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 		border-top: 1px solid var(--oxblood-dark);
 		font-family: "DM Sans", sans-serif;
 		font-size: 1rem;
-		overflow-wrap: anywhere;
+		overflow-wrap: normal;
 		color: var(--bone-newsprint);
+	}
+
+	/* A long identifier in a narrow column: with no runtime there is no scroll
+	   region, so the token is allowed to break rather than spill across the
+	   page (the 375px overflow this site already paid for). With the runtime
+	   the table keeps its boundaries and scrolls instead - see
+	   `.docs-table--scroll`. */
+	html:not(.js) .docs-prose :global(td),
+	html:not(.js) .docs-prose :global(th) {
+		overflow-wrap: anywhere;
+	}
+
+	/* The scroll region BindTables builds: a table wider than the reading
+	   column scrolls inside its own box, labelled by the heading above it and
+	   focusable only while it actually overflows (an always-present region
+	   would add a tab stop to every table on the page). */
+	.docs-prose :global(.docs-table) {
+		margin: 2.5rem 0;
+		max-width: 100%;
+	}
+
+	.docs-prose :global(.docs-table > table) {
+		margin: 0;
+	}
+
+	.docs-prose :global(.docs-table--scroll) {
+		overflow-x: auto;
+		overscroll-behavior-x: contain;
+		scrollbar-width: thin;
+		scrollbar-color: var(--blood-crimson) var(--asphalt-panel-dark);
+	}
+
+	.docs-prose :global(.docs-table--scroll:focus-visible) {
+		outline: 2px solid var(--raw-blood);
+		outline-offset: 2px;
+	}
+
+	/* KEY -> VALUE: a two-column table is a definition list. The term keeps the
+	   technical voice and its token boundaries; the definition keeps the
+	   reading voice; one hairline per pair instead of the zebra, because these
+	   rows are not a comparison and nothing here benefits from counting them. */
+	.docs-prose :global(table:has(td:nth-child(2)):not(:has(td:nth-child(3)))) {
+		border: 0;
+	}
+
+	.docs-prose
+		:global(table:has(td:nth-child(2)):not(:has(td:nth-child(3))) td:first-child) {
+		width: 24ch;
+		border-top: 0;
+		font-family: "JetBrains Mono", monospace;
+		font-size: 0.9375rem;
+		vertical-align: top;
+		color: var(--bone-white);
+	}
+
+	.docs-prose
+		:global(table:has(td:nth-child(2)):not(:has(td:nth-child(3))) tr:not(:first-child) > *) {
+		border-top: 1px solid var(--oxblood-dark);
 	}
 
 	.docs-prose :global(tr:nth-child(even) td) {
 		background-color: color-mix(in srgb, var(--asphalt-panel) 55%, transparent);
+	}
+
+	.docs-prose :global(table:has(td:nth-child(2)):not(:has(td:nth-child(3))) tr:nth-child(even) td) {
+		background-color: transparent;
 	}
 
 	.docs-prose :global(blockquote) {
@@ -744,7 +1119,7 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 	}
 
 	.docs-prose :global(hr) {
-		margin: 7rem 0;
+		margin: var(--space-chapter) 0;
 		border: none;
 		border-top: 2px dashed var(--oxblood-dark);
 	}
@@ -772,6 +1147,61 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 		font-family: "JetBrains Mono", monospace;
 		font-size: 1rem;
 		color: var(--bone-white);
+	}
+
+	/* ── REFERENCE DENSITY ─────────────────────────────────────────────────
+	   The same roles, tightened: a heading sits one group away from the block
+	   it introduces instead of one chapter, and the paragraphs inside a
+	   section close up so a lookup reads as one entry rather than a landing
+	   page. Nothing is removed - every sentence, table row and fence is
+	   still here; only the distance between them changes. */
+	.docs-prose[data-density="reference"] :global(h2) {
+		margin-top: var(--space-group);
+		margin-bottom: 1rem;
+		padding-bottom: 0.5rem;
+	}
+
+	.docs-prose[data-density="reference"] :global(h3) {
+		margin-top: 1.75rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.docs-prose[data-density="reference"] :global(h4),
+	.docs-prose[data-density="reference"] :global(h5),
+	.docs-prose[data-density="reference"] :global(h6) {
+		margin-top: 1.5rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.docs-prose[data-density="reference"] :global(p) {
+		margin: 1rem 0;
+	}
+
+	.docs-prose[data-density="reference"] :global(ul),
+	.docs-prose[data-density="reference"] :global(ol) {
+		margin: 1rem 0;
+	}
+
+	.docs-prose[data-density="reference"] :global(table),
+	.docs-prose[data-density="reference"] :global(.docs-table) {
+		margin: 1.5rem 0;
+	}
+
+	.docs-prose[data-density="reference"] :global(blockquote) {
+		margin: 1.5rem 0;
+	}
+
+	.docs-prose[data-density="reference"] :global(hr) {
+		margin: var(--space-group) 0;
+	}
+
+	/* The wrapper owns the table's distance from the prose, in BOTH densities:
+	   the inner table's own margin must not add to it. This rule sits last on
+	   purpose - the reference block above outranks `.docs-table > table` on
+	   specificity, and a scroll region is a block formatting context, so its
+	   margins do not collapse with the table's and the gap would double. */
+	.docs-prose :global(.docs-table > table) {
+		margin: 0;
 	}
 </style>
 
@@ -946,8 +1376,115 @@ const SelfPurpose = Purposes.get(Doc.id) ?? "";
 		}
 	}
 
-	BindDocsDrawer();
-	BindOutline();
-	document.addEventListener("astro:page-load", BindDocsDrawer);
-	document.addEventListener("astro:page-load", BindOutline);
+	// The wide reference matrices: a table wider than the reading column gets a
+	// scroll region of its own, labelled by the heading it belongs to. The
+	// wrapper is built here rather than in the stylesheet because a scroll
+	// container cannot be expressed in CSS - and it is a scroll region only
+	// when the table actually overflows, so a table that fits stays a plain
+	// table with no extra tab stop and no extra landmark.
+	//
+	// Two passes on purpose. The first wraps, the second MEASURES every wrapper
+	// it can see - including one an earlier call built. The webfont lands after
+	// the first measurement and its metrics decide whether a table crosses the
+	// column, so a one-shot wrap would freeze the pre-font answer and leave a
+	// wide table silently clipped.
+	function BindTables() {
+		const Tables = Array.from(
+			document.querySelectorAll<HTMLTableElement>(".docs-prose table"),
+		);
+
+		for (const Table of Tables) {
+			if (Table.dataset["tableBound"] === "1") {
+				continue;
+			}
+
+			Table.dataset["tableBound"] = "1";
+
+			const Wrapper = document.createElement("div");
+
+			Wrapper.className = "docs-table";
+			Table.replaceWith(Wrapper);
+			Wrapper.append(Table);
+		}
+
+		const Wrappers = Array.from(
+			document.querySelectorAll<HTMLElement>(".docs-prose .docs-table"),
+		);
+
+		if (Wrappers.length === 0) {
+			return;
+		}
+
+		const Headings = Array.from(
+			document.querySelectorAll<HTMLElement>(".docs-prose h2, .docs-prose h3"),
+		);
+
+		for (const Wrapper of Wrappers) {
+			// The wrapper is the column's width and the table's own min-content
+			// decides whether it fits.
+			const Overflows = Wrapper.scrollWidth > Wrapper.clientWidth + 1;
+
+			switch (Overflows) {
+				case true: {
+					// The label names the table's subject, taken from the nearest
+					// heading above it in document order - never from the table's
+					// own content.
+					let Subject = "";
+
+					for (const Heading of Headings) {
+						const Follows =
+							Heading.compareDocumentPosition(Wrapper) &
+							Node.DOCUMENT_POSITION_FOLLOWING;
+
+						if (Follows) {
+							Subject = Heading.textContent?.trim() ?? Subject;
+						}
+					}
+
+					Wrapper.classList.add("docs-table--scroll");
+					Wrapper.tabIndex = 0;
+					Wrapper.setAttribute("role", "region");
+					Wrapper.setAttribute("aria-label", Subject ? `Table: ${Subject}` : "Table");
+
+					break;
+				}
+				default:
+					Wrapper.classList.remove("docs-table--scroll");
+					Wrapper.removeAttribute("tabindex");
+					Wrapper.removeAttribute("role");
+					Wrapper.removeAttribute("aria-label");
+			}
+		}
+	}
+
+	// Each binder is isolated: one that throws must never take the rest of this
+	// page's runtime with it. A bare call here once aborted the whole script and
+	// silently killed the drawer and the outline together.
+	const Binders: ReadonlyArray<() => void> = [BindDocsDrawer, BindOutline, BindTables];
+
+	const BindRuntime = (): void => {
+		for (const Bind of Binders) {
+			try {
+				Bind();
+			} catch (Error) {
+				console.warn("aphrodite: a docs binder failed", Error);
+			}
+		}
+	};
+
+	BindRuntime();
+	document.addEventListener("astro:page-load", BindRuntime);
+
+	// The webfont decides whether a table crosses the column, and it lands after
+	// the first measurement: re-measure once it has. Isolated like every other
+	// binder, and short-circuited where `document.fonts` does not exist.
+	document.fonts?.ready
+		.then(() => {
+			try {
+				BindTables();
+			} catch (Error) {
+				console.warn("aphrodite: the table re-measure failed", Error);
+			}
+		})
+		.catch(() => undefined);
 </script>

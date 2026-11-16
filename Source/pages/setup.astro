@@ -12,49 +12,115 @@ import ZineStamp from "@Component/ZineStamp.astro";
 import ZineFold from "@Component/ZineFold.astro";
 import ZineReveal from "@Component/ZineReveal.astro";
 import ZineSource from "@Component/ZineSource.astro";
+import ZineCopyChip from "@Component/ZineCopyChip.astro";
 import CodeFence from "@Component/CodeFence.astro";
+import CopyButton from "@Component/CopyButton.astro";
 
-import { ExternalLinks } from "@Library/Links";
+import { DocsRoute, ExternalLinks, Routes } from "@Library/Links";
 
-// THE FOUR ROUTES - one record per install path. The shape is the point: a
-// route that cannot say what it writes, what it fails on and how you verify
-// it is not finished install documentation, so those fields are mandatory and
-// every card renders all of them. `Comment` is the `//` note block a route
-// carries (cargo and from-source both need one); `Lesson` is the one aside a
-// single route earns - macOS Gatekeeper, on #3.
+// THE INSTALL MODEL - the shape is the point.
+//
+// This page used to store each route as one transcript STRING with `$` prompts
+// and `//` annotations inside it, and hand that whole string to CopyButton: the
+// copy payload was the picture of a terminal, not a command. A reader who
+// pasted it got `$ hermes plugins install aphrodite // or answer yes at the
+// Enable now? prompt` - prompt sigil, annotation and all.
+//
+// So a route is now a list of STEPS and a step is a list of FACTS:
+//
+//   Command        the bare, runnable line. This - and only this - is what a
+//                  copy control hands to the clipboard. No `$`, no `//`.
+//   Explanation    the words that used to ride inside the transcript as a `//`
+//                  annotation. Prose beside the block, where a reader can read
+//                  it without it ending up in the clipboard.
+//   Prerequisite   what has to be true before the line runs.
+//   Expected       what a successful run leaves behind.
+//   Troubleshooting  the failure THIS step produces. The page used to keep one
+//                  `Fails: string[]` per route, mixing prerequisites, directory
+//                  conflicts, wrong working directories, platform differences,
+//                  optional flags, registration failures and existing-config
+//                  behaviour into a list a reader could not map onto a command.
+//                  Each one now sits under the step that can cause it, as a
+//                  quiet inline warning; the ONE large warning block on the
+//                  page is reserved for the catalog rule, which is the only
+//                  instruction whose cost is destructive.
+interface InstallStep {
+	/** The step's short imperative name. */
+	Title: string;
+
+	/** The bare, runnable command - the copy payload, byte for byte. */
+	Command: string;
+
+	/** Prose beside the block; may carry `<code>`. */
+	Explanation?: string;
+
+	/** What must be true before the line runs. */
+	Prerequisite?: string;
+
+	/** What a successful run leaves behind. */
+	Expected?: string;
+
+	/** The failures this step can produce - one sentence each. */
+	Troubleshooting?: string[];
+}
+
+// A LANE is one platform's complete sequence. Platform is an input, not a
+// footnote: the page used to change exactly one command for Windows
+// (`bash download.sh` -> `pwsh ./download.ps1`) and leave the linking step as
+// `ln -s`, so the "Windows path" was POSIX with a PowerShell download in the
+// middle of it. A lane is complete or it is not offered.
+interface InstallLane {
+	/** "macOS / Linux" or "Windows" - printed beside every block. */
+	Platform: string;
+
+	/** The shell every command in the lane is written for. */
+	Shell: "bash" | "powershell";
+
+	/** The Shiki grammar for the lane's fences, so the plate labels itself. */
+	Lang: string;
+
+	Steps: InstallStep[];
+}
+
 interface InstallRoute {
 	/** The anchor id the card's `<h2>` carries. */
-	Id: string;
+	ID: string;
 
-	/** The corner badge, e.g. "#1 // PLUGIN CATALOG (RECOMMENDED)". */
+	/** The corner badge, e.g. "#1 // PLUGIN CATALOG". */
 	Badge: string;
 
-	/** Badge color: canary for the two recommended lanes, raw and teal after. */
+	/** Badge color: canary for the recommended lane, raw and teal after. */
 	BadgeColor: "canary" | "raw" | "teal" | "bone";
 
 	/** Badge side - the cards alternate, so the page staggers. */
 	Side: "left" | "right";
 
-	/** The plate's tilt from `sm` up; mobile is always flat. */
+	/** The plate's tilt from `sm` up; mobile is always flat. Empty = flat. */
 	Rotate: string;
+
+	/** The plate's emphasis tier: crimson for the recommendation, subtle after. */
+	Tone: "crimson" | "subtle";
 
 	/** The card's `<h2>`. */
 	Title: string;
 
-	/** The step count chip. */
-	Steps: string;
+	/**
+	 * The one line that says what the route is FOR. Exactly one route carries
+	 * `Recommended`; the rest say the situation they fit. The page used to
+	 * badge both the catalog and the clone RECOMMENDED while the introduction
+	 * told an unsure reader to take the catalog - two recommendations and one
+	 * answer.
+	 */
+	Label: string;
 
-	/** The copy button's label - the payload IS the fence below it. */
-	CopyLabel: string;
+	/** True for exactly one route. Drives the badge shape, not the wording. */
+	Recommended: boolean;
 
-	/** The transcript, byte-exact. */
-	Code: string;
+	/** The complete sequence per platform. */
+	Lanes: InstallLane[];
 
-	/** The `//` note block, rendered as its own plain fence. */
-	Comment?: string;
-
-	/** A one-line note under the transcript. */
-	Note?: string;
+	/** Route-level prose: the `//` notes that were never about one command. */
+	Notes?: string[];
 
 	/** The outcome kicker, e.g. "OUTCOME // CATALOG INSTALL:". */
 	OutcomeTag: string;
@@ -65,147 +131,522 @@ interface InstallRoute {
 	/** What the route writes, and where. */
 	Writes: string;
 
-	/** What it fails on - one sentence per failure. */
-	Fails: string[];
-
 	/** The verification, one sentence per line. */
 	Verify: string[];
 
+	/** The output to expect once the route is done. */
+	Expect: string;
+
 	/** Render the external SRC link to the Hermes plugin guide. */
 	Guide?: boolean;
+
+	/** The one large warning block on the page - destructive cost only. */
+	Warning?: { Label: string; Lines: string[] };
 
 	/** One route-specific aside. */
 	Lesson?: { Label: string; Text: string };
 }
 
-const Routes: InstallRoute[] = [
+/** A macOS / Linux lane: POSIX shell, `bash` fences. */
+const Posix = (Steps: InstallStep[]): InstallLane => ({
+	Platform: "macOS / Linux",
+	Shell: "bash",
+	Lang: "bash",
+	Steps,
+});
+
+/** A Windows lane: native PowerShell, `powershell` fences. */
+const Windows = (Steps: InstallStep[]): InstallLane => ({
+	Platform: "Windows",
+	Shell: "powershell",
+	Lang: "powershell",
+	Steps,
+});
+
+/**
+ * The "copy all" payload: only executable lines, in order, one per line. It is
+ * built from the same `Command` fields the per-step controls copy, so the two
+ * can never drift - and a prompt or an annotation has nowhere to enter.
+ */
+const Executable = (Steps: InstallStep[]): string => Steps.map((Step) => Step.Command).join("\n");
+
+/** The inline-code voice, once, so a route's prose does not repeat the class. */
+const Code = (Text: string): string =>
+	`<code class="font-mono text-base text-weathered-teal">${Text}</code>`;
+
+// The page's own install routes. NOT `Routes` - that name belongs to the link
+// registry (`@Library/Links`), and a local `const Routes` next to
+// `import { Routes }` is a duplicate binding that no template parse catches.
+const InstallRoutes: InstallRoute[] = [
 	{
-		Id: "catalog",
-		Badge: "#1 // PLUGIN CATALOG (RECOMMENDED)",
+		ID: "catalog",
+		Badge: "#1 // PLUGIN CATALOG",
 		BadgeColor: "canary",
 		Side: "left",
 		Rotate: "-rotate-[1.8deg]",
+		Tone: "crimson",
 		Title: "Plugin catalog install",
-		Steps: "5 STEPS",
-		CopyLabel: "CATALOG",
-		Code: `$ hermes plugins install aphrodite
-$ hermes plugins enable aphrodite // or answer yes at the Enable now? prompt
-$ cd ~/.hermes/plugins/aphrodite
-$ bash download.sh // or: pwsh ./download.ps1 - still required
-$ hermes`,
-		Note: "The catalog is the only lane with no <code class=\"font-mono text-base text-weathered-teal\">git</code> and no Rust in it: one install, one enable, one download.",
+		Label: "Recommended",
+		Recommended: true,
+		Lanes: [
+			Posix([
+				{
+					Title: "Install the plugin from the catalog",
+					Command: "hermes plugins install aphrodite",
+					Explanation: `Checks out the catalog entry's reviewed, pinned commit - never a branch tip. Hermes asks ${Code("Enable now?")} at the end of this step; the next step answers it explicitly, so the sequence does not depend on a prompt.`,
+					Expected: `A pinned checkout in ${Code("~/.hermes/plugins/aphrodite")} - ${Code("plugin.yaml")} plus the ${Code("__init__.py")} shim.`,
+				},
+				{
+					Title: "Enable the plugin",
+					Command: "hermes plugins enable aphrodite",
+					Explanation: `Or answer yes at the ${Code("Enable now?")} prompt - this is the same write, run as its own step so it can be re-run on its own.`,
+					Prerequisite: `${Code("hermes")} on ${Code("PATH")}.`,
+					Troubleshooting: [
+						`${Code("hermes plugins enable aphrodite")} skipped: enabling is a separate write to Hermes's own ${Code("config.yaml")}, so a finished install alone does not register the hooks.`,
+					],
+				},
+				{
+					Title: "Step into the installed plugin folder",
+					Command: "cd ~/.hermes/plugins/aphrodite",
+					Explanation: `${Code("download.sh")} is a file in the plugin tree, not a command on ${Code("PATH")}, so the next step has to run from inside the folder.`,
+					Troubleshooting: [
+						`A ${Code("download.sh")} run from outside the plugin folder: the script is a file in the tree, so ${Code("cd")} into it before running it.`,
+					],
+				},
+				{
+					Title: "Fetch the prebuilt binary and library",
+					Command: "bash download.sh",
+					Explanation: `Fetches the prebuilt binary and dylib from GitHub Releases into ${Code("~/.hermes/aphrodite/binaries/")} - never into the plugin directory - validated against the in-tree ${Code("SHA256SUMS.txt")} and magic-byte checked. Nothing is compiled and no Rust toolchain is required. Pin both explicitly: ${Code("bash download.sh 1.6.5 x86_64-unknown-linux-gnu")}.`,
+					Expected: `${Code("aphrodite")} + ${Code("libaphrodite_hermes")} in ${Code("~/.hermes/aphrodite/binaries/")}.`,
+					Troubleshooting: [
+						`No route to GitHub Releases: the fetch step fails. The plugin is already enabled in ${Code("config.yaml")} by step 2, so Hermes tries to load it - and a loader with no binary logs the setup command and stays inert until the binary is present. An enabled configuration is not a runtime that can load; ${Code("register()")} never downloads anything on its own.`,
+						`A checksum that does not match ${Code("SHA256SUMS.txt")}: the verify step fails, and the honest fix is a re-run, not a hand-copied file.`,
+					],
+				},
+				{
+					Title: "Start Hermes",
+					Command: "hermes",
+					Explanation: `The plugin launches the proxy pair from the binaries you just fetched: ${Code(":9797")} (cache) and ${Code(":9798")} (token).`,
+					Expected: "A log line saying Aphrodite is enabled, then two proxy listeners.",
+				},
+			]),
+			Windows([
+				{
+					Title: "Install the plugin from the catalog",
+					Command: "hermes plugins install aphrodite",
+					Explanation: `Checks out the catalog entry's reviewed, pinned commit - never a branch tip. Hermes asks ${Code("Enable now?")} at the end of this step; the next step answers it explicitly, so the sequence does not depend on a prompt.`,
+					Expected: `A pinned checkout in ${Code("%USERPROFILE%\\.hermes\\plugins\\aphrodite")} - ${Code("plugin.yaml")} plus the ${Code("__init__.py")} shim.`,
+				},
+				{
+					Title: "Enable the plugin",
+					Command: "hermes plugins enable aphrodite",
+					Explanation: `Or answer yes at the ${Code("Enable now?")} prompt - this is the same write, run as its own step so it can be re-run on its own.`,
+					Prerequisite: `${Code("hermes")} on ${Code("PATH")}.`,
+					Troubleshooting: [
+						`${Code("hermes plugins enable aphrodite")} skipped: enabling is a separate write to Hermes's own ${Code("config.yaml")}, so a finished install alone does not register the hooks.`,
+					],
+				},
+				{
+					Title: "Step into the installed plugin folder",
+					Command: `cd "$env:USERPROFILE\\.hermes\\plugins\\aphrodite"`,
+					Explanation: `On Windows the catalog entry lands in ${Code("%USERPROFILE%\\.hermes\\plugins\\aphrodite")}, and ${Code("download.ps1")} is a file in that folder.`,
+					Troubleshooting: [
+						`A ${Code("download.ps1")} run from outside the plugin folder: the script is a file in the tree, so ${Code("Set-Location")} into it before running it.`,
+					],
+				},
+				{
+					Title: "Fetch the prebuilt binary and library",
+					Command: "pwsh ./download.ps1",
+					Explanation: `The direct PowerShell equivalent of ${Code("download.sh")}: same version and platform detection, same ${Code("SHA256SUMS.txt")} validation, same runtime home - and it runs under both PowerShell 5.1 (built into Windows) and PowerShell 7+. Native PowerShell cannot run ${Code("bash download.sh")} without Git Bash, WSL or MSYS, which is why this lane uses ${Code("download.ps1")} and not the POSIX script.`,
+					Expected: `${Code("aphrodite.exe")} + ${Code("aphrodite_hermes.dll")} in ${Code("%USERPROFILE%\\.hermes\\aphrodite\\binaries\\")}.`,
+					Troubleshooting: [
+						`No route to GitHub Releases: the fetch step fails. The plugin is already enabled in ${Code("config.yaml")} by step 2, so Hermes tries to load it - and a loader with no binary logs the setup command and stays inert until the binary is present. An enabled configuration is not a runtime that can load; ${Code("register()")} never downloads anything on its own.`,
+						`A checksum that does not match ${Code("SHA256SUMS.txt")}: the verify step fails, and the honest fix is a re-run, not a hand-copied file.`,
+					],
+				},
+				{
+					Title: "Start Hermes",
+					Command: "hermes",
+					Explanation: `The plugin launches the proxy pair from the binaries you just fetched: ${Code(":9797")} (cache) and ${Code(":9798")} (token).`,
+					Expected: "A log line saying Aphrodite is enabled, then two proxy listeners.",
+				},
+			]),
+		],
+		Notes: [
+			`The catalog is the only lane with no ${Code("git")} and no Rust in it: one install, one enable, one download.`,
+		],
 		OutcomeTag: "OUTCOME // CATALOG INSTALL:",
-		Outcome: "Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256 verified, plugin enabled.",
-		Writes: "The catalog checkout only - <code class=\"font-mono text-base text-weathered-teal\">plugin.yaml</code> plus the <code class=\"font-mono text-base text-weathered-teal\">__init__.py</code> shim, in <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/plugins/aphrodite</code>. <code class=\"font-mono text-base text-weathered-teal\">download.sh</code> then fetches the binary and the dylib into <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/aphrodite/binaries/</code>, never into the plugin directory, validated against the in-tree <code class=\"font-mono text-base text-weathered-teal\">SHA256SUMS.txt</code> and magic-byte checked.",
-		Fails: [
-			"No route to GitHub Releases: the fetch step fails and the plugin stays disabled - <code class=\"font-mono text-base text-weathered-teal\">register()</code> never downloads anything on its own.",
-			"A checksum that does not match <code class=\"font-mono text-base text-weathered-teal\">SHA256SUMS.txt</code>: the verify step fails, and the honest fix is a re-run, not a hand-copied file.",
-			"<code class=\"font-mono text-base text-weathered-teal\">aphrodite setup</code> run against the catalog directory: it rewrites the loader the catalog manages. Use <code class=\"font-mono text-base text-weathered-teal\">download.sh</code> from that folder instead.",
-		],
+		Outcome:
+			"Reviewed pinned checkout of the catalog entry, binaries fetched + SHA-256 verified, plugin enabled.",
+		Writes: `The catalog checkout only - ${Code("plugin.yaml")} plus the ${Code("__init__.py")} shim, in ${Code("~/.hermes/plugins/aphrodite")}. ${Code("download.sh")} then fetches the binary and the dylib into ${Code("~/.hermes/aphrodite/binaries/")}, never into the plugin directory, validated against the in-tree ${Code("SHA256SUMS.txt")} and magic-byte checked.`,
 		Verify: [
 			"Start <code class=\"font-mono text-base text-weathered-teal\">hermes</code>.",
 			"The plugin should log that Aphrodite is enabled.",
 			"If the binaries are missing, it logs the setup command and stays disabled until you run it.",
 		],
+		Expect:
+			"A log line saying Aphrodite is enabled, then two proxy listeners on :9797 (cache) and :9798 (token).",
 		Guide: true,
+		Warning: {
+			Label: "THE CATALOG RULE",
+			Lines: [
+				`The catalog entry is reviewed and pinned - ${Code("hermes plugins install")} checks out exactly that commit, never a branch tip.`,
+				`Do NOT run ${Code("aphrodite setup")} in a catalog-managed directory - it rewrites the loader the catalog manages. Still run ${Code("download.sh")} (or ${Code("download.ps1")} on Windows) from the installed plugin folder.`,
+			],
+		},
 	},
 	{
-		Id: "clone",
-		Badge: "#2 // GIT CLONE (RECOMMENDED)",
-		BadgeColor: "canary",
+		ID: "clone",
+		Badge: "#2 // GIT CLONE",
+		BadgeColor: "teal",
 		Side: "right",
-		Rotate: "rotate-[2.2deg]",
+		Rotate: "",
+		Tone: "subtle",
 		Title: "Clone, link, download, enable",
-		Steps: "7 STEPS",
-		CopyLabel: "CLONE",
-		Code: `$ git clone ${ExternalLinks.HermesRepository}.git
-$ cd Aphrodite-Hermes
-$ ln -s "$(pwd)" ~/.hermes/plugins/aphrodite
-$ bash download.sh // or: pwsh ./download.ps1 (Windows)
-$ cd ..
-$ hermes plugins enable aphrodite
-$ hermes`,
-		Note: "Pin both explicitly: <code class=\"font-mono text-base text-weathered-teal\">bash download.sh 1.6.5 x86_64-unknown-linux-gnu</code>. <code class=\"font-mono text-base text-weathered-teal\">register()</code> never downloads - the only escape hatch is <code class=\"font-mono text-base text-weathered-teal\">APHRODITE_AUTO_DOWNLOAD=1</code>, which runs the script itself before launching.",
-		OutcomeTag: "OUTCOME // VERIFIED INSTALL:",
-		Outcome: "Binary + native library (dylib) fetched from GitHub Releases, SHA-256 verified, plugin enabled.",
-		Writes: "<code class=\"font-mono text-base text-weathered-teal\">download.sh</code> resolves the version from the bundled <code class=\"font-mono text-base text-weathered-teal\">BINARY_VERSION</code>, the monorepo's own <code class=\"font-mono text-base text-weathered-teal\">Cargo.toml</code>, or the latest published release, detects your platform, and installs <code class=\"font-mono text-base text-weathered-teal\">aphrodite</code> + <code class=\"font-mono text-base text-weathered-teal\">libaphrodite_hermes</code> into <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/aphrodite/binaries/</code>. Nothing is written inside the plugin tree.",
-		Fails: [
-			"<code class=\"font-mono text-base text-weathered-teal\">ln -s</code> onto an existing <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/plugins/aphrodite</code> directory: the link lands inside it instead of replacing it. Remove the directory first.",
-			"A <code class=\"font-mono text-base text-weathered-teal\">download.sh</code> run from outside the clone: the script is a file in the tree, so <code class=\"font-mono text-base text-weathered-teal\">cd</code> into it before running it.",
-			"Native Windows PowerShell: <code class=\"font-mono text-base text-weathered-teal\">bash download.sh</code> needs Git Bash, WSL or MSYS - use <code class=\"font-mono text-base text-weathered-teal\">pwsh ./download.ps1</code> instead.",
-			"<code class=\"font-mono text-base text-weathered-teal\">hermes plugins enable aphrodite</code> skipped: enabling is a separate write to Hermes's own <code class=\"font-mono text-base text-weathered-teal\">config.yaml</code>, so a finished download alone does not register the hooks.",
+		Label: "For a local plugin checkout",
+		Recommended: false,
+		Lanes: [
+			Posix([
+				{
+					Title: "Clone the plugin repository",
+					Command: `git clone ${ExternalLinks.HermesRepository}.git`,
+					Explanation:
+						"The plugin is a pure loader - it does not bundle the binary or the dylib - so the clone is small.",
+					Expected: "An <code class=\"font-mono text-base text-weathered-teal\">Aphrodite-Hermes</code> directory beside where you ran the command.",
+				},
+				{
+					Title: "Enter the clone",
+					Command: "cd Aphrodite-Hermes",
+					Explanation:
+						"Every following step runs from inside the clone: the download script lives in the tree.",
+				},
+				{
+					Title: "Link the clone into Hermes's plugin directory",
+					Command: `ln -s "$(pwd)" ~/.hermes/plugins/aphrodite`,
+					Explanation:
+						"Hermes discovers plugins from <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/plugins/&lt;name&gt;</code>, so the link is what makes the clone a plugin. A symlink (not a copy) means edits to your checkout are picked up without recopying.",
+					Prerequisite:
+						"No existing <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/plugins/aphrodite</code> entry.",
+					Troubleshooting: [
+						`<code class="font-mono text-base text-weathered-teal">ln -s</code> onto an existing <code class="font-mono text-base text-weathered-teal">~/.hermes/plugins/aphrodite</code> directory: the link lands inside it instead of replacing it. Remove the directory first.`,
+					],
+				},
+				{
+					Title: "Fetch the prebuilt binary and library",
+					Command: "bash download.sh",
+					Explanation: `Resolves the version from the bundled ${Code("BINARY_VERSION")}, the monorepo's own ${Code("Cargo.toml")}, or the latest published release, detects your platform, and installs ${Code("aphrodite")} + ${Code("libaphrodite_hermes")} into ${Code("~/.hermes/aphrodite/binaries/")}. Nothing is written inside the plugin tree, and no Rust toolchain is required.`,
+					Expected: `${Code("aphrodite")} + ${Code("libaphrodite_hermes")} in ${Code("~/.hermes/aphrodite/binaries/")}.`,
+					Troubleshooting: [
+						`A ${Code("download.sh")} run from outside the clone: the script is a file in the tree, so ${Code("cd")} into it before running it.`,
+					],
+				},
+				{
+					Title: "Leave the clone",
+					Command: "cd ..",
+					Explanation:
+						"Optional housekeeping: the remaining steps are not relative to the clone.",
+				},
+				{
+					Title: "Enable the plugin",
+					Command: "hermes plugins enable aphrodite",
+					Prerequisite: `${Code("hermes")} on ${Code("PATH")}.`,
+					Troubleshooting: [
+						`${Code("hermes plugins enable aphrodite")} skipped: enabling is a separate write to Hermes's own ${Code("config.yaml")}, so a finished download alone does not register the hooks.`,
+					],
+				},
+				{
+					Title: "Start Hermes",
+					Command: "hermes",
+					Expected: "A log line saying Aphrodite is enabled, then two proxy listeners.",
+				},
+			]),
+			Windows([
+				{
+					Title: "Clone the plugin repository",
+					Command: `git clone ${ExternalLinks.HermesRepository}.git`,
+					Explanation:
+						"The plugin is a pure loader - it does not bundle the binary or the dylib - so the clone is small.",
+					Expected: "An <code class=\"font-mono text-base text-weathered-teal\">Aphrodite-Hermes</code> directory beside where you ran the command.",
+				},
+				{
+					Title: "Enter the clone",
+					Command: "cd Aphrodite-Hermes",
+					Explanation:
+						"Every following step runs from inside the clone: the download script lives in the tree.",
+				},
+				{
+					Title: "Create the plugins directory",
+					Command: `mkdir "$env:USERPROFILE\\.hermes\\plugins" -Force`,
+					Explanation: `Hermes discovers plugins from ${Code("%USERPROFILE%\\.hermes\\plugins\\<name>")}. ${Code("-Force")} leaves an existing directory alone, so the step is safe to repeat.`,
+				},
+				{
+					Title: "Link the clone into Hermes's plugin directory",
+					Command: `New-Item -ItemType Junction -Path "$env:USERPROFILE\\.hermes\\plugins\\aphrodite" -Target (Get-Location)`,
+					Explanation:
+						"A directory junction is the Windows equivalent of the POSIX symlink and needs no admin rights on modern Windows, unlike a real symlink - so edits to your clone are picked up without recopying.",
+					Prerequisite:
+						"No existing <code class=\"font-mono text-base text-weathered-teal\">aphrodite</code> entry in that directory.",
+					Troubleshooting: [
+						"Some locked-down environments still restrict junctions: copy instead - <code class=\"font-mono text-base text-weathered-teal\">Copy-Item -Recurse</code> - and remember you will need to re-copy after every plugin update.",
+					],
+				},
+				{
+					Title: "Fetch the prebuilt binary and library",
+					Command: "pwsh ./download.ps1",
+					Explanation: `The direct PowerShell equivalent of ${Code("download.sh")} - version and platform auto-detected, ${Code("SHA256SUMS.txt")} validated, output written into ${Code("%USERPROFILE%\\.hermes\\aphrodite\\binaries\\")}. Native Windows PowerShell cannot run ${Code("bash download.sh")} without Git Bash, WSL or MSYS, so this lane uses the PowerShell script throughout.`,
+					Expected: `${Code("aphrodite.exe")} + ${Code("aphrodite_hermes.dll")} in ${Code("%USERPROFILE%\\.hermes\\aphrodite\\binaries\\")}.`,
+					Troubleshooting: [
+						`A ${Code("download.ps1")} run from outside the clone: the script is a file in the tree, so ${Code("Set-Location")} into it before running it.`,
+					],
+				},
+				{
+					Title: "Leave the clone",
+					Command: "cd ..",
+					Explanation:
+						"Optional housekeeping: the remaining steps are not relative to the clone.",
+				},
+				{
+					Title: "Enable the plugin",
+					Command: "hermes plugins enable aphrodite",
+					Prerequisite: `${Code("hermes")} on ${Code("PATH")}.`,
+					Troubleshooting: [
+						`${Code("hermes plugins enable aphrodite")} skipped: enabling is a separate write to Hermes's own ${Code("config.yaml")}, so a finished download alone does not register the hooks.`,
+					],
+				},
+				{
+					Title: "Start Hermes",
+					Command: "hermes",
+					Expected: "A log line saying Aphrodite is enabled, then two proxy listeners.",
+				},
+			]),
 		],
+		Notes: [
+			`Pin both explicitly: ${Code("bash download.sh 1.6.5 x86_64-unknown-linux-gnu")}. ${Code("register()")} never downloads - the only escape hatch is ${Code("APHRODITE_AUTO_DOWNLOAD=1")}, which runs the script itself before launching.`,
+		],
+		OutcomeTag: "OUTCOME // VERIFIED INSTALL:",
+		Outcome:
+			"Binary + native library (dylib) fetched from GitHub Releases, SHA-256 verified, plugin enabled.",
+		Writes: `${Code("download.sh")} resolves the version from the bundled ${Code("BINARY_VERSION")}, the monorepo's own ${Code("Cargo.toml")}, or the latest published release, detects your platform, and installs ${Code("aphrodite")} + ${Code("libaphrodite_hermes")} into ${Code("~/.hermes/aphrodite/binaries/")}. Nothing is written inside the plugin tree.`,
 		Verify: [
 			"Start <code class=\"font-mono text-base text-weathered-teal\">hermes</code>.",
 			"The plugin should log that Aphrodite is enabled.",
 			"If the binaries are missing, it logs the setup command and stays disabled until you run it.",
 		],
+		Expect:
+			"A log line saying Aphrodite is enabled, then two proxy listeners on :9797 (cache) and :9798 (token).",
 	},
 	{
-		Id: "cargo",
+		ID: "cargo",
 		Badge: "#3 // CARGO",
 		BadgeColor: "raw",
 		Side: "left",
-		Rotate: "rotate-[2.2deg]",
+		Rotate: "",
+		Tone: "subtle",
 		Title: "Crates.io install",
-		Steps: "3 STEPS",
-		CopyLabel: "CARGO",
-		Code: `$ cargo install aphrodite // proxy binary
-$ cargo install aphrodite-hermes // dylib + helper bin
-$ aphrodite setup`,
-		Comment: `// cargo installs the binaries only - aphrodite setup then writes a minimal
-// loader into ~/.hermes/plugins/aphrodite. For the full plugin, use Option 1
-// or 2. Needs Rust 1.88+ (the repo toolchain pins nightly).`,
-		Note: "Setup ends by starting the proxy - pass <code class=\"font-mono text-base text-weathered-teal\">--no-launch</code> to skip that, and <code class=\"font-mono text-base text-weathered-teal\">--force</code> to rewrite an existing <code class=\"font-mono text-base text-weathered-teal\">aphrodite.toml</code>.",
-		OutcomeTag: "OUTCOME // BINARIES + LOADER:",
-		Outcome: "The proxy binary and the dylib installed by cargo, the runtime home provisioned by aphrodite setup, a hooks-only loader written, the plugin registered.",
-		Writes: "<code class=\"font-mono text-base text-weathered-teal\">aphrodite setup</code> provisions <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/aphrodite/</code> - the binary, the dylibs, <code class=\"font-mono text-base text-weathered-teal\">aphrodite.toml</code> from the embedded template (only if none exists, unless <code class=\"font-mono text-base text-weathered-teal\">--force</code>) and the <code class=\"font-mono text-base text-weathered-teal\">BINARY_VERSION</code> pin - then writes the hooks-only loader, <code class=\"font-mono text-base text-weathered-teal\">plugin.yaml</code> + <code class=\"font-mono text-base text-weathered-teal\">__init__.py</code>, into <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/plugins/aphrodite/</code>, removing a stale symlink from older installs first. It ends by running <code class=\"font-mono text-base text-weathered-teal\">hermes plugins enable aphrodite</code>.",
-		Fails: [
-			"No <code class=\"font-mono text-base text-weathered-teal\">hermes</code> on <code class=\"font-mono text-base text-weathered-teal\">PATH</code>: step one runs <code class=\"font-mono text-base text-weathered-teal\">hermes --version</code> and fails fast with a clear error, before anything is written.",
-			"A missing <code class=\"font-mono text-base text-weathered-teal\">libaphrodite_hermes</code> aborts setup; a missing core <code class=\"font-mono text-base text-weathered-teal\">libaphrodite</code> only warns - the plugin loads the Hermes dylib, not the core one.",
-			"An existing <code class=\"font-mono text-base text-weathered-teal\">aphrodite.toml</code> is left alone unless you pass <code class=\"font-mono text-base text-weathered-teal\">--force</code>; <code class=\"font-mono text-base text-weathered-teal\">--cache-port</code> and <code class=\"font-mono text-base text-weathered-teal\">--token-port</code> move the pair off 9797/9798 for a second agent on the same machine.",
-			"A failed <code class=\"font-mono text-base text-weathered-teal\">hermes plugins enable</code>: setup prints a warning and carries on - the binaries are installed, the registration is not.",
+		Label: "For Cargo-managed installation",
+		Recommended: false,
+		Lanes: [
+			Posix([
+				{
+					Title: "Install the proxy binary",
+					Command: "cargo install aphrodite",
+					Explanation: `Built from crates.io on your machine, so this route does need a Rust toolchain: 1.88+, and the repo's own toolchain pins nightly.`,
+				},
+				{
+					Title: "Install the plugin's dylib and helper bin",
+					Command: "cargo install aphrodite-hermes",
+					Explanation:
+						"The native library the Python loader loads, plus the helper binary.",
+				},
+				{
+					Title: "Run setup",
+					Command: "aphrodite setup",
+					Explanation: `Provisions ${Code("~/.hermes/aphrodite/")} - the binary, the dylibs, ${Code("aphrodite.toml")} from the embedded template and the ${Code("BINARY_VERSION")} pin - then writes the hooks-only loader, ${Code("plugin.yaml")} + ${Code("__init__.py")}, into ${Code("~/.hermes/plugins/aphrodite/")}, removing a stale symlink from older installs first. It ends by running ${Code("hermes plugins enable aphrodite")}.`,
+					Prerequisite: `${Code("hermes")} on ${Code("PATH")}; Rust 1.88+.`,
+					Expected: `The runtime home provisioned, the loader written, the plugin registered.`,
+					Troubleshooting: [
+						`No ${Code("hermes")} on ${Code("PATH")}: step one runs ${Code("hermes --version")} and fails fast with a clear error, before anything is written.`,
+						`A missing ${Code("libaphrodite_hermes")} aborts setup; a missing core ${Code("libaphrodite")} only warns - the plugin loads the Hermes dylib, not the core one.`,
+						`An existing ${Code("aphrodite.toml")} is left alone unless you pass ${Code("--force")}; ${Code("--cache-port")} and ${Code("--token-port")} move the pair off 9797/9798 for a second agent on the same machine.`,
+						`A failed ${Code("hermes plugins enable")}: setup prints a warning and carries on - the binaries are installed, the registration is not.`,
+					],
+				},
+			]),
+			Windows([
+				{
+					Title: "Install the proxy binary",
+					Command: "cargo install aphrodite",
+					Explanation: `Built from crates.io on your machine, so this route does need a Rust toolchain: 1.88+, and the repo's own toolchain pins nightly.`,
+				},
+				{
+					Title: "Install the plugin's dylib and helper bin",
+					Command: "cargo install aphrodite-hermes",
+					Explanation:
+						"The native library the Python loader loads, plus the helper binary.",
+				},
+				{
+					Title: "Run setup",
+					Command: "aphrodite setup",
+					Explanation: `Provisions ${Code("%USERPROFILE%\\.hermes\\aphrodite\\")} - the binary, the dylibs, ${Code("aphrodite.toml")} from the embedded template and the ${Code("BINARY_VERSION")} pin - and registers the plugin with Hermes. It ends by starting the proxy and printing the one manual step left on Windows: linking the plugin into Hermes, which is the next two steps.`,
+					Prerequisite: `${Code("hermes")} on ${Code("PATH")}; Rust 1.88+.`,
+					Expected: "The runtime home provisioned, the plugin registered, the remaining link step named.",
+					Troubleshooting: [
+						`No ${Code("hermes")} on ${Code("PATH")}: step one runs ${Code("hermes --version")} and fails fast with a clear error, before anything is written.`,
+						`A missing ${Code("libaphrodite_hermes")} aborts setup; a missing core ${Code("libaphrodite")} only warns - the plugin loads the Hermes dylib, not the core one.`,
+						`An existing ${Code("aphrodite.toml")} is left alone unless you pass ${Code("--force")}; ${Code("--cache-port")} and ${Code("--token-port")} move the pair off 9797/9798 for a second agent on the same machine.`,
+						`A failed ${Code("hermes plugins enable")}: setup prints a warning and carries on - the binaries are installed, the registration is not.`,
+					],
+				},
+				{
+					Title: "Create the plugins directory",
+					Command: `New-Item -ItemType Directory -Force "$env:USERPROFILE\\.hermes\\plugins" | Out-Null`,
+					Explanation: `Hermes discovers plugins from ${Code("%USERPROFILE%\\.hermes\\plugins\\<name>")}; ${Code("-Force")} leaves an existing directory alone.`,
+				},
+				{
+					Title: "Link the runtime home into the plugin directory",
+					Command: `New-Item -ItemType Junction -Path "$env:USERPROFILE\\.hermes\\plugins\\aphrodite" -Target "$env:USERPROFILE\\.hermes\\aphrodite"`,
+					Explanation:
+						"This is the manual follow-up setup names on Windows: either a directory junction (no admin rights needed on modern Windows) or a copy of the runtime home. A junction keeps the two in step without recopying.",
+					Troubleshooting: [
+						"Some locked-down environments still restrict junctions: copy the runtime home into the plugin directory instead, and re-copy after every upgrade.",
+					],
+				},
+			]),
 		],
+		Notes: [
+			`${Code("cargo install")} installs the binaries only - ${Code("aphrodite setup")} then writes a minimal hooks-only loader into ${Code("~/.hermes/plugins/aphrodite")}. For the full plugin tree, use #1 or #2: this route gives you the proxy and a loader that registers the hooks, not the checkout.`,
+			`Setup ends by starting the proxy - pass ${Code("--no-launch")} to skip that, and ${Code("--force")} to rewrite an existing ${Code("aphrodite.toml")}.`,
+		],
+		OutcomeTag: "OUTCOME // BINARIES + LOADER:",
+		Outcome:
+			"The proxy binary and the dylib installed by cargo, the runtime home provisioned by aphrodite setup, a hooks-only loader written, the plugin registered.",
+		Writes: `${Code("aphrodite setup")} provisions ${Code("~/.hermes/aphrodite/")} - the binary, the dylibs, ${Code("aphrodite.toml")} from the embedded template (only if none exists, unless ${Code("--force")}) and the ${Code("BINARY_VERSION")} pin - then writes the hooks-only loader, ${Code("plugin.yaml")} + ${Code("__init__.py")}, into ${Code("~/.hermes/plugins/aphrodite/")}, removing a stale symlink from older installs first. It ends by running ${Code("hermes plugins enable aphrodite")}.`,
 		Verify: [
-			"Option 3 does not install the plugin by itself - after <code class=\"font-mono text-base text-weathered-teal\">aphrodite setup</code> writes the loader, start <code class=\"font-mono text-base text-weathered-teal\">hermes</code>.",
+			`Option 3 does not install the full plugin tree by itself - after ${Code("aphrodite setup")} writes the loader, start ${Code("hermes")}.`,
 			"The plugin should log that Aphrodite is enabled; if the binaries are missing, it logs the setup command and stays disabled until you run it.",
 		],
+		Expect:
+			"A log line saying Aphrodite is enabled, then two proxy listeners on :9797 (cache) and :9798 (token).",
 		Lesson: {
 			Label: "MACOS GATEKEEPER",
 			Text: "Every artifact copy in aphrodite setup goes through one Gatekeeper-safe path: ditto (metadata-preserving), falling back to fs::copy + xattr -c to clear quarantine, then install_name_tool -id @rpath/<name> and an explicit ad-hoc codesign -f -s - for dylibs. A machine missing Xcode Command Line Tools used to get a SIGKILLed binary with zero diagnostic; every step now prints a specific warning instead.",
 		},
 	},
 	{
-		Id: "source",
+		ID: "source",
 		Badge: "#4 // FROM SOURCE",
-		BadgeColor: "teal",
+		BadgeColor: "raw",
 		Side: "right",
-		Rotate: "rotate-[1.4deg]",
+		Rotate: "",
+		Tone: "subtle",
 		Title: "Build it yourself",
-		Steps: "4 STEPS",
-		CopyLabel: "SOURCE",
-		Code: `$ git clone ${ExternalLinks.Repository}.git
-$ cd Aphrodite
-$ git submodule update --init --recursive
-$ cargo build --release -p aphrodite -p aphrodite-hermes`,
-		Comment: `// needs Rust 1.88+ (the repo toolchain pins nightly). The build outputs land
-// in target/release/ - point APHRODITE_BINARY_PATH / APHRODITE_HERMES_DYLIB_PATH
-// at them, or copy them into ~/.hermes/aphrodite/binaries/.`,
-		OutcomeTag: "OUTCOME // A LOCAL BUILD:",
-		Outcome: "A release build in target/release/ that you point the plugin at, or copy into the runtime home's binaries/ - no installer script, no download.",
-		Writes: "Nothing outside your checkout: <code class=\"font-mono text-base text-weathered-teal\">cargo build --release</code> writes <code class=\"font-mono text-base text-weathered-teal\">target/release/aphrodite</code> and <code class=\"font-mono text-base text-weathered-teal\">target/release/libaphrodite_hermes.dylib</code> (<code class=\"font-mono text-base text-weathered-teal\">.so</code> on Linux). The plugin reads <code class=\"font-mono text-base text-weathered-teal\">APHRODITE_BINARY_PATH</code> / <code class=\"font-mono text-base text-weathered-teal\">APHRODITE_HERMES_DYLIB_PATH</code>, or you copy the pair into <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/aphrodite/binaries/</code>.",
-		Fails: [
-			"A skipped <code class=\"font-mono text-base text-weathered-teal\">git submodule update --init --recursive</code>: vendored dependencies live in submodules and the build stops early.",
-			"A stable toolchain against a repo pinned to nightly: the workspace needs Rust 1.88+ and the repo's toolchain pins nightly.",
-			"Build output left in <code class=\"font-mono text-base text-weathered-teal\">target/release/</code> while the plugin looks in <code class=\"font-mono text-base text-weathered-teal\">~/.hermes/aphrodite/binaries/</code>: set the two env paths, or copy the files across.",
-			"Nothing self-heals: the plugin never downloads and never repairs an install, and <code class=\"font-mono text-base text-weathered-teal\">layout_check.py</code> is report-only.",
+		Label: "For development",
+		Recommended: false,
+		Lanes: [
+			Posix([
+				{
+					Title: "Clone the monorepo",
+					Command: `git clone ${ExternalLinks.Repository}.git`,
+				},
+				{
+					Title: "Enter the checkout",
+					Command: "cd Aphrodite",
+				},
+				{
+					Title: "Initialise the submodules",
+					Command: "git submodule update --init --recursive",
+					Explanation:
+						"Vendored dependencies live in submodules, so this is required rather than tidy.",
+					Troubleshooting: [
+						`A skipped ${Code("git submodule update --init --recursive")}: vendored dependencies live in submodules and the build stops early.`,
+					],
+				},
+				{
+					Title: "Build the release pair",
+					Command: "cargo build --release -p aphrodite -p aphrodite-hermes",
+					Explanation: `Needs Rust 1.88+ - the repo toolchain pins nightly, and a stable toolchain against it is the build that fails. The outputs land in ${Code("target/release/")}: ${Code("aphrodite")} and ${Code("libaphrodite_hermes.dylib")} (${Code(".so")} on Linux). Point ${Code("APHRODITE_BINARY_PATH")} / ${Code("APHRODITE_HERMES_DYLIB_PATH")} at them, or copy them into ${Code("~/.hermes/aphrodite/binaries/")}.`,
+					Expected: `${Code("target/release/aphrodite")} + ${Code("target/release/libaphrodite_hermes.dylib")} (${Code(".so")} on Linux).`,
+					Troubleshooting: [
+						`A stable toolchain against a repo pinned to nightly: the workspace needs Rust 1.88+ and the repo's toolchain pins nightly.`,
+						`Build output left in ${Code("target/release/")} while the plugin looks in ${Code("~/.hermes/aphrodite/binaries/")}: set the two env paths, or copy the files across.`,
+						`Nothing self-heals: the plugin never downloads and never repairs an install, and ${Code("layout_check.py")} is report-only.`,
+					],
+				},
+			]),
+			Windows([
+				{
+					Title: "Clone the monorepo",
+					Command: `git clone ${ExternalLinks.Repository}.git`,
+				},
+				{
+					Title: "Enter the checkout",
+					Command: "cd Aphrodite",
+				},
+				{
+					Title: "Initialise the submodules",
+					Command: "git submodule update --init --recursive",
+					Explanation:
+						"Vendored dependencies live in submodules, so this is required rather than tidy.",
+					Troubleshooting: [
+						`A skipped ${Code("git submodule update --init --recursive")}: vendored dependencies live in submodules and the build stops early.`,
+					],
+				},
+				{
+					Title: "Build the release pair",
+					Command: "cargo build --release -p aphrodite -p aphrodite-hermes",
+					Explanation: `Needs Rust 1.88+ - the repo toolchain pins nightly, and a stable toolchain against it is the build that fails. The outputs land in ${Code("target\\release\\")} as ${Code("aphrodite.exe")} and ${Code("aphrodite_hermes.dll")}. Point ${Code("APHRODITE_BINARY_PATH")} / ${Code("APHRODITE_HERMES_DYLIB_PATH")} at them, or copy them into ${Code("%USERPROFILE%\\.hermes\\aphrodite\\binaries\\")}.`,
+					Expected: `${Code("target\\release\\aphrodite.exe")} + ${Code("target\\release\\aphrodite_hermes.dll")}.`,
+					Troubleshooting: [
+						`A stable toolchain against a repo pinned to nightly: the workspace needs Rust 1.88+ and the repo's toolchain pins nightly.`,
+						`Build output left in ${Code("target\\release\\")} while the plugin looks in ${Code("%USERPROFILE%\\.hermes\\aphrodite\\binaries\\")}: set the two env paths, or copy the files across.`,
+						`Nothing self-heals: the plugin never downloads and never repairs an install, and ${Code("layout_check.py")} is report-only.`,
+					],
+				},
+			]),
 		],
+		Notes: [
+			`Nothing outside your checkout is written: ${Code("cargo build --release")} writes into ${Code("target/")} and you point the plugin at the result - no installer script, no download.`,
+		],
+		OutcomeTag: "OUTCOME // A LOCAL BUILD:",
+		Outcome:
+			"A release build in target/release/ that you point the plugin at, or copy into the runtime home's binaries/ - no installer script, no download.",
+		Writes: `Nothing outside your checkout: ${Code("cargo build --release")} writes ${Code("target/release/aphrodite")} and ${Code("target/release/libaphrodite_hermes.dylib")} (${Code(".so")} on Linux). The plugin reads ${Code("APHRODITE_BINARY_PATH")} / ${Code("APHRODITE_HERMES_DYLIB_PATH")}, or you copy the pair into ${Code("~/.hermes/aphrodite/binaries/")}.`,
 		Verify: [
 			"Start <code class=\"font-mono text-base text-weathered-teal\">hermes</code>.",
 			"The plugin should log that Aphrodite is enabled.",
 			"If the binaries are missing, it logs the setup command and stays disabled until you run it.",
 		],
+		Expect:
+			"A log line saying Aphrodite is enabled, then two proxy listeners on :9797 (cache) and :9798 (token).",
 	},
+];
+
+// THE UNINSTALL - the reverse direction, as the same two-lane shape. The
+// commands are separate from their prose for the same reason the install steps
+// are: what a reader pastes must be the command, not the sentence about it.
+const Uninstall: InstallLane[] = [
+	Posix([
+		{ Title: "Disable the plugin", Command: "hermes plugins disable aphrodite" },
+		{
+			Title: "Remove the loader",
+			Command: "rm -rf ~/.hermes/plugins/aphrodite",
+		},
+		{
+			Title: "Stop anything still running",
+			Command: `pkill -f "aphrodite" 2>/dev/null || true`,
+		},
+	]),
+	Windows([
+		{ Title: "Disable the plugin", Command: "hermes plugins disable aphrodite" },
+		{
+			Title: "Remove the loader",
+			Command: `Remove-Item "$env:USERPROFILE\\.hermes\\plugins\\aphrodite" -Recurse`,
+		},
+		{
+			Title: "Stop anything still running",
+			Command: "Get-Process aphrodite -ErrorAction SilentlyContinue | Stop-Process",
+		},
+	]),
 ];
 
 // THE LAYOUT - the canonical runtime home, as the install docs draw it. Every
@@ -237,12 +678,6 @@ const SetupSteps = `<ol class="mt-1 list-decimal space-y-2 pl-5">
 	<li><strong class="text-bone-white">Runs hermes plugins enable aphrodite</strong> - a failed registration prints a warning, it does not abort.</li>
 </ol>`;
 
-// The other direction: three commands and one directory to remove.
-const Uninstall = `
-<p>Disable the plugin, remove the loader, then stop anything still running:</p>
-<p class="mt-2 border border-oxblood-dark bg-soot-black p-3 font-mono text-base leading-relaxed text-bone-newsprint">hermes plugins disable aphrodite<br />rm -rf ~/.hermes/plugins/aphrodite<br />pkill -f "aphrodite" 2&gt;/dev/null || true</p>
-<p class="mt-2">Remove <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code> as well to clean up the binaries, config, CCR database and logs the download scripts or <code class="font-mono text-base text-weathered-teal">aphrodite setup</code> wrote.</p>`;
-
 // The toml excerpt: resolution order, precedence, and the two keys the rest of
 // the site quotes. A fence, so the `#` voice stays code.
 const Config = `# resolution order:
@@ -267,12 +702,12 @@ budget_chars = 2600 # hard cap per turn`;
 			Title="Install Aphrodite"
 			Lead={[
 				`Aphrodite is installed as a Hermes Agent plugin (recommended) or run as a standalone proxy for OpenAI-compatible APIs.`,
-				`Two things to know first: the plugin never downloads anything on its own - you run one setup command, and it fetches the Aphrodite binary and library from GitHub Releases, verifies them with SHA-256, and stores them in <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>. And you do not need Rust unless you build from source.`,
+				`Two things to know first: the plugin never downloads anything on its own - you run one setup command, and it fetches the Aphrodite binary and library from GitHub Releases, verifies them with SHA-256, and stores them in <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>. And you need no Rust toolchain for the two plugin routes: the catalog and the clone install prebuilt binaries. The Cargo and from-source routes do build with Rust, and need 1.88+.`,
 				`Not sure which to choose? Use the plugin catalog (Option 1).`,
 			]}
 		/>
 
-		<!-- SLOT 1: the decision - four routes, one table, one transcript below -->
+		<!-- SLOT 1: the decision - four routes, one table, one platform input -->
 		<section class="relative w-full" data-reveal>
 			<ZineTape Variant="section" Label="INSTALL // FOUR ROUTES" />
 			<div class="mb-12 flex flex-wrap gap-3">
@@ -280,17 +715,16 @@ budget_chars = 2600 # hard cap per turn`;
 				<ZineStamp Label="RUST 1.88+ FOR #3-#4" Color="raw" Rotate="sm:rotate-1" />
 				<ZineStamp Label="SHA-256 VERIFIED" Color="teal" Rotate="sm:-rotate-1" />
 			</div>
-			<h2
-				id="routes"
-				class="mb-4 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-			>
+			<h2 id="routes" class="type-section uppercase text-bone-white">
 				Which route to take
 			</h2>
-			<p class="mb-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+			<p class="mt-4 max-w-3xl type-body text-bone-newsprint">
 				Four routes, one engine. They differ in what they fetch and who owns the files
-				afterwards - never in what Aphrodite does once it runs.
+				afterwards - and in how much of the plugin you get: Cargo installs the proxy and a
+				hooks-only loader, not the plugin tree. What Aphrodite does once the full plugin is
+				running is the same on all four.
 			</p>
-			<div class="overflow-x-auto">
+			<div class="mt-8 overflow-x-auto">
 				<table class="w-full border-collapse font-mono text-base">
 					<thead>
 						<tr class="border-b-2 border-oxblood-dark text-left">
@@ -328,31 +762,62 @@ budget_chars = 2600 # hard cap per turn`;
 					</tbody>
 				</table>
 			</div>
-			<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
+			<p class="mt-8 type-body text-zinc-dust">
 				The full host map, including the flavors still planned, is laid out on
-				<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/flavors/"
+				<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={Routes.Flavors}
 					>FLAVORS</a
 				>.
 			</p>
-			<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-				The transcript below is the same four routes in full, command by command.
+			<p class="mt-3 type-body text-zinc-dust">
+				The four routes follow in full, command by command.
 			</p>
-			<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-				WINDOWS: use PowerShell and run
-				<code class="font-mono text-base text-weathered-teal">pwsh ./download.ps1</code>
-				instead of
-				<code class="font-mono text-base text-weathered-teal">bash download.sh</code>
-				- the full Windows walkthrough is on
-				<a
-					class="text-weathered-teal underline transition-colors hover:text-bone-white"
-					href="/docs/install/windows/">/docs/install/windows/</a
-				>.
-			</p>
+
+			<!-- THE PLATFORM INPUT. It was one footnote sentence saying "use pwsh
+			     instead of bash"; a reader on Windows then followed a sequence whose
+			     second half was POSIX. It is now a stated input: every route ships
+			     two complete lanes, and a lane is all-POSIX or all-PowerShell. -->
+			<div class="mt-8 border border-oxblood-dark bg-asphalt-panel p-4 sm:p-5">
+				<div class="flex flex-wrap items-center gap-2">
+					<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary"
+						>PLATFORM //</span
+					>
+					<span
+						class="inline-flex items-center gap-2 border border-oxblood-dark bg-soot-black px-2 py-1 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal"
+					>
+						<span class="h-1.5 w-1.5 bg-weathered-teal" aria-hidden="true"></span>
+						BASH - macOS / Linux
+					</span>
+					<span
+						class="inline-flex items-center gap-2 border border-oxblood-dark bg-soot-black px-2 py-1 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal"
+					>
+						<span class="h-1.5 w-1.5 bg-weathered-teal" aria-hidden="true"></span>
+						POWERSHELL - Windows
+					</span>
+				</div>
+				<p class="mt-3 type-body text-bone-newsprint">
+					Platform is an input, not a footnote. Every route ships two complete lanes -
+					directory creation, discovery and linking, download, enable, verification - and every
+					command block carries the shell it is written for. A Windows lane contains no POSIX
+					command, and a macOS / Linux lane contains no PowerShell.
+				</p>
+				<p class="mt-2 type-body text-zinc-dust">
+					WINDOWS: use PowerShell and run
+					<code class="font-mono text-base text-weathered-teal">pwsh ./download.ps1</code>
+					instead of
+					<code class="font-mono text-base text-weathered-teal">bash download.sh</code>
+					- the full Windows walkthrough is on
+					<a
+						class="text-weathered-teal underline transition-colors hover:text-bone-white"
+						href={DocsRoute("install/windows")}>/docs/install/windows/</a
+					>.
+				</p>
+			</div>
+
 			<div class="mt-12">
 				<ZineLesson
 					Label="CHOOSE BY INTENT"
 					Lines={[
-						"One command and the reviewed commit: #1.",
+						"One install command and one explicit download, on the reviewed commit: #1.",
 						"The plugin tree in your own checkout, so you can read it and keep it: #2.",
 						"Only the proxy, with cargo owning the versions: #3.",
 						"You are changing the code, so a release build of your own: #4.",
@@ -362,142 +827,196 @@ budget_chars = 2600 # hard cap per turn`;
 			</div>
 		</section>
 
-		<!-- SLOT 2: the transcript - one card per route, each with its own
-		     outcome, its own write surface, its own failure list, its own
-		     three-line verification. -->
+		<!-- SLOT 2: the transcript - the recommended path expanded first, then
+		     the three alternatives. Each card is self-contained: its own lanes,
+		     its own outcome, its own write surface, its own verification. -->
 		<section class="relative w-full" data-reveal>
 			<ZineTape Variant="section" Label="THE TRANSCRIPT // ROUTE BY ROUTE" />
-			<h2
-				id="transcript"
-				class="mb-4 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-			>
+			<h2 id="transcript" class="type-section uppercase text-bone-white">
 				Four installs, one at a time
 			</h2>
-			<p class="mb-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Each card below is self-contained: the commands, what they leave on disk, what
-				makes them fail, and the one check that says the install is live.
+			<p class="mt-4 mb-12 max-w-3xl type-body text-bone-newsprint">
+				Each route is self-contained: the commands, what they leave on disk, what makes
+				them fail, and the one check that says the install is live. The recommended path is
+				first and expanded; the other three follow as their own anchored sections.
 			</p>
 			<div class="flex flex-col gap-20 lg:gap-28">
 				{
-					Routes.map(
-						({ Id, Badge, BadgeColor, Side, Rotate, Title, Steps, CopyLabel, Code, Comment, Note, OutcomeTag, Outcome, Writes, Fails, Verify, Guide, Lesson }) => (
-							<div class={`w-full lg:w-5/6 ${Side === "left" ? "lg:self-start" : "lg:self-end"}`}>
+					InstallRoutes.map((Route, Index) => (
+						<>
+							{Index === 1 && (
+								<div class="max-w-3xl border-t border-oxblood-dark pt-6">
+									<h3 class="section-kicker">The other three routes</h3>
+									<p class="mt-2 type-body text-zinc-dust">
+										Same engine, different owner of the files. Each is an anchored
+										section, so a link can point at the route a reader needs.
+									</p>
+								</div>
+							)}
+							<div class={`w-full ${Route.Recommended ? "lg:w-5/6 lg:self-start" : "lg:w-5/6 lg:self-end"}`}>
 								<ZineBox
-									Size="md"
-									Rotate={Rotate}
-									Tape={Badge}
-									TapeColor={BadgeColor}
-									TapeSide={Side}
+									Size={Route.Recommended ? "lg" : "md"}
+									Rotate={Route.Rotate}
+									Tone={Route.Tone}
+									Tape={Route.Recommended ? Route.Badge : undefined}
+									TapeColor={Route.BadgeColor}
+									TapeSide={Route.Side}
 								>
-									<div class="mb-3 mt-2 flex flex-wrap items-center justify-between gap-2">
+									<div class="mb-4 mt-2 flex flex-wrap items-center justify-between gap-2">
 										<h2
-											id={Id}
-											class="font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
+											id={Route.ID}
+											class:list={[
+												Route.Recommended ? "type-section" : "type-sub",
+												"uppercase text-bone-white",
+											]}
 										>
-											{Title}
+											{Route.Title}
 										</h2>
-										<span class="font-mono text-base text-zinc-dust">{Steps}</span>
-									</div>
-									<CodeFence
-										Class="border border-oxblood-dark [&>pre]:overflow-x-hidden [&>pre]:[overflow-wrap:anywhere]"
-										Copy
-										CopyLabel={CopyLabel}
-										Code={Code}
-									/>
-									{Comment !== undefined && (
-										<CodeFence
-											Lang="text"
-											Class="mt-3 border border-oxblood-dark"
-											Code={Comment}
-										/>
-									)}
-									{Note !== undefined && (
-										<p
-											class="mt-3 font-mono text-base leading-relaxed text-zinc-dust"
-											set:html={Note}
-										/>
-									)}
-
-									<div class="mt-6 border-2 border-oxblood-dark bg-asphalt-panel p-4">
-										<ZineKicker Tone="canary" As="div">{OutcomeTag}</ZineKicker>
-										<p class="mt-2 border border-oxblood-dark bg-soot-black p-3 font-mono text-base font-bold leading-relaxed text-bone-white">
-											{Outcome}
-										</p>
-										{Guide === true && (
-											<>
-												<div class="mt-4 border-l-4 border-stamped-canary bg-soot-black p-4">
-													<ZineKicker Tone="canary" As="div">THE CATALOG RULE</ZineKicker>
-													<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
-														The catalog entry is reviewed and pinned -
-														<code class="font-mono text-base text-weathered-teal">hermes plugins install</code>
-														checks out exactly that commit, never a branch tip.
-													</p>
-													<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
-														Do NOT run
-														<code class="font-mono text-base text-weathered-teal">aphrodite setup</code>
-														in a catalog-managed directory - still run
-														<code class="font-mono text-base text-weathered-teal">download.sh</code>
-														(or <code class="font-mono text-base text-weathered-teal">download.ps1</code>
-														on Windows) from the installed plugin folder.
-													</p>
-												</div>
-												<p class="mt-2 font-mono text-base text-zinc-dust">
-													SRC:{" "}
-													<a
-														class="text-weathered-teal underline transition-colors hover:text-bone-white"
-														href={ExternalLinks.HermesGuide}
-													>
-														the Hermes plugin guide
-													</a>{" "}
-													- Installing from the catalog.
-												</p>
-											</>
+										{Route.Recommended ? (
+											<span class="inline-block border-2 border-black bg-stamped-canary px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-soot-black shadow-[3px_3px_0px_#000]">
+												{Route.Label}
+											</span>
+										) : (
+											<span class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+												{Route.Badge}
+											</span>
 										)}
 									</div>
+									{Route.Recommended === false && (
+										<p class="type-caption text-zinc-dust">{Route.Label}</p>
+									)}
+
+									{Route.Lanes.map((Lane) => (
+										<div class="mt-8 border-t border-oxblood-dark pt-5">
+											<div class="flex flex-wrap items-center justify-between gap-3">
+												<div class="flex flex-wrap items-center gap-2">
+													<span class="inline-flex items-center gap-2 border border-oxblood-dark bg-soot-black px-2 py-1 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
+														<span class="h-1.5 w-1.5 bg-weathered-teal" aria-hidden="true"></span>
+														{Lane.Shell.toUpperCase()} - {Lane.Platform}
+													</span>
+													<span class="font-mono text-base text-zinc-dust">
+														{Lane.Steps.length} STEPS
+													</span>
+												</div>
+												<CopyButton
+													Label={`COPY ALL ${Lane.Steps.length}`}
+													Payload={Executable(Lane.Steps)}
+													Tone="teal"
+													Size="sm"
+												/>
+											</div>
+
+											<ol class="mt-4 list-none">
+												{Lane.Steps.map((Step, StepIndex) => (
+													<li class="mt-6 border-l-2 border-oxblood-dark pl-4 sm:pl-5">
+														<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+															<span class="font-mono text-base font-black tracking-widest text-stamped-canary">
+																{String(StepIndex + 1).padStart(2, "0")}
+															</span>
+															<h3 class="type-sub text-bone-white">{Step.Title}</h3>
+														</div>
+														{Step.Prerequisite !== undefined && (
+															<p class="mt-2 type-caption text-zinc-dust">
+																<span class="font-mono font-black uppercase tracking-widest text-weathered-teal">
+																	BEFORE //{" "}
+																</span>
+																<span set:html={Step.Prerequisite} />
+															</p>
+														)}
+														<CodeFence
+															Class="mt-3 border border-oxblood-dark"
+															Copy
+															CopyLabel={Lane.Shell.toUpperCase()}
+															Lang={Lane.Lang}
+															Code={Step.Command}
+														/>
+														{Step.Explanation !== undefined && (
+															<p class="mt-3 type-body text-bone-newsprint" set:html={Step.Explanation} />
+														)}
+														{Step.Expected !== undefined && (
+															<p class="mt-2 type-caption text-zinc-dust">
+																<span class="font-mono font-black uppercase tracking-widest text-weathered-teal">
+																	EXPECT //{" "}
+																</span>
+																<span set:html={Step.Expected} />
+															</p>
+														)}
+														{Step.Troubleshooting?.map((Note) => (
+															<p
+																class="mt-2 border-l-2 border-raw-blood pl-3 type-caption text-bone-newsprint"
+																set:html={Note}
+															/>
+														))}
+													</li>
+												))}
+											</ol>
+										</div>
+									))}
+
+									{Route.Notes?.map((Note) => (
+										<p class="mt-6 type-body text-zinc-dust" set:html={Note} />
+									))}
+
+									<div class="mt-8 border-2 border-oxblood-dark bg-asphalt-panel p-4">
+										<ZineKicker Tone="canary" As="div">{Route.OutcomeTag}</ZineKicker>
+										<p class="mt-2 border border-oxblood-dark bg-soot-black p-3 font-mono text-base font-bold leading-relaxed text-bone-white">
+											{Route.Outcome}
+										</p>
+										{Route.Guide === true && (
+											<p class="mt-2 font-mono text-base text-zinc-dust">
+												SRC:{" "}
+												<a
+													class="text-weathered-teal underline transition-colors hover:text-bone-white"
+													href={ExternalLinks.HermesGuide}
+												>
+													the Hermes plugin guide
+												</a>{" "}
+												- Installing from the catalog.
+											</p>
+										)}
+									</div>
+
+									{Route.Warning !== undefined && (
+										<div class="mt-6 border-l-4 border-stamped-canary bg-soot-black p-4">
+											<ZineKicker Tone="canary" As="div">{Route.Warning.Label}</ZineKicker>
+											{Route.Warning.Lines.map((Line) => (
+												<p class="mt-2 type-body text-bone-newsprint" set:html={Line} />
+											))}
+										</div>
+									)}
+
+									{Route.Lesson !== undefined && (
+										<div class="mt-6">
+											<ZineLesson Label={Route.Lesson.Label} Text={Route.Lesson.Text} Color="teal" />
+										</div>
+									)}
 
 									<div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-5">
 										<div class="border border-oxblood-dark bg-soot-black p-4 lg:col-span-2">
 											<ZineKicker Tone="teal" As="div">WHAT IT WRITES</ZineKicker>
-											<p
-												class="mt-2 font-body text-base leading-relaxed text-bone-newsprint"
-												set:html={Writes}
-											/>
+											<p class="mt-2 type-body text-bone-newsprint" set:html={Route.Writes} />
 										</div>
 										<div class="border border-oxblood-dark bg-soot-black p-4 lg:col-span-3">
-											<ZineKicker As="div">WHAT IT FAILS ON</ZineKicker>
-											{Fails.map((Fail) => (
-												<p
-													class="mt-2 font-body text-base leading-relaxed text-bone-newsprint"
-													set:html={Fail}
-												/>
+											<ZineKicker As="div">VERIFY IT WORKS</ZineKicker>
+											{Route.Verify.map((Line) => (
+												<p class="mt-2 type-body text-bone-newsprint" set:html={Line} />
 											))}
+											<p class="mt-3 border-t border-oxblood-dark pt-2 type-caption text-zinc-dust">
+												<span class="font-mono font-black uppercase tracking-widest text-stamped-canary">
+													EXPECT //{" "}
+												</span>
+												{Route.Expect}
+											</p>
 										</div>
 									</div>
-
-									<div class="mt-6 border-t border-oxblood-dark pt-4">
-										<ZineKicker Tone="teal" As="div">VERIFY IT WORKS</ZineKicker>
-										{Verify.map((Line) => (
-											<p
-												class="mt-2 font-body text-base leading-relaxed text-bone-newsprint"
-												set:html={Line}
-											/>
-										))}
-									</div>
-
-									{Lesson !== undefined && (
-										<div class="mt-6">
-											<ZineLesson Label={Lesson.Label} Text={Lesson.Text} Color="teal" />
-										</div>
-									)}
-
 								</ZineBox>
 							</div>
-						),
-					)
+						</>
+					))
 				}
 			</div>
 			<p class="mt-12 font-mono text-base text-zinc-dust">
-				Every route above converges on the same two directories -
+				All four routes converge on the same two directories -
 				<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="#layout"
 					>what changes on disk</a
 				>.
@@ -510,252 +1029,14 @@ budget_chars = 2600 # hard cap per turn`;
 			/>
 		</section>
 
-		<!-- SLOT 3: the evidence - the canonical layout every route converges on -->
-		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="AFTER ANY ROUTE // THE LAYOUT" />
-			<ZineBox Size="lg" Rotate="-rotate-[1deg]">
-				<h2
-					id="layout"
-					class="mb-4 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					What changes on disk
-				</h2>
-				<p class="mb-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					All four routes converge on the same two directories. Nothing else moves: no
-					PATH edit, no shell profile, no system-wide install.
-				</p>
-				<CodeFence Lang="text" Class="border border-oxblood-dark" Code={Layout} />
-				<div class="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
-					<div class="border border-oxblood-dark bg-soot-black p-4">
-						<ZineKicker Tone="teal" As="div">THE PLUGIN DIRECTORY</ZineKicker>
-						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
-							The plugin directory stays hooks-only: it carries just
-							<code class="font-mono text-base text-weathered-teal">plugin.yaml</code> and the
-							<code class="font-mono text-base text-weathered-teal">__init__.py</code> loader
-							that registers hooks and tools, and the plugin never writes, downloads or
-							modifies anything inside it.
-						</p>
-					</div>
-					<div class="border border-oxblood-dark bg-soot-black p-4">
-						<ZineKicker Tone="teal" As="div">THE RUNTIME HOME</ZineKicker>
-						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
-							Every runtime artifact lives in
-							<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>:
-							binaries, config, directives, the CCR database and logs. That split is what lets
-							the catalog own the checkout while the binaries live somewhere else entirely.
-						</p>
-					</div>
-				</div>
-				<p class="mt-6 font-body text-base leading-relaxed text-zinc-dust">
-					On plugin startup
-					<code class="font-mono text-base text-weathered-teal">layout_check.py</code> checks
-					toward this schema; installed layouts are already canonical, because
-					<code class="font-mono text-base text-weathered-teal">aphrodite setup</code> produced
-					them.
-				</p>
-				<div class="mt-12 flex flex-col gap-4">
-					<ZineFold
-						Label="WHAT APHRODITE SETUP DOES, IN ORDER"
-						Tag="8 STEPS"
-						Body={SetupSteps}
-					/>
-					<ZineFold
-						Label="UNINSTALL // THREE COMMANDS AND A DIRECTORY"
-						Tag="REVERSE"
-						Body={Uninstall}
-					/>
-				</div>
-			</ZineBox>
-			<ZineSource
-				Lines={[
-					"SRC: docs/install/macos-linux.md (what changes after any of these)",
-					"SRC: docs/install/troubleshooting.md (proxy launch order)",
-				]}
-			/>
-		</section>
-
-		<!-- SLOT 4: the standalone lane - the same engine without Hermes -->
-		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="PROXY // THE STANDALONE LANE" />
-			<ZineBox Size="lg" Rotate="rotate-[1.6deg]">
-				<h2
-					id="proxy"
-					class="mb-4 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					Run it without Hermes
-				</h2>
-				<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The same compression engine runs as a standalone proxy: point any
-					OpenAI-compatible client's
-					<code class="font-mono text-base text-weathered-teal">base_url</code> at
-					<code class="font-mono text-base text-weathered-teal">http://localhost:9798</code>
-					(token) or <code class="font-mono text-base text-weathered-teal">:9797</code>
-					(cache), and responses compress over plain HTTP.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Invoked without an
-					<code class="font-mono text-base text-weathered-teal">aphrodite.toml</code>, the
-					binary needs <code class="font-mono text-base text-weathered-teal">--api-key</code> or
-					<code class="font-mono text-base text-weathered-teal">APHRODITE_API_KEY</code>. That
-					is a startup requirement, not an upstream call - a placeholder is enough to prove
-					the binary serves.
-				</p>
-				<div class="mt-8 overflow-x-auto">
-					<table class="w-full border-collapse font-mono text-base">
-						<thead>
-							<tr class="border-b-2 border-oxblood-dark text-left">
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">PORT</th>
-								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">MODE</th>
-								<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">WHAT IT SERVES</th>
-							</tr>
-						</thead>
-						<tbody class="text-bone-newsprint">
-							<tr class="border-b border-oxblood-dark">
-								<td class="py-3 pr-4 text-bone-white">9797</td>
-								<td class="py-3 pr-4 text-weathered-teal">cache</td>
-								<td class="py-3">the cache proxy - threshold 2048 bytes by default</td>
-							</tr>
-							<tr>
-								<td class="py-3 pr-4 text-bone-white">9798</td>
-								<td class="py-3 pr-4 text-weathered-teal">token</td>
-								<td class="py-3">the token proxy - threshold 256 bytes by default</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<CodeFence
-					Class="mt-8 border border-oxblood-dark"
-					Copy
-					CopyLabel="PROXY"
-					Code={`$ ./aphrodite --api-key «redacted:sk-...» --listen 127.0.0.1:9798
-$ curl http://127.0.0.1:9798/health
-{"status":"healthy","ccr":true,"mode":"token","version":"<current version>","fill_pct":...}`}
-				/>
-				<div class="mt-6">
-					<ZineReveal
-						Cover="aphrodite: no API key configured - set APHRODITE_API_KEY env var or api_key in aphrodite.toml"
-						Tag="STDERR"
-						Raw={`<span class="text-stamped-canary">No aphrodite.toml in the working directory</span> - the CLI mode has no config to read a key from, so the flag (or the env var) is the whole requirement.`}
-					/>
-				</div>
-				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-					You do not need a real Hermes session, a real Hermes install or a real upstream API
-					key to confirm the binary itself works: starting the proxy and hitting
-					<code class="font-mono text-base text-weathered-teal">/health</code> never calls
-					upstream. Set
-					<code class="font-mono text-base text-weathered-teal">APHRODITE_NO_AUTO_LAUNCH=1</code>
-					if you launch it yourself and do not want the plugin to start a second pair - there
-					is no <code class="font-mono text-base text-weathered-teal">auto_start</code> key in
-					either config file.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-					The full surface is documented on the proxy pages:
-					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/docs/proxy/architecture/">architecture</a>,
-					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/docs/proxy/compression/">compression</a>,
-					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/docs/proxy/handlers/">handlers</a>,
-					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/docs/proxy/retry/">retry</a>.
-				</p>
-			</ZineBox>
-			<ZineSource
-				Lines={[
-					"SRC: docs/install/troubleshooting.md (verify the proxy without Hermes)",
-					"SRC: docs/proxy/architecture.md; docs/proxy/compression.md",
-				]}
-			/>
-		</section>
-
-		<!-- SLOT 5: the config module - two files, two parsers, one precedence -->
-		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="/CONFIG.TOML" />
-			<ZineBox Size="lg" Rotate="-rotate-[2.5deg]">
-				<h2
-					id="config"
-					class="mb-4 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					Configuration
-				</h2>
-				<p class="mb-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Two files matter and they share no keys:
-					<code class="font-mono text-base text-weathered-teal">aphrodite.toml</code> for
-					everything that tunes how Aphrodite compresses, and Hermes's own
-					<code class="font-mono text-base text-weathered-teal">config.yaml</code> for enabling
-					the plugin.
-				</p>
-				<CodeFence Lang="toml" Class="border border-oxblood-dark" Code={Config} />
-				<div
-					class="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-oxblood-dark pt-3 text-base text-zinc-dust"
-				>
-					<span>TEMPLATES IN THE REPO:</span>
-					<span class="font-bold text-stamped-canary">aphrodite.toml.example + the embedded template</span>
-				</div>
-				<p class="mt-2 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-					Two shipped files stay in sync: aphrodite.toml.example (the annotated reference) and
-					the embedded template the binary ships with.
-				</p>
-				<p class="mt-2 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-					Keys not yet wired into the runtime are annotated DOCUMENTED BUT UNWIRED in the
-					example - it is the source of truth for the documented surface.
-				</p>
-				<div class="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
-					<div class="border border-oxblood-dark bg-soot-black p-4">
-						<ZineKicker Tone="teal" As="div">TWO PARSERS, ONE FILE</ZineKicker>
-						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
-							The Rust HTTP proxy (<code class="font-mono text-base text-weathered-teal">config/proxy.rs</code>)
-							reads <code class="font-mono text-base text-weathered-teal">[[proxies]]</code>,
-							<code class="font-mono text-base text-weathered-teal">[defaults]</code>, the four
-							hot-reload thresholds plus auto_expand / auto_expand_limit /
-							max_request_body_size, and preview_max_chars. The Hermes dylib session
-							(<code class="font-mono text-base text-weathered-teal">config_loader.rs</code>)
-							reads the <code class="font-mono text-base text-weathered-teal">[compression]</code>
-							engine keys, <code class="font-mono text-base text-weathered-teal">[defaults]</code>
-							model/api_url, <code class="font-mono text-base text-weathered-teal">[flow]</code>,
-							<code class="font-mono text-base text-weathered-teal">[directives]</code>,
-							<code class="font-mono text-base text-weathered-teal">[prompts]</code> and
-							<code class="font-mono text-base text-weathered-teal">[templates]</code>.
-						</p>
-					</div>
-					<div class="border border-oxblood-dark bg-soot-black p-4">
-						<ZineKicker Tone="teal" As="div">NOT HERMES'S CONFIG.YAML</ZineKicker>
-						<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
-							The only Aphrodite-relevant keys in
-							<code class="font-mono text-base text-weathered-teal">config.yaml</code> are
-							<code class="font-mono text-base text-weathered-teal">plugins.enabled: [aphrodite]</code>,
-							added by <code class="font-mono text-base text-weathered-teal">hermes plugins enable</code>,
-							and optionally <code class="font-mono text-base text-weathered-teal">context.engine: aphrodite</code>
-							with its threshold. Ports, thresholds, preview style and prompt wording all
-							belong in the toml.
-						</p>
-					</div>
-				</div>
-				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
-					Every knob the file exposes is explorable on
-					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href="/config/">/config/</a>,
-					and the complete schema is
-					<a
-						class="text-weathered-teal underline transition-colors hover:text-bone-white"
-						href="/docs/config/aphrodite-toml/">/docs/config/aphrodite-toml/</a
-					>.
-				</p>
-			</ZineBox>
-			<ZineSource
-				Lines={[
-					"SRC: aphrodite.toml.example (the annotated reference)",
-					"SRC: docs/config/aphrodite-toml.md; docs/config/env-vars.md",
-				]}
-			/>
-		</section>
-
-		<!-- SLOT 6: the failure matrix - what the message means and what to do -->
+		<!-- SLOT 3: the failure matrix - what the message means and what to do -->
 		<section class="relative w-full" data-reveal>
 			<ZineTape Variant="section" Label="FAILURES // WHAT THE MESSAGE MEANS" />
-			<h2
-				id="failures"
-				class="mb-4 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-			>
+			<h2 id="failures" class="type-section uppercase text-bone-white">
 				When it does not come up
 			</h2>
-			<p class="mb-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Every install failure on this page announces itself in one of six ways. The proxy's
+			<p class="mt-4 mb-8 max-w-3xl type-body text-bone-newsprint">
+				Every install failure announces itself in one of six ways. The proxy's
 				own stderr goes to
 				<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/proxy-stderr.log</code>
 				- read that file before anything else.
@@ -803,7 +1084,7 @@ $ curl http://127.0.0.1:9798/health
 					</tbody>
 				</table>
 			</div>
-			<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
+			<p class="mt-8 max-w-3xl type-body text-zinc-dust">
 				Before launching, the plugin probes both ports' /health endpoints and skips the launch
 				when another process already answers a confirmed Aphrodite health body - so a second
 				Hermes session does not start a second proxy pair. A failed registration is a warning,
@@ -817,7 +1098,321 @@ $ curl http://127.0.0.1:9798/health
 			/>
 		</section>
 
-		<!-- SLOT 7: the natural neighbors -->
+		<!-- SLOT 4: the evidence - the canonical layout every route converges on -->
+		<section class="relative w-full" data-reveal>
+			<ZineTape Variant="section" Label="AFTER ANY ROUTE // THE LAYOUT" />
+			<ZineBox Size="lg" Rotate="-rotate-[1deg]" Tone="subtle">
+				<h2 id="layout" class="type-section uppercase text-bone-white">
+					What changes on disk
+				</h2>
+				<p class="mt-4 mb-8 max-w-3xl type-body text-bone-newsprint">
+					All four routes converge on the same two directories. Nothing else moves: no
+					PATH edit, no shell profile, no system-wide install.
+				</p>
+				<CodeFence Lang="text" Class="border border-oxblood-dark" Code={Layout} />
+				<div class="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
+					<div class="border border-oxblood-dark bg-soot-black p-4">
+						<div class="flex flex-wrap items-center justify-between gap-2">
+							<ZineKicker Tone="teal" As="div">THE PLUGIN DIRECTORY</ZineKicker>
+							<ZineCopyChip
+								Label="COPY PATH"
+								Copy="~/.hermes/plugins/aphrodite"
+								Aria="Copy the plugin directory path to the clipboard"
+								Color="teal"
+							/>
+						</div>
+						<p class="mt-2 type-body text-bone-newsprint">
+							The plugin directory stays hooks-only: it carries just
+							<code class="font-mono text-base text-weathered-teal">plugin.yaml</code> and the
+							<code class="font-mono text-base text-weathered-teal">__init__.py</code> loader
+							that registers hooks and tools, and the plugin never writes, downloads or
+							modifies anything inside it.
+						</p>
+					</div>
+					<div class="border border-oxblood-dark bg-soot-black p-4">
+						<div class="flex flex-wrap items-center justify-between gap-2">
+							<ZineKicker Tone="teal" As="div">THE RUNTIME HOME</ZineKicker>
+							<ZineCopyChip
+								Label="COPY PATH"
+								Copy="~/.hermes/aphrodite"
+								Aria="Copy the runtime home path to the clipboard"
+								Color="teal"
+							/>
+						</div>
+						<p class="mt-2 type-body text-bone-newsprint">
+							Every runtime artifact lives in
+							<code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code>:
+							binaries, config, directives, the CCR database and logs. That split is what lets
+							the catalog own the checkout while the binaries live somewhere else entirely.
+						</p>
+					</div>
+				</div>
+				<p class="mt-6 type-body text-zinc-dust">
+					On plugin startup
+					<code class="font-mono text-base text-weathered-teal">layout_check.py</code> checks
+					toward this schema; installed layouts are already canonical, because
+					<code class="font-mono text-base text-weathered-teal">aphrodite setup</code> produced
+					them.
+				</p>
+				<div class="mt-12 flex flex-col gap-4">
+					<ZineFold
+						Label="WHAT APHRODITE SETUP DOES, IN ORDER"
+						Tag="8 STEPS"
+						Body={SetupSteps}
+					/>
+				</div>
+			</ZineBox>
+			<ZineSource
+				Lines={[
+					"SRC: docs/install/macos-linux.md (what changes after any of these)",
+					"SRC: docs/install/troubleshooting.md (proxy launch order)",
+				]}
+			/>
+		</section>
+
+		<!-- SLOT 5: the config module - two files, two parsers, one precedence -->
+		<section class="relative w-full" data-reveal>
+			<ZineTape Variant="section" Label="/CONFIG.TOML" />
+			<ZineBox Size="lg" Rotate="-rotate-[2.5deg]" Tone="subtle">
+				<h2 id="config" class="type-section uppercase text-bone-white">
+					Configuration
+				</h2>
+				<p class="mt-4 mb-8 max-w-3xl type-body text-bone-newsprint">
+					Two files matter and they share no keys:
+					<code class="font-mono text-base text-weathered-teal">aphrodite.toml</code> for
+					everything that tunes how Aphrodite compresses, and Hermes's own
+					<code class="font-mono text-base text-weathered-teal">config.yaml</code> for enabling
+					the plugin.
+				</p>
+				<CodeFence Lang="toml" Class="border border-oxblood-dark" Code={Config} />
+				<div
+					class="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-oxblood-dark pt-3 text-base text-zinc-dust"
+				>
+					<span>TEMPLATES IN THE REPO:</span>
+					<span class="font-bold text-stamped-canary">aphrodite.toml.example + the embedded template</span>
+				</div>
+				<p class="mt-2 max-w-3xl type-body text-zinc-dust">
+					Two shipped files stay in sync: aphrodite.toml.example (the annotated reference) and
+					the embedded template the binary ships with.
+				</p>
+				<p class="mt-2 max-w-3xl type-body text-zinc-dust">
+					Keys not yet wired into the runtime are annotated DOCUMENTED BUT UNWIRED in the
+					example - it is the source of truth for the documented surface.
+				</p>
+				<div class="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
+					<div class="border border-oxblood-dark bg-soot-black p-4">
+						<ZineKicker Tone="teal" As="div">TWO PARSERS, ONE FILE</ZineKicker>
+						<p class="mt-2 type-body text-bone-newsprint">
+							The Rust HTTP proxy (<code class="font-mono text-base text-weathered-teal">config/proxy.rs</code>)
+							reads <code class="font-mono text-base text-weathered-teal">[[proxies]]</code>,
+							<code class="font-mono text-base text-weathered-teal">[defaults]</code>, the four
+							hot-reload thresholds plus auto_expand / auto_expand_limit /
+							max_request_body_size, and preview_max_chars. The Hermes dylib session
+							(<code class="font-mono text-base text-weathered-teal">config_loader.rs</code>)
+							reads the <code class="font-mono text-base text-weathered-teal">[compression]</code>
+							engine keys, <code class="font-mono text-base text-weathered-teal">[defaults]</code>
+							model/api_url, <code class="font-mono text-base text-weathered-teal">[flow]</code>,
+							<code class="font-mono text-base text-weathered-teal">[directives]</code>,
+							<code class="font-mono text-base text-weathered-teal">[prompts]</code> and
+							<code class="font-mono text-base text-weathered-teal">[templates]</code>.
+						</p>
+					</div>
+					<div class="border border-oxblood-dark bg-soot-black p-4">
+						<ZineKicker Tone="teal" As="div">NOT HERMES'S CONFIG.YAML</ZineKicker>
+						<p class="mt-2 type-body text-bone-newsprint">
+							The only Aphrodite-relevant keys in
+							<code class="font-mono text-base text-weathered-teal">config.yaml</code> are
+							<code class="font-mono text-base text-weathered-teal">plugins.enabled: [aphrodite]</code>,
+							added by <code class="font-mono text-base text-weathered-teal">hermes plugins enable</code>,
+							and optionally <code class="font-mono text-base text-weathered-teal">context.engine: aphrodite</code>
+							with its threshold. Ports, thresholds, preview style and prompt wording all
+							belong in the toml.
+						</p>
+					</div>
+				</div>
+				<p class="mt-8 type-body text-zinc-dust">
+					Every knob the file exposes is explorable on
+					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={Routes.Config}>/config/</a>,
+					and the complete schema is
+					<a
+						class="text-weathered-teal underline transition-colors hover:text-bone-white"
+						href={DocsRoute("config/aphrodite-toml")}>/docs/config/aphrodite-toml/</a
+					>.
+				</p>
+			</ZineBox>
+			<ZineSource
+				Lines={[
+					"SRC: aphrodite.toml.example (the annotated reference)",
+					"SRC: docs/config/aphrodite-toml.md; docs/config/env-vars.md",
+				]}
+			/>
+		</section>
+
+		<!-- SLOT 6: the standalone lane - the same engine without Hermes -->
+		<section class="relative w-full" data-reveal>
+			<ZineTape Variant="section" Label="PROXY // THE STANDALONE LANE" />
+			<ZineBox Size="lg" Rotate="rotate-[1.6deg]" Tone="subtle">
+				<h2 id="proxy" class="type-section uppercase text-bone-white">
+					Run it without Hermes
+				</h2>
+				<p class="mt-4 max-w-3xl type-body text-bone-newsprint">
+					The same compression engine runs as a standalone proxy: point any
+					OpenAI-compatible client's
+					<code class="font-mono text-base text-weathered-teal">base_url</code> at
+					<code class="font-mono text-base text-weathered-teal">http://localhost:9798</code>
+					(token) or <code class="font-mono text-base text-weathered-teal">:9797</code>
+					(cache), and responses compress over plain HTTP.
+				</p>
+				<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
+					Invoked without an
+					<code class="font-mono text-base text-weathered-teal">aphrodite.toml</code>, the
+					binary needs <code class="font-mono text-base text-weathered-teal">--api-key</code> or
+					<code class="font-mono text-base text-weathered-teal">APHRODITE_API_KEY</code>. That
+					is a startup requirement, not an upstream call - a placeholder is enough to prove
+					the binary serves.
+				</p>
+				<div class="mt-8 overflow-x-auto">
+					<table class="w-full border-collapse font-mono text-base">
+						<thead>
+							<tr class="border-b-2 border-oxblood-dark text-left">
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">PORT</th>
+								<th class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary">MODE</th>
+								<th class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary">WHAT IT SERVES</th>
+							</tr>
+						</thead>
+						<tbody class="text-bone-newsprint">
+							<tr class="border-b border-oxblood-dark">
+								<td class="py-3 pr-4 text-bone-white">9797</td>
+								<td class="py-3 pr-4 text-weathered-teal">cache</td>
+								<td class="py-3">the cache proxy - threshold 2048 bytes by default</td>
+							</tr>
+							<tr>
+								<td class="py-3 pr-4 text-bone-white">9798</td>
+								<td class="py-3 pr-4 text-weathered-teal">token</td>
+								<td class="py-3">the token proxy - threshold 256 bytes by default</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p class="mt-8 font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+					START // the binary, no Hermes
+				</p>
+				<CodeFence
+					Class="border border-oxblood-dark"
+					Copy
+					CopyLabel="BASH"
+					Code={`./aphrodite --api-key «redacted:sk-...» --listen 127.0.0.1:9798`}
+				/>
+				<p class="mt-2 type-caption text-zinc-dust">
+					The key is redacted here on purpose: a placeholder is enough, because the flag is a
+					startup requirement rather than a credential the binary verifies.
+				</p>
+				<p class="mt-6 font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+					CHECK // the health endpoint
+				</p>
+				<CodeFence Class="border border-oxblood-dark" Copy CopyLabel="BASH" Code={`curl http://127.0.0.1:9798/health`} />
+				<p class="mt-3 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
+					EXPECT // the health body
+				</p>
+				<CodeFence
+					Lang="json"
+					Class="border border-oxblood-dark"
+					Code={`{"status":"healthy","ccr":true,"mode":"token","version":"<current version>","fill_pct":...}`}
+				/>
+				<div class="mt-6">
+					<ZineReveal
+						Cover="aphrodite: no API key configured - set APHRODITE_API_KEY env var or api_key in aphrodite.toml"
+						Tag="STDERR"
+						Raw={`<span class="text-stamped-canary">No aphrodite.toml in the working directory</span> - the CLI mode has no config to read a key from, so the flag (or the env var) is the whole requirement.`}
+					/>
+				</div>
+				<p class="mt-6 max-w-3xl type-body text-zinc-dust">
+					You do not need a real Hermes session, a real Hermes install or a real upstream API
+					key to confirm the binary itself works: starting the proxy and hitting
+					<code class="font-mono text-base text-weathered-teal">/health</code> never calls
+					upstream. Set
+					<code class="font-mono text-base text-weathered-teal">APHRODITE_NO_AUTO_LAUNCH=1</code>
+					if you launch it yourself and do not want the plugin to start a second pair - there
+					is no <code class="font-mono text-base text-weathered-teal">auto_start</code> key in
+					either config file.
+				</p>
+				<p class="mt-3 max-w-3xl type-body text-zinc-dust">
+					The full surface is documented on the proxy pages:
+					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={DocsRoute("proxy/architecture")}>architecture</a>,
+					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={DocsRoute("proxy/compression")}>compression</a>,
+					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={DocsRoute("proxy/handlers")}>handlers</a>,
+					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={DocsRoute("proxy/retry")}>retry</a>.
+				</p>
+			</ZineBox>
+			<ZineSource
+				Lines={[
+					"SRC: docs/install/troubleshooting.md (verify the proxy without Hermes)",
+					"SRC: docs/proxy/architecture.md; docs/proxy/compression.md",
+				]}
+			/>
+		</section>
+
+		<!-- SLOT 7: the reverse direction - uninstall, as two complete lanes -->
+		<section class="relative w-full" data-reveal>
+			<ZineTape Variant="section" Label="UNINSTALL // THREE COMMANDS AND A DIRECTORY" />
+			<ZineBox Size="md" Tone="subtle">
+				<h2 id="uninstall" class="type-section uppercase text-bone-white">
+					Uninstall
+				</h2>
+				<p class="mt-4 max-w-3xl type-body text-bone-newsprint">
+					Disable the plugin, remove the loader, then stop anything still running. Every
+					command is its own copy control, so a reader never pastes the sentence about
+					the command.
+				</p>
+				<div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+					{Uninstall.map((Lane) => (
+						<div class="border border-oxblood-dark bg-soot-black p-4">
+							<div class="flex flex-wrap items-center gap-2">
+								<span class="inline-flex items-center gap-2 border border-oxblood-dark bg-asphalt-panel px-2 py-1 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
+									<span class="h-1.5 w-1.5 bg-weathered-teal" aria-hidden="true"></span>
+									{Lane.Shell.toUpperCase()} - {Lane.Platform}
+								</span>
+							</div>
+							<ol class="mt-3 list-none">
+								{Lane.Steps.map((Step, Index) => (
+									<li class="mt-3 border-l-2 border-oxblood-dark pl-3">
+										<div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+											<span class="font-mono text-base font-black tracking-widest text-stamped-canary">
+												{String(Index + 1).padStart(2, "0")}
+											</span>
+											<span class="font-mono text-base font-bold uppercase tracking-widest text-bone-white">
+												{Step.Title}
+											</span>
+										</div>
+										<div class="mt-1 flex flex-wrap items-center gap-2">
+											<code class="type-code text-bone-newsprint">{Step.Command}</code>
+											<ZineCopyChip
+												Label="COPY"
+												Copy={Step.Command}
+												Aria={`Copy the command: ${Step.Command}`}
+												Color="teal"
+											/>
+										</div>
+									</li>
+								))}
+							</ol>
+						</div>
+					))}
+				</div>
+				<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
+					Remove <code class="font-mono text-base text-weathered-teal">~/.hermes/aphrodite/</code> as well to clean up the binaries, config, CCR database and logs the download scripts or <code class="font-mono text-base text-weathered-teal">aphrodite setup</code> wrote.
+				</p>
+				<p class="mt-2 max-w-3xl type-body text-zinc-dust">
+					On Windows the runtime home is
+					<code class="font-mono text-base text-weathered-teal">%USERPROFILE%\.hermes\aphrodite\</code>.
+				</p>
+			</ZineBox>
+			<ZineSource
+				Lines={["SRC: docs/install/macos-linux.md (uninstall); docs/install/windows.md (uninstall)"]}
+			/>
+		</section>
+
+		<!-- SLOT 8: the natural neighbors -->
 		<Related
 			Links={[
 				{ Href: "/plugin/", Label: "PLUGIN" },

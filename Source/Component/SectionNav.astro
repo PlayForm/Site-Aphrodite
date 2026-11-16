@@ -1,44 +1,75 @@
 ---
 /**
- * SectionNav - the site's first fragment index. The pages with three or more
- * content sections carried no anchors at all: `case-study` had eight `<h2>`s
- * and not one `id`, so its five incidents started 81% down the page with no
- * way to reach them, and `workbench` had one `<h2>` for four panes.
+ * SectionNav - the site's on-page index.
  *
  * It is not a registry: the page passes its own sections, which is what keeps
  * the index truthful - a link can never name a section the page does not
  * render. Each section gains `id={Section.Id}` on the page side.
  *
- * `aria-current` is set from an IntersectionObserver, because "which section am
- * I reading" is a runtime fact, not a build-time one. The script is a module
- * with no dependencies and no framework: it reads the nav's own links, so a
- * page that renders no sections renders no observer.
+ * TWO VOICES, ONE ANCHOR SET. A section heading is written for a reader who
+ * has arrived; the index is read by a reader who is scanning. A page may pass
+ * `Nav` beside its own `Label`, and this component otherwise falls back to the
+ * registry's `NavLabels` map and then to the label itself - so nine
+ * sentence-like titles become `Retrieve`, `Compound commands`, `Pass-through`
+ * in the index while the full title stays on the section, where it belongs.
+ *
+ * TWO PRESENTATIONS, ONE SOURCE. On a phone the index is a compact `<details>`
+ * disclosure: the sticky bar of wrapping mono links was a wall of text that
+ * occupied the top third of the screen. Both presentations render from the
+ * same `Entries` array and are marked `data-section-nav`, so the one script
+ * below binds each of them and they cannot disagree about what is active.
+ *
+ * `aria-current="true"` is set from the scroll position, because "which
+ * section am I reading" is a runtime fact, not a build-time one. The script is
+ * a module with no dependencies and no framework: it reads the nav's own
+ * links, so a page that renders no sections renders no listener.
  */
 import ZineStamp from "./ZineStamp.astro";
 
+import { NavLabels } from "@Library/Links";
+
+interface SectionEntry {
+	/** The section's anchor, and the `id` the page puts on the element. */
+	Id: string;
+
+	/** The section's own heading, verbatim - the long form. */
+	Label: string;
+
+	/** Optional short label for the index; falls back to NavLabels, then Label. */
+	Nav?: string;
+}
+
 interface Props {
 	/** The page's own sections, in document order. */
-	Sections: { Id: string; Label: string }[];
+	Sections: SectionEntry[];
 }
 
 const { Sections } = Astro.props;
+
+const Entries = Sections.map((Section) => ({
+	Id: Section.Id,
+	Label: Section.Label,
+	Nav: Section.Nav ?? NavLabels[Section.Id] ?? Section.Label,
+}));
+
+/** The link classes, in the index's own voice: quiet until it is the section you are in. */
+const LinkClass =
+	"type-meta uppercase text-zinc-dust transition-colors hover:text-bone-white aria-[current=true]:text-stamped-canary aria-[current=true]:underline aria-[current=true]:decoration-2 aria-[current=true]:underline-offset-4";
 ---
 
+<!-- Desktop: the sticky bar. Hidden below `sm`, where it becomes a disclosure. -->
 <nav
 	aria-label="On this page"
 	data-section-nav
-	class="sticky top-0 z-30 -mx-5 flex w-full flex-col items-start gap-3 border-b border-oxblood-dark bg-carbon-void px-5 py-3 sm:-mx-8 sm:px-8 lg:-mx-14 lg:flex-row lg:items-center lg:gap-6 lg:px-14"
+	class="section-nav sticky top-0 z-30 -mx-5 hidden w-full items-center gap-6 border-b border-oxblood-dark bg-carbon-void px-5 py-3 sm:-mx-8 sm:flex sm:px-8 lg:-mx-14 lg:px-14"
 >
 	<ZineStamp Label="ON THIS PAGE" Color="raw" />
-	<ul class="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-base font-bold uppercase tracking-widest">
+	<ul class="flex flex-wrap items-center gap-x-5 gap-y-1">
 		{
-			Sections.map((Section) => (
+			Entries.map((Entry) => (
 				<li>
-					<a
-						href={`#${Section.Id}`}
-						class="text-zinc-dust transition-colors hover:text-bone-white aria-[current=true]:text-stamped-canary"
-					>
-						{Section.Label}
+					<a href={`#${Entry.Id}`} class={LinkClass} title={Entry.Label}>
+						{Entry.Nav}
 					</a>
 				</li>
 			))
@@ -46,55 +77,193 @@ const { Sections } = Astro.props;
 	</ul>
 </nav>
 
+<!-- Mobile: the same index, collapsed to one row until the reader opens it. -->
+<details
+	data-section-nav
+	class="section-nav sticky top-0 z-30 -mx-5 w-full border-b border-oxblood-dark bg-carbon-void px-5 py-2 sm:hidden"
+>
+	<summary
+		class="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden"
+	>
+		<ZineStamp Label="ON THIS PAGE" Color="raw" />
+		<span class="type-meta uppercase text-zinc-dust"
+			>{Entries.length} {Entries.length === 1 ? "SECTION" : "SECTIONS"}</span
+		>
+	</summary>
+	<ul class="flex flex-col pb-1 pt-3">
+		{
+			Entries.map((Entry) => (
+				<li class="border-t border-oxblood-dark/40">
+					<a href={`#${Entry.Id}`} class={`${LinkClass} block py-2.5`} title={Entry.Label}>
+						{Entry.Nav}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</details>
+
 <script>
-	// The section the reader is in is the last one whose top has passed the
-	// viewport's upper third. A plain IntersectionObserver with a bottom-heavy
-	// rootMargin answers the same question with less code, and degrades to "no
-	// aria-current" when the API or the sections are missing - never to an error.
-	const Navs = document.querySelectorAll<HTMLElement>("[data-section-nav]");
+	// WHICH SECTION IS ACTIVE - one rule, stated once, and the code below is
+	// that rule with nothing added:
+	//
+	//   The active section is the LAST one whose heading has crossed the
+	//   reference line, a horizontal line one third of the way down the
+	//   viewport.
+	//
+	// That is a pure function of the scroll position, so every case the index
+	// has to handle falls out of it instead of being special-cased:
+	//
+	//   - the current section stays active until the NEXT heading crosses the
+	//     line, because only then does a later section become the last one past
+	//     it;
+	//   - scrolling up restores the previous section, because the answer is
+	//     recomputed from the position rather than accumulated from events;
+	//   - a deep link initialises correctly, because the first evaluation runs
+	//     on load, after the browser has scrolled to the anchor;
+	//   - the final section activates near the bottom even when its heading
+	//     never reaches the line (a short last section), because at the end of
+	//     the document the last section is the one being read - and only when
+	//     the document actually scrolls.
+	//
+	// Before the first heading crosses the line nothing is active: the reader
+	// is still in the page's opening, and naming a section there would be a
+	// guess. Every failure path is silent - a nav with no resolvable targets
+	// binds nothing, and a missing rAF or ResizeObserver costs a redraw, never
+	// an error.
 
-	if ("IntersectionObserver" in window) {
-		for (const Nav of Navs) {
-			const Links = new Map<string, HTMLAnchorElement>();
+	type Entry = { Id: string; Link: HTMLAnchorElement; Target: HTMLElement };
 
-			for (const Link of Nav.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')) {
-				const Id = (Link.getAttribute("href") ?? "").slice(1);
+	const Mount = (Nav: HTMLElement) => {
+		if (Nav.dataset.navBound === "true") {
+			return;
+		}
 
-				if (Id !== "") {
-					Links.set(Id, Link);
-				}
-			}
+		Nav.dataset.navBound = "true";
 
-			const Targets = [...Links.keys()]
-				.map((Id) => document.getElementById(Id))
-				.filter((Target): Target is HTMLElement => Target !== null);
+		const Controller = new AbortController();
+		const { signal } = Controller;
 
-			if (Targets.length === 0) {
+		const Entries: Entry[] = [];
+
+		for (const Link of Nav.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')) {
+			const Id = (Link.getAttribute("href") ?? "").slice(1);
+
+			if (Id === "") {
 				continue;
 			}
 
-			const Observer = new IntersectionObserver(
-				(Entries) => {
-					for (const Entry of Entries) {
-						if (!Entry.isIntersecting) {
-							continue;
-						}
+			const Target = document.getElementById(Id);
 
-						for (const [Id, Link] of Links) {
-							if (Id === Entry.target.id) {
-								Link.setAttribute("aria-current", "true");
-							} else {
-								Link.removeAttribute("aria-current");
-							}
-						}
-					}
-				},
-				{ rootMargin: "0px 0px -70% 0px", threshold: 0 },
-			);
-
-			for (const Target of Targets) {
-				Observer.observe(Target);
+			if (Target !== null) {
+				Entries.push({ Id, Link, Target });
 			}
 		}
-	}
+
+		if (Entries.length === 0) {
+			return;
+		}
+
+		/** Entries are in document order, because the page passes its sections in order. */
+		const Apply = (Active: string | null) => {
+			for (const { Id, Link } of Entries) {
+				if (Id === Active) {
+					Link.setAttribute("aria-current", "true");
+				} else {
+					Link.removeAttribute("aria-current");
+				}
+			}
+		};
+
+		const Resolve = () => {
+			const Line = window.innerHeight / 3;
+
+			let Active: string | null = null;
+
+			for (const { Id, Target } of Entries) {
+				if (Target.getBoundingClientRect().top <= Line) {
+					Active = Id;
+				}
+			}
+
+			const Root = document.documentElement;
+			const Scrolls = Root.scrollHeight > window.innerHeight + 8;
+			const AtEnd = window.innerHeight + window.scrollY >= Root.scrollHeight - 2;
+
+			if (Scrolls && AtEnd) {
+				Active = Entries[Entries.length - 1].Id;
+			}
+
+			Apply(Active);
+		};
+
+		let Pending = false;
+
+		const Schedule = () => {
+			if (Pending) {
+				return;
+			}
+
+			Pending = true;
+
+			requestAnimationFrame(() => {
+				Pending = false;
+				Resolve();
+			});
+		};
+
+		window.addEventListener("scroll", Schedule, { passive: true, signal });
+		window.addEventListener("resize", Schedule, { signal });
+		window.addEventListener("hashchange", Schedule, { signal });
+		window.addEventListener("load", Schedule, { signal, once: true });
+
+		// On the phone the index IS the disclosure, so picking a section has to
+		// put it away again - otherwise the panel the reader opened covers the
+		// section they just asked for.
+		if (Nav instanceof HTMLDetailsElement) {
+			Nav.addEventListener(
+				"click",
+				(Event) => {
+					const Chosen = (Event.target as Element | null)?.closest?.('a[href^="#"]');
+
+					if (Chosen) {
+						Nav.open = false;
+					}
+				},
+				{ signal },
+			);
+		}
+
+		// A reveal animation or a lazily-sized figure changes the offsets
+		// without a scroll event; watching the body keeps the index honest
+		// through both.
+		let Growth: ResizeObserver | null = null;
+
+		if ("ResizeObserver" in window) {
+			Growth = new ResizeObserver(Schedule);
+			Growth.observe(document.body);
+		}
+
+		document.addEventListener(
+			"astro:before-swap",
+			() => {
+				Growth?.disconnect();
+				Controller.abort();
+				Nav.dataset.navBound = "false";
+			},
+			{ once: true },
+		);
+
+		Resolve();
+		Schedule();
+	};
+
+	const MountAll = () => {
+		for (const Nav of document.querySelectorAll<HTMLElement>("[data-section-nav]")) {
+			Mount(Nav);
+		}
+	};
+
+	MountAll();
+	document.addEventListener("astro:page-load", MountAll);
 </script>

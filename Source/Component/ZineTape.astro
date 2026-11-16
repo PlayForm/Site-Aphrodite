@@ -1,21 +1,32 @@
 ---
 /**
- * ZineTape - D3 of the restructure plan. The tape stamp was hand-rolled 103
- * times in four shapes across the pages, while this component could express
- * exactly one of them (`absolute -top-7`, `-rotate-1`, `px-3 py-0.5`). That
- * mismatch was the whole duplication engine: every page that needed a slightly
- * different tape wrote its own instead of passing a variant.
+ * ZineTape - the module's label, and the site's annotation hierarchy.
  *
- * The variant set is closed on purpose. A tape is a grammar element - the
- * module's label - so it has a finite number of shapes and a page picks one;
- * six free-form knobs would let the grammar drift back.
+ * EMPHASIS TIER: this component spans the tiers, and the shape IS the tier.
+ * `kicker` and `hash` are quiet; `corner` and `tab` are standard; `section`,
+ * `strip` and `hero` are expressive - the tier a section spends once.
  *
- *   corner   the module's top edge, absolutely placed (the default)
- *   section  in flow above a section, the full `mb-12` rhythm
- *   hero     the large stamp in the hero row
- *   hash     the mono hash chip - fixed teal on carbon-void, the mechanical voice
- *   tab      the index tab that hangs above a plate (`-mb-7`)
- *   strip    the full-bleed file strip across a hero's top edge
+ * THE HIERARCHY, loudest last. Pick the smallest shape that carries the job;
+ * a page that tapes everything has no tape.
+ *
+ *   kicker   A SECTION IDENTIFIER: small mono text, no box, no shadow, no
+ *            rotation. This is what most section labels actually need - the
+ *            reader has to find the section, not admire the label.
+ *   hash     The mechanical voice: a mono chip for a hash, a version, a count.
+ *   corner   IMPORTANT ANNOTATION: a narrow strip on a module's top edge. The
+ *            default shape, and the workhorse.
+ *   tab      The index tab that hangs above a plate.
+ *   strip    The full-bleed file strip across a hero's top edge.
+ *   section  The in-flow section stamp, with the full `mb-12` rhythm.
+ *   hero     The BRAND STICKER: the large stamp in the hero row.
+ *
+ * RESERVE THE FULL TAPE for a few moments. `section`, `hero` and `strip` are
+ * the expressive tier - one per section at most, and the page's own brand
+ * moment gets the `hero`. Everything else is `kicker`, `corner` or `hash`.
+ *
+ * The variant set is closed on purpose. A tape is a grammar element, so it has
+ * a finite number of shapes and a page picks one; six free-form knobs would let
+ * the grammar drift back.
  *
  * `corner` keeps the geometry the site ships today (`-top-7`, `-rotate-1`) so
  * the pages that already import this component render unchanged; a caller that
@@ -29,8 +40,8 @@ interface Props {
 	/** The tape's text. */
 	Label: string;
 
-	/** The shape: corner (default) | section | hero | hash | tab | strip. */
-	Variant?: "corner" | "section" | "hero" | "hash" | "tab" | "strip";
+	/** The shape: corner (default) | section | hero | hash | tab | strip | kicker. */
+	Variant?: "corner" | "section" | "hero" | "hash" | "tab" | "strip" | "kicker";
 
 	/** Stamp color: raw-blood (default), stamped-canary, weathered-teal, bone-newsprint. */
 	Color?: "raw" | "canary" | "teal" | "bone";
@@ -48,11 +59,22 @@ interface Props {
 const { Label, Variant = "corner", Color = "raw", Side = "left", Offset = "-top-7", Rotate } =
 	Astro.props;
 
+/** A tape's colour is a FILL with text on it. */
 const Palette = {
 	raw: "bg-raw-blood text-bone-white",
 	canary: "bg-stamped-canary text-soot-black",
 	teal: "bg-weathered-teal text-bone-white",
 	bone: "bg-bone-newsprint text-soot-black",
+}[Color];
+
+/** `kicker` has no box to fill, so it takes the same voice as TEXT. `raw` is a
+ * chrome colour and never a text colour (the AA-LIFT law), so the section-label
+ * voice is dust - which is also what a label should read as. */
+const Ink = {
+	raw: "text-zinc-dust",
+	canary: "text-stamped-canary",
+	teal: "text-weathered-teal",
+	bone: "text-bone-newsprint",
 }[Color];
 
 const Position = {
@@ -61,7 +83,9 @@ const Position = {
 	center: "left-1/2 -translate-x-1/2",
 }[Side];
 
-/** The tilt each shape carries when the caller does not override it. */
+/** The tilt each shape carries when the caller does not override it. `kicker`
+ * sits still: a section identifier that leans is decoration pretending to be a
+ * label. */
 const DefaultTilt = {
 	corner: "-rotate-1",
 	section: "-rotate-1",
@@ -69,6 +93,7 @@ const DefaultTilt = {
 	hash: "rotate-1",
 	tab: "-rotate-1",
 	strip: "-rotate-1",
+	kicker: "",
 }[Variant];
 
 const Tilt = Rotate ?? DefaultTilt;
@@ -80,10 +105,12 @@ const Shape = {
 	hash: "rotate-1 border-2 border-black bg-carbon-void px-4 py-1.5 font-mono text-base font-bold uppercase tracking-widest text-weathered-teal shadow-[4px_4px_0px_#000]",
 	tab: `relative z-10 -mb-7 ml-6 inline-block border border-black px-4 py-1.5 font-mono text-base font-black uppercase tracking-widest shadow-[3px_3px_0px_#000] ${Tilt} max-sm:rotate-0 ${Palette}`,
 	strip: `tape-strip absolute -top-6 left-0 z-10 ${Tilt} border-b border-t border-bone-newsprint/30 px-4 py-1 text-base font-black uppercase tracking-widest text-bone-newsprint`,
+	kicker: `inline-block font-mono text-base font-black uppercase tracking-widest ${Ink} ${Tilt}`,
 }[Variant];
 
-/** The hash chip is the one inline shape: it sits inside a hero's flex row. */
-const Element = Variant === "hash" ? "span" : "div";
+/** The hash chip and the kicker are the inline shapes: they sit inside a flow
+ * or a flex row rather than owning a block of their own. */
+const Element = Variant === "hash" || Variant === "kicker" ? "span" : "div";
 ---
 
 <Element class={Shape}>{Label}</Element>

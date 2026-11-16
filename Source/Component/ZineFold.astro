@@ -1,15 +1,27 @@
 ---
 /**
- * ZineFold - the expandable pane pair: a closed pane showing the headline
- * and a "OPEN +" tab; expanding reveals the body (and swaps the tab to
- * "CLOSE −"). Details/summary semantics, styled in the grammar (radius 0,
- * hard shadow, no smooth height animation).
+ * ZineFold - the quiet disclosure.
+ *
+ * EMPHASIS TIER: quiet. ONE top rule, no shadow, no inner card, no fill - a
+ * fold is a list item the reader opens, not a plate competing with the argument
+ * above it. Consecutive folds therefore read as one list: rule, title, body,
+ * rule, title, body.
+ *
+ * Native `<details>` keeps the keyboard, the screen-reader semantics and the
+ * no-JavaScript behaviour; only the presentation is ours. The state is a GLYPH
+ * rather than a word, because "OPEN +" beside a title is a second label for a
+ * control that already has one - the reader does not need to be told twice what
+ * a disclosure does.
+ *
+ * `Tag` is quiet mono metadata, never a second bordered badge: a badge beside a
+ * fold title reads as a competing label, which is the old problem (everything
+ * shouts, so nothing does) in miniature.
  */
 interface Props {
 	/** The closed-state headline. */
 	Label: string;
 
-	/** Optional side tag, e.g. "DETAIL" or a step number. */
+	/** Optional side tag, e.g. "DETAIL" or a step number. Quiet mono, no badge. */
 	Tag?: string;
 
 	/** The body content (rich). */
@@ -19,12 +31,14 @@ interface Props {
 const { Label, Tag, Body } = Astro.props;
 ---
 
-<details class="group border border-oxblood-dark bg-carbon-void shadow-[3px_3px_0px_#000]" data-zine-fold>
-	<summary class="flex cursor-pointer list-none items-center gap-3 border-b border-transparent bg-soot-black px-3 py-2 font-mono text-base font-bold text-bone-newsprint transition-colors group-open:border-oxblood-dark hover:text-bone-white">
-		{Tag && <span class="border border-oxblood-dark bg-raw-blood px-1.5 py-0.5 text-base font-black uppercase tracking-widest text-bone-white">{Tag}</span>}
-		<span class="grow">{Label}</span>
-		<span class="text-stamped-canary group-open:hidden" aria-hidden="true">OPEN +</span>
-		<span class="hidden text-zinc-dust group-open:inline" aria-hidden="true">CLOSE −</span>
+<details class="group border-t border-oxblood-dark" data-zine-fold>
+	<summary
+		class="flex cursor-pointer list-none items-baseline gap-3 py-3 text-bone-newsprint transition-colors hover:text-bone-white"
+	>
+		{Tag && <span class="type-meta shrink-0 uppercase text-zinc-dust">{Tag}</span>}
+		<span class="grow font-body text-base font-bold leading-snug">{Label}</span>
+		<span class="shrink-0 font-mono text-base text-zinc-dust group-open:hidden" aria-hidden="true">+</span>
+		<span class="hidden shrink-0 font-mono text-base text-zinc-dust group-open:inline" aria-hidden="true">−</span>
 	</summary>
-	<div class="p-3 font-body text-base leading-relaxed text-bone-newsprint" set:html={Body} />
+	<div class="pb-4 font-body text-base leading-relaxed text-bone-newsprint" set:html={Body} />
 </details>

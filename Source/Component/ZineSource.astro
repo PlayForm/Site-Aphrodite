@@ -1,22 +1,114 @@
 ---
 /**
- * ZineSource - D9 of the restructure plan. The citation footer shipped in two
- * forms: `mt-12 ... pt-8` on four pages and `mt-8 ... pt-4` on three, for the
- * same role. This component owns the larger rhythm, the one that matches the
- * page's own section gap; the smaller form was drift.
+ * ZineSource - where a claim came from, at two levels.
+ *
+ * EMPHASIS TIER: quiet at both levels. A source never competes with the claim
+ * it supports; it is what the reader reaches for AFTER the claim has landed.
+ *
+ *   inline       One compact line under a claim: the mono voice at caption
+ *                size, zinc-dust, a hairline above it. The default, and what an
+ *                ordinary citation gets. The outer rhythm (`mt-12` / `pt-8` /
+ *                `space-y-1`) is unchanged from the citation footer this
+ *                component has always shipped, so every existing call site
+ *                keeps its place in the page - what changed is the VOICE, one
+ *                step down from the reading size.
+ *   methodology  The full provenance block, for a claim that carries a method:
+ *                sources, revision, method, reproduction commands and
+ *                limitations, each a labelled row. Use it where a reader could
+ *                otherwise not check the number for themselves.
+ *
+ * Every field is optional and each renders only when present, so a claim with
+ * three of the five facts prints three rows, never a row of empty labels. The
+ * rows are built as data, so the markup has one shape rather than five guarded
+ * copies of itself.
  *
  * The citation is plain prose by law (site-modules §5): the CodeMentions pass
  * links the paths in the BUILT tree, so the lines stay text here and no page
  * hand-writes a `<code>` around a source path.
  */
-interface Props {
-	/** Each "SRC: file:lines." citation on its own line. */
-	Lines: string[];
+interface Methodology {
+	/** The source paths and line ranges the claim was read from. */
+	Sources?: string[];
+
+	/** The revision the figures were measured at - a tag, a commit, a version. */
+	Revision?: string;
+
+	/** How the figure was produced, in one sentence. */
+	Method?: string;
+
+	/** The commands a reader can run to reproduce it. */
+	Commands?: string[];
+
+	/** What the figure does not cover - the qualifier a number always needs. */
+	Limitations?: string[];
 }
 
-const { Lines } = Astro.props;
+interface Props {
+	/** Each "SRC: file:lines." citation on its own line. */
+	Lines?: string[];
+
+	/** `inline` (default) is the compact line; `methodology` is the full block. */
+	Variant?: "inline" | "methodology";
+
+	/** The structured fields the `methodology` variant renders. */
+	Methodology?: Methodology;
+
+	/** The `methodology` block's quiet heading, e.g. "METHODOLOGY". */
+	Title?: string;
+}
+
+const { Lines = [], Variant = "inline", Methodology, Title } = Astro.props;
+
+/** The voice each row speaks: mono for anything a reader copies (paths,
+ * commands, a revision), body for anything a reader reads (the method, the
+ * caveats). */
+const Voice: Record<string, string> = {
+	mono: "font-mono text-caption",
+	body: "font-body text-caption",
+};
+
+/** The five facts, in the order a reader checks them. A row with no values is
+ * dropped, so the block never prints a label with nothing under it. */
+const Rows = [
+	{ Key: "REVISION", Voice: "mono", Values: Methodology?.Revision ? [Methodology.Revision] : [] },
+	{ Key: "METHOD", Voice: "body", Values: Methodology?.Method ? [Methodology.Method] : [] },
+	{ Key: "SOURCES", Voice: "mono", Values: Methodology?.Sources ?? [] },
+	{ Key: "REPRODUCE", Voice: "mono", Values: Methodology?.Commands ?? [] },
+	{ Key: "LIMITATIONS", Voice: "body", Values: Methodology?.Limitations ?? [] },
+].filter((Row) => Row.Values.length > 0);
 ---
 
-<div class="mt-12 space-y-1 border-t border-oxblood-dark pt-8 text-base leading-relaxed text-zinc-dust">
-	{Lines.map((Line) => <p>{Line}</p>)}
-</div>
+{
+	Variant === "methodology" ? (
+		<section class="mt-12 border-t border-oxblood-dark pt-8" data-zine-source="methodology">
+			{Title && <h3 class="section-kicker">{Title}</h3>}
+			{Lines.length > 0 && (
+				<div class="mt-3 space-y-1 font-mono text-caption leading-relaxed text-zinc-dust">
+					{Lines.map((Line) => (
+						<p>{Line}</p>
+					))}
+				</div>
+			)}
+			{Rows.length > 0 && (
+				<dl class="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-[9rem_1fr]">
+					{Rows.map((Row) => (
+						<>
+							<dt class="type-meta text-zinc-dust">{Row.Key}</dt>
+							<dd class:list={[Voice[Row.Voice], "space-y-1 leading-relaxed text-bone-newsprint"]}>
+								{Row.Values.map((Value) => (
+									<p class={Row.Voice === "mono" ? "break-all" : ""}>{Value}</p>
+								))}
+							</dd>
+						</>
+					))}
+				</dl>
+			)}
+		</section>
+	) : (
+		<div class="mt-12 space-y-1 border-t border-oxblood-dark pt-8 font-mono text-caption leading-relaxed text-zinc-dust">
+			{Lines.map((Line) => (
+				<p>{Line}</p>
+			))}
+		</div>
+	)
+}

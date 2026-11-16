@@ -1,30 +1,55 @@
 ---
 /**
- * ZineBox - D4 of the restructure plan. The crimson plate was hand-rolled 80
- * times: the same `border-4 border-blood-crimson bg-carbon-void` boundary in
- * two padding sizes and four hand-written rotations, 39 of them restating the
- * `zine-box-crimson` shadow token that already draws the border's twin plane.
+ * ZineBox - the module plate, and the one place a block decides how loudly it
+ * is framed.
+ *
+ * EMPHASIS TIER: this component spans all three tiers, and the tier is CHOSEN
+ * rather than accumulated.
+ *
+ *   quiet     A hairline rule - 1px outline-oxblood with a 2px crimson left
+ *             edge, no fill, no shadow, no tilt. The tier for a block the
+ *             reader has to study: methodology, caveats, a definition list, a
+ *             long quotation. Renders Global.css `.emphasis-quiet` directly,
+ *             because quiet spends a complete budget and nothing here competes
+ *             with it - `Surface`, `Accent`, `Tilt`, `Tone` and `Hover` are
+ *             inert under quiet by design, not by omission.
+ *   standard  The 4px crimson module boundary plus the hard offset shadow,
+ *             flat. The default, and the plate for an example, a figure or a
+ *             table. Mirrors `.emphasis-standard` declaration for declaration
+ *             (`border-4 border-blood-crimson bg-carbon-void zine-box-crimson`)
+ *             but is composed instead of classed, because `Surface`, `Accent`
+ *             and `Tilt` each have to beat the tier's own background,
+ *             box-shadow and transform - and those sit at equal specificity in
+ *             Global.css with the tier declared last.
+ *   featured  standard plus a tilt: the ONE expressive assembly a section is
+ *             allowed. Mirrors `.emphasis-expressive`. One per section - a
+ *             second one takes emphasis away from the first, and from
+ *             everything the reader actually has to study.
  *
  * Grammar law 1 is the border (4px crimson = the module boundary) and law 2 is
- * the shadow (zero-blur, pasted down, radius 0); this component is those two
- * laws plus the padding pair, so a plate is a component call and never a class
- * string.
+ * the shadow (zero-blur, pasted down, radius 0); law 3 is "mobile flattens",
+ * which is why every tilt is composed with `max-sm:rotate-0`.
  *
- * `Rotate` is applied from the `sm` breakpoint up - law 3, "mobile flattens".
- * The hand-rolled plates rotated on every viewport, which was the violation
- * this component fixes: pass the unprefixed rotation (`-rotate-[1.2deg]`) and
- * the component decides where it applies.
+ * The legacy props keep their meaning. `Tone` still selects only the shadow
+ * plane, and it still outranks `Accent`'s shadow, so a call site that passes
+ * `Tone="subtle"` keeps its crimson boundary and its subtle plane.
+ *
+ * Hover motion is OPT-IN (`Hover`). A plate that carries copy is not a control,
+ * and a plate that leans away when a pointer crosses it tells the reader it can
+ * be clicked. Only a plate that IS the affordance asks for `Hover`.
  */
 import ZineTape from "./ZineTape.astro";
 
 interface Props {
-	/** Shadow tone: the zine-box class from Global.css. */
+	/** Shadow tone: the zine-box class from Global.css. Legacy alias - it owns
+	 * the shadow plane and nothing else, and it wins over `Accent`'s shadow. */
 	Tone?: "crimson" | "subtle" | "canary" | "teal";
 
 	/** The plate's padding: md = p-6 sm:p-8, lg = p-8 sm:p-12. */
 	Size?: "md" | "lg";
 
-	/** Rotation from `sm` up; mobile is always flat. Pass the unprefixed class. */
+	/** Rotation from `sm` up; mobile is always flat. Pass the unprefixed class.
+	 * The most specific rotation control - it outranks `Tilt`. */
 	Rotate?: string;
 
 	/** The corner tape rendered by ZineTape, if any. */
@@ -47,47 +72,119 @@ interface Props {
 	 * need a second mark drawing attention to it.
 	 */
 	Wipe?: boolean;
+
+	/** The fill under the frame. plain = the module surface (carbon-void, the
+	 * default); inset = the page ground, so the plate reads as a hole in it;
+	 * paper = one sheet above the module surface (asphalt-panel). */
+	Surface?: "plain" | "inset" | "paper";
+
+	/** The emphasis tier - see the doc comment. One `featured` per section. */
+	Emphasis?: "quiet" | "standard" | "featured";
+
+	/** The boundary colour, and the shadow plane that mirrors it. `none` is the
+	 * quietest framed plate: an oxblood-dark boundary on a subtle plane. */
+	Accent?: "none" | "crimson" | "canary" | "teal";
+
+	/** The lean. `featured` leans left on its own; pass `none` to hold a
+	 * featured plate flat, or a side to lean a standard one. */
+	Tilt?: "none" | "left" | "right";
+
+	/** Opt-in hover motion: the plate straightens under the pointer. Off by
+	 * default - a reading panel must not suggest interactivity. */
+	Hover?: boolean;
 }
 
 const {
-	Tone = "crimson",
+	Tone,
 	Size = "md",
-	Rotate = "",
+	Rotate,
 	Tape,
 	TapeColor = "raw",
 	TapeSide = "left",
 	Class = "",
 	Wipe = false,
+	Surface = "plain",
+	Emphasis = "standard",
+	Accent = "crimson",
+	Tilt,
+	Hover = false,
 } = Astro.props;
-
-const Shadow = {
-	crimson: "zine-box-crimson",
-	subtle: "zine-box-subtle",
-	canary: "zine-box-canary",
-	teal: "zine-box-teal",
-}[Tone];
 
 const Pad = {
 	md: "p-6 sm:p-8",
 	lg: "p-8 sm:p-12",
 }[Size];
 
+const Fill = {
+	plain: "bg-carbon-void",
+	inset: "bg-soot-black",
+	paper: "bg-asphalt-panel",
+}[Surface];
+
+const Boundary = {
+	none: "border-oxblood-dark",
+	crimson: "border-blood-crimson",
+	canary: "border-stamped-canary",
+	teal: "border-weathered-teal",
+}[Accent];
+
+/** `Tone` is the shadow-only legacy alias, so it outranks `Accent` here: that is
+ * what a call site passing `Tone` means by the prop. `Accent` supplies both the
+ * boundary colour above and the plane that mirrors it. */
+const Plane =
+	Tone !== undefined
+		? {
+				crimson: "zine-box-crimson",
+				subtle: "zine-box-subtle",
+				canary: "zine-box-canary",
+				teal: "zine-box-teal",
+			}[Tone]
+		: {
+				none: "zine-box-subtle",
+				crimson: "zine-box-crimson",
+				canary: "zine-box-canary",
+				teal: "zine-box-teal",
+			}[Accent];
+
+/** The lean, in precedence order: the legacy `Rotate` string (honoured
+ * verbatim), then `Tilt`, then `featured`'s own default. */
+const LeanByTilt = {
+	none: "",
+	left: "-rotate-[1.2deg]",
+	right: "rotate-[0.8deg]",
+};
+
+const DefaultLean = Emphasis === "featured" ? "-rotate-[1.2deg]" : "";
+
+const Lean =
+	Rotate !== undefined && Rotate !== ""
+		? Rotate
+		: Tilt === undefined
+			? DefaultLean
+			: LeanByTilt[Tilt];
+
 /** The tilt is composed as `rotate` + a mobile flatten, never as a `sm:` prefix:
  * Tailwind's scanner only sees literal class text, so a composed `sm:-rotate-x`
  * would never be generated and the plate would render flat. */
-const Tilt = Rotate === "" ? "max-sm:rotate-0" : `${Rotate} max-sm:rotate-0`;
+const Transform = Lean === "" ? "max-sm:rotate-0" : `${Lean} max-sm:rotate-0`;
+
+/** Quiet is one published class carrying a complete budget; standard and
+ * featured are composed so that Surface / Accent / Tilt can beat the tier's own
+ * declarations instead of losing a specificity tie to them. */
+const Frame =
+	Emphasis === "quiet"
+		? ["emphasis-quiet"]
+		: [
+				"border-4",
+				Boundary,
+				Fill,
+				Plane,
+				Transform,
+				Hover && "transition-transform duration-300 hover:rotate-0",
+			];
 ---
 
-<div
-	class:list={[
-		"relative border-4 border-blood-crimson bg-carbon-void transition-transform duration-300 hover:rotate-0",
-		Pad,
-		Shadow,
-		Tilt,
-		Wipe && "motion-wipe-host",
-		Class,
-	]}
->
+<div class:list={["relative", ...Frame, Pad, Wipe && "motion-wipe-host", Class]} data-emphasis={Emphasis}>
 	{Wipe && <span class="motion-wipe" data-wipe aria-hidden="true" />}
 	{Tape !== undefined && <ZineTape Variant="corner" Label={Tape} Color={TapeColor} Side={TapeSide} />}
 	<slot />

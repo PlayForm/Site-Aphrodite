@@ -1,17 +1,75 @@
 ---
+/**
+ * ZineButton - the site's one action control, and its action hierarchy.
+ *
+ * EMPHASIS TIER: `Role` decides the budget, and the budget is the point.
+ *
+ *   primary    Filled raw-blood, bone-white text, black hairline, hard 3px
+ *              offset shadow, press collapses both. THE action of a section.
+ *              A section usually has ONE filled primary action - a second one
+ *              competes with the first, and takes emphasis from both.
+ *   secondary  A thin oxblood-dark boundary on no fill. Everything that is an
+ *              action without being THE action: a sibling destination, a
+ *              "compare the other number".
+ *   text       An underlined link - no border, no shadow, no fill. Navigation
+ *              that belongs inside the argument: "read the source", "see the
+ *              measured page".
+ *   utility    The small neutral control: mono, one step down, dust until it is
+ *              pointed at. Reserved for SHORT labels (COPY, RUN, OPEN), where
+ *              uppercase is a mark rather than a shout.
+ *
+ * LABEL CASING: sentence case is the default, because a button label is a
+ * sentence the reader says to themselves. Uppercase belongs to the `utility`
+ * voice only, and a `utility` label must stay short enough to read at a glance.
+ *
+ * The click is NOT handled here. `Source/Layout/Base.astro` owns the only copy
+ * runtime in the site: it binds every `[data-copy]` element, writes the payload
+ * to the clipboard and shows the toast, and re-binds on `astro:page-load` under
+ * a bound guard. This component therefore ships markup and a `data-copy` value,
+ * nothing else.
+ */
 interface Props {
+	/** The visible label and the accessible name. Sentence case. */
 	Label: string;
 
 	/** When set, clicking copies this text and shows the toast stamp. */
 	Copy?: string;
 
+	/** When set the control is an `<a>`; otherwise it is a `<button>`. */
 	Href?: string;
+
+	/** The action budget - see the doc comment. Defaults to the filled CTA. */
+	Role?: "primary" | "secondary" | "text" | "utility";
+
+	/** Extra classes for the control itself. */
+	Class?: string;
 }
 
-const { Label, Copy, Href } = Astro.props;
+const { Label, Copy, Href, Role = "primary", Class = "" } = Astro.props;
 
-const Base =
-	"inline-block border border-black bg-raw-blood px-4 py-2 font-mono text-base font-black uppercase text-bone-white shadow-[3px_3px_0px_#000] transition-colors hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none";
+const Base = "inline-block font-mono transition-colors";
+
+const Shape = {
+	primary:
+		"border border-black bg-raw-blood px-4 py-2 text-base font-black text-bone-white shadow-[3px_3px_0px_#000] hover:bg-blood-crimson active:translate-x-0.5 active:translate-y-0.5 active:shadow-none",
+	secondary:
+		"border border-oxblood-dark bg-transparent px-4 py-2 text-base font-bold text-bone-newsprint hover:border-blood-crimson hover:text-bone-white",
+	text: "text-base font-bold text-bone-newsprint underline decoration-oxblood-dark decoration-2 underline-offset-4 hover:text-bone-white hover:decoration-blood-crimson",
+	utility:
+		"border border-oxblood-dark bg-soot-black px-2 py-1 text-meta font-black uppercase tracking-widest text-zinc-dust hover:border-blood-crimson hover:text-bone-white",
+}[Role];
+
+const Classes = [Base, Shape, Class];
 ---
 
-{Href ? <a class={Base} href={Href}>{Label}</a> : <button class={Base} data-copy={Copy} type="button">{Label}</button>}
+{
+	Href ? (
+		<a class:list={Classes} href={Href}>
+			{Label}
+		</a>
+	) : (
+		<button class:list={Classes} data-copy={Copy} type="button">
+			{Label}
+		</button>
+	)
+}

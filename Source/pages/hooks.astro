@@ -45,8 +45,8 @@ const Hooks = Roster.map((Hook) => {
 			Title="Six hooks, one turn"
 			Lead={[
 				"Every hook is a thin dispatch that forwards its arguments to the Rust dylib and hands the JSON reply back to Hermes.",
-				"It is the reason the shim registers one callback per name: on plugin load it asks the dylib for its hook names, and the six below are always registered together.",
-				`The chain is the whole integration: each seam below fires in turn order, and nothing reaches the model that a seam did not first see.`,
+				"It is the reason the shim registers one callback per name: on plugin load it asks the dylib for its hook names, and the six hooks are always registered together.",
+				`The chain is the whole integration: each seam fires in turn order, and nothing reaches the model that a seam did not first see.`,
 			]}
 		/>
 

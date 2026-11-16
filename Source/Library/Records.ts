@@ -171,23 +171,104 @@ export interface ExampleOutputLine {
 }
 
 /**
- * The scenario's own evidence. Three shapes cover every case on the page, and
- * a scenario picks one per panel - never a fourth shape:
+ * The scenario's own evidence. Five shapes cover every case on the page, and
+ * a scenario picks one per panel - never a sixth shape:
  *
- * - `rows`  - one bordered line per item, term left, reading right, optional chip.
- * - `cards` - a small plate per item, title over body, optional footer note.
- * - `lanes` - two panes side by side, each a title over mono lines, optional marker.
+ * - `rows`     - one bordered line per item, term left, reading right, optional chip.
+ * - `cards`    - a small plate per item, title over body, optional footer note.
+ * - `lanes`    - two panes side by side, each a title over mono lines, optional marker.
+ * - `table`    - an aligned comparison, one column per setting, one row per decision.
+ * - `sequence` - an ordered processing sequence: ordinal, title, rule.
+ *
+ * A panel is a UNION of five records rather than one wide record with five
+ * optional payloads, so "one shape per panel" is a fact the compiler enforces:
+ * a `rows` panel cannot carry `Lanes`, and a `table` cannot be rendered from a
+ * `cards` payload. `Kind` is the discriminant; every panel literal written
+ * before this union existed still type-checks, because it names its own `Kind`.
  */
-export interface ExamplePanel {
-	Kind: "rows" | "cards" | "lanes";
+export type ExamplePanel = RowsPanel | CardsPanel | LanesPanel | TablePanel | SequencePanel;
+
+/** One term -> reading pair of a `rows` panel, with its optional verdict chip. */
+export interface ExamplePanelRow {
+	/** The term: the stable key a reader scans down. */
+	Left: string;
+	/** The reading: what that key means in this scenario. */
+	Right: string;
+	/** An optional verdict chip, printed inside the reading's own cell. */
+	Tag?: string;
+	/** The chip's tone; `canary` when unset. */
+	TagTone?: ExampleTagTone;
+}
+
+/** `rows` - one bordered line per item, term left, reading right. */
+export interface RowsPanel {
+	Kind: "rows";
 	/** The panel's kicker, e.g. "THE FOUR DOORS". */
 	Label: string;
-	/** `rows` payload: term, reading, optional verdict chip. */
-	Rows?: { Left: string; Right: string; Tag?: string; TagTone?: ExampleTagTone }[];
-	/** `cards` payload: a plate per item. */
+	/**
+	 * The pairs. Rendered as a real `<dl>` with one shared track for the terms,
+	 * so the readings line up in a column a reader can scan - which a wrapping
+	 * `justify-between` row cannot do, because every reading starts wherever
+	 * its own term happens to end.
+	 */
+	Rows?: ExamplePanelRow[];
+}
+
+/** `cards` - a plate per item, title over body, optional footer note. */
+export interface CardsPanel {
+	Kind: "cards";
+	/** The panel's kicker. */
+	Label: string;
+	/** The plates. */
 	Cards?: { Title: string; Body: string; Note?: string }[];
-	/** `lanes` payload: a pane per item. */
+}
+
+/** `lanes` - a pane per item, side by side, optional marker under the lines. */
+export interface LanesPanel {
+	Kind: "lanes";
+	/** The panel's kicker. */
+	Label: string;
+	/** The panes. */
 	Lanes?: { Title: string; Lines: string[]; Marker?: string }[];
+}
+
+/**
+ * `table` - an aligned comparison: the same question answered once per column.
+ *
+ * This is the shape the pages kept hand-rolling inline, because none of the
+ * first three could express it: a setting-by-decision matrix is not a bordered
+ * row, a card or a lane pair. It renders as a real `<table>`, so the columns
+ * are columns to a screen reader too.
+ */
+export interface TablePanel {
+	Kind: "table";
+	/** The panel's kicker, above the table. */
+	Label: string;
+	/**
+	 * The table's own accessible name, printed as its `<caption>`: the question
+	 * the comparison answers. Required rather than derived from `Label`, because
+	 * a caption that only repeats the kicker names nothing - and a table with no
+	 * caption is a grid of cells with nothing saying what it compares.
+	 */
+	Caption: string;
+	/** The header row, one cell per column. The FIRST column heads the row terms. */
+	Columns: string[];
+	/** One entry per row, one cell per column, in `Columns` order. */
+	Rows?: string[][];
+}
+
+/**
+ * `sequence` - an ordered processing sequence: what happens, and in what order.
+ *
+ * Rendered as an `<ol>`, so the order survives with the styling off. `N` is the
+ * ordinal the reader sees; the list carries no second numbering of its own.
+ */
+export interface SequencePanel {
+	Kind: "sequence";
+	/** The panel's kicker. */
+	Label: string;
+	/** The ordered steps. */
+	Steps?: { N: string; Title: string; Rule: string }[];
 }
 
 /** An inline diagram and its caption. */
@@ -198,15 +279,84 @@ export interface ExampleDiagram {
 	Caption: string;
 }
 
+/* -------------------------------------------------------------------------
+ * THE OUTCOME MODEL - how an example's bytes reach the transcript
+ * ---------------------------------------------------------------------- */
+
+/**
+ * How an example's bytes reach the transcript. These are four genuinely
+ * different mechanisms, so each one gets its own visual in `ExampleCase`:
+ * rendering one fixed sequence for all four is what made an example that
+ * produces no marker still print a `THE MARKER` label over a `PREVIEW + HASH`
+ * pane - a visual claim the data contradicted.
+ *
+ * - `compressed`  - original output -> preview line + marker (over threshold)
+ * - `passthrough` - input -> byte-identical output + the reason it was skipped
+ * - `injected`    - ordered text assembly into the prompt (never a tool result)
+ * - `callback`    - request -> immediate reply -> later delivery at a callback URL
+ *
+ * A record that leaves this unset renders the single fixed sequence the
+ * component shipped with, so a page that has not adopted the outcome model
+ * (or a scenario that genuinely is one stream in, one preview out) renders
+ * exactly as it did before.
+ */
+export type ExampleOutcome = "compressed" | "passthrough" | "injected" | "callback";
+
+/**
+ * Where an example's words come from. Four different claims, and the page must
+ * not blur them: "anonymized" says who was protected, "illustrative" says who
+ * wrote it, and they are not synonyms.
+ *
+ * - `Illustrative`    - authored: a faithful fragment of the shape, not a capture
+ * - `Catalog-exact`   - byte-identical to the documented enriched-preview catalog
+ * - `Captured`        - recorded from a real run, then anonymized
+ * - `Engine-verified` - checked against a named engine version
+ *
+ * Printed as TEXT beside the title. A colour may reinforce the label; colour
+ * alone never carries the distinction.
+ */
+export type ExampleProvenance = "Illustrative" | "Catalog-exact" | "Captured" | "Engine-verified";
+
+/**
+ * One ordered stage of an example whose mechanism is a sequence: the parts of a
+ * callback exchange, or the sections of an injected block. Read from the
+ * entry's own raw stream, so the stages cannot describe an order the output
+ * does not have.
+ */
+export interface ExampleStage {
+	/** The stage's own label, e.g. `"THE IMMEDIATE REPLY"`. */
+	Label: string;
+	/** The stage's lines, in the stream pane's tones. */
+	Lines: ExampleOutputLine[];
+}
+
+/** The retrieval round-trip, as the store answers it. */
+export interface ExampleRetrieval {
+	/** The call text, e.g. `aphrodite_retrieve(hash: "f3a1c0d4...")`. */
+	Call: string;
+	/** The tool that was called. */
+	Tool: string;
+	/** The hash argument, byte-exact. */
+	Hash: string;
+	/** Whether the store found the content. */
+	Found: boolean;
+	/** Which store answered - `ccr` on every success path. */
+	Source: string;
+	/** The returned content, as the answer carries it. */
+	Content: string;
+}
+
 /**
  * ONE worked scenario, in the one shape every scenario takes: a claim, the
  * command that starts it, the real output, the marker it produced, then the
  * scenario's own evidence. `ExampleCase` renders exactly this; a page's array
  * is an `ExampleRecord[]` and nothing else.
  *
- * The stream/preview pair is grammar law 4, so `Output` and `Preview`/`Marker`
- * are required: a scenario that cannot show its own compression is not a
- * scenario this component can render.
+ * The stream/preview pair is grammar law 4, so `Output` and `Preview` are
+ * required: a scenario that cannot show what the agent saw is not a scenario
+ * this component can render. `Marker` is NOT required - an example whose data
+ * says it produced no marker must be able to say so structurally, instead of
+ * carrying a sentence where a hash belongs.
  */
 export interface ExampleRecord {
 	/** The section anchor; the page's hero index links to it. */
@@ -222,8 +372,11 @@ export interface ExampleRecord {
 	/** Rotation from the sm breakpoint up; mobile is always flat (law 3). */
 	Rotate?: string;
 	/**
-	 * The claim: one sentence (or tight group) per entry, `mt-3` between them
-	 * - the PROSE BREAKDOWN, not one flowing block. Goes through `set:html`.
+	 * The claim: one sentence (or tight group) per entry, separated by the
+	 * published reading distance (`.prose-flow`, `--space-reading`) - the PROSE
+	 * BREAKDOWN, not one flowing block. Goes through `set:html`.
+	 * The FIRST entry is the one-sentence takeaway the compact resting state
+	 * shows; the rest are read in the expanded pane.
 	 */
 	Claim: string[];
 	/** The one command or call that starts the scenario; fenced byte-exact. */
@@ -232,11 +385,26 @@ export interface ExampleRecord {
 	Output: ExampleOutputLine[];
 	/** The compact line the model kept. */
 	Preview: string;
-	/** The marker it produced (escaped), or the explicit "none - ..." reason. */
-	Marker: string;
+	/**
+	 * The marker the output produced (escaped), or unset when the entry's data
+	 * says it produced none. A renderer must not invent a marker for an entry
+	 * that has none - that is the visual claim this field's absence settles.
+	 */
+	Marker?: string;
+	/** How the bytes reached the transcript; unset renders the legacy sequence. */
+	Outcome?: ExampleOutcome;
+	/** Where the words come from, printed as text beside the title. */
+	Provenance?: ExampleProvenance;
+	/**
+	 * The ordered stages of a sequential mechanism (a callback exchange, an
+	 * injected assembly), read from the entry's own raw stream.
+	 */
+	Stages?: ExampleStage[];
+	/** The retrieval round-trip, call and answer, when the entry made one. */
+	Retrieval?: ExampleRetrieval;
 	/** Closing sentences after the panels - the "what it cost" half. */
 	Note?: string[];
-	/** The scenario's own evidence, from the closed set of three shapes. */
+	/** The scenario's own evidence, from the closed set of five shapes. */
 	Panels?: ExamplePanel[];
 	/** An inline diagram and its caption. */
 	Diagram?: ExampleDiagram;

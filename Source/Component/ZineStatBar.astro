@@ -19,6 +19,14 @@ interface Props {
 
 const { Label, Ratio, Percent, Color = "teal", Fill = "static" } = Astro.props;
 
+// The palette is resolved HERE, on the server, and rendered as a class on the
+// fill element. It used to be resolved inside the <script>, which is a separate
+// module: a plain <script> never receives a component's frontmatter variables,
+// so `Color` was undefined there, `classList.add(undefined)` threw a
+// ReferenceError on the first observed bar, and the colour was never applied -
+// while the width, set one line earlier, still was. The symptom was a bar of
+// the right length in the wrong (default) colour with nothing in the console
+// that pointed at this file.
 const Palette = {
 	teal: "bg-weathered-teal",
 	raw: "bg-raw-blood",
@@ -30,6 +38,10 @@ const Text = {
 	raw: "text-raw-blood",
 	canary: "text-stamped-canary",
 }[Color];
+
+// Clamped once, server-side: a caller that passes 140 or -5 gets a bar that
+// cannot overflow its track, and the script never has to guess what it meant.
+const Width = Math.max(0, Math.min(100, Percent));
 ---
 
 <div>
@@ -41,19 +53,24 @@ const Text = {
 		{
 			Fill === "scroll" ? (
 				<div
-					class="zine-stat-fill h-full"
-					style="width: 0%;"
-					data-stat-fill={Percent}
+					class={`zine-stat-fill h-full ${Palette}`}
+					style={`width: ${Width}%;`}
+					data-stat-fill={Width}
 					aria-hidden="true"
 				/>
 			) : (
-				<div class={`h-full ${Palette}`} style={`width: ${Percent}%;`} />
+				<div class={`h-full ${Palette}`} style={`width: ${Width}%;`} />
 			)
 		}
 	</div>
 </div>
 
 <script>
+	// The scroll-fill. The client sets ONE thing here - the width - because the
+	// palette and the final width are already in the markup. Everything the
+	// reader needs without JavaScript is server-rendered: the ratio text beside
+	// the bar, and the bar itself at its final width (the pre-hide in the style
+	// block is scoped to `html.js`, which only a scripting reader has).
 	function BindStatFills() {
 		for (const Bar of document.querySelectorAll<HTMLElement>("[data-stat-fill]")) {
 			if (Bar.dataset.statFillBound) {
@@ -62,13 +79,21 @@ const Text = {
 
 			Bar.dataset.statFillBound = "1";
 
-			// The MONUMENT scroll-fill: the color plane and the target width are
-			// applied only when the bar first enters the viewport (hard offsets:
-			// width goes 0% -> target in steps, never eased).
 			const Fill = () => {
+				// The attribute goes first: the pre-hide rule matches on its
+				// absence, so clearing it and setting the width must not be
+				// separated by a paint.
+				Bar.dataset.statFillOn = "1";
 				Bar.style.width = `${Bar.dataset["statFill"] ?? "0"}%`;
-				Bar.classList.add({ teal: "bg-weathered-teal", raw: "bg-raw-blood", canary: "bg-stamped-canary" }[Color]);
 			};
+
+			// No observer, no pre-hide to release: a reader whose browser lacks
+			// IntersectionObserver gets the final width at once rather than a
+			// bar frozen at zero.
+			if (!("IntersectionObserver" in window)) {
+				Fill();
+				continue;
+			}
 
 			const Observer = new IntersectionObserver(
 				(Entries) => {
@@ -79,7 +104,7 @@ const Text = {
 						}
 					}
 				},
-				{ threshold: 0.4 }
+				{ threshold: 0.4 },
 			);
 
 			Observer.observe(Bar);
@@ -89,3 +114,17 @@ const Text = {
 	BindStatFills();
 	document.addEventListener("astro:page-load", BindStatFills);
 </script>
+
+<style>
+	/* The pre-hide, on the same three conditions the site's reveal system uses
+	   (Source/Stylesheet/Motion.css): `html.js` is set by Base.astro's head
+	   script before paint, so a reader without JavaScript never has the bar
+	   hidden from them; a reader who asked for stillness reads the final width
+	   immediately; and `:not([data-stat-fill-on])` means the rule can never
+	   outlive the fill that releases it. */
+	@media (prefers-reduced-motion: no-preference) {
+		:global(html.js) .zine-stat-fill[data-stat-fill]:not([data-stat-fill-on]) {
+			width: 0 !important;
+		}
+	}
+</style>

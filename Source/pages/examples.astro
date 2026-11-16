@@ -4,13 +4,15 @@ import ConfigResolution from "../Content/Mermaid/config-resolution.svg?raw";
 import ToolRelay from "../Content/Mermaid/tool-relay.svg?raw";
 import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import ZineFlow from "@Component/ZineFlow.astro";
+import ZineFold from "@Component/ZineFold.astro";
 import ExampleCase from "@Component/ExampleCase.astro";
 import PageShell from "@Component/PageShell.astro";
 import SectionNav from "@Component/SectionNav.astro";
 import ZineSource from "@Component/ZineSource.astro";
 import Related from "@Component/Related.astro";
 import type { ExampleRecord } from "@Library/Records";
-import { Link, OurRepo } from "@Library/Links";
+import { Link, OurRepo, Routes } from "@Library/Links";
+import { RunBytes, RunMarker, RunPreview } from "@Library/Motion";
 
 // Examples page ledger - the worked scenarios' single source of truth (the
 // borrowed Content.ts pattern, scoped to this page): every dynamic figure the
@@ -32,54 +34,231 @@ import { Link, OurRepo } from "@Library/Links";
 /** A scenario plus the one line the hero index prints for it. */
 type CaseRecord = ExampleRecord & { Hero: string };
 
-// The four live-reload thresholds AT THEIR SHIPPED-EXAMPLE VALUES
-// (aphrodite.toml.example:95-123, README.md:584-588, docs/config/aphrodite-toml.md:121-131).
-// The compiled defaults differ and are named beside each one, because both are
-// true at once: an installation using the shipped example sees the first
-// column, a bare binary sees the second.
-const Thresholds = [
-	{ Key: "tool_threshold_token", Shipped: "256", Compiled: "1024", Gate: "TOKEN PROXY", Effect: "tool results above 256 bytes compress" },
-	{ Key: "tool_threshold_cache", Shipped: "2048", Compiled: "8192", Gate: "CACHE PROXY", Effect: "tool results above 2048 bytes compress" },
-	{ Key: "inline_threshold", Shipped: "1024", Compiled: "256", Gate: "STORAGE CUTOFF", Effect: "above this, store instead of inline zlib" },
-	{ Key: "code_multiplier", Shipped: "1.0", Compiled: "3.0", Gate: "CODE TIER", Effect: "code_* types get base threshold x 1.0 - no headroom in the example" },
-] as const;
+// THE ONE FIXTURE. Every threshold example on this page is measured against
+// this payload, and the preview, the marker and every arithmetic clause below
+// read it from here. It is a constant because the page used to print a
+// 1,000-byte claim beside a `[text:3L 50B | ...]` preview and a `|text|1000`
+// marker: three numbers for one blob. A constant is what makes that
+// disagreement impossible rather than merely unlikely.
+const PayloadBytes = 1000;
 
-// The same output at different settings: one 1,000-byte text blob, four doors,
-// measured against the shipped example's values (the token proxy at 256 lets it
-// through as a marker, the cache proxy at 2048 passes it untouched, the code
-// tier at 256 x 1.0 compresses it too, and the storage cutoff at 1024 keeps a
-// compressed blob inline). The arithmetic is the walkthrough; nothing is
-// rounded.
-const Doors = [
-	{ Surface: "TOKEN PROXY (256)", Verdict: "MARKER", Why: "1000 > 256 - compressed, preview + marker" },
-	{ Surface: "CACHE PROXY (2048)", Verdict: "RAW", Why: "1000 < 2048 - passes through untouched" },
-	{ Surface: "AS SOURCE CODE (256)", Verdict: "MARKER", Why: "256 x 1.0 = 256 headroom; 1000 > 256" },
-	{ Surface: "STORAGE CUTOFF (1024)", Verdict: "INLINE", Why: "had it compressed: 1000 < 1024 stays inline zlib" },
-] as const;
+// THE SECOND FIXTURE. The chain-split scenario is one command and two
+// segments, so its three sizes have to be arithmetic over the same lines:
+// each segment's marker carries that segment's own UTF-8 byte count, and the
+// unsplit blob's marker carries the sum (plus the newline that joins them).
+// The page used to print a `[build:2E 5W 210L | ...]` preview beside a
+// `|terminal|398` marker - a build preview and a terminal marker offered as
+// one payload, with 210 standing for a line count in the preview and a byte
+// count in the marker. Deriving all of it from these lines is what makes that
+// impossible rather than merely unlikely.
+const SplitBuild: readonly string[] = [
+	"$ cargo build --release --workspace",
+	"   Compiling aphrodite-core v0.4.2 (/workspace/crates/aphrodite-core)",
+	"warning: unused variable: `Count`",
+	"warning: unused import: `std::fmt`",
+	"warning: value assigned to `Total` is never read",
+	"warning: unused `Result` that must be used",
+	"warning: variable `Index` is never used",
+	"   Compiling aphrodite v0.4.2 (/workspace/crates/aphrodite)",
+	"error[E0432]: unresolved import `crate::store::SessionStore`",
+	"  --> crates/aphrodite/src/lib.rs:12:5",
+	"error[E0308]: mismatched types",
+	"  --> crates/aphrodite/src/preview/builders/build.rs:31:9",
+];
 
-// The SAME walkthrough at the second coherent setting the repo documents
+const SplitTest: readonly string[] = [
+	"$ cargo test --release -p aphrodite preview::builders",
+	"    Finished `release` profile [optimized] target(s) in 12.41s",
+	"     Running unittests src/lib.rs (/workspace/target/release/deps/aphrodite-7f3c9a1d2b4e5f60)",
+	"test preview::builders::build::test::build_counts_error_lines_not_occurrences ... ok",
+	"test preview::builders::grep::test::grep_reports_hits_and_distinct_files ... ok",
+	"test preview::builders::ls::test::ls_lists_extension_counts ... ok",
+	"test preview::builders::test::test::test_reports_pass_fail_ignored ... ok",
+	"test preview::builders::json::test::json_counts_items_and_keys ... ok",
+	"test preview::builders::terminal::test::terminal_reads_the_exit_code_line ... ok",
+	"test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s",
+];
+
+/** The unsplit command: both segments in one stream, as the hook receives it. */
+const SplitBlob: readonly string[] = [...SplitBuild, ...SplitTest];
+
+/**
+ * `RunMarker` escaped for the `set:html` fields that carry a marker. The
+ * escaping is a rendering concern, so it lives here at the boundary and the
+ * size still comes from `RunBytes` - the same helper `RunMarker` uses.
+ */
+const SplitMarker = (Hash: string, Type: string, Lines: readonly string[]): string =>
+	RunMarker(Hash, Type, Lines).replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+
+// The four live-reload thresholds at BOTH settings the repo documents, side by
+// side: the shipped example (aphrodite.toml.example:95-123, README.md:584-588,
+// docs/config/aphrodite-toml.md:121-131) and the docs/examples values
 // (docs/examples/README.md:21, and the bench configs under bench/ that ship
-// tool_threshold_token = 512): token 512, cache 4096, code_multiplier 3.0 and
-// inline 2048. Two settings, two answers to the same 1,000 bytes - which is the
-// point of a knob, so the page shows both rather than picking one and calling
-// it the default.
-const BenchThresholds = [
-	{ Key: "tool_threshold_token", Value: "512", Gate: "TOKEN PROXY", Effect: "tool results above 512 bytes compress" },
-	{ Key: "tool_threshold_cache", Value: "4096", Gate: "CACHE PROXY", Effect: "tool results above 4096 bytes compress" },
-	{ Key: "inline_threshold", Value: "2048", Gate: "STORAGE CUTOFF", Effect: "above 2048, store instead of inline zlib" },
-	{ Key: "code_multiplier", Value: "3.0", Gate: "CODE TIER", Effect: "code_* types get base threshold x 3" },
+// tool_threshold_token = 512). The compiled defaults differ from both and are
+// named beside each one, because all three are true at once: an installation
+// using the shipped example sees the first column, a bare binary sees the
+// compiled default, and a tuned install sees the third.
+const Thresholds = [
+	{
+		Key: "tool_threshold_token",
+		Gate: "TOKEN PROXY",
+		Shipped: "256",
+		Compiled: "1024",
+		Docs: "512",
+		ShippedEffect: "tool results above 256 bytes compress",
+		DocsEffect: "tool results above 512 bytes compress",
+	},
+	{
+		Key: "tool_threshold_cache",
+		Gate: "CACHE PROXY",
+		Shipped: "2048",
+		Compiled: "8192",
+		Docs: "4096",
+		ShippedEffect: "tool results above 2048 bytes compress",
+		DocsEffect: "tool results above 4096 bytes compress",
+	},
+	{
+		Key: "inline_threshold",
+		Gate: "STORAGE CUTOFF",
+		Shipped: "1024",
+		Compiled: "256",
+		Docs: "2048",
+		ShippedEffect: "above this, store instead of inline zlib",
+		DocsEffect: "above 2048, store instead of inline zlib",
+	},
+	{
+		Key: "code_multiplier",
+		Gate: "CODE TIER",
+		Shipped: "1.0",
+		Compiled: "3.0",
+		Docs: "3.0",
+		ShippedEffect: "code_* types get base threshold x 1.0 - no headroom in the example",
+		DocsEffect: "code_* types get base threshold x 3",
+	},
 ] as const;
 
-const BenchDoors = [
-	{ Surface: "TOKEN PROXY (512)", Verdict: "MARKER", Why: "1000 > 512 - compressed, preview + marker" },
-	{ Surface: "CACHE PROXY (4096)", Verdict: "RAW", Why: "1000 < 4096 - passes through untouched" },
-	{ Surface: "AS SOURCE CODE (1536)", Verdict: "RAW", Why: "512 x 3.0 = 1536 headroom; 1000 < 1536" },
-	{ Surface: "STORAGE CUTOFF (2048)", Verdict: "INLINE", Why: "had it compressed: below 2048 stays inline zlib" },
+// The same payload through the same four doors, at both settings - the ONE
+// question this page asks about thresholds, answered once. The arithmetic is
+// the walkthrough and nothing is rounded; each row carries the shipped answer
+// and the documented-alternate answer in the same two fields, so the reader
+// compares columns instead of hunting for a second panel. `SAME` / `DIFFERS`
+// is computed from the two verdicts, never typed: three doors are insensitive
+// to the knob at this size, and the code tier is the one that flips.
+const Doors = [
+	{
+		Door: "TOKEN PROXY",
+		Shipped: "256",
+		Docs: "512",
+		ShippedVerdict: "MARKER",
+		DocsVerdict: "MARKER",
+		ShippedWhy: "1000 > 256 - compressed, preview + marker",
+		DocsWhy: "1000 > 512 - compressed, preview + marker",
+	},
+	{
+		Door: "CACHE PROXY",
+		Shipped: "2048",
+		Docs: "4096",
+		ShippedVerdict: "RAW",
+		DocsVerdict: "RAW",
+		ShippedWhy: "1000 < 2048 - passes through untouched",
+		DocsWhy: "1000 < 4096 - passes through untouched",
+	},
+	{
+		Door: "AS SOURCE CODE",
+		Shipped: "256",
+		Docs: "1536",
+		ShippedVerdict: "MARKER",
+		DocsVerdict: "RAW",
+		ShippedWhy: "256 x 1.0 = 256 headroom; 1000 > 256",
+		DocsWhy: "512 x 3.0 = 1536 headroom; 1000 < 1536",
+	},
+	{
+		Door: "STORAGE CUTOFF",
+		Shipped: "1024",
+		Docs: "2048",
+		ShippedVerdict: "INLINE",
+		DocsVerdict: "INLINE",
+		ShippedWhy: "had it compressed: 1000 < 1024 stays inline zlib",
+		DocsWhy: "had it compressed: below 2048 stays inline zlib",
+	},
 ] as const;
+
+/** The verdict chip's colour, by verdict - the same three tones the panels use,
+ *  so a reader who learned them in one scenario reads them the same way here. */
+const VerdictTone: Record<string, string> = {
+	MARKER: "border-stamped-canary text-stamped-canary",
+	RAW: "border-weathered-teal text-weathered-teal",
+	INLINE: "border-bone-newsprint text-bone-newsprint",
+};
+
+/**
+ * The hot-path mechanics, moved VERBATIM out of the claim column and into the
+ * disclosure under the comparison. The words are unchanged - a paragraph that
+ * moves is not a paragraph that may be reworded - and the reader now meets the
+ * precision after the comparison instead of before the core interaction.
+ */
+const HotPathMechanics = [
+	'The mechanics of the hot path: the config-file watcher reacts to <code class="font-mono text-base">Modify</code> events on <code class="font-mono text-base">aphrodite.toml</code> with a 500 ms debounce, reloads the file, and stores the four resolved thresholds into every live <code class="font-mono text-base">AppState</code>\'s atomics - nothing else is updated live (docs/architecture/07-config-resolution.md:71).',
+	'The dylib session is a different story: it re-applies config fields on change only when <code class="font-mono text-base">auto_reload = true</code> (README.md:390-391).',
+] as const;
+
+/**
+ * THE PRECISION BEHIND THE COMPARISON - the disclosure's body, as one HTML
+ * string because `ZineFold` takes its body as rich text.
+ *
+ * The threshold table is GENERATED from `Thresholds`, never typed: a figure
+ * that exists twice is a figure that will disagree with itself, and this page
+ * already carried that defect once (a 1,000-byte claim beside a `50B` preview).
+ * The mechanics sentences are interpolated from `HotPathMechanics` for the same
+ * reason. `<p>`/table spacing inside the fold is `.prose-flow`'s job, exactly as
+ * it is on the page.
+ */
+const ThresholdPrecision = `
+	<div class="prose-flow">
+		<p class="type-body">
+			Three values are in play, and the comparison prints two of them rather than picking one
+			and calling it the default: the shipped example (256 / 2048 / 1.0 / 1024), the docs/examples
+			values the bench configs also ship (512 / 4096 / 3.0 / 2048), and the compiled defaults a bare
+			binary runs with. An installation using the shipped example sees the first column, a tuned
+			install sees the second, and a binary with no configuration file sees the third.
+		</p>
+		<div class="overflow-x-auto">
+			<table class="w-full border-collapse text-left">
+				<thead>
+					<tr>
+						<th scope="col" class="border border-oxblood-dark px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">KEY</th>
+						<th scope="col" class="border border-oxblood-dark px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">SHIPPED</th>
+						<th scope="col" class="border border-oxblood-dark px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">COMPILED DEFAULT</th>
+						<th scope="col" class="border border-oxblood-dark px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">DOCS/EXAMPLES</th>
+						<th scope="col" class="border border-oxblood-dark px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">WHAT IT GATES</th>
+					</tr>
+				</thead>
+				<tbody>
+					${Thresholds.map(
+						({ Key, Gate, Shipped, Compiled, Docs, ShippedEffect, DocsEffect }) => `
+						<tr>
+							<th scope="row" class="border border-oxblood-dark px-3 py-2 font-mono text-base font-bold text-bone-white">${Key}</th>
+							<td class="border border-oxblood-dark px-3 py-2 font-mono text-base text-stamped-canary">${Shipped}</td>
+							<td class="border border-oxblood-dark px-3 py-2 font-mono text-base text-zinc-dust">${Compiled}</td>
+							<td class="border border-oxblood-dark px-3 py-2 font-mono text-base text-weathered-teal">${Docs}</td>
+							<td class="border border-oxblood-dark px-3 py-2 font-mono text-base leading-relaxed text-zinc-dust">${Gate} · ${ShippedEffect}<br />docs: ${DocsEffect}</td>
+						</tr>`,
+					).join("")}
+				</tbody>
+			</table>
+		</div>
+		${HotPathMechanics.map((Sentence) => `<p class="type-body">${Sentence}</p>`).join("")}
+	</div>
+`;
 
 // The annotated artifacts of one worked session (CHANGELOG.md:613-616).
 const Artifacts = [
-	{ Line: "git status", Shape: "[git:2M 2A 1D 3?? | src/x.rs src/y.rs +5 more]", Reads: "2 modified, 2 added, 1 deleted, 3 untracked; first files named" },
+	{
+		Line: "git status",
+		Shape: "[git:2M 2A 1D 3?? | src/x.rs src/y.rs +6 more]",
+		Reads:
+			"2 modified, 2 added, 1 deleted, 3 untracked; first files named, and the +6 more counter names the six entries the preview does not print - eight in all",
+	},
 	{ Line: "test run", Shape: "[test:220 pass 0 fail 1 ignored | 0.31s]", Reads: "all green - the one ignored test is visible, nothing to retrieve" },
 	{ Line: "grep", Shape: "[grep:4 hits in 3 files | src/preview.rs:12 ...]", Reads: "hit count, distinct files, first location - retrieve or narrow the search" },
 ] as const;
@@ -108,78 +287,11 @@ const InjectionOrder = [
 // index line; the rest is what ExampleCase renders.
 const Cases: CaseRecord[] = [
 	{
-		Id: "thresholds",
-		N: "I",
-		Label: "THE THRESHOLD TUNING WALKTHROUGH",
-		Hero: "A threshold edit propagates through a running proxy.",
-		Title: "Four knobs, hot",
-		Tone: "crimson",
-		Rotate: "sm:-rotate-[0.6deg]",
-		Claim: [
-			'The four hot-reload thresholds are the only compression values the running proxy re-reads: <code class="font-mono text-base">tool_threshold_token</code>, <code class="font-mono text-base">tool_threshold_cache</code>, <code class="font-mono text-base">inline_threshold</code> and <code class="font-mono text-base">code_multiplier</code>.',
-			'Edit + save, or <code class="font-mono text-base">POST /reload</code> - the new values apply immediately, with no restart (README.md:389-391).',
-			"Everything else about a proxy is fixed at startup.",
-			'The mechanics of the hot path: the config-file watcher reacts to <code class="font-mono text-base">Modify</code> events on <code class="font-mono text-base">aphrodite.toml</code> with a 500 ms debounce, reloads the file, and stores the four resolved thresholds into every live <code class="font-mono text-base">AppState</code>\'s atomics - nothing else is updated live (docs/architecture/07-config-resolution.md:71).',
-			'The dylib session is a different story: it re-applies config fields on change only when <code class="font-mono text-base">auto_reload = true</code> (README.md:390-391).',
-			"Two coherent settings exist in the repo and the panels below walk both: the shipped example (256 / 2048 / 1.0 / 1024) and the docs/examples values (512 / 4096 / 3.0 / 2048).",
-			"The arithmetic is the teaching - the same 1,000 bytes land differently at each setting, and neither column is rounded.",
-		],
-		Command: { Lang: "text", Code: "POST /reload" },
-		Output: [
-			{ Text: "&lt; 1,000 bytes of prose, above the token gate &gt;", Tone: "dim" },
-			{ Text: "SAME BYTES ON THE CACHE LANE: NO PREVIEW, NO MARKER, NO STORE ENTRY", Tone: "dim" },
-		],
-		Preview: "[text:3L 50B | some unrecognizable prose here]",
-		Marker: "&lt;&lt;&lt;CCR:0e3a5c9f...a1e|text|1000&gt;&gt;&gt;",
-		Panels: [
-			{
-				Kind: "rows",
-				Label: "THE FOUR LIVE THRESHOLDS // SHIPPED EXAMPLE, COMPILED DEFAULT",
-				Rows: Thresholds.map(({ Key, Shipped, Compiled, Gate, Effect }) => ({
-					Left: Key,
-					Right: `${Gate} · ${Effect} · compiled ${Compiled}`,
-					Tag: Shipped,
-				})),
-			},
-			{
-				Kind: "rows",
-				Label: "THE WALKTHROUGH // ONE 1,000-BYTE TEXT BLOB, FOUR DOORS",
-				Rows: Doors.map(({ Surface, Verdict, Why }) => ({
-					Left: Surface,
-					Right: Why,
-					Tag: Verdict,
-					TagTone: Verdict === "MARKER" ? "canary" : Verdict === "RAW" ? "teal" : "newsprint",
-				})),
-			},
-			{
-				Kind: "rows",
-				Label: "THE SAME FOUR KNOBS AT THE DOCS/EXAMPLES VALUES // 512 / 4096 / 3.0 / 2048",
-				Rows: BenchThresholds.map(({ Key, Value, Gate, Effect }) => ({
-					Left: Key,
-					Right: `${Gate} · ${Effect}`,
-					Tag: Value,
-				})),
-			},
-			{
-				Kind: "rows",
-				Label: "THE WALKTHROUGH AT THOSE VALUES // THE SAME 1,000 BYTES, FOUR DOORS",
-				Rows: BenchDoors.map(({ Surface, Verdict, Why }) => ({
-					Left: Surface,
-					Right: Why,
-					Tag: Verdict,
-					TagTone: Verdict === "MARKER" ? "canary" : Verdict === "RAW" ? "teal" : "newsprint",
-				})),
-			},
-		],
-		Diagram: { Html: ConfigResolution, Caption: "THE HOT PATH // EDIT-SAVE - 500 MS DEBOUNCE - FOUR ATOMICS" },
-		Src: "SRC: README.md:389-407,584-588 · docs/architecture/07-config-resolution.md:66-71 · docs/config/aphrodite-toml.md:121-131,204 · aphrodite.toml.example:95-123 · docs/examples/README.md:21",
-	},
-	{
 		Id: "retrieval",
-		N: "II",
-		Label: "THE RETRIEVAL ROUND-TRIP",
+		N: "I",
+		Label: "BYTE-EXACT · THE RETRIEVAL ROUND-TRIP",
 		Hero: "A marker travels from compression to byte-exact retrieval.",
-		Title: "Compress, marker, retrieve, byte-exact",
+		Title: "Retrieve the original output",
 		Tone: "canary",
 		Rotate: "sm:rotate-[0.5deg]",
 		Claim: [
@@ -196,7 +308,7 @@ const Cases: CaseRecord[] = [
 			{ Text: "↓ APHRODITE_RETRIEVE(HASH) - THE AGENT DECIDES, NOT THE ENGINE ↓", Tone: "canary" },
 			{ Text: "173 bytes return unchanged · nested markers resolved", Tone: "result" },
 		],
-		Preview: "[git:2M 2A 1D 3?? | src/x.rs src/y.rs +5 more]",
+		Preview: "[git:2M 2A 1D 3?? | src/x.rs src/y.rs +6 more]",
 		Marker: "&lt;&lt;&lt;CCR:d0e3f6a9...d4e7|git|173&gt;&gt;&gt;",
 		Panels: [
 			{
@@ -228,6 +340,40 @@ const Cases: CaseRecord[] = [
 		Src: "SRC: docs/tool-relay/tools.md:36-39 · docs/ccr/marker-format.md:76-86 · CHANGELOG.md:613-626 · README.md:298-299,506",
 	},
 	{
+		Id: "skip-gate",
+		N: "II",
+		Label: "THE ESSENTIAL-TOOL SKIP GATE",
+		Hero: "Essential tools refuse the machine.",
+		Title: "What stays raw, and why",
+		Tone: "teal",
+		Rotate: "sm:-rotate-[0.4deg]",
+		Claim: [
+			'Before any classification or storage, <code class="font-mono text-base">transform_tool_result</code> runs its skip gates: a result is left untouched when it is empty; when the tool is in the <strong class="text-bone-white">essential set</strong> - <code class="font-mono text-base">skill_view</code>, <code class="font-mono text-base">skills_list</code>, <code class="font-mono text-base">skill_manage</code>, <code class="font-mono text-base">memory</code>, <code class="font-mono text-base">session_search</code>, <code class="font-mono text-base">read_file</code>, <code class="font-mono text-base">read_terminal</code>; when it is one of Aphrodite\'s own tools or a headroom helper; or when it sits below the tool threshold (docs/plugin/hooks.md:76-83).',
+			"The logic is not protectionism - it is information theory per surface.",
+			"The essential tools return compact, self-describing metadata the agent needs raw: a skill's instructions, a memory entry, a file's content.",
+			"Compressing them would trade precision for nothing.",
+			"The self-tools are already the compressed form: their output is a marker or a catalog, and marking a marker is the preview-doubling bug in slow motion.",
+			"And the size gate is the quiet one - most tool output is simply small, and passes through without a store entry ever existing.",
+			'One subtlety: the hook tracks file references <em>before</em> the skip gates, so <code class="font-mono text-base">read_file</code> and <code class="font-mono text-base">search_files</code> results feed the recall catalog even when it never compresses them (docs/plugin/hooks.md:92-94).',
+		],
+		Command: { Lang: "text", Code: "read_file" },
+		Output: [
+			{ Text: "01 EMPTY · nothing to compress", Tone: "result" },
+			{ Text: "02 ESSENTIAL SET · the agent needs raw output", Tone: "result" },
+			{ Text: "03 SELF TOOLS · already compact metadata", Tone: "result" },
+			{ Text: "04 SIZE GATE · 1,024 bytes on the token lane, 8,192 on the cache lane", Tone: "result" },
+			{ Text: "04 SIZE GATE // THE DYLIB LANE", Tone: "dim" },
+			{ Text: "4,096 chars default; 0 disables the gate", Tone: "dim" },
+		],
+		Preview: "the raw bytes, unchanged",
+		Marker: "none - this is the gate that refuses the machine.",
+		Note: [
+			'The gate order is fixed: the empty check, the essential set, the self-tools, then the size gate (docs/plugin/hooks.md:69-94).',
+			`The classifier demo in <a class="text-stamped-canary hover:text-bone-white" href="${Routes.Workbench}">the workbench</a> walks the same gates with live output.`,
+		],
+		Src: "SRC: docs/plugin/hooks.md:69-94,146-153 · docs/config/aphrodite-toml.md:121-131",
+	},
+	{
 		Id: "chain-split",
 		N: "III",
 		Label: "THE CHAIN-SPLIT",
@@ -246,24 +392,57 @@ const Cases: CaseRecord[] = [
 		Command: { Lang: "bash", Code: "cd project && cargo build --release && cargo test 2>&1" },
 		Output: [
 			{ Text: "PER-SEGMENT MARKERS BEHIND IT - EACH SEGMENT ITS OWN RECEIPT:", Tone: "dim" },
-			{ Text: "&lt;&lt;&lt;CCR:f8a1d4c7...b0e3|build_output|210&gt;&gt;&gt;", Tone: "teal" },
-			{ Text: "&lt;&lt;&lt;CCR:a9b2c5d8...e1f4|test|188&gt;&gt;&gt;", Tone: "teal" },
+			{ Text: SplitMarker("f8a1d4c7...b0e3", "build_output", SplitBuild), Tone: "teal" },
+			{ Text: SplitMarker("a9b2c5d8...e1f4", "test", SplitTest), Tone: "teal" },
 		],
-		Preview: "[build:2E 5W 210L | error[E0432]: ...]",
-		Marker: "&lt;&lt;&lt;CCR:e7c0f3a6...c1f4|terminal|398&gt;&gt;&gt;",
+		Preview: RunPreview("build", SplitBuild),
+		Marker: SplitMarker("f8a1d4c7...b0e3", "build_output", SplitBuild),
 		Note: [
-			'<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">OFF BY DEFAULT · </span>Without the split, the same compound command is one terminal blob with one marker; the build preview and the test preview never separate.',
+			'<span class="font-mono text-base font-bold uppercase tracking-widest text-zinc-dust">OFF BY DEFAULT · </span>Without the split, the same compound command is one terminal blob with one marker - <code class="font-mono text-base">' +
+				SplitMarker("e7c0f3a6...c1f4", "terminal", SplitBlob) +
+				"</code>, whose size is the two segments summed plus the newline that joins them; the build preview and the test preview never separate.",
+			"Every size in this scenario measures the same thing: the UTF-8 bytes of the lines behind the marker, while the number inside a preview counts lines. That is why one segment reads " +
+				SplitBuild.length +
+				"L in its preview and " +
+				RunBytes(SplitBuild) +
+				" in its marker - two measurements of one segment, never two estimates of it.",
 			'The command itself is the case the split exists for: <code class="font-mono text-base">cd project && cargo build --release && cargo test 2&gt;&amp;1</code> - one call, two tools, redirected stdout.',
 			"Marked output is compressed before the threshold gate, so a split segment never leaks raw even when it is small enough to have passed through whole.",
 		],
 		Src: "SRC: docs/proxy/compression.md:366-379 · docs/plugin/hooks.md:59-65,102-106 · README.md:411-413",
 	},
 	{
-		Id: "directives",
+		Id: "thresholds",
 		N: "IV",
-		Label: "THE DIRECTIVES IN ACTION",
+		Label: "FOUR KNOBS, HOT · THE THRESHOLD WALKTHROUGH",
+		Hero: "A threshold edit propagates through a running proxy.",
+		Title: "Change compression thresholds without restarting",
+		Tone: "crimson",
+		Rotate: "sm:-rotate-[0.6deg]",
+		Claim: [
+			'The four hot-reload thresholds are the only compression values the running proxy re-reads: <code class="font-mono text-base">tool_threshold_token</code>, <code class="font-mono text-base">tool_threshold_cache</code>, <code class="font-mono text-base">inline_threshold</code> and <code class="font-mono text-base">code_multiplier</code>.',
+			'Edit + save, or <code class="font-mono text-base">POST /reload</code> - the new values apply immediately, with no restart (README.md:389-391).',
+			"Everything else about a proxy is fixed at startup.",
+			'One payload is the whole demonstration: the preview and the marker count the same bytes - the blob\'s own UTF-8 length, because <code class="font-mono text-base">[text:{lines}L {bytes}B | first line]</code> is the plain-text preview shape (docs/classification/content-types.md:153). That is why this scenario reads <code class="font-mono text-base">1000B</code> in the preview beside this claim and <code class="font-mono text-base">1000</code> in its marker, and why every clause below measures those same bytes.',
+			"Two coherent settings exist in the repo as configuration files and the comparison walks both: the shipped example (256 / 2048 / 1.0 / 1024) and the docs/examples values (512 / 4096 / 3.0 / 2048). The compiled default that each one overrides is in the disclosure beneath the table.",
+			"The arithmetic is the teaching - the same 1,000 bytes cross all four doors at both settings, and the comparison says which door changes its answer and which does not; neither column is rounded.",
+		],
+		Command: { Lang: "text", Code: "POST /reload" },
+		Output: [
+			{ Text: "&lt; 1,000 bytes of prose, above the token gate &gt;", Tone: "dim" },
+			{ Text: "SAME BYTES ON THE CACHE LANE: NO PREVIEW, NO MARKER, NO STORE ENTRY", Tone: "dim" },
+		],
+		Preview: `[text:3L ${PayloadBytes}B | some unrecognizable prose here]`,
+		Marker: `&lt;&lt;&lt;CCR:0e3a5c9f...a1e|text|${PayloadBytes}&gt;&gt;&gt;`,
+		Diagram: { Html: ConfigResolution, Caption: "THE HOT PATH // EDIT-SAVE - 500 MS DEBOUNCE - FOUR ATOMICS" },
+		Src: "SRC: README.md:389-407,584-588 · docs/architecture/07-config-resolution.md:66-71 · docs/config/aphrodite-toml.md:121-131,204 · aphrodite.toml.example:95-123 · docs/examples/README.md:21 · docs/classification/content-types.md:153",
+	},
+	{
+		Id: "directives",
+		N: "V",
+		Label: "SEVEN BUILT-INS · THE DIRECTIVES BLOCK",
 		Hero: "Directives assemble under a budget.",
-		Title: "Seven built-ins, one budget",
+		Title: "Fit agent guidance into a fixed budget",
 		Tone: "crimson",
 		Rotate: "sm:rotate-[0.5deg]",
 		Claim: [
@@ -290,12 +469,11 @@ const Cases: CaseRecord[] = [
 				Rows: Builtins.map(({ Name, Role }) => ({ Left: Name, Right: Role })),
 			},
 			{
-				Kind: "cards",
+				Kind: "rows",
 				Label: "THE INJECTION ORDER // PRE_LLM_CALL, TOP TO BOTTOM, DROPS FROM THE BOTTOM",
-				Cards: InjectionOrder.map(({ N, Section, Rule }) => ({
-					Title: `ORDER // ${N}`,
-					Body: Section,
-					Note: Rule,
+				Rows: InjectionOrder.map(({ N, Section, Rule }) => ({
+					Left: `${N} · ${Section}`,
+					Right: Rule,
 				})),
 			},
 		],
@@ -307,10 +485,10 @@ const Cases: CaseRecord[] = [
 	},
 	{
 		Id: "relay",
-		N: "V",
-		Label: "THE TOOL-RELAY CALLBACK",
+		N: "VI",
+		Label: "SYNCHRONOUS · THE TOOL-RELAY CALLBACK",
 		Hero: "A relay call fires a callback.",
-		Title: "Synchronous, unless you say otherwise",
+		Title: "Return tool results inline or by callback",
 		Tone: "canary",
 		Rotate: "sm:-rotate-[0.5deg]",
 		Claim: [
@@ -340,45 +518,11 @@ const Cases: CaseRecord[] = [
 		Src: "SRC: docs/tool-relay/callbacks.md:27-111,139-144 · docs/plugin/hooks.md:76-83",
 	},
 	{
-		Id: "skip-gate",
-		N: "VI",
-		Label: "THE ESSENTIAL-TOOL SKIP GATE",
-		Hero: "Essential tools refuse the machine.",
-		Title: "What stays raw, and why",
-		Tone: "teal",
-		Rotate: "sm:-rotate-[0.4deg]",
-		Claim: [
-			'Before any classification or storage, <code class="font-mono text-base">transform_tool_result</code> runs its skip gates: a result is left untouched when it is empty; when the tool is in the <strong class="text-bone-white">essential set</strong> - <code class="font-mono text-base">skill_view</code>, <code class="font-mono text-base">skills_list</code>, <code class="font-mono text-base">skill_manage</code>, <code class="font-mono text-base">memory</code>, <code class="font-mono text-base">session_search</code>, <code class="font-mono text-base">read_file</code>, <code class="font-mono text-base">read_terminal</code>; when it is one of Aphrodite\'s own tools or a headroom helper; or when it sits below the tool threshold (docs/plugin/hooks.md:76-83).',
-			"The logic is not protectionism - it is information theory per surface.",
-			"The essential tools return compact, self-describing metadata the agent needs raw: a skill's instructions, a memory entry, a file's content.",
-			"Compressing them would trade precision for nothing.",
-			"The self-tools are already the compressed form: their output is a marker or a catalog, and marking a marker is the preview-doubling bug in slow motion.",
-			"And the size gate is the quiet one - most tool output is simply small, and passes through without a store entry ever existing.",
-			'One subtlety: the hook tracks file references <em>before</em> the skip gates, so <code class="font-mono text-base">read_file</code> and <code class="font-mono text-base">search_files</code> results feed the recall catalog even when it never compresses them (docs/plugin/hooks.md:92-94).',
-		],
-		Command: { Lang: "text", Code: "read_file" },
-		Output: [
-			{ Text: "01 EMPTY · nothing to compress", Tone: "result" },
-			{ Text: "02 ESSENTIAL SET · the agent needs raw output", Tone: "result" },
-			{ Text: "03 SELF TOOLS · already compact metadata", Tone: "result" },
-			{ Text: "04 SIZE GATE · 1,024 bytes on the token lane, 8,192 on the cache lane", Tone: "result" },
-			{ Text: "04 SIZE GATE // THE DYLIB LANE", Tone: "dim" },
-			{ Text: "4,096 chars default; 0 disables the gate", Tone: "dim" },
-		],
-		Preview: "the raw bytes, unchanged",
-		Marker: "none - this is the gate that refuses the machine.",
-		Note: [
-			'The gate order is fixed: the empty check, the essential set, the self-tools, then the size gate (docs/plugin/hooks.md:69-94).',
-			'The classifier demo in <a class="text-stamped-canary hover:text-bone-white" href="/workbench/">the workbench</a> walks the same gates with live output.',
-		],
-		Src: "SRC: docs/plugin/hooks.md:69-94,146-153 · docs/config/aphrodite-toml.md:121-131",
-	},
-	{
 		Id: "dual-listener",
 		N: "VII",
-		Label: "THE DUAL-LISTENER PARALLEL",
+		Label: "TWO LANES · THE DUAL-LISTENER PARALLEL",
 		Hero: "And the same payload crosses two listeners without changing shape.",
-		Title: "Same output, two lanes, one marker",
+		Title: "Compare plugin and proxy behaviour",
 		Tone: "crimson",
 		Rotate: "sm:rotate-[0.5deg]",
 		Claim: [
@@ -398,11 +542,11 @@ const Cases: CaseRecord[] = [
 		Marker: "&lt;&lt;&lt;CCR:d7b4f2a8...c6b0|terminal|612&gt;&gt;&gt;",
 		Panels: [
 			{
-				Kind: "cards",
+				Kind: "rows",
 				Label: "TWO LISTENERS, TWO BACKENDS",
-				Cards: [
-					{ Title: "CACHE :9797", Body: "DASHMAP · 10,000", Note: "8192-BYTE THRESHOLD · TRANSIENT" },
-					{ Title: "TOKEN :9798", Body: "SQLITE · ccr.db", Note: "1024-BYTE THRESHOLD · PERSISTENT" },
+				Rows: [
+					{ Left: "CACHE :9797", Right: "DASHMAP · 10,000 · 8192-BYTE THRESHOLD · TRANSIENT" },
+					{ Left: "TOKEN :9798", Right: "SQLITE · ccr.db · 1024-BYTE THRESHOLD · PERSISTENT" },
 				],
 			},
 		],
@@ -423,7 +567,7 @@ const Sections = [
 
 <Base
 	Title="EXAMPLES // APHRODITE"
-	Description="The worked scenarios: threshold tuning in action, the retrieval round-trip, the chain split, the directives block, the tool-relay callback, the skip gate, and the dual-listener parallel - real mechanics, every claim anchored."
+	Description="The worked scenarios: the retrieval round-trip, what stays raw and why, the chain split, threshold tuning in action, the directives block, the tool-relay callback, and the dual-listener parallel - real mechanics, every claim anchored."
 >
 	<PageShell Crumbs>
 		<!-- ============ HERO // THE WORKED SCENARIOS ============ -->
@@ -438,11 +582,11 @@ const Sections = [
 					THE WORKED SCENARIOS // HOW IT ACTUALLY MOVES
 				</p>
 				<h1
-					class="mt-8 font-headline text-5xl font-black uppercase leading-[0.9] tracking-tighter text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-7xl lg:text-8xl"
+					class="type-display mt-8 uppercase text-bone-white drop-shadow-[4px_4px_0px_#520612]"
 				>
 					Seven scenarios,<br />one <span class="text-stamped-canary">lifecycle</span>
 				</h1>
-				<p class="mt-16 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+				<p class="type-body mt-16 max-w-3xl text-bone-newsprint">
 					Not what the output looks like - what happens to it, step by step.
 				</p>
 				<!-- The index: the seven claims, each a jump link to its scenario -->
@@ -451,10 +595,10 @@ const Sections = [
 						Cases.map(({ Id, N, Hero }) => (
 							<li>
 								<a
-									class="font-body text-base leading-relaxed text-bone-newsprint transition-colors hover:text-stamped-canary"
+									class="type-body text-bone-newsprint transition-colors hover:text-stamped-canary"
 									href={`#${Id}`}
 								>
-									<span class="mr-3 font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+									<span class="type-meta mr-3 text-stamped-canary">
 										{N}
 									</span>
 									{Hero}
@@ -464,9 +608,9 @@ const Sections = [
 					}
 				</ol>
 				<div class="mt-24 flex flex-wrap gap-12 font-mono text-base font-bold uppercase tracking-widest">
-					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-stamped-canary transition-colors hover:text-bone-white" href="/workbench/">TRY THE SIMULATOR</a>
-					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-zinc-dust transition-colors hover:text-bone-white" href="/tools/">THE TOOLS</a>
-					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-zinc-dust transition-colors hover:text-bone-white" href="/docs/">THE DOCS</a>
+					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-stamped-canary transition-colors hover:text-bone-white" href={Routes.Workbench}>TRY THE SIMULATOR</a>
+					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-zinc-dust transition-colors hover:text-bone-white" href={Routes.Tools}>THE TOOLS</a>
+					<a class="border border-oxblood-dark bg-soot-black px-4 py-2 text-zinc-dust transition-colors hover:text-bone-white" href={Routes.Docs}>THE DOCS</a>
 				</div>
 			</div>
 		</header>
@@ -475,24 +619,136 @@ const Sections = [
 		<SectionNav Sections={Sections} />
 
 		<!-- ============ I-VII // THE SEVEN SCENARIOS, ONE SHAPE ============ -->
-		{Cases.map(({ Hero: _Hero, ...Scenario }) => <ExampleCase {...Scenario} Reveal Stream />)}
+		{
+			Cases.map(({ Hero: _Hero, ...Scenario }) => (
+				<>
+					<ExampleCase {...Scenario} Reveal Stream />
+					{/* THE THRESHOLDS COMPARISON - one question, one table, and the
+					    precision behind a disclosure. It is NOT a panel: `ExampleCase`'s
+					    panel shapes are a bordered row, a card and a lane pair, and none
+					    of them is a table or a fold. Rendering the same four doors in two
+					    panels (shipped, then alternate) is what made this section read as
+					    four answers to one question; a table compares the two settings in
+					    the row they belong to, and `ZineFold` holds the figures the table
+					    does not need to show. */}
+					{Scenario.Id === "thresholds" && (
+						<div class="relative flex w-full flex-col" data-reveal>
+							<div class="overflow-x-auto">
+								<table class="w-full min-w-[48rem] border-collapse text-left">
+									<caption class="type-sub mb-[var(--space-tight)] text-left text-bone-white">
+										What happens to the same {PayloadBytes.toLocaleString("en-US")}-byte payload?
+									</caption>
+									<thead>
+										<tr>
+											<th
+												scope="col"
+												class="border border-oxblood-dark px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
+											>
+												DECISION
+											</th>
+											<th
+												scope="col"
+												class="border border-oxblood-dark px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
+											>
+												SHIPPED EXAMPLE<br />256 / 2048 / 1.0 / 1024
+											</th>
+											<th
+												scope="col"
+												class="border border-oxblood-dark px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
+											>
+												DOCS/EXAMPLES<br />512 / 4096 / 3.0 / 2048
+											</th>
+											<th
+												scope="col"
+												class="border border-oxblood-dark px-3 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust"
+											>
+												SAME ANSWER?
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										{
+											Doors.map(({ Door, Shipped, Docs, ShippedVerdict, DocsVerdict, ShippedWhy, DocsWhy }) => (
+												<tr>
+													<th
+														scope="row"
+														class="border border-oxblood-dark px-3 py-3 align-top font-mono text-base font-black uppercase tracking-widest text-bone-white"
+													>
+														{Door}
+														<span class="mt-1 block font-mono text-base font-normal normal-case tracking-normal text-zinc-dust">
+															{Shipped} / {Docs}
+														</span>
+													</th>
+													<td class="border border-oxblood-dark px-3 py-3 align-top font-mono text-base leading-relaxed text-zinc-dust">
+														<span
+															class:list={[
+																"border px-2 py-0.5 font-mono text-base font-black",
+																VerdictTone[ShippedVerdict],
+															]}
+														>
+															{ShippedVerdict}
+														</span>
+														<span class="mt-2 block">{ShippedWhy}</span>
+													</td>
+													<td class="border border-oxblood-dark px-3 py-3 align-top font-mono text-base leading-relaxed text-zinc-dust">
+														<span
+															class:list={[
+																"border px-2 py-0.5 font-mono text-base font-black",
+																VerdictTone[DocsVerdict],
+															]}
+														>
+															{DocsVerdict}
+														</span>
+														<span class="mt-2 block">{DocsWhy}</span>
+													</td>
+													<td class="border border-oxblood-dark px-3 py-3 align-top font-mono text-base font-black uppercase tracking-widest">
+														<span
+															class:list={[
+																ShippedVerdict === DocsVerdict
+																	? "text-zinc-dust"
+																	: "text-stamped-canary",
+															]}
+														>
+															{ShippedVerdict === DocsVerdict ? "SAME" : "DIFFERS"}
+														</span>
+													</td>
+												</tr>
+											))
+										}
+									</tbody>
+								</table>
+							</div>
+							<div class="mt-[var(--space-group)]">
+								<ZineFold
+									Label="Show thresholds behind these decisions"
+									Tag="DETAIL"
+									Body={ThresholdPrecision}
+								/>
+							</div>
+						</div>
+					)}
+				</>
+			))
+		}
 
 		<!-- ============ VIII // THE TURN CYCLE (INTERACTIVE) ============ -->
-		<section id="turn-cycle" class="relative w-full lg:w-11/12 lg:self-end" data-reveal>
-			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The scenarios above each zoom into one mechanism.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				This is the loop that holds them: the six hooks, in firing order, with what the agent sees
-				and what the system does at each step.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Read it as two columns: the left is the transcript the model reads, the right is the work
-				that produced it. Every step cites the hook section that owns it, so the diagram is a
-				route into <code class="font-mono text-base text-weathered-teal">docs/plugin/hooks.md</code>
-				rather than a summary of it.
-			</p>
-			<div class="mt-8">
+		<section id="turn-cycle" class="relative flex w-full flex-col lg:w-11/12 lg:self-end" data-reveal>
+			<p class="section-kicker">VIII · IN FIRING ORDER</p>
+			<h2 class="type-section mt-2 text-bone-white">The turn cycle</h2>
+			<div class="prose-flow type-body mt-[var(--space-tight)] max-w-3xl text-bone-newsprint">
+				<p>Each scenario zooms into one mechanism.</p>
+				<p>
+					This is the loop that holds them: the six hooks, in firing order, with what the agent sees
+					and what the system does at each step.
+				</p>
+				<p>
+					Two columns answer together: the transcript the model reads, and the work
+					that produced it. Every step cites the hook section that owns it, so the diagram is a
+					route into <code class="font-mono text-base text-weathered-teal">docs/plugin/hooks.md</code>
+					rather than a summary of it.
+				</p>
+			</div>
+			<div class="mt-[var(--space-group)]">
 				<ZineFlow
 					Title="THE TURN CYCLE // SIX HOOKS, ONE LOOP"
 					Complete="THE LOOP CLOSES"
@@ -585,17 +841,21 @@ const Sections = [
 		</section>
 
 		<!-- ============ IX // ONE RUNTIME HOME (INTERACTIVE) ============ -->
-		<section id="runtime-home" class="relative w-full lg:w-11/12 lg:self-start" data-reveal>
-			<p class="max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The history behind issue #40, as a decision walk: how the runtime home is resolved today,
-				and why both halves of the plugin agree by construction.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Each step names the rule that decides, the mechanism that carries it, and the changelog
-				entry the claim rests on - so a reader can check the last column instead of trusting the
-				first.
-			</p>
-			<div class="mt-8">
+		<section id="runtime-home" class="relative flex w-full flex-col lg:w-11/12 lg:self-start" data-reveal>
+			<p class="section-kicker">IX · ISSUE #40, AS A DECISION WALK</p>
+			<h2 class="type-section mt-2 text-bone-white">One runtime home</h2>
+			<div class="prose-flow type-body mt-[var(--space-tight)] max-w-3xl text-bone-newsprint">
+				<p>
+					The history behind issue #40, as a decision walk: how the runtime home is resolved today,
+					and why both halves of the plugin agree by construction.
+				</p>
+				<p>
+					Each step names the rule that decides, the mechanism that carries it, and the changelog
+					entry the claim rests on - so a reader can check the last column instead of trusting the
+					first.
+				</p>
+			</div>
+			<div class="mt-[var(--space-group)]">
 				<ZineFlow
 					Title="THE HOME DECISION // RESOLVED ONCE, SHARED BY BOTH HALVES"
 					Complete="ONE HOME"

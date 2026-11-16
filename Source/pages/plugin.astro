@@ -19,7 +19,7 @@ import ZineDiagramNav from "@Component/ZineDiagramNav.astro";
 import ContextEngine from "../Content/Mermaid/context-engine.svg?raw";
 import HookChain from "../Content/Mermaid/hook-chain.svg?raw";
 import { Stamps, Versions } from "@Library/Versions";
-import { ExternalLinks } from "@Library/Links";
+import { ExternalLinks, Routes } from "@Library/Links";
 import { Assert, HookNames, Hooks as Roster } from "@Library/Roster";
 import { PluginHookCard, PluginSequence as Sequence } from "@Library/Prose/Hooks";
 import { ToolNames } from "@Library/Roster";
@@ -127,7 +127,7 @@ const Layers = [
 	{
 		N: "04",
 		Name: "libaphrodite (core)",
-		Role: "All the compression logic: classification, hashing, marker composition, preview extraction, directives, retrieval. Every number on this page is decided here.",
+		Role: "All the compression logic: classification, hashing, marker composition, preview extraction, directives, retrieval. Every number the engine reports is decided here.",
 		Fails: "A store that will not open degrades to the in-memory backend - the compression still happens, the persistence does not.",
 	},
 	{
@@ -489,7 +489,7 @@ const Dispatch = [
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					It is the reason the shim registers one callback per name: on plugin load it
-					asks the dylib for its hook names, and the six below are always registered
+					asks the dylib for its hook names, and the six hooks are always registered
 					together.
 				</p>
 				<h4 class="mb-6 mt-12 font-headline text-lg font-black uppercase text-bone-white">
@@ -664,7 +664,7 @@ const Dispatch = [
 					on
 					<a
 						class="text-weathered-teal underline transition-colors hover:text-bone-white"
-						href="/config/"
+						href={Routes.Config}
 					>
 						CONFIG
 					</a>.
@@ -736,7 +736,7 @@ const Dispatch = [
 							<li class="border-l-2 border-oxblood-dark pl-3">the backup is a rename</li>
 							<li class="border-l-2 border-oxblood-dark pl-3">
 								and the last one is not a check at all - it is what the plugin does when every
-								check above it has already failed.
+								check before it has already failed.
 							</li>
 						</ul>
 					</div>
@@ -767,7 +767,7 @@ const Dispatch = [
 
 				<p class="mt-12 border-t border-oxblood-dark pt-8 font-body text-base leading-relaxed text-zinc-dust">
 					ALSO ON THE STORE: the plugin is in the Hermes plugin catalog - the reviewed,
-					pinned alternative to the manual clone above.
+					pinned alternative to the manual clone.
 				</p>
 				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
 					<code class="font-mono text-base text-weathered-teal">
@@ -787,7 +787,7 @@ const Dispatch = [
 					The full flow is on
 					<a
 						class="text-weathered-teal underline transition-colors hover:text-bone-white"
-						href="/setup/"
+						href={Routes.Setup}
 					>
 						SETUP
 					</a>;
@@ -849,7 +849,7 @@ const Dispatch = [
 						Label="FAILS SAFE"
 						Color="raw"
 						Lines={[
-							"Every step above degrades in the same direction:",
+							"Every step degrades in the same direction:",
 							"a missing binary disables the plugin",
 							"a missing key stops the proxy",
 							"a missing config narrows it to one listener.",
@@ -874,7 +874,7 @@ const Dispatch = [
 				</h2>
 				<p class="mb-10 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Two directories, two owners. Hermes owns the plugin directory and the plugin
-					owns everything under the runtime home - the arrow annotations below are the
+					owns everything under the runtime home - the arrow annotations are the
 					whole map of who writes what.
 				</p>
 				<div class="space-y-0 border border-oxblood-dark bg-soot-black p-5 font-mono text-base leading-relaxed text-bone-newsprint">

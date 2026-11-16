@@ -1,27 +1,35 @@
 /* Motion.css - the CSS half of the motion contract in Source/Library/Motion.ts.
    Everything else about the motion language is JavaScript, because Web
    Animations restart deterministically on re-entry and a CSS transition cannot
-   do that without a forced layout. Exactly one rule needs to exist before the
-   runtime runs. */
+   do that without a forced layout. The rules that live here are the ones that
+   must exist BEFORE any script runs: the reveal pre-hide, the collapsed
+   pre-initialisation frame of the interactive components, and the sticky-chrome
+   offsets that let a deep link land on its heading. */
 
 /* The reveal pre-hide. A panel that [data-reveal] will rise must not paint and
    then blink out, so it is held at opacity 0 from the first frame - but only
-   when all three of these are true, and each one is a promise:
+   when all four of these are true, and each one is a promise:
 
-     html.js        Base.astro's head script sets this class before paint, so a
-                    reader without JavaScript never has content hidden from
-                    them. The runtime only releases the pre-hide, never sets it.
-     no-preference  a reader who asked for stillness reads the panel at once;
-                    the media query simply never applies.
-     :not(revealed) the runtime marks a panel [data-revealed] in the same tick
-                    it starts the rise, so the pre-hide can never outlive the
-                    animation and strand copy at opacity 0.
+     html.js              Base.astro's head script sets this class before paint,
+                          so a reader without JavaScript never has content
+                          hidden from them. The runtime only releases the
+                          pre-hide, never sets it.
+     no-preference        a reader who asked for stillness reads the panel at
+                          once; the media query simply never applies.
+     :not(revealed)       the runtime marks a panel [data-revealed] in the same
+                          tick it starts the rise, so the pre-hide can never
+                          outlive the animation and strand copy at opacity 0.
+     :not(motion-fallback) the head script adds .motion-fallback when the
+                          runtime has not reported in by its failsafe deadline,
+                          which releases every pre-hidden panel at once. A
+                          script that fails to load, or that throws on its way
+                          to the mount, must never be able to hide a sentence.
 
    There is no will-change here on purpose: a Web Animation on transform and
    opacity is promoted for its own duration, and a blanket will-change on every
    revealable panel would spend layer memory on the whole page. */
 @media (prefers-reduced-motion: no-preference) {
-	html.js [data-reveal]:not([data-revealed]) {
+	html.js:not(.motion-fallback) [data-reveal]:not([data-revealed]) {
 		opacity: 0;
 	}
 }
@@ -55,4 +63,185 @@
 	box-shadow: 0 0 1.2cqw rgba(147, 17, 40, 0.85);
 	opacity: 0;
 	pointer-events: none;
+}
+
+/* ═══ STICKY CHROME ══════════════════════════════════════════════════════
+ *
+ * The site header and the section index both stick to the top of the viewport,
+ * so without an offset the index slides UNDER the header and an anchored
+ * heading lands behind both of them. Two heights, stated once as tokens,
+ * because three rules need the same two numbers: the index's own top, the
+ * scroll margin of every anchored heading, and anything that later has to
+ * clear the chrome.
+ *
+ * The values are the rendered heights of the current chrome. The header is a
+ * 20px mark inside `py-3` plus a 2px rule; the index is a stamp and a wrapped
+ * link list below 1024px, one row above it. A taller header changes this
+ * block, never the rules that read it.
+ *
+ * The index's height is deliberately the WORST case, not the average: a
+ * scroll margin that is too small hides the heading the link promised, and one
+ * that is too generous only leaves a little air above it. Content wins.
+ */
+:root {
+	--site-header-height: 3.5rem;
+	--section-nav-height: 6rem;
+}
+
+@media (min-width: 1024px) {
+	:root {
+		--section-nav-height: 3.25rem;
+	}
+}
+
+/* The index parks below the header instead of on top of it. `.section-nav` is
+   the contract name; [data-section-nav] is what the component carries today,
+   so both are covered and neither can drift from the other.
+
+   The `body` prefix is there for SPECIFICITY, not scoping: the component also
+   carries Tailwind's `top-0`, and a plain attribute selector ties with it at
+   (0,1,0), which leaves the winner to stylesheet order - a coin flip between
+   the utility layer and this file. One element selector settles it. */
+body .section-nav,
+body [data-section-nav] {
+	top: var(--site-header-height);
+}
+
+/* Every anchor target clears both bands plus a reading gap, so a deep link
+   lands with the heading visible rather than behind the sticky chrome.
+
+   `html [id]` is deliberately stronger than the `scroll-mt-24` utility the
+   pages carry: those values were written against the OLD chrome, where the
+   index sat on top of the header, and a utility would otherwise outrank this
+   floor at equal specificity. A page that genuinely wants more clearance
+   still wins with an id selector or an inline style - this is a floor, not a
+   ceiling. */
+html [id] {
+	scroll-margin-top: calc(
+		var(--site-header-height) + var(--section-nav-height) + 1rem
+	);
+}
+
+/* ═══ READABLE WITHOUT JAVASCRIPT ════════════════════════════════════════
+ *
+ * The stepper (ZineFlow) and the comparison toggle (ZineToggle) are
+ * interactive PRESENTATIONS of content that has to be readable without them.
+ * Both components therefore render every stage and both panes in document
+ * order, and collapse into the one-at-a-time presentation only after their
+ * script has bound - which is what `data-flow-ready` / `data-toggle-ready`
+ * mean: the script rendered its first frame, so the markup may now be
+ * collapsed.
+ *
+ * Three states, and what each one shows:
+ *
+ *   html:not(.js)          no script at all: every stage and both panes, in
+ *                          reading order, with no controls - a button that
+ *                          cannot work is a promise the page cannot keep.
+ *   html.js, not ready     the collapsed frame from the FIRST paint, so the
+ *                          reader never sees six stages flash and then
+ *                          collapse into one.
+ *   ready                  the interactive presentation.
+ *
+ * The collapsed frame is safe only because of the release flags the page's
+ * inline failsafe sets (Base.astro, head script) when a module has not
+ * reported in by its deadline:
+ *
+ *   .motion-fallback      releases the reveal pre-hide above
+ *   [data-flow-stalled]   releases this stepper's stages
+ *   [data-toggle-stalled] releases this toggle's second pane
+ *
+ * The flags are separate because the failures are: one broken module must not
+ * be able to hide content just because a different module mounted. A script
+ * that dies can therefore never leave a stage or a pane unreachable. Content
+ * wins over motion - the same law the reveal pre-hide follows.
+ */
+[data-zine-flow]:not([data-flow-ready]) [data-flow-ticks],
+[data-zine-flow]:not([data-flow-ready]) [data-flow-controls],
+[data-zine-toggle]:not([data-toggle-ready]) .zine-toggle-bar {
+	display: none;
+}
+
+html.js:not(.motion-fallback)
+	[data-zine-flow]:not([data-flow-ready]):not([data-flow-stalled])
+	.zine-flow-step:not([data-flow-step="0"]) {
+	display: none;
+}
+
+html.js:not(.motion-fallback)
+	[data-zine-toggle]:not([data-toggle-ready]):not([data-toggle-stalled])
+	[data-toggle-pane="right"] {
+	display: none;
+}
+
+/* In stepper mode the stage's own number is carried by the progress row, so
+   the per-stage label would say it twice. Reading all stages, or having no
+   script, the label is the only thing that numbers them - so it stays. */
+[data-zine-flow][data-flow-ready]:not([data-flow-all]) .zine-flow-step-index {
+	display: none;
+}
+
+/* A readable list of stages needs a seam between them. In stepper mode only
+   one stage is in the flow, so this rule never paints. */
+.zine-flow-step + .zine-flow-step {
+	border-top: 1px dashed var(--oxblood-dark);
+	padding-top: var(--space-reading);
+}
+
+/* The pane tones live here rather than in a per-render class string: the pane
+   already names itself with data-flow-pane, and a colour chosen in the
+   component is a second place the palette lives. Agent is the transcript the
+   model reads (canary); System is the work that produced it (teal). */
+[data-flow-pane="agent"] .zine-flow-pane-label {
+	color: var(--stamped-canary);
+}
+
+[data-flow-pane="system"] .zine-flow-pane-label {
+	color: var(--weathered-teal);
+}
+
+/* The stage ticks: the HIT AREA is 44px tall and the visible bar stays a
+   hairline, so the control is reachable with a thumb or a pointer without the
+   progress row shouting. Colour is owned here and state is owned by the
+   script (aria-current="step" on the stage being read, data-flow-done on the
+   ones already passed), so the two can never disagree. */
+[data-flow-tick][data-flow-done] .zine-flow-tick-bar {
+	background: var(--stamped-canary);
+}
+
+[data-flow-tick][aria-current="step"] .zine-flow-tick-bar {
+	background: var(--bone-white);
+	border-color: var(--bone-white);
+}
+
+[data-flow-tick]:hover .zine-flow-tick-bar {
+	border-color: var(--bone-white);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.zine-flow-tick-bar {
+		transition:
+			background-color 120ms linear,
+			border-color 120ms linear;
+	}
+}
+
+/* On paper every stage prints, whatever the screen was showing: a walkthrough
+   that only prints its current step is a walkthrough with five stages missing.
+   !important is the point of the rule - the script sets the `hidden` attribute,
+   and the UA's own [hidden] rule has to be defeated for print. */
+@media print {
+	[data-zine-flow] .zine-flow-step[hidden],
+	[data-zine-toggle] [data-toggle-pane][hidden] {
+		display: block !important;
+	}
+
+	[data-zine-flow] .zine-flow-step-index {
+		display: inline !important;
+	}
+
+	[data-zine-flow] [data-flow-ticks],
+	[data-zine-flow] [data-flow-controls],
+	[data-zine-toggle] .zine-toggle-bar {
+		display: none !important;
+	}
 }

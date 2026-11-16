@@ -15,59 +15,85 @@ import ZineReveal from "@Component/ZineReveal.astro";
 import StudyLedger from "@Component/StudyLedger.astro";
 import CodeFence from "@Component/CodeFence.astro";
 
-import { Benchmark, Cite, Narrative, Provenance, Study } from "@Library/Numbers";
+import { Routes } from "@Library/Links";
+import { Band, Benchmark, ClassId, Cite, Figure, Figures, Narrative, Provenance, SourceRevision, Study } from "@Library/Numbers";
 
-// THE FOUR HEADLINE PLATES - one figure each, and every plate carries the
-// sentence that keeps it honest. A ratio without its corpus is a poster: the
-// ceiling plate is the best case on one long document, so its own body says the
-// per-type chart below tops out lower, and the reader is never left to assume
-// the headline is the typical case.
+// ONE QUESTION PER SECTION.
 //
-// Every figure and every number inside the sentences is generated. The
-// sentences are this page's - a generated number is the frame, the explanation
-// is the content - and each one reads the figure it explains from the same
-// record the plate's figure does.
+// The page used to open with four equally emphatic plates and then explain, in
+// paragraphs further down, how to read them. That is the wrong way round: a
+// reader met four monuments before knowing what question each answered, and
+// every one of them shouted, so none of them landed.
+//
+// It now runs in the order a sceptic actually asks:
+//
+//   01  How much output is replaced?      the ceiling, the corpus, the classes
+//   02  What overhead does it add?        the round-trip, the classifier, the step
+//   03  What happened in recorded sessions?  the study, and what it is not
+//   04  How can I reproduce this?         the harness, the provenance, the register
+//   05  Limitations                       what none of the above establishes
+//
+// Each figure is a record with a stable ID, a unit, a scope, a kind and a
+// method (`Source/Library/Numbers.ts`), and this page joins those records by ID.
+// Nothing here types a number, and a label cannot drift onto a neighbouring
+// figure's value: `Figure("...")` throws naming the ID instead.
+//
+// EXPRESSIVE BUDGET: ONE ASSEMBLY PER SECTION. The ceiling plate owns section
+// 01 and the latency plate owns section 02. Everything a reader has to study -
+// the method, the per-type table, the ledger, the register - is quiet.
+
+/** A headline plate: one figure, its scope, and the sentence that keeps it honest. */
 interface Plate {
+	/** The figure record this plate prints. */
+	Id: string;
+
 	Tape: string;
 	TapeColor: "raw" | "canary" | "teal" | "bone";
 	Tone: "crimson" | "canary" | "teal" | "subtle";
-	Figure: string;
+
+	/** The section's one expressive assembly, or a quiet record. */
+	Emphasis: "featured" | "quiet";
+
 	Caption: string;
 	Body: string[];
 	Src: string;
-	Rotate: string;
+	Rotate?: string;
 }
 
-// The per-type chart's own vocabulary: the README's table row is the key, and
-// the label, the tone and the corpus sentence are the page's. A class the
-// README grows without a row here stops the build rather than rendering
-// unlabelled - which is the difference between a chart and a list of numbers.
+// THE PER-TYPE VOCABULARY - keyed by FIGURE ID, never by the README's label.
+//
+// The ID is what `Numbers.ts` registers (`benchmark.class.<slug>`); the label,
+// the tone and the corpus sentence are this page's voice. A class the README
+// grows without a row here stops the build rather than rendering unlabelled -
+// which is the difference between a chart and a list of numbers. `Corpus` says
+// what the sample behind each row actually is, because a ratio for "JSON" is
+// meaningless until the reader knows which JSON.
 const Chart: Record<string, { Label: string; Color: "teal" | "raw" | "canary"; Corpus: string }> = {
-	"Browser snapshot (342 el)": {
+	"benchmark.class.browser-snapshot": {
 		Label: "BROWSER SNAPSHOT",
 		Color: "teal",
 		Corpus:
 			"one serialised page: every element, every attribute, the same wrapper nesting repeated to the leaves",
 	},
-	"Build output (142L)": {
+	"benchmark.class.build-output": {
 		Label: "BUILD OUTPUT",
 		Color: "raw",
 		Corpus:
 			"a compiler and linker log - repeated paths, repeated warning shapes, one error restated at the end",
 	},
-	"JSON blob (30 keys)": {
+	"benchmark.class.json-blob": {
 		Label: "JSON",
 		Color: "canary",
 		Corpus:
 			"one structured API payload: keys, nesting, and the values a reader needs kept byte-exact",
 	},
-	"Git diff (42L)": {
+	"benchmark.class.git-diff": {
 		Label: "GIT DIFF",
 		Color: "raw",
 		Corpus:
 			"a patch: hunk headers, context lines, and the same file path on both sides of every change",
 	},
-	"Terminal output": {
+	"benchmark.class.terminal-output": {
 		Label: "TERMINAL",
 		Color: "canary",
 		Corpus:
@@ -75,88 +101,124 @@ const Chart: Record<string, { Label: string; Color: "teal" | "raw" | "canary"; C
 	},
 };
 
-// THE PER-TYPE CHART - the README's standard-corpus table, one bar per output
-// class, largest ratio first. Widths are the generator's log-scale reading of
-// each ratio (the biggest at full width), so the bars stay comparable to the
-// plate above them and a width can never disagree with its figure. `Corpus`
-// says what the sample behind each row actually is, because a ratio for "JSON"
-// is meaningless until the reader knows which JSON.
+// THE PER-TYPE ROWS - the README's standard-corpus table, largest ratio first.
+// `Scale` is the numeric ratio the generator read; `Percent` is its log-scale
+// position, computed by the generator so a bar can never disagree with the
+// figure beside it. The table below the chart states the raw counts, because a
+// filled bar on a log scale invites a proportional reading a five-sample corpus
+// cannot support.
 const Classes = [...Benchmark.Classes]
 	.sort((Left, Right) => Right.Ratio - Left.Ratio)
 	.map((Entry) => {
-		const Vocabulary = Chart[Entry.Label];
+		const Id = ClassId(Entry.Label);
+		const Vocabulary = Chart[Id];
 
 		if (Vocabulary === undefined) {
 			throw new Error(
-				`[Benchmarks] README.md's per-type table carries "${Entry.Label}", which this page has no label or corpus sentence for. Add it to the Chart map in Source/pages/benchmarks.astro.`,
+				`[Benchmarks] the per-type table registers "${Id}" (README label "${Entry.Label}"), which this page has no label or corpus sentence for. Add it to the Chart map in Source/pages/benchmarks.astro.`,
 			);
 		}
 
-		return { ...Vocabulary, Ratio: Entry.Savings, Percent: Entry.Percent };
+		return {
+			Id,
+			...Vocabulary,
+			Fact: Figure(Id),
+			Ratio: Entry.Savings,
+			Percent: Entry.Percent,
+			Scale: Entry.Ratio,
+			Without: Entry.Without,
+			With: Entry.With,
+		};
 	});
 
 const Peak = Classes[0]!;
 const RunnerUp = Classes[1]!;
 const Floor = Classes[Classes.length - 1]!;
 
-const Plates: Plate[] = [
+// THE LOG AXIS, MADE EXPLICIT. A bar chart whose bars are log positions is a
+// ranking, not a proportion; a reader without the ticks reads 416× as "four
+// times 100×". These are the decade marks, positioned by the same log function
+// the generator used for the widths.
+const Ticks = [1, 10, 100].map((Value) => ({
+	Label: `${Value}×`,
+	Left: (Math.log10(Value) / Math.log10(Peak.Scale)) * 100,
+}));
+
+// 01 // HOW MUCH OUTPUT IS REPLACED
+//
+// The ceiling is the page's one monument and it carries its own qualifier: it is
+// the best case on ONE long low-entropy document, and its body says so. The
+// median is a quiet record beneath the per-type table it belongs to.
+const ReplacementPlates: Plate[] = [
 	{
+		Id: "benchmark.ceiling",
 		Tape: "MAX COMPRESSION",
 		TapeColor: "raw",
 		Tone: "crimson",
-		Figure: Benchmark.Ceiling,
-		Caption: "THE CEILING",
+		Emphasis: "featured",
+		Caption: "THE CEILING // THE BEST CASE, ON ONE DOCUMENT",
 		Body: [
 			"Best case on large low-entropy prose.",
 			`${Benchmark.Overall} overall on the same corpus, ${Benchmark.CorpusIn} → ${Benchmark.CorpusOut}.`,
-			`The best case is not part of the per-type chart below - that chart peaks at ${Peak.Ratio}.`,
+			`The best case is not part of the per-type chart - that chart peaks at ${Peak.Ratio}.`,
 		],
 		Src: `SRC: ${Cite(Benchmark.From)}`,
 		Rotate: "-rotate-[1.8deg]",
 	},
 	{
+		Id: "benchmark.median",
+		Tape: "MEDIAN // THE TYPICAL CASE",
+		TapeColor: "bone",
+		Tone: "subtle",
+		Emphasis: "quiet",
+		Caption: "MEDIAN REDUCTION ACROSS THE REPORTED SAMPLES",
+		Body: [
+			"Fewer tokens on tool output - the median the README reports for its per-type table.",
+			`It is the number the README reports for that table, and it is the one to plan a context budget against.`,
+			`That over-reads a median across ${Classes.length} selected samples. What a session actually saves depends on the output type, on the size of that output, on how much of it repeats, on where the per-type thresholds sit, and on how often the agent retrieves instead of reading the preview.`,
+		],
+		Src: `SRC: ${Cite(Benchmark.From)}`,
+	},
+];
+
+// 02 // WHAT OVERHEAD IT ADDS
+//
+// The round-trip is the section's one monument, because it is the figure a
+// reader who is considering the proxy actually needs. The classifier's cost and
+// the compress step are quiet records: they answer "is the tax visible", and the
+// answer is a number, not a plate.
+const OverheadPlates: Plate[] = [
+	{
+		Id: "benchmark.latency",
 		Tape: "END-TO-END",
 		TapeColor: "canary",
 		Tone: "canary",
-		Figure: Benchmark.Latency,
+		Emphasis: "featured",
 		Caption: "THE LATENCY BAND",
 		Body: [
 			`Including the HTTP round-trip; the headline figure is ${Benchmark.LatencyHeadline}.`,
-			`Eight milliseconds is the fast case, forty the slow one: one call, compression and retrieve path included.`,
+			"Eight milliseconds is the fast case, forty the slow one: one call, compression and retrieve path included.",
 		],
 		Src: `SRC: ${Cite(Benchmark.From)}`,
 		Rotate: "rotate-[2.2deg]",
 	},
 	{
+		Id: "benchmark.classify",
 		Tape: "CLASSIFICATION",
 		TapeColor: "teal",
 		Tone: "teal",
-		Figure: Benchmark.Classify,
+		Emphasis: "quiet",
 		Caption: "THE FLOOR",
 		Body: [
 			`The whole compress step is ${Narrative.CompressStep}.`,
 			"Classification is the step before it: naming the content type costs nanoseconds, and it runs on every call.",
 		],
 		Src: `SRC: ${Cite(Benchmark.From)}`,
-		Rotate: "-rotate-[1deg]",
-	},
-	{
-		Tape: "MEDIAN",
-		TapeColor: "bone",
-		Tone: "subtle",
-		Figure: Benchmark.Median,
-		Caption: "THE TYPICAL CASE",
-		Body: [
-			"Fewer tokens on tool output - the median the README reports for its per-type table.",
-			"It is the number the README reports for that table, and the one to plan a context budget against.",
-		],
-		Src: `SRC: ${Cite(Benchmark.From)}`,
-		Rotate: "rotate-[2.5deg]",
 	},
 ];
 
 // THE HARNESS - five examples in the aphrodite crate, one per question the
-// plates above answer. Each body is the example's own promise: what it spawns,
+// figures above answer. Each body is the example's own promise: what it spawns,
 // what it asserts, and what makes it exit non-zero.
 const Harness = [
 	{
@@ -203,9 +265,44 @@ const Needs = [
 	},
 	{
 		Label: "The release profile",
-		Text: "Every figure above is a release run - the commands below pass --release - and a debug build is not comparable to the plates.",
+		Text: "Every figure is a release run - the harness commands pass --release - and a debug build is not comparable to the plates.",
 	},
 ];
+
+// THE SESSION SHAPES - the study's four ranges, joined BY ID.
+//
+// `Band(Id)` finds the generated row whose range the ID claims, so a reordered
+// README relabels nothing and a renamed range stops the build. The fourth shape
+// is a SIMULATED workload: it never happened, it is tagged, and it is rendered
+// in its own block after the three recorded shapes rather than as a fourth peer.
+const Shape = [
+	{ Id: "study.band.chat-only", Label: "CHAT-ONLY SESSIONS", Color: "zinc" as const },
+	{ Id: "study.band.light-developer", Label: "LIGHT DEVELOPER SESSIONS", Color: "teal" as const },
+	{ Id: "study.band.tool-heavy", Label: "TOOL-HEAVY SESSIONS", Color: "teal" as const },
+	{
+		Id: "study.band.pure-tool",
+		Label: "SIMULATED PURE-TOOL LOOP",
+		Color: "raw" as const,
+		Note: "a simulated diff+ls+build+search workload - a stress test, not real usage",
+	},
+];
+
+const Shapes = Shape.map(({ Id, Label, Color, ...Rest }) => ({ Id, Label, Color, ...Rest, ...Band(Id) }));
+
+const RecordedShapes = Shapes.filter(({ Kind }) => Kind !== "simulated");
+const SimulatedShapes = Shapes.filter(({ Kind }) => Kind === "simulated");
+
+const BarColor = {
+	zinc: "bg-zinc-dust",
+	teal: "bg-weathered-teal",
+	raw: "bg-raw-blood",
+};
+
+const BarText = {
+	zinc: "text-zinc-dust",
+	teal: "text-weathered-teal",
+	raw: "text-raw-blood",
+};
 
 // THE PROVENANCE TABLE - the chain behind every figure, in the order a reader
 // meets the figures on the page. The paths are the generator's own record of
@@ -219,7 +316,7 @@ const ProvenanceRows = [
 	{
 		Fact: "the benchmark corpus",
 		From: Provenance.Benchmark,
-		Feeds: "the four plates and the per-type chart",
+		Feeds: "the four plates and the per-type chart: the ceiling, the corpus totals, the per-type rows, the latency band, the classification floor",
 	},
 	{
 		Fact: "the classification surface",
@@ -239,11 +336,25 @@ const ProvenanceRows = [
 ].map(({ Fact, From, Feeds }) => ({
 	Cells: [{ Text: Fact }, { Text: From }, { Text: Feeds }],
 }));
+
+// THE FIGURE REGISTER - every record the page prints, with the four fields a
+// reader needs in order to refuse to trust it blindly: what kind of figure it
+// is, what unit it counts, what it was measured over, and how it was produced.
+const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => ({
+	Cells: [
+		{ Text: Id },
+		{ Text: Kind },
+		{ Text: Value, Align: "right" as const },
+		{ Text: Unit },
+		{ Text: Scope },
+		{ Text: Method },
+	],
+}));
 ---
 
 <Base
 	Title="BENCHMARKS // APHRODITE"
-	Description={`Aphrodite benchmarks: up to ${Benchmark.Ceiling} compression on the standard corpus (${Benchmark.Overall} overall, ${Benchmark.CorpusIn} to ${Benchmark.CorpusOut}), ${Benchmark.Latency} end-to-end, ${Benchmark.Classify} classification, and the ${Study.Sessions}-session real-world study.`}
+	Description={`Aphrodite benchmarks: up to ${Benchmark.Ceiling} best case on the standard corpus (${Benchmark.Overall} overall, ${Benchmark.CorpusIn} to ${Benchmark.CorpusOut}), ${Benchmark.Latency} end-to-end, ${Benchmark.Classify} classification, and the ${Study.Sessions}-session real-world study.`}
 >
 	<PageShell Rhythm="wide" Crumbs>
 		<PageHeader
@@ -251,109 +362,128 @@ const ProvenanceRows = [
 			Title="Benchmarks"
 			Lead={[
 				`These figures come from the project's own benchmarks and from a study of the author's real Hermes sessions.`,
-				`Benchmark ratios are measured; session savings are estimated, and the uncertainty band is shown below.`,
+				`Benchmark ratios are measured; session savings are estimated, and the uncertainty band is stated with the estimate.`,
 				`Every plate carries the corpus it was measured on and the SRC line that contains it, and the harness at the foot of the page re-derives the measured figures from a checkout.`,
+				`Every figure is extracted from a pinned revision of the repository - ${SourceRevision.Branch} at ${SourceRevision.Short} for this build - so what a reader checks is the number the tree carried, not a number someone typed here.`,
 			]}
 		/>
 
-		<!-- SLOT 3: one claim's evidence - the four plates, the method, the chart,
-		     the study, the harness, the limits -->
-
-		<!-- THE HEADLINE: four monument plates. 2x2 through the tablet range,
-		     four-across only at xl, where each plate keeps room for its figure. -->
+		<!-- THE MAP: what the page asks, in order, and which figure answers each.
+		     The four-item list is the page's original orientation, kept verbatim;
+		     what is new is the sentence saying which section carries which. -->
 		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="THE HEADLINE // FOUR FIGURES" />
-			<h2
-				id="headline"
-				class="mb-10 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
-			>
-				Four figures, four corpora
-			</h2>
-			<div
-				class="grid grid-cols-1 gap-14 sm:grid-cols-2 sm:gap-12 xl:grid-cols-4 xl:gap-8"
-			>
-				{
-					Plates.map(({ Tape, TapeColor, Tone, Figure, Caption, Body, Src, Rotate }) => (
-						<ZineBox
-							Tone={Tone}
-							Rotate={Rotate}
-							Tape={Tape}
-							TapeColor={TapeColor}
-							Class="flex flex-col"
-						>
-							<div class="mt-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-								{Caption}
-							</div>
-							<div class="font-headline text-4xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-5xl">
-								{Figure}
-							</div>
-							<div class="mt-4 border-t border-oxblood-dark pt-3">
-								{Body.map((Sentence, I) => (
-									<p
-										class={
-											I === 1
-												? "mt-2 text-base leading-relaxed text-weathered-teal"
-												: "text-base leading-relaxed text-zinc-dust"
-										}
-									>
-										{Sentence}
-									</p>
-								))}
-							</div>
-							<div class="mt-auto pt-6 font-mono text-base text-zinc-dust">
-								{Src}
-							</div>
-						</ZineBox>
-					))
-				}
+			<div class="max-w-3xl">
+				<p class="type-body text-bone-newsprint">Read the four together and the shape of the product is in them:</p>
+				<ul class="prose-flow mt-4 max-w-3xl type-body text-bone-newsprint">
+					<li class="border-l-4 border-raw-blood pl-4">a ceiling that belongs to one long document</li>
+					<li class="border-l-4 border-raw-blood pl-4">a band for the round-trip</li>
+					<li class="border-l-4 border-raw-blood pl-4">a floor for the step that runs on every call</li>
+					<li class="border-l-4 border-raw-blood pl-4">and a median for the ordinary case.</li>
+				</ul>
+				<p class="mt-4 max-w-3xl type-body text-bone-newsprint">
+					The ceiling and the median belong to the next section - how much output a marker replaces. The
+					round-trip band and the classification floor belong to the one after it - what that replacement
+					costs. The recorded sessions, the harness and the limits follow in that order.
+				</p>
+				<p class="mt-3 max-w-3xl type-caption text-zinc-dust">
+					The ceiling is the number quoted in the repository's first line; the median is the ordinary case -
+					the one to plan a context budget against, as far as a median over {Classes.length} selected
+					samples can tell you.
+				</p>
 			</div>
-			<p class="mt-14 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				Read the four together and the shape of the product is in them:
-			</p>
-			<ul class="mt-3 max-w-3xl space-y-2 font-body text-base leading-relaxed text-bone-newsprint">
-				<li class="border-l-4 border-raw-blood pl-4">a ceiling that belongs to one long document</li>
-				<li class="border-l-4 border-raw-blood pl-4">a band for the round-trip</li>
-				<li class="border-l-4 border-raw-blood pl-4">a floor for the step that runs on every call</li>
-				<li class="border-l-4 border-raw-blood pl-4">and a median for the ordinary case.</li>
-			</ul>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-zinc-dust">
-				The ceiling is the number quoted in the repository's first line; the median is the
-				one to plan against.
-			</p>
 			<ZineSource
 				Lines={[
 					`SRC: ${Cite(Benchmark.From)} (the ceiling, the corpus, the latency band, the classification floor)`,
-					`SRC: ${Cite(Study.From)} (the 200-session study)`,
+					`SRC: ${Cite(Study.From)} (the ${Study.Sessions}-session study)`,
 				]}
 			/>
 		</section>
 
-		<!-- THE METHOD: what the number is before it is a number -->
+		<!-- ============ 01 // HOW MUCH OUTPUT IS REPLACED ============ -->
 		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="METHOD // ONE PAYLOAD, COUNTED TWICE" />
-			<ZineBox Size="lg" Rotate="rotate-[0.8deg]">
-				<h2
-					id="method"
-					class="mb-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
-				>
-					How a ratio is computed
-				</h2>
-				<p class="font-body text-base leading-relaxed text-bone-newsprint">
-					A ratio on this page is one payload counted twice: the tokens the tool produced,
-					the tokens the model actually reads, and the first divided by the second.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					Nothing else enters the number - no weighting, no projection, no averaging
-					across calls.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					The denominator is not the raw output minus a preview.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					It is the whole replacement the model receives: the marker, its type, its size,
-					and the short preview that lets the model decide whether the bytes are worth
-					retrieving.
-				</p>
+			<ZineTape Variant="kicker" Label="01 // THE HEADLINE // FOUR FIGURES" />
+			<h2 id="headline" class="mt-3 max-w-4xl type-section text-bone-white">
+				How much output is replaced?
+			</h2>
+			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
+				What follows is the best case, the corpus it belongs to, and the per-class detail underneath both.
+				Every figure in this section is measured - arithmetic on a fixed corpus - and the method that computes
+				it is stated before the first one so the unit is never in doubt.
+			</p>
+
+			<!-- THE CEILING: the section's one expressive assembly, and the page's brand
+			     moment. Its caption and body carry the qualifier that keeps it honest. -->
+			<div class="mt-16">
+				{
+					ReplacementPlates.filter(({ Emphasis }) => Emphasis === "featured").map(({ Id, Tape, TapeColor, Tone, Caption, Body, Src, Rotate }) => {
+						const Fact = Figure(Id);
+
+						return (
+							<ZineBox Tone={Tone} Rotate={Rotate} Tape={Tape} TapeColor={TapeColor} Emphasis="featured" Class="flex flex-col">
+								<div class="mt-2 type-meta font-black text-zinc-dust">{Caption}</div>
+								<div class="font-headline text-4xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-5xl">
+									{Fact.Value}
+								</div>
+								<div class="mt-2 type-caption text-zinc-dust">
+									{Fact.Unit} &bull; {Fact.Scope}
+								</div>
+								<div class="mt-4 border-t border-oxblood-dark pt-3 prose-flow">
+									{Body.map((Sentence) => (
+										<p class="type-body text-bone-newsprint">{Sentence}</p>
+									))}
+								</div>
+								<div class="mt-auto pt-6 type-meta text-zinc-dust">{Src}</div>
+							</ZineBox>
+						);
+					})
+				}
+			</div>
+
+			<!-- THE WHOLE CORPUS, as records: the totals the ceiling is a best case of. -->
+			<div class="mt-16 border-t border-oxblood-dark pt-8">
+				<div class="section-kicker">THE WHOLE CORPUS, COUNTED AT ONCE</div>
+				<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-3">
+					{
+						[
+							{ Id: "benchmark.corpus.in", Label: "CORPUS IN" },
+							{ Id: "benchmark.corpus.out", Label: "CORPUS OUT" },
+							{ Id: "benchmark.overall", Label: "OVERALL RATIO" },
+						].map(({ Id, Label }) => {
+							const Fact = Figure(Id);
+
+							return (
+								<div class="border-t border-oxblood-dark pt-3">
+									<div class="type-meta font-bold text-zinc-dust">{Label}</div>
+									<div class="mt-2 font-headline text-2xl font-black tracking-tight text-bone-white">{Fact.Value}</div>
+									<div class="mt-1 type-caption text-zinc-dust">
+										{Fact.Unit} &bull; {Fact.Scope}
+									</div>
+								</div>
+							);
+						})
+					}
+				</div>
+			</div>
+
+			<!-- THE METHOD: what the number is before it is a number. Demoted from its
+			     own section to the definition that opens the figures it defines. -->
+			<div id="method" class="mt-16 border-t border-oxblood-dark pt-8">
+				<div class="section-kicker">METHOD // ONE PAYLOAD, COUNTED TWICE</div>
+				<h3 class="mt-3 max-w-3xl type-sub text-bone-white">How a ratio is computed</h3>
+				<div class="prose-flow mt-6 max-w-3xl">
+					<p class="type-body text-bone-newsprint">
+						A ratio is one payload counted twice: the tokens the tool produced, the tokens the
+						model actually reads, and the first divided by the second.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						Nothing else enters the number - no weighting, no projection, no averaging across calls.
+					</p>
+					<p class="type-body text-bone-newsprint">The denominator is not the raw output minus a preview.</p>
+					<p class="type-body text-bone-newsprint">
+						It is the whole replacement the model receives: the marker, its type, its size, and the short
+						preview that lets the model decide whether the bytes are worth retrieving.
+					</p>
+				</div>
 				<div class="mt-8">
 					<ZineLedger
 						Headers={["STEP", "WHAT IS COUNTED", "WHERE IT COMES FROM"]}
@@ -376,137 +506,123 @@ const ProvenanceRows = [
 								Cells: [
 									{ Text: "RATIO", Delta: "up" },
 									{ Text: "before ÷ after, reported as a whole multiple" },
-									{ Text: "the two counts above", Delta: "up" },
+									{ Text: "the before and after counts", Delta: "up" },
 								],
 							},
 						]}
 					/>
 				</div>
-				<p class="mt-8 font-body text-base leading-relaxed text-bone-newsprint">
-					The corpus is fixed, and it is the same corpus for every row: the per-type table
-					takes one representative sample per output class, and the headline figure
-					aggregates the whole set - {Benchmark.CorpusIn} in, {Benchmark.CorpusOut} out,{" "}
-					{Benchmark.Overall} overall, with the single best document reaching{" "}
-					{Benchmark.Ceiling}.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					Timing is reported on a different axis on purpose.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					Classification is {Benchmark.Classify} and is timed on its own because it runs on every
-					call.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					The whole compress step is {Narrative.CompressStep}.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					{Benchmark.Latency} is what a client waits once the HTTP round-trip is included.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					And the {Benchmark.LatencyHeadline} headline sits near the fast end of that band.
+				<div class="prose-flow mt-8 max-w-3xl">
+					<p class="type-body text-bone-newsprint">
+						The corpus is fixed, and it is the same corpus for every row: the per-type table takes one
+						representative sample per output class, and the headline figure aggregates the whole set -{" "}
+						{Benchmark.CorpusIn} in, {Benchmark.CorpusOut} out, {Benchmark.Overall} overall, with the single
+						best document reaching {Benchmark.Ceiling}.
+					</p>
+					<p class="type-caption text-zinc-dust">
+						The three figures that are timed rather than counted are in the next section, on their own axis:
+						the classification floor, the compress step, and the round-trip a client waits for.
+					</p>
+				</div>
+			</div>
+
+			<!-- THE PER-TYPE ROWS: a table first, because a table states the counts a
+			     ratio was computed from; then the bars, with the log axis labelled. -->
+			<div id="per-type" class="mt-16 border-t border-oxblood-dark pt-8">
+				<div class="section-kicker">MEASURED // PER-TYPE COMPRESSION</div>
+				<h3 class="mt-3 max-w-3xl type-sub text-bone-white">Ratio by output class</h3>
+				<p class="mt-4 max-w-3xl type-body text-bone-newsprint">
+					The bars are drawn at the ratios' log-scale positions, so the top row sits at full width and each
+					subsequent row reads as a step down. Because a log position is a ranking rather than a proportion,
+					the counts behind each row are stated first.
 				</p>
 
-				<ZineTape Variant="section" Label="TWO HALVES // TWO CONFIDENCE LEVELS" Color="teal" />
-				<h3
-					id="confidence"
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					What is measured and what is estimated
-				</h3>
-				<p class="font-body text-base leading-relaxed text-bone-newsprint">
-					The page has two halves and they do not carry the same confidence.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					Everything in the plates and the per-type chart is measured: a fixed payload goes
-					in, a marker comes out, and the quotient is arithmetic.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					The session study is an estimate by construction: it reconstructs what each API
-					call would have carried with every marker expanded, so its figure depends on the
-					tokenizer used to count that reconstruction.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					That is why it ships as a band with a stated sensitivity range rather than as a
-					single percentage.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					Neither half is a vendor number.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					A reader with a checkout can re-derive the measured half exactly and the
-					estimated half to within its band - the harness section below is the first half
-					of that sentence, and
-					<a
-						class="text-weathered-teal underline transition-colors hover:text-bone-white"
-						href="/case-study/">the case study</a
-					> is where the second half is argued.
-				</p>
-			</ZineBox>
-			<ZineSource
-				Lines={[
-					`SRC: ${Cite(Benchmark.From)} (the per-type table, the round trips, the timing axes)`,
-					`SRC: ${Cite(Study.From)} (the session study and its band)`,
-				]}
-			/>
-		</section>
+				<div class="mt-8 overflow-x-auto border border-oxblood-dark bg-soot-black">
+					<table class="w-full border-collapse font-mono text-base">
+						<thead>
+							<tr class="border-b-2 border-blood-crimson">
+								<th class="px-3 py-2 text-left type-meta font-black text-zinc-dust">SAMPLE</th>
+								<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">ORIGINAL TOKENS</th>
+								<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">REPLACEMENT TOKENS</th>
+								<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">RATIO</th>
+							</tr>
+						</thead>
+						<tbody>
+							{
+								Classes.map(({ Label, Corpus, Without, With, Ratio }) => (
+									<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
+										<td class="px-3 py-3 text-left">
+											<div class="font-black text-bone-white">{Label}</div>
+											<div class="mt-1 max-w-md type-caption text-zinc-dust">{Corpus}</div>
+										</td>
+										<td class="px-3 py-3 text-right text-bone-newsprint">{Without}</td>
+										<td class="px-3 py-3 text-right text-bone-newsprint">{With}</td>
+										<td class="px-3 py-3 text-right font-black text-weathered-teal">{Ratio}</td>
+									</tr>
+								))
+							}
+						</tbody>
+					</table>
+				</div>
 
-		<!-- THE CHART: the per-type ratios, one bar per output class -->
-		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="MEASURED // PER-TYPE COMPRESSION" Color="canary" />
-			<ZineBox Size="lg" Rotate="-rotate-[0.6deg]">
-				<h2
-					id="per-type"
-					class="mb-3 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
-				>
-					Ratio by output class
-				</h2>
-				<div class="mb-10 font-mono text-base font-bold uppercase tracking-wider text-zinc-dust">
-					RATIO BY OUTPUT CLASS (README STANDARD CORPUS, LOG SCALE):
+				<div class="mt-12">
+					<div class="type-meta font-bold text-zinc-dust">
+						RATIO BY OUTPUT CLASS (README STANDARD CORPUS, LOG SCALE):
+					</div>
+					<div class="mt-6 space-y-8">
+						{
+							Classes.map(({ Label, Ratio, Percent, Color, Corpus }) => (
+								<div>
+									<ZineStatBar Label={Label} Ratio={Ratio} Percent={Percent} Color={Color} />
+									<p class="mt-2 max-w-3xl type-caption text-zinc-dust">{Corpus}</p>
+								</div>
+							))
+						}
+					</div>
+					<!-- THE AXIS: the decade marks, so the log scale is readable rather than
+					     assumed. Same function the generator used for the bar widths. -->
+					<div class="mt-10">
+						<div class="relative h-2 border-t border-oxblood-dark">
+							{
+								Ticks.map(({ Label, Left }, Index) => (
+									<div class={Index === 0 ? "absolute top-0" : "absolute top-0 -translate-x-1/2"} style={`left: ${Left}%`}>
+										<div class="h-2 w-px bg-zinc-dust" />
+										<div class="mt-1 whitespace-nowrap type-meta text-zinc-dust">{Label}</div>
+									</div>
+								))
+							}
+						</div>
+						<p class="mt-10 max-w-3xl type-caption text-zinc-dust">
+							Decade marks on the log axis: {Ticks.map(({ Label }) => Label).join(", ")}. The top bar reaches{" "}
+							{Peak.Ratio}, which is why the last mark sits short of the right edge.
+						</p>
+					</div>
 				</div>
-				<div class="space-y-8">
-					{
-						Classes.map(({ Label, Ratio, Percent, Color, Corpus }) => (
-							<div>
-								<ZineStatBar
-									Label={Label}
-									Ratio={Ratio}
-									Percent={Percent}
-									Color={Color}
-								/>
-								<p class="mt-2 font-body text-base leading-relaxed text-zinc-dust">
-									{Corpus}
-								</p>
-							</div>
-						))
-					}
+
+				<div class="prose-flow mt-12 border-t border-oxblood-dark pt-8 max-w-3xl">
+					<p class="type-body text-bone-newsprint">
+						The chart peaks at <span class="text-stamped-canary">{Peak.Ratio}</span>, on the browser snapshot:
+						a serialised DOM repeats the same wrapper nesting down to the leaves, and the ratio is a measure
+						of exactly that repetition.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						The {Benchmark.Ceiling} plate is deliberately outside this chart.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						It is not a sixth class: it is the best case on a single long low-entropy document, while the{" "}
+						{Classes.length} rows above are one representative sample per class and {Benchmark.Overall} is the
+						whole corpus counted at once.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						Plotting a best case beside five class samples would invite a comparison the number cannot
+						support.
+					</p>
+					<p class="type-caption text-zinc-dust">
+						Read the chart as a ranking, not a promise: a diff, a build log and a terminal session are the
+						ordinary material of an agent turn, and they land between {Floor.Ratio} and {RunnerUp.Ratio},
+						while the median the README reports for the same table is {Benchmark.Median}.
+					</p>
 				</div>
-				<p class="mt-12 border-t border-oxblood-dark pt-8 font-body text-base leading-relaxed text-bone-newsprint">
-					The bars are drawn at the ratios' log-scale positions, so the top row sits at full
-					width and each row below it reads as a step down.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					The chart peaks at
-					<span class="text-stamped-canary" data-count={Peak.Ratio.replace("×", "")}>{Peak.Ratio.replace("×", "")}</span>&times;, on the browser
-					snapshot: a serialised DOM repeats the same wrapper nesting down to the leaves, and
-					the ratio is a measure of exactly that repetition.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					The {Benchmark.Ceiling} plate is deliberately outside this chart.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					It is not a sixth class: it is the best case on a single long low-entropy
-					document, while the {Classes.length} rows above are one representative sample per class and{" "}
-					{Benchmark.Overall} is the whole corpus counted at once.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					Plotting a best case beside five class samples would invite a comparison the
-					number cannot support.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					Read the chart as a ranking, not a promise: a diff, a build log and a terminal
-					session are the ordinary material of an agent turn, and they land between {Floor.Ratio} and{" "}
-					{RunnerUp.Ratio}, while the median the README reports for the same table is {Benchmark.Median}.
-				</p>
 				<div class="mt-8">
 					<ZineReveal
 						Tag="SUPPRESSED"
@@ -514,159 +630,312 @@ const ProvenanceRows = [
 						Raw={`<span class="font-bold text-stamped-canary">${Floor.Ratio}</span> - the floor of the chart, and the floor is the useful number: a terminal dump that compresses ${Floor.Ratio} is a dump the model can afford to keep.`}
 					/>
 				</div>
-			</ZineBox>
-			<ZineSource Lines={[`SRC: ${Cite(Benchmark.From)}`]} />
+
+				<!-- THE MEDIAN: a quiet record under the table it belongs to, carrying the
+				     qualification the caption used to claim away. -->
+				<div class="mt-16">
+					{
+						ReplacementPlates.filter(({ Emphasis }) => Emphasis === "quiet").map(({ Id, Tape, Caption, Body, Src }) => {
+							const Fact = Figure(Id);
+
+							return (
+								<ZineBox Emphasis="quiet" Class="flex flex-col">
+									<div class="section-kicker">{Tape}</div>
+									<div class="mt-3 type-meta font-black text-zinc-dust">{Caption}</div>
+									<div class="mt-2 font-headline text-3xl font-black tracking-tighter text-bone-white">{Fact.Value}</div>
+									<div class="mt-2 type-caption text-zinc-dust">
+										{Fact.Unit} &bull; {Fact.Scope}
+									</div>
+									<div class="mt-4 prose-flow">
+										{Body.map((Sentence) => (
+											<p class="type-body text-bone-newsprint">{Sentence}</p>
+										))}
+									</div>
+									<div class="mt-6 type-meta text-zinc-dust">{Src}</div>
+								</ZineBox>
+							);
+						})
+					}
+				</div>
+			</div>
+
+			<ZineSource
+				Lines={[
+					`SRC: ${Cite(Benchmark.From)} (the ceiling, the corpus, the per-type table)`,
+					`SRC: ${Cite(Study.From)} (the session study and its band)`,
+				]}
+			/>
 		</section>
 
-		<!-- THE STUDY: 200 real sessions, reconstructed payload by payload -->
+		<!-- ============ 02 // WHAT OVERHEAD IT ADDS ============ -->
 		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="REAL-WORLD STUDY // 200 SESSIONS" />
-			<ZineBox Size="lg" Rotate="-rotate-[1.2deg]">
-				<h2
-					id="study"
-					class="mb-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
-				>
-					What {Study.Sessions} sessions measured
-				</h2>
-				<p class="font-body text-base leading-relaxed text-bone-newsprint">
-					The study takes {Study.Sessions} real Hermes sessions -
-					<span class="text-stamped-canary" data-count={Study.ApiCalls.replace(/,/g, "")}>{Study.ApiCalls}</span> API calls over
-					three days - and reconstructs every call's payload from the session transcript.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					Each payload is counted twice: as the model saw it, with the CCR markers in
-					place, and with every marker expanded back to the content it replaced, which is
-					what stock Hermes would have sent.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					The difference between those two counts is the saving.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					Nothing is simulated in that arithmetic - the markers, the retrieval calls and
-					the expansions are the ones the transcripts contain - but the expansion depends
-					on a tokenizer, so the result is a band rather than a point.
-				</p>
-				<div class="mt-10">
-					<StudyLedger Scale="full" ShowBars />
+			<ZineTape Variant="kicker" Label="02 // OVERHEAD" />
+			<h2 id="overhead" class="mt-3 max-w-4xl type-section text-bone-white">
+				What overhead does it add?
+			</h2>
+			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
+				Timing is reported on a different axis on purpose. A ratio says how much is replaced; it says nothing
+				about what the replacement costs to produce, and a reader deciding whether to put a proxy in front of
+				their client needs the second number more than the first.
+			</p>
+
+			<!-- THE ROUND-TRIP: the section's one expressive assembly. -->
+			<div class="mt-16">
+				{
+					OverheadPlates.filter(({ Emphasis }) => Emphasis === "featured").map(({ Id, Tape, TapeColor, Tone, Caption, Body, Src, Rotate }) => {
+						const Fact = Figure(Id);
+
+						return (
+							<ZineBox Tone={Tone} Rotate={Rotate} Tape={Tape} TapeColor={TapeColor} Emphasis="featured" Class="flex flex-col">
+								<div class="mt-2 type-meta font-black text-zinc-dust">{Caption}</div>
+								<div class="font-headline text-4xl font-black tracking-tighter text-bone-white drop-shadow-[3px_3px_0px_#520612] sm:text-5xl">
+									{Fact.Value}
+								</div>
+								<div class="mt-2 type-caption text-zinc-dust">
+									{Fact.Unit} &bull; {Fact.Scope}
+								</div>
+								<div class="mt-4 border-t border-oxblood-dark pt-3 prose-flow">
+									{Body.map((Sentence) => (
+										<p class="type-body text-bone-newsprint">{Sentence}</p>
+									))}
+								</div>
+								<div class="mt-auto pt-6 type-meta text-zinc-dust">{Src}</div>
+							</ZineBox>
+						);
+					})
+				}
+			</div>
+
+			<!-- THE FLOOR AND THE STEP, as records: the two costs that are too small to
+			     see on a millisecond axis, which is exactly why they are stated. -->
+			<div class="mt-16 border-t border-oxblood-dark pt-8">
+				<div class="section-kicker">TWO COSTS TOO SMALL FOR THE SAME AXIS</div>
+				<div class="mt-6 grid grid-cols-1 gap-10 sm:grid-cols-2">
+					{
+						OverheadPlates.filter(({ Emphasis }) => Emphasis === "quiet").map(({ Id, Tape, Caption, Body, Src }) => {
+							const Fact = Figure(Id);
+
+							return (
+								<ZineBox Emphasis="quiet" Class="flex flex-col">
+									<div class="section-kicker">{Tape}</div>
+									<div class="mt-3 type-meta font-black text-zinc-dust">{Caption}</div>
+									<div class="mt-2 font-headline text-3xl font-black tracking-tighter text-bone-white">{Fact.Value}</div>
+									<div class="mt-2 type-caption text-zinc-dust">
+										{Fact.Unit} &bull; {Fact.Scope}
+									</div>
+									<div class="mt-4 prose-flow">
+										{Body.map((Sentence) => (
+											<p class="type-body text-bone-newsprint">{Sentence}</p>
+										))}
+									</div>
+									<div class="mt-6 type-meta text-zinc-dust">{Src}</div>
+								</ZineBox>
+							);
+						})
+					}
+				</div>
+			</div>
+
+			<!-- WHAT THE OVERHEAD BUYS: the round-trip is not a fee for nothing. -->
+			<div class="mt-16 border-t border-oxblood-dark pt-8">
+				<div class="section-kicker">WHAT THE OVERHEAD BUYS</div>
+				<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
+					{
+						[
+							{ Id: "benchmark.round-trips", Label: "ROUND TRIPS" },
+							{ Id: "narrative.marker-tokens", Label: "THE REPLACEMENT ITSELF" },
+						].map(({ Id, Label }) => {
+							const Fact = Figure(Id);
+
+							return (
+								<div class="border-t border-oxblood-dark pt-3">
+									<div class="type-meta font-bold text-zinc-dust">
+										{Label} &bull; {Fact.Kind.toUpperCase()}
+									</div>
+									<div class="mt-2 font-headline text-xl font-black tracking-tight text-bone-white">{Fact.Value}</div>
+									<div class="mt-1 type-caption text-zinc-dust">
+										{Fact.Unit} &bull; {Fact.Scope}
+									</div>
+								</div>
+							);
+						})
+					}
+				</div>
+				<div class="prose-flow mt-8 max-w-3xl">
+					<p class="type-body text-bone-newsprint">
+						Classification is {Benchmark.Classify} and is timed on its own because it runs on every call.
+					</p>
+					<p class="type-body text-bone-newsprint">The whole compress step is {Narrative.CompressStep}.</p>
+					<p class="type-body text-bone-newsprint">
+						{Benchmark.Latency} is what a client waits once the HTTP round-trip is included.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						And the {Benchmark.LatencyHeadline} headline sits near the fast end of that band.
+					</p>
+				</div>
+			</div>
+
+			<ZineSource
+				Lines={[
+					`SRC: ${Cite(Benchmark.From)} (the latency band, the classification floor, the round trips)`,
+					`SRC: ${Cite(Narrative.From)} (the compress step and the marker format)`,
+				]}
+			/>
+		</section>
+
+		<!-- ============ 03 // WHAT HAPPENED IN RECORDED SESSIONS ============ -->
+		<section class="relative w-full" data-reveal>
+			<ZineTape Variant="kicker" Label="03 // RECORDED SESSIONS" />
+			<h2 id="study" class="mt-3 max-w-4xl type-section text-bone-white">
+				What happened in recorded sessions?
+			</h2>
+			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
+				The study takes {Study.Sessions} real Hermes sessions - <span class="text-stamped-canary">{Study.ApiCalls}</span>{" "}
+				API calls over three days - and reconstructs every call's payload from the session transcript.
+			</p>
+			<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
+				Each payload is counted twice: as the model saw it, with the CCR markers in place, and with every
+				marker expanded back to the content it replaced, which is what stock Hermes would have sent.
+			</p>
+			<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
+				The difference between those two counts is the saving.
+			</p>
+			<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
+				Nothing is simulated in that arithmetic - the markers, the retrieval calls and the expansions are the
+				ones the transcripts contain - but the expansion depends on a tokenizer, so the result is a band rather
+				than a point.
+			</p>
+
+			<div class="mt-12">
+				<StudyLedger Scale="full" />
+			</div>
+
+			<!-- THE SHAPE OF A SESSION: three recorded shapes, then the simulated one in
+			     its own block. A simulated workload is not a fourth observation. -->
+			<div class="mt-16 border-t border-oxblood-dark pt-8">
+				<div class="section-kicker">THE SHAPE OF A SESSION // FOUR PAYOFFS</div>
+				<h3 id="shape" class="mt-3 max-w-3xl type-sub text-bone-white">Why the same engine reports four numbers</h3>
+				<div class="prose-flow mt-6 max-w-3xl">
+					<p class="type-body text-bone-newsprint">Savings track tool-output volume, not session count.</p>
+					<p class="type-body text-bone-newsprint">
+						A chat-only session has nothing to compress, so it saves {Band("study.band.chat-only").Range}.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						A light developer session saves {Band("study.band.light-developer").Range}.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						A tool-heavy session lands in the {Band("study.band.tool-heavy").Range} band.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						And a simulated pure-tool loop - a diff, an ls, a build and a search on repeat - reaches{" "}
+						{Band("study.band.pure-tool").Range}.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						That last figure is a stress test, not real usage, and the block below labels it as one.
+					</p>
 				</div>
 
-				<ZineTape Variant="section" Label="THE SHAPE OF A SESSION // FOUR PAYOFFS" Color="teal" />
-				<h3
-					id="shape"
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					Why the same engine reports four numbers
-				</h3>
-				<p class="font-body text-base leading-relaxed text-bone-newsprint">
-					Savings track tool-output volume, not session count.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					A chat-only session has nothing to compress, so it saves {Study.Bands[0]!.Range}.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					A light developer session saves {Study.Bands[1]!.Range}.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					A tool-heavy session lands in the {Study.Bands[2]!.Range} band.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					And a simulated pure-tool loop - a diff, an ls, a build and a search on repeat -
-					reaches {Study.Bands[3]!.Range}.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					That last figure is a stress test, not real usage, and the bars above label it as
-					one.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					The {Study.SessionsSaved} row is the other way to read the same data: in{" "}
-					{Study.SessionsSaved.split("/")[0]!.trim()} of the {Study.Sessions} sessions something was saved.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					The two rates beside it answer different questions - {Study.MedianRatio} is the median session's
-					saved ratio, {Study.AvgPerCall} is what an average call did not have to carry - and both are
-					reported because neither alone describes the study.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					The retrieval tax is the cost side of the ledger:
-					<span class="text-stamped-canary" data-count={Study.TaxCalls.replace(/,/g, "")}>{Study.TaxCalls}</span> retrieve calls
-					returned <span class="text-stamped-canary" data-count={Study.TaxTokens.replace(/,/g, "")}>{Study.TaxTokens}</span>
-					tokens, roughly {Study.TaxPct} of what was saved.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					Savings are gross; this row is what the model paid to get its bytes back.
-				</p>
-			</ZineBox>
+				<div class="mt-10">
+					<div class="type-meta font-bold text-zinc-dust">
+						RECORDED SESSION SHAPES &bull; ESTIMATED &bull; PERCENT OF THE SESSION'S CONTEXT BUDGET
+					</div>
+					<div class="mt-6 space-y-6">
+						{
+							RecordedShapes.map(({ Label, Range, Percent, Color }) => (
+								<div>
+									<div class="mb-1 flex flex-wrap justify-between gap-2 text-base font-bold">
+										<span class="text-bone-newsprint">{Label}</span>
+										<span class={BarText[Color]}>{Range}</span>
+									</div>
+									<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+										<div class={`h-full ${BarColor[Color]}`} style={`width: ${Percent}%;`} />
+									</div>
+								</div>
+							))
+						}
+					</div>
+				</div>
+
+				<div class="mt-10 border-l-4 border-raw-blood bg-asphalt-panel p-5">
+					<div class="type-meta font-black text-raw-blood">
+						SIMULATED WORKLOAD // NOT A RECORDED SESSION
+					</div>
+					{
+						SimulatedShapes.map(({ Label, Range, Percent, Note }) => (
+							<div class="mt-4">
+								<div class="mb-1 flex flex-wrap justify-between gap-2 text-base font-bold">
+									<span class="text-bone-newsprint">{Label}</span>
+									<span class="text-raw-blood">{Range}</span>
+								</div>
+								<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
+									<div class="h-full bg-raw-blood" style={`width: ${Percent}%;`} />
+								</div>
+								{Note && <div class="mt-2 max-w-3xl type-caption text-zinc-dust">{Note}</div>}
+							</div>
+						))
+					}
+					<p class="mt-4 max-w-3xl type-caption text-zinc-dust">
+						This range comes from a scripted loop, not from the study's sessions. It is the engine's
+						behaviour on an input nobody's day produced, and it is here to show where the ceiling of the
+						recorded shapes sits - never to be quoted as a session result.
+					</p>
+				</div>
+
+				<div class="prose-flow mt-12 max-w-3xl">
+					<p class="type-body text-bone-newsprint">
+						The {Study.SessionsSaved} row is the other way to read the same data: in{" "}
+						{Study.SessionsSaved.split("/")[0]!.trim()} of the {Study.Sessions} sessions something was saved.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						The two rates beside it answer different questions - {Study.MedianRatio} is the median session's
+						saved ratio, {Study.AvgPerCall} is what an average call did not have to carry - and both are
+						reported because neither alone describes the study.
+					</p>
+					<p class="type-caption text-zinc-dust">
+						The same engine, four payoffs - savings track tool-output volume.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						The retrieval tax is the cost side of the ledger: <span class="text-stamped-canary">{Study.TaxCalls}</span>{" "}
+						retrieve calls returned <span class="text-stamped-canary">{Study.TaxTokens}</span> tokens, roughly{" "}
+						{Study.TaxPct} of what was saved.
+					</p>
+					<p class="type-caption text-zinc-dust">
+						Savings are gross; this row is what the model paid to get its bytes back.
+					</p>
+				</div>
+			</div>
+
 			<ZineSource
 				Lines={[`SRC: ${Cite(Study.From)}.`, `SRC: ${Cite(Benchmark.From)} (the session-shape bands)`]}
 			/>
 		</section>
 
-		<!-- PROVENANCE: where every figure on this page comes from. A page that
-		     can silently keep an old number is a page that cannot be cited, so the
-		     build reads these files on every run and stops when one stops carrying
-		     the figure the page prints. -->
-		<section class="relative w-full">
-			<ZineTape Variant="section" Label="PROVENANCE // WHERE THESE NUMBERS COME FROM" Color="bone" />
-			<ZineBox Size="lg" Rotate="rotate-[0.4deg]">
-				<h2
-					id="provenance"
-					class="mb-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
-				>
-					Nothing on this page is typed
-				</h2>
-				<p class="font-body text-base leading-relaxed text-bone-newsprint">
-					Every figure above is extracted from the repository on the build that produced this
-					page - not copied into a template once and trusted afterwards.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					The generator reads the README and the docs tree, writes the numbers into a
-					generated record, and the page renders that record. A figure the repository stops
-					carrying stops the build; it never survives as a stale plate.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					The table below is the whole chain: the fact, the file it is read from, and the
-					part of this page it feeds.
-				</p>
-				<div class="mt-8">
-					<ZineLedger
-						Headers={["FACT", "READ FROM", "WHAT IT FEEDS"]}
-						Rows={ProvenanceRows}
-					/>
-				</div>
-				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
-					A wrong figure is fixed in the repository and the pin advances - never in the
-					generated record, which the next build overwrites.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					That is what makes the SRC line under each plate an address rather than a
-					formality: the line numbers beside it come from the same pass that produced the
-					number above it.
-				</p>
-			</ZineBox>
-		</section>
-
-		<!-- THE HARNESS: how a reader runs it, and what each example proves -->
+		<!-- ============ 04 // HOW CAN I REPRODUCE THIS ============ -->
 		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="REPRODUCE // BENCH HARNESS" Color="teal" />
-			<ZineBox Size="lg" Rotate="rotate-[1.4deg]">
-				<h2
-					id="reproduce"
-					class="mb-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
-				>
-					Run the numbers yourself
-				</h2>
-				<p class="mb-6 font-body text-base leading-relaxed text-bone-newsprint">
-					The harness is five examples in the aphrodite crate, and each one prints the figure
-					its row above quotes.
-				</p>
-				<p class="mb-6 font-body text-base leading-relaxed text-bone-newsprint">
-					Nothing in the table is a vendor number: a reader with a checkout can re-derive every
-					row on their own machine.
-				</p>
+			<ZineTape Variant="kicker" Label="04 // REPRODUCTION" />
+			<h2 id="reproduce" class="mt-3 max-w-4xl type-section text-bone-white">
+				How can I reproduce this?
+			</h2>
+			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
+				The harness is five examples in the aphrodite crate, and each one prints the figure its row above
+				quotes.
+			</p>
+			<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
+				Nothing in the table is a vendor number: a reader with a checkout can re-derive every row on their own
+				machine.
+			</p>
+			<div class="mt-8">
 				<CodeFence
 					Copy
 					CopyLabel="BASH"
 					Class="border border-oxblood-dark"
+					CopyPayload={`git clone https://github.com/PlayForm/Aphrodite.git && cd Aphrodite
+git submodule update --init --recursive
+cargo run --release -p aphrodite --example bench_01_corpus
+cargo run --release -p aphrodite --example bench_02_threshold
+cargo run --release -p aphrodite --example bench_03_retrieve
+cargo run --release -p aphrodite --example bench_04_ema
+cargo run --release -p aphrodite --example bench_05_type_coverage`}
 					Code={`# requires a source checkout + Rust (see the SETUP page for versions)
 $ git clone https://github.com/PlayForm/Aphrodite.git && cd Aphrodite
 $ git submodule update --init --recursive
@@ -676,56 +945,111 @@ $ cargo run --release -p aphrodite --example bench_03_retrieve
 $ cargo run --release -p aphrodite --example bench_04_ema
 $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 				/>
-				<p class="mt-4 font-mono text-base text-zinc-dust">SRC: {Cite(Benchmark.From)}</p>
+			</div>
+			<p class="mt-4 type-meta text-zinc-dust">SRC: {Cite(Benchmark.From)}</p>
 
-				<ZineTape Variant="section" Label="FIVE EXAMPLES // WHAT EACH ONE PROVES" Color="canary" />
-				<h3
-					id="examples"
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					What a run actually does
-				</h3>
-				<p class="mb-6 font-body text-base leading-relaxed text-bone-newsprint">
-					Each example starts its own proxies, drives them over HTTP, and exits non-zero the
-					moment a promise breaks - so a green run is a verdict, not a printout.
+			<div class="mt-16 border-t border-oxblood-dark pt-8">
+				<div class="section-kicker">FIVE EXAMPLES // WHAT EACH ONE PROVES</div>
+				<h3 id="examples" class="mt-3 max-w-3xl type-sub text-bone-white">What a run actually does</h3>
+				<p class="mt-4 max-w-3xl type-body text-bone-newsprint">
+					Each example starts its own proxies, drives them over HTTP, and exits non-zero the moment a promise
+					breaks - so a green run is a verdict, not a printout.
 				</p>
-				<div class="space-y-3">
+				<div class="mt-6 space-y-3">
 					{Harness.map(({ Tag, Label, Body }) => <ZineFold Tag={Tag} Label={Label} Body={Body} />)}
 				</div>
+			</div>
 
-				<ZineTape Variant="section" Label="WHAT A RUN NEEDS // PRECONDITIONS" />
-				<h3
-					id="needs"
-					class="mb-8 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-				>
-					Before the first command
-				</h3>
-				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+			<div class="mt-16 border-t border-oxblood-dark pt-8">
+				<div class="section-kicker">WHAT A RUN NEEDS // PRECONDITIONS</div>
+				<h3 id="needs" class="mt-3 max-w-3xl type-sub text-bone-white">Before the first command</h3>
+				<div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
 					{
 						Needs.map(({ Label, Text }) => (
 							<div class="border-l-4 border-blood-crimson bg-asphalt-panel p-4">
-								<div class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-									{Label}
-								</div>
-								<p class="mt-2 font-body text-base leading-relaxed text-bone-newsprint">
-									{Text}
-								</p>
+								<div class="type-meta font-black text-stamped-canary">{Label}</div>
+								<p class="mt-2 type-body text-bone-newsprint">{Text}</p>
 							</div>
 						))
 					}
 				</div>
-				<p class="mt-8 font-body text-base leading-relaxed text-zinc-dust">
-					The versions the site builds against are on
-					<a
-						class="text-weathered-teal underline transition-colors hover:text-bone-white"
-						href="/setup/">SETUP</a
-					>, and the crate layout that holds the examples is on
-					<a
-						class="text-weathered-teal underline transition-colors hover:text-bone-white"
-						href="/crates/">CRATES</a
-					>.
+				<p class="mt-8 max-w-3xl type-caption text-zinc-dust">
+					The versions the site builds against are on{" "}
+					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={Routes.Setup}>SETUP</a>,
+					and the crate layout that holds the examples is on{" "}
+					<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={Routes.Crates}>CRATES</a>.
 				</p>
-			</ZineBox>
+			</div>
+
+			<!-- PROVENANCE: where every figure on this page comes from. A page that can
+			     silently keep an old number is a page that cannot be cited, so the build
+			     reads these files on every run and stops when one stops carrying the
+			     figure the page prints. -->
+			<div id="provenance" class="mt-16 border-t border-oxblood-dark pt-8">
+				<div class="section-kicker">PROVENANCE // WHERE THESE NUMBERS COME FROM</div>
+				<h3 class="mt-3 max-w-3xl type-sub text-bone-white">
+					Extracted from a pinned revision
+				</h3>
+				<div class="prose-flow mt-6 max-w-3xl">
+					<p class="type-body text-bone-newsprint">
+						Nothing is typed by hand: every figure is extracted from the repository on the build
+						that produces the site - not copied into a template once and trusted afterwards.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						The generator reads the README and the docs tree, writes the numbers into a generated record,
+						and the page renders that record. A figure the repository stops carrying stops the build; it
+						never survives as a stale plate.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						The revision for this build is {SourceRevision.Branch} at {SourceRevision.Short} (
+						{SourceRevision.Commit}). That is the pin the generator read, so "generated" here means
+						generated from an address a reader can check out - not merely that no one retyped the number.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						The table below is the whole chain: the fact, the file it is read from, and the part of this
+						page it feeds.
+					</p>
+				</div>
+				<div class="mt-8">
+					<ZineLedger Headers={["FACT", "READ FROM", "WHAT IT FEEDS"]} Rows={ProvenanceRows} />
+				</div>
+
+				<!-- THE REGISTER: every figure, with its ID, its kind, its unit, its scope
+				     and its method. This is the page's evidence record made readable: a
+				     reader can refuse to trust any single line on stated grounds. -->
+				<div class="mt-12">
+					<div class="section-kicker">THE FIGURE REGISTER // ONE ROW PER FIGURE</div>
+					<p class="mt-4 max-w-3xl type-body text-bone-newsprint">
+						Every figure on this page is a record with a stable ID. The kind says how it came to exist -{" "}
+						<strong class="text-bone-white">measured</strong> is arithmetic on a fixed corpus,{" "}
+						<strong class="text-bone-white">estimated</strong> is a reconstruction that depends on a
+						tokenizer, <strong class="text-bone-white">simulated</strong> is a workload that never happened,
+						and <strong class="text-bone-white">derived</strong> is a quotient of two other records.
+					</p>
+					<p class="mt-3 max-w-3xl type-caption text-zinc-dust">
+						The page joins each record by ID, never by position, so a label cannot drift onto a
+						neighbouring figure's value. A missing record stops the build and names the ID.
+					</p>
+					<div class="mt-6">
+						<ZineLedger
+							Headers={["FIGURE", "KIND", "VALUE", "UNIT", "SCOPE", "METHOD"]}
+							Rows={RegisterRows}
+						/>
+					</div>
+				</div>
+
+				<div class="prose-flow mt-12 max-w-3xl">
+					<p class="type-caption text-zinc-dust">
+						A wrong figure is fixed in the repository and the pin advances - never in the generated record,
+						which the next build overwrites.
+					</p>
+					<p class="type-caption text-zinc-dust">
+						That is what makes the SRC line under each plate an address rather than a formality: the line
+						numbers beside it come from the same pass that produced the number above it.
+					</p>
+				</div>
+			</div>
+
 			<ZineSource
 				Lines={[
 					`SRC: ${Cite(Benchmark.From)}`,
@@ -735,55 +1059,87 @@ $ cargo run --release -p aphrodite --example bench_05_type_coverage`}
 			/>
 		</section>
 
-		<!-- THE LIMITS: what these numbers are not -->
+		<!-- ============ 05 // LIMITATIONS ============ -->
 		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="section" Label="LIMITS // WHAT THE NUMBERS ARE NOT" />
-			<ZineBox Size="lg" Rotate="-rotate-[0.9deg]">
-				<h2
-					id="limits"
-					class="mb-8 font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl"
-				>
-					Where the figures stop
-				</h2>
-				<div class="space-y-5">
-					<ZineLesson
-						Label="NOT A TYPICAL CASE"
-						Color="raw"
-						Text={`${Benchmark.Ceiling} is the ceiling on one long low-entropy document. The per-type chart peaks at ${Peak.Ratio}, and the median the same table reports is ${Benchmark.Median} - quote the ceiling only with the corpus attached.`}
-					/>
-					<ZineLesson
-						Label="NOT A SINGLE PERCENTAGE"
-						Color="canary"
-						Text={`The session saving is a band, not a point: ${Study.Band} across a ${Study.CharsPerTok} chars/token sensitivity range, centered ${Study.BandCenter}. Any single number inside that band is a reading of the same data, not a better measurement.`}
-					/>
-					<ZineLesson
-						Label="NOT REAL USAGE"
-						Color="teal"
-						Text={`The ${Study.Bands[3]!.Range} pure-tool figure comes from a simulated diff+ls+build+search loop. It is a stress test of the engine, and the real sessions it sits beside saved ${Study.Bands[2]!.Range} when they were tool-heavy.`}
-					/>
-					<ZineLesson
-						Label="NOT NET OF RETRIEVAL"
-						Color="canary"
-						Text={`Savings are counted before retrieval. The study's own tax row - ${Study.TaxCalls} calls, ${Study.TaxTokens} tokens - is what the model spent getting bytes back, roughly ${Study.TaxPct} of the tokens saved.`}
-					/>
+			<ZineTape Variant="kicker" Label="05 // LIMITATIONS // WHAT THE NUMBERS ARE NOT" />
+			<h2 id="limits" class="mt-3 max-w-4xl type-section text-bone-white">Where the figures stop</h2>
+
+			<!-- WHAT IS MEASURED AND WHAT IS ESTIMATED: the page's two halves, stated
+			     before the individual limits so a reader knows which half each one
+			     applies to. -->
+			<div id="confidence" class="mt-10">
+				<div class="section-kicker">TWO HALVES // TWO CONFIDENCE LEVELS</div>
+				<h3 class="mt-3 max-w-3xl type-sub text-bone-white">What is measured and what is estimated</h3>
+				<div class="prose-flow mt-6 max-w-3xl">
+					<p class="type-body text-bone-newsprint">
+						The page has two halves and they do not carry the same confidence.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						Everything in the plates and the per-type chart is measured: a fixed payload goes in, a marker
+						comes out, and the quotient is arithmetic.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						The session study is an estimate by construction: it reconstructs what each API call would have
+						carried with every marker expanded, so its figure depends on the tokenizer used to count that
+						reconstruction.
+					</p>
+					<p class="type-body text-bone-newsprint">
+						That is why it ships as a band with a stated sensitivity range rather than as a single
+						percentage.
+					</p>
+					<p class="type-body text-bone-newsprint">Neither half is a vendor number.</p>
+					<p class="type-caption text-zinc-dust">
+						A reader with a checkout can re-derive the measured half exactly and the estimated half to within
+						its band - the harness section above is the first half of that sentence, and{" "}
+						<a class="text-weathered-teal underline transition-colors hover:text-bone-white" href={Routes.CaseStudy}>the case study</a>{" "}
+						is where the second half is argued.
+					</p>
 				</div>
-				<p class="mt-10 border-t border-oxblood-dark pt-8 font-body text-base leading-relaxed text-bone-newsprint">
-					None of this weakens the claim the page makes.
+			</div>
+
+			<div class="mt-12 space-y-5">
+				<ZineLesson
+					Label="NOT A TYPICAL CASE"
+					Color="raw"
+					Text={`${Benchmark.Ceiling} is the ceiling on one long low-entropy document. The per-type chart peaks at ${Peak.Ratio}, and the median the same table reports is ${Benchmark.Median} - quote the ceiling only with the corpus attached.`}
+				/>
+				<ZineLesson
+					Label="NOT A SINGLE PERCENTAGE"
+					Color="canary"
+					Text={`The session saving is a band, not a point: ${Study.Band} across a ${Study.CharsPerTok} chars/token sensitivity range, centered ${Study.BandCenter}. Any single number inside that band is a reading of the same data, not a better measurement.`}
+				/>
+				<ZineLesson
+					Label="NOT REAL USAGE"
+					Color="teal"
+					Text={`The ${Band("study.band.pure-tool").Range} pure-tool figure comes from a simulated diff+ls+build+search loop. It is a stress test of the engine, and the real sessions it sits beside saved ${Band("study.band.tool-heavy").Range} when they were tool-heavy.`}
+				/>
+				<ZineLesson
+					Label="NOT NET OF RETRIEVAL"
+					Color="canary"
+					Text={`Savings are counted before retrieval. The study's own tax row - ${Study.TaxCalls} calls, ${Study.TaxTokens} tokens - is what the model spent getting bytes back, roughly ${Study.TaxPct} of the tokens saved.`}
+				/>
+				<ZineLesson
+					Label="NOT A CONTROLLED COMPARISON"
+					Color="raw"
+					Text={`The session study is an author-run reconstruction of one person's sessions, not a randomised comparison against a control. It establishes neither better task success nor universal cost savings: it measures how much context the markers replaced, and nothing else.`}
+				/>
+			</div>
+
+			<div class="prose-flow mt-12 border-t border-oxblood-dark pt-8 max-w-3xl">
+				<p class="type-body text-bone-newsprint">None of this weakens the claim the page makes.</p>
+				<p class="type-body text-bone-newsprint">
+					A compression proxy earns its place on the ordinary turn - a diff, a build log, a terminal dump -
+					where the ratio is {Floor.Ratio} to {RunnerUp.Ratio} and the model keeps working from the preview.
 				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
-					A compression proxy earns its place on the ordinary turn - a diff, a build log, a
-					terminal dump - where the ratio is {Floor.Ratio} to {RunnerUp.Ratio} and the model keeps working from
-					the preview.
-				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-bone-newsprint">
+				<p class="type-body text-bone-newsprint">
 					The ceiling is what the engine can do; the median is what a session gets.
 				</p>
-				<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-					If a number here disagrees with your own run, the harness is the arbiter: the
-					examples ship with the crate, and the SRC lines above name the README section each
-					figure is copied from.
+				<p class="type-caption text-zinc-dust">
+					If a number here disagrees with your own run, the harness is the arbiter: the examples ship with the
+					crate, and the SRC lines above name the README section each figure is copied from.
 				</p>
-			</ZineBox>
+			</div>
+
 			<ZineSource
 				Lines={[
 					`SRC: ${Cite(Benchmark.From)}`,

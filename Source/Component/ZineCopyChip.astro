@@ -6,11 +6,19 @@ interface Props {
 	/** The payload handed to the clipboard; unset copies the Label. */
 	Copy?: string;
 
+	/**
+	 * The accessible name. A chip that copies a command needs to say WHICH
+	 * command: the default reads `Copy <Label> to the clipboard`, which is
+	 * useless when the visible label is the word `COPY` and the payload is a
+	 * shell line nobody can see from the control.
+	 */
+	Aria?: string;
+
 	/** Chip color: teal (default), canary, raw, bone. */
 	Color?: "teal" | "canary" | "raw" | "bone";
 }
 
-const { Label, Copy, Color = "teal" } = Astro.props;
+const { Label, Copy, Aria, Color = "teal" } = Astro.props;
 
 const Palette = {
 	teal: "text-weathered-teal hover:bg-weathered-teal",
@@ -31,7 +39,7 @@ const HoverText = {
 	class={`group inline-flex items-center gap-1.5 border border-oxblood-dark bg-soot-black px-2 py-1 font-mono text-base font-bold transition-colors ${Palette} ${HoverText}`}
 	data-copy={Copy ?? Label}
 	type="button"
-	aria-label={`Copy ${Label} to the clipboard`}
+	aria-label={Aria ?? `Copy ${Label} to the clipboard`}
 >
 	<span class="opacity-60 group-hover:opacity-100">{Label}</span>
 	<span aria-hidden="true" class="text-base opacity-40 group-hover:opacity-90">⧉</span>

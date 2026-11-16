@@ -194,9 +194,22 @@ interface Props {
 	/** Landmark name. The desktop rail and the mobile drawer render this
 	    component twice, so the two must not share one label. */
 	Label?: string;
+
+	/** The editorial reading order: section names in the order a reader should
+	    meet them. The page owns this sequence (it also ranks prev/next and the
+	    next steps), so the rail takes it as a prop instead of deriving a
+	    second, alphabetical one. A section the order does not name keeps
+	    alphabetical position after the named ones, and the destinations always
+	    come from the collection - the order never adds or removes a page. */
+	Order?: readonly string[];
 }
 
-const { Sections: Registry, CurrentId, Label = "Documentation sections" } = Astro.props;
+const {
+	Sections: Registry,
+	CurrentId,
+	Label = "Documentation sections",
+	Order = [],
+} = Astro.props;
 
 // "/docs/ccr/backends/sqlite/" -> "ccr/backends/sqlite"; "/docs/" -> "index".
 const IdFromUrl = () => {
@@ -207,7 +220,25 @@ const IdFromUrl = () => {
 
 const Current = CurrentId ?? IdFromUrl();
 
-const Sections = await DocsTree();
+const Tree = await DocsTree();
+
+// Editorial order first, alphabetical within each rank. `indexOf` returning -1
+// would sort an unnamed section ahead of every named one, so it is mapped to
+// the end of the list instead. With no order handed in, the tree keeps its own
+// (Overview first, then alphabetical) - this component never invents a
+// sequence of its own.
+const RankOf = (Name: string) => {
+	const Position = Order.indexOf(Name);
+
+	return Position === -1 ? Order.length : Position;
+};
+
+const Sections =
+	Order.length === 0
+		? Tree
+		: [...Tree].sort(
+				(A, B) => RankOf(A.Name) - RankOf(B.Name) || A.Name.localeCompare(B.Name),
+			);
 
 const WipIds = new Set(
 	(Registry ?? []).flatMap(({ Entries }) =>
@@ -222,22 +253,20 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
 	);
 ---
 
-<nav aria-label={Label}>
-	<div class="relative">
-	<!-- The tape stamp lives OUTSIDE the scroll container: overflow-y-auto
-	     clips absolutely-positioned children that cross its top edge, and
-	     z-index cannot undo a clip. The scroll applies to the entry box only. -->
-	<span
-		class="absolute -top-3.5 left-4 z-20 -rotate-1 border border-black bg-raw-blood px-3 py-0.5 text-base font-black uppercase tracking-widest text-bone-white shadow-[2px_2px_0px_#000]"
-	>
-		DOC INDEX
-	</span>
+{/* The index is a QUIET surface. It carries one hairline boundary, sentence-
+    case group labels, a neutral count and one restrained active marker; the
+    expressive budget on a docs page belongs to the page itself, and a rail
+    wearing a tape, a 4px crimson frame and an offset shadow competed with the
+    article it was meant to serve. The words are unchanged - "DOC INDEX" moved
+    from a tape stamp to the eyebrow above the index. */}
+<nav aria-label={Label} class="docs-index">
+	<p class="type-meta uppercase tracking-widest text-zinc-dust">Doc index</p>
 	<div
-		class="relative z-10 max-h-[calc(100vh-9rem)] overflow-y-auto border-4 border-blood-crimson bg-carbon-void p-5 zine-box-subtle"
+		class="mt-2 max-h-[calc(100vh-9rem)] overflow-y-auto border border-oxblood-dark bg-carbon-void p-5"
 	>
 		{/* The in-page outline is the docs route's own (pages/docs/[...slug].astro):
 		    the rail names where a reader can go, not where they are inside a page. */}
-		<div class="flex flex-col gap-2">
+		<div class="flex flex-col gap-3">
 			{
 				Sections.map((Section) => {
 					const IsCurrent = HoldsCurrent(Section);
@@ -249,10 +278,10 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
 							data-docs-section={Section.Name}
 							data-current-section={IsCurrent ? "1" : undefined}
 						>
-							<summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base font-black uppercase tracking-widest transition-colors [&::-webkit-details-marker]:hidden">
+							<summary class="flex cursor-pointer list-none items-center gap-2 font-mono text-base tracking-normal transition-colors [&::-webkit-details-marker]:hidden">
 								<span
 									class={`inline-block h-3 w-1 shrink-0 ${
-										IsCurrent ? "bg-stamped-canary" : "bg-blood-crimson"
+										IsCurrent ? "bg-stamped-canary" : "bg-oxblood-dark"
 									}`}
 									aria-hidden="true"
 								/>
@@ -260,22 +289,16 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
 									class={`min-w-0 flex-1 ${
 										IsCurrent
 											? "text-bone-white"
-											: "text-zinc-dust group-hover:text-bone-white"
+											: "text-bone-newsprint group-hover:text-bone-white"
 									}`}
 								>
 									{Section.Name}
 								</span>
-								<span
-									class={`font-mono text-[13px] font-normal tracking-normal ${
-										IsCurrent ? "text-stamped-canary" : "text-oxblood-dark"
-									}`}
-								>
+								<span class="font-mono text-[13px] tracking-normal text-zinc-dust">
 									{Section.Count}
 								</span>
 								<span
-									class={`inline-block font-mono text-[13px] transition-transform group-open:rotate-90 ${
-										IsCurrent ? "text-stamped-canary" : "text-oxblood-dark"
-									}`}
+									class="inline-block font-mono text-[13px] text-zinc-dust transition-transform group-open:rotate-90"
 									aria-hidden="true"
 								>
 									▸
@@ -289,13 +312,13 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
 											aria-current={Page.Id === Current ? "page" : undefined}
 											class={`block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors ${
 												Page.Id === Current
-													? "bg-raw-blood pl-2 text-bone-white"
+													? "pl-2 text-bone-white"
 													: "pl-2 text-zinc-dust hover:text-bone-white"
 											}`}
 										>
 											{Page.Id === Current && (
 												<span
-													class="mr-1.5 inline-block h-2 w-2 bg-stamped-canary align-middle"
+													class="mr-1.5 inline-block h-3.5 w-0.5 bg-stamped-canary align-middle"
 													aria-hidden="true"
 												/>
 											)}
@@ -320,13 +343,13 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
 															}
 															class={`block py-0.5 pr-2 font-mono text-base leading-relaxed transition-colors ${
 																Child.Id === Current
-																	? "bg-raw-blood pl-2 text-bone-white"
+																	? "pl-2 text-bone-white"
 																	: "pl-2 text-zinc-dust hover:text-bone-white"
 															}`}
 														>
 															{Child.Id === Current && (
 																<span
-																	class="mr-1.5 inline-block h-2 w-2 bg-stamped-canary align-middle"
+																	class="mr-1.5 inline-block h-3.5 w-0.5 bg-stamped-canary align-middle"
 																	aria-hidden="true"
 																/>
 															)}
@@ -353,7 +376,4 @@ const HoldsCurrent = ({ Pages }: DocsSection) =>
 			}
 		</div>
 	</div>
-	</div>
 </nav>
-
-

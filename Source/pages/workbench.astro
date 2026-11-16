@@ -11,6 +11,8 @@ import ZineSource from "@Component/ZineSource.astro";
 import DualListener from "../Content/Mermaid/dual-listener.svg?raw";
 import ConfigResolution from "../Content/Mermaid/config-resolution.svg?raw";
 
+import { DocsRoute, Routes } from "@Library/Links";
+
 // The pipeline's home. The four steps themselves - the classifier, the preview
 // shapes, the digest, the decision - live in Script/Pipeline.ts and render
 // through Component/ZinePipeline.astro, so this page keeps only its own
@@ -20,18 +22,26 @@ import ConfigResolution from "../Content/Mermaid/config-resolution.svg?raw";
 
 // The page's own section list - SectionNav's only input, which is what keeps
 // the index truthful: a link can never name a section this page does not render.
+//
+// BOUNDARY comes first on purpose. The page used to open with "The pipeline,
+// live" and put the simulation boundary at the bottom, after hashes, byte
+// counts and storage states had already established realism - a reader had
+// every reason to believe the numbers before being told what they were. The
+// instrument states what it is first, then demonstrates.
 const Sections = [
+	{ Id: "boundary", Label: "BOUNDARY" },
 	{ Id: "pipeline", Label: "PIPELINE" },
 	{ Id: "knobs", Label: "KNOBS" },
 	{ Id: "states", Label: "STATES" },
 	{ Id: "topology", Label: "TOPOLOGY" },
 	{ Id: "arc", Label: "THE ARC" },
-	{ Id: "boundary", Label: "BOUNDARY" },
 ];
 
-// The four proxy thresholds and the engine knob. The Defaults are the shipped
-// [compression] values from crates/aphrodite/templates/aphrodite.toml - a
-// slider that shows anything else is drift, because the engine reads the toml.
+// The four proxy thresholds. The Defaults are the shipped [compression] values
+// from crates/aphrodite/templates/aphrodite.toml - a slider that shows anything
+// else is drift, because the engine reads the toml. These four are the ones the
+// running engine swaps as atomics, which is why they are the ones a reader can
+// turn here.
 const Knobs = [
 	{
 		Key: "tool_threshold_token",
@@ -73,24 +83,36 @@ const Knobs = [
 		Note: "threshold multiplier for code_* types",
 		Line: "Code types multiplied the token limit by this factor, and the effect the config doc names is that code stayed inline while prose of the same size was compressed (docs/config/aphrodite-toml.md:159).",
 	},
-	{
-		Key: "engine_threshold_pct",
-		Min: 0,
-		Max: 100,
-		Step: 5,
-		Default: 30,
-		Unit: "%",
-		Note: "100+ = engine-off escape hatch",
-		Line: "The context engine's fill percentage: middle turns were archived to CCR once the session passed it, 0 meant never, and 100+ switched the engine off (README.md:580).",
-	},
 ] as const;
 
-// The three states the decision readout can name, restored verbatim from this
-// page's own baseline (820fae84) because they are the vocabulary the rest of
-// the site uses. Each record carries the label the readout prints, the
-// condition that produced it, what the agent ends up holding, and the line
-// that explains it - a label with no explanation is a state a reader cannot
-// act on.
+// The engine knob is a COMPACTION control, and compaction is not modelled on
+// this page: the simulator holds one blob and no session, so there are no
+// middle turns to archive. It is documented here rather than rendered as a
+// slider, because a slider that changed nothing would be the same class of
+// dishonesty as a fabricated timing - and because wiring it into the
+// compression readout is exactly what made the old page contradict itself
+// ("compressed" in the verdict, "engine OFF, raw passes through" beside it).
+const Compaction = {
+	Key: "engine_threshold_pct",
+	Default: 30,
+	Unit: "%",
+	Note: "100+ = engine-off escape hatch",
+	Line: "The context engine's fill percentage: middle turns were archived to CCR once the session passed it, 0 meant never, and 100+ switched the engine off (README.md:580).",
+	Why: "It is a compaction knob, not a compression one. The four proxy thresholds keep working whatever it is set to, which is why the engine standing down never turned the pipeline off - the two dimensions are separate, and only one of them is measurable without a session.",
+} as const;
+
+// The three states the site names, restored from this page's own baseline
+// (820fae84) because they are the vocabulary the rest of the site uses. Each
+// record carries the label the readout prints, the condition that produced it,
+// what the agent ends up holding, and the line that explains it - a label with
+// no explanation is a state a reader cannot act on.
+//
+// The first two are COMPRESSION states and the readout above prints them. The
+// third is a COMPACTION state: it describes the context engine standing down,
+// which is a different dimension from the proxy thresholds and is not modelled
+// by this page's simulator. It stays here because a reader who meets
+// engine_threshold_pct anywhere else needs the vocabulary, and its note says
+// exactly which dimension it belongs to.
 const States = [
 	{
 		Label: "below threshold, kept inline",
@@ -111,12 +133,13 @@ const States = [
 		],
 	},
 	{
-		Label: "engine OFF - the 100+ escape hatch, raw passes through",
+		Label: "engine OFF - the 100+ escape hatch, nothing archived mid-session",
 		When: "engine_threshold_pct >= 100",
-		Holds: "the raw bytes, unmarked",
+		Holds: "the raw turn, un-archived by the engine - the proxy thresholds still compress tool output",
 		Note: [
 			"Past 100 the context engine stood down: no middle turn was archived mid-session and nothing was marked by it.",
 			"The four proxy thresholds kept working on their own, so tool output was still compressed - the knob switches off one engine, not the pipeline.",
+			"This is a compaction state, not a compression one, which is why the readout never prints it: the two dimensions answer different questions, and conflating them is a contradiction.",
 		],
 	},
 ] as const;
@@ -197,7 +220,7 @@ const Arc: readonly {
 
 <Base
 	Title="Workbench - Aphrodite"
-	Description="The interactive preview workbench: paste any tool output and watch the Aphrodite preview line, the CCR marker and the threshold knobs work - live, client-side."
+	Description="A browser simulation of the Aphrodite preview workbench: paste any tool output and watch the preview line, the illustrative marker and the threshold knobs behave - client-side, illustrative, with no engine benchmark and no server-side retrieval."
 >
 	<PageShell Rhythm="dense" Grow>
 		<!-- THE HEAD: the h1 opens the page, not the sample switchboard.
@@ -215,21 +238,97 @@ const Arc: readonly {
 					The pipeline, live
 				</h1>
 				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Paste any tool output - a build log, a test run, a grep result - and this page runs
-					Aphrodite's four steps over it: the enriched preview line the agent would read, the
-					marker the store would hold, and the decision the agent would make.
+					A tool call's output is appended to the model's context, and the model reads every
+					line of it. Aphrodite runs four steps over that output before it arrives: the
+					enriched preview line the agent would read, the
+					marker the store would hold, and the mechanical outcome the pipeline reaches -
+					pass-through, or preview plus marker. Any tool output can be put through those
+					steps: a build log, a test run, a grep result.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The four live-reloadable thresholds and the engine knob are yours to turn.
+					The four live-reloadable compression thresholds are yours to turn. The engine's
+					compaction knob is documented further down rather than wired in, because the path
+					modelled is the tool-output path and nothing else.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Nothing below is a screenshot of the deck: the sliders move the real decision, and
-					every figure the page prints is recomputed as you turn them.
+					The thresholds the sliders move are the shipped ones, and
+					every figure is measured from the bytes of the input and recomputed
+					as they turn - so no number can disagree with the payload it describes.
 				</p>
 			</header>
 		</div>
 
 		<SectionNav Sections={Sections} />
+
+		<!-- THE INSTRUMENT LABEL + THE BOUNDARY, before the first interaction.
+		     The label is persistent and quiet - it is a caption on an
+		     instrument, not a warning - and the full boundary text sits one
+		     click away beside the controls it governs. Both used to live at the
+		     bottom of the page, under the hashes and the byte counts, which is
+		     the one order a reader should never be given. -->
+		<div data-reveal>
+			<section
+				id="boundary"
+				aria-label="What this simulates"
+				class="border-l-4 border-l-weathered-teal bg-asphalt-panel p-6"
+			>
+				<ZineKicker Tone="teal">SIMULATION BOUNDARY</ZineKicker>
+				<p class="wb-instrument">
+					Browser simulation · illustrative digest · no engine benchmark · no
+					server-side retrieval
+				</p>
+				<details class="wb-details mt-6">
+					<summary class="wb-details-summary">What this simulates</summary>
+					<div class="prose-flow mt-6 max-w-3xl">
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Real:
+						</p>
+						<ul class="space-y-1 font-body text-base leading-relaxed text-bone-newsprint">
+							<li class="border-l-2 border-oxblood-dark pl-3">
+								the classifier rules (README.md:153-176)
+							</li>
+							<li class="border-l-2 border-oxblood-dark pl-3">
+								the preview line shapes (README.md:108-133)
+							</li>
+							<li class="border-l-2 border-oxblood-dark pl-3">
+								the threshold semantics and defaults (README.md:395-420).
+							</li>
+						</ul>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Simulated:
+						</p>
+						<ul class="space-y-1 font-body text-base leading-relaxed text-bone-newsprint">
+							<li class="border-l-2 border-oxblood-dark pl-3">
+								the BLAKE3 digest (a deterministic stand-in hash - the real 40-char
+								digest needs the Rust store, and no engine can resolve the marker it
+								prints)
+							</li>
+							<li class="border-l-2 border-oxblood-dark pl-3">
+								and aphrodite_retrieve (shown as the decision text, never executed).
+							</li>
+						</ul>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							No timing is simulated at all: the 40-123 ns classify figure is the
+							engine's own historical measurement, printed on the rail and arc
+							exactly as the README and the CHANGELOG carry it, and /benchmarks/
+							prints it with its environment and its reproduce command.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							No network and no runtime: the whole pipeline runs in the browser.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							Not depicted: the context engine's auto-compaction pass and the injection
+							assembler's directive budget - only the tool-output path is modelled.
+						</p>
+						<p class="font-body text-base leading-relaxed text-bone-newsprint">
+							The full registry is larger - the 30-type content catalog lives in
+							docs/classification/content-types.md:118-151; only the README
+							tier is modelled.
+						</p>
+					</div>
+				</details>
+			</section>
+		</div>
 
 		<!-- THE FOUR STEPS: the rail, the pair, the readout. The component owns its
 		     own <section>, so the anchor the index links to is this wrapper.
@@ -277,7 +376,11 @@ const Arc: readonly {
 				<span class="motion-wipe" data-wipe aria-hidden="true" />
 				<div class="flex flex-wrap items-center justify-between gap-6">
 					<h2><ZineKicker Tone="white">THRESHOLD KNOBS</ZineKicker></h2>
-					<button type="button" class="wb-pill" data-action="reload">POST /RELOAD</button>
+					<!-- Named for what it does. The old label was "POST /RELOAD",
+					     which named an HTTP endpoint this button never calls. -->
+					<button type="button" class="wb-pill" data-action="reset-defaults">
+						Reset defaults
+					</button>
 				</div>
 				<p class="mt-6 font-mono text-base leading-relaxed text-zinc-dust">
 					aphrodite.toml [compression] - the four proxy thresholds are live-reloadable; edit +
@@ -290,6 +393,17 @@ const Arc: readonly {
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The engine knob is an escape hatch rather than a dial - past 100 the context engine
 					stands down and the four proxy thresholds keep working alone.
+				</p>
+				<!-- The reference line the button needs: it restores this page's
+				     sliders, and the real reload behaviour lives in the config docs. -->
+				<p class="wb-ref mt-4">
+					Reset defaults restores the four sliders to the shipped [compression]
+					values and changes nothing else. It is not an HTTP reload: the engine's own
+					<code class="type-code text-stamped-canary">POST /reload</code> re-applies
+					aphrodite.toml to a running binary, and its behaviour is documented in
+					<a class="wb-ref-link" href={DocsRoute("config/aphrodite-toml")}>the aphrodite.toml
+						configuration reference</a>
+					and in <a class="wb-ref-link" href={Routes.Config}>/config/</a>.
 				</p>
 				<div class="mt-12 grid gap-16 md:grid-cols-2" data-enter="180">
 					{
@@ -331,20 +445,58 @@ const Arc: readonly {
 						))
 					}
 				</div>
+				<!-- THE ENGINE KNOB, DOCUMENTED RATHER THAN RENDERED. It governs the
+				     context engine's compaction pass, which this page does not model:
+				     one blob, no session, so there are no middle turns to archive. The
+				     control is not a slider here because a slider that changed nothing
+				     would be the same dishonesty as a fabricated timing - and wiring it
+				     into the compression readout is what made the old page say
+				     "compressed" and "raw passes through" about the same sample. -->
+				<div class="mt-16 border-2 border-oxblood-dark bg-soot-black p-6" data-enter="240">
+					<div class="flex flex-wrap items-baseline justify-between gap-4">
+						<p class="font-mono text-base font-bold text-bone-newsprint">{Compaction.Key}</p>
+						<p class="font-mono text-base font-black text-zinc-dust">
+							{Compaction.Default}{Compaction.Unit}
+						</p>
+					</div>
+					<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
+						{Compaction.Note} · compaction, not compression · not modelled on this page
+					</p>
+					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+						{Compaction.Line}
+					</p>
+					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+						{Compaction.Why}
+					</p>
+					<p class="wb-ref mt-4">
+						Compaction is documented with the rest of the configuration surface in
+						<a class="wb-ref-link" href={DocsRoute("config/aphrodite-toml")}>the aphrodite.toml
+							configuration reference</a>
+						and exercised on <a class="wb-ref-link" href={Routes.Config}>/config/</a>.
+					</p>
+				</div>
+
 				<!-- The verdict strip: what the current knob set would do. -->
 				<div class="mt-16 border-2 border-raw-blood bg-soot-black p-4" data-enter="300">
-					<ZineKicker Tone="canary">COMPRESSION DECISION</ZineKicker>
+					<ZineKicker Tone="canary">COMPRESSION, CACHE AND STORAGE</ZineKicker>
 					<p class="mt-4 font-mono text-base text-bone-newsprint" data-verdict>
 						turn the knobs, then RUN PIPELINE
 					</p>
 					<p class="mt-4 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-						The strip reports the decision for the sample loaded in the rail above: the token
-						mode, whether the store was inline or durable, and the ratio that produced it.
+						The strip reports what the current knob set does to the sample loaded in the rail
+						above: the compression mode, the cache lane's own answer, and whether the store
+						routed the blob inline or durably. Three dimensions, printed side by side so one
+						can never be read as another.
 					</p>
 					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 						Move a slider and the strip changes without a reload, because the four thresholds
 						are atomics the running engine swaps - the same sample is inline under a 4 KB
 						limit and stored under a 256 B one.
+					</p>
+					<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+						The byte reduction those decisions produce is printed in the pipeline's own
+						readout above, where it is measured against the bytes actually in the pane - not
+						here, where nothing is measured and only the routing is reported.
 					</p>
 				</div>
 			</section>
@@ -359,13 +511,21 @@ const Arc: readonly {
 				<span class="motion-wipe" data-wipe aria-hidden="true" />
 				<ZineKicker Tone="teal">THRESHOLD STATES</ZineKicker>
 				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Every run ends in one of three states, and the readout names it: the name is the
-					whole contract, because it says in one line whether the bytes stayed, whether a
-					marker was minted, and whether the engine was in the loop at all.
+					Every run ends in one of three states, and a state is the whole contract: the name
+					says in one line whether the bytes stayed, whether a marker was minted, and whether
+					the engine was in the loop at all.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The first two are decided by the token threshold alone; the third overrides both,
-					which is why the engine knob sits at the end of the slider row.
+					The first two are compression states, and the readout in the pipeline above names
+					them. The third is a compaction state: the token threshold alone decides the first
+					two, while the third is the context engine standing down - which is why that knob is
+					documented beside the thresholds rather than wired into the readout, and why the
+					readout can never print it.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					None of the three is a judgement about the agent's question. Whether a preview
+					answers it is the agent's decision, taken with a task in hand; this page has no task
+					to give it, so it reports the state and leaves the judgement where it belongs.
 				</p>
 				<div class="mt-12 grid gap-8 lg:grid-cols-3" data-enter="180">
 					{
@@ -388,9 +548,9 @@ const Arc: readonly {
 					}
 				</div>
 				<p class="mt-12 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The compression decision strip in the knobs panel prints the inputs alongside the
-					name - token mode, cache mode and storage - so a run that reads as surprising can
-					be traced back to the threshold that produced it.
+					The strip in the knobs panel prints the inputs alongside the name - compression
+					mode, cache lane and storage - so a run that reads as surprising can be traced back
+					to the threshold that produced it.
 				</p>
 			</section>
 		</div>
@@ -443,6 +603,11 @@ const Arc: readonly {
 					carried at that release, and the benchmarks page carries the reproduce commands.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+					None of them is measured by this page. They are historical engine measurements,
+					printed here as receipts, and the boundary above says so before a reader meets
+					them - which is the difference between a citation and a claim.
+				</p>
+				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Read a plate as a receipt - the figure is what the release printed, the note is what
 					the number means for the design.
 				</p>
@@ -484,55 +649,9 @@ const Arc: readonly {
 			</section>
 		</div>
 
-		<!-- THE BOUNDARY: what is real here, and what is not. -->
-		<div data-reveal>
-			<footer
-				id="boundary"
-				class="wb-skew motion-wipe-host relative border-l-4 border-weathered-teal bg-carbon-void p-6"
-			>
-				<span class="motion-wipe" data-wipe aria-hidden="true" />
-				<ZineKicker Tone="teal">SIMULATION BOUNDARY</ZineKicker>
-				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Real on this page:
-				</p>
-				<ul class="mt-2 max-w-3xl space-y-1 font-body text-base leading-relaxed text-bone-newsprint">
-					<li class="border-l-2 border-oxblood-dark pl-3">
-						the classifier rules (README.md:153-176)
-					</li>
-					<li class="border-l-2 border-oxblood-dark pl-3">
-						the preview line shapes (README.md:108-133)
-					</li>
-					<li class="border-l-2 border-oxblood-dark pl-3">
-						the threshold semantics and defaults (README.md:395-420).
-					</li>
-				</ul>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Simulated:
-				</p>
-				<ul class="mt-2 max-w-3xl space-y-1 font-body text-base leading-relaxed text-bone-newsprint">
-					<li class="border-l-2 border-oxblood-dark pl-3">
-						the BLAKE3 digest (a deterministic stand-in hash - the real 40-char digest needs the
-						Rust store)
-					</li>
-					<li class="border-l-2 border-oxblood-dark pl-3">the 40-123 ns timing readout</li>
-					<li class="border-l-2 border-oxblood-dark pl-3">
-						and aphrodite_retrieve (shown as the decision text, never executed).
-					</li>
-				</ul>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					No network, no runtime - everything happens in this tab.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Not depicted: the context engine's auto-compaction pass and the injection assembler's
-					directive budget - this tab simulates the tool-output path only.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The full registry is larger - the 30-type content catalog lives in
-					docs/classification/content-types.md:118-151; this demo simulates the README tier
-					only.
-				</p>
-			</footer>
-		</div>
+		<!-- THE BOUNDARY used to close the page here. It now opens it, as a
+		     disclosure beside the controls (#boundary, above) - the same text,
+		     moved to where a reader meets it before the first figure. -->
 
 		<!-- RELATED: the natural neighbors. -->
 		<Related
@@ -578,6 +697,74 @@ const Arc: readonly {
 	.wb-slider {
 		accent-color: #931128;
 		height: 6px;
+	}
+	/* THE INSTRUMENT LABEL: a caption on the machine, always visible, never a
+	   warning. Quiet on purpose - the h1 already carries the loud voice, and a
+	   second shouted label beside it is the "everything is emphasised" problem
+	   this page is being fixed for. */
+	.wb-instrument {
+		margin-top: 1rem;
+		max-width: 52ch;
+		padding-left: 0.75rem;
+		border-left: 2px solid var(--weathered-teal);
+		font-family: "JetBrains Mono", monospace;
+		font-size: var(--type-meta);
+		font-weight: 500;
+		line-height: 1.6;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--zinc-dust);
+	}
+	/* The disclosure that holds the full boundary text. A native <details>, so
+	   it opens without JavaScript and its text is in the document either way -
+	   the reader chooses how much of the contract to read, and search engines
+	   still index all of it. */
+	.wb-details {
+		border-top: 1px solid var(--outline-oxblood);
+		padding-top: var(--space-reading);
+	}
+	.wb-details-summary {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		cursor: pointer;
+		list-style: none;
+		font-family: "JetBrains Mono", monospace;
+		font-size: var(--type-meta);
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--stamped-canary);
+	}
+	.wb-details-summary::-webkit-details-marker {
+		display: none;
+	}
+	.wb-details-summary::before {
+		content: "+";
+		color: var(--weathered-teal);
+	}
+	.wb-details[open] .wb-details-summary::before {
+		content: "\2212";
+	}
+	.wb-details-summary:hover {
+		color: var(--bone-white);
+	}
+	/* A reference line: the sentence that tells a reader where the real
+	   behaviour lives, in the voice of a citation rather than of a claim. */
+	.wb-ref {
+		max-width: 62ch;
+		font-family: "DM Sans", sans-serif;
+		font-size: var(--type-caption);
+		line-height: 1.6;
+		color: var(--zinc-dust);
+	}
+	.wb-ref-link {
+		color: var(--weathered-teal);
+		text-decoration: underline;
+		text-underline-offset: 0.18em;
+	}
+	.wb-ref-link:hover {
+		color: var(--bone-white);
 	}
 	@media (max-width: 767px) {
 		.wb-skew {

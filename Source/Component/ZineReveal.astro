@@ -1,9 +1,24 @@
 ---
 /**
- * ZineReveal - the hover-to-reveal layer: the "suppressed" surface shows a
- * redacted/muted cover line; hovering (or focusing) lifts it to expose the
- * raw content underneath. Mobile has no hover, so the reveal is tap-to-flip
- * there (click toggles the class) - the same hard-offset grammar, no easing.
+ * ZineReveal - the redacted-cover layer. DECORATIVE ONLY.
+ *
+ * EMPHASIS TIER: expressive, and spent sparingly - one per section at most.
+ * The hover/tap reveal is a printed-redaction joke: a muted cover line lifts to
+ * expose the raw content underneath, the same hard-offset grammar, no easing.
+ * Mobile has no hover, so tap flips the class there.
+ *
+ * DECORATIVE ONLY, and this is the rule that keeps it honest: the overlay is
+ * ABSOLUTELY POSITIONED and its height is decided by the COVER, not by the raw
+ * content. Put a paragraph in `Raw` and it is clipped, or overlaps the block
+ * below it; a reader who never hovers - touch without a tap, a keyboard without
+ * focus, a screen reader following the flow - gets the cover instead of the
+ * content. Use it for a flourish whose meaning is already carried by the
+ * argument beside it: a cover line over a number the page has just stated.
+ *
+ * `Flow` is the mode for substantive text: the cover becomes a quiet label and
+ * `Raw` renders in normal document order below it, at its own full height, with
+ * no overlay and no script. Same component, same grammar, no absolute
+ * positioning - so the height is decided by the CONTENT.
  */
 interface Props {
 	/** The cover line shown while suppressed (mono, muted). */
@@ -14,28 +29,53 @@ interface Props {
 
 	/** The raw content revealed underneath (rich). */
 	Raw: string;
+
+	/** Render in normal document order instead of as a hover overlay. Required
+	 * for any substantive text. */
+	Flow?: boolean;
 }
 
-const { Cover, Tag = "SUPPRESSED", Raw } = Astro.props;
+const { Cover, Tag = "SUPPRESSED", Raw, Flow = false } = Astro.props;
 ---
 
-<div class="group relative cursor-crosshair border border-oxblood-dark bg-soot-black" data-zine-reveal tabindex="0" aria-label={`${Tag}: hover or focus to reveal the raw content`}>
-	<div class="flex items-center justify-between gap-3 p-3 font-mono text-base text-zinc-dust transition-opacity duration-150 group-hover:opacity-10 group-focus:opacity-10 group-[.revealed]:opacity-10">
-		<span class="truncate">{Cover}</span>
-		<span class="shrink-0 border border-oxblood-dark px-1.5 py-0.5 text-base font-black uppercase tracking-widest text-zinc-dust">{Tag}</span>
-	</div>
-	<div
-		class="pointer-events-none absolute inset-0 flex items-center p-3 font-mono text-base font-bold text-bone-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100 group-[.revealed]:opacity-100"
-	>
-		<div class="w-full" set:html={Raw} />
-	</div>
-	<div class="pointer-events-none absolute bottom-1.5 right-2 font-mono text-base uppercase tracking-widest text-zinc-dust opacity-0 transition-opacity group-hover:opacity-70 group-focus:opacity-70 group-[.revealed]:opacity-70">
-		REVEALED
-	</div>
-</div>
+{
+	Flow ? (
+		<div class="border border-oxblood-dark bg-soot-black" data-zine-reveal-flow>
+			<div class="flex items-baseline justify-between gap-3 p-3">
+				<span class="font-mono text-base text-zinc-dust">{Cover}</span>
+				<span class="type-meta shrink-0 uppercase text-zinc-dust">{Tag}</span>
+			</div>
+			<div
+				class="border-t border-oxblood-dark p-3 font-mono text-base font-bold text-bone-white"
+				set:html={Raw}
+			/>
+		</div>
+	) : (
+		<div
+			class="group relative cursor-crosshair border border-oxblood-dark bg-soot-black"
+			data-zine-reveal
+			tabindex="0"
+			aria-label={`${Tag}: hover or focus to reveal the raw content`}
+		>
+			<div class="flex items-center justify-between gap-3 p-3 font-mono text-base text-zinc-dust transition-opacity duration-150 group-hover:opacity-10 group-focus:opacity-10 group-[.revealed]:opacity-10">
+				<span class="truncate">{Cover}</span>
+				<span class="shrink-0 border border-oxblood-dark px-1.5 py-0.5 type-meta uppercase text-zinc-dust">
+					{Tag}
+				</span>
+			</div>
+			<div class="pointer-events-none absolute inset-0 flex items-center p-3 font-mono text-base font-bold text-bone-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100 group-[.revealed]:opacity-100">
+				<div class="w-full" set:html={Raw} />
+			</div>
+			<div class="pointer-events-none absolute bottom-1.5 right-2 type-meta text-zinc-dust opacity-0 transition-opacity group-hover:opacity-70 group-focus:opacity-70 group-[.revealed]:opacity-70">
+				REVEALED
+			</div>
+		</div>
+	)
+}
 
 <script>
-	// Mobile flattens: no hover exists there, so tap flips the reveal.
+	// Mobile flattens: no hover exists there, so tap flips the reveal. Only the
+	// overlay form binds - `Flow` renders in document order and needs nothing.
 	function BindReveals() {
 		for (const Root of document.querySelectorAll("[data-zine-reveal]")) {
 			if (Root.dataset.revealBound) {

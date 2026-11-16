@@ -340,7 +340,7 @@ const Sliding = [
 						<div class="deck-overview">
 							<div class="deck-stages">
 								{Stages.map((Stage) => (
-									<div class="deck-stage">
+									<div class="deck-stage" data-stage={Stage.Index}>
 										<span class="deck-stage-index">{Stage.Index} // STAGE</span>
 										<span class="deck-stage-name">{Stage.Name}</span>
 										<span class="deck-stage-metric">{Stage.Metric}</span>

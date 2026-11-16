@@ -449,6 +449,14 @@ const Settle = (): void => {
 };
 
 const Mount = (): void => {
+	// The runtime is here: the stylesheet's collapsed frames - the reveal
+	// pre-hide and the stepper's one-stage presentation - may stay in force,
+	// and the head script's failsafe stands down. This is set BEFORE the
+	// early return below, because "the runtime ran" is the fact the failsafe
+	// asks about, not "this page had something to animate".
+	document.documentElement.setAttribute("data-motion-ready", "1");
+	document.documentElement.classList.remove("motion-fallback");
+
 	if (!Listening) {
 		Reduced().addEventListener("change", Settle);
 		Listening = true;
@@ -1221,7 +1229,7 @@ const Run = (Root: HTMLElement): (() => void) => {
 		Marker.textContent = RunMarker(Script.Hash, Script.Type, Lines);
 		Tally.textContent = `${Lines.length.toLocaleString("en-US")} lines · ${RunBytes(
 			Lines,
-		).toLocaleString("en-US")} characters`;
+		).toLocaleString("en-US")} bytes`;
 	};
 
 	const Delay = (Pace: RunPace, Kind: LineKind, Previous: LineKind | null, Nth: number): number => {
@@ -1382,6 +1390,12 @@ const Run = (Root: HTMLElement): (() => void) => {
 
 /** The discarded page's teardown: no observer, no pending counter frame, nothing left running. */
 export const Teardown = (): void => {
+	// The next page mounts its own runtime, so the ready flag has to be
+	// cleared here: the failsafe in Base.astro is re-armed per mount and must
+	// be able to tell "this page's runtime never arrived" from "the previous
+	// page's runtime did".
+	document.documentElement.removeAttribute("data-motion-ready");
+
 	Watcher?.disconnect();
 	Watcher = null;
 

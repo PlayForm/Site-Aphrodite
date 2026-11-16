@@ -132,7 +132,7 @@ const SettledTally =
 		? ""
 		: `${Build.Lines.length.toLocaleString("en-US")} lines · ${RunBytes(
 				Build.Lines,
-			).toLocaleString("en-US")} characters`;
+			).toLocaleString("en-US")} bytes`;
 
 const Slug =
 	Id ??
@@ -180,9 +180,9 @@ const FrameRows = Tail.map(
 						<ZineStream Lines={Lines} Stream />
 					</div>
 					<p class="mt-4 font-body text-base leading-relaxed text-zinc-dust">
-						Read top to bottom: the repeated compile steps fade out, the warnings that were
+						The repeated compile steps fade out, the warnings that were
 						already counted mute, and the one line that stopped the build stays at full
-						strength. Every line here is context the agent would have paid for.
+						strength. Every one of those lines is context the agent would have paid for.
 					</p>
 				</div>
 				<div>
@@ -227,11 +227,11 @@ const FrameRows = Tail.map(
 						</div>
 					</div>
 					<p class="mt-4 font-body text-base leading-relaxed text-zinc-dust">
-						This pane never stops. Each command runs, settles, and the screen clears for
-						the next one: a build that stalls and then bursts, a search that arrives flat
+						The commands in a tool-heavy session arrive in exactly this variety: a build that
+						stalls and then bursts, a search that arrives flat
 						and fast, a listing, a test run that ticks, a JSON body that only parses on its
 						last line. The fade, the dim and the mute are the suppression marks the engine
-						would put on these same lines - repeated compile steps recede, counted warnings
+						puts on these same lines - repeated compile steps recede, counted warnings
 						mute, the one line that stopped the build stays at full strength.
 					</p>
 				</div>
@@ -260,14 +260,16 @@ const FrameRows = Tail.map(
 						/>
 					</div>
 					<p class="mt-4 font-body text-base leading-relaxed text-zinc-dust">
-						The right pane is rewritten as the left one prints, and it is never a lie: the
-						counts are the counts of the lines that have actually arrived, and the marker's
-						size is the size of the bytes behind it at that moment. Read it as a sentence
-						- <em>if the stream ended here, this is the line the agent would read</em> - and
-						watch the tally climb to the settled line the build really ends on.
+						Aphrodite previews the output it has received, not the output a command will
+						eventually produce: the counts are the counts of the lines that have actually
+						arrived, and the marker's size is the size of the bytes behind it at that
+						moment. Every intermediate preview reads as one sentence -
+						<em>if the stream ended here, this is the line the agent would read</em> - and
+						the tally climbs with the stream until it settles on the line the build really
+						ends on.
 					</p>
 					<p class="mt-3 font-body text-base leading-relaxed text-zinc-dust">
-						The chip above the result is the type the tool hands the engine, and the
+						The type chip names the type the tool hands the engine, and the
 						engine honours it: a build counts errors and warnings, a search counts hits
 						and files, a listing counts entries and extensions, a test run counts passes
 						and failures, a JSON body counts items and keys. One engine, five arms of it -

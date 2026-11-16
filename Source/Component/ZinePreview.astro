@@ -1,20 +1,35 @@
 ---
 /**
- * ZinePreview - the right half of the stream/preview pair: the one line the
- * model reads, plus the marker that addresses the original bytes.
+ * ZinePreview - the compressed result, framed as the product's own argument.
  *
- * The pair is the product's argument (grammar law 4), and Documentation/Motion.md
- * renders it as motion: the raw pane prints line by line (`[data-stream]` in
- * ZineStream) and this pane lands after it, on the frame the last line
- * finishes. `Enter` is that delay in milliseconds; the caller owns it because
- * only the caller knows how long the stream beside it is. A preview that
- * arrives first would be a summary that appeared before the thing it
- * summarises.
+ * EMPHASIS TIER: standard for the result, quiet for everything that supports
+ * it. The PREVIEW is the headline - it is the sentence the model actually reads
+ * - so it is set at body size and comes first. The marker is supporting
+ * information, the address of the bytes that stayed behind, so it sits one
+ * disclosure below the claim it addresses, under `Original retained`, with a
+ * copy control beside it.
+ *
+ * `Presentation` decides whether the pane performs its arrival:
+ *
+ *   static  Settled on arrival. The default, and what ordinary content gets: a
+ *           reader should not wait 980ms for a sentence because the deck once
+ *           animated a pair. No `[data-enter]` is emitted at all, so the motion
+ *           runtime never touches it.
+ *   replay  The entrance that explains an arrival: the pane lands on the frame
+ *           the stream beside it finishes. `Enter` is that delay in ms, and the
+ *           caller owns it because only the caller knows how long the stream
+ *           beside it is. A preview that arrives first would be a summary that
+ *           appeared before the thing it summarises.
+ *
+ * Passing `Enter` still implies `replay`, exactly as it always did, so a call
+ * site that already owns a stream beat keeps its beat without a new prop.
  *
  * The entrance root that owns the pair (a `[data-reveal]` section or a
  * `[data-enter]` panel) runs both halves on its own beat - a panel that rises
  * also streams and lands, exactly as the deck's Enter(Scene) does.
  */
+import ZineCopyChip from "./ZineCopyChip.astro";
+
 interface Props {
 	/** The micro-label above the result (canary by default). */
 	Label: string;
@@ -29,25 +44,61 @@ interface Props {
 	Color?: "canary" | "teal" | "raw";
 
 	/**
-	 * Delay before this pane arrives, in ms (`[data-enter]`). Defaults to the
-	 * deck's own beat for the panel that follows a stream.
+	 * Delay before this pane arrives, in ms (`[data-enter]`). Passing it implies
+	 * `Presentation="replay"`; leaving it unset leaves the pane settled.
 	 */
 	Enter?: number;
+
+	/** `static` (default) renders settled; `replay` performs the arrival. */
+	Presentation?: "static" | "replay";
 }
 
-const { Label, Result, Hash, Color = "canary", Enter = 980 } = Astro.props;
+const { Label, Result, Hash, Color = "canary", Enter, Presentation } = Astro.props;
+
+const Mode = Presentation ?? (Enter === undefined ? "static" : "replay");
+
+const Delay = Mode === "replay" ? (Enter ?? 980) : undefined;
 
 const Palette = {
 	canary: "text-stamped-canary",
 	teal: "text-weathered-teal",
 	raw: "text-raw-blood",
 }[Color];
+
+/**
+ * The clipboard payload: the marker as TEXT. `Hash` is rendered as HTML because
+ * a page may pass the tone spans it builds, so the copy control gets the
+ * stripped string - the bytes a reader would actually paste, never markup.
+ */
+const Payload = Hash === undefined ? "" : Hash.replace(/<[^>]*>/g, "").trim();
+
+/** `static` emits no entrance attribute at all, so the motion runtime never
+ * touches the pane and it is settled from the first paint. */
+const EnterAttr = Delay === undefined ? {} : { "data-enter": Delay };
 ---
 
-<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5" data-enter={Enter}>
-	<div class={`mb-1 text-base font-black uppercase tracking-widest ${Palette}`}>{Label}</div>
-	<div class="border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold text-bone-white sm:text-base">
+<div class="border-2 border-oxblood-dark bg-asphalt-panel p-3.5" {...EnterAttr}>
+	<div class={`type-meta mb-1.5 uppercase ${Palette}`}>{Label}</div>
+	<div class="border border-oxblood-dark bg-soot-black p-3 font-mono text-body font-bold text-bone-white">
 		{Result}
 	</div>
-	{Hash && <div class="ccr-marker mt-2 font-mono text-base font-bold text-weathered-teal" set:html={Hash} />}
+	{
+		Hash && (
+			<details class="group mt-3 border-t border-oxblood-dark pt-2">
+				<summary class="flex cursor-pointer list-none items-center justify-between gap-3 font-mono text-caption text-zinc-dust transition-colors hover:text-bone-white">
+					<span>Original retained</span>
+					<span class="shrink-0 group-open:hidden" aria-hidden="true">
+						+
+					</span>
+					<span class="hidden shrink-0 group-open:inline" aria-hidden="true">
+						−
+					</span>
+				</summary>
+				<div class="mt-2 flex items-start gap-3">
+					<div class="ccr-marker grow font-mono text-caption font-bold text-weathered-teal" set:html={Hash} />
+					<ZineCopyChip Label="MARKER" Copy={Payload} />
+				</div>
+			</details>
+		)
+	}
 </div>
