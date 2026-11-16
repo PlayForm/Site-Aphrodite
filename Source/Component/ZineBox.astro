@@ -106,9 +106,13 @@ interface Props {
 	 * (a dense reading column, or a tilted plate inside another tilted frame). */
 	Hover?: boolean;
 
-	/** Ink splats behind the plate. Default follows the frame: a plate WITH a
-	 *  coloured border stays clean (the border is its edge), a plate with no
-	 *  border gets the ink AS its edge. `true`/`false` overrides either way. */
+	/** Ink splats behind the plate. This is ELIGIBILITY, not a promise: the
+	 *  painter draws a density score from the shared noise field and biases it by
+	 *  the surface behind the plate, so an eligible plate can come out clean and
+	 *  a filled one never carries more than a couple of faint groups. Default
+	 *  follows the frame: a plate WITH a coloured border keeps that border as its
+	 *  edge, a borderless one is eligible to take the ink as its edge.
+	 *  `true`/`false` overrides either way. */
 	Grunge?: boolean;
 
 	/** Force the splat corner for a plate whose copy fills its body. */
@@ -127,15 +131,28 @@ const {
 	Surface = "plain",
 	Emphasis = "standard",
 	// The frame follows the tier: `featured` keeps its crimson border (and stays
-	// clean), `standard` and `quiet` are borderless, and `standard` takes the ink
-	// as its edge. That is the mix the language wants - some plates ruled, some
-	// printed.
+	// clean), `standard` and `quiet` are borderless, and `standard` is ELIGIBLE
+	// for the ink as its edge. That is the mix the language wants - some plates
+	// ruled, some printed. Eligibility is not a promise: Script/Grunge decides
+	// the density from the noise field and the surface, so a filled plate usually
+	// comes out clean instead of every borderless plate carrying the same ink.
 	Accent = Emphasis === "featured" ? "crimson" : "none",
 	Tilt,
 	Hover = true,
 	Grunge = Accent === "none" && Emphasis !== "quiet",
 	GrungeCorner,
 } = Astro.props;
+
+/** The surface the ink is painted on, as this component composes it.
+ *
+ *  The painter MEASURES the computed background first and only falls back to
+ *  this declaration, for the one case a measurement cannot see: a fill painted
+ *  by a pseudo-element. So it has to agree with the fill actually composed, and
+ *  it is derived from the same facts - `quiet` paints nothing, and a page that
+ *  overrides with `bg-transparent` has taken the fill away. Every other value
+ *  here carries a real `background-color`. */
+const GrungeSurface: "transparent" | "filled" =
+	Emphasis === "quiet" || /(^|\s)bg-transparent(\s|$)/.test(Class) ? "transparent" : "filled";
 
 const Pad = {
 	md: "p-6 sm:p-8",
@@ -231,6 +248,7 @@ const Frame =
 	data-emphasis={Emphasis}
 	data-surface={Surface}
 	data-grunge={Grunge ? "" : undefined}
+	data-grunge-surface={Grunge ? GrungeSurface : undefined}
 	data-grunge-corner={Grunge ? GrungeCorner : undefined}
 	data-grunge-mode={Grunge ? (Accent === "none" ? "edge" : "scatter") : undefined}
 >

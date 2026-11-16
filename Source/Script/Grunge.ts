@@ -8,7 +8,7 @@
  *
  * So the geometry is drawn in the browser, per page load:
  *
- *   card -> group of 4 splats -> each splat = body + spikes + droplets
+ *   card -> group of 5 splats -> each splat = body + lobes + droplets
  *
  * Every layer rides the same 2D noise field, so the body and its spikes agree
  * about where the energy is. Each card gets a fresh seed, a fresh rotation and a
@@ -19,7 +19,7 @@
  * one drawing can read as a dark stain on the page ground or a light bloom on a
  * crimson band.
  *
- * The family is held together by three constraints, and they are the point:
+ * The family is held together by four constraints, and they are the point:
  *
  *   1. ONE noise field per page. Every splat samples the same 2D field, so the
  *      lobes fall in the same places and the arms lean the same way - a group
@@ -29,6 +29,11 @@
  *   3. ONE grey ink, weighted per layer by fill-opacity (0.9 / 0.75 / 0.55 /
  *      0.35). Layered opacity over one grey gives the depth - a dense core where
  *      the layers agree, a soft edge where they do not - without a second colour.
+ *   4. HOW MUCH ink a surface gets is a SCORE from that same field, biased by
+ *      the surface behind the plate - not a boolean per call site. A transparent
+ *      plate is the one that needs the ink (it has no other edge) and gets 6-8
+ *      groups; a filled plate already separates from the page and gets 0-2,
+ *      faint. See `Density` below, which is the whole tuning surface.
  */
 import { createNoise2D } from "simplex-noise";
 
@@ -135,18 +140,124 @@ const Splat = (Seed: number, Cx: number, Cy: number, Radius: number, Opacity: nu
 };
 
 /**
- * A card's ink: FIVE groups of FIVE layers. Both the placement and the size of
- * every layer come from the noise field, not from a PRNG - that is the point of
- * the exercise. A PRNG scatters; noise distributes, so the clusters sit at
- * different distances from the edges and in different sizes while still reading
- * as one hand. Groups are anchored independently, so the mass lands on the
- * edges and the corners rather than in the middle of the plate.
+ * Layers inside one group: five weights of ONE family, so a group reads as a
+ * single brush with a dense core and a soft edge. How many groups a surface
+ * takes is `Density` below.
  */
-const GroupsPerCard = 5;
 const LayersPerGroup = 5;
 
 /** Noise sample mapped to 0..1. */
 const Ride = (X: number, Y: number): number => (Field(X, Y) + 1) / 2;
+
+/** Clamp a box fraction to 0..1: a group pushed past the edge stays on it. */
+const Clamp = (Value: number): number => Math.min(1, Math.max(0, Value));
+
+/**
+ * DENSITY - how much ink a surface gets, and the WHOLE tuning surface in one
+ * place. Change a number here and nothing else.
+ *
+ * Ink used to be all-or-nothing: every plate carrying a `[data-grunge]` element
+ * got the same five groups, so the texture read as wallpaper instead of as an
+ * occasional stain, and it sat on filled plates where it is barely visible.
+ * Density is now a SCORE drawn from the shared field and biased by the surface:
+ *
+ *   Score  = Ride(Seed * 0.0003, 0.41) + Bias
+ *   Groups = Score < Clean ? none : Score < Light ? some : full
+ *
+ *   transparent  6-8 groups, LARGER and pushed OUT to the edges - with nothing
+ *                painted behind it, the ink is the only thing marking its edge.
+ *   filled       0-2 groups, smaller and fainter - the fill already separates
+ *                the plate from the page, so a stain on it is only noise.
+ *
+ * The SIGN of the bias is the design, and it is the one thing to keep: a
+ * transparent surface is biased UP because it needs the ink, a filled one DOWN
+ * because it does not. Two transparent plates side by side therefore still
+ * differ - one can come out clean, the next heavily inked - which a boolean
+ * (`Grunge` on/off) could never do.
+ */
+type Surface = "transparent" | "filled";
+
+interface Density {
+	/** Score bias per surface - up for transparent, down for filled. */
+	Bias: number;
+	/** A score under `Clean` takes no ink at all. */
+	Clean: number;
+	/** A score under `Light` takes `Groups[1]`; at or above, `Groups[2]`. */
+	Light: number;
+	/** Group counts per tier: [clean, light, full]. */
+	Groups: readonly [number, number, number];
+	/** Box size multiplier per group. */
+	Scale: number;
+	/** How far a group may sit from the centre: above 1 pushes it to the edge. */
+	Reach: number;
+	/** Ink weight multiplier. */
+	Weight: number;
+}
+
+const Density: Record<Surface, Density> = {
+	transparent: {
+		Bias: 0.18,
+		Clean: 0.34,
+		Light: 0.62,
+		Groups: [0, 6, 8],
+		Scale: 1.18,
+		Reach: 1.35,
+		Weight: 1,
+	},
+	filled: {
+		Bias: -0.18,
+		Clean: 0.34,
+		Light: 0.62,
+		Groups: [0, 1, 2],
+		Scale: 0.82,
+		Reach: 0.82,
+		Weight: 0.62,
+	},
+};
+
+/** The alpha of a computed `background-color`, 0..1. */
+const Alpha = (Colour: string): number => {
+	if (Colour === "" || Colour === "transparent") return 0;
+	const Match = Colour.match(/rgba?\(([^)]+)\)/);
+	if (Match === null) return 1;
+	const Parts = Match[1].split(/[\s,/]+/).filter(Boolean);
+	return Parts.length >= 4 ? Number(Parts[3]) || 0 : 1;
+};
+
+/**
+ * The surface behind an element, MEASURED where possible.
+ *
+ * The computed `background-color` is the truth: a plate that paints a fill has
+ * one, and a plate that lets the page ground through does not - including a
+ * plate a page has made transparent with `bg-transparent`. `data-grunge-surface`
+ * is the FALLBACK for the one case measurement cannot see (a fill painted by a
+ * pseudo-element), and it never overrules a measured fill: a fill is not a
+ * matter of opinion.
+ */
+const SurfaceOf = (Element: HTMLElement): Surface => {
+	let Painted = "transparent";
+	try {
+		Painted = getComputedStyle(Element).backgroundColor;
+	} catch {
+		// A detached element has no computed style; the declaration decides.
+	}
+	if (Alpha(Painted) > 0.02) return "filled";
+	const Declared = Element.dataset.grungeSurface;
+	return Declared === "filled" || Declared === "transparent" ? Declared : "transparent";
+};
+
+/**
+ * `[data-grunge]` works on ANY element, not only on one that already carries the
+ * `.grunge` class - a `.band`, a split column or a pods panel is a surface too.
+ * The class is deliberately NOT added: it also matches `.band--split > .grunge`,
+ * a grid placement, so classing a column would move it out of its column. The
+ * two inline properties are all the ink needs.
+ */
+const Prepare = (Element: HTMLElement): void => {
+	const Style = getComputedStyle(Element);
+	if (Style.position === "static") Element.style.position = "relative";
+	if (Style.isolation === "auto") Element.style.isolation = "isolate";
+};
 
 /** One group: five layers of one family, anchored in a noise-chosen corner. */
 const Group = (Seed: number, GroupIndex: number): string => {
@@ -179,12 +290,25 @@ const Group = (Seed: number, GroupIndex: number): string => {
 };
 
 /**
+ * Which density bucket a score lands in: 0 clean, 1 light, 2 full. Counted, not
+ * branched - the two thresholds are the whole decision, so the tier IS the
+ * number of them the score cleared.
+ */
+const Tier = (Score: number, Table: Density): number =>
+	Number(Score >= Table.Clean) + Number(Score >= Table.Light);
+
+/**
  * Paint every `[data-grunge]` element on the current document.
  *
- * ONE SVG PER GROUP. Stacking all five groups inside a single drawing tied them
- * to one registration - one corner, one scale - which is not what a splatter
- * does. Each group is now its own element with its own position, size, rotation
- * and ink weight, placed by noise across the whole box, so a plate can carry a
+ * HOW MUCH is decided per element by `Density` above, from one noise sample
+ * biased by the surface; WHETHER at all is part of the same score, so a page of
+ * plates is mostly clean and a few carry a stain. Nothing here is listed per
+ * page.
+ *
+ * ONE SVG PER GROUP. Stacking every group inside a single drawing tied them to
+ * one registration - one corner, one scale - which is not what a splatter does.
+ * Each group is now its own element with its own position, size, rotation and
+ * ink weight, placed by noise across the whole box, so a plate can carry a
  * cluster at one corner, a second low right, a third bleeding off the top, and
  * so on. Permutations are the point; separation is the rule.
  *
@@ -195,6 +319,9 @@ export const PaintGrunge = (): void => {
 	for (const Element of document.querySelectorAll<HTMLElement>("[data-grunge]")) {
 		if (Element.dataset.grungePainted === "1") continue;
 		try {
+			const Kind = SurfaceOf(Element);
+			const Table = Density[Kind];
+
 			// A plate carrying a code fence keeps the ink, but faint and strictly
 			// behind: a command block must read sharp, and the texture is there to
 			// edge the sheet, not to sit under the type at full weight.
@@ -203,19 +330,45 @@ export const PaintGrunge = (): void => {
 			const Faint = Element.classList.contains("grunge--faint") ? 0.5 : 1;
 			const Seed = (Math.random() * 0x7fffffff) | 0;
 
-			for (let GroupIndex = 0; GroupIndex < GroupsPerCard; GroupIndex += 1) {
+			// THE DECISION. One sample of the shared field, biased by the surface,
+			// then bucketed. A boolean could not make two transparent plates differ;
+			// a score does, on every load, which is the whole point of drawing it
+			// from noise instead of from the call site.
+			const Score = Ride(Seed * 0.0003, 0.41) + Table.Bias;
+			const Count = Table.Groups[Tier(Score, Table)];
+			// The count is left on the element so the density can be inspected in
+			// devtools - the owner tunes `Density`, never this loop.
+			Element.dataset.grungeCount = String(Count);
+			Element.dataset.grungeSurface = Kind;
+
+			if (Count === 0) {
+				Element.dataset.grungePainted = "1";
+				continue;
+			}
+
+			Prepare(Element);
+
+			const Mode = Element.dataset.grungeMode ?? "scatter";
+
+			for (let GroupIndex = 0; GroupIndex < Count; GroupIndex += 1) {
 				// Noise, not a counter: each group reads a different passage of the
 				// shared field, so its placement and size are its own.
 				const Phase = Seed * 0.0001 + GroupIndex * 0.37;
-				const Mode = Element.dataset.grungeMode ?? "scatter";
 				// `edge` rings the plate - used where the ink IS the border of an
 				// unbordered box. `scatter` puts groups anywhere in the box, which is
-				// what a thrown splatter does.
+				// what a thrown splatter does. `Reach` is what throws a transparent
+				// plate's groups out to its edge and keeps a filled plate's in.
 				const Angle = Ride(Phase, 0.31) * Math.PI * 2;
-				const Ring = 0.34 + Ride(Phase, 0.71) * 0.18;
-				const CentreX = Mode === "edge" ? 0.5 + Math.cos(Angle) * Ring : Ride(Phase, 0.11);
-				const CentreY = Mode === "edge" ? 0.5 + Math.sin(Angle) * Ring : Ride(Phase, 0.57);
-				const Width = 0.3 + Ride(GroupIndex * 0.53, Phase) * 0.5;
+				const Ring = (0.34 + Ride(Phase, 0.71) * 0.18) * Table.Reach;
+				const CentreX =
+					Mode === "edge"
+						? Clamp(0.5 + Math.cos(Angle) * Ring)
+						: Clamp(0.5 + (Ride(Phase, 0.11) - 0.5) * Table.Reach);
+				const CentreY =
+					Mode === "edge"
+						? Clamp(0.5 + Math.sin(Angle) * Ring)
+						: Clamp(0.5 + (Ride(Phase, 0.57) - 0.5) * Table.Reach);
+				const Width = (0.3 + Ride(GroupIndex * 0.53, Phase) * 0.5) * Table.Scale;
 				const Height = Width * (0.75 + Ride(Phase, 0.83) * 0.55);
 				const Turn = (Ride(GroupIndex * 0.21, 0.33) - 0.5) * 16;
 
@@ -234,11 +387,16 @@ export const PaintGrunge = (): void => {
 				// code fences and body text, which blurred them - ink belongs under the
 				// sheet, never on top of what is printed on it.
 				Svg.style.setProperty("--grunge-z", "-1");
-				// Per-group weight. The floor is 0.16, not 0.10: on a near-black page
-				// a 0.10 deposit reads as haze rather than ink.
+				// Per-group weight, dimmed by the FAINTEST of the two reasons: the
+				// surface (a filled plate's stain is a suggestion, a transparent
+				// plate's is its edge) and a code fence under the ink. They do not
+				// multiply - 0.5 x 0.62 would put a filled code plate at 0.05, which
+				// is invisible rather than faint. The floor before dimming is 0.16,
+				// not 0.10: on a near-black page a 0.10 deposit reads as haze.
+				const Weight = Math.min(Faint, Table.Weight);
 				Svg.style.setProperty(
 					"--grunge-opacity",
-					((0.16 + Ride(GroupIndex * 0.91, Phase) * 0.14) * Faint).toFixed(3),
+					((0.16 + Ride(GroupIndex * 0.91, Phase) * 0.14) * Weight).toFixed(3),
 				);
 				Element.prepend(Svg);
 			}

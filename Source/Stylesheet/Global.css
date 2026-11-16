@@ -193,16 +193,24 @@
 
    `splat-frame` above was a displaced rectangle: it read as a duplicate that
    had slipped a few pixels, because a warped box is still a box. Ink does not
-   behave that way - it leaves a body, throws spikes, and drops satellites - so
-   this layer is DRAWN, not displaced. `Scripts/Splats.mjs` builds the geometry
-   from simplex noise (body outline riding the noise field, tapered spikes,
-   power-curve droplets) and writes one SVG per GROUP of five splats, each with
-   its own seed, scale and rotation.
+   behave that way - it leaves a body, throws lobes, and drops satellites - so
+   this layer is DRAWN, not displaced. `Script/Grunge.ts` builds the geometry in
+   the browser from simplex noise (body outline riding the noise field, rounded
+   lobes, power-curve droplets) and appends one SVG per GROUP of five splats,
+   each with its own seed, scale, rotation and ink weight.
 
-   The SVG is black on transparent and used as a MASK, so the ink is a token:
-   oxblood behind a dark plate, bone behind a crimson band, whatever the region
-   needs. Six groups ship; a region picks one and the page varies them, which is
-   what stops every section wearing the same brush. */
+   HOW MUCH ink a surface takes is a density score drawn from that same noise
+   field and biased by the surface behind the element: a TRANSPARENT plate (no
+   fill of its own - a band, a split column, a pods panel) gets 6-8 groups,
+   larger and pushed out to its edges, because the ink is the only thing marking
+   its edge; a FILLED plate gets 0-2, smaller and fainter, because the fill
+   already separates it from the page. The table is `Density` in
+   `Script/Grunge.ts` and nothing here overrides it - this block only positions
+   a group and holds the ink tokens.
+
+   The ink is a real SVG element, coloured by `color` and sized by the custom
+   properties below, so one drawing serves every region: oxblood behind a dark
+   plate, bone behind a crimson band, whatever the region needs. */
 
 .grunge {
 	position: relative;
@@ -229,8 +237,8 @@
 	overflow: visible;
 }
 
-/* Six groups, six slightly different registrations. The inset and turn differ
-   per group as well as the drawing, so two sections never bleed identically. */
+/* Every group registers ITSELF: position, size and turn are its own, so two
+   sections never bleed identically - and neither do two groups on one plate. */
 
 /* Ink by region, not by habit: the same drawing reads as a dark stain on the
    page ground and as a light bloom on a crimson band. Colour and weight are two
