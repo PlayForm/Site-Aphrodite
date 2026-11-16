@@ -11,12 +11,18 @@
  * pair on that signal alone (Motion.css, "Readable without JavaScript"), so
  * initialisation adds a presentation and never adds content.
  *
- * TWO PODS AND A SWITCH (the Stitch console grammar). Each pane is a POD - a
+ * TWO PODS AND A SWITCH (the dual-pod grammar). Each pane is a POD - a
  * labelled ribbon over an inset well - and the switch above them is the
  * console's own header: the two states as tabs, one of them carrying the
  * active fill. The bar keeps its `zine-toggle-bar` class because the
  * stylesheet keys the pre-bind collapse on it, and the panes keep their
  * `data-toggle-pane` sides because the script does.
+ *
+ * THE PANE ROOT CARRIES NO DISPLAY UTILITY. `[hidden]` from preflight is
+ * `display: none` at the same specificity as `.flex`, and the utility layer
+ * comes later, so a `flex` on the element the script hides would keep the
+ * "hidden" pane on screen. The pod stacks in normal block flow instead, and
+ * the well still fills its frame.
  *
  * The switch bar is hidden until it can work: a two-button control that does
  * nothing is a promise the page cannot keep. Its listeners belong to an
@@ -50,6 +56,10 @@ const {
 	LeftLabel,
 	RightLabel,
 } = Astro.props;
+
+/** The ribbon geometry, one string for the whole set. */
+const Ribbon =
+	"flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5 font-mono text-base font-black uppercase tracking-widest";
 ---
 
 <div
@@ -79,27 +89,43 @@ const {
 			{Right}
 		</button>
 	</div>
-	<div class="zine-toggle-pane flex flex-col shell-card" data-toggle-pane="left">
-		{LeftLabel && (
-			<div class="border-b border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-				{LeftLabel}
-			</div>
-		)}
-		<div
-			class="tier-well p-3 font-mono text-base leading-relaxed text-zinc-dust"
-			set:html={LeftPane}
-		/>
+
+	<!-- Left pod: the canary label is the identity of the "before" side, and
+	     the state name rides the ribbon as the tag so the pod says both what
+	     the pane holds and which half of the comparison it is. -->
+	<div class="zine-toggle-pane border-2 border-oxblood-dark bg-asphalt-panel" data-toggle-pane="left">
+		<div class={`${Ribbon} text-stamped-canary`}>
+			<span class="min-w-0 break-words">{LeftLabel ?? Left}</span>
+			{LeftLabel !== undefined && (
+				<span class="telemetry-tag telemetry-tag--canary ml-auto shrink-0">{Left}</span>
+			)}
+		</div>
+		<div class="p-2">
+			<div
+				class="border border-oxblood-dark bg-soot-black p-3 font-mono text-base leading-relaxed text-zinc-dust"
+				set:html={LeftPane}
+			/>
+		</div>
 	</div>
-	<div class="zine-toggle-pane mt-4 flex flex-col shell-card" data-toggle-pane="right">
-		{RightLabel && (
-			<div class="border-b border-oxblood-dark bg-asphalt-panel px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-weathered-teal">
-				{RightLabel}
-			</div>
-		)}
-		<div
-			class="tier-well p-3 font-mono text-base font-bold leading-relaxed text-bone-white"
-			set:html={RightPane}
-		/>
+
+	<!-- Right pod: teal, bold bone ink - the "after" side is the answer, so it
+	     is the one the eye lands on when the two are read in order. -->
+	<div
+		class="zine-toggle-pane mt-4 border-2 border-oxblood-dark bg-asphalt-panel"
+		data-toggle-pane="right"
+	>
+		<div class={`${Ribbon} text-weathered-teal`}>
+			<span class="min-w-0 break-words">{RightLabel ?? Right}</span>
+			{RightLabel !== undefined && (
+				<span class="telemetry-tag telemetry-tag--teal ml-auto shrink-0">{Right}</span>
+			)}
+		</div>
+		<div class="p-2">
+			<div
+				class="border border-oxblood-dark bg-soot-black p-3 font-mono text-base font-bold leading-relaxed text-bone-white"
+				set:html={RightPane}
+			/>
+		</div>
 	</div>
 </div>
 

@@ -63,14 +63,26 @@
 // `.zine-fence` name so a panel that already frames or pads can zero the
 // plate's margin for the fences inside it (Global.css, CODE PLATES).
 //
-// THE RIBBON'S LEADING FIELD. `Path` is the file a block was taken from, and it
-// is METADATA like the language tag beside it - the ribbon reads
-// `aphrodite.toml  TOML  Copy`. It is a prop rather than something the plate
-// could infer, because a fence has no idea where its bytes came from: the page
-// that pasted them does. Unset is the normal case (a command has no path) and
-// renders the ribbon with the language and the control only, so no call site
-// has to change. Source/Script/CodePlate.ts builds the ribbon and reads this
-// as `data-plate-path`; this component still renders no control of its own.
+// THE RIBBON HAS THREE SLOTS AND ALL THREE ARE ALWAYS FILLED. The ribbon is a
+// row of METADATA with one action at its right edge - leading field, language,
+// copy - and the leading field names the block's SOURCE, in two truthful
+// readings:
+//
+//   `Path` set      the file the block was taken from:
+//                   `aphrodite.toml  TOML  Copy`
+//   `Path` unset    what the block IS:
+//                   `Command`, `Transcript` or `Snippet` - `Snippet  TOML  Copy`
+//
+// `Path` is a prop rather than something the plate could infer, because a
+// fence has no idea where its bytes came from: the page that pasted them does.
+// Unset is the normal case (a command has no path), so the field falls back to
+// the kind this component CAN derive from its own props: a block its page
+// declares `Copy` is a command to run, a block carrying `CopyPayload` is a
+// transcript whose clipboard holds the bare command, and anything else is a
+// snippet. Two readings of one slot, never both at once, and no call site has
+// to change to get a full ribbon. Source/Script/CodePlate.ts builds the ribbon
+// and reads this as `data-plate-path`; this component still renders no control
+// of its own.
 import { codeToHtml } from "shiki";
 
 import { ZineTheme } from "@Library/ShikiTheme";
@@ -82,7 +94,9 @@ interface Props {
 	/**
 	 * Declare that this block is meant to be copied. The plate already gives
 	 * every fence a copy chip, so this adds no second control - it records the
-	 * intent at the call site.
+	 * intent at the call site, and it is what makes the ribbon's leading field
+	 * read `Command` instead of `Snippet`: a block a page declares copyable is
+	 * a command to run, not a fragment to read.
 	 */
 	Copy?: boolean;
 	/**
@@ -101,11 +115,23 @@ interface Props {
 	 * The file the block was taken from, printed as the ribbon's leading
 	 * field. Metadata, never an action: it sits beside the language tag and
 	 * the copy chip, and nothing about it is clickable.
+	 *
+	 * A real path always wins over the derived kind, and an empty string
+	 * counts as unset - a blank leading field would leave the ribbon with two
+	 * slots and an invisible gap where the first one belongs.
 	 */
 	Path?: string;
 }
 
-const { Code, Lang = "bash", Class = "", CopyPayload, Path } = Astro.props;
+const { Code, Lang = "bash", Class = "", Copy, CopyPayload, Path } = Astro.props;
+
+// THE RIBBON'S LEADING FIELD, ranked by how strong the fact is: a path the
+// page declared, else the kind this component can prove from its own props.
+// `CopyPayload` outranks `Copy` because a transcript that copies a bare
+// command is a transcript first - the clipboard is the command, the block is
+// not. An empty `Path` is unset, not a leading field of zero width.
+const Kind = CopyPayload !== undefined ? "Transcript" : Copy ? "Command" : "Snippet";
+const Source = Path !== undefined && Path !== "" ? Path : Kind;
 
 // The plate owns the frame - border, radius, background, shadow, hover lift.
 // `Class` carries the layout half only, so the frame utilities that used to be
@@ -128,6 +154,6 @@ const Html = (await codeToHtml(Code, { lang: Lang, theme: ZineTheme }))
 <div
 	class:list={["zine-fence", Layout]}
 	data-plate-payload={CopyPayload}
-	data-plate-path={Path}
+	data-plate-path={Source}
 	set:html={Html}
 />

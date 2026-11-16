@@ -7,11 +7,13 @@
  * expose the raw content underneath, the same hard-offset grammar, no easing.
  * Mobile has no hover, so tap flips the class there.
  *
- * THE CONSOLE GRAMMAR (Stitch direction): the cover is the RIBBON - the tag on
- * the right, the cover line on the left - and the revealed content sits in an
+ * THE POD GRAMMAR (dual-pod direction): the cover is the RIBBON - the cover
+ * line on the left, the tag on the right - and the revealed content sits in an
  * inset WELL beneath it. That is the same shape a stream takes, which is the
  * point: a suppression mark and a preview are the same object seen at two
- * moments, so they are drawn with the same three parts.
+ * moments, so they are drawn with the same three parts. The ribbon carries the
+ * TAG here and no byte count, because nothing in this component measures a
+ * stream.
  *
  * DECORATIVE ONLY, and this is the rule that keeps it honest: the overlay is
  * ABSOLUTELY POSITIONED and its height is decided by the COVER, not by the raw
@@ -42,26 +44,35 @@ interface Props {
 }
 
 const { Cover, Tag = "SUPPRESSED", Raw, Flow = false } = Astro.props;
+
+/** The ribbon geometry, one string for the whole set. */
+const Ribbon =
+	"flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5";
 ---
 
 {Flow ? (
-	<div class="well" data-zine-reveal-flow>
-		<div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
-			<span class="min-w-0 font-mono text-base text-zinc-dust">{Cover}</span>
-			<span class="telemetry-tag shrink-0">{Tag}</span>
+	<div class="border border-oxblood-dark bg-soot-black" data-zine-reveal-flow>
+		<div class={Ribbon}>
+			<span class="min-w-0 break-words font-mono text-base text-zinc-dust">{Cover}</span>
+			<span class="telemetry-tag ml-auto shrink-0">{Tag}</span>
 		</div>
 		<div class="p-3 font-mono text-base font-bold text-bone-white" set:html={Raw} />
 	</div>
 ) : (
 	<div
-		class="group relative cursor-crosshair"
+		class="group relative cursor-crosshair border border-oxblood-dark bg-soot-black"
 		data-zine-reveal
 		tabindex="0"
 		aria-label={`${Tag}: hover or focus to reveal the raw content`}
 	>
-		<div class="well flex items-center justify-between gap-3 p-3 font-mono text-base text-zinc-dust transition-opacity duration-150 group-hover:opacity-10 group-focus:opacity-10 group-[.revealed]:opacity-10">
-			<span class="truncate">{Cover}</span>
-			<span class="telemetry-tag shrink-0">{Tag}</span>
+		<!-- The cover IS the ribbon. It fades rather than leaves, so the pod keeps
+		     its height while the raw content is on top of it - the height is the
+		     cover's, which is the whole reason this mode is decorative. -->
+		<div
+			class={`${Ribbon} transition-opacity duration-150 group-hover:opacity-10 group-focus:opacity-10 group-[.revealed]:opacity-10`}
+		>
+			<span class="min-w-0 truncate font-mono text-base text-zinc-dust">{Cover}</span>
+			<span class="telemetry-tag ml-auto shrink-0">{Tag}</span>
 		</div>
 		<div class="pointer-events-none absolute inset-0 flex items-center p-3 font-mono text-base font-bold text-bone-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus:opacity-100 group-[.revealed]:opacity-100">
 			<div class="w-full" set:html={Raw} />

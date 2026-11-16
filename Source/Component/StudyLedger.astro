@@ -1,9 +1,10 @@
 ---
 /**
- * StudyLedger - the canonical real-world study block. One structured form for
- * every occurrence of the Sep 2026 measured study: a header row (the period and
- * the scope), ONE primary result, a quiet details table, the method note as its
- * own bordered block, the caveat, and the SRC citation.
+ * StudyLedger - the canonical real-world study block, rendered as a TELEMETRY
+ * MATRIX: one grunge plate whose RIBBON carries the corpus, whose dominant LEAD
+ * CELL holds the single result, and whose recessed GRID carries the fourteen
+ * measures that result is computed from. The method note, the caveat and the
+ * SRC citation follow the plate.
  *
  * WHY ONE PRIMARY RESULT AND NOT A LEDGER OF EQUALS
  *
@@ -14,6 +15,35 @@
  * one result stated at reading size, and everything a reader checks it against
  * in a table underneath, each row carrying its own unit, its own kind and its
  * own scope.
+ *
+ * WHAT MAKES IT A MATRIX
+ *
+ * Three registers stack inside ONE frame, and the order is the argument:
+ *
+ *   ribbon  what was measured and over what corpus - the two telemetry tags, on
+ *           their own band above the readings, the way a pod's header names what
+ *           produced the bytes underneath it.
+ *   lead    the one result, at the metric scale, with its crimson spine. It is
+ *           the matrix's dominant cell: the plate is built around it, so it
+ *           reads as the figure the grid belongs to rather than as a caption
+ *           above a table.
+ *   grid    the recessed well (`tier-well` inside `.shell-card`, the intended
+ *           pair) holding one hairline-separated row per measure.
+ *
+ * The grid is a MATRIX and not a ruled form: one hairline per row, one stronger
+ * rule under the header band, no box per cell, no vertical rules. A grid of
+ * boxes is a form; a stack of readings is a matrix.
+ *
+ * THE COLUMN RHYTHM IS SET BY THE DATA, NOT BY PERCENTAGES. A declared track
+ * cannot hold this column set: the widest reading (424,959,588) needs ~106px of
+ * mono at the base size, so any percentage track narrow enough to keep the two
+ * prose columns readable would clip the figure. Instead every figure, unit and
+ * kind cell is `whitespace-nowrap`, every figure is tabular and right-aligned,
+ * and the two prose columns take what is left - so the digits line up down the
+ * column at every width, and the table scrolls (inside the plate) rather than
+ * reflowing. Units drop to the label voice (`type-meta`) because a unit is a
+ * label; scopes stay at `type-body`, because a scope is a sentence and a
+ * sentence never renders below the readability floor.
  *
  * OBSERVED ONLY. The study's fourth session shape is a SIMULATED pure-tool
  * workload, and it never happened. It is deliberately absent here: a simulated
@@ -46,7 +76,7 @@ const SavedTokens = Figure("study.tokens.saved");
 const LeadSize = Scale === "full" ? "metric" : "metric metric--compact";
 
 /**
- * The details table: what the result is computed from, one question per row.
+ * The details grid: what the result is computed from, one question per row.
  * `Id` is the join - the label is this component's voice, the value, unit,
  * kind and scope are the record's, and `Figure` throws when an ID is unknown.
  */
@@ -81,79 +111,143 @@ const KindTag = {
 	simulated: { Tag: "SIMULATED", Class: "telemetry-tag telemetry-tag--crimson" },
 	derived: { Tag: "DERIVED", Class: "telemetry-tag" },
 } as const;
+
+/** The matrix's one gutter. Every register of the plate indents by the same
+ * step, so the ribbon, the lead and the grid all hang off one column. */
+const Gutter = "px-4 sm:px-5";
+
+/** One cell of the grid: the plate's one gutter and the dense row height. A
+ * value, a unit and a kind are one token each, so those cells add
+ * `whitespace-nowrap` and never wrap to a second line; the two prose cells (the
+ * measure, the scope) wrap. */
+const Cell = "px-4 py-2 sm:px-5";
 ---
 
 <div class="blueprint-section">
-	<!-- HEADER row: the period + the scope. Two telemetry tags - the
-	     measurement, then the corpus it was taken over. Metadata, not a
-	     sentence, which is why they are chips and not prose. -->
-	<div class="flex flex-wrap items-center justify-between gap-2">
-		<span class="telemetry-tag telemetry-tag--teal">
-			MEASURED, {Study.Measured.toUpperCase()}
-		</span>
-		<span class="telemetry-tag">
-			{Study.Sessions} HERMES SESSIONS &bull; {Study.ApiCalls} API CALLS &bull;{" "}
-			{Study.Period.toUpperCase()}
-		</span>
-	</div>
-
-	<!-- THE PRIMARY RESULT: one figure, at the metric scale, with its unit as a
-	     child so the two never separate on a narrow viewport. -->
-	<div class="mt-8 border-l-2 border-blood-crimson pl-5">
-		<div class="section-index">ESTIMATED CONTEXT REDUCTION</div>
-		<div class={`mt-2 !text-stamped-canary ${LeadSize}`}>
-			{Reduction.Value}
-			<span class="metric__unit">{Reduction.Unit}</span>
+	<!-- THE MATRIX PLATE. `grunge` + `data-grunge` put the ink at the plate's
+	     EDGE (`mode="edge"`), never under the readings: a splatter across a
+	     column of digits is a stain on the instrument, and the readings are the
+	     one thing on this block that must stay sharp. -->
+	<div class="grunge shell-card" data-grunge data-grunge-mode="edge">
+		<!-- RIBBON: what was measured, then the corpus it was taken over. Two
+		     telemetry tags - metadata, not a sentence, which is why they are
+		     chips on their own band and not prose. -->
+		<div
+			class:list={[
+				"flex flex-wrap items-center justify-between gap-2 border-b border-oxblood-dark bg-asphalt-panel py-2.5",
+				Gutter,
+			]}
+		>
+			<span class="telemetry-tag telemetry-tag--teal">
+				MEASURED, {Study.Measured.toUpperCase()}
+			</span>
+			<span class="telemetry-tag">
+				{Study.Sessions} HERMES SESSIONS &bull; {Study.ApiCalls} API CALLS &bull;{" "}
+				{Study.Period.toUpperCase()}
+			</span>
 		</div>
-		<p class="mt-3 max-w-2xl type-body text-bone-newsprint">
-			Across {Sessions.Value} recorded sessions, with a sensitivity band of {Band.Value}. The
-			band is the result: {SavedTokens.Value} tokens is the same reconstruction counted at the
-			centre of that range.
-		</p>
-		<p class="mt-2 max-w-2xl type-body text-zinc-dust">
-			<span class="type-meta">{Reduction.Kind.toUpperCase()}</span> &bull; {Reduction.Scope}
-		</p>
-	</div>
 
-	<!-- THE DETAILS: one question per row, every row carrying its own unit and
-	     scope. A TELEMETRY MATRIX rather than a ruled table: the well recesses
-	     the readings into the page, the rows are separated by hairlines instead
-	     of a box per cell, and every figure is tabular so the digits line up
-	     down the column. -->
-	<div class="mt-10 overflow-x-auto well">
-		<table class="w-full border-collapse font-mono text-base">
-			<thead>
-				<tr class="border-b border-[var(--tier-well-edge)]">
-					<th class="px-3 py-2 text-left type-meta !font-black text-zinc-dust">
-						MEASURE
-					</th>
-					<th class="px-3 py-2 text-right type-meta !font-black text-zinc-dust">VALUE</th>
-					<th class="px-3 py-2 text-left type-meta !font-black text-zinc-dust">UNIT</th>
-					<th class="px-3 py-2 text-left type-meta !font-black text-zinc-dust">KIND</th>
-					<th class="px-3 py-2 text-left type-meta !font-black text-zinc-dust">SCOPE</th>
-				</tr>
-			</thead>
-			<tbody>
-				{Rows.map(({ Label, Fact }) => (
-					<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
-						<td class="px-3 py-2 text-left text-bone-newsprint">{Label}</td>
-						<td class="px-3 py-2 text-right font-black tabular-nums text-bone-white">
-							{Fact.Value}
-						</td>
-						<td class="px-3 py-2 text-left text-zinc-dust">{Fact.Unit}</td>
-						<td class="px-3 py-2 text-left">
-							<span class={KindTag[Fact.Kind].Class}>{KindTag[Fact.Kind].Tag}</span>
-						</td>
-						<td class="px-3 py-2 text-left type-body text-zinc-dust">{Fact.Scope}</td>
+		<!-- THE LEAD CELL: one figure, at the metric scale, with its unit as a
+		     child so the two never separate on a narrow viewport. The crimson
+		     spine is this cell's identity - it is the result, and the grid below
+		     is what the result is computed from. -->
+		<div class:list={["border-l-2 border-blood-crimson py-6", Gutter]}>
+			<div class="section-index">ESTIMATED CONTEXT REDUCTION</div>
+			<div class={`mt-2 !text-stamped-canary ${LeadSize}`}>
+				{Reduction.Value}
+				<span class="metric__unit">{Reduction.Unit}</span>
+			</div>
+			<p class="mt-3 max-w-2xl type-body text-bone-newsprint">
+				Across {Sessions.Value} recorded sessions, with a sensitivity band of {Band.Value}. The
+				band is the result: {SavedTokens.Value} tokens is the same reconstruction counted at the
+				centre of that range.
+			</p>
+			<p class="mt-2 max-w-2xl type-body text-zinc-dust">
+				<span class="type-meta">{Reduction.Kind.toUpperCase()}</span> &bull; {Reduction.Scope}
+			</p>
+		</div>
+
+		<!-- THE GRID: one question per row, every row carrying its own unit, its
+		     own kind and its own scope. Recessed into the plate (the fill-only
+		     `tier-well`, so the plate's own 1px edge stays the frame and no
+		     second edge paints beside it), separated by hairlines, every figure
+		     tabular so the digits line up down the column. The scroll container
+		     is the inner box: the plate's frame stays put, the rows move. -->
+		<div class="tier-well overflow-x-auto border-t border-[color:var(--tier-well-edge)]">
+			<table class="w-full min-w-[46rem] border-collapse font-mono text-base">
+				<thead class="bg-asphalt-panel">
+					<tr class="border-b border-[color:var(--tier-well-edge)]">
+						<th
+							scope="col"
+							class:list={["type-meta text-left !font-black text-zinc-dust", Cell]}
+						>
+							MEASURE
+						</th>
+						<th
+							scope="col"
+							class:list={[
+								"type-meta whitespace-nowrap text-right !font-black text-zinc-dust",
+								Cell,
+							]}
+						>
+							VALUE
+						</th>
+						<th
+							scope="col"
+							class:list={[
+								"type-meta whitespace-nowrap text-left !font-black text-zinc-dust",
+								Cell,
+							]}
+						>
+							UNIT
+						</th>
+						<th
+							scope="col"
+							class:list={[
+								"type-meta whitespace-nowrap text-left !font-black text-zinc-dust",
+								Cell,
+							]}
+						>
+							KIND
+						</th>
+						<th
+							scope="col"
+							class:list={["type-meta text-left !font-black text-zinc-dust", Cell]}
+						>
+							SCOPE
+						</th>
 					</tr>
-				))}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{Rows.map(({ Label, Fact }) => (
+						<tr class="border-b border-oxblood-dark/60 align-top last:border-b-0 hover:bg-[color-mix(in_srgb,var(--raw-blood)_10%,transparent)]">
+							<td class:list={["leading-tight text-bone-newsprint", Cell]}>{Label}</td>
+							<td
+								class:list={[
+									"whitespace-nowrap text-right font-black tabular-nums text-bone-white",
+									Cell,
+								]}
+							>
+								{Fact.Value}
+							</td>
+							<td class:list={["type-meta whitespace-nowrap text-zinc-dust", Cell]}>
+								{Fact.Unit}
+							</td>
+							<td class:list={["whitespace-nowrap", Cell]}>
+								<span class={KindTag[Fact.Kind].Class}>{KindTag[Fact.Kind].Tag}</span>
+							</td>
+							<td class:list={["type-body text-zinc-dust", Cell]}>{Fact.Scope}</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
 	</div>
 
 	<!-- HOW IT WAS MEASURED: the method as a block, not a footnote. The study is
 	     a reconstruction by the author, and a reconstruction establishes nothing
-	     about task success or about anyone else's sessions. -->
+	     about task success or about anyone else's sessions. The canary spine is
+	     the qualifier's identity - it is what separates a limit from a reading. -->
 	<div class="mt-8 border-l-4 border-stamped-canary tier-shell p-4">
 		<div class="type-meta font-black text-stamped-canary">HOW THIS WAS MEASURED</div>
 		<p class="mt-3 max-w-3xl type-body text-bone-newsprint">

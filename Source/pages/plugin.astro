@@ -35,8 +35,8 @@ import { ToolNames } from "@Library/Roster";
  * qualifies one. `CardHead` is a shell card's ribbon - the tier's own hairline
  * under a row of telemetry tags - and `CardBody` its padding.
  */
-const Section = "mt-3 scroll-mt-24 font-headline text-sub font-black uppercase text-bone-white";
-const Head = "font-headline text-lg font-black uppercase text-bone-white sm:text-xl";
+const Section = "mt-3 scroll-mt-24 type-section text-bone-white";
+const Head = "type-sub text-bone-white";
 const Lede = "mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint";
 const Body = "font-body text-body leading-relaxed text-bone-newsprint";
 const Note = "font-body text-body leading-relaxed text-zinc-dust";
@@ -144,7 +144,7 @@ const Lanes = [
 	},
 ];
 
-// THE FOUR LAYERS - each one names its job and the failure it owns. The point
+// THE FIVE LAYERS - each one names its job and the failure it owns. The point
 // of the table is that no layer can absorb another's failure: the boundary
 // between them is the JSON contract.
 const Layers = [
@@ -261,7 +261,7 @@ const Essential = [
 
 		<div class="flex max-w-4xl flex-wrap items-center gap-6">
 			<ZineStamp Label={`${Stamps.Plugin()} STANDALONE`} Color="raw" Rotate="sm:-rotate-2" />
-			<ZineStamp Label="6 HOOKS" Color="teal" Rotate="sm:rotate-1" />
+			<ZineStamp Label={`${HookNames.length} HOOKS`} Color="teal" Rotate="sm:rotate-1" />
 			<ZineStamp Label={`${ToolNames.length} TOOLS`} Color="teal" Rotate="sm:-rotate-1" />
 			<ZineStamp Label="ZERO LOGIC IN PYTHON" Color="canary" Rotate="sm:rotate-2" />
 		</div>
@@ -340,13 +340,13 @@ const Essential = [
 						</div>
 					</div>
 					<div class="well space-y-4 p-4 font-mono text-code">
-						<div class="text-weathered-teal"># provides_hooks (6)</div>
+						<div class="text-weathered-teal"># provides_hooks ({HookNames.length})</div>
 						<div class="text-bone-newsprint">on_session_start · pre_tool_call</div>
 						<div class="text-bone-newsprint">
 							transform_tool_result · transform_terminal_output
 						</div>
 						<div class="text-bone-newsprint">pre_llm_call · post_llm_call</div>
-						<div class="pt-6 text-weathered-teal"># provides_tools (13)</div>
+						<div class="pt-6 text-weathered-teal"># provides_tools ({ToolNames.length})</div>
 						<div class="text-bone-newsprint">
 							retrieve · compress · stats · rebuild · files · diff
 						</div>
@@ -481,7 +481,7 @@ const Essential = [
 			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
 				<div class={CardHead}>
 					<span class="telemetry-tag telemetry-tag--bone">CALL CHAIN</span>
-					<span class="telemetry-tag">5 layers</span>
+					<span class="telemetry-tag">{Layers.length} layers</span>
 					<span class="telemetry-tag telemetry-tag--teal">
 						one JSON contract per pair
 					</span>

@@ -1,23 +1,38 @@
 ---
 /**
  * ZineLedger - the generic DATA MATRIX: a recessed well of readings, one row per
- * record, an optional caption row of column labels.
+ * record, an optional caption band of column labels.
  *
- * The matrix is the telemetry voice applied to a table. Three things make it
- * one, and none of them is decoration:
+ * The matrix is the telemetry voice applied to a table. Four things make it one,
+ * and none of them is decoration:
  *
- *   the WELL      the readings sit in a channel cut into the page (`.well`),
- *                 so the block reads as captured data rather than as a panel
- *                 of prose that happens to be tabular.
- *   the HAIRLINES rows are separated by one hairline each and the header row by
- *                 one stronger rule - no box per cell, no vertical rules. A
- *                 grid of boxes is a form; a stack of readings is a matrix.
- *   the DIGITS    every cell is tabular-numeric, so a column of figures aligns
- *                 on the decimal whether or not the caller padded it.
+ *   the PLATE     the readings sit in a channel cut into the page (`.well` with
+ *                 the house hard offset plane), and the plate carries the grunge
+ *                 ink at its EDGE - a splatter across a column of digits is a
+ *                 stain on the instrument, so the ink rings the plate instead of
+ *                 sitting under the type.
+ *   the BAND      the caption row is a real band, not a line of small text: the
+ *                 asphalt fill and the stronger rule under it are the ribbon the
+ *                 readings hang from, the same way a console pod's header names
+ *                 what produced the bytes in the well beneath it.
+ *   the HAIRLINES rows are separated by one hairline each and the band by one
+ *                 stronger rule - no box per cell, no vertical rules. A grid of
+ *                 boxes is a form; a stack of readings is a matrix. The grid is
+ *                 the TRACKS (a figure column, a unit column, a label column),
+ *                 not a drawn lattice.
+ *   the DIGITS    every cell is tabular-numeric, every figure is right-aligned by
+ *                 the caller and never wraps (`whitespace-nowrap` on a
+ *                 right-aligned cell), so a column of figures aligns on the
+ *                 decimal and stays one line tall whether or not the caller
+ *                 padded it.
  *
  * `Delta` is IDENTITY, not emphasis: `up` is the canary and `down` the teal, on
  * the arrow as well as on the value. A matrix that greyed its deltas would be
  * quieter and would stop saying which direction a reading moved.
+ *
+ * The table also carries a `min-w` floor, so at a narrow viewport the tracks stop
+ * shrinking and the box scrolls instead: a matrix squeezed to four characters a
+ * column is not a denser matrix, it is an unreadable one.
  */
 interface Props {
 	/** Table rows; Delta highlights a cell in the canary/teal accent. */
@@ -41,42 +56,67 @@ const Delta = {
 	up: "text-stamped-canary",
 	down: "text-weathered-teal",
 };
+
+/** One cell of the matrix: the plate's one gutter and the dense row height. It is
+ * pure geometry, so it is valid on a `<th>` in the band as well as on a `<td>`. */
+const CellBox = "px-4 py-2 sm:px-5";
 ---
 
 <!-- The table cannot shrink below its content's min-content width, so on a
 	narrow viewport it widened the PAGE (/versions/ by 226px) instead of
-	scrolling. The box is the scroll container: the border stays put, the
-	rows move. Same pattern as every hand-written table on the site. -->
-<div class="zine-box-subtle well overflow-x-auto">
-	<table class="w-full border-collapse font-mono text-base">
-		{Headers && (
-			<thead>
-				<tr class="border-b border-[var(--tier-well-edge)]">
-					{Headers.map((Header) => (
-						<th class="px-3 py-2 text-left type-meta !font-black uppercase tracking-widest text-zinc-dust">
-							{Header}
-						</th>
-					))}
-				</tr>
-			</thead>
-		)}
-		<tbody>
-			{Rows.map((Row) => (
-				<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
-					{Row.Cells.map((Cell) => (
-						<td
-							class={`px-3 py-2 tabular-nums ${Cell.Delta ? Delta[Cell.Delta] : "text-bone-newsprint"} ${Cell.Align === "right" ? "text-right" : "text-left"}`}
-						>
-							{Cell.Delta && (
-								<span class="mr-1 font-black">
-									{Cell.Delta === "up" ? "▲" : "▼"}
-								</span>
-							)}
-							{Cell.Text}
-						</td>
-					))}
-				</tr>
-			))}
-		</tbody>
-	</table>
+	scrolling. The box is the scroll container: the border stays put, the rows
+	move. Same pattern as every hand-written table on the site.
+
+	The scroll container is the INNER box and the grunge plate is the OUTER one,
+	which is not cosmetic: `overflow` on the plate would clip the ink's own
+	bleed (`.grunge__ink` paints past the plate edge by design) and its negative
+	offsets would register as scrollable overflow, putting scrollbars on the
+	matrix for a drawing that is behind it. -->
+<div class="grunge grunge--faint zine-box-subtle well" data-grunge data-grunge-mode="edge">
+	<div class="overflow-x-auto">
+		<table class="w-full min-w-[42rem] border-collapse font-mono text-base">
+			{Headers && (
+				<thead class="bg-asphalt-panel">
+					<tr class="border-b border-[color:var(--tier-well-edge)]">
+						{Headers.map((Header) => (
+							<th
+								scope="col"
+								class:list={[
+									"type-meta whitespace-nowrap text-left !font-black uppercase text-zinc-dust",
+									CellBox,
+								]}
+							>
+								{Header}
+							</th>
+						))}
+					</tr>
+				</thead>
+			)}
+			<tbody>
+				{Rows.map((Row) => (
+					<tr class="border-b border-oxblood-dark/60 align-top last:border-b-0 hover:bg-[color-mix(in_srgb,var(--raw-blood)_10%,transparent)]">
+						{Row.Cells.map((Cell) => (
+							<td
+								class:list={[
+									CellBox,
+									"tabular-nums leading-snug",
+									Cell.Delta ? Delta[Cell.Delta] : "text-bone-newsprint",
+									Cell.Align === "right"
+										? "whitespace-nowrap text-right"
+										: "text-left",
+								]}
+							>
+								{Cell.Delta && (
+									<span class="mr-1 font-black">
+										{Cell.Delta === "up" ? "▲" : "▼"}
+									</span>
+								)}
+								{Cell.Text}
+							</td>
+						))}
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
 </div>

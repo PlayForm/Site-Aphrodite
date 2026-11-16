@@ -15,6 +15,16 @@
  *
  * `Aria` exists for the chips whose visible label is a short verb over an
  * invisible payload - `COPY` beside a shell line names nothing on its own.
+ *
+ * ONE SHAPE WITH THE RIBBON'S CHIP. `Source/Script/CodePlate.ts` builds a
+ * fence's control as `<span aria-hidden>⧉</span><span>Copy</span>` and ADOPTS
+ * any `[data-copy]` a page placed in a single-fence host: it moves that control
+ * into the ribbon instead of generating a second one, so one fence still has
+ * one control. A chip that reaches a fence therefore BECOMES the ribbon's
+ * control, and it has to be that shape - glyph first, label second, telemetry
+ * voice. A label before the glyph would be the one visible difference between
+ * an adopted control and a generated one, and two shapes in one ribbon is the
+ * same defect as two controls.
  */
 interface Props {
 	/** The chip text; clicking copies this exact string (defaults to Label). */
@@ -37,6 +47,17 @@ interface Props {
 
 const { Label, Copy, Aria, Color = "teal" } = Astro.props;
 
+// The accessible name, in the SAME grammar as `CopyButton`: a label that IS the
+// verb must not repeat it - `Copy COPY to the clipboard` names nothing - and a
+// label that names what the reader gets is read as `Copy <label> to the
+// clipboard`. Two components that answered this question differently were two
+// control surfaces pretending to be one.
+const Name =
+	Aria ??
+	(Label.toUpperCase() === "COPY"
+		? "Copy to the clipboard"
+		: `Copy ${Label} to the clipboard`);
+
 const Palette = {
 	teal: "text-weathered-teal hover:bg-weathered-teal",
 	canary: "text-stamped-canary hover:bg-stamped-canary",
@@ -56,10 +77,10 @@ const HoverText = {
 	class={`group inline-flex items-center gap-1.5 border border-oxblood-dark bg-soot-black px-2 py-1 font-mono text-meta font-bold transition-colors ${Palette} ${HoverText}`}
 	data-copy={Copy ?? Label}
 	type="button"
-	aria-label={Aria ?? `Copy ${Label} to the clipboard`}
+	aria-label={Name}
 >
-	<span class="opacity-60 group-hover:opacity-100">{Label}</span>
 	<span aria-hidden="true" class="text-base opacity-40 group-hover:opacity-90">
 		⧉
 	</span>
+	<span class="opacity-60 group-hover:opacity-100">{Label}</span>
 </button>

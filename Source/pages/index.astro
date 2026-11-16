@@ -418,6 +418,24 @@ const GridFold = `
 		The four stages run in order: each card is one step, the figure
 		on it is what that step costs, and the line under the rule is what it decides.
 	</p>
+	<p>
+		What happens between the tool printing and the model reading is four steps, run
+		in the same order every time, and only one of them costs anything measurable.
+	</p>
+	<p>
+		The first two are the engine's: name the content, then render the one line that
+		describes it. The third is storage, and it is deliberately boring. The fourth is
+		not the engine's at all - it is the agent's, and it is the only step that spends
+		the budget the other three just saved.
+	</p>
+	<p>
+		The agent sees ${Narrative.PreviewTokens} of metadata instead of hundreds - and
+		retrieves the full content only when it actually needs it.
+	</p>
+	<p>
+		It is the reason tool-heavy agents keep working: the context window stops paying
+		for noise before the reasoning starts.
+	</p>
 </div>
 `.trim();
 
@@ -466,8 +484,14 @@ const Decision = [
 		     stamped wordmark below, which is the page's identity, so a swap would
 		     ship two h1s and shrink the wordmark from 144px to 48px. The lead below
 		     keeps PageHeader's rhythm - one sentence, one <p>. -->
+		<!-- SIX BANDS, ONE RULE. Bands 02-06 are `.band`, whose chapter rule is
+		     `--oxblood-dark`; `.blueprint-section`'s default is the grey
+		     `--blueprint-rule`. Band 01 therefore states the same crimson through
+		     the documented knob, so the six numbered bands open on one rule and a
+		     reader can see the chapter grammar before the second band repeats it. -->
 		<header
 			class="blueprint-section relative flex w-full flex-col items-start justify-start pt-4 text-start"
+			style="--blueprint-rule: var(--oxblood-dark)"
 			data-enter
 		>
 			<!-- Beat 01. The folio, in the published blueprint voice: six of these
@@ -634,31 +658,13 @@ const Decision = [
 			<p class="section-index">03 // MECHANISM // PIPELINE // 4-STAGE ABSORPTION</p>
 			<h2 class="type-section mb-4 text-bone-white">How it works</h2>
 			<p class="type-sub mb-6 text-bone-newsprint">Four steps, one decision</p>
-			<div class="prose-flow max-w-[62ch]">
+			<div class="prose-flow max-w-2xl">
 				<p class="type-body text-bone-newsprint">
 					A tool result is appended to the model's context the moment the tool returns, so
 					a build log the agent never needed is read in full, and paid for in full.
 					Aphrodite intercepts that output before it reaches the LLM and replaces it with
 					a compact, structured preview - because the agent's reasoning budget is the
 					context budget, and raw noise spends both.
-				</p>
-				<p class="type-body text-bone-newsprint">
-					What happens between the tool printing and the model reading is four steps, run
-					in the same order every time, and only one of them costs anything measurable.
-				</p>
-				<p class="type-body text-bone-newsprint">
-					The first two are the engine's: name the content, then render the one line that
-					describes it. The third is storage, and it is deliberately boring. The fourth is
-					not the engine's at all - it is the agent's, and it is the only step that spends
-					the budget the other three just saved.
-				</p>
-				<p class="type-body text-bone-newsprint">
-					The agent sees {Narrative.PreviewTokens} of metadata instead of hundreds - and
-					retrieves the full content only when it actually needs it.
-				</p>
-				<p class="type-body text-bone-newsprint">
-					It is the reason tool-heavy agents keep working: the context window stops paying
-					for noise before the reasoning starts.
 				</p>
 			</div>
 			<div class="mt-10 max-w-[62ch]">
@@ -685,7 +691,7 @@ const Decision = [
 				data-grunge
 			>
 				<div
-					class="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-[1.45fr_1fr_1fr_1.45fr]"
+					class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4"
 					data-enter="180"
 				>
 					<!-- Stage 01 // CLASSIFY - teal: the technical voice, the type
@@ -768,8 +774,17 @@ const Decision = [
 		     overhead, the saved total is the study. A reader must not be able to
 		     average them into one outcome, so every figure keeps the qualifier
 		     that names its domain - and the qualifier is part of the number. -->
+		<!-- BAND 04 // EVIDENCE - the inverted sand band: bone ground, carbon ink,
+		     the page's only surface change. It is a BAND and not an inset pod
+		     because a pod would have to be laid on the same dark ground as the
+		     other five chapters, and the subject change would stop being visible
+		     without a word; the pod's composition (one dominant figure, the
+		     comparison beside it, the qualifier under it) is the band's own.
+		     `border-t-0` because the bone surface IS the divider: the shell's grey
+		     chapter rule would otherwise paint a 1px dark seam across the top edge
+		     of the paper, which is the one place on the page it cannot sit. -->
 		<section
-			class="paper-band relative bg-bone-newsprint py-6 text-soot-black sm:py-10 lg:py-14"
+			class="paper-band relative border-t-0 bg-bone-newsprint py-6 text-soot-black sm:py-10 lg:py-14"
 			data-reveal
 		>
 			<!-- ONE EXPRESSIVE DEVICE IN THIS BAND: the giant numeral. The ribbon
@@ -781,8 +796,8 @@ const Decision = [
 			     device. The four chips below are flat for the same reason: with
 			     the numeral as the band's one expressive assembly, a shadowed,
 			     tilted chip is a second and third. -->
-			<p class="section-kicker !mb-4 !text-oxblood-dark">
-				04 / EVIDENCE &middot; {Study.Sessions} SESSIONS
+			<p class="section-index !mb-4 !text-oxblood-dark">
+				04 // EVIDENCE // {Study.Sessions} SESSIONS
 			</p>
 			<h2 class="type-section mb-8 text-soot-black">
 				One result, and the four figures beside it
@@ -904,7 +919,7 @@ const Decision = [
 		     above them. Nothing was cut to buy the air; the band simply stops
 		     filling its own background. -->
 		<section class="band relative w-full" data-reveal>
-			<p class="section-kicker !mb-4">05 / INTEGRATION</p>
+			<p class="section-index">05 // CONNECT</p>
 			<h2 class="type-section mb-6 text-bone-white">Two ways to run it</h2>
 			<div class="prose-flow max-w-[62ch]">
 				<p class="type-body text-bone-newsprint">
@@ -912,6 +927,61 @@ const Decision = [
 					inside Hermes, where the interception lives inside the turn; the other is a
 					listener on a port, where it can only see traffic that arrives over HTTP.
 				</p>
+			</div>
+			<!-- THE DECISION MATRIX - the band's composition, and the reason this
+			     chapter is CONNECT rather than a second pair of plates. Four axes
+			     down the side, the two lanes across, one row per axis. Ruled rows
+			     rather than a <table>: every cell holds a sentence, and a sentence
+			     in a table cell wraps against a fixed track.
+			     The two lane columns below are the SOURCE these cells compress -
+			     every cell is a fact its own lane's prose already states, so the
+			     matrix may summarise a sentence and may never carry a claim the
+			     prose does not make. The stack repeats the lane name above each
+			     cell on small screens, because a stack loses the column header
+			     that named it. -->
+			<div class="grunge shell-card mt-10" data-grunge data-grunge-mode="edge">
+				<div
+					class="flex flex-wrap items-center gap-3 border-b border-[color:var(--tier-shell-edge)] bg-soot-black px-4 py-3 sm:px-5"
+				>
+					<span class="telemetry-tag telemetry-tag--crimson shadow-[2px_2px_0px_#000]">
+						THE DECISION MATRIX
+					</span>
+					<span class="grow font-mono text-base leading-relaxed text-zinc-dust">
+						one engine, two lanes - what each one sees, shares, and cannot do
+					</span>
+				</div>
+				<div class="px-4 sm:px-5">
+					<div
+						class="hidden border-b border-[color:var(--tier-shell-edge)] py-3 lg:grid lg:grid-cols-[13rem_1fr_1fr] lg:gap-10"
+					>
+						<span class="type-meta font-bold uppercase tracking-widest text-zinc-dust">AXIS</span>
+						<span class="type-meta font-bold uppercase tracking-widest text-bone-white">
+							PATH 01 // NATIVE PLUGIN
+						</span>
+						<span class="type-meta font-bold uppercase tracking-widest text-bone-white">
+							PATH 02 // OPENAI-COMPATIBLE PROXY
+						</span>
+					</div>
+					{Decision.map((Row) => (
+						<div class="grid grid-cols-1 gap-4 border-b border-[color:var(--tier-shell-edge)] py-5 last:border-b-0 lg:grid-cols-[13rem_1fr_1fr] lg:gap-10">
+							<p class="type-meta font-bold uppercase tracking-widest text-zinc-dust">
+								{Row.Axis}
+							</p>
+							<div>
+								<p class="type-meta mb-2 font-bold uppercase tracking-widest text-zinc-dust lg:hidden">
+									PATH 01 // NATIVE PLUGIN
+								</p>
+								<p class="type-body text-bone-newsprint">{Row.One}</p>
+							</div>
+							<div>
+								<p class="type-meta mb-2 font-bold uppercase tracking-widest text-zinc-dust lg:hidden">
+									PATH 02 // OPENAI-COMPATIBLE PROXY
+								</p>
+								<p class="type-body text-bone-newsprint">{Row.Two}</p>
+							</div>
+						</div>
+					))}
+				</div>
 			</div>
 			<div class="mt-16 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
 				<article class="flex flex-col border-t-2 border-oxblood-dark pt-6">
@@ -992,7 +1062,7 @@ const Decision = [
 		     reader takes from this page, and the outcome line is what makes it a
 		     procedure rather than a command list. -->
 		<section class="band relative w-full" data-reveal>
-			<p class="section-kicker !mb-4">06 / INSTALLATION</p>
+			<p class="section-index">06 // START</p>
 			<h2 class="type-section mb-8 text-bone-white">Installing it</h2>
 			<div class="grunge emphasis-standard max-w-4xl p-6 sm:p-8 lg:p-10" data-grunge>
 				<p class="type-meta font-bold uppercase tracking-widest text-stamped-canary">

@@ -1228,9 +1228,9 @@ const Run = (Root: HTMLElement): (() => void) => {
 
 		Preview.textContent = RunPreview(Script.Type, Lines);
 		Marker.textContent = RunMarker(Script.Hash, Script.Type, Lines);
-		Tally.textContent = `${Lines.length.toLocaleString("en-US")} lines · ${RunBytes(
-			Lines,
-		).toLocaleString("en-US")} bytes`;
+		Tally.textContent = `${Lines.length.toLocaleString("en-US")} ${
+			Lines.length === 1 ? "LINE" : "LINES"
+		} · ${RunBytes(Lines).toLocaleString("en-US")} B`;
 	};
 
 	const Delay = (

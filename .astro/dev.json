@@ -1,5 +1,5 @@
 {
-	"pid": 29312,
+	"pid": 84649,
 	"port": 9999,
 	"url": "http://localhost:9999",
 	"urls": {
@@ -10,17 +10,15 @@
 			"http://127.0.2.2:9999/",
 			"http://127.0.2.3:9999/",
 			"http://192.168.0.147:9999/",
-			"http://100.96.0.10:9999/",
 			"http://100.66.141.20:9999/"
 		],
 		"networkInterfaceNames": [
 			"lo0",
 			"lo0",
 			"en0",
-			"utun0",
 			"utun5"
 		]
 	},
 	"background": false,
-	"startedAt": "2026-11-16T13:10:21.148Z"
+	"startedAt": "2026-11-16T20:26:40.144Z"
 }

@@ -1,7 +1,17 @@
 ---
 /**
  * ZineExample - the PRE-ASSEMBLED form of one worked example: the raw input
- * pane, the "absorbed" rule, and the preview the model kept, in one plate.
+ * pod, the "absorbed" seam, and the preview the model kept, in one plate.
+ *
+ * THE DUAL PODS. The pair is the product's whole argument - bytes in on one
+ * side, the line the model actually reads on the other - so it is arranged as
+ * two pods side by side in one band rather than stacked in one column: each
+ * pane keeps its own surface (the soot channel for the raw flow, the asphalt
+ * pod for the compressed result), each carries its own name at its top, and
+ * the seam between them is where the mechanism happens. The seam keeps its
+ * word - "absorbed" - because the word is what says the left side became the
+ * right side; it stands upright between the pods on a wide screen and lies
+ * flat between them on a narrow one.
  *
  * This is the compact form. `ExampleCase` owns the full one - the outcome
  * model, the compact resting state and the `Inspect example` fold - and a page
@@ -75,9 +85,7 @@ const PreviewLabel = {
 };
 ---
 
-<div
-	class={`relative ${Rotate} transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.8deg]`}
->
+<div class={`relative ${Rotate} transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.8deg]`}>
 	<ZineTape Label={Title} Color="raw" Side="center" />
 	<div class="zine-box-subtle well p-4 pt-7 sm:p-6 sm:pt-8">
 		{(Outcome !== undefined || Provenance !== undefined) && (
@@ -88,20 +96,35 @@ const PreviewLabel = {
 				)}
 			</div>
 		)}
-		<ZineStream Lines={Lines} />
-		<div class="my-4 flex items-center gap-3" aria-hidden="true">
-			<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
-			<span class="font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
-				absorbed
-			</span>
-			<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
+		{/* THE DUAL PODS: raw input | the preview the model kept. The middle
+		    track is the seam, sized to the word it carries. */}
+		<div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-0">
+			<div class="flex min-w-0 flex-col">
+				<ZineStream Label="THE RAW INPUT" Lines={Lines} />
+			</div>
+			{/* The seam: a dashed rule either side of the word. Upright between
+			    the pods on a wide screen, lying flat between them on a narrow
+			    one - the same element, turned, so the pair never reads as two
+			    unrelated plates. */}
+			<div
+				class="flex items-center gap-3 lg:flex-col lg:justify-center lg:gap-0"
+				aria-hidden="true"
+			>
+				<span class="h-0 grow border-t border-dashed border-oxblood-dark lg:h-auto lg:w-0 lg:grow lg:border-t-0 lg:border-l"></span>
+				<span class="shrink-0 font-mono text-base font-black uppercase tracking-widest text-zinc-dust lg:px-3 lg:[writing-mode:vertical-rl]">
+					absorbed
+				</span>
+				<span class="h-0 grow border-t border-dashed border-oxblood-dark lg:h-auto lg:w-0 lg:grow lg:border-t-0 lg:border-l"></span>
+			</div>
+			<div class="flex min-w-0 flex-col">
+				<ZinePreview
+					Label={Outcome === undefined ? "PREVIEW // WHAT THE LLM SEES" : PreviewLabel[Outcome]}
+					Result={Preview}
+					Hash={StoresMarker ? Hash : undefined}
+					Color="canary"
+				/>
+			</div>
 		</div>
-		<ZinePreview
-			Label={Outcome === undefined ? "PREVIEW // WHAT THE LLM SEES" : PreviewLabel[Outcome]}
-			Result={Preview}
-			Hash={StoresMarker ? Hash : undefined}
-			Color="canary"
-		/>
 		{Retrieval && (
 			<div class="mt-3 well flex flex-wrap items-baseline gap-2 px-3 py-2 font-mono text-base leading-relaxed text-weathered-teal">
 				<span class="telemetry-tag telemetry-tag--canary">RETRIEVAL</span>

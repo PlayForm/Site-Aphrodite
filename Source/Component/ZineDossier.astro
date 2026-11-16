@@ -3,23 +3,32 @@
  * ZineDossier - TWO EVIDENCE COLUMNS READ AS ONE COMPARISON.
  *
  * A dossier is not two panels of prose that happen to sit side by side: it is
- * one comparison, and the reader's job is to move between the columns. So the
- * blueprint treatment is a single two-column field rather than two cards:
+ * ONE comparison, and the reader's job is to move ACROSS the gutter, not to
+ * count down two independent lists. So the blueprint treatment is a single
+ * two-column field, built from three parts:
  *
  *   the HEADER BAND   the stamp names the dossier and a hairline closes the
- *                     band, so both columns start from one line instead of
- *                     from the plate's own padding.
- *   the INDEX         each column is numbered (`01`, `02`) in the section-index
- *                     voice, which is what makes the pair read as one record
- *                     with two parts rather than as two independent blocks.
- *   the SHARED RULE   on a wide viewport the second column is separated by a
- *                     hairline in the gutter - one field, one divider - instead
- *                     of by a gap the eye has to measure.
+ *                     band, so both columns start from one line instead of from
+ *                     the plate's own padding.
+ *   the COLUMN HEADS  each side is numbered (`01`, `02`) in the section-index
+ *                     voice and named by its caption, on the SAME two tracks
+ *                     the rows below use - the field is declared before the
+ *                     comparison starts, so a reader knows which side is which
+ *                     without inferring it from the first label.
+ *   the PAIRED ROWS   entry N of the left column and entry N of the right
+ *                     column sit on ONE band, so the two labels begin on the
+ *                     same line and the rule between bands runs the full width
+ *                     of both. That is the comparison: the gutter hairline is
+ *                     the only thing between the two claims, and neither side
+ *                     is ever a second list to be re-found.
  *
- * Every label and every sentence in `Left` and `Right` renders exactly as
- * before; only the field around them changed. `Tone` still selects the shadow
- * plane and `Rotate` the lean, because the plate's own identity is not part of
- * the layout question.
+ * NOTHING IS DROPPED, AND NOTHING IS INVENTED. The row count is the LONGER of
+ * the two columns, and a side with no entry for a row renders an empty cell
+ * rather than closing the gap - so an unpaired entry keeps its own band instead
+ * of disappearing, and no placeholder word is printed in the empty cell to fill
+ * it. Every label and every sentence in `Left` and `Right` renders exactly as
+ * given. `Tone` still selects the shadow plane and `Rotate` the lean, because
+ * the plate's own identity is not part of the layout question.
  */
 interface Props {
 	/** The heading over the whole dossier. */
@@ -36,9 +45,24 @@ interface Props {
 
 	/** Rotation applied from the sm breakpoint up; mobile is always flat. */
 	Rotate?: string;
+
+	/** Name of the left side. Defaults to the neutral evidence label, so an
+	 *  existing call site renders exactly what it rendered before. */
+	LeftCaption?: string;
+
+	/** Name of the right side. */
+	RightCaption?: string;
 }
 
-const { Title, Left, Right, Tone = "subtle", Rotate = "" } = Astro.props;
+const {
+	Title,
+	Left,
+	Right,
+	Tone = "subtle",
+	Rotate = "",
+	LeftCaption = "EVIDENCE // A",
+	RightCaption = "EVIDENCE // B",
+} = Astro.props;
 
 const Shadow = {
 	crimson: "zine-box-crimson",
@@ -46,51 +70,90 @@ const Shadow = {
 	canary: "zine-box-canary",
 	teal: "zine-box-teal",
 }[Tone];
+
+// The two sides, in the order they are read. `Edge` is the gutter treatment on
+// the wide viewport: a hairline in the gutter, and the padding that keeps the
+// second column's text off it.
+const Sides = [
+	{ Index: "01", Caption: LeftCaption, Edge: "" },
+	{
+		Index: "02",
+		Caption: RightCaption,
+		Edge: "lg:border-l lg:border-[var(--tier-shell-edge)] lg:pl-16",
+	},
+];
+
+// The pairing. One row per comparison key, taken from the longer column so an
+// unpaired entry still gets its own band. `Left` / `Right` are undefined for a
+// row the shorter column does not reach; the cell renders empty.
+const Rows = Array.from({ length: Math.max(Left.length, Right.length) }, (_, Index) => ({
+	Index,
+	Left: Left[Index],
+	Right: Right[Index],
+}));
 ---
 
 <section
 	class={`relative border-4 border-blood-crimson bg-carbon-void p-6 sm:p-10 ${Shadow} ${Rotate} transition-transform duration-300 hover:rotate-0`}
 >
 	<!-- THE HEADER BAND -->
-	<div class="mb-8 flex items-center gap-4 border-b border-[var(--tier-shell-edge)] pb-3">
+	<div class="flex items-center gap-4 border-b border-[var(--tier-shell-edge)] pb-3">
 		<span class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
 			{Title}
 		</span>
 		<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
 	</div>
 
-	<!-- ONE FIELD, TWO COLUMNS: the divider lives in the gutter on a wide
-	     viewport and disappears when the columns stack. -->
-	<div class="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-0">
-		{[
-			{ Index: "01", Caption: "EVIDENCE // A", Items: Left, Edge: "" },
-			{
-				Index: "02",
-				Caption: "EVIDENCE // B",
-				Items: Right,
-				Edge: "lg:border-l lg:border-[var(--tier-shell-edge)] lg:pl-16",
-			},
-		].map((Column) => (
-			<div class={`min-w-0 ${Column.Edge}`}>
-				<div class="mb-4 flex items-baseline gap-3 border-b border-oxblood-dark pb-1">
-					<span class="section-index">{Column.Index}</span>
-					<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
-						{Column.Caption}
-					</span>
-				</div>
-				<dl class="space-y-6">
-					{Column.Items.map((Item) => (
-						<div class="border-l-2 border-oxblood-dark pl-4">
-							<dt class="type-meta !font-black uppercase tracking-widest text-bone-white">
-								{Item.Label}
+	<!-- THE COLUMN HEADS: one per side, on the same two tracks as every row
+	     below, so the field is declared before the first comparison. -->
+	<div class="grid grid-cols-1 border-b border-oxblood-dark lg:grid-cols-2 lg:gap-0">
+		{Sides.map((Side) => (
+			<div class={`flex items-baseline gap-3 pb-2 pt-4 ${Side.Edge}`}>
+				<span class="section-index">{Side.Index}</span>
+				<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+					{Side.Caption}
+				</span>
+			</div>
+		))}
+	</div>
+
+	<!-- THE PAIRED ROWS. Each row is one comparison: the same band, two cells,
+	     a hairline between them on a wide viewport and a dashed rule between
+	     them when the field stacks. The rule between rows runs the full width,
+	     which is what makes the pair read as one record with two parts. -->
+	<div>
+		{Rows.map((Row, Position) => (
+			<dl
+				class:list={[
+					"grid grid-cols-1 lg:grid-cols-2 lg:gap-0",
+					Position > 0 ? "border-t border-oxblood-dark" : "",
+				]}
+			>
+				<div class="min-w-0 py-5 lg:pr-16">
+					{Row.Left === undefined ? null : (
+						<>
+							<dt class="type-meta !font-black uppercase text-bone-white">
+								{Row.Left.Label}
 							</dt>
 							<dd class="mt-1 font-body text-base leading-relaxed text-bone-newsprint">
-								{Item.Text}
+								{Row.Left.Text}
 							</dd>
-						</div>
-					))}
-				</dl>
-			</div>
+						</>
+					)}
+				</div>
+				<div class="min-w-0 py-5 max-lg:border-t max-lg:border-dashed max-lg:border-oxblood-dark lg:border-l lg:border-[var(--tier-shell-edge)] lg:pl-16">
+					{Row.Right === undefined ? null : (
+						<>
+							<dt class="type-meta !font-black uppercase text-bone-white">
+								{Row.Right.Label}
+							</dt>
+							<dd class="mt-1 font-body text-base leading-relaxed text-bone-newsprint">
+								{Row.Right.Text}
+							</dd>
+						</>
+					)}
+				</div>
+			</dl>
 		))}
 	</div>
 </section>

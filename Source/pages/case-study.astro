@@ -195,22 +195,20 @@ const Layers = [
 	},
 ] as const;
 
-// The layer's own colour, in the one place the blueprint grammar reads it: the
-// numbered index above the figure. Colour is identity here, not decoration -
-// the four layers are teal, canary, raw and bone wherever the site draws them -
-// so it is DERIVED from the record's `Tone` rather than restated beside it,
-// where the two could drift. The card's tape used to carry this colour as an
-// EXPRESSIVE shape; four of them in one section broke the emphasis budget
-// (`.section-index` is the published demotion path, and the words are
-// unchanged: `LAYER // 01` still reads `LAYER // 01`).
-const LayerInk: Record<string, string> = {
+// THE PAGE'S ONE TONE -> INK MAP. A stage colour is identity, not decoration:
+// the four pipeline layers are teal, canary, raw and bone wherever the site
+// draws them, and a history arc is ruled in the colour its own `Border` already
+// carries. Both read their ink here, so a further tone is one entry and two
+// spellings of the same colour cannot drift apart.
+const StageInk: Record<string, string> = {
 	teal: "!text-weathered-teal",
 	canary: "!text-stamped-canary",
 	raw: "!text-raw-blood",
 	bone: "!text-bone-white",
+	dust: "!text-zinc-dust",
 };
 
-const LayerCards = Layers.map(({ Tone, ...Layer }) => ({ ...Layer, Ink: LayerInk[Tone]! }));
+const LayerCards = Layers.map(({ Tone, ...Layer }) => ({ ...Layer, Ink: StageInk[Tone]! }));
 
 // EXHIBIT: the 142-line build, kept by the terminal and replaced by one line
 // in the model's context. ZineSplit reads the leading `dim:` / `fade:` / `mute:`
@@ -432,19 +430,14 @@ for (const Arc of Arcs) {
 // The arc's own colour, in the two places the blueprint grammar reads it: the
 // chapter rule that opens the arc, and the numbered index beside it. Colour is
 // identity here, not decoration - ARC 1 was crimson-ruled before this page had
-// a blueprint grammar and it is crimson-ruled after it - so both are DERIVED
-// from the record's existing `Border` and `Tone` rather than restated beside
-// them, where they could drift from the left rule the arc already carries.
+// a blueprint grammar and it is crimson-ruled after it - so the rule's colour
+// is DERIVED from the record's existing `Border` (the left rule the arc already
+// carries) and the index reads the same `Tone` through `StageInk` above, rather
+// than restating either one where the two could drift.
 const BorderRule: Record<string, string> = {
 	"border-raw-blood": "var(--raw-blood)",
 	"border-stamped-canary": "var(--stamped-canary)",
 	"border-weathered-teal": "var(--weathered-teal)",
-};
-
-const ToneInk: Record<string, string> = {
-	canary: "!text-stamped-canary",
-	teal: "!text-weathered-teal",
-	dust: "!text-zinc-dust",
 };
 
 // The arcs with their three beats normalized: `[Beat].flat()` turns a
@@ -455,7 +448,7 @@ const ToneInk: Record<string, string> = {
 const ArcsWithBeats = Arcs.map((Arc) => ({
 	...Arc,
 	Rule: BorderRule[Arc.Border]!,
-	Ink: ToneInk[Arc.Tone]!,
+	Ink: StageInk[Arc.Tone]!,
 	Beats: [
 		{ N: "01", Label: "The incident.", Sentences: [Arc.Incident].flat() },
 		{ N: "02", Label: "The fix.", Sentences: [Arc.Fix].flat() },
@@ -514,7 +507,13 @@ const TokenGroups = Study.TokensSaved.split(",");
 					data-enter="240"
 				>
 					<ZineKicker Tone="ink">CONTEXT TOKENS SAVED · 200 REAL SESSIONS</ZineKicker>
-					<div class="metric mt-6 !text-soot-black drop-shadow-[3px_3px_0px_#520612]">
+					{/* The figure keeps the page's own type scale - Space Grotesk at
+					    the display size, tracking-tighter, the hard offset shadow -
+					    because a Stitch layout is arrangement only: the sand tier
+					    inverts the GROUND and the ink, never the typeface. */}
+					<div
+						class="mt-6 font-headline text-5xl font-black tracking-tighter text-soot-black drop-shadow-[3px_3px_0px_#520612] sm:text-7xl"
+					>
 						{/* set:html, not a JSX map: Astro preserves the whitespace between
 						    sibling expressions in a multi-line template, so the mapped
 						    version rendered "156 , 342 , 817" with visible spaces around
@@ -587,11 +586,8 @@ const TokenGroups = Study.TokensSaved.split(",");
 				))}
 			</div>
 			<p class="mt-16 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				That is the whole architecture.
-			</p>
-			<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-				The agent keeps its budget for reasoning, and pays for detail only when detail is
-				the answer.
+				That is the whole architecture: the agent keeps its budget for reasoning, and pays
+				for detail only when detail is the answer.
 			</p>
 		</section>
 
@@ -609,17 +605,13 @@ const TokenGroups = Study.TokensSaved.split(",");
 					with raw output - compilation logs, accessibility trees, JSON blobs.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The agent spends its budget reading noise instead of reasoning.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The structural failure is that raw output arrives <em>before any decision</em>:
+					The structural failure is upstream: the agent spends its budget reading noise
+					instead of reasoning, because raw output arrives <em>before any decision</em> -
 					the context pays the full price for content the agent may never use.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Compression applied after the fact cannot refund a turn that already happened.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					So the intervention point has to be{" "}
+					Compression applied after the fact cannot refund a turn that already happened, so
+					the intervention point has to be{" "}
 					<strong class="text-bone-white">before the LLM sees anything</strong>.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
@@ -662,10 +654,8 @@ const TokenGroups = Study.TokensSaved.split(",");
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					A compiler error and a verbose build log are both output - but one must stay
-					visible and the other should never have been shown in full.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					A single compression policy cannot serve both.
+					visible and the other should never have been shown in full, and a single
+					compression policy cannot serve both.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					So the type-aware classifier runs first - {Benchmark.Classify}, first match wins
@@ -736,10 +726,7 @@ const TokenGroups = Study.TokensSaved.split(",");
 				</h2>
 				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Replacing output with a summary only works if the missing content stays
-					reachable.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The bridge between the two is a single string:
+					reachable, and the bridge between the two is a single string:
 				</p>
 				<div class="ccr-marker mt-6 border border-oxblood-dark bg-soot-black px-4 py-3 font-mono text-base text-weathered-teal">
 					{"<<<CCR:0e3a5c9f2b8d4e6a1c3f5b7d9e0a2c4b6d8f0a1e|build|1420>>>"}
@@ -809,8 +796,8 @@ const TokenGroups = Study.TokensSaved.split(",");
 					cache listener).
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Storage is not the interesting problem; the interesting problem is that the
-					agent's decision needs a stable address - and that is all the marker has to be.
+					Storage is not the interesting problem: the agent's decision needs a stable
+					address, and that is all the marker has to be.
 				</p>
 			</ZineBox>
 		</section>
@@ -913,10 +900,7 @@ const TokenGroups = Study.TokensSaved.split(",");
 							<code class="font-mono text-base">engine_threshold_pct</code>).
 						</p>
 						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Why so few?
-						</p>
-						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-							Because each knob maps to a question the agent actually asks:{" "}
+							Few, because each knob maps to a question the agent actually asks:{" "}
 							<em>how patient should I be with this kind of output?</em>
 						</p>
 						<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
@@ -989,8 +973,8 @@ const TokenGroups = Study.TokensSaved.split(",");
 					What one output costs
 				</h2>
 				<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Two views survive here because they are the argument's own: what each output
-					class compressed to in the wild, and what the standard corpus paid per type.
+					Two measurements carry the argument: what each output class compressed to in the
+					wild, and what the standard corpus paid per type.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					The corpus ratios, the {Benchmark.Ceiling} ceiling, the median and the reproduce
@@ -1002,8 +986,8 @@ const TokenGroups = Study.TokensSaved.split(",");
 					magnitudes without normalising either one.
 				</p>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					Read together, the plates carry the argument's sharpest claim: the ratio is a
-					property of the content type, not of the session that produced it.
+					The pair carries the argument's sharpest claim: the ratio is a property of the
+					content type, not of the session that produced it.
 				</p>
 				<div class="mt-16 grid grid-cols-1 gap-24 lg:grid-cols-2" data-enter="200">
 					<!-- Real-world per-output compression -->
@@ -1148,11 +1132,8 @@ const TokenGroups = Study.TokensSaved.split(",");
 				</h2>
 				<div class="prose-flow mt-8 max-w-3xl">
 					<p class="font-body text-base leading-relaxed text-bone-newsprint">
-						Every rule in the engine was paid for once.
-					</p>
-					<p class="font-body text-base leading-relaxed text-bone-newsprint">
-						Each arc runs the same three beats: the incident, the fix, and the mechanic
-						that still stands today.
+						Every rule in the engine was paid for once, and each arc runs the same three
+						beats: the incident, the fix, and the mechanic that still stands today.
 					</p>
 					<p class="font-body text-base leading-relaxed text-bone-newsprint">
 						All of it is public record - the CHANGELOG entries and the release notes.

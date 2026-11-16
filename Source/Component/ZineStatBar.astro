@@ -1,4 +1,32 @@
 ---
+/**
+ * ZineStatBar - A GIANT FIGURE, ITS UNIT IN THE LABEL VOICE, AND THE TRACK
+ * THAT MEASURES IT.
+ *
+ * The readout is read in one order, and only that order:
+ *
+ *   the LABEL     a mono micro-label directly over the figure, tight (the gap
+ *                 is --space-tight), so the number answers the label instead of
+ *                 floating somewhere beside it.
+ *   the FIGURE    `.metric` (Global.css): JetBrains Mono, tabular digits,
+ *                 clamp(2.5rem, 6vw, 4.5rem). The numeral is the largest thing
+ *                 in the block at every width; `Scale="compact"` is the same
+ *                 figure in a dense stack.
+ *   the UNIT      `.metric__unit`, a CHILD of `.metric`: the unit keeps the
+ *                 telemetry voice (11.5px mono, uppercase, zinc-dust) while the
+ *                 numeral stays oversized, and being a child it can never wrap
+ *                 away from the figure it belongs to.
+ *   the TRACK     under both, full width, because a bar whose length encodes a
+ *                 percentage must not be sized by the figure above it.
+ *
+ * `Ratio` arrives as ONE string ("416x", "0%", "13 / 13"), so the unit is split
+ * off HERE rather than demanded from every call site. The split is deliberately
+ * conservative: only a trailing non-numeric token of at most three characters
+ * counts as a unit, and the figure in front of it must stay short. A comparison
+ * ("13 / 13") or a range therefore stays whole instead of being cut through the
+ * middle of a fact. `Unit` overrides the split for a caller that knows better,
+ * and `Qualifier` keeps the word that makes a number honest visible under it.
+ */
 interface Props {
 	Label: string;
 
@@ -23,9 +51,27 @@ interface Props {
 	 * The page that owns the stack is the only thing that knows which it is.
 	 */
 	Scale?: "metric" | "compact";
+
+	/** The unit printed after the figure in the telemetry voice ("×", "%", "ms").
+	 *  Omit it and the trailing token of `Ratio` is used. */
+	Unit?: string;
+
+	/** A qualifier line under the figure - the word that keeps a number honest
+	 *  ("ESTIMATED", "PER OUTPUT", "MEASURED"). It renders in the label voice,
+	 *  which is legible where the giant figure would swallow a sentence. */
+	Qualifier?: string;
 }
 
-const { Label, Ratio, Percent, Color = "teal", Fill = "static", Scale = "metric" } = Astro.props;
+const {
+	Label,
+	Ratio,
+	Percent,
+	Color = "teal",
+	Fill = "static",
+	Scale = "metric",
+	Unit,
+	Qualifier,
+} = Astro.props;
 
 // The palette is resolved HERE, on the server, and rendered as a class on the
 // fill element. It used to be resolved inside the <script>, which is a separate
@@ -59,22 +105,42 @@ const Text = {
 /** The figure's scale: the giant metric, or the compact one for a dense stack. */
 const MetricScale = Scale === "compact" ? "metric metric--compact" : "metric";
 
+// The split: `^(.*[0-9])\s*([^\s0-9]{1,3})$` reads "everything up to the last
+// digit, then a short non-numeric tail". "416×" -> "416" + "×"; "0%" -> "0" +
+// "%"; "13 / 13" ends on a digit, so it matches nothing and stays whole.
+const TrailingUnit = /^(.*[0-9])\s*([^\s0-9]{1,3})$/;
+const Trimmed = Ratio.trim();
+const Split = Trimmed.match(TrailingUnit);
+const Splittable = Split !== null && Split[1]!.length <= 12;
+const Figure = Unit === undefined && Splittable ? Split![1]! : Trimmed;
+const UnitText = Unit ?? (Splittable ? Split![2]! : "");
+
 // Clamped once, server-side: a caller that passes 140 or -5 gets a bar that
 // cannot overflow its track, and the script never has to guess what it meant.
 const Width = Math.max(0, Math.min(100, Percent));
 ---
 
 <div>
-	{/* The readout: a micro-label, then the figure at metric scale, then the
-	    track it measures. The label and the figure share one baseline row so the
-	    number is read as the answer to the label rather than as a separate line;
-	    the track sits under both, full width, because a bar whose length encodes
-	    a percentage must not be sized by the figure above it. */}
-	<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-		<span class="section-index">{Label}</span>
-		<span class={`${MetricScale} ${Text}`}>{Ratio}</span>
+	{/* THE TIGHT LABEL: mono, uppercase, black, one line above its own figure.
+	    It is a label, not a sentence - the sentence that explains the figure
+	    belongs to the page, which is the only thing that knows the context. */}
+	<p class="type-meta !font-black uppercase text-bone-white">{Label}</p>
+
+	{/* THE FIGURE AND ITS UNIT. `.metric` is a block, so the figure's text and
+	    the unit's span stay inline on one baseline - the same shape StudyLedger
+	    uses. No flex here: Global.css loads after the utility layer, so its
+	    `display: block` would win over a `flex` utility anyway. */}
+	<div class="mt-2">
+		<p class={`${MetricScale} ${Text}`}>
+			{Figure}{UnitText === "" ? null : <span class="metric__unit">{UnitText}</span>}
+		</p>
 	</div>
-	<div class="mt-2 flex h-4 w-full overflow-hidden well">
+
+	{Qualifier === undefined ? null : (
+		<p class="mt-2 type-meta uppercase text-zinc-dust">{Qualifier}</p>
+	)}
+
+	<div class="mt-3 flex h-4 w-full overflow-hidden well">
 		{Fill === "scroll" ? (
 			<div
 				class={`zine-stat-fill h-full ${Palette}`}

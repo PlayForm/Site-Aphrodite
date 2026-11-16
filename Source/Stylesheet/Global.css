@@ -47,8 +47,8 @@
 	   where it means --space-reading has mis-stated its own structure. */
 	--space-tight: 0.5rem; /* label -> value, heading -> its own context */
 	--space-reading: 0.875rem; /* paragraph -> paragraph */
-	--space-group: 2.5rem; /* explanation -> figure, figure -> caption */
-	--space-chapter: clamp(4rem, 7vw, 7rem); /* a genuinely new subject */
+	--space-group: 1.75rem; /* explanation -> figure, figure -> caption */
+	--space-chapter: clamp(2.5rem, 4vw, 4rem); /* a genuinely new subject */
 }
 
 /* Self-hosted variable fonts (latin subset, OFL - see Public/Font/LICENSE.md) */
@@ -324,6 +324,43 @@
 
 	.split--even {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+/* A band whose prose sits BESIDE its figure instead of above it - the Stitch
+   split. The kicker, heading and subhead span both columns; the reading column
+   takes the left, the plate takes the right and spans the remaining rows, so a
+   section never leaves half the page empty. */
+.band--split {
+	display: grid;
+	grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+	column-gap: var(--space-group);
+	align-items: start;
+}
+
+.band--split > :is(.section-index, .section-kicker, h2, .type-sub) {
+	grid-column: 1 / -1;
+}
+
+.band--split > .prose-flow,
+.band--split > .mt-10 {
+	grid-column: 1;
+}
+
+.band--split > .grunge {
+	grid-column: 2;
+	grid-row: 2 / span 3;
+	margin: 0;
+}
+
+@media (max-width: 1023px) {
+	.band--split {
+		display: flex;
+	}
+
+	.band--split > .grunge {
+		grid-row: auto;
+		margin-block-start: var(--space-group);
 	}
 }
 

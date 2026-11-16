@@ -9,10 +9,10 @@
  *                     a telemetry tag on the right. The ribbon is where a
  *                     reader learns what produced the bytes and how many there
  *                     are, before reading one of them.
- *   an INSET WELL     `.well` - the recessed channel of the elevation grammar
- *                     (Global.css, BLUEPRINT GRAMMAR). Darker than the shell
- *                     that holds it, with a LIGHTER 1px edge, which is what
- *                     makes it read as depth rather than as one more panel.
+ *   an INSET BODY     the pod's own 1px oxblood edge on soot-black - the
+ *                     terminal-panel weight every other console on the site is
+ *                     drawn with - so the stream reads as a channel cut into
+ *                     the plate rather than as one more panel beside it.
  *   SYNTAX ROLES      four roles, each carried by colour AND by shape, so a
  *                     line's kind is legible before its text is read.
  *
@@ -35,7 +35,7 @@ type Tone = "plain" | "dim" | "fade" | "mute" | "result" | "canary" | "teal";
  *   tag      a name, type or address   cyan
  *   warning  something to look at      crimson, carried by a rule and a tint
  *                                      rather than by crimson type - `--raw-blood`
- *                                      is 2.12:1 on the well and would be
+ *                                      is 2.12:1 on the pod's fill and would be
  *                                      unreadable as ink, so the identity moves
  *                                      into the row and the words stay bone.
  */
@@ -116,7 +116,7 @@ const Ink = (LineTone: Tone, LineRole: Role | undefined): string[] =>
  * crimson is not legible as type on this fill, so the ROW carries the colour
  * and the ink stays bone.
  *
- * The tint is a `color-mix` against the well rather than `bg-raw-blood/15`:
+ * The tint is a `color-mix` against the pod's own fill rather than `bg-raw-blood/15`:
  * `--raw-blood` is a `var()` holding a hex, so Tailwind cannot apply an opacity
  * modifier to it and silently emits no rule at all. The 2px rule is the part
  * that always paints, which is why the identity does not depend on the tint.
@@ -126,7 +126,7 @@ const RoleRow: Record<Role, string> = {
 	tree: "",
 	tag: "",
 	warning:
-		"border-l-2 border-raw-blood bg-[color-mix(in_srgb,var(--raw-blood)_18%,var(--tier-well))] pl-2",
+		"border-l-2 border-raw-blood bg-[color-mix(in_srgb,var(--raw-blood)_18%,var(--soot-black))] pl-2",
 };
 
 const Ribbon = Command !== undefined || Label !== undefined || Bytes !== undefined;
@@ -136,7 +136,7 @@ const Count = `${Lines.length.toLocaleString("en-US")} ${Lines.length === 1 ? "L
 const Tally = Bytes === undefined ? Count : `${Count} · ${Bytes.toLocaleString("en-US")} B`;
 ---
 
-<figure class="well ccr-marker m-0">
+<figure class="ccr-marker m-0 border border-oxblood-dark bg-soot-black">
 	{Ribbon && (
 		<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
 			<span class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5 font-mono text-base leading-snug">

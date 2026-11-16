@@ -21,12 +21,25 @@
 // no box, so the scene keeps positioning against .deck-frame exactly as before.
 //
 // The transport's BEATS disclosure is the deck's index, and it is a MATRIX: one
-// numbered cell per scene, three to a row, carrying the ordinal and the beat's
+// numbered cell per scene, four to a row, carrying the ordinal and the beat's
 // own span on its top line, the scene's claim in the middle, and the page that
-// carries the argument named at the foot. The cells are the same anchors the
-// player seeks on (data-beat), so the index navigates the film rather than
-// describing it; the arrangement is the page's own, in the deck's container
-// units, and the film itself is untouched.
+// carries the argument named at the foot.
+//
+// Four to a row is the arrangement the film's own shape asks for. The eleven
+// beats fall into three movements - four beats of setup, the four steps, three
+// beats of evidence - and at four columns the four step cells land on ONE row,
+// so the index reads as the stage row the deck already draws inside scene 04
+// instead of splitting it across two.
+//
+// The four steps also carry their stage accent in the cell, taken from the
+// deck's own vocabulary (Deck.css `.deck-stage[data-stage="01..04"]`): classify
+// teal, preview canary, store raw blood, decide bone. Colour is identity, so a
+// reader finds the step by the colour it wears inside the frame - and the chip
+// is the published `.telemetry-tag`, not a second chip vocabulary in this file.
+//
+// The cells are the same anchors the player seeks on (data-beat), so the index
+// navigates the film rather than describing it; the arrangement is the page's
+// own, in the deck's container units, and the film itself is untouched.
 //
 // The route already has its <h1>: DeckScene renders the opening beat's title as
 // one (DeckScene.astro:213). A second, sr-only heading here would give the page
@@ -52,6 +65,19 @@ const ScrubMax = Math.round(Timeline.Total * 10);
 
 // The build-time state of the transport: beat 01's exit, and beat 01's ordinal.
 const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
+
+// The four steps keep the accents they wear inside the frame. The hues are the
+// deck's own, read from `Deck.css` `.deck-stage[data-stage="01..04"]`; the chip
+// is the published `.telemetry-tag` modifier for that hue. Teal stays an
+// OUTLINE and the other three are solid, because that is the contrast rule the
+// vocabulary already declares - `--raw-blood` as text on a dark fill does not
+// reach 4.5:1, so a crimson tag is solid or it is not used.
+const Stage: Record<string, { Label: string; Chip: string }> = {
+	classify: { Label: "STEP 1", Chip: "telemetry-tag--teal" },
+	preview: { Label: "STEP 2", Chip: "telemetry-tag--canary" },
+	store: { Label: "STEP 3", Chip: "telemetry-tag--crimson" },
+	decide: { Label: "STEP 4", Chip: "telemetry-tag--bone" },
+};
 ---
 
 <Base
@@ -85,34 +111,42 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 					<summary class="deck-ui-button deck-beats-summary">BEATS</summary>
 					<div class="deck-beats-panel">
 						<p class="deck-beats-index">
-							<span class="deck-beats-index-tag">BEAT INDEX</span>
+							<span class="deck-beats-index-tag">DECK // BEAT INDEX</span>
 							<span class="deck-beats-index-count">
 								{`${String(Total).padStart(2, "0")} SCENES // ${Span}`}
 							</span>
 						</p>
 						<nav aria-label="Beats">
 							<ol class="deck-beats-matrix">
-								{Scenes.map((Scene, Index) => (
-									<li class="deck-beats-cell">
-										<a
-											class="deck-beats-link"
-											href={`#${Scene.Identifier}`}
-											data-beat={Index}
-											aria-current={Index === 0 ? "true" : undefined}
-										>
-											<span class="deck-beats-head">
-												<span class="deck-beats-ordinal">
-													{String(Index + 1).padStart(2, "0")}
+								{Scenes.map((Scene, Index) => {
+									const Step = Stage[Scene.Visual];
+									return (
+										<li class="deck-beats-cell">
+											<a
+												class="deck-beats-link"
+												href={`#${Scene.Identifier}`}
+												data-beat={Index}
+												aria-current={Index === 0 ? "true" : undefined}
+											>
+												<span class="deck-beats-head">
+													<span class="deck-beats-ordinal">
+														{String(Index + 1).padStart(2, "0")}
+													</span>
+													{Step && (
+														<span class:list={["telemetry-tag", Step.Chip]}>
+															{Step.Label}
+														</span>
+													)}
+													<span class="deck-beats-span">
+														{`${Scene.Duration.toFixed(1)}s`}
+													</span>
 												</span>
-												<span class="deck-beats-span">
-													{`${Scene.Duration.toFixed(1)}s`}
-												</span>
-											</span>
-											<span class="deck-beats-name">{Scene.Title}</span>
-											<span class="deck-beats-exit">{Scene.Exit.Label}</span>
-										</a>
-									</li>
-								))}
+												<span class="deck-beats-name">{Scene.Title}</span>
+												<span class="deck-beats-exit">{Scene.Exit.Label}</span>
+											</a>
+										</li>
+									);
+								})}
 							</ol>
 						</nav>
 						<p class="deck-beats-keys">
@@ -230,13 +264,17 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 			display: none;
 		}
 
+		/* Four cells need the width three did not. At 46cqw a four-up cell is
+		   ~11cqw, and a claim set at the deck's display floor breaks to five
+		   lines in that width; 56cqw gives each cell ~14cqw and keeps a claim
+		   at three or four lines, while the frame's right half stays clear. */
 		.deck-beats-panel {
 			position: absolute;
 			bottom: calc(100% + 0.8cqw);
 			left: 0;
 			z-index: 2;
-			width: 46cqw;
-			max-width: 46cqw;
+			width: 56cqw;
+			max-width: 56cqw;
 			border: 2px solid var(--oxblood-dark);
 			border-radius: 0;
 			background: var(--carbon-void);
@@ -245,9 +283,13 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 		}
 
 		/* The index head is the blueprint chapter rule, in the deck's own units:
-		   a hairline across the panel, the tag at its left, the count at its
-		   right. Both values are the ones the film already prints - the scene
-		   count the transport steps through and the span it runs for. */
+		   a hairline across the panel, the coordinate at its left, the count at
+		   its right. The coordinate takes the published `.section-index`
+		   grammar - `DECK // BEAT INDEX`, mono, uppercase, 0.08em of tracking,
+		   no border, no fill, no shadow - so the panel opens the way every
+		   numbered band on the site opens. Both values are the ones the film
+		   already prints: the scene count the transport steps through and the
+		   span it runs for. */
 		.deck-beats-index {
 			display: flex;
 			align-items: baseline;
@@ -258,7 +300,7 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 			padding-bottom: 0.55cqw;
 			font-size: max(11px, calc(0.56cqw * var(--type-scale)));
 			font-weight: 400;
-			letter-spacing: 0.14em;
+			letter-spacing: 0.08em;
 			text-transform: uppercase;
 		}
 
@@ -272,14 +314,16 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 			font-variant-numeric: tabular-nums;
 		}
 
-		/* The index is a MATRIX: one numbered cell per scene, three to a row.
-		   The ordinal and the beat's own span sit on the cell's top line, the
-		   scene's claim in the middle, and the page that carries the argument
-		   named at the foot - the same anchor, the same data-beat wiring the
-		   player seeks on, only the arrangement changed. */
+		/* The index is a MATRIX: one numbered cell per scene, FOUR to a row.
+		   The ordinal, the step's accent chip and the beat's own span sit on the
+		   cell's top line, the scene's claim in the middle, and the page that
+		   carries the argument named at the foot - the same anchor, the same
+		   data-beat wiring the player seeks on, only the arrangement changed.
+		   Four columns is what puts the four step cells on one row: the beats
+		   fall 4 / 4 / 3, so the stage row appears where the deck draws it. */
 		.deck-beats-matrix {
 			display: grid;
-			grid-template-columns: repeat(3, minmax(0, 1fr));
+			grid-template-columns: repeat(4, minmax(0, 1fr));
 			gap: 0.5cqw;
 			max-height: 58cqh;
 			margin: 0;
@@ -316,6 +360,17 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 			align-items: baseline;
 			justify-content: space-between;
 			gap: 0.6cqw;
+		}
+
+		/* The step chip is the published `.telemetry-tag`, used bare: the hues,
+		   the ink, the tracking and the zero radius all come from the shared
+		   vocabulary, so this file declares no second chip. The one thing a
+		   cell needs that the vocabulary does not say is that the chip must not
+		   shrink - it sits between two figures on a baseline row, and a flex
+		   child shrinks. Scoped by the cell's own head, so the shared class
+		   keeps rendering as published everywhere else. */
+		.deck-beats-head .telemetry-tag {
+			flex: none;
 		}
 
 		.deck-beats-ordinal {
@@ -449,6 +504,17 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 			color: var(--raw-blood);
 		}
 
+		/* Between the 16:9 frame and a phone, four columns are too narrow to
+		   hold a claim: at 1024px a four-up cell is ~143px and a claim set at
+		   the display floor breaks to five lines. Two columns there, one on a
+		   phone, so the matrix stays readable at every width the deck renders
+		   at rather than only at the one it was drawn on. */
+		@media (min-width: 1024px) and (max-width: 1279px) {
+			.deck-beats-matrix {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+		}
+
 		/* The column layout's transport: these rules are scoped to this page, so
 		   the narrow-viewport overrides for the scrubber and the beat list live
 		   here, reading the same label step Deck.css declares. */
@@ -458,8 +524,8 @@ const Opening = Scenes[0]?.Exit ?? { Href: "/", Label: "OVERVIEW" };
 				max-width: min(22rem, calc(100vw - 2rem));
 			}
 
-			/* One column on a phone: three 7rem cells are not a matrix, they are
-			   a grid of unreadable columns. */
+			/* One column on a phone: four 3.5rem cells are not a matrix, they
+			   are a grid of unreadable columns. */
 			.deck-beats-matrix {
 				grid-template-columns: 1fr;
 			}

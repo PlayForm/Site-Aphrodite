@@ -1,4 +1,18 @@
 ---
+/**
+ * ZineDiagram - one diagram, framed as a console pod: a header ribbon that
+ * names it, a RECESSED CHANNEL holding the drawing, a footer ribbon carrying
+ * the caption. The arrangement is the Stitch console grammar applied to a
+ * figure - ribbon, channel, ribbon - and the surface is ours: the crimson
+ * module boundary, the hard offset plane and the carbon-void ribbons are
+ * untouched, and the channel is the published `.well` tier, whose edge is
+ * LIGHTER than the plate's own so it reads as depth rather than as one more
+ * panel.
+ *
+ * ZineDiagramNav is attached below: it builds the figure's numbered stage row
+ * (one entry per node, in the SVG's own order) and owns the hover highlight,
+ * so a diagram is navigable by name and not only by pointing at a box.
+ */
 import ZineDiagramNav from "./ZineDiagramNav.astro";
 
 interface Props {
@@ -34,8 +48,13 @@ const LinkAttribute = Links ? JSON.stringify(Links) : undefined;
 		<span class="section-index">{Name}</span>
 		<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
 	</div>
-	<div class="overflow-x-auto p-4 [&_svg]:h-auto" set:html={Svg} />
-	<figcaption class="border-t border-[var(--tier-shell-edge)] px-4 py-3 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
+	<!-- THE CHANNEL: the drawing sits in the recessed tier, inset from the plate
+	     on all four sides, so the ribbons above and below read as the pod's
+	     edges and the diagram reads as the thing the pod holds. -->
+	<div class="well m-4 overflow-x-auto p-3 [&_svg]:h-auto" set:html={Svg} />
+	<!-- THE FOOTER RIBBON: the same band as the header, in the same fill, so the
+	     frame closes the way it opened. -->
+	<figcaption class="border-t border-[var(--tier-shell-edge)] bg-carbon-void px-4 py-2 font-mono text-base font-black uppercase tracking-widest text-zinc-dust">
 		{Caption}
 	</figcaption>
 </figure>

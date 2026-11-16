@@ -5,6 +5,27 @@
  * and SYSTEM-PATH (what Aphrodite does), a per-stage detail line, and a SRC
  * anchor chip naming the file the stage is described in.
  *
+ * TWO PODS PER STAGE (the dual-pod grammar). Each view is a POD - a labelled
+ * ribbon over an inset well - so the pair reads as two consoles at the same
+ * depth, and the difference between them is what they show, never how far they
+ * sit from the page. The console's own header ribbon is the progress row: the
+ * stage ticks on the left, the stage's short name and its position on the
+ * right. The ribbon carries the NAME and the VERDICT here; nothing in this
+ * component counts bytes.
+ *
+ * SYNTAX ROLES, the four names ZineStream owns, applied to the pane lines:
+ *
+ *   command  a line that starts `$ `             amber
+ *   tree     a tree glyph or `Compiling `         sand
+ *   tag      a CCR marker, or a line starting `» `  cyan
+ *   warning  `warning:` / `error[`                crimson, carried by a rule
+ *                                                 and a tint rather than by
+ *                                                 crimson type
+ *
+ * VOLUME is the separate axis and only it may be reduced: a `· ` line fades
+ * (40) and a `→ ` line dims (70), and neither loses its role. A dimmed warning
+ * is still a warning.
+ *
  * READABLE WITHOUT JAVASCRIPT, WHICH IS THE DEFAULT IT IS BUILT FROM.
  * Every stage is server-rendered with both panes, its own stage number, its
  * SRC chip and its detail line, in document order - so a reader with no
@@ -62,23 +83,119 @@ const Pad = (Value: number) => String(Value).padStart(2, "0");
 /** One pane value -> the mono lines it renders as. */
 const PaneLines = (Text: string | string[]) => (Array.isArray(Text) ? Text : [Text]);
 
-/** The per-line treatment: the marker chip, the suppression fades. */
-const PaneLineClass = (Line: string) =>
-	Line.includes("<<<CCR:")
-		? "ccr-marker text-stamped-canary font-bold"
-		: Line.startsWith("» ")
-			? "text-weathered-teal"
-			: Line.startsWith("· ")
-				? "opacity-40"
-				: Line.startsWith("→ ")
-					? "opacity-70"
-					: "";
+/** The VOLUME a line's prefix carries - the suppression law, and nothing else. */
+type Volume = "plain" | "fade" | "dim";
+
+/** The syntax role of a line - IDENTITY, not emphasis. The four names are
+ *  ZineStream's; the derivation is ZineSplit's `RoleOf`, so one line of output
+ *  is classified the same way wherever the site prints it. */
+type Role = "command" | "tree" | "tag" | "warning";
+
+const VolumeOf = (Line: string): Volume =>
+	Line.startsWith("· ") ? "fade" : Line.startsWith("→ ") ? "dim" : "plain";
+
+const VolumeClass: Record<Volume, string> = {
+	plain: "",
+	fade: "opacity-40",
+	dim: "opacity-70",
+};
+
+const RoleInk: Record<Role, string> = {
+	command: "text-stamped-canary font-bold",
+	tree: "text-bone-newsprint",
+	tag: "text-weathered-teal",
+	warning: "text-bone-white",
+};
+
+/**
+ * The role's row. Only the warning needs one: its identity is crimson, and
+ * crimson is not legible as type on this fill, so the ROW carries the colour
+ * and the ink stays bone.
+ *
+ * The tint is a `color-mix` against the well rather than `bg-raw-blood/15`:
+ * `--raw-blood` is a `var()` holding a hex, so Tailwind cannot apply an opacity
+ * modifier to it and silently emits no rule at all. The 2px rule is the part
+ * that always paints, which is why the identity does not depend on the tint.
+ */
+const RoleRow: Record<Role, string> = {
+	command: "",
+	tree: "",
+	tag: "",
+	warning:
+		"border-l-2 border-raw-blood bg-[color-mix(in_srgb,var(--raw-blood)_18%,var(--soot-black))] pl-2",
+};
+
+/**
+ * A role is only ever taken by a line that proves it. `» ` is checked before
+ * the warning test on purpose: a highlighted line that happens to quote an
+ * error is still the highlighted line, and the prefix the caller wrote is the
+ * contract, not the words inside it.
+ */
+const RoleOf = (Line: string): Role | undefined => {
+	const Trimmed = Line.trimStart();
+
+	if (Trimmed.includes("<<<CCR:") || Trimmed.startsWith("» ")) {
+		return "tag";
+	}
+
+	if (Trimmed.startsWith("$ ")) {
+		return "command";
+	}
+
+	if (
+		/^(warning|error)[:[]/i.test(Trimmed) ||
+		Trimmed.includes(": error[") ||
+		Trimmed.includes(": warning:")
+	) {
+		return "warning";
+	}
+
+	if (/^[├└│─]/.test(Trimmed) || Trimmed.startsWith("Compiling ")) {
+		return "tree";
+	}
+
+	return undefined;
+};
+
+/** A CCR marker wraps mid-token (`.ccr-marker`); visual only - the string the
+ *  reader copies stays byte-exact. It also keeps its weight, because an address
+ *  that can break anywhere should not also read as prose. */
+const IsMarker = (Line: string) => Line.includes("<<<CCR:");
+
+/** The role's row, or nothing when the line proves no role. */
+const LineRow = (Line: string): string => {
+	const LineRole = RoleOf(Line);
+
+	return LineRole === undefined ? "" : RoleRow[LineRole];
+};
+
+/** The line's ink: volume first, then the role's colour, then the marker's
+ *  wrap. A line with no role keeps the pane's own bone ink. */
+const LineInk = (Line: string): string[] => {
+	const LineRole = RoleOf(Line);
+
+	return [
+		VolumeClass[VolumeOf(Line)],
+		LineRole === undefined ? "" : RoleInk[LineRole],
+		IsMarker(Line) ? "ccr-marker" : "",
+	];
+};
 
 /** The two panes, named once: the same pair renders inside every stage. */
 const Panes = ["agent", "system"] as const;
 
-const PaneLabel = (Pane: (typeof Panes)[number]) =>
-	Pane === "agent" ? "AGENT-VIEW · CONVERSATION" : "SYSTEM-PATH · BACKEND";
+/** The view name: the left slot of the pane ribbon. */
+const PaneName = (Pane: (typeof Panes)[number]) =>
+	Pane === "agent" ? "AGENT-VIEW" : "SYSTEM-PATH";
+
+/** What the view carries: the ribbon's tag. Agent is the transcript the model
+ *  reads (canary); System is the work that produced it (teal) - the same two
+ *  tones Motion.css assigns the pane label. */
+const PanePayload = (Pane: (typeof Panes)[number]) =>
+	Pane === "agent" ? "CONVERSATION" : "BACKEND";
+
+const PaneTag = (Pane: (typeof Panes)[number]) =>
+	Pane === "agent" ? "telemetry-tag--canary" : "telemetry-tag--teal";
 
 const PaneText = (Step: Props["Steps"][number], Pane: (typeof Panes)[number]) =>
 	PaneLines(Pane === "agent" ? Step.Agent : Step.System);
@@ -123,7 +240,7 @@ const PaneText = (Step: Props["Steps"][number], Pane: (typeof Panes)[number]) =>
 			<span class="text-zinc-dust" data-flow-stage>
 				{Steps[0]?.Title ?? ""}
 			</span>
-			<span class="text-bone-white" data-flow-count>
+			<span class="telemetry-tag ml-auto shrink-0" data-flow-count>
 				{Pad(1)} / {Pad(Total)}
 			</span>
 		</span>
@@ -168,14 +285,24 @@ const PaneText = (Step: Props["Steps"][number], Pane: (typeof Panes)[number]) =>
 
 				<div class="grid min-h-[5.5rem] gap-4 lg:grid-cols-2">
 					{Panes.map((Pane) => (
-						<div class="shell-card flex flex-col" data-flow-pane={Pane}>
-							<div class="zine-flow-pane-label border-b border-oxblood-dark bg-asphalt-panel px-3 py-1 text-base font-black uppercase tracking-widest">
-								{PaneLabel(Pane)}
+						<div
+							class="zine-flow-pane flex flex-col border-2 border-oxblood-dark bg-asphalt-panel"
+							data-flow-pane={Pane}
+						>
+							<div class="zine-flow-pane-label flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5 font-mono text-base font-black uppercase tracking-widest">
+								<span class="min-w-0 break-words">{PaneName(Pane)}</span>
+								<span class:list={["telemetry-tag ml-auto shrink-0", PaneTag(Pane)]}>
+									{PanePayload(Pane)}
+								</span>
 							</div>
-							<div class="tier-well grow p-2.5 font-mono text-base font-bold leading-relaxed text-bone-white">
-								{PaneText(Step, Pane).map((Line) => (
-									<div class={PaneLineClass(Line)}>{Line}</div>
-								))}
+							<div class="flex grow p-2">
+								<div class="grow border border-oxblood-dark bg-soot-black p-2 font-mono text-base font-bold leading-relaxed text-bone-white">
+									{PaneText(Step, Pane).map((Line) => (
+										<div class={LineRow(Line)}>
+											<span class:list={LineInk(Line)}>{Line}</span>
+										</div>
+									))}
+								</div>
 							</div>
 						</div>
 					))}

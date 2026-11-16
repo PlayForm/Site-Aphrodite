@@ -13,15 +13,15 @@
  *
  * TWO PODS, ONE PLATE (the Stitch console grammar). The pair is no longer two
  * framed boxes with a label floating above each: each half is a POD, and a pod
- * is a HEADER RIBBON over an INSET WELL.
+ * is a HEADER RIBBON over an INSET BODY.
  *
  *   the ribbon   what produced these bytes and how many there are - the
  *                command in amber mono on the left, the count as a telemetry
  *                tag on the right. It is the first thing read.
- *   the well     `.well` from the elevation grammar: the recessed channel of
- *                the plate, one step darker than the shell with a LIGHTER 1px
- *                edge, which is what makes the pair read as two instruments on
- *                one bench instead of two more panels.
+ *   the body     the pod's own 1px oxblood edge on soot-black: the terminal
+ *                weight this plate has always drawn its panes with, so the pair
+ *                reads as two instruments on one bench instead of two more
+ *                panels.
  *
  * The tally moved into the ribbon for that reason: a byte count is a header
  * fact, not a footer one, and a figure a reader has to read a terminal to find
@@ -192,9 +192,9 @@ const SettledMarker = Build === undefined ? "" : RunMarker(Build.Hash, Build.Typ
 const SettledTally =
 	Build === undefined
 		? ""
-		: `${Build.Lines.length.toLocaleString("en-US")} lines · ${RunBytes(
-				Build.Lines,
-			).toLocaleString("en-US")} bytes`;
+		: `${Build.Lines.length.toLocaleString("en-US")} ${
+				Build.Lines.length === 1 ? "LINE" : "LINES"
+			} · ${RunBytes(Build.Lines).toLocaleString("en-US")} B`;
 
 const Slug =
 	Id ??
@@ -284,9 +284,9 @@ const FrameRows = Tail.map(
 ) : (
 	<ZineBox Size="lg" Rotate="-rotate-[1deg]" Wipe={Wipe}>
 		{/* `data-run` is on the GRID, not on the terminal pod: the runtime owns
-			    both halves of the pair, because the right one is a function of the
-			    left one. The terminal is the left column's well; the preview, the
-			    marker, the verdict chip and the tally are the right column's. */}
+		    both halves of the pair, because the right one is a function of the
+		    left one. The terminal is the left column's pod; the preview, the
+		    marker, the verdict chip and the tally are the right column's. */}
 		<div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10" data-run={Slug}>
 			{/* POD ONE - the live terminal. Without JavaScript the pane is the
 				    settled build at its natural height, with the command in the ribbon
@@ -297,7 +297,7 @@ const FrameRows = Tail.map(
 				    The prompt element carries its own `$`: the runtime writes
 				    `$ <command>` into it, so a `$` beside it would print twice. */}
 			<div class="flex min-w-0 flex-col gap-4">
-				<div class="well ccr-marker flex flex-col">
+				<div class="ccr-marker flex flex-col border border-oxblood-dark bg-soot-black">
 					<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
 						<span class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
 							<span class="shrink-0 font-mono text-meta font-bold uppercase text-zinc-dust">
@@ -352,7 +352,7 @@ const FrameRows = Tail.map(
 						data-enter="980"
 					>
 						<div class="type-meta mb-1.5 uppercase text-stamped-canary">{Label}</div>
-						<div class="well p-3">
+						<div class="border border-oxblood-dark bg-soot-black p-2">
 							<div
 								class="font-mono text-base font-bold text-bone-white"
 								data-run-preview

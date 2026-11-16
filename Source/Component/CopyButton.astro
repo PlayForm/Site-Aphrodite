@@ -31,6 +31,12 @@
  * what the block is written in and belongs on the fence's metadata tag, where
  * nothing is clickable.
  *
+ * The plate enforces it from its side: a control a PAGE placed in a
+ * single-fence host is MOVED into the ribbon, never duplicated, so a stray
+ * button beside a fence becomes that fence's one control rather than a second
+ * one. This component therefore does not need a guard of its own - it needs to
+ * stay out of the ribbon, which is what the `Size` note says.
+ *
  *   <CopyButton Payload={InstallSequence} />
  *   <CopyButton Label="COPY TOML" Payload={Toml} Tone="teal" Size="sm" />
  */
@@ -48,7 +54,13 @@ interface Props {
 	/** The fill. `crimson` is the CTA voice; `teal` and `canary` are the marks. */
 	Tone?: "crimson" | "teal" | "canary";
 
-	/** `md` in a panel, `sm` inside a code fence's header. */
+	/**
+	 * `md` in a panel, `sm` in a dense row of one. NOT for a code fence's
+	 * header: the fence header is the ribbon's, its control is built by
+	 * `Source/Script/CodePlate.ts`, and a button placed there would be a
+	 * second control for one payload - the exact defect this component's own
+	 * header records.
+	 */
 	Size?: "md" | "sm";
 
 	/** Extra classes for the one caller that needs to sit in a flex row. */

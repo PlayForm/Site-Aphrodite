@@ -6,29 +6,31 @@ import PageShell from "@Component/PageShell.astro";
 import PageHeader from "@Component/PageHeader.astro";
 import ZineBox from "@Component/ZineBox.astro";
 import ZineStamp from "@Component/ZineStamp.astro";
-import ZineTape from "@Component/ZineTape.astro";
 import ZineSource from "@Component/ZineSource.astro";
 import { HookNames, ToolNames } from "@Library/Roster";
 
 /* ═══ THE DECISION MATRIX ═══════════════════════════════════════════════════
  *
- * LAYOUT ONLY. This page takes Stitch's ARRANGEMENT and nothing else: numbered
- * bands, a decision matrix, one dominant plate over subordinate cards, and one
- * two-column split. It takes none of Stitch's tokens, surfaces, shadows, radii
- * or type scale - the palette, the 4px module boundaries, the hard offset
- * shadows, the grunge ink, the tape and stamp vocabulary and the chip are the
- * ones this page already carried, unchanged.
+ * LAYOUT ONLY. This page takes the Stitch ARRANGEMENT and nothing else:
+ * numbered chapters, a decision matrix, one dominant plate over subordinate
+ * cards, dual pods and a recessed sand pod. It takes none of Stitch's tokens,
+ * surfaces, shadows, radii or type scale - the palette, the 4px module
+ * boundaries, the hard offset shadows, the grunge ink, the tape and stamp
+ * vocabulary and the chip are the ones this page already carried, unchanged.
  *
- * The arrangement answers one question - WHICH FLAVOR DO I RUN - so the page is
- * laid out as a decision rather than as four things of equal weight:
+ * THE ARRANGEMENT answers one question - WHICH FLAVOR DO I RUN - so the page
+ * is laid out as a decision rather than as four things of equal weight:
  *
  *   01  THE MATRIX     every flavor in one shape, so the whole surface is
  *                      readable before any detail. The rows are ordered by how
  *                      much of the turn a host can see, and that ordering IS
  *                      the decision: a host can only compress what it sees.
+ *                      Beside it, in the two-column split, the one-line answer
+ *                      the rows add up to.
  *   02  RECOMMENDED    one dominant plate - the native Hermes plugin - at the
- *                      page's single expressive volume, carrying the counts the
- *                      decision turns on and the one cost it asks.
+ *                      page's single expressive volume, split into two pods:
+ *                      what it is (with the counts the decision turns on) and
+ *                      the decision itself (host, reach, trade-off).
  *   03  THE OTHERS     the three subordinate cards, each a standard plate with
  *                      its own boundary accent, a cost chip and the trade-off
  *                      chips that name what it cannot see.
@@ -40,12 +42,20 @@ import { HookNames, ToolNames } from "@Library/Roster";
  * always printed, so no card invents a claim - a chip is the row's own words in
  * label form, and the prose under it is the sentence that was already there.
  *
- * COLOUR IS IDENTITY, NOT DECORATION. The status ink is the page's own mapping,
- * row for row - canary for the plugin, teal for the proxy, dust for the other
- * two - and each card's boundary takes one of the site's accents (crimson for
- * the recommendation, then teal, oxblood and canary), so the four flavors are
- * separable by their edges without reading a word. No fill, radius or shadow
- * value was invented for this page.
+ * COLOUR IS IDENTITY, NOT DECORATION, and every colour below keeps the meaning
+ * it already has on this page or elsewhere on the site:
+ *
+ *   - STATUS keeps this page's own mapping, row for row: canary for the plugin,
+ *     teal for the proxy, dust for the other two. Nothing is reassigned.
+ *   - The FRAME accent per plate is unchanged: crimson for the recommendation,
+ *     then teal, oxblood (none) and canary.
+ *   - The EVIDENCE BADGES use the four published `.telemetry-tag` modifiers
+ *     with the meanings the rest of the site gives them, one meaning each:
+ *     bone = a static declaration (here, the cost), crimson = a limitation
+ *     (here, the trade-off), canary and teal = the two live paths. The lead
+ *     plate's single trade-off chip is canary rather than crimson because it
+ *     states the opposite of a limitation - that the plugin gives up nothing.
+ *     No modifier is invented and none is collapsed into another.
  *
  * VOICE. Two sentences whose subject was the page's own furniture were
  * rewritten; the mapping is recorded here so the report can show that no fact
@@ -62,20 +72,27 @@ import { HookNames, ToolNames } from "@Library/Roster";
  *     from caption to the matrix's lead-in: "A host can only compress what it
  *     can see..."
  *
- * Every other sentence, figure, table row, chip, key and SRC line is the text
- * this page already carried.
+ * ADDED, never subtracted: the decision line beside the matrix (01), and the
+ * pod eyebrows that name what each block of a plate holds. Every sentence,
+ * figure, table row, chip, key and SRC line this page already carried is still
+ * here, verbatim.
  */
 
-/** The page's chip, byte-for-byte as this page has always printed it. Declared
- * once because the decision adds a cost chip and trade-off chips beside the
- * capability chips that were already here, and a second copy of this string is
- * a second thing to keep in step. */
-const Chip =
-	"border border-oxblood-dark bg-soot-black px-3 py-1 font-mono text-base uppercase text-bone-newsprint";
+/** The label voice this page's own table header already used - the canary
+ * mono label - now expressed in the published type role rather than a literal
+ * size. */
+const Label = "type-meta font-bold uppercase text-stamped-canary";
 
-/** The label voice this page's own table header already used, reused for the
- * `dt` of each card's fact list. */
-const Label = "font-mono text-base font-black uppercase tracking-widest text-stamped-canary";
+/** The quiet eyebrow: the same voice without the accent, for a block whose
+ * head is not the thing being decided. */
+const Eyebrow = "type-meta font-bold uppercase text-zinc-dust";
+
+/** The four chip voices, one meaning each - see the header. Declared once
+ * because a second copy of a class string is a second thing to keep in step. */
+const FactTag = "telemetry-tag";
+const CostTag = "telemetry-tag telemetry-tag--bone";
+const TradeTag = "telemetry-tag telemetry-tag--crimson";
+const LeadTradeTag = "telemetry-tag telemetry-tag--canary";
 
 /** The accents ZineBox can frame with. Headroom takes `none` - the oxblood
  * boundary a standard plate ships - because the component has no bone frame;
@@ -98,8 +115,10 @@ interface Flavor {
 	/** Matrix cell 4: whether it ships. */
 	Status: string;
 
-	/** The status ink - this page's own identity mapping, unchanged. */
-	Tone: string;
+	/** The status badge - this page's own identity mapping, unchanged. Canary
+	 * for the plugin, teal for the proxy, and the badge's quiet default (dust)
+	 * for the two that do not ship today. */
+	Badge: "" | "telemetry-tag--canary" | "telemetry-tag--teal";
 
 	/** The anchor the matrix row links to, and the card's own id. */
 	Id: string;
@@ -139,7 +158,7 @@ const Hosts: [Flavor, ...Flavor[]] = [
 		Host: "Hermes Agent",
 		Sees: "Everything - hooks, tools, the prompt",
 		Status: "TODAY",
-		Tone: "text-stamped-canary",
+		Badge: "telemetry-tag--canary",
 		Id: "hermes",
 		Head: "The full integration",
 		Accent: "crimson",
@@ -164,7 +183,7 @@ const Hosts: [Flavor, ...Flavor[]] = [
 		Host: "Any OpenAI-compatible client",
 		Sees: "The HTTP body - no hook interception",
 		Status: "SHIPS TODAY",
-		Tone: "text-weathered-teal",
+		Badge: "telemetry-tag--teal",
 		Id: "proxy",
 		Head: "Any OpenAI-compatible client",
 		Accent: "teal",
@@ -180,7 +199,7 @@ const Hosts: [Flavor, ...Flavor[]] = [
 		Host: "The engine's own core",
 		Sees: "Content types and previews, not agent APIs",
 		Status: "FOUNDATION",
-		Tone: "text-zinc-dust",
+		Badge: "",
 		Id: "headroom",
 		Head: "The portable core",
 		Accent: "none",
@@ -196,7 +215,7 @@ const Hosts: [Flavor, ...Flavor[]] = [
 		Host: "Additional agents",
 		Sees: "Whatever the host exposes - the proxy path already works",
 		Status: "PLANNED",
-		Tone: "text-zinc-dust",
+		Badge: "",
 		Id: "roadmap",
 		Head: "Other agents",
 		Accent: "canary",
@@ -229,155 +248,178 @@ const [Plugin, ...Others] = Hosts;
 			]}
 		/>
 
-		<!-- 01 // THREE HOSTS // ONE CORE - the whole surface in one shape,
-		     ordered by reach -->
-		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="kicker" Label="01 // THREE HOSTS // ONE CORE" />
-			<h2
-				id="surface"
-				class="mt-3 font-headline text-sub font-black uppercase text-bone-white"
-			>
+		<!-- 01 // THE MATRIX - the whole surface in one shape, ordered by reach,
+		     beside the answer the rows add up to -->
+		<section class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index">01 // THREE HOSTS // ONE CORE</p>
+			<h2 id="surface" class="mt-3 scroll-mt-24 type-section text-bone-white">
 				What ships, and what each one sees
 			</h2>
-			<p class="mt-6 max-w-[46rem] font-body text-base leading-relaxed text-bone-newsprint">
-				A host can only compress what it can see, so the flavors are ordered by how much of
-				the turn each one is exposed to - and that ordering is what decides which
-				compression the flavor can perform.
-			</p>
 
-			<ZineBox Size="lg" Rotate="-rotate-[1deg]" Class="mt-8">
+			<div class="split mt-6">
+				<p class="max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
+					A host can only compress what it can see, so the flavors are ordered by how much
+					of the turn each one is exposed to - and that ordering is what decides which
+					compression the flavor can perform.
+				</p>
+
+				<div class="well p-4 sm:p-5">
+					<p class={Eyebrow}>WHICH ONE TO RUN</p>
+					<p class="mt-3 font-body text-body leading-relaxed text-bone-newsprint">
+						If the agent is Hermes, the plugin is the deepest integration and it ships
+						today. If it is any other OpenAI-compatible client, the standalone proxy
+						already works and simply sees less of the turn.
+					</p>
+					<p class="mt-3 font-body text-body leading-relaxed text-zinc-dust">
+						Embedded Headroom is the core the other flavors carry rather than a host you
+						adopt on its own, and further hosts are planned on the same hook-and-tool
+						pattern.
+					</p>
+				</div>
+			</div>
+
+			<div class="grunge shell-card mt-8" data-grunge data-grunge-mode="edge">
 				<div class="overflow-x-auto">
-					<table class="w-full border-collapse font-mono text-base">
+					<table class="w-full border-collapse text-left">
 						<thead>
-							<tr class="border-b-2 border-oxblood-dark text-left">
+							<tr class="border-b border-[color:var(--tier-well-edge)]">
 								<th
 									scope="col"
-									class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
 								>
 									FLAVOR
 								</th>
 								<th
 									scope="col"
-									class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
 								>
 									HOST
 								</th>
 								<th
 									scope="col"
-									class="py-3 pr-4 text-base font-black uppercase tracking-widest text-stamped-canary"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
 								>
 									WHAT IT SEES
 								</th>
 								<th
 									scope="col"
-									class="py-3 text-base font-black uppercase tracking-widest text-stamped-canary"
+									class="type-meta px-4 py-3 font-bold uppercase text-zinc-dust sm:px-5"
 								>
 									STATUS
 								</th>
 							</tr>
 						</thead>
-						<tbody class="text-bone-newsprint">
+						<tbody>
 							{Hosts.map((Host) => (
-								<tr class="border-b border-oxblood-dark">
-									<td class="py-3 pr-4 text-bone-white">
+								<tr class="border-b border-[color:var(--tier-shell-edge)] align-top last:border-b-0">
+									<th
+										scope="row"
+										class="whitespace-nowrap px-4 py-4 text-left sm:px-5"
+									>
 										<a
 											href={`#${Host.Id}`}
-											class="underline decoration-transparent decoration-2 underline-offset-4 transition-colors hover:decoration-stamped-canary"
+											class="font-mono text-code font-bold text-weathered-teal underline decoration-transparent decoration-2 underline-offset-4 transition-colors hover:decoration-stamped-canary"
 										>
 											{Host.Flavor}
 										</a>
+									</th>
+									<td class="max-w-[20rem] px-4 py-4 font-body text-body leading-relaxed text-bone-newsprint sm:px-5">
+										{Host.Host}
 									</td>
-									<td class="py-3 pr-4">{Host.Host}</td>
-									<td class="py-3 pr-4 text-zinc-dust">{Host.Sees}</td>
-									<td
-										class={`py-3 font-black uppercase tracking-widest ${Host.Tone}`}
-									>
-										{Host.Status}
+									<td class="max-w-[26rem] px-4 py-4 font-body text-body leading-relaxed text-zinc-dust sm:px-5">
+										{Host.Sees}
+									</td>
+									<td class="px-4 py-4 sm:px-5">
+										<span class:list={["telemetry-tag", Host.Badge]}>
+											{Host.Status}
+										</span>
 									</td>
 								</tr>
 							))}
 						</tbody>
 					</table>
 				</div>
-			</ZineBox>
+			</div>
 		</section>
 
 		<!-- 02 // RECOMMENDED - the one dominant plate, at the page's single
-		     expressive volume -->
-		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="kicker" Label="02 // RECOMMENDED // FLAVOR 01" />
-			<h2
-				id={Plugin.Id}
-				class="mt-3 font-headline text-sub font-black uppercase text-bone-white"
-			>
+		     expressive volume, split into what it is and what the decision turns
+		     on -->
+		<section class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index">02 // RECOMMENDED // FLAVOR 01</p>
+			<h2 id={Plugin.Id} class="mt-3 scroll-mt-24 type-section text-bone-white">
 				{Plugin.Head}
 			</h2>
 
 			<ZineBox
 				Emphasis="featured"
 				Size="lg"
+				Surface="shell"
 				Tape={Plugin.Label}
 				TapeColor="raw"
 				Grunge={true}
 				Class="mt-8"
 			>
-				<div class="flex flex-wrap items-center gap-4">
+				<div class="chips">
 					<ZineStamp Label="RECOMMENDED" Color="canary" Rotate="-rotate-2" />
-					<p
-						class={`font-mono text-base font-black uppercase tracking-widest ${Plugin.Tone}`}
-					>
-						{Plugin.Status}
-					</p>
-					<span class={Chip}>{Plugin.Cost}</span>
+					<span class:list={["telemetry-tag", Plugin.Badge]}>{Plugin.Status}</span>
+					<span class={CostTag}>{Plugin.Cost}</span>
 				</div>
 
-				<div class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
-					<div
-						class="prose-flow font-body text-base leading-relaxed text-bone-newsprint"
-						set:html={Plugin.Body}
-					/>
+				<div class="pods mt-8">
+					<div>
+						<p class={Eyebrow}>WHAT IT IS</p>
+						<div
+							class="prose-flow mt-3 font-body text-body leading-relaxed text-bone-newsprint"
+							set:html={Plugin.Body}
+						/>
+						<div class="chips mt-6">
+							{Plugin.Chips.map((Name) => (
+								<span class={FactTag}>{Name}</span>
+							))}
+						</div>
+					</div>
 
-					<div class="flex flex-wrap gap-6 lg:flex-col lg:items-start">
-						{Plugin.Chips.map((Name) => (
-							<span class={Chip}>{Name}</span>
-						))}
+					<div class="well p-4 sm:p-5">
+						<p class={Eyebrow}>THE DECISION</p>
+						<dl class="mt-4 grid gap-y-4">
+							<div>
+								<dt class={Label}>HOST</dt>
+								<dd class="mt-1 font-body text-body leading-relaxed text-bone-newsprint">
+									{Plugin.Host}
+								</dd>
+							</div>
+							<div>
+								<dt class={Label}>WHAT IT SEES</dt>
+								<dd class="mt-1 font-body text-body leading-relaxed text-zinc-dust">
+									{Plugin.Sees}
+								</dd>
+							</div>
+							<div>
+								<dt class={Label}>TRADE-OFF</dt>
+								<dd class="chips mt-2">
+									{Plugin.Trade.map((Name) => (
+										<span class={LeadTradeTag}>{Name}</span>
+									))}
+								</dd>
+							</div>
+						</dl>
 					</div>
 				</div>
-
-				<dl class="mt-8 grid gap-x-6 gap-y-3 border-t border-oxblood-dark pt-6 sm:grid-cols-[9rem_1fr]">
-					<dt class={Label}>HOST</dt>
-					<dd class="font-body text-base leading-relaxed text-bone-newsprint">
-						{Plugin.Host}
-					</dd>
-
-					<dt class={Label}>WHAT IT SEES</dt>
-					<dd class="font-body text-base leading-relaxed text-zinc-dust">
-						{Plugin.Sees}
-					</dd>
-
-					<dt class={Label}>TRADE-OFF</dt>
-					<dd class="flex flex-wrap gap-4">
-						{Plugin.Trade.map((Name) => (
-							<span class={Chip}>{Name}</span>
-						))}
-					</dd>
-				</dl>
 			</ZineBox>
 		</section>
 
 		<!-- 03 // THE OTHERS - three standard plates, subordinate to the
 		     recommendation by treatment, never by losing a claim -->
-		<section class="relative w-full" data-reveal>
-			<ZineTape Variant="kicker" Label="03 // THE OTHER HOSTS" />
-			<h2 class="mt-3 font-headline text-sub font-black uppercase text-bone-white">
-				What each one gives up
-			</h2>
-			<p class="mt-6 max-w-[46rem] font-body text-base leading-relaxed text-bone-newsprint">
+		<section class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index">03 // THE OTHER HOSTS</p>
+			<h2 class="mt-3 type-section text-bone-white">What each one gives up</h2>
+			<p class="mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
 				Each of these runs the same core behind less of the turn, and each card names the
 				reach it trades away - the host it asks for, what it can see, and what it cannot.
 			</p>
 
-			<div class="mt-16 grid gap-10 md:grid-cols-2 xl:grid-cols-3">
+			<div class="mt-10 grid gap-10 md:grid-cols-2 xl:grid-cols-3">
 				{Others.map((Card) => (
 					<ZineBox
 						Emphasis="standard"
@@ -387,49 +429,46 @@ const [Plugin, ...Others] = Hosts;
 						Grunge={true}
 						Class="flex h-full flex-col"
 					>
-						<div class="flex flex-wrap items-center gap-4">
-							<p
-								class={`font-mono text-base font-black uppercase tracking-widest ${Card.Tone}`}
-							>
-								{Card.Status}
-							</p>
-							<span class={Chip}>{Card.Cost}</span>
-						</div>
+						<header class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-[color:var(--tier-shell-edge)] pb-4">
+							<span class:list={["telemetry-tag", Card.Badge]}>{Card.Status}</span>
+							<span class={CostTag}>{Card.Cost}</span>
+						</header>
 
-						<h3
-							id={Card.Id}
-							class="mt-6 font-headline text-lg font-black uppercase text-bone-white sm:text-xl"
-						>
+						<h3 id={Card.Id} class="mt-6 scroll-mt-24 type-sub text-bone-white">
 							{Card.Head}
 						</h3>
 
-						<dl class="mt-6 grid gap-x-4 gap-y-3">
-							<dt class={Label}>HOST</dt>
-							<dd class="font-body text-base leading-relaxed text-bone-newsprint">
-								{Card.Host}
-							</dd>
-
-							<dt class={Label}>WHAT IT SEES</dt>
-							<dd class="font-body text-base leading-relaxed text-zinc-dust">
-								{Card.Sees}
-							</dd>
+						<dl class="mt-4 grid gap-y-3">
+							<div>
+								<dt class={Label}>HOST</dt>
+								<dd class="mt-1 font-body text-body leading-relaxed text-bone-newsprint">
+									{Card.Host}
+								</dd>
+							</div>
+							<div>
+								<dt class={Label}>WHAT IT SEES</dt>
+								<dd class="mt-1 font-body text-body leading-relaxed text-zinc-dust">
+									{Card.Sees}
+								</dd>
+							</div>
 						</dl>
 
 						<div
-							class="mt-6 prose-flow font-body text-base leading-relaxed text-bone-newsprint"
+							class="prose-flow mt-5 font-body text-body leading-relaxed text-bone-newsprint"
 							set:html={Card.Body}
 						/>
 
-						<div class="mt-auto pt-8">
+						<div class="well mt-auto p-4">
 							<p class={Label}>TRADE-OFF</p>
-							<div class="mt-3 flex flex-wrap gap-4">
+							<div class="chips mt-2">
 								{Card.Trade.map((Name) => (
-									<span class={Chip}>{Name}</span>
+									<span class={TradeTag}>{Name}</span>
 								))}
 							</div>
-							<div class="mt-3 flex flex-wrap gap-4">
+							<p class={`${Eyebrow} mt-4`}>CAPABILITIES</p>
+							<div class="chips mt-2">
 								{Card.Chips.map((Name) => (
-									<span class={Chip}>{Name}</span>
+									<span class={FactTag}>{Name}</span>
 								))}
 							</div>
 						</div>

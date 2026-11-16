@@ -387,6 +387,45 @@ const Artifacts = [
 	},
 ];
 
+// THE FOUR FILES - chapter 02's stage row.
+//
+// The chapter's heading claims four files, so four cards count them: one per
+// file, in the site's fixed stage-accent order (teal, canary, raw blood, bone).
+// Colour is IDENTITY here, never decoration - the teal card is the binary lane
+// and stays the binary lane - so a quietening pass may drop a shadow and may
+// not move a card off its colour.
+//
+// Each figure is the stamp that file carries on the day of the build, read from
+// the manifests (Library/Versions) rather than typed. Three of the four follow
+// the binary and the plugin spec runs its own track, which is the point the
+// heading makes: the reader can see at a glance which files agree.
+const Agreement = [
+	{
+		Index: "01 // BINARY",
+		Value: Stamps.Binary(),
+		Accent: "bg-weathered-teal",
+		Note: "crates/aphrodite/Cargo.toml: the proxy, the CCR store, and the cdylib the shim loads.",
+	},
+	{
+		Index: "02 // PLUGIN SPEC",
+		Value: Stamps.Plugin(),
+		Accent: "bg-stamped-canary",
+		Note: "plugins/aphrodite/plugin.yaml: hook names, tool schemas, and the requires_hermes floor that decides which Hermes can load it.",
+	},
+	{
+		Index: "03 // PIN",
+		Value: `v${Versions.BinaryVersionFile}`,
+		Accent: "bg-raw-blood",
+		Note: "plugins/aphrodite/BINARY_VERSION: the downloader fetches the binary release this file names, never the newest tag on the repository.",
+	},
+	{
+		Index: "04 // CHECKSUM",
+		Value: `v${Versions.BinaryVersionFile}`,
+		Accent: "bg-bone-newsprint",
+		Note: "SHA256SUMS.txt ships in the tree, regenerated to match the pin, and is the only checksum source of truth: a missing file, a version mismatch or a missing asset entry is a hard refusal.",
+	},
+];
+
 // The page's own sections, in document order - SectionNav renders exactly these,
 // so an entry can never name a section this page does not have.
 const Sections = [
@@ -580,6 +619,29 @@ const Holes = [0, 1, 2, 3, 4, 5];
 					than to a release page that is still uploading.
 				</p>
 			</div>
+
+			{/* THE STAGE ROW - the four files the heading claims, counted. One card
+			    per file, in the site's fixed stage-accent order, each figure the
+			    stamp that file carries today. Three of the four follow the binary;
+			    the plugin spec runs its own track, and that is the agreement the
+			    heading is about. The dossier below keeps every labelled explanation
+			    verbatim - this row counts them, it does not replace them. */}
+			<p class="mt-10 max-w-[46rem] type-body text-bone-newsprint">
+				Each file owns one number, and a tag is cut only when all four agree:
+			</p>
+			<div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+				{Agreement.map((Cell) => (
+					<div class="grunge shell-card flex flex-col" data-grunge>
+						<div class:list={["h-[2px] w-full", Cell.Accent]} />
+						<div class="flex flex-1 flex-col px-5 py-5">
+							<p class="section-index">{Cell.Index}</p>
+							<div class="metric metric--compact mt-4">{Cell.Value}</div>
+							<p class="mt-4 type-body text-bone-newsprint">{Cell.Note}</p>
+						</div>
+					</div>
+				))}
+			</div>
+
 			<div class="mt-10">
 				<ZineDossier
 					Title="THE PAIRING // BOTH HALVES"

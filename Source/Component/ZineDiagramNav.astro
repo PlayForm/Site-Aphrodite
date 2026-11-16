@@ -3,19 +3,42 @@
  * ZineDiagramNav - the DeepSeek DiagramNav pattern re-skinned in the zine
  * palette, attached at runtime to every `[data-diagram]` figure on the page.
  *
- * The Mermaid SVGs are embedded via `?raw` + `set:html`, so the binding happens
- * after mount (and again on each astro:page-load). From the SVG itself:
- * - node groups carry ids like `flowchart-H1-0`  -> the key is `H1`
- * - edge paths carry ids like `L_H1_TURN_0`      -> the edge is H1 -> TURN
+ * TWO JOBS, ONE PASS OVER THE SVG.
  *
- * Hovering a node dims everything not adjacent to it (`.zine-diagram-dim`)
- * and lights its adjacent edges raw-blood (`.zine-diagram-hot`). When the
- * figure declares `data-diagram-links` (a JSON map of node key -> route),
- * linkable nodes get the canary hover chrome and clicking navigates.
+ * 1. THE STAGE ROW. The diagram's own nodes become a NUMBERED ROW above the
+ *    drawing - `01 AGENT`, `02 SHIM`, ... - in the SVG's own document order,
+ *    which is the order the diagram is meant to be read in. The row is the
+ *    figure's nav: pointing at or focusing an entry dims everything not
+ *    adjacent to that node and lights its edges, exactly as pointing at the
+ *    node itself does, and an entry whose node carries a route in
+ *    `data-diagram-links` navigates on click. The coordinate is the node's
+ *    position (two digits, the stage-coordinate form the rest of the site
+ *    uses); the node KEY is the identity, so a row entry and its node can
+ *    never disagree about which stage they name. The row carries no accent of
+ *    its own - the four stage accents are identity and belong to the stages
+ *    that own them, not to an arbitrary node of a Mermaid graph - so the only
+ *    colour in it is the canary laser edge on a navigable entry, which is the
+ *    same canary the SVG's own linkable nodes hover to.
+ *
+ * 2. THE HOVER HIGHLIGHT. Pointing at a node dims everything not adjacent to
+ *    it (`.zine-diagram-dim`) and lights its adjacent edges raw-blood
+ *    (`.zine-diagram-hot`).
+ *
+ * THE ID FORMS, because this is where the nav used to die. These SVGs are
+ * Mermaid's own output and Mermaid prefixes every id with the `<svg id>`: a
+ * node group is `aphrodite-diagram-hook-chain-flowchart-H1-0` and an edge path
+ * is `aphrodite-diagram-hook-chain-L_H1_TURN_0`. Matching `g[id^="flowchart-"]`
+ * and `path[id^="L_"]` therefore found NOTHING and every diagram on the site
+ * was inert. The key is read after the last `flowchart-` / `-L_` marker, and
+ * the bare form is still accepted, so an unprefixed SVG binds as well.
+ *
+ * The node's words come from the drawing itself (`tspan.row`), never from a
+ * table beside it: a row entry cannot name a node differently from the box the
+ * reader is looking at. A node with no text falls back to its key.
  *
  * Pages that hand-roll their `<figure data-diagram="...">` (the DRIFT-ALIGN
- * precedent in hooks/plugin/tools) include this component once to get the
- * interactivity without changing their figure markup.
+ * precedent in hooks/plugin/tools) include this component once and get the
+ * stage row and the interactivity without changing their figure markup.
  */
 ---
 
@@ -26,8 +49,116 @@
 	// absent (view transitions disabled).
 	import { navigate } from "astro:transitions/client";
 
+	/** The node's key: everything after the last `flowchart-`, minus Mermaid's
+	 *  ordinal suffix. A bare `flowchart-H1-0` id yields `H1` all the same. */
 	function NodeKey(Group: Element): string {
-		return Group.id.replace(/^flowchart-/, "").replace(/-\d+$/, "");
+		const Id = Group.id;
+		const Marker = Id.lastIndexOf("flowchart-");
+
+		return (Marker === -1 ? Id : Id.slice(Marker + "flowchart-".length)).replace(/-\d+$/, "");
+	}
+
+	/** The edge's two ends, read from `...-L_FROM_TO_0` (or a bare `L_FROM_TO_0`).
+	 *  Two ends exactly, as before: an id that does not split in two is not an
+	 *  edge this component understands, and guessing at it would invent one. */
+	function EdgeEnds(Path: Element): [string, string] | undefined {
+		const Marker = Path.id.lastIndexOf("-L_");
+		const Bare = Marker === -1 ? Path.id : Path.id.slice(Marker + 1);
+
+		if (!Bare.startsWith("L_")) {
+			return undefined;
+		}
+
+		const Parts = Bare.slice(2).replace(/_\d+$/, "").split("_");
+
+		return Parts.length === 2 ? [Parts[0], Parts[1]] : undefined;
+	}
+
+	/** The words the node draws. Mermaid renders one `tspan.row` per line and
+	 *  pads labels with zero-width spaces, so the rows are joined, stripped and
+	 *  collapsed; a node with no words is named by its key rather than left
+	 *  blank in the row. */
+	function NodeLabel(Group: Element, Key: string): string {
+		const Rows = Array.from(Group.querySelectorAll("tspan.row"))
+			.map((Row) => (Row.textContent ?? "").replace(/\u200b/g, "").trim())
+			.filter((Text) => Text !== "");
+
+		const Label =
+			Rows.length > 0
+				? Rows.join(" ")
+				: (Group.textContent ?? "").replace(/\u200b/g, "").trim();
+
+		return Label === "" ? Key : Label.replace(/\s+/g, " ");
+	}
+
+	/**
+	 * THE STAGE ROW. One numbered entry per node, in the map's order (which is
+	 * the SVG's document order). It is a real control, not a caption: pointing
+	 * at an entry runs the same highlight as pointing at its node, and an entry
+	 * with a route navigates. Nothing is emitted when a figure has no nodes -
+	 * an empty row would be a row that names nothing.
+	 */
+	function StageRow(
+		Nodes: Map<string, Element>,
+		Links: Record<string, string>,
+		Enter: (Key: string) => void,
+		Leave: () => void,
+		Open: (Key: string) => void,
+	): HTMLElement | undefined {
+		if (Nodes.size === 0) {
+			return undefined;
+		}
+
+		const Row = document.createElement("div");
+
+		Row.className =
+			"flex flex-wrap items-center gap-x-2 gap-y-1.5 border-b border-[var(--tier-shell-edge)] bg-carbon-void px-4 py-2";
+		Row.setAttribute("role", "group");
+		Row.setAttribute("aria-label", `Diagram nodes, ${Nodes.size} in order`);
+		Row.dataset.diagramStages = "";
+
+		let Index = 0;
+
+		for (const [Key, Group] of Nodes) {
+			Index += 1;
+
+			const Label = NodeLabel(Group, Key);
+			const Linkable = Links[Key] !== undefined;
+
+			const Entry = document.createElement("button");
+
+			Entry.type = "button";
+			Entry.className =
+				"flex min-w-0 items-baseline gap-1.5 border border-oxblood-dark bg-asphalt-panel px-2 py-1 font-mono text-base leading-snug text-bone-newsprint transition-colors hover:border-stamped-canary focus-visible:border-stamped-canary";
+
+			const Coord = document.createElement("span");
+
+			Coord.className = Linkable
+				? "shrink-0 tabular-nums text-stamped-canary"
+				: "shrink-0 tabular-nums text-zinc-dust";
+			Coord.textContent = String(Index).padStart(2, "0");
+
+			const Name = document.createElement("span");
+
+			Name.className = "min-w-0 break-words";
+			Name.textContent = Label;
+
+			Entry.append(Coord, Name);
+			Entry.setAttribute(
+				"aria-label",
+				Linkable ? `Open ${Label} (${Key})` : `Highlight ${Label} (${Key})`,
+			);
+
+			Entry.addEventListener("mouseenter", () => Enter(Key));
+			Entry.addEventListener("mouseleave", Leave);
+			Entry.addEventListener("focus", () => Enter(Key));
+			Entry.addEventListener("blur", Leave);
+			Entry.addEventListener("click", () => Open(Key));
+
+			Row.append(Entry);
+		}
+
+		return Row;
 	}
 
 	function BindDiagrams() {
@@ -46,17 +177,24 @@
 
 			const Nodes = new Map<string, Element>();
 
-			for (const Group of Svg.querySelectorAll('g[id^="flowchart-"]')) {
-				Nodes.set(NodeKey(Group), Group);
+			for (const Group of Array.from(Svg.querySelectorAll("g.node"))) {
+				const Key = NodeKey(Group);
+
+				if (Key === "") {
+					continue;
+				}
+
+				Nodes.set(Key, Group);
 				Group.classList.add("zine-diagram-node");
 			}
 
 			const Edges = new Map<Element, [string, string]>();
 
-			for (const Path of Svg.querySelectorAll('path[id^="L_"]')) {
-				const Parts = Path.id.slice(2).replace(/_\d+$/, "").split("_");
-				if (Parts.length === 2 && Nodes.has(Parts[0]) && Nodes.has(Parts[1])) {
-					Edges.set(Path, [Parts[0], Parts[1]]);
+			for (const Path of Array.from(Svg.querySelectorAll("path"))) {
+				const Ends = EdgeEnds(Path);
+
+				if (Ends !== undefined && Nodes.has(Ends[0]) && Nodes.has(Ends[1])) {
+					Edges.set(Path, Ends);
 				}
 			}
 
@@ -72,58 +210,75 @@
 				Links = {};
 			}
 
+			const Enter = (Key: string) => {
+				const Near = new Set([Key]);
+
+				for (const [From, To] of Edges.values()) {
+					if (From === Key) Near.add(To);
+					if (To === Key) Near.add(From);
+				}
+
+				for (const [NodeKey, Node] of Nodes) {
+					Node.classList.toggle("zine-diagram-dim", !Near.has(NodeKey));
+				}
+
+				for (const [Path, [From, To]] of Edges) {
+					const Hot = From === Key || To === Key;
+					Path.classList.toggle("zine-diagram-hot", Hot);
+					Path.classList.toggle("zine-diagram-dim", !Hot);
+				}
+			};
+
+			const Leave = () => {
+				for (const Node of Nodes.values()) {
+					Node.classList.remove("zine-diagram-dim");
+				}
+
+				for (const Path of Edges.keys()) {
+					Path.classList.remove("zine-diagram-hot", "zine-diagram-dim");
+				}
+			};
+
+			/** A node with no route is not a link: the entry still highlights,
+			 *  and clicking it does nothing rather than navigating nowhere. */
+			const Open = (Key: string) => {
+				const Route = Links[Key];
+
+				if (Route !== undefined && Route !== "") {
+					navigate(Route);
+				}
+			};
+
 			for (const [Key, Group] of Nodes) {
 				if (Links[Key]) {
 					Group.classList.add("zine-diagram-linkable");
 					Group.setAttribute("role", "link");
 					Group.setAttribute("tabindex", "0");
 					Group.setAttribute("aria-label", `Open ${Key}`);
-				}
-
-				const Enter = () => {
-					const Near = new Set([Key]);
-
-					for (const [From, To] of Edges.values()) {
-						if (From === Key) Near.add(To);
-						if (To === Key) Near.add(From);
-					}
-
-					for (const [NodeKey, Node] of Nodes) {
-						Node.classList.toggle("zine-diagram-dim", !Near.has(NodeKey));
-					}
-
-					for (const [Path, [From, To]] of Edges) {
-						const Hot = From === Key || To === Key;
-						Path.classList.toggle("zine-diagram-hot", Hot);
-						Path.classList.toggle("zine-diagram-dim", !Hot);
-					}
-				};
-
-				const Leave = () => {
-					for (const Node of Nodes.values()) {
-						Node.classList.remove("zine-diagram-dim");
-					}
-
-					for (const Path of Edges.keys()) {
-						Path.classList.remove("zine-diagram-hot", "zine-diagram-dim");
-					}
-				};
-
-				Group.addEventListener("mouseenter", Enter);
-				Group.addEventListener("mouseleave", Leave);
-				Group.addEventListener("focus", Enter);
-				Group.addEventListener("blur", Leave);
-
-				if (Links[Key]) {
-					Group.addEventListener("click", () => {
-						navigate(Links[Key]);
-					});
+					Group.addEventListener("click", () => Open(Key));
 					Group.addEventListener("keydown", (Event) => {
 						if ((Event as KeyboardEvent).key === "Enter") {
-							navigate(Links[Key]);
+							Open(Key);
 						}
 					});
 				}
+
+				Group.addEventListener("mouseenter", () => Enter(Key));
+				Group.addEventListener("mouseleave", Leave);
+				Group.addEventListener("focus", () => Enter(Key));
+				Group.addEventListener("blur", Leave);
+			}
+
+			// The row sits directly above the drawing: after the figure's own
+			// header ribbon when it has one, before the channel that holds the
+			// SVG in every case.
+			const Row = StageRow(Nodes, Links, Enter, Leave, Open);
+
+			if (Row !== undefined) {
+				const Parent = Svg.parentElement;
+				const Host: Element = Parent !== null && Parent !== Figure ? Parent : Svg;
+
+				Figure.insertBefore(Row, Host);
 			}
 		}
 	}
