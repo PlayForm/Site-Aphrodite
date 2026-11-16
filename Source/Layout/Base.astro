@@ -582,6 +582,109 @@ interface Props {
 				}
 			}
 
+			/* COPY CONFIRMATION - BEGIN. The copy-state probe extracts this
+			   region on its own; keep it free of imports and of every other
+			   module-scope name so it can be driven against a stub DOM. */
+
+			// THE COPY CONFIRMATION, IN THE ONE PLACE EVERY PAGE LOADS.
+			//
+			// Stitch's CLI snippet confirms the copy where the reader clicked,
+			// and the rule that keeps it honest is where the signal comes
+			// from: this module reveals `#copy-toast` only AFTER
+			// `navigator.clipboard.writeText` resolved. A refused write - an
+			// insecure origin, a denied permission - leaves the toast hidden,
+			// so the reflector marks nothing. A control that claimed COPIED
+			// over a clipboard the browser refused would be the one lie on a
+			// page whose pitch is honest previews.
+			//
+			// WHY HERE AND NOT IN A CONTROL: a component's `<script>` is
+			// bundled only on the routes that render the component. While this
+			// block lived in `Component/CopyButton.astro` and
+			// `Component/ZineCopyChip.astro` the state reached the six routes
+			// rendering one of them and never reached crates, benchmarks,
+			// plugin or any docs page - so on those routes every fence's plate
+			// chip kept saying `Copy` after a successful write. Base is every
+			// page, so it is the only home a reflector can have. The controls
+			// carry markup and nothing else.
+			//
+			// It WRITES NO CLIPBOARD and binds no second handler for the copy
+			// itself: the click listener is capture-phase and passive, it runs
+			// before BindCopy's own handler, records which control was
+			// activated, and the observer watches the toast's class for the
+			// reveal. Nothing here races an async promise with a timer.
+			//
+			// It sits OUTSIDE the mount contract deliberately. This module is
+			// evaluated once per document, so its document-level listener has
+			// to outlive every mount (a session-scoped one would have to be
+			// re-added on every navigation), while the observer follows the
+			// toast ELEMENT, which the router replaces on every swap.
+			let Armed: Element | null = null;
+
+			document.addEventListener(
+				"click",
+				(Event) => {
+					const Control = (Event.target as Element | null)?.closest?.("[data-copy]");
+
+					// Always the LAST control clicked: a copy the browser refused
+					// leaves no mark, and the next successful one must not
+					// confirm it instead.
+					if (Control) {
+						Armed = Control;
+					}
+				},
+				{ capture: true, passive: true },
+			);
+
+			const Reflect = (): void => {
+				const Toast = document.getElementById("copy-toast");
+
+				// Guarded per ELEMENT, not per module: the view-transitions router
+				// swaps `<body>`, so the toast is a new node after every
+				// navigation and the observer has to follow it. A module-level
+				// flag would leave the second page's toast unwatched and the
+				// state would stop arriving after one click-through.
+				if (!Toast || Toast.dataset["copyStateBound"]) {
+					return;
+				}
+
+				Toast.dataset["copyStateBound"] = "1";
+
+				let Marked: Element | null = null;
+
+				new MutationObserver(() => {
+					if (!Toast.classList.contains("hidden")) {
+						const Control = Armed;
+
+						Armed = null;
+
+						if (!Control) {
+							return;
+						}
+
+						Marked = Control;
+						Marked.setAttribute("data-copy-state", "copied");
+
+						return;
+					}
+
+					// The toast hides on the runtime's own timer, so the state's
+					// lifetime is the confirmation's lifetime - one timer, not two.
+					Marked?.removeAttribute("data-copy-state");
+					Marked = null;
+				}).observe(Toast, { attributes: true, attributeFilter: ["class"] });
+			};
+
+			try {
+				Reflect();
+				document.addEventListener("astro:page-load", Reflect);
+			} catch (Error) {
+				// Decoration on a control that still copies: a failure here is a
+				// warning, never a broken page.
+				console.warn("aphrodite: the copy confirmation could not bind", Error);
+			}
+
+			/* COPY CONFIRMATION - END */
+
 			// The hamburger: a per-element guard (one click listener per toggle
 			// element) and exactly ONE document-level Escape listener per
 			// mount. It used to add an Escape listener per binding and never

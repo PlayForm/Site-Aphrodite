@@ -1,0 +1,168 @@
+/* Index.css - the Homepage route's own sheet.
+   The one gutter (`.paper-band`'s bleed to the shell's box edges), the 40rem prose measure, and the four stage cards' accent identity - one `--stage-accent` per card, read by the edge, the rule, the ink and the figure.
+
+   PAGE-LOCAL BY CONSTRUCTION. These rules used to be a <style> block inside the
+   page, and a page's block ships only with that page. They are a sheet the page
+   imports for the same reason: routing them through the global entry point would
+   apply them to every route. `Deck.css` is the precedent.
+
+   Every value here is a token or a utility the layer already defines; nothing in
+   this file introduces a colour, a distance or a radius of its own.
+   Extracted from Source/pages/index.astro - 1 block(s), no value changed. */
+
+/* ONE GUTTER FOR EVERY BAND - AND IT IS THE SHELL'S OWN.
+   `PageShell` insets `<main>` by `px-5 sm:px-8 lg:px-14` (20 / 32 / 56px),
+   and every band on the page is a `w-full` child of that `<main>`, so the
+   bands already share one left edge with no padding of their own. The
+   defect the phase-2 review measured (sections 02/03/05/06 flush at the
+   band edge while the evidence spread was inset) came from the one band
+   that ADDED padding, not from the five that had none.
+
+   The first fix applied that extra padding to every band instead, which
+   aligned the six bands with each other and moved the whole page 56px
+   right of every other route: measured at 1440, `/setup/`, `/showcase/`
+   and `/docs/` put their first glyph at x=56 while `/` put it at x=112,
+   so navigating between routes shifted the page sideways. Two nested
+   paddings that happen to sum to a constant is not one gutter; the shared
+   edge is the shell's, applied once. Verified at 1440: all six bands plus
+   the related nav and the colophon report textX=56, inset=0.
+
+   Nothing is page-scoped any more, so nothing can drift: a band that
+   wants air uses margin on its own plate (`mx-3` on the stage plate
+   exists for the tilt's bounding box, not for a gutter). */
+
+/* THE BONE SPREAD IS A SPREAD, NOT A BOX. The evidence band is the page's
+   only surface change, and its light ground used to be exactly the text
+   column (x 56 to 1383 at 1440), so the kicker's glyph sat 0px from the
+   paper's edge and the 26.9% numeral 5px from it - while every other
+   surface on the page insets its text (the demo plate 55px, the install
+   panel 44px). A light rectangle that ends where the text ends reads as a
+   text box, not as paper.
+
+   The ground therefore bleeds to the shell's box edges while the TEXT
+   stays on the page's one gutter: the margin is negative by exactly the
+   padding it adds back, so the net text position is unchanged (verified:
+   textX 56 at 1440, 32 at 768, 20 at 390 - identical to the five dark
+   bands) and only the surface grows. The values are PageShell's own scale
+   (`px-5 sm:px-8 lg:px-14`), restated because a child cannot read its
+   parent's utility. */
+.paper-band {
+	margin-inline: -1.25rem;
+	padding-inline: 1.25rem;
+}
+
+@media (min-width: 40rem) {
+	.paper-band {
+		margin-inline: -2rem;
+		padding-inline: 2rem;
+	}
+}
+
+@media (min-width: 64rem) {
+	.paper-band {
+		margin-inline: -3.5rem;
+		padding-inline: 3.5rem;
+	}
+}
+
+/* One measure for every prose line on the page. Per-container classes were
+   not enough: the install panel is 896px wide, so its paragraphs measured
+   808px (~90 characters) even after the outer blocks were capped. 40rem is
+   ~71 characters at this body size - `ch` is useless here because it
+   measures the "0" glyph, which in DM Sans is far wider than average
+   lowercase (62ch computed to 763px). */
+main p.type-body,
+main li.type-body {
+	max-width: 40rem;
+}
+/* An inline identifier inside a sentence must not break mid-token:
+   `hermes --version` split across two lines reads as `hermes -` / `-version`.
+   A code span is one word, so it wraps as one word or not at all. */
+main code.type-code {
+	white-space: nowrap;
+}
+/* STAGE IDENTITY // the four stages are four different operations, and a
+   reader has to be able to tell stage 03 from stage 01 at a glance and to
+   match it to the same stage on the case study. The accent is therefore one
+   custom property per card: the left edge, the rule, the corner stamp, the
+   heading and the chip all read it, so the five cannot drift apart.
+
+   01 CLASSIFY           teal     the technical voice: naming the content
+   02 ENRICH & PREVIEW   canary   the result the reader acts on
+   03 BLAKE3 STORE       blood    storage, and the marker it hands back
+   04 AGENT DECIDES      bone     the one step that is the agent's own choice
+
+   Emphasis is untouched: no shadow, no tilt, no tape, straight edges. The
+   identity is colour + stage letter + figure; the volume stays low.
+
+   The ink is the accent everywhere except stage 03, where the accent cannot
+   be read as text: --raw-blood measures 2.12:1 on --carbon-void, so its
+   labels are the same hue lifted toward --bone-newsprint (55/45 = 4.85:1).
+   The edge and the rule keep the full raw blood - only the words are
+   lifted. */
+/* The selectors name the tier they override (`.emphasis-quiet`) because this
+   sheet is unscoped: a bare `.stage-card` is one class, exactly the weight of
+   `.emphasis-quiet` in `Component/Plate`, so the winner would be whichever
+   sheet loaded last. `.emphasis-quiet.stage-card` is one class heavier, so the
+   accent wins wherever the sheets land. */
+/* The plate is a TINTED surface, not a transparent one and not a flat dark
+   one. Two failures taught this: transparent made the cards inherit the
+   page (#09090b) so they read as borders on nothing, and a #050506 fill was
+   a 4-level step nobody can see. The fill is the stage accent at 7% over
+   --carbon-void: every card separates from the page AND from its siblings,
+   so the row reads as four plates with four identities before any border
+   is noticed. */
+.emphasis-quiet.stage-card {
+	--stage-accent: var(--blood-crimson);
+	--stage-ink: var(--stage-accent);
+	--stage-tint: 7%;
+	background: color-mix(in srgb, var(--stage-accent) var(--stage-tint), var(--carbon-void));
+	border-width: 1px;
+	border-color: color-mix(in srgb, var(--stage-accent) 30%, var(--oxblood-dark));
+	border-left-width: 2px;
+	border-left-color: var(--stage-accent);
+}
+
+/* FOUR METRICS IN ONE ROW. The published `.metric` is one figure per section;
+   the stage row deliberately spends four, because these four figures are one
+   comparison and not four monuments. So the cap lives on the CARD, not on the
+   class: at the published clamp a card of ~212px would print
+   `aphrodite_retrieve` wider than its own plate, and the figure the reader is
+   meant to compare would be the one that broke the row. The `<wbr>` in stage
+   04 keeps the identifier breakable at its own seam. */
+.stage-card .metric {
+	font-size: clamp(1.375rem, 2.2vw, 2rem);
+	letter-spacing: -0.02em;
+}
+
+.emphasis-quiet.stage-card--a {
+	--stage-accent: var(--weathered-teal);
+}
+
+.emphasis-quiet.stage-card--b {
+	--stage-accent: var(--stamped-canary);
+}
+
+.emphasis-quiet.stage-card--c {
+	--stage-accent: var(--raw-blood);
+	--stage-ink: color-mix(in srgb, var(--raw-blood) 55%, var(--bone-newsprint));
+}
+
+/* Stage 04 is the agent's own decision, which sits outside the engine's
+   three-hue language - so it takes the lightest neutral the palette owns and
+   carries it at a stronger tint (16% vs 7%). At 7% the bone accent was
+   achromatic AND low-contrast: the plate needed a second look to separate.
+   Raised, it reads as the fourth plate of the set rather than as default
+   foreground. */
+.emphasis-quiet.stage-card--d {
+	--stage-accent: var(--bone-white);
+	--stage-tint: 16%;
+}
+
+.stage-ink {
+	color: var(--stage-ink);
+}
+
+.stage-rule {
+	border-top-color: var(--stage-accent);
+}

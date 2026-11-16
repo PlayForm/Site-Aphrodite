@@ -301,7 +301,10 @@
      .deck-*      the presentation route                 (Deck.css)
      .console-well  the console pod's recessed body      (Component/Console)
      .docs-prose  the docs reading column                (Page/Docs.css)
-     .stage-card* .paper-band  the homepage's own bands  (Page/Index.css)
+     .stage-card*  .stage-ink  .stage-rule  .paper-band   (Page/Index.css)
+                   the homepage's stage row, its ink and its spread. The same
+                   sheet sets the per-card `--stage-accent`, `--stage-ink` and
+                   `--stage-tint` custom properties
      #keys        the config route's matrix anchor       (Page/Config.css)
 
      A page or component OUTSIDE the owner never names one of these. If a page

@@ -273,8 +273,10 @@ const BuildPlate = (Pre: HTMLPreElement): void => {
 		// `group` is what makes the confirmation below resolve: the swap is
 		// written as `group-data-[copy-state=copied]:*` variants, which
 		// Tailwind scopes under `.group[data-copy-state="copied"]`, and
-		// `data-copy-state` is set ON THIS BUTTON by the reflector that
-		// `Component/CopyButton.astro` / `Component/ZineCopyChip.astro` ship.
+		// `data-copy-state` is set ON THIS BUTTON by `Layout/Base.astro`'s
+		// reflector - the one copy runtime every route loads, never a
+		// control's own `<script>`, which ships only where that control
+		// renders.
 		Button.className = "zine-plate-copy group";
 		Button.dataset["copy"] = Payload(Pre, Declared);
 		// The label names the ACTION. `Copy command` where the clipboard holds

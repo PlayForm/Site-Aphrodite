@@ -46,6 +46,13 @@
  * `navigator.clipboard.writeText` resolved), so a refused write marks nothing
  * and no control ever claims a copy that did not happen.
  *
+ * The state itself is written by `Layout/Base.astro`'s reflector, beside the
+ * toast it follows - not here. A component's `<script>` is bundled only on the
+ * routes that render the component, so a reflector living in this file reached
+ * the six routes that render a control and left every fence on crates,
+ * benchmarks, plugin and the docs pages confirming nothing. The confirmation
+ * is markup here; the mechanism is Base's, once, on every page.
+ *
  *   <CopyButton Payload={InstallSequence} />
  *   <CopyButton Label="COPY TOML" Payload={Toml} Tone="teal" Size="sm" />
  */
@@ -114,84 +121,3 @@ const Metrics = {
 	<span class="group-data-[copy-state=copied]:hidden">{Label}</span>
 	<span class="hidden group-data-[copy-state=copied]:inline" aria-live="polite">COPIED</span>
 </button>
-
-<script>
-	// THE COPY CONFIRMATION, INSIDE THE CONTROL.
-	//
-	// Stitch's CLI snippet confirms the copy where the reader clicked, and the
-	// rule that keeps it honest is where the signal comes from:
-	// `Layout/Base.astro` reveals `#copy-toast` only AFTER
-	// `navigator.clipboard.writeText` resolved. A refused write - an insecure
-	// origin, a denied permission - leaves the toast hidden, so this module
-	// marks nothing. A control that claimed COPIED over a clipboard the browser
-	// refused would be the one lie on a page whose pitch is honest previews.
-	//
-	// This module WRITES NO CLIPBOARD and binds no second handler for the copy
-	// itself: the click listener is capture-phase and passive, it runs before
-	// the runtime's own handler, records which control was activated, and the
-	// observer watches the toast's class for the reveal. Nothing here races an
-	// async promise with a timer.
-	let Armed: Element | null = null;
-
-	document.addEventListener(
-		"click",
-		(Event) => {
-			const Control = (Event.target as Element | null)?.closest?.("[data-copy]");
-
-			// Always the LAST control clicked: a copy the browser refused leaves
-			// no mark, and the next successful one must not confirm it instead.
-			if (Control) {
-				Armed = Control;
-			}
-		},
-		{ capture: true, passive: true },
-	);
-
-	const Reflect = (): void => {
-		const Toast = document.getElementById("copy-toast");
-
-		// Guarded per ELEMENT, not per module: the view-transitions router swaps
-		// `<body>`, so the toast is a new node after every navigation and the
-		// observer has to follow it. A module-level flag would leave the second
-		// page's toast unwatched and the state would stop arriving after one
-		// click-through.
-		if (!Toast || Toast.dataset["copyStateBound"]) {
-			return;
-		}
-
-		Toast.dataset["copyStateBound"] = "1";
-
-		let Marked: Element | null = null;
-
-		new MutationObserver(() => {
-			if (!Toast.classList.contains("hidden")) {
-				const Control = Armed;
-
-				Armed = null;
-
-				if (!Control) {
-					return;
-				}
-
-				Marked = Control;
-				Marked.setAttribute("data-copy-state", "copied");
-
-				return;
-			}
-
-			// The toast hides on the runtime's own timer, so the state's lifetime
-			// is the confirmation's lifetime - one timer, not two.
-			Marked?.removeAttribute("data-copy-state");
-			Marked = null;
-		}).observe(Toast, { attributes: true, attributeFilter: ["class"] });
-	};
-
-	try {
-		Reflect();
-		document.addEventListener("astro:page-load", Reflect);
-	} catch (Error) {
-		// Decoration on a control that still copies: a failure here is a warning,
-		// never a broken page.
-		console.warn("aphrodite: the copy confirmation could not bind", Error);
-	}
-</script>
