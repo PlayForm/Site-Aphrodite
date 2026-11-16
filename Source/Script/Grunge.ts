@@ -64,7 +64,7 @@ const Splat = (Seed: number, Cx: number, Cy: number, Radius: number, Opacity: nu
 	const Next = Random(Seed);
 	const Parts: string[] = [];
 
-	const Steps = 132;
+	const Steps = 72;
 	const Points: string[] = [];
 	for (let Index = 0; Index < Steps; Index += 1) {
 		const Angle = (Index / Steps) * Math.PI * 2;
@@ -77,7 +77,7 @@ const Splat = (Seed: number, Cx: number, Cy: number, Radius: number, Opacity: nu
 	Parts.push(`<polygon points="${Points.join(" ")}"/>`);
 
 	// 7-9 arms: enough to read as a throw, few enough that every arm is seen.
-	const Spikes = 7 + Math.floor(Next() * 3);
+	const Spikes = 5 + Math.floor(Next() * 3);
 	for (let Index = 0; Index < Spikes; Index += 1) {
 		const Angle = (Index / Spikes) * Math.PI * 2 + Next() * 0.35;
 		const Reach = Radius * (1.05 + Field(Angle * 2, Seed * 0.01) * 0.55 + Next() * 0.45);
@@ -93,7 +93,7 @@ const Splat = (Seed: number, Cx: number, Cy: number, Radius: number, Opacity: nu
 		);
 	}
 
-	const Drops = 10 + Math.floor(Next() * 16);
+	const Drops = 7 + Math.floor(Next() * 6);
 	for (let Index = 0; Index < Drops; Index += 1) {
 		const Angle = Next() * Math.PI * 2;
 		const Distance = Radius * (0.85 + Next() * 2.0);
@@ -106,21 +106,45 @@ const Splat = (Seed: number, Cx: number, Cy: number, Radius: number, Opacity: nu
 	return `<g fill-opacity="${Opacity.toFixed(2)}">${Parts.join("")}</g>`;
 };
 
-/** A card's group: four layers of one family, each a slightly different passage. */
-const Group = (Seed: number): string => {
-	const Next = Random(Seed ^ 0x9e3779b9);
-	const Shapes: string[] = [];
-	for (let Index = 0; Index < LayerOpacity.length; Index += 1) {
-		// Narrow bands, on purpose: the group must look made by one hand.
-		const Radius = Size * (0.12 + Next() * 0.05);
-		const Cx = Size * (0.3 + Next() * 0.4);
-		const Cy = Size * (0.3 + Next() * 0.4);
-		const Turn = (Next() * 44 - 22).toFixed(1);
-		Shapes.push(
-			`<g transform="rotate(${Turn} ${Cx.toFixed(1)} ${Cy.toFixed(1)})">${Splat((Seed + Index * 7919) | 0, Cx, Cy, Radius, LayerOpacity[Index])}</g>`,
+/**
+ * A card's ink: FIVE groups of FIVE layers. Both the placement and the size of
+ * every layer come from the noise field, not from a PRNG - that is the point of
+ * the exercise. A PRNG scatters; noise distributes, so the clusters sit at
+ * different distances from the edges and in different sizes while still reading
+ * as one hand. Groups are anchored independently, so the mass lands on the
+ * edges and the corners rather than in the middle of the plate.
+ */
+const GroupsPerCard = 5;
+const LayersPerGroup = 5;
+
+/** Noise sample mapped to 0..1. */
+const Ride = (X: number, Y: number): number => (Field(X, Y) + 1) / 2;
+
+/** One group: five layers of one family around a noise-chosen anchor. */
+const Group = (Seed: number, GroupIndex: number): string => {
+	const Parts: string[] = [];
+	const Phase = Seed * 0.001 + GroupIndex * 0.61;
+	const AnchorX = Ride(Phase, 0.25);
+	const AnchorY = Ride(Phase, 0.75);
+
+	for (let Layer = 0; Layer < LayersPerGroup; Layer += 1) {
+		const DriftX = (Ride(Layer * 0.43, GroupIndex * 0.19) - 0.5) * 0.18;
+		const DriftY = (Ride(GroupIndex * 0.23, Layer * 0.43) - 0.5) * 0.18;
+		const Cx = Size * (0.02 + AnchorX * 0.96 + DriftX);
+		const Cy = Size * (0.02 + AnchorY * 0.96 + DriftY);
+		const Radius = Size * (0.045 + Ride(Layer * 0.71, GroupIndex * 0.37) * 0.115);
+		const Turn = ((Ride(Layer * 0.29, GroupIndex * 0.83) - 0.5) * 44).toFixed(1);
+		Parts.push(
+			`<g transform="rotate(${Turn} ${Cx.toFixed(1)} ${Cy.toFixed(1)})">${Splat(
+				(Seed + GroupIndex * 7919 + Layer * 104729) | 0,
+				Cx,
+				Cy,
+				Radius,
+				LayerOpacity[Layer % LayerOpacity.length],
+			)}</g>`,
 		);
 	}
-	return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${Size} ${Size}" fill="#000">${Shapes.join("")}</svg>`;
+	return Parts.join("");
 };
 
 /**
@@ -133,7 +157,12 @@ export const PaintGrunge = (): void => {
 		if (Element.dataset.grungePainted === "1") continue;
 		try {
 			const Seed = (Math.random() * 0x7fffffff) | 0;
-			Element.style.setProperty("--grunge-mask", `url("data:image/svg+xml,${encodeURIComponent(Group(Seed))}")`);
+			const Groups: string[] = [];
+			for (let GroupIndex = 0; GroupIndex < GroupsPerCard; GroupIndex += 1) {
+				Groups.push(Group(Seed, GroupIndex));
+			}
+			const Svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${Size} ${Size}" fill="#000">${Groups.join("")}</svg>`;
+			Element.style.setProperty("--grunge-mask", `url("data:image/svg+xml,${encodeURIComponent(Svg)}")`);
 			// Registration varies a little, never a lot: +/-1.2deg, 4-10% bleed.
 			Element.style.setProperty("--grunge-turn", `${(Math.random() * 2.4 - 1.2).toFixed(2)}deg`);
 			Element.style.setProperty(

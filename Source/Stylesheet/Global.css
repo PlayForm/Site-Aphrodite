@@ -208,8 +208,8 @@
 	/* ONE grey ink for the whole family; the per-layer weight lives in the
 	   drawing's fill-opacity, not in a second colour. */
 	background: var(--grunge-ink, rgba(158, 158, 165, 0.55));
-	-webkit-mask-image: var(--grunge-mask, url("/Brand/Splat/group-01.svg"));
-	mask-image: var(--grunge-mask, url("/Brand/Splat/group-01.svg"));
+	-webkit-mask-image: var(--grunge-mask);
+	mask-image: var(--grunge-mask);
 	-webkit-mask-size: 100% 100%;
 	mask-size: 100% 100%;
 	-webkit-mask-repeat: no-repeat;
@@ -222,12 +222,6 @@
 
 /* Six groups, six slightly different registrations. The inset and turn differ
    per group as well as the drawing, so two sections never bleed identically. */
-.grunge--1 { --grunge-mask: url("/Brand/Splat/group-01.svg"); --grunge-inset: -7% -11% -9% -8%; --grunge-turn: -1.1deg; }
-.grunge--2 { --grunge-mask: url("/Brand/Splat/group-02.svg"); --grunge-inset: -10% -6% -7% -12%; --grunge-turn: 1.4deg; }
-.grunge--3 { --grunge-mask: url("/Brand/Splat/group-03.svg"); --grunge-inset: -6% -13% -11% -6%; --grunge-turn: -0.7deg; }
-.grunge--4 { --grunge-mask: url("/Brand/Splat/group-04.svg"); --grunge-inset: -11% -7% -6% -10%; --grunge-turn: 1.9deg; }
-.grunge--5 { --grunge-mask: url("/Brand/Splat/group-05.svg"); --grunge-inset: -8% -9% -12% -7%; --grunge-turn: -1.7deg; }
-.grunge--6 { --grunge-mask: url("/Brand/Splat/group-06.svg"); --grunge-inset: -9% -8% -8% -11%; --grunge-turn: 0.9deg; }
 
 /* Ink by region, not by habit: the same drawing reads as a dark stain on the
    page ground and as a light bloom on a crimson band. */
