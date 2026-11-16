@@ -4,8 +4,6 @@ section: "Install"
 source: "docs/install/README.md"
 ---
 
-# Installing Aphrodite
-
 "How do I install this" has four correct answers depending on your platform
 and setup. This page picks the right one for you before you touch a terminal.
 

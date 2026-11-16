@@ -4,8 +4,6 @@ section: "Metrics"
 source: "docs/metrics/queries.md"
 ---
 
-# Metrics Queries
-
 PromQL reference for monitoring and alerting on Aphrodite proxy metrics - see
 [Prometheus Metrics](/docs/metrics/prometheus/) for the full metric catalog these queries draw on.
 

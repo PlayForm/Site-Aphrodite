@@ -4,8 +4,6 @@ section: "Install"
 source: "docs/install/macos-linux.md"
 ---
 
-# macOS / Linux: Install
-
 Everything below also works on Windows if you have Git Bash, WSL,
 or MSYS - these are all POSIX shell scripts.
 

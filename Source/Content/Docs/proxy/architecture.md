@@ -4,8 +4,6 @@ section: "Proxy"
 source: "docs/proxy/architecture.md"
 ---
 
-# Proxy Architecture
-
 Aphrodite ships a local reverse proxy that sits between any OpenAI-compatible client
 and an upstream LLM API.
 

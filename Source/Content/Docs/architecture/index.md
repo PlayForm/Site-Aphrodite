@@ -4,8 +4,6 @@ section: "Architecture"
 source: "docs/architecture/README.md"
 ---
 
-# Architecture
-
 Flow traces of every runtime path in Aphrodite:
 
 - the CCR compression proxy with its dual loopback listeners

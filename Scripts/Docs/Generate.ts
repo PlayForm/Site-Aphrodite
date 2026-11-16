@@ -19,7 +19,10 @@
 // The transform a page gets is the one it always got: the H1 becomes the title,
 // the first path segment becomes the section, relative links between docs files
 // become site routes, and a repository deep-link is recomposed through the link
-// registry so the branch pin lives in one place.
+// registry so the branch pin lives in one place. The H1 line itself is consumed
+// by that transform rather than copied through: the page header renders the
+// frontmatter title as the page's only <h1>, so a body that kept its own would
+// render a second one, in the same words, directly under the header.
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
@@ -151,6 +154,17 @@ export default (Module: string, Site: string): Result => {
 
 		const Linked = Links(Content, dirname(Key), Routes, (Link) => Stale.push(`${Key}: ${Link}`));
 
+		// The H1 line Meta() read as the title is REMOVED from the body, using
+		// the same rule Meta() used to find it, so the page renders exactly one
+		// <h1>: the header's. Nothing is lost - the words are the frontmatter
+		// title, the tab title, the meta description's subject and the header.
+		const Body = Linked.split("\n");
+		const TitleLine = Body.findIndex((Candidate) => Candidate.startsWith("# "));
+
+		if (TitleLine >= 0) {
+			Body.splice(TitleLine, 1);
+		}
+
 		const Destination = resolve(Site, Row.Destination);
 
 		mkdirSync(dirname(Destination), { recursive: true });
@@ -163,7 +177,7 @@ export default (Module: string, Site: string): Result => {
 				`source: ${JSON.stringify(Row.Source)}`,
 				"---",
 				"",
-				Linked.trimEnd(),
+				Body.join("\n").replace(/^\n+/, "").trimEnd(),
 				"",
 			].join("\n"),
 			"utf8",

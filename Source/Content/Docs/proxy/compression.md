@@ -4,8 +4,6 @@ section: "Proxy"
 source: "docs/proxy/compression.md"
 ---
 
-# Compression Pipeline
-
 The proxy decides whether to compress each piece of Chat Completions response content, and
 if so, how.
 

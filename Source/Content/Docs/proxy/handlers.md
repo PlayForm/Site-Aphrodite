@@ -4,8 +4,6 @@ section: "Proxy"
 source: "docs/proxy/handlers.md"
 ---
 
-# Proxy Handlers
-
 The proxy exposes HTTP handlers for proxying LLM API requests, managing CCR entries,
 executing tool relay calls, and health checks.
 

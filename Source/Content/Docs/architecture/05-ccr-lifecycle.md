@@ -4,8 +4,6 @@ section: "Architecture"
 source: "docs/architecture/05-ccr-lifecycle.md"
 ---
 
-# CCR Entry Lifecycle & EMA Threshold State
-
 State machine of a single CCR entry from creation through storage, preview, retrieval,
 and eviction/decay/GC - plus the separate EMA compression-ratio state
 that governs the adaptive threshold.

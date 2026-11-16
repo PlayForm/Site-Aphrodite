@@ -4,8 +4,6 @@ section: "Architecture"
 source: "docs/architecture/01-startup.md"
 ---
 
-# Process Startup & Dual-Proxy Launch
-
 `aphrodite` startup splits into two halves.
 
 The binary half resolves configuration (env > TOML > default), binds every listener

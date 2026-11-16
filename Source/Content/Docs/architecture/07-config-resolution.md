@@ -4,8 +4,6 @@ section: "Architecture"
 source: "docs/architecture/07-config-resolution.md"
 ---
 
-# Config Resolution Precedence
-
 Two independent resolution stacks share the same **env > TOML > default** precedence but live
 in different modules:
 

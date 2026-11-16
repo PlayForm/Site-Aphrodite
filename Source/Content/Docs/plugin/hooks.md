@@ -4,8 +4,6 @@ section: "Plugin"
 source: "docs/plugin/hooks.md"
 ---
 
-# Plugin Hooks
-
 The plugin registers six hooks with Hermes.
 
 Every hook is a thin dispatch that forwards its arguments

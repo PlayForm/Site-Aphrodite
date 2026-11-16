@@ -4,8 +4,6 @@ section: "Architecture"
 source: "docs/architecture/08-dylib-loading.md"
 ---
 
-# Dylib Loading (load-once per process)
-
 The Python shim loads the Rust dylib exactly once per process
 from the resolved path (`ctypes.CDLL` on the canonical candidate).
 

@@ -4,8 +4,6 @@ section: "Classification"
 source: "docs/classification/README.md"
 ---
 
-# Classification
-
 How the compression pipeline labels content before storage:
 
 - the vendored base classifier

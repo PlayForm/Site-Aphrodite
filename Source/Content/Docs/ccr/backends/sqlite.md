@@ -4,8 +4,6 @@ section: "CCR"
 source: "docs/ccr/backends/sqlite.md"
 ---
 
-# SQLite CCR Backend
-
 The SQLite backend is the production CCR store: persistent across worker restarts
 and shareable across workers via a single database file.
 

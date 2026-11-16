@@ -4,8 +4,6 @@ section: "Guides"
 source: "docs/guides/hermes-tool-output-schemas.md"
 ---
 
-# Hermes Tool Output Schemas
-
 Every Hermes tool returns output with its own shape: unified diffs, JSON envelopes,
 grep listings, markdown, console logs.
 

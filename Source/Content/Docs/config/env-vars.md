@@ -4,8 +4,6 @@ section: "Config"
 source: "docs/config/env-vars.md"
 ---
 
-# Environment Variables
-
 Aphrodite reads a set of `APHRODITE_*` environment variables (plus a few non-prefixed ones)
 across three surfaces: the Rust proxy, the `aphrodite setup` subcommand,
 and the Hermes-plugin dylib session.

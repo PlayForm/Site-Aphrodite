@@ -4,8 +4,6 @@ section: "Guides"
 source: "docs/guides/hermes-integration.md"
 ---
 
-# Hermes Integration
-
 Aphrodite connects to Hermes Agent as a native plugin, not as a proxy you point a client at.
 
 It is the reason the interception lives inside the turn: tool output never hits a wire,

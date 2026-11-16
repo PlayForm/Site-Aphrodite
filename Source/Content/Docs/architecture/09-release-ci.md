@@ -4,8 +4,6 @@ section: "Architecture"
 source: "docs/architecture/09-release-ci.md"
 ---
 
-# Release & Publish CI
-
 Two GitHub Actions workflows fire on an `Aphrodite/v*` tag push.
 
 `Build.yml` creates the GitHub release once, runs a 4-target build matrix

@@ -4,8 +4,6 @@ section: "Plugin"
 source: "docs/plugin/context-engine.md"
 ---
 
-# Context Engine
-
 The context engine is the dylib session's middle-turn archiver:
 when the conversation index fills up, it packs the middle turns into one compact CCR entry
 and replaces them with a single marker, so the model sees a short history (head + marker +

@@ -4,8 +4,6 @@ section: "API"
 source: "docs/api/retrieve.md"
 ---
 
-# Retrieve Endpoint
-
 `POST /retrieve` resolves a CCR hash back to its original content, with optional line filtering
 and pagination. It is the HTTP path behind the `aphrodite_retrieve` tool and external callers.
 

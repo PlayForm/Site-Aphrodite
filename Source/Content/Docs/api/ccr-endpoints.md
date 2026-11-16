@@ -4,8 +4,6 @@ section: "API"
 source: "docs/api/ccr-endpoints.md"
 ---
 
-# CCR Management Endpoints
-
 These loopback-only endpoints let external tools and scripts create, list,
 and delete compressed content entries in the CCR store directly,
 and re-apply the compression configuration live.

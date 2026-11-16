@@ -4,8 +4,6 @@ section: "Architecture"
 source: "docs/architecture/04-hook-ffi.md"
 ---
 
-# Hermes Hook & FFI Path
-
 The Hermes plugin path: Hermes fires a hook → the Python ctypes shim resolves the dylib fresh
 for each call → the C ABI in `crates/aphrodite-hermes` (`aphrodite_hermes_call_hook`,
 panic-guarded) → the core `aphrodite` crate hook bodies.

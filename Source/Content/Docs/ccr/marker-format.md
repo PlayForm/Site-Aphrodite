@@ -4,8 +4,6 @@ section: "CCR"
 source: "docs/ccr/marker-format.md"
 ---
 
-# CCR Marker Format
-
 CCR markers are compact strings that stand in for compressed content in an agent's context.
 
 Each marker carries the content's hash, type, and size plus a human-readable preview,

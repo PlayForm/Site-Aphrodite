@@ -4,8 +4,6 @@ section: "Guides"
 source: "docs/guides/README.md"
 ---
 
-# Guides
-
 Guides are walkthrough-style pages: they connect the parts of Aphrodite the way you use them,
 rather than document a single component.
 

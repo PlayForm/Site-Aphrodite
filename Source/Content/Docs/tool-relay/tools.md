@@ -4,8 +4,6 @@ section: "Tool Relay"
 source: "docs/tool-relay/tools.md"
 ---
 
-# Tool Relay Tools
-
 Aphrodite exposes 13 tools to the Hermes agent for compression, retrieval, stats,
 and session management.
 

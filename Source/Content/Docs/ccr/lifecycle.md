@@ -4,8 +4,6 @@ section: "CCR"
 source: "docs/ccr/lifecycle.md"
 ---
 
-# CCR Lifecycle
-
 CCR (Compress-Cache-Retrieve) is the lossless end-to-end compression path
 for LLM proxy traffic: Aphrodite hashed the content, stored it, and replaced it
 with a compact marker in the response, and the agent retrieved the original by hash on demand.

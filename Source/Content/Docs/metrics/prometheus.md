@@ -4,8 +4,6 @@ section: "Metrics"
 source: "docs/metrics/prometheus.md"
 ---
 
-# Prometheus Metrics
-
 All proxy operations expose counters, gauges, and histograms at `GET /metrics`
 in the Prometheus text exposition format, for monitoring, alerting, and dashboards.
 

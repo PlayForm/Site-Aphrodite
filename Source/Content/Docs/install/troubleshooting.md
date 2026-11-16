@@ -4,8 +4,6 @@ section: "Install"
 source: "docs/install/troubleshooting.md"
 ---
 
-# Install Troubleshooting
-
 ## Proxy doesn't auto-launch
 
 When Hermes loads the plugin, it tries to launch the proxy binary automatically. Here's

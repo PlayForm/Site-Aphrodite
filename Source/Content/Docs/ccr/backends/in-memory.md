@@ -4,8 +4,6 @@ section: "CCR"
 source: "docs/ccr/backends/in-memory.md"
 ---
 
-# In-Memory CCR Backend
-
 The in-memory backend is a process-local, sharded concurrent store used for cache-mode deployments.
 
 It is lightweight by design - no persistence is needed for an ephemeral cache -

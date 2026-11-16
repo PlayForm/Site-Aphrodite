@@ -4,8 +4,6 @@ section: "Tool Relay"
 source: "docs/tool-relay/callbacks.md"
 ---
 
-# Callbacks
-
 Two distinct callback surfaces exist around the tool relay:
 
 - the Hermes-side hooks that fire when a tool result comes back

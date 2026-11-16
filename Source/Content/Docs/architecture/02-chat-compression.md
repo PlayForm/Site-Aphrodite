@@ -4,8 +4,6 @@ section: "Architecture"
 source: "docs/architecture/02-chat-compression.md"
 ---
 
-# Chat-Completion Compression
-
 The token and cache proxies' central flow: a `/v1/chat/completions` response comes back
 from upstream, and `compress_chat_completion` classifies each `message.content`,
 applies an EMA-tuned per-type threshold (scaled by the `x-headroom-budget` header),

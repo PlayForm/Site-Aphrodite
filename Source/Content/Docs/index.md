@@ -4,8 +4,6 @@ section: "Overview"
 source: "docs/README.md"
 ---
 
-# Aphrodite Documentation
-
 Aphrodite compresses context before it hits the LLM.
 
 It is the reason there are two integration paths: a reverse proxy

@@ -4,8 +4,6 @@ section: "Architecture"
 source: "docs/architecture/11-data-model.md"
 ---
 
-# Core Data Model
-
 The principal data structures behind the compression engine:
 
 - the per-session `AphroditeState` (FFI/Hermes path)

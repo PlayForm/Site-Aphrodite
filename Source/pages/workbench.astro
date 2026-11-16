@@ -415,8 +415,14 @@ const Arc: readonly {
 				<div class="mt-12 grid gap-16 md:grid-cols-2" data-enter="180">
 					{
 						Knobs.map((Knob) => (
-							<div class="border-2 border-blood-crimson/60 bg-soot-black p-6">
-								<div class="flex items-baseline justify-between">
+							/* min-w-0 + a wrapping label/value row: the row was nowrap, so its
+							   min-content (a 15-character mono key plus its value) set the
+							   CARD's min-content and the card measured 282px in a 278px grid
+							   track at 390 - it jutted 4px past the column while nothing
+							   inside it reported overflow. Letting the pair wrap fixes the
+							   cause; min-w-0 stops a longer key from doing it again. */
+							<div class="min-w-0 border-2 border-blood-crimson/60 bg-soot-black p-6">
+								<div class="flex flex-wrap items-baseline justify-between gap-x-3">
 									<label
 										class="font-mono text-base font-bold text-bone-newsprint"
 										for={`wb-knob-${Knob.Key}`}
@@ -536,9 +542,16 @@ const Arc: readonly {
 				<div class="mt-12 grid gap-8 lg:grid-cols-3" data-enter="180">
 					{
 						States.map((State) => (
-							<div class="border-2 border-weathered-teal/60 bg-soot-black p-6">
+							/* min-w-0 + `.break-token` on the WHEN line: that line carries the
+							   TOML keys (tool_threshold_token, engine_threshold_pct) in mono
+							   with tracking-widest, so an unbreakable 21-character token set
+							   the card's min-content at 276px and the three cards ran 12px
+							   past a 320px viewport. `.break-token` is the utility Global.css
+							   documents for exactly this - a container whose min-content is a
+							   token - and this was its first caller. */
+							<div class="min-w-0 border-2 border-weathered-teal/60 bg-soot-black p-6">
 								<p class="font-mono text-base font-black text-bone-white">{State.Label}</p>
-								<p class="mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
+								<p class="break-token mt-4 font-mono text-base uppercase tracking-widest text-zinc-dust">
 									WHEN: {State.When}
 								</p>
 								{State.Note.map((Sentence) => (

@@ -4,8 +4,6 @@ section: "Architecture"
 source: "docs/architecture/03-retrieve.md"
 ---
 
-# Retrieve & Recursive Marker Resolution
-
 Two related paths turn a `<<<CCR:hash|type|size>>>` marker back into content:
 
 - the HTTP `/retrieve` endpoint (inline_ccr → CcrStore, query filter + pagination,

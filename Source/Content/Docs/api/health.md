@@ -4,8 +4,6 @@ section: "API"
 source: "docs/api/health.md"
 ---
 
-# Health Endpoint
-
 `GET /health` is the public liveness check for load balancers and monitoring systems.
 
 It always returns HTTP 200 - capability state (CCR enabled, mode, context fill) is conveyed

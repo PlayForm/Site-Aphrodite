@@ -4,8 +4,6 @@ section: "Install"
 source: "docs/install/windows.md"
 ---
 
-# Windows Install
-
 Native Windows (PowerShell) is a first-class install path - `download.ps1` is the direct
 PowerShell equivalent of the Unix `download.sh` script, so Git Bash/WSL are no longer required.
 

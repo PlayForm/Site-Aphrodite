@@ -4,8 +4,6 @@ section: "Classification"
 source: "docs/classification/content-types.md"
 ---
 
-# Content Type Taxonomy
-
 The classifier labeled every payload that enters the compression pipeline with a content type
 so thresholds and previews can adapt per type - errors stay visible in context
 while Aphrodite compressed verbose build and log output at the base threshold.

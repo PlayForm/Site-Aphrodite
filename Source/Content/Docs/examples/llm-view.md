@@ -4,8 +4,6 @@ section: "Examples"
 source: "docs/examples/llm-view.md"
 ---
 
-# CCR Examples - What the LLM Actually Sees
-
 Every example on this page is a real tool result captured from a live session
 against the 1.4.6 binary.
 

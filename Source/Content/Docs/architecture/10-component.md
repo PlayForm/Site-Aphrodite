@@ -4,8 +4,6 @@ section: "Architecture"
 source: "docs/architecture/10-component.md"
 ---
 
-# Component Architecture
-
 Top-level components and the two boundaries that matter:
 the **C-ABI** (Python shim ↔ Rust dylib) and the **HTTP** boundary (LLM clients / Hermes ↔ the
 two loopback proxies ↔ upstream API).

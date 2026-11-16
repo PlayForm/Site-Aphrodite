@@ -4,8 +4,6 @@ section: "Plugin"
 source: "docs/plugin/directives.md"
 ---
 
-# Conversational Directives
-
 Directives are short behavioral instruction files - one `.md` file each -
 that `pre_llm_call` injects inline into the LLM's context on every call.
 

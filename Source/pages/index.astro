@@ -747,7 +747,7 @@ const GridFold = `
 					>
 						<span data-count={Benchmark.Ceiling.replace("×", "")}>{Benchmark.Ceiling.replace("×", "")}</span>&times; COMPRESSION
 					</span>
-					<span class="max-w-[13rem] text-base leading-relaxed text-oxblood-dark">
+					<span class="max-w-[15rem] text-pretty text-base leading-relaxed text-oxblood-dark">
 						Best case, on large low-entropy prose.
 					</span>
 				</div>
@@ -757,7 +757,7 @@ const GridFold = `
 					>
 						<span data-count={Benchmark.Overall.replace("×", "")}>{Benchmark.Overall.replace("×", "")}</span>&times; OVERALL
 					</span>
-					<span class="max-w-[13rem] text-base leading-relaxed text-oxblood-dark">
+					<span class="max-w-[15rem] text-pretty text-base leading-relaxed text-oxblood-dark">
 						The whole standard corpus: {Benchmark.CorpusIn} to {Benchmark.CorpusOut}.
 					</span>
 				</div>
@@ -767,7 +767,7 @@ const GridFold = `
 					>
 						{Benchmark.LatencyHeadline.toUpperCase().replace(" ", "")} E2E OVERHEAD
 					</span>
-					<span class="max-w-[13rem] text-base leading-relaxed text-oxblood-dark">
+					<span class="max-w-[15rem] text-pretty text-base leading-relaxed text-oxblood-dark">
 						Including the HTTP round-trip; the spread is {Benchmark.Latency}.
 					</span>
 				</div>
@@ -777,7 +777,7 @@ const GridFold = `
 					>
 						<span data-count={Study.SavedMillions.replace("M+", "")}>{Study.SavedMillions.replace("M+", "")}</span>M+ TOKENS SAVED
 					</span>
-					<span class="max-w-[13rem] text-base leading-relaxed text-oxblood-dark">
+					<span class="max-w-[15rem] text-pretty text-base leading-relaxed text-oxblood-dark">
 						{Study.Sessions} real sessions, {Study.ApiCalls} API calls, {Study.Measured}.
 					</span>
 				</div>
@@ -975,9 +975,17 @@ const GridFold = `
 	   specificity - a bare `.stage-card` would tie with `.emphasis-quiet` and
 	   the winner would depend on stylesheet order. `.emphasis-quiet.stage-card`
 	   is one class heavier, so the accent wins wherever the sheets land. */
+	/* The plate is a RECESSED surface, not a transparent one. On the soot page
+	   (#09090b) a transparent card is indistinguishable from the section it
+	   sits in - the four stages read as one continuous slab with four borders
+	   floating on it. --void-inset is deliberately darker than the page ground:
+	   a plate cut into the page, with the accent edge as its only colour. */
 	.emphasis-quiet.stage-card {
 		--stage-accent: var(--blood-crimson);
 		--stage-ink: var(--stage-accent);
+		background: var(--void-inset);
+		border-width: 1px;
+		border-color: var(--oxblood-dark);
 		border-left-width: 3px;
 		border-left-color: var(--stage-accent);
 	}

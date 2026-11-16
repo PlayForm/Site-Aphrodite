@@ -50,14 +50,14 @@ const Width = Math.max(0, Math.min(100, Percent));
 ---
 
 <div>
-	{/* leading-none on the pair itself, because `text-base` sets a line-height
-	    alongside the font-size and wins over `leading-none` on the container - the
-	    row kept its 24px rhythm and the value sat 4px above the label (measured:
-	    glyph bottoms 4px apart). Set on the spans, both glyphs land on one baseline
-	    (measured: 0px apart). A one-line pair has nothing for the slack to hold. */}
-	<div class="mb-1 flex items-baseline justify-between text-base font-bold">
-		<span class="text-bone-newsprint leading-none">{Label}</span>
-		<span class={`${Text} leading-none`}>{Ratio}</span>
+	{/* The label and the value look 4px apart when you compare the BOX bottoms of
+	    their glyph ranges, but the offset is identical under align-items stretch,
+	    baseline, center and inline-block (measured), so it is the two faces'
+	    different descents, not a misaligned pair: the "×" is set from a fallback
+	    whose box is a pixel shorter. Left as the plain row. */}
+	<div class="mb-1 flex justify-between text-base font-bold">
+		<span class="text-bone-newsprint">{Label}</span>
+		<span class={Text}>{Ratio}</span>
 	</div>
 	<div class="flex h-4 w-full overflow-hidden border border-oxblood-dark bg-soot-black">
 		{

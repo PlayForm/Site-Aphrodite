@@ -4,8 +4,6 @@ section: "Architecture"
 source: "docs/architecture/06-sse-streaming.md"
 ---
 
-# SSE Streaming Passthrough
-
 Server-sent-event (`text/event-stream`) responses bypass compression
 and the response cache entirely, stream chunk-by-chunk with a timeout-free client,
 and account bytes and errors mid-stream.

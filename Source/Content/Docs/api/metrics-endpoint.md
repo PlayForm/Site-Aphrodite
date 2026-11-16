@@ -4,8 +4,6 @@ section: "API"
 source: "docs/api/metrics-endpoint.md"
 ---
 
-# Metrics Endpoint
-
 `GET /metrics` exposes proxy counters, gauges, and a latency histogram
 in the Prometheus text exposition format for scraping, alerting, and dashboards.
 

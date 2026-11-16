@@ -4,8 +4,6 @@ section: "CCR"
 source: "docs/ccr/backends/inline.md"
 ---
 
-# Inline CCR
-
 Tiny entries bypass the CCR backend round-trip entirely.
 
 Two inline stores exist: one in the proxy process for chat-completions

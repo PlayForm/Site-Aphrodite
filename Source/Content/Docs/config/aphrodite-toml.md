@@ -4,8 +4,6 @@ section: "Config"
 source: "docs/config/aphrodite-toml.md"
 ---
 
-# aphrodite.toml
-
 Aphrodite's proxy listeners and compression engine are configured through a single TOML file.
 
 This page documents every section, field, precedence rule, and validation check;

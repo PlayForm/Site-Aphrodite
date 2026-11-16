@@ -4,8 +4,6 @@ section: "Proxy"
 source: "docs/proxy/retry.md"
 ---
 
-# Proxy Retry
-
 Transient network failures to the upstream LLM API don't fail the entire request.
 
 A bounded retry loop with exponential backoff and jitter avoids both immediate failure

@@ -4,8 +4,6 @@ section: "CCR"
 source: "docs/ccr/backends/README.md"
 ---
 
-# CCR Backends
-
 The CCR (Compress-Cache-Retrieve) store has two full backends, selected by deployment mode,
 plus the inline stores that bypass the backend round-trip for tiny entries.
 

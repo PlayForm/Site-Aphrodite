@@ -4,8 +4,6 @@ section: "Examples"
 source: "docs/examples/README.md"
 ---
 
-# Examples
-
 Real tool results captured from live sessions against the Aphrodite 1.4.6 binary,
 shown the way the model sees them: verbatim markers, rendered previews, and the byte economics
 of compression.

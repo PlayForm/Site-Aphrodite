@@ -1325,8 +1325,7 @@ body:has([data-deck]) footer {
 	.deck-decide-flow,
 	.deck-hook-grid,
 	.deck-compare,
-	.deck-stages,
-	.deck-numbers {
+	.deck-stages {
 		grid-template-columns: 1fr;
 	}
 
@@ -1369,10 +1368,10 @@ body:has([data-deck]) footer {
 		overflow-wrap: anywhere;
 		text-overflow: clip;
 		/* A wrapped log line keeps a hanging indent at the log's own content
-		   column (three spaces), so its continuation never reads as a new
-		   entry. */
-		padding-left: 3ch;
-		text-indent: -3ch;
+		   column (the build log indents by four spaces), so its continuation
+		   never reads as a new entry. */
+		padding-left: 4ch;
+		text-indent: -4ch;
 	}
 
 	/* The state stamp is one word pair: it never splits inside its chip, and the

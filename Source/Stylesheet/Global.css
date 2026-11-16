@@ -7,6 +7,10 @@
 	--carbon-void: #111014; /* workbench module bg */
 	--asphalt-panel: #16151a; /* sub-panel bg */
 	--asphalt-panel-dark: #0d0c10;
+	/* A plate recessed INTO the page: darker than --soot-black on purpose, so a
+	   card on the landing page separates from the section it sits in without a
+	   lighter fill competing with the bone text. */
+	--void-inset: #050506;
 
 	/* Blood family */
 	--oxblood-dark: #520612; /* borders, shadow planes */
