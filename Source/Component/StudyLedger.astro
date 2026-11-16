@@ -43,7 +43,7 @@ const Band = Figure("study.reduction.band");
 const Sessions = Figure("study.sessions");
 const SavedTokens = Figure("study.tokens.saved");
 
-const LeadSize = Scale === "full" ? "text-3xl sm:text-5xl" : "text-2xl sm:text-3xl";
+const LeadSize = Scale === "full" ? "metric" : "metric metric--compact";
 
 /**
  * The details table: what the result is computed from, one question per row.
@@ -69,29 +69,37 @@ const Measures: { Id: string; Label: string }[] = [
 
 const Rows = Measures.map(({ Id, Label }) => ({ Label, Fact: Figure(Id) }));
 
-/** The kind tag. A reader must be able to tell a reconstruction from a count. */
+/** The kind tag. A reader must be able to tell a reconstruction from a count, so
+ * the kind is a CHIP in the telemetry voice and its colour is identity:
+ * measured is the teal outline, estimated the solid canary, simulated the solid
+ * crimson, derived the quiet default. The solid variants carry their own ink,
+ * which is also why `simulated` is no longer `text-raw-blood` - crimson as a
+ * text colour measures 2.23:1 on these fills. */
 const KindTag = {
-	measured: { Tag: "MEASURED", Class: "text-weathered-teal" },
-	estimated: { Tag: "ESTIMATED", Class: "text-stamped-canary" },
-	simulated: { Tag: "SIMULATED", Class: "text-raw-blood" },
-	derived: { Tag: "DERIVED", Class: "text-zinc-dust" },
+	measured: { Tag: "MEASURED", Class: "telemetry-tag telemetry-tag--teal" },
+	estimated: { Tag: "ESTIMATED", Class: "telemetry-tag telemetry-tag--canary" },
+	simulated: { Tag: "SIMULATED", Class: "telemetry-tag telemetry-tag--crimson" },
+	derived: { Tag: "DERIVED", Class: "telemetry-tag" },
 } as const;
 ---
 
-<div class="border-t-2 border-oxblood-dark pt-6">
-	<!-- HEADER row: the period + the scope -->
-	<div class="flex flex-wrap items-baseline justify-between gap-2">
-		<div class="type-meta font-bold text-zinc-dust">MEASURED, {Study.Measured.toUpperCase()}</div>
-		<div class="type-meta font-bold text-zinc-dust">
+<div class="blueprint-section">
+	<!-- HEADER row: the period + the scope. Two telemetry tags - the
+	     measurement, then the corpus it was taken over. Metadata, not a
+	     sentence, which is why they are chips and not prose. -->
+	<div class="flex flex-wrap items-center justify-between gap-2">
+		<span class="telemetry-tag telemetry-tag--teal">MEASURED, {Study.Measured.toUpperCase()}</span>
+		<span class="telemetry-tag">
 			{Study.Sessions} HERMES SESSIONS &bull; {Study.ApiCalls} API CALLS &bull; {Study.Period.toUpperCase()}
-		</div>
+		</span>
 	</div>
 
-	<!-- THE PRIMARY RESULT: one figure, at reading size, with its scope beside it -->
+	<!-- THE PRIMARY RESULT: one figure, at the metric scale, with its unit as a
+	     child so the two never separate on a narrow viewport. -->
 	<div class="mt-8 border-l-2 border-blood-crimson pl-5">
-		<div class="type-meta font-bold text-zinc-dust">ESTIMATED CONTEXT REDUCTION</div>
-		<div class={`mt-2 font-headline font-black tracking-tighter text-stamped-canary ${LeadSize}`}>
-			{Reduction.Value}
+		<div class="section-index">ESTIMATED CONTEXT REDUCTION</div>
+		<div class={`mt-2 !text-stamped-canary ${LeadSize}`}>
+			{Reduction.Value}<span class="metric__unit">{Reduction.Unit}</span>
 		</div>
 		<p class="mt-3 max-w-2xl type-body text-bone-newsprint">
 			Across {Sessions.Value} recorded sessions, with a sensitivity band of {Band.Value}. The band is the
@@ -102,16 +110,20 @@ const KindTag = {
 		</p>
 	</div>
 
-	<!-- THE DETAILS: one question per row, every row carrying its own unit and scope -->
-	<div class="mt-10 overflow-x-auto border border-oxblood-dark bg-soot-black">
+	<!-- THE DETAILS: one question per row, every row carrying its own unit and
+	     scope. A TELEMETRY MATRIX rather than a ruled table: the well recesses
+	     the readings into the page, the rows are separated by hairlines instead
+	     of a box per cell, and every figure is tabular so the digits line up
+	     down the column. -->
+	<div class="mt-10 overflow-x-auto well">
 		<table class="w-full border-collapse font-mono text-base">
 			<thead>
-				<tr class="border-b-2 border-blood-crimson">
-					<th class="px-3 py-2 text-left type-meta font-black text-zinc-dust">MEASURE</th>
-					<th class="px-3 py-2 text-right type-meta font-black text-zinc-dust">VALUE</th>
-					<th class="px-3 py-2 text-left type-meta font-black text-zinc-dust">UNIT</th>
-					<th class="px-3 py-2 text-left type-meta font-black text-zinc-dust">KIND</th>
-					<th class="px-3 py-2 text-left type-meta font-black text-zinc-dust">SCOPE</th>
+				<tr class="border-b border-[var(--tier-well-edge)]">
+					<th class="px-3 py-2 text-left type-meta !font-black text-zinc-dust">MEASURE</th>
+					<th class="px-3 py-2 text-right type-meta !font-black text-zinc-dust">VALUE</th>
+					<th class="px-3 py-2 text-left type-meta !font-black text-zinc-dust">UNIT</th>
+					<th class="px-3 py-2 text-left type-meta !font-black text-zinc-dust">KIND</th>
+					<th class="px-3 py-2 text-left type-meta !font-black text-zinc-dust">SCOPE</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -119,10 +131,10 @@ const KindTag = {
 					Rows.map(({ Label, Fact }) => (
 						<tr class="border-b border-oxblood-dark/60 last:border-b-0 hover:bg-raw-blood/10">
 							<td class="px-3 py-2 text-left text-bone-newsprint">{Label}</td>
-							<td class="px-3 py-2 text-right font-black text-bone-white">{Fact.Value}</td>
+							<td class="px-3 py-2 text-right font-black tabular-nums text-bone-white">{Fact.Value}</td>
 							<td class="px-3 py-2 text-left text-zinc-dust">{Fact.Unit}</td>
-							<td class={`px-3 py-2 text-left font-black uppercase tracking-wider ${KindTag[Fact.Kind].Class}`}>
-								{KindTag[Fact.Kind].Tag}
+							<td class="px-3 py-2 text-left">
+								<span class={KindTag[Fact.Kind].Class}>{KindTag[Fact.Kind].Tag}</span>
 							</td>
 							<td class="px-3 py-2 text-left type-body text-zinc-dust">{Fact.Scope}</td>
 						</tr>
@@ -135,7 +147,7 @@ const KindTag = {
 	<!-- HOW IT WAS MEASURED: the method as a block, not a footnote. The study is
 	     a reconstruction by the author, and a reconstruction establishes nothing
 	     about task success or about anyone else's sessions. -->
-	<div class="mt-8 border-l-4 border-stamped-canary bg-asphalt-panel p-4">
+	<div class="mt-8 border-l-4 border-stamped-canary tier-shell p-4">
 		<div class="type-meta font-black text-stamped-canary">HOW THIS WAS MEASURED</div>
 		<p class="mt-3 max-w-3xl type-body text-bone-newsprint">
 			The study is the author's own work - multi-agent atomization fan-outs, merge/PR work, plugin
@@ -153,7 +165,7 @@ const KindTag = {
 	</div>
 
 	<!-- CAVEAT: its own bordered note, visually distinct -->
-	<div class="mt-4 border-l-4 border-stamped-canary bg-asphalt-panel p-4 font-mono text-base leading-relaxed text-bone-newsprint">
+	<div class="mt-4 border-l-4 border-stamped-canary tier-shell p-4 font-mono text-base leading-relaxed text-bone-newsprint">
 		<span class="font-black uppercase tracking-widest text-stamped-canary">CAVEAT &bull; </span>
 		THE EXACT PERCENTAGE IS A BAND: {Study.Band} ACROSS A {Study.CharsPerTok} CHARS/TOKEN SENSITIVITY RANGE,
 		CENTERED {Study.BandCenter}.

@@ -164,6 +164,23 @@ const Layers = [
 	{ N: "04", Name: "DECIDE", Figure: "RETRIEVE?", Tone: "bone", Note: "the agent, not the engine, spends the budget" },
 ] as const;
 
+// The layer's own colour, in the one place the blueprint grammar reads it: the
+// numbered index above the figure. Colour is identity here, not decoration -
+// the four layers are teal, canary, raw and bone wherever the site draws them -
+// so it is DERIVED from the record's `Tone` rather than restated beside it,
+// where the two could drift. The card's tape used to carry this colour as an
+// EXPRESSIVE shape; four of them in one section broke the emphasis budget
+// (`.section-index` is the published demotion path, and the words are
+// unchanged: `LAYER // 01` still reads `LAYER // 01`).
+const LayerInk: Record<string, string> = {
+	teal: "!text-weathered-teal",
+	canary: "!text-stamped-canary",
+	raw: "!text-raw-blood",
+	bone: "!text-bone-white",
+};
+
+const LayerCards = Layers.map(({ Tone, ...Layer }) => ({ ...Layer, Ink: LayerInk[Tone]! }));
+
 // EXHIBIT: the 142-line build, kept by the terminal and replaced by one line
 // in the model's context. ZineSplit reads the leading `dim:` / `fade:` / `mute:`
 // as the suppression tones (70 / 40 / 25%), so the array is the same nine lines
@@ -510,9 +527,9 @@ const TokenGroups = Study.TokensSaved.split(",");
 		</header>
 
 		<!-- ============ THE THREE CLAIMS ============ -->
-		<section id="claims" class="relative w-full" data-reveal>
-			<ZineTape Variant="tab" Label="THE THREE CLAIMS" Color="raw" />
-			<p class="mt-16 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
+		<section id="claims" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index !text-raw-blood">01 // THE CLAIMS // THREE LINES</p>
+			<p class="mt-8 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 				The whole argument fits in three lines, and every section that follows is the evidence for one of
 				them.
 			</p>
@@ -551,9 +568,9 @@ const TokenGroups = Study.TokensSaved.split(",");
 		<SectionNav Sections={Sections} />
 
 		<!-- ============ I. THE PROBLEM // CONTEXT FLOOD ============ -->
-		<section id="problem" class="relative w-full" data-reveal>
-			<ZineTape Variant="tab" Label="I // THE PROBLEM" Color="raw" />
-			<ZineBox Tone="crimson" Size="lg" Rotate="-rotate-[0.6deg]" Class="w-full" Wipe>
+		<section id="problem" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index !text-raw-blood">02 // THE PROBLEM // THE FLOOD</p>
+			<ZineBox Tone="crimson" Size="lg" Rotate="-rotate-[0.6deg]" Class="mt-8 w-full" Wipe>
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					The flood is not the data's fault
 				</h2>
@@ -603,9 +620,9 @@ const TokenGroups = Study.TokensSaved.split(",");
 		</section>
 
 		<!-- ============ II. THE GATE // CLASSIFY ============ -->
-		<section id="gate" class="relative w-full" data-reveal>
-			<ZineTape Variant="tab" Label="II // THE GATE" Color="canary" Rotate="rotate-1" />
-			<ZineBox Tone="canary" Size="lg" Rotate="rotate-[0.5deg]" Class="w-full" Wipe>
+		<section id="gate" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index !text-stamped-canary">03 // THE GATE // THE CLASSIFIER</p>
+			<ZineBox Tone="canary" Size="lg" Rotate="rotate-[0.5deg]" Class="mt-8 w-full" Wipe>
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					The classifier is the gate
 				</h2>
@@ -688,9 +705,9 @@ const TokenGroups = Study.TokensSaved.split(",");
 		</section>
 
 		<!-- ============ III. THE CONTRACT // THE MARKER ============ -->
-		<section id="contract" class="relative w-full" data-reveal>
-			<ZineTape Variant="tab" Label="III // THE CONTRACT" Color="teal" />
-			<ZineBox Tone="teal" Size="lg" Rotate="-rotate-[0.4deg]" Class="w-full" Wipe>
+		<section id="contract" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index !text-weathered-teal">04 // THE CONTRACT // THE MARKER</p>
+			<ZineBox Tone="teal" Size="lg" Rotate="-rotate-[0.4deg]" Class="mt-8 w-full" Wipe>
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					The marker is the contract
 				</h2>
@@ -746,9 +763,9 @@ const TokenGroups = Study.TokensSaved.split(",");
 		</section>
 
 		<!-- ============ IV. THE LOOP // FOUR LAYERS ============ -->
-		<section id="loop" class="relative w-full" data-reveal>
-			<ZineTape Variant="tab" Label="IV // THE LOOP" Color="raw" Rotate="rotate-1" />
-			<ZineBox Tone="crimson" Size="lg" Rotate="rotate-[0.4deg]" Class="w-full" Wipe>
+		<section id="loop" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index !text-raw-blood">05 // THE LOOP // FOUR LAYERS</p>
+			<ZineBox Tone="crimson" Size="lg" Rotate="rotate-[0.4deg]" Class="mt-8 w-full" Wipe>
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					Four layers, one decision
 				</h2>
@@ -821,9 +838,9 @@ const TokenGroups = Study.TokensSaved.split(",");
 		</section>
 
 		<!-- ============ V. THE KNOBS // THRESHOLDS ============ -->
-		<section id="knobs" class="relative w-full" data-reveal>
-			<ZineTape Variant="tab" Label="V // THE KNOBS" Color="canary" />
-			<ZineBox Tone="canary" Size="lg" Rotate="-rotate-[0.5deg]" Class="w-full" Wipe>
+		<section id="knobs" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index !text-stamped-canary">06 // THE KNOBS // THRESHOLDS</p>
+			<ZineBox Tone="canary" Size="lg" Rotate="-rotate-[0.5deg]" Class="mt-8 w-full" Wipe>
 				<div class="grid grid-cols-1 gap-32 lg:grid-cols-2" data-enter="200">
 					<div>
 						<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
@@ -899,9 +916,9 @@ const TokenGroups = Study.TokensSaved.split(",");
 		</section>
 
 		<!-- ============ VI. THE EVIDENCE // TWO PLATES ============ -->
-		<section id="evidence" class="relative w-full" data-reveal>
-			<ZineTape Variant="tab" Label="VI // THE EVIDENCE" Color="teal" Rotate="rotate-1" />
-			<ZineBox Tone="teal" Size="lg" Rotate="-rotate-[0.4deg]" Class="w-full" Wipe>
+		<section id="evidence" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index !text-weathered-teal">07 // THE EVIDENCE // WHAT ONE OUTPUT COSTS</p>
+			<ZineBox Tone="teal" Size="lg" Rotate="-rotate-[0.4deg]" Class="mt-8 w-full" Wipe>
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					What one output costs
 				</h2>
@@ -1043,9 +1060,9 @@ const TokenGroups = Study.TokensSaved.split(",");
 		</section>
 
 		<!-- ============ VII. THE HISTORY SPINE ============ -->
-		<section id="history" class="relative w-full" data-reveal>
-			<ZineTape Variant="tab" Label="VII // THE HISTORY SPINE" Color="raw" />
-			<ZineBox Tone="crimson" Size="lg" Rotate="-rotate-[0.3deg]" Class="w-full" Wipe>
+		<section id="history" class="blueprint-section relative w-full" data-reveal>
+			<p class="section-index !text-raw-blood">08 // THE HISTORY // FIVE INCIDENTS</p>
+			<ZineBox Tone="crimson" Size="lg" Rotate="-rotate-[0.3deg]" Class="mt-8 w-full" Wipe>
 				<h2 class="font-headline text-2xl font-black uppercase tracking-tight text-bone-white sm:text-4xl">
 					Five incidents that set the laws
 				</h2>

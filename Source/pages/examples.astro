@@ -214,7 +214,7 @@ const VerdictTone: Record<string, string> = {
  * record is shared with /showcase. `Sections` reads the same map, so the
  * sticky index and the chapter rules cannot disagree.
  */
-const Chapters: Record<string, string> = {
+const Chapters: Record<string, string | undefined> = {
 	retrieval: "01 // RETRIEVE",
 	"skip-gate": "02 // PASS-THROUGH",
 	"chain-split": "03 // COMPOUND COMMANDS",
@@ -222,6 +222,25 @@ const Chapters: Record<string, string> = {
 	directives: "05 // DIRECTIVES",
 	relay: "06 // RELAY",
 	"dual-listener": "07 // STORAGE",
+};
+
+/**
+ * The chapter for a scenario, and the build's own guard around it. A scenario
+ * with no chapter would render an empty index tag - a numbered page with a gap
+ * where a number belongs - so the reader throws instead and names the id. This
+ * runs in the page's frontmatter, which is build time: a missing entry stops
+ * the build rather than shipping a blank section rule.
+ */
+const Chapter = (Id: string): string => {
+	const Label = Chapters[Id];
+
+	if (Label === undefined) {
+		throw new Error(
+			`examples.astro: no chapter for scenario "${Id}" - add it to the Chapters map.`,
+		);
+	}
+
+	return Label;
 };
 
 /** The tape's ink, by the plate's own tone - the label never invents a fifth
@@ -607,7 +626,7 @@ const Cases: CaseRecord[] = [
 // that close the page. Each entry names a section the page really renders,
 // because it is built from the data that renders it.
 const Sections = [
-	...Cases.map(({ Id }) => ({ Id, Label: Chapters[Id] })),
+	...Cases.map(({ Id }) => ({ Id, Label: Chapter(Id) })),
 	{ Id: "turn-cycle", Label: "08 // TURN CYCLE" },
 	{ Id: "runtime-home", Label: "09 // RUNTIME HOME" },
 ];
@@ -651,7 +670,7 @@ const Sections = [
 									href={`#${Id}`}
 								>
 									<span class="shrink-0 font-mono text-base font-bold uppercase tracking-widest text-stamped-canary transition-colors group-hover:text-bone-white">
-										{Chapters[Id]}
+										{Chapter(Id)}
 									</span>
 									<span class="type-body text-bone-newsprint transition-colors group-hover:text-bone-white">
 										{Hero}
@@ -683,7 +702,7 @@ const Sections = [
 						class="blueprint-section relative flex w-full scroll-mt-24 flex-col"
 						data-reveal
 					>
-						<p class="section-index">{Chapters[Scenario.Id]}</p>
+						<p class="section-index">{Chapter(Scenario.Id)}</p>
 
 						<ZineBox Tone={Scenario.Tone} Rotate={Scenario.Rotate} Class="mt-4 w-full">
 							<ZineTape

@@ -50,6 +50,17 @@ const PlateClass = "zine-plate";
 const ScrollClass = "zine-plate--scroll";
 const FlushClass = "zine-plate--flush";
 
+/**
+ * The RECESSED WELL. The Stitch direction renders every code block as a channel
+ * cut into the page with a header ribbon over it, rather than a plate with a
+ * chip cluster floating inside its top padding. The class is added here - and
+ * only here - so `Global.css` can scope the whole treatment to
+ * `body .zine-plate.well` and leave the plate rules for a bare
+ * `<pre class="astro-code">` exactly as they were: a fence with no JavaScript
+ * still gets its frame, its padding and its crimson spine.
+ */
+const WellClass = "well";
+
 /** Wrap the `[Start, End)` slice of a text node in a span of `ClassName`. */
 const Wrap = (Target: Text, Start: number, End: number, ClassName: string): void => {
 	Target.splitText(End);
@@ -199,6 +210,11 @@ const BuildPlate = (Pre: HTMLPreElement): void => {
 	const Figure = document.createElement("figure");
 
 	Figure.className = PlateClass;
+	// The well is the fence's surface: `Global.css` scopes the recessed fill,
+	// the lighter edge and the ribbon to this class, so a plate built here is
+	// a channel and a plate rendered by markdown before this module runs is
+	// still the plate it always was.
+	Figure.classList.add(WellClass);
 
 	// ONE FRAME PER REGION. A host that already frames or pads the fence asks
 	// the plate to drop its own margin (`data-plate-flush`), so the fence's
@@ -212,9 +228,25 @@ const BuildPlate = (Pre: HTMLPreElement): void => {
 	Figure.appendChild(Pre);
 
 	const Bar = document.createElement("div");
+	const DeclaredPath = Host?.dataset["platePath"];
 	const Lang = document.createElement("span");
 
 	Bar.className = "zine-plate-bar";
+
+	// THE RIBBON'S LEADING FIELD. A fence that declares where it came from
+	// (`Component/CodeFence.astro`'s `Path`) prints it at the head of the
+	// ribbon; the free space it takes is what pushes the language and the
+	// control to the right edge. Metadata like the language tag - a `<span>`,
+	// never a button - because a path names what the block IS, not what it
+	// does.
+	if (DeclaredPath !== undefined && DeclaredPath !== "") {
+		const Path = document.createElement("span");
+
+		Path.className = "zine-plate-path";
+		Path.textContent = DeclaredPath;
+		Bar.appendChild(Path);
+	}
+
 	Lang.className = "zine-plate-lang";
 	// Metadata, not an action: a `<span>`, never a button, and the stylesheet
 	// gives it the quiet label voice rather than the copy chip's.

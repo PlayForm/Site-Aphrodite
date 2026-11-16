@@ -1283,3 +1283,120 @@ body .zine-plate > pre.astro-code {
 	text-transform: uppercase;
 	color: var(--zinc-dust);
 }
+
+/* ---- DATA SURFACES // the fence well and its ribbon ----------------------
+
+   The Stitch direction renders a code block as a CHANNEL CUT INTO THE PAGE
+   with a header ribbon over it, instead of a plate carrying a chip cluster
+   that floats inside its own top padding. Three things change and nothing
+   else does:
+
+     well     the figure takes the recessed tier: #0b0b0e ground and the
+              LIGHTER 1px edge (#3f3f46) that makes a channel read as depth.
+     ribbon   the chip cluster becomes a real band with its own row, so it can
+              be visible at rest - a floating cluster is hidden until hover
+              only because revealing it must move nothing.
+     path     the ribbon's leading field names the file the block came from.
+
+   ADDITIVE AND SCOPED. Every selector below requires `.zine-plate.well`, the
+   class `Source/Script/CodePlate.ts` adds to the figure it builds, so the
+   plate rules above still describe a bare `<pre class="astro-code">` exactly
+   as they did - a fence with no JavaScript, or a fence outside this tree,
+   keeps its own frame and padding. No existing selector is re-declared here.
+
+   ONE CONTROL, STILL. The copy chip remains the block's only control and is
+   still built by CodePlate.ts; the path and the language are `<span>`s. The
+   ribbon is a row of METADATA with one action at its right edge. */
+
+body .zine-plate.well {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	border: 1px solid var(--tier-well-edge);
+	border-radius: 0;
+	background-color: var(--tier-well);
+}
+
+/* The code keeps the crimson spine - it is what identifies a plate as a plate -
+   and drops the other three edges: the well's own lighter edge IS the frame,
+   and a second border inside it is the two-frames-one-region defect. The fill
+   here cannot be set: Shiki writes `background-color` as an inline style on the
+   `<pre>`, which no stylesheet rule short of `!important` outranks, so the
+   channel reads through its edge and its ribbon rather than through a wash the
+   block would paint over. */
+body .zine-plate.well > pre.astro-code {
+	margin: 0;
+	border: 0;
+	border-left: 3px solid var(--blood-crimson);
+}
+
+/* An inset channel does not LIFT. Hover keeps both of the states that carry
+   meaning - the canary spine and the crimson wash - and drops the offset
+   shadow, which would paint across the well's own edge and read as a second
+   frame rather than as a lift. */
+body .zine-plate.well > pre.astro-code:hover,
+body .zine-plate.well > pre.astro-code:focus-within {
+	border-left-color: var(--stamped-canary);
+	box-shadow: none;
+	background-image: linear-gradient(rgba(147, 17, 40, 0.1), rgba(147, 17, 40, 0.1));
+}
+
+/* THE RIBBON. `order: -1` puts it above the code without moving the DOM: the
+   bar is appended AFTER the `<pre>` (so the cluster can be positioned over it
+   in the non-well plate), and the well simply renders it first. Static, opaque
+   and full-width, which is why it can be always visible. */
+body .zine-plate.well > .zine-plate-bar {
+	position: static;
+	order: -1;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0.4rem 0.6rem;
+	border-bottom: 1px solid var(--tier-well-edge);
+	background-color: var(--tier-shell);
+	opacity: 1;
+}
+
+/* THE PATH is the ribbon's leading field: it says WHERE the block came from,
+   so it takes the free space and pushes the language and the control to the
+   right edge. `min-width: 0` plus `overflow-wrap: anywhere` because a path is
+   one unbreakable token - it must break inside the ribbon rather than widen the
+   block, and the label voice's own `normal` wrapping would let it push the
+   control off the plate. */
+body .zine-plate.well > .zine-plate-bar > .zine-plate-path {
+	flex: 1 1 auto;
+	min-width: 0;
+	margin-inline-end: auto;
+	padding: 0;
+	border: 0;
+	background: none;
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: 0.04em;
+	color: var(--bone-newsprint);
+	overflow-wrap: anywhere;
+	hyphens: none;
+}
+
+/* Inside a ribbon the two chips drop their own frame: the ribbon is already a
+   band, and a bordered chip inside a bordered band is a chip in a box in a box.
+   They keep their shape, their metrics and their voices - uppercase metadata
+   against sentence-case action - which is what tells them apart. */
+body .zine-plate.well > .zine-plate-bar > .zine-plate-lang,
+body .zine-plate.well > .zine-plate-bar > .zine-plate-copy {
+	padding: 0;
+	border: 0;
+	background: none;
+}
+
+/* THE COMPACT METRIC. `.metric` is the one giant figure a section is built
+   around; this is the same figure in a telemetry footnote, where the block is
+   a line inside another reading rather than a section of its own. The figure,
+   the tabular digits and the unit-as-child are unchanged - only the scale
+   steps down, because two 4.5rem numbers on one page halve each other. */
+.metric--compact {
+	font-size: clamp(1.75rem, 3.6vw, 2.5rem);
+}

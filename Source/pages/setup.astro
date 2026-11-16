@@ -467,7 +467,7 @@ const InstallRoutes: InstallRoute[] = [
 		Recommended: false,
 		Installs: "the binaries, then a minimal loader",
 		NeedsRust: "yes",
-		UseWhen: "you want the proxy, or want cargo to own the versions",
+		UseWhen: "you only need the proxy, or want cargo to own the versions",
 		Lanes: [
 			Posix([
 				{
@@ -811,9 +811,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 			</div>
 			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
 				Every card states the same three facts - what it installs, whether it needs Rust, and
-				the situation it fits. The catalog is the card the page recommends; the other three
-				are the same engine with a different owner of the files, and each one is an anchor,
-				so a link can point at the route a reader needs.
+				the situation it fits. The catalog is the card the page recommends.
 			</p>
 
 			<!-- THE DOMINANT CARD. One expressive assembly per section, and this is
@@ -876,6 +874,17 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 						</dl>
 					</div>
 				</ZineBox>
+			</div>
+
+			<!-- THE OTHER THREE. The heading and its sentence are the ones this block
+			     carried when the routes followed one another down the page; the routes
+			     are cards now, so the sentence sits above the row it describes. -->
+			<div class="mt-10 max-w-[46rem] border-t border-[color:var(--tier-shell-edge)] pt-6">
+				<h3 class="section-kicker">The other three routes</h3>
+				<p class="mt-2 type-body text-zinc-dust">
+					Same engine, different owner of the files. Each is an anchored
+					section, so a link can point at the route a reader needs.
+				</p>
 			</div>
 
 			<!-- THE THREE ALTERNATIVES. Quiet surfaces: the ink is their edge, so
@@ -1762,5 +1771,23 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 	   verification are always the ones the selected sequence belongs to. */
 	.workflow__dossier {
 		position: relative;
+	}
+
+	/* THE NO-`:has()` FALLBACK. Without the selector above, every panel stays
+	   hidden by default and the page would ship an instrument with nothing in
+	   it: the controls would toggle nothing and the reader would see an empty
+	   plate where eight command sequences used to be. A browser that cannot
+	   switch gets the whole set instead - the longer page this design replaced,
+	   with every lane and every record present - and the controls are dropped,
+	   because a control that does nothing is worse than no control. */
+	@supports not selector(:has(*)) {
+		.workflow__controls {
+			display: none;
+		}
+
+		.workflow__route,
+		.workflow__lane {
+			display: block;
+		}
 	}
 </style>
