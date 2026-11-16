@@ -1,4 +1,6 @@
 ---
+import "@Stylesheet/Component/Data.scss";
+
 /**
  * ZineStatBar - A GIANT FIGURE, ITS UNIT IN THE LABEL VOICE, AND THE TRACK
  * THAT MEASURES IT.
@@ -50,7 +52,7 @@ interface Props {
 	Color?: "teal" | "raw" | "canary";
 
 	/** "scroll" = the MONUMENT treatment: width 0 until the bar enters the
-	 *  viewport, then snaps to Percent in hard steps (.zine-stat-fill).
+	 *  viewport, then snaps to Percent in hard steps (`.statbar__fill`).
 	 *  Default "static" renders the width immediately (the existing form). */
 	Fill?: "static" | "scroll";
 
@@ -100,34 +102,25 @@ const {
 	Count = false,
 } = Astro.props;
 
-// The palette is resolved HERE, on the server, and rendered as a class on the
-// fill element. It used to be resolved inside the <script>, which is a separate
+// The TONE is one class on the block, and the sheet states BOTH inks a tone
+// needs - the fill and the figure - because the two are not always the same
+// ink. `--raw-blood` is a FILL token (Global.css: "stamps, primary buttons,
+// badges"); as text on soot-black it measures 2.23:1 and fails the 4.5:1 floor,
+// so a "raw" bar printed its figure in a red no reader could read. The bar
+// itself keeps the raw fill, which is where the variant's identity lives, and
+// the value takes the heading voice. Keeping the pair in the sheet is what stops
+// a caller pairing a raw fill with a raw figure.
+//
+// The palette used to be resolved HERE as two maps and rendered as a class on
+// the fill element, and before that inside the <script> - which is a separate
 // module: a plain <script> never receives a component's frontmatter variables,
 // so `Color` was undefined there, `classList.add(undefined)` threw a
 // ReferenceError on the first observed bar, and the colour was never applied -
 // while the width, set one line earlier, still was. The symptom was a bar of
 // the right length in the wrong (default) colour with nothing in the console
-// that pointed at this file.
-const Palette = {
-	teal: "bg-weathered-teal",
-	raw: "bg-raw-blood",
-	canary: "bg-stamped-canary",
-}[Color];
-
-// The RATIO TEXT is a separate question from the fill. `--raw-blood` is a FILL
-// token (Global.css: "stamps, primary buttons, badges"); as text on soot-black it
-// measures 2.23:1 and fails the 4.5:1 floor, so a "raw" bar printed its figure in
-// a red no reader could read. The bar itself keeps the raw fill, which is where
-// the variant's identity lives, and the value takes the heading voice.
-//
-// The `!` is the house override idiom, not decoration: `.metric` declares its own
-// colour and Global.css loads after the utility layer, so an unprefixed
-// `text-weathered-teal` would lose to it and every readout would print bone-white.
-const Text = {
-	teal: "!text-weathered-teal",
-	raw: "!text-bone-white",
-	canary: "!text-stamped-canary",
-}[Color];
+// that pointed at this file. The tone is server-rendered here and the script
+// only ever sets the width.
+const Tone = `statbar--${Color}`;
 
 /** The figure's scale: the giant metric, or the compact one for a dense stack. */
 const MetricScale = Scale === "compact" ? "metric metric--compact" : "metric";
@@ -182,7 +175,7 @@ const Width = Math.max(0, Math.min(100, Percent ?? 0));
 
 {
 	Variant === "pod" ? (
-		<div class={`flex h-full flex-col gap-2 border-2 border-black px-4 py-3 ${Pod.Ground}`}>
+		<div class={`statbar ${Tone} statbar__pod ${Pod.Ground}`}>
 			{/* THE TIGHT LABEL, in the plate's ink: it names the domain the figure
 			    belongs to, so a reader can tell one pod from another before
 			    reading a digit. */}
@@ -205,37 +198,35 @@ const Width = Math.max(0, Math.min(100, Percent ?? 0));
 			)}
 		</div>
 	) : (
-		<div>
+		<div class={`statbar ${Tone}`}>
 			{/* THE TIGHT LABEL: mono, uppercase, black, one line above its own figure.
 			    It is a label, not a sentence - the sentence that explains the figure
 			    belongs to the page, which is the only thing that knows the context. */}
-			<p class="type-meta !font-black uppercase text-bone-white">{Label}</p>
+			<p class="statbar__label">{Label}</p>
 
 			{/* THE FIGURE AND ITS UNIT. `.metric` is a block, so the figure's text and
 			    the unit's span stay inline on one baseline - the same shape StudyLedger
 			    uses. No flex here: Global.css loads after the utility layer, so its
 			    `display: block` would win over a `flex` utility anyway. */}
-			<div class="mt-2">
-				<p class={`${MetricScale} ${Text}`}>
+			<div class="statbar__figure">
+				<p class={`statbar__value ${MetricScale}`}>
 					{Count ? <span data-count={Figure}>{Figure}</span> : Figure}
 					{UnitText === "" ? null : <span class="metric__unit">{UnitText}</span>}
 				</p>
 			</div>
 
-			{Qualifier === undefined ? null : (
-				<p class="mt-2 type-meta uppercase text-zinc-dust">{Qualifier}</p>
-			)}
+			{Qualifier === undefined ? null : <p class="statbar__qualifier">{Qualifier}</p>}
 
-			<div class="mt-3 flex h-4 w-full overflow-hidden well">
+			<div class="statbar__track well">
 				{Fill === "scroll" ? (
 					<div
-						class={`zine-stat-fill h-full ${Palette}`}
+						class="statbar__fill"
 						style={`width: ${Width}%;`}
 						data-stat-fill={Width}
 						aria-hidden="true"
 					/>
 				) : (
-					<div class={`h-full ${Palette}`} style={`width: ${Width}%;`} />
+					<div class="statbar__fill" style={`width: ${Width}%;`} />
 				)}
 			</div>
 		</div>
@@ -300,7 +291,7 @@ const Width = Math.max(0, Math.min(100, Percent ?? 0));
 	   immediately; and `:not([data-stat-fill-on])` means the rule can never
 	   outlive the fill that releases it. */
 	@media (prefers-reduced-motion: no-preference) {
-		:global(html.js) .zine-stat-fill[data-stat-fill]:not([data-stat-fill-on]) {
+		:global(html.js) .statbar__fill[data-stat-fill]:not([data-stat-fill-on]) {
 			width: 0 !important;
 		}
 	}

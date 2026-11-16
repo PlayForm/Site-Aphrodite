@@ -331,7 +331,7 @@ const FrameRows = Tail.map(
 							</span>
 						</div>
 						<ZinePreview Label={Label} Result={Preview} Color="canary" Enter={StreamBeat} />
-						<div class="mt-3 flex items-center gap-3">
+						<div class="console__cutoff mt-3 flex items-center gap-3">
 							<span class="type-meta shrink-0 !font-black uppercase text-zinc-dust">
 								CUTOFF
 							</span>
@@ -385,8 +385,8 @@ const FrameRows = Tail.map(
 				    The prompt element carries its own `$`: the runtime writes
 				    `$ <command>` into it, so a `$` beside it would print twice. */}
 				<div class="flex min-w-0 flex-col gap-4">
-					<div class="ccr-marker flex flex-col border border-oxblood-dark bg-soot-black">
-						<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
+					<div class="console ccr-marker flex flex-col border border-oxblood-dark bg-soot-black">
+						<div class="console__bar flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-oxblood-dark bg-asphalt-panel px-3 py-1.5">
 							<span class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
 								<span class="type-meta shrink-0 !font-black uppercase text-zinc-dust">
 									RAW STREAM // WHAT THE TERMINAL KEEPS
@@ -450,7 +450,7 @@ const FrameRows = Tail.map(
 									data-run-preview
 									set:html={Escape(SettledPreview)}
 								/>
-								<div class="mt-2 flex items-center gap-3">
+								<div class="console__cutoff mt-2 flex items-center gap-3">
 									<span class="type-meta shrink-0 !font-black uppercase text-zinc-dust">
 										CUTOFF
 									</span>
@@ -494,12 +494,3 @@ const FrameRows = Tail.map(
 		</ZineBox>
 	)
 }
-
-<style>
-	/* THE RECESSED WELL, the same rule `ZineStream` carries: the running
-	   terminal's body is cut into the plate by one hard 3px inset in the plate's
-	   own black. Hard offset, no blur, no radius - the site has neither. */
-	.console-well {
-		box-shadow: inset 3px 3px 0 #000;
-	}
-</style>

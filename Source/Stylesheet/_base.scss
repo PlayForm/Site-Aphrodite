@@ -1,0 +1,218 @@
+/* ============================================================================
+   BASE - the document itself: the faces, the reset, the reading defaults.
+
+   THE LAYER. `_base` in `System.scss`'s order, after `_tokens` and `_mixins`
+   and before every `Component/*` partial: a component may assume the reset has
+   already run.
+
+   WHAT IT OWNS
+     @font-face      the three self-hosted variable faces - Space Grotesk, DM
+                     Sans and JetBrains Mono. The voices every type role names,
+                     loaded once so a role never falls back to a system face
+     the reset       `html`, `html, body`, `body`, selection, `img`
+     focus           the zine ring (`:focus-visible`) and the wash a focused
+                     control takes. A hard 2px raw-blood edge, no blur
+     motion guard    `prefers-reduced-motion` for the DOCUMENT: instant
+                     animation and no smooth scroll. The per-class collapse
+                     lives beside the class that owns it (Component/Console)
+     the token law   `body { overflow-wrap: break-word }`, the label voice in
+                     `:where()` - element-level specificity only, so every
+                     carrier beats it without `!important` - the carriers, and
+                     the table-cell exception
+     the page clip   `main > section { overflow-x: clip }`: a tilted plate's
+                     BOUNDING box is wider than its layout box, and `clip`
+                     rather than `hidden` because it creates no scroll container
+
+   WHY `break-word` AND NOT `anywhere` ON THE BODY. `anywhere` also collapses an
+   element's min-content contribution to one character, so a flex or grid track
+   may shrink below the width of its longest word and the word then breaks
+   mid-token - `REPRO_PROOF #001` rendered as `REPRO_PROO` / `F`. The page takes
+   the prose value; the containers that genuinely hold an unbreakable token opt
+   in through `.break-token` or a named carrier.
+   ========================================================================= */
+
+/* ---- THE FACES ---------------------------------------------------------- */
+
+/* Self-hosted variable fonts (latin subset, OFL - see Public/Font/LICENSE.md) */
+@font-face {
+	font-family: "Space Grotesk";
+	font-style: normal;
+	font-weight: 300 700;
+	font-display: swap;
+	src: url("/Font/space-grotesk-latin.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 100 800;
+	font-display: swap;
+	src: url("/Font/jetbrains-mono-latin.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "DM Sans";
+	font-style: normal;
+	font-weight: 100 1000;
+	font-display: swap;
+	src: url("/Font/dm-sans-latin.woff2") format("woff2");
+}
+/* ---- THE RESET ---------------------------------------------------------- */
+
+html {
+	-webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+	@apply h-full w-full;
+}
+
+body {
+	@apply min-h-screen bg-soot-black font-mono text-bone-newsprint antialiased;
+
+	font-variant-ligatures: no-common-ligatures;
+}
+
+*::selection,
+::selection {
+	text-shadow: none;
+
+	@apply bg-raw-blood text-bone-white;
+}
+
+img {
+	@apply inline-block select-none align-top outline-none;
+}
+/* ---- FOCUS -------------------------------------------------------------- */
+
+/* Focus-visible in the zine palette: the raw-blood stamp outline, hard edge,
+   no blur (the A11Y-PERF spec: 2px raw-blood ring, 2px offset). */
+:focus-visible {
+	outline: 2px solid var(--raw-blood);
+	outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+	background-color: rgba(147, 17, 40, 0.12);
+}
+/* ---- MOTION GUARD (document) -------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+
+/* ---- THE LONG-TOKEN AND LABEL-VOICE LAW --------------------------------- */
+
+/* ── LONG TOKENS AND THE LABEL VOICE ──────────────────────────────────────
+   Long unbreakable tokens - repository paths, 40-hex hashes, TOML keys,
+   dotted identifiers - carry no break opportunity, so they set the
+   min-content width of every box that holds them. On a 375px viewport that
+   min-content width BECAME the page's scrollWidth: the docs PREV/NEXT links,
+   the prose file citations, the mono chips and the SRC footer lines pushed
+   12 routes 12-226px past the viewport.
+
+   The escape hatch is SCOPED, not global. `overflow-wrap: anywhere` at the
+   root fixed those twelve routes and shredded every label on the site -
+   `REPRO_PROOF #001` broke as `REPRO_PROO` / `F` - because `anywhere`, unlike
+   `break-word`, also collapses an element's min-content contribution to a
+   single character: a flex or grid track may then shrink BELOW the width of
+   the longest word, and the word breaks mid-token to fit it. The overflow was
+   real; the trade was made in the wrong place.
+
+   So the page carries the prose value and only the token carriers opt in:
+
+   - `break-word` on the body: a genuinely oversized token still wraps rather
+     than overflowing, while an ordinary word is never split. It does NOT
+     shrink min-content, which is exactly why the containers below have to opt
+     in explicitly instead of inheriting it.
+   - `.break-token` is the reusable opt-in for a CONTAINER whose min-content
+     width used to be absorbed by the body rule.
+   - the rest are the named carriers: a marker line, a code chip, a docs
+     prev/next path line.
+
+   Fenced code is untouched (`white-space: pre` never wraps), and table cells
+   keep `normal` so a wide table scrolls in its own box rather than shredding
+   its paths mid-token. */
+body {
+	overflow-wrap: break-word;
+}
+
+/* The label voice never breaks mid-word: a tape, stamp, badge, kicker or mono
+   chip wraps at its spaces or not at all. `REPRO_PROOF #001` is one label, not
+   two lines of one.
+
+   The list is the site's label vocabulary. `.font-black.uppercase` is there
+   because the tape and stamp shapes emit no class of their own - ZineTape's
+   corner/section/hero/tab variants and ZineStamp are Tailwind utilities only -
+   so the VOICE is the hook, and it is the same voice in every one of them.
+   Headings are excluded on purpose: a display line keeps `break-word` as the
+   safety valve for a word that genuinely cannot fit its column.
+
+   The group sits in `:where()` so it carries element-level specificity only
+   (the `:not()` chain contributes element selectors; `:where()` itself
+   contributes none) - so every carrier below, every Tailwind `break-all` chip
+   and every `.break-token` container beats it without an `!important`, and
+   `body` never competes (a declaration always wins over an inherited value).
+
+   `hyphens: none` because auto-hyphenation in a technical label invents a
+   break the content does not have. No `white-space: nowrap` anywhere: a long
+   label must still be able to wrap at a space on a narrow viewport - it must
+   never be clipped. */
+:where(
+		.tape-strip,
+		.tape-staple,
+		.zine-plate-lang,
+		.section-kicker,
+		.type-meta,
+		.font-black.uppercase
+	):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+}
+
+/* The carriers. Each one is an element that actually holds a token with no
+   break opportunity, so each one takes the min-content collapse the body no
+   longer gives it. */
+.ccr-marker,
+.break-token,
+a.code-link,
+a.code-link code,
+a[rel="prev"] .font-mono.uppercase,
+a[rel="next"] .font-mono.uppercase {
+	overflow-wrap: anywhere;
+}
+
+td,
+th {
+	overflow-wrap: normal;
+}
+
+/* A tilted plate's BOUNDING box is wider than its layout box: the tilt is
+   1.2deg, so a 6.5k-px-tall plate adds height·sin(1.2deg) - 137px - to its
+   width, and /plugin/ poked 12px past a 1440px viewport (no scrollbar, since
+   body clips; the viewport still kept a 12px scroll area, so scrollWidth was
+   1452). The section is the tilt's frame: `clip` - not `hidden` - because
+   clip creates no scroll container, so position:sticky and the tape corners
+   keep behaving exactly as before. */
+main > section {
+	overflow-x: clip;
+}
+/* ---- THE PAGE CLIP ------------------------------------------------------ */
+
+main > section {
+	overflow-x: clip;
+}

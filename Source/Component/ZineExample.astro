@@ -1,4 +1,6 @@
 ---
+import "@Stylesheet/Component/Data.scss";
+
 /**
  * ZineExample - the PRE-ASSEMBLED form of one worked example: the raw input
  * pod, the "absorbed" seam, and the preview the model kept, in one plate.
@@ -87,9 +89,9 @@ const PreviewLabel = {
 
 <div class={`relative ${Rotate} transition-transform duration-300 hover:rotate-0 sm:-rotate-[0.8deg]`}>
 	<ZineTape Label={Title} Color="raw" Side="center" />
-	<div class="zine-box-subtle well p-4 pt-7 sm:p-6 sm:pt-8">
+	<div class="example__plate zine-box-subtle well">
 		{(Outcome !== undefined || Provenance !== undefined) && (
-			<div class="mb-4 flex flex-wrap items-center gap-2">
+			<div class="example__tags">
 				{Provenance && <span class="telemetry-tag">{Provenance}</span>}
 				{Outcome && (
 					<span class="telemetry-tag telemetry-tag--teal">{OutcomeLabel[Outcome]}</span>
@@ -98,25 +100,22 @@ const PreviewLabel = {
 		)}
 		{/* THE DUAL PODS: raw input | the preview the model kept. The middle
 		    track is the seam, sized to the word it carries. */}
-		<div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-0">
-			<div class="flex min-w-0 flex-col">
+		<div class="example__pods">
+			<div class="example__pod">
 				<ZineStream Label="THE RAW INPUT" Lines={Lines} />
 			</div>
 			{/* The seam: a dashed rule either side of the word. Upright between
 			    the pods on a wide screen, lying flat between them on a narrow
 			    one - the same element, turned, so the pair never reads as two
 			    unrelated plates. */}
-			<div
-				class="flex items-center gap-3 lg:flex-col lg:justify-center lg:gap-0"
-				aria-hidden="true"
-			>
-				<span class="h-0 grow border-t border-dashed border-oxblood-dark lg:h-auto lg:w-0 lg:grow lg:border-t-0 lg:border-l"></span>
-				<span class="shrink-0 font-mono text-base font-black uppercase tracking-widest text-zinc-dust lg:px-3 lg:[writing-mode:vertical-rl]">
+			<div class="example__seam" aria-hidden="true">
+				<span class="example__seamrule"></span>
+				<span class="example__seamword">
 					absorbed
 				</span>
-				<span class="h-0 grow border-t border-dashed border-oxblood-dark lg:h-auto lg:w-0 lg:grow lg:border-t-0 lg:border-l"></span>
+				<span class="example__seamrule"></span>
 			</div>
-			<div class="flex min-w-0 flex-col">
+			<div class="example__pod">
 				<ZinePreview
 					Label={Outcome === undefined ? "PREVIEW // WHAT THE LLM SEES" : PreviewLabel[Outcome]}
 					Result={Preview}
@@ -126,7 +125,7 @@ const PreviewLabel = {
 			</div>
 		</div>
 		{Retrieval && (
-			<div class="mt-3 well flex flex-wrap items-baseline gap-2 px-3 py-2 font-mono text-base leading-relaxed text-weathered-teal">
+			<div class="example__retrieval well">
 				<span class="telemetry-tag telemetry-tag--canary">RETRIEVAL</span>
 				<span class="min-w-0">{Retrieval}</span>
 			</div>

@@ -83,6 +83,33 @@
 // to change to get a full ribbon. Source/Script/CodePlate.ts builds the ribbon
 // and reads this as `data-plate-path`; this component still renders no control
 // of its own.
+//
+// ONE COMMAND PER WELL, AND THE RESULT IT SHOULD PRODUCE UNDER IT. The block
+// this component carries is an INTERACTIVE CLI SNIPPET: a recessed well holding
+// ONE command, the copy affordance in its ribbon confirming the copy IN PLACE
+// (the plate's chip is the block's only control, and the confirmation is the
+// control's own label - see `Component/CopyButton.astro`), and a CALLOUT BANNER
+// under the well carrying what the reader should see when it works.
+//
+// `Result` renders that banner: a hairline, a label, and the expected output in
+// the technical voice, byte-exact. It is the expected RESULT and nothing else -
+// the clipboard still holds `CopyPayload` (or `Code`), so a banner never
+// changes what the control copies, and the copy payload stays byte-exact.
+//
+// ONE FRAME PER REGION, still. The banner draws a TOP HAIRLINE and no other
+// edge: the region's frame belongs to the page (a `.shell-card`, a
+// `border-2 border-oxblood-dark bg-soot-black` body), and a banner with four
+// edges under a well would be a second frame around the same region - the
+// defect the flush rule in Global.css exists to prevent. Inside such a body the
+// banner spans the body's full width and the well's own 0.5rem inset is the gap
+// above the hairline, which is the footer-callout shape the pages already use
+// (Source/pages/plugin.astro).
+//
+// ONE COMMAND, NOT A SEQUENCE. A well carries one command because the ribbon
+// says `Command` and the chip says `Copy command`: a reader who pastes it gets
+// one thing to run. A multi-step install is a SEQUENCE - model it as data (the
+// setup page's `InstallStep`) and let its own surface carry the steps, or the
+// single `Copy command` claim is false.
 import { codeToHtml } from "shiki";
 
 import { ZineTheme } from "@Library/ShikiTheme";
@@ -121,9 +148,31 @@ interface Props {
 	 * slots and an invisible gap where the first one belongs.
 	 */
 	Path?: string;
+	/**
+	 * The expected result of running this block - what a reader should see when
+	 * it worked. Rendered byte-exact in the callout banner under the well.
+	 *
+	 * Unset renders NO banner: a transcript, a config file or a fragment has no
+	 * "expected result", and an empty banner is a frame with nothing in it.
+	 */
+	Result?: string;
+	/**
+	 * The banner's label - the eyebrow that says the line beside it is the
+	 * result of the command rather than more of it. Defaults to `EXPECTED`.
+	 */
+	ResultLabel?: string;
 }
 
-const { Code, Lang = "bash", Class = "", Copy, CopyPayload, Path } = Astro.props;
+const {
+	Code,
+	Lang = "bash",
+	Class = "",
+	Copy,
+	CopyPayload,
+	Path,
+	Result,
+	ResultLabel = "EXPECTED",
+} = Astro.props;
 
 // THE RIBBON'S LEADING FIELD, ranked by how strong the fact is: a path the
 // page declared, else the kind this component can prove from its own props.
@@ -155,5 +204,16 @@ const Html = (await codeToHtml(Code, { lang: Lang, theme: ZineTheme }))
 	class:list={["zine-fence", Layout]}
 	data-plate-payload={CopyPayload}
 	data-plate-path={Source}
-	set:html={Html}
-/>
+>
+	<!-- The fence itself: the same bare `<pre class="astro-code">` Astro's
+	     markdown pipeline emits. `Source/Script/CodePlate.ts` wraps it in the
+	     well and hangs the ribbon on it; a page that declares `Result` gets the
+	     banner below as the block's last row. -->
+	<Fragment set:html={Html} />
+	{Result && (
+		<div class="zine-callout flex min-w-0 flex-col gap-2 border-t border-[color:var(--tier-well-edge)] px-3 py-3 sm:flex-row sm:items-baseline sm:gap-4">
+			<span class="telemetry-tag shrink-0">{ResultLabel}</span>
+			<code class="type-code min-w-0 break-words whitespace-pre-wrap text-bone-newsprint">{Result}</code>
+		</div>
+	)}
+</div>

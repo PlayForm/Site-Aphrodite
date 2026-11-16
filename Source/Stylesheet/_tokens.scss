@@ -1,0 +1,128 @@
+/* ============================================================================
+   TOKENS - every `:root` custom property the layer publishes.
+
+   THE LAYER. `_tokens` in `System.scss`'s order (_contract -> **tokens** ->
+   _mixins -> _base -> Component/Plate -> Texture -> Console -> Data -> Chrome
+   -> _utilities). It emits `:root` blocks and nothing else: no selector, no
+   rule, no `@media`. A partial that declares a colour, a distance, a radius or
+   a type size outside this file is a second place the palette lives.
+
+   THE THREE BLOCKS, in the order they were published:
+     1. THE PALETTE AND THE READING SCALE   surfaces, blood family, ink, accents,
+                                            the seven type roles, the four
+                                            spacing roles
+     2. SPLAT INK                           the torn edge's colour and the four
+                                            unequal insets that make it
+                                            asymmetric
+     3. ELEVATION AND CHROME                the five tier depths and the two
+                                            section-rule knobs
+
+   Moved verbatim from `Global.css` when the layer was split - not one value
+   changed, which is why the palette's own comments travelled with their
+   declarations instead of being rewritten.
+
+   Rule 1 of `_contract.scss` follows from this file: a new value is a token
+   here FIRST and a `var(--name)` at every call site after. A `var(--token,
+   #fallback)` is still a stray literal - the fallback is a second copy of the
+   palette.
+   ========================================================================= */
+
+/* ---- 1. THE PALETTE AND THE READING SCALE ------------------------------- */
+
+:root {
+	/* Surfaces */
+	--soot-black: #09090b; /* body bg, terminal panels */
+	--carbon-void: #111014; /* workbench module bg */
+	--asphalt-panel: #16151a; /* sub-panel bg */
+	--asphalt-panel-dark: #0d0c10;
+	/* A plate recessed INTO the page: darker than --soot-black on purpose, so a
+	   card on the landing page separates from the section it sits in without a
+	   lighter fill competing with the bone text. */
+	--void-inset: #050506;
+
+	/* Blood family */
+	--oxblood-dark: #520612; /* borders, shadow planes */
+	--blood-crimson: #7a0a1e; /* 4px module borders, hover fills */
+	--raw-blood: #931128; /* stamps, primary buttons, badges */
+	--outline-oxblood: #3d040d; /* inner borders, shadow color */
+
+	/* Text */
+	--bone-newsprint: #dedbd2; /* body text */
+	--bone-white: #ece9e0; /* headings */
+	--zinc-dust: #82808a; /* muted - lifted from #73717b: 4.15:1 on soot failed
+	                         WCAG AA for body text; #82808a is 5.12:1 on soot,
+	                         4.88:1 on carbon-void, 4.67:1 on asphalt-panel */
+
+	/* Accents */
+	--stamped-canary: #e5a93b;
+	--weathered-teal: #2a938d; /* lifted from the prior weathered teal: passes 4.5:1 on all surfaces */
+
+	/* Type roles - the reader's chapter signal. A section heading today is
+	   `text-lg` (18px) against 16px body copy: 2px of separation, so a reader
+	   gets no signal that the subject changed. The GAP between roles - not any
+	   single size - is what creates rhythm, so these are read as a scale and
+	   never re-invented per page. */
+	--type-display: clamp(4rem, 9vw, 7.5rem);
+	--type-section: clamp(2.25rem, 4.4vw, 3.5rem);
+	--type-sub: clamp(1.375rem, 2.4vw, 1.75rem);
+	--type-body: clamp(1.0625rem, 0.4vw + 1rem, 1.125rem);
+	--type-caption: 0.84375rem; /* a short annotation - never a sentence */
+	--type-meta: 0.71875rem; /* a label, unit or count - never a sentence */
+	--type-code: 0.90625rem;
+
+	/* Spacing roles - four distances, each MEANING a different relationship
+	   rather than being four sizes. A block that reaches for --space-chapter
+	   where it means --space-reading has mis-stated its own structure. */
+	--space-tight: 0.5rem; /* label -> value, heading -> its own context */
+	--space-reading: 0.875rem; /* paragraph -> paragraph */
+	--space-group: 1.75rem; /* explanation -> figure, figure -> caption */
+	--space-chapter: clamp(2.5rem, 4vw, 4rem); /* a genuinely new subject */
+}
+/* ---- 2. SPLAT INK ------------------------------------------------------- */
+
+:root {
+	/* Oxblood ink, not neutral grey: a grey wash on a near-black page reads as a
+	   drop shadow from a component library. Toner from this press is red-black,
+	   so the bleed is the same family as the frame it surrounds. */
+	--splat-ink: rgba(147, 17, 40, 0.42);
+	--splat-ink-strong: rgba(147, 17, 40, 0.62);
+	/* top right bottom left - deliberately unequal, and unequal enough to read
+	   at row scale. A 2-3px difference is invisible on a 1400px page. */
+	--splat-inset: -0.9rem -2.6rem -1.9rem -1.1rem;
+	--splat-inset-right: -2.6rem -0.95rem -1.15rem -2.2rem;
+}
+/* ---- 3. ELEVATION AND CHROME -------------------------------------------- */
+
+:root {
+	/* ELEVATION TIERS - five named depths.
+
+	     canvas    The page ground. Same value as --soot-black and referenced
+	               rather than repeated, because a second copy of a hex is a
+	               second thing to change.
+	     shell     A workbench module lifted off the canvas: one step lighter
+	               with a 1px zinc edge and no shadow. The default surface for a
+	               block of content.
+	     well      A channel recessed INTO a shell: darker than the shell with a
+	               LIGHTER edge (#3f3f46 against #27272a), which is what makes
+	               it read as depth rather than as one more panel.
+	     critical  The alert tier: blood crimson carrying its own 16px glow.
+	     inverted  A printed sheet laid on the dark table: bone ground, carbon
+	               type. The one tier that inverts the page. */
+
+	--tier-canvas: var(--soot-black);
+	--tier-shell: #121216;
+	--tier-shell-edge: #27272a;
+	--tier-well: #0b0b0e;
+	--tier-well-edge: #3f3f46;
+	--tier-critical: var(--raw-blood);
+	--tier-critical-glow: 0 0 16px rgba(147, 17, 40, 0.35);
+	--tier-inverted: var(--bone-white);
+	--tier-inverted-ink: var(--carbon-void);
+
+	/* The section rule's colour, and the drop from that rule to the first line
+	   of the section. Both are knobs, so a page that wants a crimson chapter
+	   rule sets `--blueprint-rule` on its own section instead of fighting this
+	   file's cascade. */
+	--blueprint-rule: var(--tier-shell-edge);
+	--blueprint-inset: var(--space-tight);
+}

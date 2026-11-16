@@ -172,10 +172,12 @@ const Pad = {
  *  classes, which set a background and nothing else, so the frame composed
  *  above stays intact.
  *
- *  The two families are `:where()`-scoped in `Plate.scss` for the first three
- *  and plain classes for the last three, so a call site that passes its own
- *  `bg-*` (the `GrungeSurface` derivation below exists for exactly that case)
- *  still wins - the fill is the one value a page may still take away. */
+ *  The first three are `:where()`-scoped in `Plate.scss`, so a call site that
+ *  passes its own `bg-*` still wins there - the `GrungeSurface` derivation
+ *  below exists for exactly that case, and the utility it reads has to keep
+ *  beating the modifier or the ink would be drawn for a fill that is no longer
+ *  there. The tier fills stay plain classes: `Surface="shell"` is the surface
+ *  the page asked for, and it is already a fill class and nothing more. */
 const Fill = {
 	plain: "plate--surface-plain",
 	inset: "plate--surface-inset",

@@ -415,6 +415,11 @@ $ink-body: var(--bone-newsprint);
 	--statbar-text: #{$measured};
 }
 
+.statbar--teal {
+	--statbar-fill: #{$measured};
+	--statbar-text: #{$measured};
+}
+
 .statbar--raw {
 	--statbar-fill: #{$raw-fill};
 	--statbar-text: #{$figure};
@@ -484,6 +489,22 @@ $ink-body: var(--bone-newsprint);
 .statbar__fill {
 	height: 100%;
 	background-color: var(--statbar-fill);
+}
+
+/* THE POD VARIANT: the same readout as a filled plate with no track, because the
+   figures a pod carries are not shares of anything ("610x", "~10MS") and a bar
+   beneath one would encode nothing. The plate's own fill and ink are the accent's
+   identity and are still resolved by the component's `Pod` table - a pod pairs a
+   ground with a legible ink for each accent, and that pairing is one decision the
+   caller's `Color` already makes. What the surface owns here is the frame: the
+   plate fills its cell, so a row of pods sits on one line. */
+.statbar__pod {
+	display: flex;
+	height: 100%;
+	flex-direction: column;
+	gap: 0.5rem;
+	border: 2px solid #000000;
+	padding: 0.75rem 1rem;
 }
 
 /* ========================================================================

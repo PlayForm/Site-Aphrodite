@@ -1,0 +1,481 @@
+/* ============================================================================
+   CONSOLE - the code plates, the streams, the terminal grammar.
+
+   THE LAYER. Part of `Component/`, between `Component/Texture` and
+   `Component/Data` in `System.scss`'s order (_tokens -> _mixins -> _base ->
+   Plate -> Texture -> Console -> Data -> Chrome -> _utilities). A console block
+   reads tokens and nothing else: it never restates a palette value, never
+   re-derives a type role, and never sets a distance the four `--space-*` roles
+   already name.
+
+   WHAT BELONGS HERE. Everything that draws a region holding MACHINE OUTPUT:
+   the Shiki fence plate (frame, padding band, hover lift, scroll cue, language
+   tag, copy chip), the recessed well and its ribbon, the stream pod, the
+   cutoff rule that marks where a preview stops, and the pipeline console's
+   chrome. A plate that holds PROSE is `Component/Plate`; the print ink that
+   sits on top of either is `Component/Texture`.
+
+   WHAT DOES NOT BELONG HERE. The Shiki PALETTE. It is emitted by the theme
+   (`Source/Library/ShikiTheme.ts`) as inline `style="color:#..."` on every
+   token span, and an inline style outranks every stylesheet rule short of
+   `!important`. A sheet that re-colours `github-dark` output is a fight it
+   cannot win; the palette is set where it is emitted.
+
+   THE NO-JAVASCRIPT CONTRACT, unchanged. `Source/Script/CodePlate.ts` wraps
+   every fence in a `figure.zine-plate` at run time, so the language tag and the
+   copy chip can sit OUTSIDE the scroll container (an absolutely positioned
+   child of a scroll container scrolls away with the content). Every rule below
+   therefore ALSO matches a bare `<pre class="astro-code">`, so a block is
+   framed, padded and rhythmically placed before - and without - that script.
+   The well/ribbon rules are scoped to `.zine-plate.well`, which only the script
+   adds, so a no-JS fence keeps the plain plate exactly as it always has.
+
+   THE PUBLISHED NAMES. The console grammar's canonical class names are
+   `.plate--code`, `.console`, `.console__bar`, `.console__well` and
+   `.console__cutoff`. `.plate--code` and `.console__well` are ALIASES of the
+   live hooks (`.zine-plate`, `.console-well`) inside the same selector group,
+   so the published name and the hook are one definition and can never drift.
+   `.console`, `.console__bar` and `.console__cutoff` are carried additively by
+   the live call sites beside the Tailwind class string that still defines the
+   per-site differences; the declarations below are exactly the values that
+   string produces, so holding both cannot move a pixel. The string is what a
+   later card removes.
+
+   SECTIONS
+     1. Code plate    - the fence frame, its scrollbars, its hover lift
+     2. Fence well    - the recessed channel and its ribbon
+     3. Console pod   - the stream's frame, ribbon, well and cutoff rule
+   ========================================================================= */
+
+/* ---- 1. CODE PLATE -----------------------------------------------------
+
+   Every Shiki fence is a PLATE: pasted-down print, not a floating editor
+   widget. The COLOURS are not here - they are emitted by the theme itself
+   (Source/Library/ShikiTheme.ts) because Shiki writes them as inline
+   `style="color:#..."` attributes on every token span, and an inline style
+   outranks every stylesheet rule short of `!important`.
+
+   What the stylesheet owns is the PRINT GRAMMAR: the frame, the padding, the
+   rhythm, the hover lift and the scroll cue.
+
+   The `figure.zine-plate` wrapper is added by Source/Script/CodePlate.ts, so
+   the language tag and the copy chip can sit OUTSIDE the scroll container
+   (an absolutely positioned child of a scroll container scrolls away with
+   the content). Every rule below also matches a bare `<pre class="astro-code">`
+   so a block is framed and padded before - and without - JavaScript.
+
+   TWO RULES THE CHIPS AND THE FRAME OBEY, both learned from the running site:
+
+   ONE COPY CONTROL PER PLATE. The bar holds a language tag and a copy chip,
+   and the copy chip is the block's ONLY copy control - `Component/
+   CodeFence.astro` no longer renders a second one. The tag is metadata:
+   uppercase, zinc-dust, not clickable. The chip is the action: sentence case
+   (`Copy`, or `Copy command` when the clipboard holds a bare command), canary
+   on hover, a pointer. Two chips of equal weight in one corner read as two
+   language tags, which is how a `BASH` label ended up sitting where an action
+   belongs.
+
+   ONE FRAME PER REGION. The plate draws the frame and the padding; a panel
+   that already draws its own does not get a second one, and the plate drops
+   its rhythm inside it (see the flush rule below).
+
+   Specificity note: `body pre.astro-code` (0,1,2) deliberately outranks the
+   docs reading column's own `pre` rule (0,1,1) without `!important`, so one
+   definition of the plate holds on every page. */
+
+body pre.astro-code,
+body .zine-plate > pre.astro-code,
+body .plate--code > pre.astro-code {
+	position: relative;
+	max-width: 100%;
+	margin: 1.75rem 0;
+	/* SYMMETRIC. The chip cluster floats inside the top padding, so the band it
+	   needs is the same 1.35rem the other three sides get - a taller top band
+	   is a gap between the frame and the code that the bottom edge does not
+	   have, and at rest (the cluster is hidden until hover) it is empty space
+	   above the first line. The cluster is sized to fit inside this band, so no
+	   fence needs a reserved strip of its own. */
+	padding: 1.35rem;
+	border: 1px solid var(--oxblood-dark);
+	border-left: 3px solid var(--blood-crimson);
+	border-radius: 0;
+	background-color: var(--carbon-void);
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.9375rem;
+	line-height: 1.75;
+	tab-size: 2;
+	/* Long commands scroll INSIDE the plate - a fence may never widen the page. */
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	/* A styled scrollbar is a non-overlay scrollbar: on macOS the default one
+	   fades out, so this is what makes the overflow cue persist. */
+	scrollbar-width: thin;
+	scrollbar-color: var(--blood-crimson) var(--asphalt-panel-dark);
+	transition:
+		border-color 0.12s steps(2),
+		box-shadow 0.12s steps(2);
+}
+
+body pre.astro-code::-webkit-scrollbar {
+	height: 8px;
+}
+
+body pre.astro-code::-webkit-scrollbar-track {
+	border-top: 1px solid var(--outline-oxblood);
+	background: var(--asphalt-panel-dark);
+}
+
+body pre.astro-code::-webkit-scrollbar-thumb {
+	border: 1px solid var(--outline-oxblood);
+	background: var(--blood-crimson);
+}
+
+body pre.astro-code:hover::-webkit-scrollbar-thumb {
+	background: var(--raw-blood);
+}
+
+/* The inner <code> must inherit the plate's colour: the docs column paints
+   `pre code` zinc-dust, which would grey out the 86 tokenless `text`/
+   `plaintext` fences that carry no spans to colour. */
+body pre.astro-code > code,
+body .zine-plate > pre.astro-code > code,
+body .plate--code > pre.astro-code > code {
+	padding: 0;
+	border: 0;
+	background: none;
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	color: inherit;
+}
+
+/* Hover: the plate lifts off the page. The background lift rides
+   `background-image` on purpose - Shiki's inline style only sets
+   `background-color`, so a gradient over it is the one wash a stylesheet can
+   apply without `!important`. */
+body pre.astro-code:hover,
+body .zine-plate:hover > pre.astro-code,
+body .plate--code:hover > pre.astro-code,
+body .zine-plate:focus-within > pre.astro-code,
+body .plate--code:focus-within > pre.astro-code {
+	border-color: var(--raw-blood);
+	border-left-color: var(--stamped-canary);
+	box-shadow: 3px 3px 0 var(--outline-oxblood);
+	background-image: linear-gradient(rgba(147, 17, 40, 0.08), rgba(147, 17, 40, 0.08));
+}
+
+.zine-plate,
+.plate--code {
+	position: relative;
+	min-width: 0;
+	max-width: 100%;
+	margin: 1.75rem 0;
+}
+
+/* ONE FRAME PER REGION. A plate inside a container that already draws a frame
+   or an inset contributes no RHYTHM of its own: the container's padding is the
+   inset, so the fence's border sits the same distance from the panel's border
+   on all four sides instead of that inset PLUS 1.75rem on two of them - the
+   gap a reader reports as "extra padding between the fence and its border".
+
+   The one gap the plate keeps is 0.5rem on every side, which is the lift's
+   clearance rather than spacing: the hover state throws a 3px hard shadow, and
+   at a zero inset that shadow paints over the panel's own border. It is the
+   same on all four sides, so the inset stays even.
+
+   Two ways in, because the plate is built at runtime and cannot be given a
+   class by the page that lays it out:
+     `.zine-plate--flush`  set by Source/Script/CodePlate.ts when the host
+                           declares `data-plate-flush`;
+     the panel rule       the containers this tree already uses for a framed
+                           code region - a soot inset or an asphalt panel,
+                           with the fence's `.zine-fence` wrapper between
+                           them. Exactly one wrapper level, so a fence merely
+                           *nested* somewhere inside a panel keeps its rhythm.
+   The bare `<pre>` forms carry the same rule so a no-JS fence inside a panel
+   is inset the same way as its plated twin. */
+.zine-plate--flush,
+:is(.bg-asphalt-panel, .bg-soot-black) > .zine-fence > .zine-plate,
+:is(.bg-asphalt-panel, .bg-soot-black) > .zine-fence > pre.astro-code,
+:is(.bg-asphalt-panel, .bg-soot-black) > pre.astro-code {
+	margin: 0.5rem;
+}
+
+/* The FIGURE owns the plate's rhythm, so the pre inside it carries none. This
+   must repeat the full `body`-prefixed selector: the group above declares
+   `margin: 1.75rem 0` on `body .zine-plate > pre.astro-code` (0,2,2), which
+   outranks a bare `.zine-plate > pre.astro-code` (0,2,1) - the shorthand form
+   silently lost, the pre kept its margin, and the flush rule below was
+   cancelled by the larger of the two collapsed margins. */
+body .zine-plate > pre.astro-code,
+body .plate--code > pre.astro-code {
+	margin: 0;
+}
+
+/* The chip cluster: language tag + copy, floated in the plate's top padding
+   band so revealing it moves nothing. Hidden at rest (the plate is clean
+   print), revealed on hover or keyboard focus; always shown where hover does
+   not exist, because a hidden control with no way to reveal it is a dead
+   control.
+
+   The cluster is sized to sit inside the symmetric 1.35rem band: 0.3rem offset
+   + a 0.975rem chip = 1.275rem, so it clears the first code line instead of
+   reserving a taller top padding for itself. */
+.zine-plate-bar {
+	position: absolute;
+	top: 0.3rem;
+	right: 0.55rem;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	opacity: 0;
+	transition: opacity 0.12s steps(2);
+}
+
+.zine-plate:hover .zine-plate-bar,
+.zine-plate:focus-within .zine-plate-bar,
+.plate--code:hover .zine-plate-bar,
+.plate--code:focus-within .zine-plate-bar {
+	opacity: 1;
+}
+
+@media (hover: none) {
+	.zine-plate-bar {
+		opacity: 1;
+	}
+}
+
+/* The two chips share a SHAPE - same frame, same mono face, same metrics - and
+   differ in VOICE, because they are two different kinds of thing. The direct-
+   child specificity (0,2,0) is deliberate: an adopted control can arrive with
+   utility classes of its own, and the bar's metrics must win without
+   `!important`. */
+.zine-plate-bar > .zine-plate-lang,
+.zine-plate-bar > .zine-plate-copy {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 0.05rem 0.4rem;
+	border: 1px solid var(--outline-oxblood);
+	border-radius: 0;
+	background: var(--soot-black);
+	font-family: "JetBrains Mono", monospace;
+	font-size: 0.625rem;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	line-height: 1.2;
+}
+
+/* The LANGUAGE TAG is metadata: uppercase, zinc-dust, no pointer, no hover. It
+   must not look like, or act as, a copy button - a language name on an action
+   is a defect, and a language name dressed as an action is the same defect
+   wearing a chip. */
+.zine-plate-bar > .zine-plate-lang {
+	color: var(--zinc-dust);
+	text-transform: uppercase;
+}
+
+/* The COPY CHIP is the action, and it says so: sentence case (`Copy`, or
+   `Copy command` when the clipboard holds a bare command), the canary accent
+   on hover, a pointer. The case difference is what separates it from the
+   language tag beside it at a glance - uppercase is the label voice on this
+   site, sentence case is the verb. */
+.zine-plate-bar > .zine-plate-copy {
+	border-color: var(--oxblood-dark);
+	color: var(--bone-newsprint);
+	letter-spacing: 0.02em;
+	text-transform: none;
+	cursor: pointer;
+	transition:
+		color 0.12s steps(2),
+		border-color 0.12s steps(2),
+		background-color 0.12s steps(2);
+}
+
+.zine-plate-bar > .zine-plate-copy:hover {
+	border-color: var(--stamped-canary);
+	background: var(--carbon-void);
+	color: var(--stamped-canary);
+}
+
+/* The overflow mark: the scrollbar is the persistent cue, this is the explicit
+   one - it only exists when the block actually scrolls. */
+.zine-plate--scroll .zine-plate-lang::after {
+	content: " ⇥";
+	color: var(--stamped-canary);
+}
+
+/* The annotations Source/Script/CodePlate.ts wraps: a class rule on the
+   wrapper outranks the INHERITED inline colour of the token span around it,
+   which is how these two stay distinct without `!important`. */
+.zine-prompt {
+	color: var(--stamped-canary);
+	font-weight: 700;
+}
+
+.zine-comment {
+	color: var(--zinc-dust);
+	font-style: italic;
+}
+
+/* ---- 2. FENCE WELL // the channel cut into the page and its ribbon -------
+
+   The Stitch direction renders a code block as a CHANNEL CUT INTO THE PAGE
+   with a header ribbon over it, instead of a plate carrying a chip cluster
+   that floats inside its own top padding. Three things change and nothing
+   else does:
+
+     well     the figure takes the recessed tier: #0b0b0e ground and the
+              LIGHTER 1px edge (#3f3f46) that makes a channel read as depth.
+     ribbon   the chip cluster becomes a real band with its own row, so it can
+              be visible at rest - a floating cluster is hidden until hover
+              only because revealing it must move nothing.
+     path     the ribbon's leading field names the file the block came from.
+
+   ADDITIVE AND SCOPED. Every selector below requires `.zine-plate.well`, the
+   class `Source/Script/CodePlate.ts` adds to the figure it builds, so the
+   plate rules above still describe a bare `<pre class="astro-code">` exactly
+   as they did - a fence with no JavaScript, or a fence outside this tree,
+   keeps its own frame and padding. No existing selector is re-declared here.
+
+   ONE CONTROL, STILL. The copy chip remains the block's only control and is
+   still built by CodePlate.ts; the path and the language are `<span>`s. The
+   ribbon is a row of METADATA with one action at its right edge. */
+
+body .zine-plate.well {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	border: 1px solid var(--tier-well-edge);
+	border-radius: 0;
+	background-color: var(--tier-well);
+}
+
+/* The code keeps the crimson spine - it is what identifies a plate as a plate -
+   and drops the other three edges: the well's own lighter edge IS the frame,
+   and a second border inside it is the two-frames-one-region defect. The fill
+   here cannot be set: Shiki writes `background-color` as an inline style on the
+   `<pre>`, which no stylesheet rule short of `!important` outranks, so the
+   channel reads through its edge and its ribbon rather than through a wash the
+   block would paint over. */
+body .zine-plate.well > pre.astro-code {
+	margin: 0;
+	border: 0;
+	border-left: 3px solid var(--blood-crimson);
+}
+
+/* An inset channel does not LIFT. Hover keeps both of the states that carry
+   meaning - the canary spine and the crimson wash - and drops the offset
+   shadow, which would paint across the well's own edge and read as a second
+   frame rather than as a lift. */
+body .zine-plate.well > pre.astro-code:hover,
+body .zine-plate.well > pre.astro-code:focus-within {
+	border-left-color: var(--stamped-canary);
+	box-shadow: none;
+	background-image: linear-gradient(rgba(147, 17, 40, 0.1), rgba(147, 17, 40, 0.1));
+}
+
+/* THE RIBBON. `order: -1` puts it above the code without moving the DOM: the
+   bar is appended AFTER the `<pre>` (so the cluster can be positioned over it
+   in the non-well plate), and the well simply renders it first. Static, opaque
+   and full-width, which is why it can be always visible.
+
+   `.console__bar` is the published name for this row: a console's ribbon and a
+   well's ribbon are one band, so they are one rule. */
+body .zine-plate.well > .zine-plate-bar,
+.console__bar {
+	position: static;
+	order: -1;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 1rem 0.25rem;
+	margin: 0;
+	padding: 0.375rem 0.75rem;
+	border-bottom: 1px solid var(--oxblood-dark);
+	background-color: var(--asphalt-panel);
+	opacity: 1;
+}
+
+/* A well's ribbon carries the well's own edge colour and a tighter gap: the
+   channel's band is part of the channel, so it may not paint a second palette
+   edge into it. */
+body .zine-plate.well > .zine-plate-bar {
+	gap: 0.5rem;
+	padding: 0.4rem 0.6rem;
+	border-bottom-color: var(--tier-well-edge);
+	background-color: var(--tier-shell);
+}
+
+/* THE PATH is the ribbon's leading field: it says WHERE the block came from,
+   so it takes the free space and pushes the language and the control to the
+   right edge. `min-width: 0` plus `overflow-wrap: anywhere` because a path is
+   one unbreakable token - it must break inside the ribbon rather than widen the
+   block, and the label voice's own `normal` wrapping would let it push the
+   control off the plate. */
+body .zine-plate.well > .zine-plate-bar > .zine-plate-path {
+	flex: 1 1 auto;
+	min-width: 0;
+	margin-inline-end: auto;
+	padding: 0;
+	border: 0;
+	background: none;
+	font-family: "JetBrains Mono", monospace;
+	font-size: var(--type-meta);
+	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: 0.04em;
+	color: var(--bone-newsprint);
+	overflow-wrap: anywhere;
+	hyphens: none;
+}
+
+/* Inside a ribbon the two chips drop their own frame: the ribbon is already a
+   band, and a bordered chip inside a bordered band is a chip in a box in a box.
+   They keep their shape, their metrics and their voices - uppercase metadata
+   against sentence-case action - which is what tells them apart. */
+body .zine-plate.well > .zine-plate-bar > .zine-plate-lang,
+body .zine-plate.well > .zine-plate-bar > .zine-plate-copy {
+	padding: 0;
+	border: 0;
+	background: none;
+}
+
+/* ---- 3. CONSOLE POD // the stream's frame, well and cutoff ---------------
+
+   A stream is a CONSOLE, not a text box: a frame, a header ribbon naming what
+   produced the bytes, and a body cut INTO the frame. The pod's per-call-site
+   differences - whether it is a flex column, how wide its ribbon pads - stay in
+   the class string on the element; what is declared here is the part every pod
+   on the site shares, which is the part that must never be re-decided.
+
+   `.console__well` is an ALIAS of `.console-well`, the hook `ZineStream` and
+   `ZineSplit` already carry. One rule, two names. */
+
+.console {
+	border: 1px solid var(--oxblood-dark);
+	background-color: var(--soot-black);
+}
+
+/* THE RECESSED WELL. The body is cut INTO the plate, not laid on top of it:
+   the ribbon above is the lighter asphalt plane and this one hard 3px inset in
+   the plate's own black is the lip the cut leaves behind. It is the same
+   shadow plane `.zp-result` prints its bone plate with - hard offset, no blur,
+   no radius, because the site has neither. */
+.console-well,
+.console__well {
+	box-shadow: inset 3px 3px 0 #000;
+}
+
+/* THE CUTOFF RULE. One labelled rule marking the one boundary the preview pair
+   exists to show: the preview stops at this rule and the stored original begins
+   under it. The label, the hairline and the DISTANCE above the rule are the
+   caller's - the two call sites sit 0.75rem and 0.5rem under different things,
+   and a row that decided its own margin would move one of them. */
+.console__cutoff {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}

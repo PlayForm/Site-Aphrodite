@@ -1,4 +1,6 @@
 ---
+import "@Stylesheet/Component/Data.scss";
+
 /**
  * ZineDossier - TWO EVIDENCE COLUMNS READ AS ONE COMPARISON.
  *
@@ -21,6 +23,11 @@
  *                     of both. That is the comparison: the gutter hairline is
  *                     the only thing between the two claims, and neither side
  *                     is ever a second list to be re-found.
+ *
+ * All of that geometry lives in `Stylesheet/Component/Data.scss` as the
+ * `.dossier` block - the frame, the band, the stamp, the two tracks and the
+ * gutter. This component states WHICH comparison is being drawn; the sheet
+ * states what a comparison looks like.
  *
  * NOTHING IS DROPPED, AND NOTHING IS INVENTED. The row count is the LONGER of
  * the two columns, and a side with no entry for a row renders an empty cell
@@ -72,15 +79,11 @@ const Shadow = {
 }[Tone];
 
 // The two sides, in the order they are read. `Edge` is the gutter treatment on
-// the wide viewport: a hairline in the gutter, and the padding that keeps the
-// second column's text off it.
+// the wide viewport: the sheet puts a hairline in the gutter and the padding
+// that keeps the second column's text off it.
 const Sides = [
 	{ Index: "01", Caption: LeftCaption, Edge: "" },
-	{
-		Index: "02",
-		Caption: RightCaption,
-		Edge: "lg:border-l lg:border-[var(--tier-shell-edge)] lg:pl-16",
-	},
+	{ Index: "02", Caption: RightCaption, Edge: "dossier__column--right" },
 ];
 
 // The pairing. One row per comparison key, taken from the longer column so an
@@ -93,24 +96,22 @@ const Rows = Array.from({ length: Math.max(Left.length, Right.length) }, (_, Ind
 }));
 ---
 
-<section
-	class={`relative border-4 border-blood-crimson bg-carbon-void p-6 sm:p-10 ${Shadow} ${Rotate} transition-transform duration-300 hover:rotate-0`}
->
+<section class={`dossier ${Shadow} ${Rotate} transition-transform duration-300 hover:rotate-0`}>
 	<!-- THE HEADER BAND -->
-	<div class="flex items-center gap-4 border-b border-[var(--tier-shell-edge)] pb-3">
-		<span class="border-2 border-black bg-raw-blood px-3 py-1 font-mono text-base font-black uppercase tracking-widest text-bone-white shadow-[3px_3px_0px_#000]">
+	<div class="dossier__band">
+		<span class="dossier__stamp">
 			{Title}
 		</span>
-		<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
+		<span class="dossier__rule"></span>
 	</div>
 
 	<!-- THE COLUMN HEADS: one per side, on the same two tracks as every row
 	     below, so the field is declared before the first comparison. -->
-	<div class="grid grid-cols-1 border-b border-oxblood-dark lg:grid-cols-2 lg:gap-0">
+	<div class="dossier__heads">
 		{Sides.map((Side) => (
-			<div class={`flex items-baseline gap-3 pb-2 pt-4 ${Side.Edge}`}>
+			<div class={`dossier__column ${Side.Edge}`}>
 				<span class="section-index">{Side.Index}</span>
-				<span class="font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+				<span class="dossier__caption">
 					{Side.Caption}
 				</span>
 			</div>
@@ -125,29 +126,29 @@ const Rows = Array.from({ length: Math.max(Left.length, Right.length) }, (_, Ind
 		{Rows.map((Row, Position) => (
 			<dl
 				class:list={[
-					"grid grid-cols-1 lg:grid-cols-2 lg:gap-0",
-					Position > 0 ? "border-t border-oxblood-dark" : "",
+					"dossier__row",
+					Position > 0 ? "dossier__row--ruled" : "",
 				]}
 			>
-				<div class="min-w-0 py-5 lg:pr-16">
+				<div class="dossier__cell dossier__cell--left">
 					{Row.Left === undefined ? null : (
 						<>
-							<dt class="type-meta !font-black uppercase text-bone-white">
+							<dt class="dossier__label type-meta">
 								{Row.Left.Label}
 							</dt>
-							<dd class="mt-1 font-body text-base leading-relaxed text-bone-newsprint">
+							<dd class="dossier__text">
 								{Row.Left.Text}
 							</dd>
 						</>
 					)}
 				</div>
-				<div class="min-w-0 py-5 max-lg:border-t max-lg:border-dashed max-lg:border-oxblood-dark lg:border-l lg:border-[var(--tier-shell-edge)] lg:pl-16">
+				<div class="dossier__cell dossier__cell--right">
 					{Row.Right === undefined ? null : (
 						<>
-							<dt class="type-meta !font-black uppercase text-bone-white">
+							<dt class="dossier__label type-meta">
 								{Row.Right.Label}
 							</dt>
-							<dd class="mt-1 font-body text-base leading-relaxed text-bone-newsprint">
+							<dd class="dossier__text">
 								{Row.Right.Text}
 							</dd>
 						</>

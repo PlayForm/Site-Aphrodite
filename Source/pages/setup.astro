@@ -12,6 +12,7 @@ import ZineFold from "@Component/ZineFold.astro";
 import ZineReveal from "@Component/ZineReveal.astro";
 import ZineSource from "@Component/ZineSource.astro";
 import ZineCopyChip from "@Component/ZineCopyChip.astro";
+import ZineButton from "@Component/ZineButton.astro";
 import CodeFence from "@Component/CodeFence.astro";
 import CopyButton from "@Component/CopyButton.astro";
 
@@ -1054,23 +1055,34 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 			</div>
 		</section>
 
-		<!-- 03 // OPERATIONAL WORKFLOW - one instrument. Pick a platform, pick a
-		     route, read the exact sequence; the record for that route (its notes,
-		     outcome, warning, lesson and verification) is the same surface's lower
-		     half, so a reader never has to hold two places in the page at once. -->
-		<section class="blueprint-section relative w-full" data-reveal>
+		<!-- 03 // OPERATIONAL WORKFLOW - Stitch's TABBED TERMINAL PLAYBOOK. The
+		     band opens on a numbered coordinate, a claim and the one sentence that
+		     says what the instrument is; the two control tiers - platform, then
+		     route - sit as rows of one bar on the terminal's top edge; the terminal
+		     below shows the selected route's steps and the record that belongs to
+		     them; and the band closes on the verification callout banner.
+
+		     ONE INSTRUMENT, STILL CSS-ONLY. The controls are real radios and the
+		     panels are shown by `:has()` on a checked radio, so the playbook works
+		     with JavaScript off; every lane and every record stays in the document,
+		     which is what keeps the page readable when the switch cannot run. -->
+		<section class="workflow blueprint-section relative w-full" data-reveal>
 			<p class="section-index">
 				03 // OPERATIONAL WORKFLOW // THE TRANSCRIPT // ROUTE BY ROUTE
 			</p>
 			<h2 id="transcript" class="mt-3 type-section text-bone-white">
 				Four installs, one at a time
 			</h2>
+			<p class="mt-6 max-w-[46rem] type-body text-bone-newsprint">
+				Each route is self-contained: the commands, what they leave on disk, what makes
+				them fail, and the one check that says the install is live. The recommended path
+				is selected first; the other three are one pill away, in the same container.
+			</p>
+
+			<!-- THE PLATFORM FACT sits beside the selector rather than inside it: the
+			     selector says which lane is drawn, these two paragraphs say why two
+			     lanes exist and what the Windows one changes. -->
 			<div class="prose-flow mt-6 max-w-[46rem]">
-				<p class="type-body text-bone-newsprint">
-					Each route is self-contained: the commands, what they leave on disk, what makes
-					them fail, and the one check that says the install is live. The recommended path
-					is selected first; the other three are one pill away, in the same container.
-				</p>
 				<p class="type-body text-bone-newsprint">
 					Platform is an input, not a footnote. Every route ships two complete lanes -
 					directory creation, discovery and linking, download, enable, verification - and
@@ -1093,59 +1105,64 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 				</p>
 			</div>
 
-			<div class="workflow mt-8">
-				<!-- THE CONTROLS. Radio inputs and their labels: no script, so the
-				     switch works with JS off, and the pills are real form controls a
-				     keyboard can reach. -->
-				<div class="workflow__controls">
-					<fieldset class="workflow__group">
-						<legend class="workflow__legend">PLATFORM //</legend>
-						<div class="workflow__pills">
-							<input
-								class="workflow__radio"
-								type="radio"
-								name="setup-platform"
-								id="platform-posix"
-								checked
-							/>
-							<label class="workflow__pill" for="platform-posix">
-								BASH - macOS / Linux
-							</label>
-							<input
-								class="workflow__radio"
-								type="radio"
-								name="setup-platform"
-								id="platform-windows"
-							/>
-							<label class="workflow__pill" for="platform-windows">
-								POWERSHELL - Windows
-							</label>
-						</div>
-					</fieldset>
-					<fieldset class="workflow__group workflow__group--route">
-						<legend class="workflow__legend">ROUTE //</legend>
-						<div class="workflow__pills">
-							{InstallRoutes.map((Route) => (
-								<>
-									<input
-										class="workflow__radio"
-										type="radio"
-										name="setup-route"
-										id={`route-${Route.ID}`}
-										checked={Route.Recommended}
-									/>
-									<label
-										class="workflow__pill"
-										for={`route-${Route.ID}`}
-										style={`--pill-accent: ${PillAccent[Route.BadgeColor]}`}
-									>
-										{Route.Badge}
-									</label>
-								</>
-							))}
-						</div>
-					</fieldset>
-				</div>
+			<!-- THE CONTROL BAR, two tiers in one frame on the terminal's top edge:
+			     the platform selector above, the four route pills below it. Radio
+			     inputs and their labels: no script, so the switch works with JS off,
+			     and the pills are real form controls a keyboard can reach. -->
+			<div class="workflow__controls mt-8 flex-col">
+				<fieldset class="workflow__group">
+					<legend class="workflow__legend">PLATFORM //</legend>
+					<div class="workflow__pills">
+						<input
+							class="workflow__radio"
+							type="radio"
+							name="setup-platform"
+							id="platform-posix"
+							checked
+						/>
+						<label class="workflow__pill" for="platform-posix">
+							BASH - macOS / Linux
+						</label>
+						<input
+							class="workflow__radio"
+							type="radio"
+							name="setup-platform"
+							id="platform-windows"
+						/>
+						<label class="workflow__pill" for="platform-windows">
+							POWERSHELL - Windows
+						</label>
+					</div>
+				</fieldset>
+				<fieldset class="workflow__group">
+					<legend class="workflow__legend">ROUTE //</legend>
+					<div class="workflow__pills">
+						{InstallRoutes.map((Route) => (
+							<>
+								<input
+									class="workflow__radio"
+									type="radio"
+									name="setup-route"
+									id={`route-${Route.ID}`}
+									checked={Route.Recommended}
+								/>
+								<label
+									class="workflow__pill"
+									for={`route-${Route.ID}`}
+									style={`--pill-accent: ${PillAccent[Route.BadgeColor]}`}
+								>
+									{Route.Badge}
+									{Route.Recommended && (
+										<span class="bg-soot-black px-1 py-0.5 text-[0.625rem] leading-none tracking-widest text-stamped-canary">
+											RECOMMENDED
+										</span>
+									)}
+								</label>
+							</>
+						))}
+					</div>
+				</fieldset>
+			</div>
 
 				<!-- THE CONTAINER. One terminal, eight lanes, four records - all in
 				     the document, one of each shown. -->
@@ -1159,6 +1176,21 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 							{Route.Lanes.map((Lane) => (
 								<div class="workflow__lane" data-os={Platform(Lane)}>
 									<div class="workflow__bar">
+										<span class="flex gap-1.5" aria-hidden="true">
+											<span
+												class="block h-2 w-2 bg-[color:var(--tier-well-edge)]"
+											/>
+											<span
+												class="block h-2 w-2 bg-[color:var(--tier-well-edge)]"
+											/>
+											<span
+												class="block h-2 w-2 bg-[color:var(--tier-well-edge)]"
+											/>
+										</span>
+										<span class="telemetry-tag telemetry-tag--teal">
+											SESSION // {Lane.Shell.toUpperCase()} - {Lane.Platform}
+										</span>
+										<h3 class="type-sub text-bone-white">{Route.Title}</h3>
 										<span
 											class:list={[
 												"telemetry-tag",
@@ -1166,10 +1198,6 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 											]}
 										>
 											{Route.Badge}
-										</span>
-										<h3 class="type-sub text-bone-white">{Route.Title}</h3>
-										<span class="telemetry-tag">
-											{Lane.Shell.toUpperCase()} - {Lane.Platform}
 										</span>
 										<span class="font-mono text-base text-zinc-dust">
 											{Lane.Steps.length} STEPS
@@ -1181,6 +1209,7 @@ const Platform = (Lane: InstallLane): string => (Lane.Shell === "bash" ? "posix"
 											Tone="teal"
 											Size="sm"
 										/>
+										<span class="telemetry-tag">READY</span>
 									</div>
 
 									<ol class="workflow__steps list-none px-4 pb-6 pt-2 sm:px-5">

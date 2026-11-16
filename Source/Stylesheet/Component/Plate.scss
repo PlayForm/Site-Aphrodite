@@ -378,6 +378,19 @@ $duration: 150ms;
    6. THE TAPE - ZineTape's seven shapes
    ------------------------------------------------------------------------- */
 
+/* THE TAPE AND THE STAMP ARE LABELS, and a label breaks at its spaces or not at
+   all (the layer's rule 5). Both are single-token-heavy by nature - a hash, a
+   version, `REPRO_PROOF #001` - so they opt out of the page's `break-word`
+   before any shape rule runs. This is the one declaration in sections 6-9 that
+   is not a transcription of a class string: the component carried no wrap rule,
+   the contract requires one, and the value is the layer's, not this file's. */
+.plate__tape,
+.plate__stamp {
+	overflow-wrap: normal;
+	hyphens: none;
+	word-break: keep-all;
+}
+
 /* Replaces the per-variant class strings. The SHAPE and the PALETTE live here;
    PLACEMENT does not: `Side`, `Offset` and `Rotate` are props whose values a
    call site chooses, so `left-6` / `-top-7` / `-rotate-1` stay utilities on the

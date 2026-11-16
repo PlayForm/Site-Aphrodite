@@ -25,6 +25,14 @@
  * voice. A label before the glyph would be the one visible difference between
  * an adopted control and a generated one, and two shapes in one ribbon is the
  * same defect as two controls.
+ *
+ * THE CONFIRMATION IS THE CHIP. On a successful write the label becomes
+ * `COPIED` for as long as the site's toast is on screen, then returns - the
+ * same state `CopyButton` carries, in the quieter shape. It is a second
+ * CONFIRMATION of the one clipboard write, never a second control and never a
+ * second write: the state is set from `Layout/Base.astro`'s own success signal
+ * (the toast it reveals only after `navigator.clipboard.writeText` resolved),
+ * so a refused write marks nothing.
  */
 interface Props {
 	/** The chip text; clicking copies this exact string (defaults to Label). */
@@ -82,5 +90,106 @@ const HoverText = {
 	<span aria-hidden="true" class="text-base opacity-40 group-hover:opacity-90">
 		⧉
 	</span>
-	<span class="opacity-60 group-hover:opacity-100">{Label}</span>
+	<span class="copy__verb opacity-60 group-hover:opacity-100">{Label}</span>
+	<span class="copy__done opacity-60 group-hover:opacity-100" aria-live="polite">COPIED</span>
 </button>
+
+<style>
+	/* THE CONFIRMATION IS THE CHIP, in the chip's own metrics: the label swaps
+	   where it sits, so the row of metadata keeps its rhythm and the control
+	   never grows a second surface. `data-copy-state` is set on this button by
+	   the reflector below for exactly as long as the site's toast is on
+	   screen. */
+	.copy__done {
+		display: none;
+	}
+
+	[data-copy-state] .copy__done {
+		display: inline;
+	}
+
+	[data-copy-state] .copy__verb {
+		display: none;
+	}
+</style>
+
+<script>
+	// THE COPY CONFIRMATION, INSIDE THE CONTROL.
+	//
+	// Stitch's CLI snippet confirms the copy where the reader clicked, and the
+	// rule that keeps it honest is where the signal comes from:
+	// `Layout/Base.astro` reveals `#copy-toast` only AFTER
+	// `navigator.clipboard.writeText` resolved. A refused write - an insecure
+	// origin, a denied permission - leaves the toast hidden, so this module
+	// marks nothing. A control that claimed COPIED over a clipboard the browser
+	// refused would be the one lie on a page whose pitch is honest previews.
+	//
+	// This module WRITES NO CLIPBOARD and binds no second handler for the copy
+	// itself: the click listener is capture-phase and passive, it runs before
+	// the runtime's own handler, records which control was activated, and the
+	// observer watches the toast's class for the reveal. Nothing here races an
+	// async promise with a timer.
+	let Armed: Element | null = null;
+
+	document.addEventListener(
+		"click",
+		(Event) => {
+			const Control = (Event.target as Element | null)?.closest?.("[data-copy]");
+
+			// Always the LAST control clicked: a copy the browser refused leaves
+			// no mark, and the next successful one must not confirm it instead.
+			if (Control) {
+				Armed = Control;
+			}
+		},
+		{ capture: true, passive: true },
+	);
+
+	const Reflect = (): void => {
+		const Toast = document.getElementById("copy-toast");
+
+		// Guarded per ELEMENT, not per module: the view-transitions router swaps
+		// `<body>`, so the toast is a new node after every navigation and the
+		// observer has to follow it. A module-level flag would leave the second
+		// page's toast unwatched and the state would stop arriving after one
+		// click-through.
+		if (!Toast || Toast.dataset["copyStateBound"]) {
+			return;
+		}
+
+		Toast.dataset["copyStateBound"] = "1";
+
+		let Marked: Element | null = null;
+
+		new MutationObserver(() => {
+			if (!Toast.classList.contains("hidden")) {
+				const Control = Armed;
+
+				Armed = null;
+
+				if (!Control) {
+					return;
+				}
+
+				Marked = Control;
+				Marked.setAttribute("data-copy-state", "copied");
+
+				return;
+			}
+
+			// The toast hides on the runtime's own timer, so the state's lifetime
+			// is the confirmation's lifetime - one timer, not two.
+			Marked?.removeAttribute("data-copy-state");
+			Marked = null;
+		}).observe(Toast, { attributes: true, attributeFilter: ["class"] });
+	};
+
+	try {
+		Reflect();
+		document.addEventListener("astro:page-load", Reflect);
+	} catch (Error) {
+		// Decoration on a control that still copies: a failure here is a warning,
+		// never a broken page.
+		console.warn("aphrodite: the copy confirmation could not bind", Error);
+	}
+</script>

@@ -257,6 +257,191 @@ const LatencyFact = Figure(Latency.Id);
 const ClassificationFact = Figure(Classification.Id);
 const CompressStepFact = Figure(CompressStep.Id);
 
+// 02 // PILLARS - THE COST AXIS AS ONE DRAWING
+//
+// Three of this chapter's costs are timed, two of them are BANDS, and the bands
+// sit six orders of magnitude apart. Printed in separate cards that is three
+// numbers a reader has to hold in their head to compare; drawn on ONE
+// logarithmic nanosecond axis it is the argument the chapter already makes in
+// prose - the step that runs on every call is invisible beside the round-trip a
+// client waits for.
+//
+// NOTHING IS TYPED HERE. Every endpoint is read out of the generated figure the
+// card beside it prints, converted to nanoseconds and positioned by the same
+// decade arithmetic the per-type chart uses. `CostSpan` THROWS when a figure
+// stops looking like a range, so a reworded README stops the build instead of
+// leaving an old bar drawn under a new sentence.
+const Nanosecond: Record<string, number> = {
+	ns: 1,
+	"µs": 1e3,
+	us: 1e3,
+	ms: 1e6,
+	s: 1e9,
+};
+
+/** `"40-123 ns"` -> its two endpoints in nanoseconds. */
+function CostSpan(Value: string, Source: string): { Low: number; High: number } {
+	const Match = /^([\d.]+)\s*-\s*([\d.]+)\s*(ns|µs|us|ms|s)$/.exec(Value.trim());
+
+	if (Match === null) {
+		throw new Error(
+			`[Benchmarks] "${Source}" is "${Value}", which is not a range the cost axis can draw. The strip reads its endpoints out of the generated figure, so teach CostSpan the new shape rather than leaving the old band on the page.`,
+		);
+	}
+
+	const Factor = Nanosecond[Match[3]!] ?? 0;
+
+	return { Low: Number(Match[1]) * Factor, High: Number(Match[2]) * Factor };
+}
+
+/** `"~10 ms"` -> nanoseconds. The tilde is part of the generated figure, not a
+ *  decoration this page adds. */
+function CostPoint(Value: string, Source: string): number {
+	const Match = /^~\s*([\d.]+)\s*(ns|µs|us|ms|s)$/.exec(Value.trim());
+
+	if (Match === null) {
+		throw new Error(
+			`[Benchmarks] "${Source}" is "${Value}", which is not a point the cost axis can place. Teach CostPoint the new shape.`,
+		);
+	}
+
+	return Number(Match[1]) * (Nanosecond[Match[2]!] ?? 0);
+}
+
+/** `sub-millisecond` is a BOUND, not a measurement: the README states the step
+ *  is under a millisecond and gives no range, so the axis can only mark where
+ *  that ceiling sits. Any other wording is a fact this page has not been taught
+ *  to draw, and it stops the build rather than drawing the old bound. */
+function CostBound(Value: string): number {
+	if (Value.trim() !== "sub-millisecond") {
+		throw new Error(
+			`[Benchmarks] the compress step is now "${Value}", and the cost axis only knows how to place "sub-millisecond" - a ceiling at one millisecond. Teach CostBound the new shape.`,
+		);
+	}
+
+	return 1e6;
+}
+
+const LatencySpan = CostSpan(Benchmark.Latency, "Benchmark.Latency");
+const ClassifySpan = CostSpan(Benchmark.Classify, "Benchmark.Classify");
+const CompressBound = CostBound(Narrative.CompressStep);
+const HeadlinePoint = CostPoint(Benchmark.LatencyHeadline, "Benchmark.LatencyHeadline");
+
+// THE AXIS: the decade below the fastest endpoint to the decade above the
+// slowest, so every tick is a whole power of ten and no band sits on an edge.
+const AxisFloor = 10 ** Math.floor(Math.log10(Math.min(ClassifySpan.Low, LatencySpan.Low, CompressBound)));
+const AxisCeil = 10 ** Math.ceil(Math.log10(Math.max(ClassifySpan.High, LatencySpan.High, CompressBound)));
+
+/** Where a nanosecond value sits on the axis, 0-100. */
+const AxisAt = (Ns: number): number =>
+	((Math.log10(Ns) - Math.log10(AxisFloor)) / (Math.log10(AxisCeil) - Math.log10(AxisFloor))) * 100;
+
+const AxisTicks = Array.from(
+	{ length: Math.round(Math.log10(AxisCeil) - Math.log10(AxisFloor)) + 1 },
+	(_, Index) => {
+		const Ns = 10 ** (Math.log10(AxisFloor) + Index);
+
+		return {
+			Left: AxisAt(Ns),
+			Label: Ns >= 1e6 ? `${Ns / 1e6} ms` : Ns >= 1e3 ? `${Ns / 1e3} µs` : `${Ns} ns`,
+		};
+	},
+);
+
+// THE LANES, in the order a call passes through them: classification first,
+// then the compress step, then the round-trip the client waits for. A lane with
+// a range draws a band; the compress step has no range, only a ceiling, so its
+// lane draws the ceiling as a rule and says so in its note. `Mark` is the one
+// point inside a band worth pointing at - the headline at the fast end.
+const AxisLanes: {
+	Label: string;
+	Note: string;
+	Value: string;
+	Ink: string;
+	Text: string;
+	From: number;
+	To: number;
+	Mark: number | undefined;
+}[] = [
+	{
+		Label: "CLASSIFICATION",
+		Note: "on every call",
+		Value: Benchmark.Classify,
+		Ink: "bg-weathered-teal",
+		Text: "text-weathered-teal",
+		From: AxisAt(ClassifySpan.Low),
+		To: AxisAt(ClassifySpan.High),
+		Mark: undefined,
+	},
+	{
+		Label: "THE COMPRESS STEP",
+		Note: "a ceiling, not a range",
+		Value: Narrative.CompressStep,
+		Ink: "bg-bone-newsprint",
+		Text: "text-bone-newsprint",
+		From: AxisAt(CompressBound),
+		To: AxisAt(CompressBound),
+		Mark: undefined,
+	},
+	{
+		Label: "THE ROUND-TRIP",
+		Note: "HTTP round-trip included",
+		Value: Benchmark.Latency,
+		Ink: "bg-stamped-canary",
+		Text: "text-stamped-canary",
+		From: AxisAt(LatencySpan.Low),
+		To: AxisAt(LatencySpan.High),
+		Mark: AxisAt(HeadlinePoint),
+	},
+];
+
+// THE FOUR PILLARS. Stitch draws four cards across the top of its benchmark
+// page - one per foundation - each opening on a short accent bar with a
+// coordinate and a name. These are this chapter's four: the cost a client waits
+// for, the two costs too small to see on that axis, and the token the model
+// reads instead of the payload.
+//
+// THE HARNESS IS NOT A PILLAR. `benchmark.round-trips` is the proof that the
+// other four were measured rather than an overhead of its own, so it rides the
+// provenance ribbon above the block with the pinned revision - where Stitch
+// puts its own `REPRODUCIBLE HARNESS` field.
+const Replacement: Pillar = {
+	Id: "narrative.marker-tokens",
+	Tape: "WHAT THE OVERHEAD BUYS",
+	TapeColor: "bone",
+	Accent: "bone",
+	Caption: "THE REPLACEMENT ITSELF",
+	Body: [],
+	Src: `SRC: ${Cite(Narrative.From)}`,
+};
+
+const ReplacementFact = Figure(Replacement.Id);
+
+/** The accent a card's bar and figure paint with. Crimson is a FILL token - as
+ *  text on a shell card `--raw-blood` measures 2.23:1 - so a crimson pillar
+ *  keeps its colour in the bar and prints its figure in bone. Colour is
+ *  identity here, so it is never dropped, only moved to where it is legible. */
+const AccentBar: Record<Pillar["Accent"], string> = {
+	crimson: "bg-raw-blood",
+	canary: "bg-stamped-canary",
+	teal: "bg-weathered-teal",
+	bone: "bg-bone-newsprint",
+};
+
+const AccentText: Record<Pillar["Accent"], string> = {
+	crimson: "!text-bone-white",
+	canary: "!text-stamped-canary",
+	teal: "!text-weathered-teal",
+	bone: "!text-bone-newsprint",
+};
+
+const Pillars = [
+	{ Pillar: Latency, Fact: LatencyFact },
+	{ Pillar: Classification, Fact: ClassificationFact },
+	{ Pillar: CompressStep, Fact: CompressStepFact },
+	{ Pillar: Replacement, Fact: ReplacementFact },
+];
+
 // THE HARNESS - five examples in the aphrodite crate, one per question the
 // figures above answer. Each body is the example's own promise: what it spawns,
 // what it asserts, and what makes it exit non-zero.
@@ -455,6 +640,39 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 	Description={`Aphrodite benchmarks: up to ${Benchmark.Ceiling} best case on the standard corpus (${Benchmark.Overall} overall, ${Benchmark.CorpusIn} to ${Benchmark.CorpusOut}), ${Benchmark.Latency} end-to-end, ${Benchmark.Classify} classification, and the ${Study.Sessions}-session real-world study.`}
 >
 	<PageShell Rhythm="wide" Crumbs>
+		{/* THE PROVENANCE RIBBON. Stitch opens its benchmark page with a
+		    sub-ribbon carrying the pinned revision, the harness and the session
+		    count; the arrangement is adopted, the facts are ours. It sits above
+		    the header because it qualifies every figure on the page, not one
+		    chapter of it: the revision is the pin the generator read, the
+		    round-trip count is the harness result, and the session count is the
+		    study's population. All three are joined by ID or derived from the
+		    generated record - the revision comes from `Module.json`, never from
+		    a string typed here. */}
+		<div
+			class="flex flex-wrap items-center justify-between gap-x-8 gap-y-2 border-b border-oxblood-dark bg-carbon-void px-4 py-2 type-meta uppercase"
+		>
+			<div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+				<span class="inline-flex items-center gap-2 font-black text-bone-white">
+					<span class="h-2 w-2 shrink-0 bg-weathered-teal" aria-hidden="true"></span>
+					PINNED REVISION
+				</span>
+				<span class="text-zinc-dust">
+					HEAD <code class="text-weathered-teal">@{SourceRevision.Short}</code>
+				</span>
+				<span class="text-zinc-dust">{SourceRevision.Branch}</span>
+			</div>
+			<div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-zinc-dust">
+				<span class="font-black">REPRODUCIBLE HARNESS</span>
+				<span class="border border-oxblood-dark bg-asphalt-panel px-1.5 py-0.5 font-black text-bone-newsprint">
+					{Benchmark.RoundTrips}
+				</span>
+				<span class="border border-raw-blood bg-raw-blood px-1.5 py-0.5 font-black text-bone-white">
+					{Study.Sessions} SESSIONS AUDITED
+				</span>
+			</div>
+		</div>
+
 		<PageHeader
 			Tape="BENCHMARKS // MEASURED FIGURES"
 			Title="Benchmarks"
@@ -679,119 +897,150 @@ const RegisterRows = Figures.map(({ Id, Kind, Value, Unit, Scope, Method }) => (
 			<h2 id="overhead" class="mt-3 max-w-4xl type-section text-bone-white">
 				What overhead does it add?
 			</h2>
-			<p class="mt-6 max-w-3xl type-body text-bone-newsprint">
-				Timing is reported on a different axis on purpose. A ratio says how much is
-				replaced; it says nothing about what the replacement costs to produce, and a reader
-				deciding whether to put a proxy in front of their client needs the second number
-				more than the first.
-			</p>
-
-			<!-- THE ROUND-TRIP: the pillar a reader weighing the proxy actually needs,
-			     so it takes the full width and the canary accent. -->
-			<div class="mt-12">
-				<article
-					class="grunge shell-card flex flex-col p-6 sm:p-8"
-					style={`border-left: 4px solid var(${AccentInk[Latency.Accent]})`}
-					data-grunge
-				>
-					<ZineTape Variant="corner" Label={Latency.Tape} Color={Latency.TapeColor} />
-					<div class="section-kicker">{Latency.Caption}</div>
-					<div class="mt-3 font-headline text-3xl font-black tracking-tighter text-bone-white">
-						{LatencyFact.Value}
+			{/* THE CHAPTER HEADER: the question on the left, the band that qualifies
+			    every session figure on the page on the right - the arrangement
+			    Stitch uses for `CONFIDENCE INTERVAL: 99.4%`. Ours names what the
+			    band is a band OF, because this chapter's figures are timings and
+			    the band is a saving: a reader who read it as a timing interval
+			    would be reading a different claim. */}
+			<div
+				class="mt-6 flex flex-col gap-6 border-b border-oxblood-dark pb-4 sm:flex-row sm:items-end sm:justify-between"
+			>
+				<p class="max-w-3xl type-body text-bone-newsprint">
+					Timing is reported on a different axis on purpose. A ratio says how much is
+					replaced; it says nothing about what the replacement costs to produce, and a
+					reader deciding whether to put a proxy in front of their client needs the
+					second number more than the first.
+				</p>
+				<div class="shrink-0 sm:text-right">
+					<div class="type-meta font-black uppercase text-zinc-dust">
+						CONFIDENCE BAND // SESSION SAVING
 					</div>
-					<div class="mt-2 type-body text-zinc-dust">
-						<span class="type-meta">{LatencyFact.Unit}</span> &bull; {LatencyFact.Scope}
+					<div class="mt-1 font-mono text-2xl font-black tracking-tight text-stamped-canary">
+						{Study.Band}
 					</div>
-					<div class="mt-4 prose-flow">
-						{Latency.Body.map((Sentence) => (
-							<p class="type-body text-bone-newsprint">{Sentence}</p>
-						))}
+					<div class="mt-1 type-meta uppercase text-zinc-dust">
+						{Study.CharsPerTok} chars/token
 					</div>
-					<div class="mt-auto pt-6 type-meta text-zinc-dust">{Latency.Src}</div>
-				</article>
+				</div>
 			</div>
 
-			<!-- THE FLOOR AND THE STEP: the two costs too small to see on a millisecond
-			     axis, which is exactly why they are stated. One card each, both teal,
-			     because both belong to the classification stage. -->
-			<div class="mt-16">
-				<div class="section-kicker">TWO COSTS TOO SMALL FOR THE SAME AXIS</div>
-				<div class="mt-6 grid grid-cols-1 gap-10 sm:grid-cols-2">
-					{[
-						{ Pillar: Classification, Fact: ClassificationFact },
-						{ Pillar: CompressStep, Fact: CompressStepFact },
-					].map(({ Pillar, Fact }) => (
-						<article
-							class="grunge shell-card flex flex-col p-6 sm:p-8"
-							style={`border-left: 4px solid var(${AccentInk[Pillar.Accent]})`}
-							data-grunge
-						>
-							<ZineTape
-								Variant="corner"
-								Label={Pillar.Tape}
-								Color={Pillar.TapeColor}
-							/>
-							<div class="section-kicker">{Pillar.Caption}</div>
-							<div class="mt-3 font-headline text-3xl font-black tracking-tighter text-bone-white">
+			{/* THE FOUR PILLARS. Stitch's four-up bento row, adopted as the
+			    arrangement: one card per cost, each opening on a short accent bar
+			    with its coordinate on the left and its name on the right, the
+			    figure beneath, then the scope and the SRC line that contain it.
+			    The bar carries the pillar's identity colour; the NAME stays in
+			    bone because `--raw-blood` as text measures 2.23:1 - colour is
+			    never dropped here, only moved to the fill where it is legible. */}
+			<div class="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+				{Pillars.map(({ Pillar, Fact }, Index) => (
+					<article class="grunge shell-card flex flex-col" data-grunge>
+						<div class={`h-1 w-12 ${AccentBar[Pillar.Accent]}`} aria-hidden="true" />
+						<div class="flex grow flex-col p-5 sm:p-6">
+							<div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+								<span class="section-index">{`PILLAR_0${Index + 1}`}</span>
+								<span class="type-meta font-black uppercase text-bone-white">
+									{Pillar.Tape}
+								</span>
+							</div>
+							<div
+								class={`mt-4 font-mono text-2xl font-black leading-tight tracking-tight tabular-nums ${AccentText[Pillar.Accent]}`}
+							>
 								{Fact.Value}
 							</div>
-							<div class="mt-2 type-body text-zinc-dust">
-								<span class="type-meta">{Fact.Unit}</span> &bull; {Fact.Scope}
+							<div class="mt-2">
+								<span class="type-meta uppercase text-zinc-dust">{Fact.Unit}</span>
+								<div class="mt-1 type-body text-zinc-dust">{Fact.Scope}</div>
 							</div>
-							<div class="mt-4 prose-flow">
-								{Pillar.Body.map((Sentence) => (
-									<p class="type-body text-bone-newsprint">{Sentence}</p>
-								))}
+							<div class="mt-3 type-meta font-black uppercase text-bone-newsprint">
+								{Pillar.Caption}
 							</div>
-							<div class="mt-auto pt-6 type-meta text-zinc-dust">{Pillar.Src}</div>
-						</article>
-					))}
-				</div>
+							{Pillar.Body.length === 0 ? null : (
+								<div class="prose-flow mt-3">
+									{Pillar.Body.map((Sentence) => (
+										<p class="type-body text-bone-newsprint">{Sentence}</p>
+									))}
+								</div>
+							)}
+							<div class="mt-auto pt-5 type-meta text-zinc-dust">
+								{Fact.Kind.toUpperCase()} &bull; {Pillar.Src}
+							</div>
+						</div>
+					</article>
+				))}
 			</div>
 
-			<!-- WHAT THE OVERHEAD BUYS: the round-trip is not a fee for nothing. Two
-			     records, then the prose that ties the three timed figures together. -->
-			<div class="mt-16">
-				<div class="section-kicker">WHAT THE OVERHEAD BUYS</div>
-				<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
-					{[
-						{ Id: "benchmark.round-trips", Label: "ROUND TRIPS" },
-						{ Id: "narrative.marker-tokens", Label: "THE REPLACEMENT ITSELF" },
-					].map(({ Id, Label }) => {
-						const Fact = Figure(Id);
+			{/* THE COST AXIS: ONE STRIP, NOT THREE CARDS. The three timed costs
+			    share a single logarithmic nanosecond axis, so the two that are too
+			    small to see beside the round-trip are drawn where they actually
+			    sit - six decades to its left - instead of being asserted in a
+			    sentence. Bands are positioned by the generator's decade
+			    arithmetic, never by a hand-set percentage. */}
+			<div class="mt-14">
+				<div class="flex flex-wrap items-center gap-3 border-b border-oxblood-dark pb-2">
+					<span class="section-index">TWO COSTS TOO SMALL FOR THE SAME AXIS</span>
+					<span class="h-0 grow border-t border-dashed border-oxblood-dark"></span>
+					<span class="telemetry-tag">LOG SCALE // NANOSECONDS</span>
+				</div>
 
-						return (
-							<article class="grunge shell-card flex flex-col p-6" data-grunge>
-								<div class="type-meta font-bold text-zinc-dust">
-									{Label} &bull; {Fact.Kind.toUpperCase()}
-								</div>
-								<div class="mt-3 font-headline text-xl font-black tracking-tight text-bone-white">
-									{Fact.Value}
-								</div>
-								<div class="mt-2 type-body text-zinc-dust">
-									<span class="type-meta">{Fact.Unit}</span> &bull; {Fact.Scope}
-								</div>
-							</article>
-						);
-					})}
+				<div class="mt-6 space-y-4">
+					{AxisLanes.map(({ Label, Note, Value, Ink, Text, From, To, Mark }) => (
+						<div class="flex flex-col gap-1 md:flex-row md:items-center md:gap-4">
+							<div class="md:w-56 md:shrink-0">
+								<div class="type-meta font-black uppercase text-bone-white">{Label}</div>
+								<div class="type-meta uppercase text-zinc-dust">{Note}</div>
+							</div>
+							<div class="relative h-5 w-full overflow-hidden border border-oxblood-dark bg-soot-black md:grow">
+								{From === To ? (
+									<div class="absolute inset-y-0 w-0.5" style={`left: ${From}%;`}>
+										<div class={`h-full w-full ${Ink}`} />
+									</div>
+								) : (
+									<div
+										class={`absolute inset-y-0 ${Ink}`}
+										style={`left: ${From}%; width: ${To - From}%;`}
+									/>
+								)}
+								{Mark === undefined ? null : (
+									<div
+										class="absolute inset-y-0 w-0.5 bg-carbon-void"
+										style={`left: ${Mark}%;`}
+										aria-hidden="true"
+									/>
+								)}
+							</div>
+							<div class={`type-meta font-black uppercase md:w-28 md:shrink-0 md:text-right ${Text}`}>
+								{Value}
+							</div>
+						</div>
+					))}
 				</div>
-				<div class="prose-flow mt-8 max-w-3xl">
-					<p class="type-body text-bone-newsprint">
-						Classification is {Benchmark.Classify} and is timed on its own because it
-						runs on every call.
-					</p>
-					<p class="type-body text-bone-newsprint">
-						The whole compress step is {Narrative.CompressStep}.
-					</p>
-					<p class="type-body text-bone-newsprint">
-						{Benchmark.Latency} is what a client waits once the HTTP round-trip is
-						included.
-					</p>
-					<p class="type-body text-bone-newsprint">
-						And the {Benchmark.LatencyHeadline} headline sits near the fast end of that
-						band.
-					</p>
+
+				{/* THE DECADE TICKS. The two spacers are the lane's own label and
+				    value columns, so a tick sits under the nanosecond it names. */}
+				<div class="mt-2 flex gap-4">
+					<div class="hidden md:block md:w-56 md:shrink-0"></div>
+					<div class="relative h-9 grow">
+						{AxisTicks.map(({ Label, Left }, Index) => (
+							<div
+								class={Index === 0 ? "absolute top-0" : "absolute top-0 -translate-x-1/2"}
+								style={`left: ${Left}%`}
+							>
+								<div class="h-2 w-px bg-zinc-dust" />
+								<div class="mt-1 whitespace-nowrap type-meta text-zinc-dust">{Label}</div>
+							</div>
+						))}
+					</div>
+					<div class="hidden md:block md:w-28 md:shrink-0"></div>
 				</div>
+
+				<p class="mt-8 max-w-3xl type-body text-bone-newsprint">
+					{Benchmark.Latency} is what a client waits once the HTTP round-trip is included,
+					and the {Benchmark.LatencyHeadline} headline sits near the fast end of that band.
+					Classification is {Benchmark.Classify} and is timed on its own because it runs on
+					every call. The whole compress step is {Narrative.CompressStep}, so its lane marks a
+					ceiling rather than a range.
+				</p>
 			</div>
 
 			<ZineSource

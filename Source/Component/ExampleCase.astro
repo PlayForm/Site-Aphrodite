@@ -1,4 +1,6 @@
 ---
+import "@Stylesheet/Component/Data.scss";
+
 /**
  * ExampleCase - ONE worked scenario, in the one shape every scenario takes.
  *
@@ -207,13 +209,13 @@ const OutcomeChip = {
 								{OutcomeCopy[Outcome].Original}
 							</ZineKicker>
 							{Stages.map((Stage, Index) => (
-								<div class="flex min-w-0 flex-col">
+								<div class="example__pod">
 									{/* A NUMBERED BAND: the coordinate and the stage's own name sit
 									    in the pod's header ribbon, and the stream is the channel
 									    beneath it. The number keeps its crimson chip and the label
 									    its canary ink - those two accents ARE the stage's identity,
 									    so the arrangement moves and the mapping does not. */}
-									<div class="flex flex-wrap items-baseline gap-3 border border-oxblood-dark border-b-0 bg-asphalt-panel px-3 py-1.5">
+									<div class="example__stage">
 										<span class="telemetry-tag telemetry-tag--crimson tabular-nums">
 											{String(Index + 1).padStart(2, "0")}
 										</span>
@@ -223,7 +225,7 @@ const OutcomeChip = {
 										    cut the label off mid-word at 390px. `min-w-0` lets the item
 										    take the row's width and `break-words` breaks the token only
 										    because it cannot fit; the label's own words never split. */}
-										<span class="min-w-0 break-words font-mono text-base font-black uppercase tracking-widest text-stamped-canary">
+										<span class="example__stagename">
 											{Stage.Label}
 										</span>
 									</div>
@@ -254,8 +256,8 @@ const OutcomeChip = {
 						{/* POD A - THE ORIGINAL OUTPUT: the pod's header ribbon carries the
 						    pane's name and the excerpt's own extent, and the stream is the
 						    channel beneath it. */}
-						<div class="flex min-w-0 flex-col">
-							<div class="flex flex-wrap items-baseline justify-between gap-x-3 border border-oxblood-dark border-b-0 bg-asphalt-panel px-3 py-1.5">
+						<div class="example__pod">
+							<div class="example__ribbon">
 								<ZineKicker As="p" Tone="dust">
 									{OutcomeCopy[Outcome].Original}
 								</ZineKicker>
@@ -274,8 +276,8 @@ const OutcomeChip = {
 						{/* POD B - WHAT THE AGENT SEES: the same ribbon shape as pod A, so
 						    the pair reads as two pods of one band rather than as two
 						    columns that happen to sit next to each other. */}
-						<div class="flex min-w-0 flex-col">
-							<div class="flex flex-wrap items-baseline justify-between gap-x-3 border border-oxblood-dark border-b-0 bg-asphalt-panel px-3 py-1.5">
+						<div class="example__pod">
+							<div class="example__ribbon">
 								<ZineKicker As="p" Tone="dust">
 									{OutcomeCopy[Outcome].Result}
 								</ZineKicker>
@@ -470,8 +472,8 @@ const OutcomeChip = {
 			<div class="mt-6 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-8">
 				<!-- POD A // THE CLAIM: the left prose, framed as a pod so the band
 				     reads as two pods rather than as a paragraph beside a stack. -->
-				<div class="flex min-w-0 flex-col">
-					<div class="flex flex-wrap items-baseline justify-between gap-x-3 border border-oxblood-dark border-b-0 bg-asphalt-panel px-3 py-1.5">
+				<div class="example__pod">
+					<div class="example__ribbon">
 						<ZineKicker As="p" Tone="dust">THE CLAIM</ZineKicker>
 						<span class="telemetry-tag shrink-0">
 							{Claim.length} {Claim.length === 1 ? "PARAGRAPH" : "PARAGRAPHS"}
@@ -503,8 +505,8 @@ const OutcomeChip = {
 				     ribbon carries the label it always carried; the pane beneath it is
 				     the channel the pod holds. -->
 				<div class="flex flex-col gap-8">
-					<div class="flex min-w-0 flex-col">
-						<div class="flex flex-wrap items-baseline justify-between gap-x-3 border border-oxblood-dark border-b-0 bg-asphalt-panel px-3 py-1.5">
+					<div class="example__pod">
+						<div class="example__ribbon">
 							<ZineKicker As="h3" Tone="dust">
 								THE COMMAND
 							</ZineKicker>
@@ -513,8 +515,8 @@ const OutcomeChip = {
 							<CodeFence Code={Command.Code} Lang={Command.Lang} Copy />
 						</div>
 					</div>
-					<div class="flex min-w-0 flex-col">
-						<div class="flex flex-wrap items-baseline justify-between gap-x-3 border border-oxblood-dark border-b-0 bg-asphalt-panel px-3 py-1.5">
+					<div class="example__pod">
+						<div class="example__ribbon">
 							<ZineKicker As="h3" Tone="dust">
 								THE OUTPUT
 							</ZineKicker>
@@ -524,8 +526,8 @@ const OutcomeChip = {
 						</div>
 						<ZineStream Lines={Output} Stream={Stream} />
 					</div>
-					<div class="flex min-w-0 flex-col">
-						<div class="flex flex-wrap items-baseline justify-between gap-x-3 border border-oxblood-dark border-b-0 bg-asphalt-panel px-3 py-1.5">
+					<div class="example__pod">
+						<div class="example__ribbon">
 							<ZineKicker As="h3" Tone="dust">
 								THE MARKER
 							</ZineKicker>
