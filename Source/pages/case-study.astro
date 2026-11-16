@@ -666,7 +666,7 @@ const TokenGroups = Study.TokensSaved.split(",");
 				</p>
 			</ZineBox>
 			<figure
-				class="mt-24 border border-oxblood-dark bg-asphalt-panel p-4"
+				class="well mt-24 p-4 sm:p-5"
 				data-diagram="preview-flow"
 				data-enter="220"
 			>
@@ -724,17 +724,47 @@ const TokenGroups = Study.TokensSaved.split(",");
 				<p class="mt-6 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Hash, type, size - in that order, on purpose.
 				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The <strong class="text-bone-white">hash</strong> is the full 40-char BLAKE3
-					digest, the address of the stored original.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The <strong class="text-bone-white">type</strong> tells the agent what kind
-					of thing it skipped.
-				</p>
-				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
-					The <strong class="text-bone-white">size</strong> tells it how much.
-				</p>
+				{/* THE THREE FIELDS, as a ruled row: one column per field, divided by
+				    the drawing's own hairlines. Each field's name moves from the head
+				    of its sentence to the column head, where it names the column - the
+				    facts stay ("full 40-char BLAKE3 digest", "the address of the stored
+				    original", "what kind of thing it skipped", "how much") and only the
+				    repeated subject "The <hash|type|size> is" leaves the prose. */}
+				<div class="mt-8 grid grid-cols-1 divide-y divide-oxblood-dark border-y border-oxblood-dark sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+					<div class="py-5 sm:px-6 sm:first:pl-0 sm:last:pr-0">
+						<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+							<span class="section-index !text-weathered-teal">01</span>
+							<strong class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+								HASH
+							</strong>
+						</div>
+						<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
+							The full 40-char BLAKE3 digest - the address of the stored original.
+						</p>
+					</div>
+					<div class="py-5 sm:px-6 sm:first:pl-0 sm:last:pr-0">
+						<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+							<span class="section-index !text-weathered-teal">02</span>
+							<strong class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+								TYPE
+							</strong>
+						</div>
+						<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
+							Tells the agent what kind of thing it skipped.
+						</p>
+					</div>
+					<div class="py-5 sm:px-6 sm:first:pl-0 sm:last:pr-0">
+						<div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+							<span class="section-index !text-weathered-teal">03</span>
+							<strong class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+								SIZE
+							</strong>
+						</div>
+						<p class="mt-4 font-body text-base leading-relaxed text-bone-newsprint">
+							Tells it how much.
+						</p>
+					</div>
+				</div>
 				<p class="mt-3 max-w-3xl font-body text-base leading-relaxed text-bone-newsprint">
 					Three fields are all an agent needs to decide whether retrieval is worth it
 					- which is exactly why the marker, not a tool call, is the contract: every
@@ -784,10 +814,10 @@ const TokenGroups = Study.TokensSaved.split(",");
 					data-enter="200"
 				>
 					{
-						Layers.map(({ N, Name, Figure, Tone, Note }) => (
-							<div class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-6 pt-9 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.2deg] sm:hover:rotate-0">
-								<ZineTape Label={`LAYER // ${N}`} Color={Tone} Side="left" />
-								<div class="font-headline text-2xl font-black tracking-tight text-bone-white">
+						LayerCards.map(({ N, Name, Figure, Ink, Note }) => (
+							<div class="zine-box-subtle relative border-[3px] border-oxblood-dark bg-carbon-void p-6 transition-transform duration-200 hover:rotate-0 sm:-rotate-[1.2deg] sm:hover:rotate-0">
+								<p class:list={["section-index", Ink]}>LAYER // {N}</p>
+								<div class="mt-4 font-headline text-2xl font-black tracking-tight text-bone-white">
 									{Figure}
 								</div>
 								<ZineKicker Tone="canary" As="div">
@@ -877,32 +907,37 @@ const TokenGroups = Study.TokensSaved.split(",");
 							the study.
 						</p>
 					</div>
-					<!-- THRESHOLD TIERS: the multiplier each content type carries. -->
+					<!-- THRESHOLD TIERS: the multiplier each content type carries. One
+					     frame, five ruled rows - the decision matrix reading. Each row
+					     used to carry its own border and fill, which made five separate
+					     cards out of one table and repeated the same frame five times. -->
 					<div class="flex flex-col gap-6">
 						<ZineKicker Tone="dust">THRESHOLD TIERS</ZineKicker>
-						{
-							Tiers.map(({ Tier, Types, Multiplier, Note }) => (
-								<div class="flex items-center justify-between gap-8 border border-oxblood-dark bg-asphalt-panel px-4 py-3">
-									<div class="min-w-0">
-										<div class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
-											{Tier}
-											<span class="ml-2 text-stamped-canary">{Multiplier}</span>
+						<div class="shell-card">
+							{
+								Tiers.map(({ Tier, Types, Multiplier, Note }) => (
+									<div class="flex items-center justify-between gap-8 border-b border-oxblood-dark px-4 py-3 last:border-b-0">
+										<div class="min-w-0">
+											<div class="font-mono text-base font-black uppercase tracking-widest text-bone-white">
+												{Tier}
+												<span class="ml-2 text-stamped-canary">{Multiplier}</span>
+											</div>
+											<div class="truncate font-mono text-base text-zinc-dust">{Types}</div>
 										</div>
-										<div class="truncate font-mono text-base text-zinc-dust">{Types}</div>
+										{/* The note column must be allowed to shrink. `shrink-0` kept it
+										    at its max-content width (634px) inside a 549px row, so it
+										    painted 136px past the panel and the `truncate` column
+										    beside it collapsed to zero width - the type list for that
+										    tier rendered as nothing at all, with no ellipsis to show
+										    it had been cut. min-w-0 + the default shrink lets the note
+										    wrap onto its own second line instead. */}
+										<div class="hidden min-w-0 text-right font-mono text-base text-weathered-teal sm:block">
+											{Note}
+										</div>
 									</div>
-									{/* The note column must be allowed to shrink. `shrink-0` kept it
-									    at its max-content width (634px) inside a 549px row, so it
-									    painted 136px past the panel and the `truncate` column
-									    beside it collapsed to zero width - the type list for that
-									    tier rendered as nothing at all, with no ellipsis to show
-									    it had been cut. min-w-0 + the default shrink lets the note
-									    wrap onto its own second line instead. */}
-									<div class="hidden min-w-0 text-right font-mono text-base text-weathered-teal sm:block">
-										{Note}
-									</div>
-								</div>
-							))
-						}
+								))
+							}
+						</div>
 						<div class="font-mono text-base leading-relaxed text-zinc-dust">
 							HIGHER MULTIPLIER = LONGER THE CONTENT STAYS VISIBLE BEFORE COMPRESSION
 						</div>
