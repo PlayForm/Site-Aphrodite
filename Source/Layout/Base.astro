@@ -483,6 +483,9 @@ interface Props {
 			COPIED TO SPOOL
 		</div>
 		<script>
+			// The grunge painter is a CLIENT module: a frontmatter import lives on
+			// the server and is invisible here, so it is imported in this block.
+			import { PaintGrunge } from "@Script/Grunge";
 			// ONE MOUNT CONTRACT for the page's interactive runtimes.
 			//
 			// Every binder runs once now and again on every astro:page-load, and
@@ -602,6 +605,7 @@ interface Props {
 					() => BindCopy(signal),
 					() => BindNav(signal),
 					Mount,
+					PaintGrunge,
 				];
 
 				for (const Bind of Binders) {

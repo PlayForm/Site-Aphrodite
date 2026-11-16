@@ -205,9 +205,11 @@
 	content: "";
 	position: absolute;
 	inset: var(--grunge-inset, -7% -11% -9% -8%);
-	background: var(--grunge-ink, rgba(147, 17, 40, 0.55));
-	-webkit-mask-image: var(--grunge-mask);
-	mask-image: var(--grunge-mask);
+	/* ONE grey ink for the whole family; the per-layer weight lives in the
+	   drawing's fill-opacity, not in a second colour. */
+	background: var(--grunge-ink, rgba(158, 158, 165, 0.55));
+	-webkit-mask-image: var(--grunge-mask, url("/Brand/Splat/group-01.svg"));
+	mask-image: var(--grunge-mask, url("/Brand/Splat/group-01.svg"));
 	-webkit-mask-size: 100% 100%;
 	mask-size: 100% 100%;
 	-webkit-mask-repeat: no-repeat;
