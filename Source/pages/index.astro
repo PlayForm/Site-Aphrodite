@@ -478,14 +478,27 @@ const GridFold = `
 			     red rule that used to sit under it was the beat's fourth device
 			     (card, wordmark, rule, chip), and a 2px bar cannot add emphasis
 			     to a 144px word - it only spends the section's budget. Its 56px
-			     of vertical space is kept as spacing, so nothing else moves. -->
+			     of vertical space is kept as spacing, so nothing else moves.
+
+			     The oxblood drop-shadow that used to sit under these letters is
+			     gone for the same reason, and it was the LAST duplicate: the
+			     card above already carries an oxblood offset plane
+			     (`bg-oxblood-dark` at translate 12/12) plus its own hard shadow,
+			     so a third oxblood offset under the wordmark was the same device
+			     spent twice in one section - measured: the hero carried
+			     rotate(-2.5deg) + translate(12,12) plane + 6px hard shadow +
+			     rotated tape + stamp chip + a 4px oxblood drop-shadow on the
+			     144px word. The wordmark's identity is the NAME at scale in bone
+			     white, which no shadow was ever carrying; the offset plane
+			     belongs to the card alone now. Verified in the rendered page:
+			     the hero's only remaining offset planes are the card's. -->
 			<div class="relative flex flex-col items-center">
 				<!-- The wordmark clamps at the small breakpoints: at 320px the
-				     fixed 72px measures ~346px wide and clips both edges against
-				     the overflow-x-hidden body; 17.5vw keeps the full name inside
-				     the viewport until the fixed scale resumes above ~412px. -->
+				fixed 72px measures ~346px wide and clips both edges against
+				the overflow-x-hidden body; 17.5vw keeps the full name inside
+				the viewport until the fixed scale resumes above ~412px. -->
 				<h1
-					class="select-none font-headline text-[min(72px,17.5vw)] font-black uppercase leading-[0.85] tracking-tighter text-bone-white drop-shadow-[4px_4px_0px_#520612] sm:text-[108px] lg:text-[144px]"
+					class="select-none font-headline text-[min(72px,17.5vw)] font-black uppercase leading-[0.85] tracking-tighter text-bone-white sm:text-[108px] lg:text-[144px]"
 				>
 					Aphrodite
 				</h1>
@@ -763,12 +776,27 @@ const GridFold = `
 			<!-- BENTO, ONE DOMINANT + THREE SUPPORTING: the ceiling is the page's
 			     headline figure, so it takes 1.5fr of a weighted track set while
 			     the other three take 1fr each - a two-size cluster instead of a
-			     row of four equals. ONE ACCENT PER CLUSTER: all four chips are
-			     raw blood, because they are four measurements of one study and
-			     colour is not what separates them - the qualifier under each one
-			     is. Amber stays stage 02's identity, and teal means retrieval;
-			     nothing in this band retrieves. No shadow and no tilt: the giant
-			     numeral above is the band's one expressive assembly. -->
+			     row of four equals.
+
+			     FOUR ACCENTS, AND THEY ARE IDENTITY, NOT DECORATION. These four
+			     badges are four measurements in four different domains: the
+			     ceiling is one corpus, the overall is the whole standard corpus,
+			     the latency is the engine's own overhead, the saved total is the
+			     session study. Their colours are the only cue saying the numbers
+			     are not comparable, so each keeps its own surface and ink:
+
+			       610x COMPRESSION      raw blood on bone white
+			       132x OVERALL          carbon void, weathered teal ink
+			       ~10MS E2E OVERHEAD    raw blood on bone white
+			       156M+ TOKENS SAVED    stamped canary on soot black
+
+			     "One accent per cluster" governs DECORATION - tape, rules,
+			     shadows, chips that carry no meaning. It does not apply where
+			     colour IS the distinction: flattening these four to one accent
+			     was tried and the owner's verdict was that they "lost their
+			     visual identity". Same carve-out as the four stage cards.
+			     Emphasis is still the quiet tier: no shadow, no tilt, because
+			     the giant numeral above is the band's one expressive assembly. -->
 			<div
 				class="mt-8 grid max-w-5xl grid-cols-1 items-start justify-items-center gap-4 sm:grid-cols-2 xl:grid-cols-[1.5fr_1fr_1fr_1fr]"
 				data-enter="260"
@@ -1004,44 +1032,26 @@ hermes`}
 </Base>
 
 <style>
-	/* ONE GUTTER FOR EVERY BAND. The shell (`PageShell`) insets its `<main>` by
-	   `px-5 sm:px-8 lg:px-14`; a band that wants its own breathing room used to
-	   add a second padding on top of it, so the evidence spread's text started
-	   at 112px while the other five bands started at 56 - measured at 1440:
-	   section 02/03/05/06 first text x=56, section 04 first text x=112, its
-	   right edge 56px short of the column. Every band now reads the SAME value,
-	   so all six share one gutter and the page's left edge is one line from the
-	   hero to the colophon.
+	/* ONE GUTTER FOR EVERY BAND - AND IT IS THE SHELL'S OWN.
+	   `PageShell` insets `<main>` by `px-5 sm:px-8 lg:px-14` (20 / 32 / 56px),
+	   and every band on the page is a `w-full` child of that `<main>`, so the
+	   bands already share one left edge with no padding of their own. The
+	   defect the phase-2 review measured (sections 02/03/05/06 flush at the
+	   band edge while the evidence spread was inset) came from the one band
+	   that ADDED padding, not from the five that had none.
 
-	   The value is the shell's own padding scale, restated here because a band
-	   cannot inherit a Tailwind utility from its parent. It is page-scoped: the
-	   sixteen other routes keep their own composition, and no shared component
-	   gained a margin. */
-	:global(:root) {
-		--band-gutter: 1.25rem;
-	}
+	   The first fix applied that extra padding to every band instead, which
+	   aligned the six bands with each other and moved the whole page 56px
+	   right of every other route: measured at 1440, `/setup/`, `/showcase/`
+	   and `/docs/` put their first glyph at x=56 while `/` put it at x=112,
+	   so navigating between routes shifted the page sideways. Two nested
+	   paddings that happen to sum to a constant is not one gutter; the shared
+	   edge is the shell's, applied once. Verified at 1440: all six bands plus
+	   the related nav and the colophon report textX=56, inset=0.
 
-	@media (min-width: 40rem) {
-		:global(:root) {
-			--band-gutter: 2rem;
-		}
-	}
-
-	@media (min-width: 64rem) {
-		:global(:root) {
-			--band-gutter: 3.5rem;
-		}
-	}
-
-	/* `nav` and `p` are here because Related and the colophon are direct
-	   children of `<main>` too: aligning the six bands and leaving the page's
-	   last two elements on the old edge would trade one break for another. */
-	:global(main > header),
-	:global(main > section),
-	:global(main > nav),
-	:global(main > p) {
-		padding-inline: var(--band-gutter);
-	}
+	   Nothing is page-scoped any more, so nothing can drift: a band that
+	   wants air uses margin on its own plate (`mx-3` on the stage plate
+	   exists for the tilt's bounding box, not for a gutter). */
 
 	/* One measure for every prose line on the page. Per-container classes were
 	   not enough: the install panel is 896px wide, so its paragraphs measured
