@@ -467,7 +467,7 @@ const Decision = [
 		     ship two h1s and shrink the wordmark from 144px to 48px. The lead below
 		     keeps PageHeader's rhythm - one sentence, one <p>. -->
 		<header
-			class="relative flex w-full flex-col items-start justify-start pt-4 text-start"
+			class="blueprint-section relative flex w-full flex-col items-start justify-start pt-4 text-start"
 			data-enter
 		>
 			<!-- Beat 01. The folio, in the published blueprint voice: six of these
@@ -727,9 +727,7 @@ const Decision = [
 							<h3 class="type-meta font-bold stage-ink">03 // BLAKE3 STORE</h3>
 							<span class="type-meta stage-ink">STAGE // C</span>
 						</div>
-						<div class="mt-4 mb-4 font-headline text-sub font-black tracking-tight text-bone-white">
-							SQLite
-						</div>
+						<div class="metric mt-4 mb-4">SQLite</div>
 						<div class="stage-rule mt-auto border-t pt-3">
 							<p class="type-body ccr-marker text-bone-newsprint">
 								CCR marker: &lt;&lt;&lt;CCR:hash|type|size&gt;&gt;&gt;
@@ -745,10 +743,8 @@ const Decision = [
 							<h3 class="type-meta font-bold stage-ink">04 // AGENT DECIDES</h3>
 							<span class="type-meta stage-ink">STAGE // D</span>
 						</div>
-						<div class="mt-4 mb-4 font-mono text-sub font-bold tracking-tight text-bone-white">
-							aphrodite_
-							<wbr />
-							retrieve
+						<div class="metric mt-4 mb-4">
+							aphrodite_<wbr />retrieve
 						</div>
 						<div class="stage-rule mt-auto border-t pt-3">
 							<p class="type-body text-bone-newsprint">
@@ -1229,8 +1225,20 @@ hermes`}
 		background: color-mix(in srgb, var(--stage-accent) var(--stage-tint), var(--carbon-void));
 		border-width: 1px;
 		border-color: color-mix(in srgb, var(--stage-accent) 30%, var(--oxblood-dark));
-		border-left-width: 3px;
+		border-left-width: 2px;
 		border-left-color: var(--stage-accent);
+	}
+
+	/* FOUR METRICS IN ONE ROW. The published `.metric` is one figure per section;
+	   the stage row deliberately spends four, because these four figures are one
+	   comparison and not four monuments. So the cap lives on the CARD, not on the
+	   class: at the published clamp a card of ~212px would print
+	   `aphrodite_retrieve` wider than its own plate, and the figure the reader is
+	   meant to compare would be the one that broke the row. The `<wbr>` in stage
+	   04 keeps the identifier breakable at its own seam. */
+	.stage-card .metric {
+		font-size: clamp(1.375rem, 2.2vw, 2rem);
+		letter-spacing: -0.02em;
 	}
 
 	.emphasis-quiet.stage-card--a {

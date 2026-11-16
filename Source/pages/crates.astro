@@ -183,9 +183,9 @@ const Chain = [
 
 		<!-- 02 // CASES - one shell card per crate, ribbon first -->
 		<section class="blueprint-section relative w-full" data-reveal>
-			<p class="section-index">02 // CASES // ONE CARD PER CRATE</p>
+			<p class="section-index">02 // CASES // THE MANIFEST, CRATE BY CRATE</p>
 			<h2 id="cases" class="mt-3 scroll-mt-24 type-section text-bone-white">
-				Each crate, one card
+				Each crate in full
 			</h2>
 			<p class="mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
 				Each name declares itself once, in its own manifest: the version is that file's
@@ -282,7 +282,7 @@ const Chain = [
 
 		<!-- 03 // DEPENDENCY - the whole story in one wide card -->
 		<section class="blueprint-section relative w-full" data-reveal>
-			<p class="section-index">03 // DEPENDENCY // ONE CHAIN, THREE LINKS</p>
+			<p class="section-index">03 // DEPENDENCY // ONE CHAIN, {Chain.length} LINKS</p>
 			<h2 id="dependency" class="mt-3 scroll-mt-24 type-section text-bone-white">
 				Who pulls whom
 			</h2>
@@ -339,8 +339,9 @@ const Chain = [
 					vendored core carries the content transforms and nothing else, the proxy adds
 					the preview pipeline, the CCR store, the tool relay and the dual-proxy
 					architecture around it, and Hermes adds the tool schemas, the hook dispatch and
-					the skill registration on top of the proxy. Each layer is installable on its
-					own, and the boundary between them is a manifest line rather than a convention.
+					the skill registration on top of the proxy. Each layer stays installable,
+					testable and replaceable on its own, and the boundary between them is a
+					manifest line rather than a convention.
 				</p>
 			</ZineBox>
 		</section>
@@ -354,8 +355,8 @@ const Chain = [
 			<p class="mt-6 max-w-[46rem] font-body text-body leading-relaxed text-bone-newsprint">
 				One TOML file is read by both halves of the pair: the proxy takes its listeners and
 				its flow budget from it, the dylib takes the compression thresholds and the
-				previews. These are the keys the shipped example carries, grouped the way the file
-				groups them, and the values are the example's own.
+				previews. The shipped example carries the keys grouped the way the file groups
+				them, and every value is the example's own default rather than a recommendation.
 			</p>
 
 			<div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
