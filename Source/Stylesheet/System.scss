@@ -21,10 +21,14 @@
    partial directly: a partial that nothing reaches is not extracted, it is
    deleted (see the "never strand a rule" note in .hermes/tmp/stitch/BRIDGE.md).
 
-   `@import` rather than `@use` is deliberate: these partials were written
-   against one global scope and reference each other's variables directly.
-   Migrating them to namespaced `@use` is a later, mechanical pass - doing it now
-   would mean rewriting every variable reference in nine files at once.
+   `@use` rather than `@import`. The partials were written against one global
+   scope, so every call site still reads the same: a partial that borrows a
+   mixin declares `@use "mixins" as *` itself (`Component/*` reaches it as
+   `"../mixins"`), which is the only cross-file dependency the layer has - the
+   tokens are CSS custom properties, not Sass variables, so nothing else is
+   shared through the module system. Dart Sass loads each module once, so the
+   order below is still the emitted order and every `:root` block still lands
+   where it did under `@import`.
 
    THE COMPONENT SIDE IS A SEPARATE CONTRACT. This file answers "where does this
    RULE live". `Documentation/DesignSystem.md` answers "which PRIMITIVE is this
@@ -36,13 +40,13 @@
    component, never a second copy of the markup.
    ============================================================================ */
 
-@import "contract";
-@import "tokens";
-@import "mixins";
-@import "base";
-@import "Component/Plate";
-@import "Component/Texture";
-@import "Component/Console";
-@import "Component/Data";
-@import "Component/Chrome";
-@import "utilities";
+@use "contract";
+@use "tokens";
+@use "mixins";
+@use "base";
+@use "Component/Plate";
+@use "Component/Texture";
+@use "Component/Console";
+@use "Component/Data";
+@use "Component/Chrome";
+@use "utilities";

@@ -248,7 +248,9 @@ interface Props {
 		     token said 3.5rem and the bar rendered 60px (a 34px MENU button
 		     inside `py-3` plus the 2px rule), which put the index's first 4px
 		     behind the header. -->
-		<header class="sticky top-0 z-40 w-full border-b-2 border-oxblood-dark bg-soot-black/95">
+		<header
+			class="site-header sticky top-0 z-40 w-full border-b-2 border-oxblood-dark bg-soot-black/95"
+		>
 			<nav
 				aria-label="Site"
 				class="site-bar mx-auto flex max-w-[1440px] items-center justify-between px-5 sm:px-8"
@@ -390,6 +392,22 @@ interface Props {
 			   height, which is the graceful direction. */
 			.site-bar {
 				height: calc(var(--site-header-height) - 2px);
+			}
+
+			/* THE BAR'S FILL, with a floor under it. `bg-soot-black/95` compiles to
+			   `color-mix(in srgb, var(--soot-black) 95%, transparent)`; a browser
+			   without `color-mix` drops that declaration, and a sticky bar with no
+			   fill is a transparent bar - the exact failure this class pair was
+			   added to end. So the opaque token is the base declaration and the
+			   translucent one only overrides it where it is understood. */
+			.site-header {
+				background-color: var(--soot-black);
+			}
+
+			@supports (background-color: color-mix(in srgb, black 95%, transparent)) {
+				.site-header {
+					background-color: color-mix(in srgb, var(--soot-black) 95%, transparent);
+				}
 			}
 		</style>
 

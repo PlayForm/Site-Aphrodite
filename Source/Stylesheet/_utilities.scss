@@ -1,5 +1,14 @@
+@use "mixins" as *;
+
 /* ============================================================================
    UTILITIES - the page-level vocabulary: roles, prose rhythm, section grammar.
+
+   THE ONE `@use` SITS ABOVE THIS HEADER, on line 1, because Sass requires every
+   `@use` to precede all other statements - and a preserved comment counts as
+   one, so the note cannot precede it. It is the only module this partial
+   borrows from: `as *` keeps the call sites exactly as they were written
+   (`@include telemetry-tag;`), so moving the layer from `@import` to `@use`
+   changed no selector and no declaration.
 
    THE LAYER. `_utilities` is LAST in `System.scss`'s order, on purpose: these
    are the classes a PAGE puts on its own markup, and the ones a component must

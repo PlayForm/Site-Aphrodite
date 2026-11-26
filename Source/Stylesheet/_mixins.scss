@@ -6,9 +6,11 @@
    this file costs no bytes and takes no cascade position - it only publishes
    the vocabulary below to every partial that follows it.
 
-   `System.scss` loads this file ONCE, globally, so no partial needs its own
-   `@import`. A partial that repeats one of these five inlines is a missing
-   import, not a local decision.
+   `System.scss` loads this file ONCE, so it emits nothing twice - but a module's
+   mixins are only visible where they are named, so a partial that borrows one
+   declares `@use "mixins" as *` itself (`Component/*` reaches it as
+   `"../mixins"`). A partial that repeats one of these five inlines is a missing
+   `@use`, not a local decision.
 
    WHAT IS PUBLISHED
      hard-shadow($x, $y, $colour, $depth-x, $depth-y)
